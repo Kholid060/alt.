@@ -1,0 +1,10 @@
+@import './fonts.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: 'Inter';
+  --background: 'transparent';
+}

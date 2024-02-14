@@ -1,0 +1,16 @@
+{
+  "root": true,
+  "env": {
+    "es2021": true,
+    "node": true,
+    "browser": false
+  },
+  "extends": [
+    "@repo/eslint-config/base.js"
+  ],
+  "ignorePatterns": ["node_modules/**", "**/dist/**"],
+  "rules": {
+    "@typescript-eslint/no-var-requires": "off",
+    "@typescript-eslint/consistent-type-imports": "error"
+  }
+}
