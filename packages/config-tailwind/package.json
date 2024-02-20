@@ -6,7 +6,9 @@
     ".": "./tailwind.config.ts"
   },
   "devDependencies": {
+    "@radix-ui/colors": "^3.0.0",
     "@repo/typescript-config": "*",
-    "tailwindcss": "^3.4.0"
+    "tailwindcss": "^3.4.1",
+    "windy-radix-palette": "^2.0.0-beta.7"
   }
 }

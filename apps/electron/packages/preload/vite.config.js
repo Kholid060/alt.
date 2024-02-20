@@ -20,9 +20,14 @@ const config = {
     outDir: 'dist',
     assetsDir: '.',
     minify: process.env.MODE !== 'development',
+    resolve: {
+      alias: {
+        '#common': join(PACKAGE_ROOT, '../common'),
+      },
+    },
     lib: {
       entry: 'src/index.ts',
-      formats: ['es'],
+      formats: ['cjs'],
     },
     rollupOptions: {
       output: {

@@ -1,0 +1,23 @@
+{
+  "name": "clipboard-extension",
+  "title": "Clipboard",
+  "icon": "icon:Clipboard",
+  "commands": [
+    {
+      "icon": "clipboard.png",
+      "name": "clipboard-copy",
+      "title": "Clipboard Copy",
+      "type": "action"
+    }
+  ],
+  "version": "1.0.0",
+  "description": "Clipboard extension",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "test": "cliaa"
+  },
+  "devDependencies": {
+    "@repo/command-api": "*"
+  }
+}

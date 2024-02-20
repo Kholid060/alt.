@@ -2,8 +2,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "/@/*": ["./src/*"],
       "#preload": ["../preload/src/index"],
-      "/@/*": ["./src/*"]
+      "#common/*": ["../common/*"]
     }
   },
   "extends": ["@repo/typescript-config/vite.json"],

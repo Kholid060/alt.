@@ -6,7 +6,6 @@
   "tailwind": {
     "config": "tailwind.config.backup.js",
     "css": "theme.css",
-    "prefix": "ui-",
     "baseColor": "zinc",
     "cssVariables": true
   },

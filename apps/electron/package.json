@@ -39,6 +39,7 @@
     "nano-staged": "0.8.0",
     "playwright": "1.41.2",
     "postcss": "^8.4.35",
+    "postcss-import": "^16.0.1",
     "simple-git-hooks": "2.9.0",
     "tailwindcss": "^3.4.1",
     "typescript": "5.3.3",
@@ -47,9 +48,17 @@
     "vitest": "1.2.2"
   },
   "dependencies": {
+    "@nut-tree/nut-js": "^3.1.2",
+    "@repo/command-api": "*",
+    "@repo/shared": "*",
     "@repo/ui": "*",
     "electron-updater": "6.1.7",
+    "framer-motion": "^11.0.5",
+    "glob": "^10.3.10",
+    "lucide-react": "^0.331.0",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "sqlite3": "^5.1.7",
+    "zustand": "^4.5.1"
   }
 }

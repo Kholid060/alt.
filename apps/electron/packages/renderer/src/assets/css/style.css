@@ -6,5 +6,14 @@
 
 :root {
   --font-sans: 'Inter';
-  --background: 'transparent';
+}
+
+@layer base {
+  body {
+    @apply text-foreground;
+    overflow: hidden;
+  }
+  * {
+    border-color: rgb(var(--border));
+  }
 }

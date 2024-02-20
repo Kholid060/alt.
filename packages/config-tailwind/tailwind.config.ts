@@ -1,9 +1,32 @@
 import { fontFamily } from 'tailwindcss/defaultTheme'
 import { Config } from 'tailwindcss/types/config';
-import defaultTheme from 'tailwindcss/defaultTheme';
+import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette';
 
-export default {
+const rgbVarColor = (varName: string) => `rgb(var(--${varName}) / <alpha-value>)`;
+const generateRadixColors = (name: string, reverse = false) => {
+  return Array.from({ length: 12 }).reduce<Record<number, string>>((acc, _, idx) => {
+    const num = reverse ? 12 - idx : idx + 1;
+    acc[idx + 1] = rgbVarColor(`${name}-${num}`);
+  
+    return acc;
+  }, {});
+}
+
+const config: Omit<Config, 'content'> = {
   darkMode: ['class'],
+  plugins: [
+    function ({ matchUtilities, theme }) {
+      matchUtilities(
+        {
+          highlight: (value) => ({ boxShadow: `inset 0 1px 0 0 ${value}` }),
+        },
+        {
+          values: flattenColorPalette(theme('backgroundColor')),
+          type: 'color',
+        },
+      );
+    },
+  ],
   theme: {
     container: {
       center: true,
@@ -14,38 +37,48 @@ export default {
     },
     extend: {
       colors: {
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        ring: 'hsl(var(--ring))',
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
+        ring: rgbVarColor('ring'),
+        input: rgbVarColor('input'),
+        border: rgbVarColor('border'),
+        'input-focus': rgbVarColor('input-focus'),
+        background: rgbVarColor('background'),
+        foreground: rgbVarColor('foreground'),
+        mauve: generateRadixColors('mauve'),
+        'mauve-dark': generateRadixColors('mauve', true),
+        violet: generateRadixColors('violet'),
+        'violet-dark': generateRadixColors('violet', true),
+        ruby: generateRadixColors('ruby'),
+        'ruby-dark': generateRadixColors('ruby', true),
         primary: {
-          DEFAULT: 'hsl(var(--primary))',
-          foreground: 'hsl(var(--primary-foreground))',
+          DEFAULT: rgbVarColor('primary'),
+          hover: rgbVarColor('primary-hover'),
+          foreground: rgbVarColor('primary-foreground'),
         },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
-          foreground: 'hsl(var(--secondary-foreground))',
+          DEFAULT: rgbVarColor('secondary'),
+          hover: rgbVarColor('secondary-hover'),
+          selected: rgbVarColor('secondary-selected'),
+          foreground: rgbVarColor('secondary-foreground'),
         },
         destructive: {
-          DEFAULT: 'hsl(var(--destructive))',
-          foreground: 'hsl(var(--destructive-foreground))',
+          DEFAULT: rgbVarColor('destructive'),
+          foreground: rgbVarColor('destructive-foreground'),
         },
         muted: {
-          DEFAULT: 'hsl(var(--muted))',
-          foreground: 'hsl(var(--muted-foreground))',
+          DEFAULT: rgbVarColor('muted'),
+          foreground: rgbVarColor('muted-foreground'),
         },
         accent: {
-          DEFAULT: 'hsl(var(--accent))',
-          foreground: 'hsl(var(--accent-foreground))',
+          DEFAULT: rgbVarColor('accent'),
+          foreground: rgbVarColor('accent-foreground'),
         },
         popover: {
-          DEFAULT: 'hsl(var(--popover))',
-          foreground: 'hsl(var(--popover-foreground))',
+          DEFAULT: rgbVarColor('popover'),
+          foreground: rgbVarColor('popover-foreground'),
         },
         card: {
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
+          DEFAULT: rgbVarColor('card'),
+          foreground: rgbVarColor('card-foreground'),
         },
       },
       borderRadius: {
@@ -72,4 +105,6 @@ export default {
       },
     },
   },
-} as Omit<Config, "content">;
+};
+
+export default config;

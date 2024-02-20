@@ -1,20 +1,37 @@
-import { app, BrowserWindow } from 'electron';
+import { BrowserWindow, app, screen } from 'electron';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-async function createWindow() {
+const COMMNAND_WINDOW_BOUND = {
+  width: 650,
+  minHeight: 300,
+} as const;
+
+export async function createCommandWindow() {
+  const cursorPos = screen.getCursorScreenPoint();
+  const activeScreen = screen.getDisplayNearestPoint(cursorPos);
+
+  const screenBound = activeScreen.bounds;
+
+  const windowYPos = (screenBound.height * 0.225) + screenBound.y;
+  const windowXPos = (screenBound.width / 2 - COMMNAND_WINDOW_BOUND.width / 2) + screenBound.x;
+
   const browserWindow = new BrowserWindow({
     show: false, // Use the 'ready-to-show' event to show the instantiated BrowserWindow.
     frame: false,
+    x: windowXPos,
+    y: windowYPos,
     transparent: true,
-    // type: 'toolbar',
     maximizable: false,
     minimizable: false,
+    resizable: import.meta.env.DEV,
+    width: COMMNAND_WINDOW_BOUND.width,
+    minHeight: COMMNAND_WINDOW_BOUND.minHeight,
     alwaysOnTop: !import.meta.env.DEV,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
-      sandbox: false, // Sandbox disabled because the demo of preload script depend on the Node.js api
+      sandbox: true, // Sandbox disabled because the demo of preload script depend on the Node.js api
       webviewTag: false, // The webview tag is not recommended. Consider alternatives like an iframe or Electron's BrowserView. @see https://www.electronjs.org/docs/latest/api/webview-tag#warning
       preload: join(app.getAppPath(), 'packages/preload/dist/index.mjs'),
     },
@@ -70,11 +87,11 @@ async function createWindow() {
 /**
  * Restore an existing BrowserWindow or Create a new BrowserWindow.
  */
-export async function restoreOrCreateWindow() {
+export async function restoreOrCreateCommandWindow() {
   let window = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed());
 
   if (window === undefined) {
-    window = await createWindow();
+    window = await createCommandWindow();
   }
 
   if (window.isMinimized()) {

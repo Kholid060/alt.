@@ -1,0 +1,104 @@
+:root {
+  --background: 10 86% 89%;
+  --foreground: 240 10% 3.9%;
+
+  --card: 12 100% 75%;
+  --card-foreground: 240 10% 3.9%;
+
+  --popover: 12 100% 75%;
+  --popover-foreground: 240 10% 3.9%;
+
+  --primary: 240 5.9% 10%;
+  --primary-foreground: 0 0% 98%;
+
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 5.9% 10%;
+
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 3.8% 46.1%;
+
+  --accent: 240 4.8% 95.9%;
+  --accent-foreground: 240 5.9% 10%;
+
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+  --ring: 240 10% 3.9%;
+
+  --radius: 0.75rem;
+}
+
+.dark {
+  --mauve-1: 18 17 19;
+  --mauve-2: 26 25 27;
+  --mauve-3: 35 34 37;
+  --mauve-4: 43 41 45;
+  --mauve-5: 50 48 53;
+  --mauve-6: 60 57 63;
+  --mauve-7: 73 71 78;
+  --mauve-8: 98 95 105;
+  --mauve-9: 111 109 120;
+  --mauve-10: 124 122 133;
+  --mauve-11: 181 178 188;
+  --mauve-12: 238 238 240;
+
+  --violet-1: 20 18 31;
+  --violet-2: 27 21 37;
+  --violet-3: 41 31 67;
+  --violet-4: 51 37 91;
+  --violet-5: 60 46 105;
+  --violet-6: 71 56 118;
+  --violet-7: 86 70 139;
+  --violet-8: 105 88 173;
+  --violet-9: 110 86 207;
+  --violet-10: 125 102 217;
+  --violet-11: 186 167 255;
+  --violet-12: 226 221 254;
+
+  --ruby-1: 25 17 19;
+  --ruby-2: 30 21 23;
+  --ruby-3: 58 20 30;
+  --ruby-4: 78 19 37;
+  --ruby-5: 94 26 46;
+  --ruby-6: 111 37 57;
+  --ruby-7: 136 52 71;
+  --ruby-8: 179 68 90;
+  --ruby-9: 229 70 102;
+  --ruby-10: 236 90 114;
+  --ruby-11: 255 148 157;
+  --ruby-12: 254 210 225;
+
+  --background: var(--mauve-1);
+  --foreground: var(--mauve-12);
+
+  --card: var(--mauve-2);
+  --card-foreground: var(--mauve-12);
+
+  --popover: var(--mauve-2);
+  --popover-foreground: var(--mauve-12);
+
+  --primary: var(--violet-9);
+  --primary-hover: var(--violet-10);
+  --primary-foreground: var(--mauve-1);
+
+  --secondary: var(--mauve-3);
+  --secondary-hover: var(--mauve-4);
+  --secondary-selected: var(--mauve-5);
+  --secondary-foreground: var(--mauve-12);
+
+  --muted: var(--mauve-3);
+  --muted-foreground: var(--mauve-11);
+
+  --accent: var(--mauve-4);
+  --accent-foreground: var(--mauve-12);
+
+  --destructive: var(--ruby-9);
+  --destructive-foreground: var(--mauve-1);
+
+  --input: var(--mauve-7);
+  --input-focus: var(--mauve-8);
+  --border: var(--mauve-6);
+  --ring: var(--violet-8);
+}

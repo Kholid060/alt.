@@ -1,0 +1,13 @@
+{
+  "name": "@repo/shared",
+  "version": "0.0.0",
+  "scripts": {
+    "lint": "eslint . --max-warnings 0"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "*",
+    "@repo/tailwind-config": "*",
+    "@repo/typescript-config": "*",
+    "eslint": "^8.56.0"
+  }
+}

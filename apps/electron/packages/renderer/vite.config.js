@@ -19,6 +19,7 @@ const config = {
   resolve: {
     alias: {
       '/@/': join(PACKAGE_ROOT, 'src') + '/',
+      '#common': join(PACKAGE_ROOT, '../common'),
     },
   },
   base: '',
@@ -33,7 +34,10 @@ const config = {
     outDir: 'dist',
     assetsDir: '.',
     rollupOptions: {
-      input: join(PACKAGE_ROOT, 'index.html'),
+      input: {
+        main: join(PACKAGE_ROOT, 'index.html'),
+        sandbox: join(PACKAGE_ROOT, 'index.html'),
+      },
     },
     emptyOutDir: true,
     reportCompressedSize: false,

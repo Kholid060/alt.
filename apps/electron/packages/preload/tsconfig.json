@@ -9,6 +9,9 @@
     "strict": true,
     "isolatedModules": true,
     "types": ["node"],
+    "paths": {
+      "#common/*": ["../common/*"]
+    },
     "baseUrl": "."
   },
   "include": ["src/**/*.ts", "../../types/**/*.d.ts"],
