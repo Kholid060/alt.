@@ -1,10 +1,13 @@
 import { ipcMain } from 'electron';
 import type { IPCEvents } from '#common/interface/ipc-events';
 import type { ExtensionCommand, ExtensionManifest } from '@repo/command-api';
+import InstalledApps from './InstalledApps';
 
-function onIpcMessage<T extends keyof IPCEvents>(name: T, callback: IPCEvents[T]) {
-  // @ts-expect-error take all the params
-  ipcMain.handle(name, (_, ...args) => callback(...args));
+function onIpcMessage<T extends keyof IPCEvents>(
+  name: T,
+  callback: (...args: Parameters<IPCEvents[T]>) => Promise<ReturnType<IPCEvents[T]>>,
+) {
+  ipcMain.handle(name, (_, ...args) => callback(...args as Parameters<IPCEvents[T]>));
 }
 
 onIpcMessage('extension:list', () => {
@@ -16,5 +19,8 @@ onIpcMessage('extension:list', () => {
     { title: 'Hello world', commands, description: 'Something amazing', icon: 'icon:File', name: 'hello-world' },
   ];
 
-  return extensions;
+  return Promise.resolve(extensions);
 });
+
+onIpcMessage('apps:get-list', () => InstalledApps.instance.getList());
+

@@ -4,6 +4,7 @@ import { restoreOrCreateCommandWindow } from './window/command-wIndow';
 import { platform } from 'node:process';
 import updater from 'electron-updater';
 import './utils/ipc-messages-handler';
+import { registerCustomProtocols } from './utils/custom-protocol';
 
 Menu.setApplicationMenu(null);
 
@@ -41,7 +42,10 @@ app.on('activate', restoreOrCreateCommandWindow);
  */
 app
   .whenReady()
-  .then(restoreOrCreateCommandWindow)
+  .then(() => {
+    registerCustomProtocols();
+    restoreOrCreateCommandWindow();
+  })
   .catch((e) => console.error('Failed create window:', e));
 
 /**
