@@ -57,8 +57,8 @@ function CommandItem({
 
 function CommandList() {
   const searchStr = useCommandState((state) => state.search);
+  const extName = useCommandStore((state) => state.paths[0]);
   const [extensions, setStoreState] = useCommandStore((state) => [state.extensions, state.setState]);
-  const [extName] = useCommandStore((state) => state.paths);
 
   return (
     <>
@@ -73,7 +73,7 @@ function CommandList() {
                 title={manifest.title}
                 value={manifest.title}
                 subtitle={manifest.description}
-                onSelect={() => setStoreState('paths', [{ id: manifest.name, label: manifest.title }])}
+                onSelect={() => setStoreState('paths', [{ id: manifest.name, label: manifest.title, type: 'extension' }])}
               />
             }
             {(extName?.id == manifest.name || searchStr) && manifest.commands.map((command) =>
@@ -84,8 +84,8 @@ function CommandList() {
                 subtitle={command.subtitle}
                 onSelect={() => {
                   setStoreState('paths', [
-                    { id: manifest.name, label: manifest.title },
-                    { id: command.name, label: command.title }
+                    { id, label: manifest.title, type: 'extension' },
+                    { id: command.name, label: command.title, type: 'command' }
                   ]);
                 }}
                 icon={command.icon ? <CommandIcon id={id} alt={command.name} icon={command.icon} /> : extensionIcon}

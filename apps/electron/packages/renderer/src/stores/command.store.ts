@@ -4,7 +4,7 @@ import { create } from 'zustand';
 interface CommandStoreState {
   query: string;
   extensions: ExtensionData[];
-  paths: { id: string; label: string }[];
+  paths: { id: string; label: string; type: 'command' | 'extension' }[];
 }
 
 interface CommandStoreActions {

@@ -78,6 +78,10 @@ class ExtensionLoader {
     return [...this.extensions.values()];
   }
 
+  getExtension(extensionId: string) {
+    return this.extensions.get(extensionId) ?? null;
+  }
+
   async reloadExtensions() {
     await this.loadExtensions();
     return this.extensions;
