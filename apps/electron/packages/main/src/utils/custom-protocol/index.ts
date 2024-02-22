@@ -1,4 +1,5 @@
 import { protocol } from 'electron';
+import { logger } from '/@/lib/log';
 
 export interface CustomProtocol {
   scheme: string;
@@ -36,7 +37,10 @@ export function registerCustomProtocols() {
       try {
         return await customProtocol.handler(request);
       } catch (error) {
-        console.error(error);
+        if (error instanceof Error) {
+          logger('error', ['PROTOCOL', customProtocol.scheme], error.message);
+        }
+
         return createErrorResponse({
           message: 'Something went wrong',
         });

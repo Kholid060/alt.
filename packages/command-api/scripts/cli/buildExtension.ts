@@ -4,8 +4,9 @@ import chalk from 'chalk';
 import { imageSize } from 'image-size';
 import { build, Options } from 'tsup';
 import { fromZodError } from 'zod-validation-error';
-import { ExtensionManifestSchema, ExtensionManifest } from '../../src';
 import { BuildError, logger } from './utils/logger';
+import semverValid from 'semver/functions/valid';
+import { ExtensionManifestSchema, ExtensionManifest } from '../../src';
 
 const EXT_ROOT_DIR = process.cwd();
 const EXT_SRC_DIR = path.join(EXT_ROOT_DIR, 'src');
@@ -48,6 +49,9 @@ async function getExtensionManifest() {
   const manifest = await ExtensionManifestSchema.safeParseAsync(packageJSON);
   if (!manifest.success) {
     throw logger.error(fromZodError(manifest.error).toString());
+  }
+  if (!semverValid(manifest.data.version)) {
+    throw logger.error(`"${manifest.data.version}" is invalid version. See https://semver.org/`);
   }
 
   const extManifest = manifest.data;

@@ -1,9 +1,8 @@
 /* eslint-env node */
 
-import {chrome} from '../../.electron-vendors.cache.json';
+import { chrome } from '../../.electron-vendors.cache.json';
 import react from '@vitejs/plugin-react';
-import {renderer} from 'unplugin-auto-expose';
-import {join} from 'node:path';
+import { join } from 'node:path';
 
 const PACKAGE_ROOT = __dirname;
 const PROJECT_ROOT = join(PACKAGE_ROOT, '../..');
@@ -18,6 +17,7 @@ const config = {
   envDir: PROJECT_ROOT,
   resolve: {
     alias: {
+      '#packages': join(PACKAGE_ROOT, '../'),
       '/@/': join(PACKAGE_ROOT, 'src') + '/',
       '#common': join(PACKAGE_ROOT, '../common'),
     },
@@ -36,7 +36,7 @@ const config = {
     rollupOptions: {
       input: {
         main: join(PACKAGE_ROOT, 'index.html'),
-        sandbox: join(PACKAGE_ROOT, 'index.html'),
+        extension: join(PACKAGE_ROOT, 'extension.html'),
       },
     },
     emptyOutDir: true,
@@ -47,9 +47,6 @@ const config = {
   },
   plugins: [
     react(),
-    renderer.vite({
-      preloadEntry: join(PACKAGE_ROOT, '../preload/src/index.ts'),
-    }),
   ],
 };
 

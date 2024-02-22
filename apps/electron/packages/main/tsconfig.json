@@ -9,6 +9,7 @@
     "strict": true,
     "isolatedModules": true,
     "types": ["node"],
+    "experimentalDecorators": true,
     "baseUrl": ".",
     "paths": {
       "/@/*": ["./src/*"],

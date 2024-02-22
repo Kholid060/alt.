@@ -53,8 +53,10 @@
     "@repo/shared": "*",
     "@repo/ui": "*",
     "dayjs": "^1.11.10",
+    "electron-log": "^5.1.1",
     "electron-store": "^8.1.0",
     "electron-updater": "6.1.7",
+    "file-type": "^19.0.0",
     "framer-motion": "^11.0.5",
     "fs-extra": "^11.2.0",
     "globby": "^14.0.1",
@@ -62,7 +64,9 @@
     "nanoid": "^5.0.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "semver": "^7.6.0",
     "sqlite3": "^5.1.7",
+    "zod": "^3.22.4",
     "zustand": "^4.5.1"
   }
 }

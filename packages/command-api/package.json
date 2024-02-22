@@ -25,6 +25,7 @@
     "fs-extra": "^11.2.0",
     "glob": "^10.3.10",
     "image-size": "^1.1.1",
+    "semver": "^7.6.0",
     "tsup": "^8.0.2",
     "tsx": "^4.7.1",
     "zod-validation-error": "^3.0.2"

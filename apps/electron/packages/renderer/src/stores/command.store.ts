@@ -1,9 +1,9 @@
-import { ExtensionManifest } from '@repo/command-api';
+import { ExtensionData } from '#common/interface/extension';
 import { create } from 'zustand';
 
 interface CommandStoreState {
   query: string;
-  extensions: ExtensionManifest[];
+  extensions: ExtensionData[];
   paths: { id: string; label: string }[];
 }
 

@@ -1,4 +1,4 @@
-import { BrowserWindow, app, screen } from 'electron';
+import { BrowserWindow, MessageChannelMain, app, screen } from 'electron';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -31,6 +31,7 @@ export async function createCommandWindow() {
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
+      nodeIntegrationInSubFrames: true,
       sandbox: true, // Sandbox disabled because the demo of preload script depend on the Node.js api
       webviewTag: false, // The webview tag is not recommended. Consider alternatives like an iframe or Electron's BrowserView. @see https://www.electronjs.org/docs/latest/api/webview-tag#warning
       preload: join(app.getAppPath(), 'packages/preload/dist/index.mjs'),
@@ -51,6 +52,11 @@ export async function createCommandWindow() {
     if (import.meta.env.DEV) {
       browserWindow?.webContents.openDevTools();
     }
+  });
+
+  browserWindow.webContents.on('will-frame-navigate', (event) => {
+    console.log(event);
+    // event.preventDefault();
   });
 
   /**

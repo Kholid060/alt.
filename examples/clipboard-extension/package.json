@@ -4,7 +4,7 @@
   "icon": "icon:Clipboard",
   "commands": [
     {
-      "icon": "clipboard.png",
+      "icon": "clipboard",
       "name": "clipboard-copy",
       "title": "Clipboard Copy",
       "type": "action"

@@ -26,7 +26,9 @@ export const ExtensionCommandSchema = z.object({
 
 export const ExtensionManifestSchema = z.object({
   icon: z.string().min(1),
+  version: z.string().min(1),
   title: z.string().min(3).max(64),
+  author: z.string().min(1).max(24),
   description: z.string().min(12).max(128),
   commands: ExtensionCommandSchema.array().min(1),
   permissions: z.enum(EXTENSION_PERMISSIONS).array().optional(),

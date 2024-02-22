@@ -7,6 +7,7 @@ import './utils/ipc-messages-handler';
 import { registerCustomProtocols } from './utils/custom-protocol';
 
 Menu.setApplicationMenu(null);
+console.log(app.getPath('appData'), app.getPath('sessionData'));
 
 /**
  * Prevent electron from running multiple instances.

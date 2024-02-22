@@ -1,14 +1,15 @@
 import { UiCommandItem, useCommandState } from '@repo/ui';
 import { commandIcons } from '/@/utils/command-icons';
-import { ExtensionManifest } from '@repo/command-api';
 import { Fragment } from 'react';
 import { useCommandStore } from '/@/stores/command.store';
+import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
+import UiImage from '../ui/UiImage';
 
-function CommandIcon({ icon, alt }: { icon: string; alt: string; }) {
-  if (icon.startsWith('http')) {
-    return <img src={icon} alt={alt} />;
-  } else if (icon.startsWith('icon:')) {
-    const Icon = commandIcons[icon] ?? commandIcons['Command'];
+const iconPrefix = 'icon:';
+
+function CommandIcon({ id, icon, alt }: { icon: string; alt: string; id: string }) {
+  if (icon.startsWith(iconPrefix)) {
+    const Icon = commandIcons[icon.slice(iconPrefix.length)] ?? commandIcons['Command'];
     return (
       <span className="group-aria-selected:bg-secondary-hover inline-flex justify-center items-center bg-secondary rounded-sm border border-border/40 h-full w-full">
         <Icon className="h-4 w-4 group-aria-selected:text-foreground text-muted-foreground" />
@@ -16,9 +17,12 @@ function CommandIcon({ icon, alt }: { icon: string; alt: string; }) {
     );
   }
 
-  // resolve extension icon
-
-  return null;
+  return (
+    <UiImage
+      src={`${CUSTOM_SCHEME.extIcon}://${id}/${icon}`}
+      alt={alt}
+    />
+  );
 }
 
 function CommandItem({
@@ -58,33 +62,33 @@ function CommandList() {
 
   return (
     <>
-      {extensions.map((extension) => {
-        const extensionIcon = <CommandIcon alt={`${extension.title} icon`} icon={extension.icon} />;
+      {extensions.map(({ id, manifest }) => {
+        const extensionIcon = <CommandIcon alt={`${manifest.title} icon`} id={id} icon={manifest.icon} />;
 
         return (
-          <Fragment key={extension.name}>
+          <Fragment key={id + manifest.name}>
             {!extName &&
               <CommandItem
                 icon={extensionIcon}
-                title={extension.title}
-                value={extension.title}
-                subtitle={extension.description}
-                onSelect={() => setStoreState('paths', [{ id: extension.name, label: extension.title }])}
+                title={manifest.title}
+                value={manifest.title}
+                subtitle={manifest.description}
+                onSelect={() => setStoreState('paths', [{ id: manifest.name, label: manifest.title }])}
               />
             }
-            {(extName?.id == extension.name || searchStr) && extension.commands.map((command) =>
+            {(extName?.id == manifest.name || searchStr) && manifest.commands.map((command) =>
               <CommandItem
-                key={extension.name + command.name}
+                key={manifest.name + command.name}
                 title={command.title}
-                value={extension.name + ' ' + command.title}
+                value={manifest.name + ' ' + command.title}
                 subtitle={command.subtitle}
                 onSelect={() => {
                   setStoreState('paths', [
-                    { id: extension.name, label: extension.title },
+                    { id: manifest.name, label: manifest.title },
                     { id: command.name, label: command.title }
                   ]);
                 }}
-                icon={command.icon ? <CommandIcon alt={command.name} icon={command.icon} /> : extensionIcon}
+                icon={command.icon ? <CommandIcon id={id} alt={command.name} icon={command.icon} /> : extensionIcon}
               />
             )}
           </Fragment>

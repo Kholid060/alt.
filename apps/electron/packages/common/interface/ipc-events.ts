@@ -1,7 +1,7 @@
-import type { ExtensionManifest } from '@repo/command-api';
 import type { PublicInstalledAppDetail } from './installed-apps';
+import { ExtensionData } from './extension';
 
 export interface IPCEvents {
-  'extension:list': () => ExtensionManifest[];
+  'extension:list': () => ExtensionData[];
   'apps:get-list': () => PublicInstalledAppDetail[];
 }
