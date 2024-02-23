@@ -149,10 +149,9 @@ import {
   Wifi,
   WifiOff,
   XCircle,
-  LucideIcon,
 } from 'lucide-react';
 
-export const commandIcons: Record<string, LucideIcon> = {
+export const commandIcons = {
   Clipboard,
   BadgeDollarSign,
   Atom,

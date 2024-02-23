@@ -1,10 +1,16 @@
 import { ExtensionData } from '#common/interface/extension';
 import { create } from 'zustand';
 
+export interface CommandSelectedItem {
+  id: string;
+  label: string;
+  type: 'command' | 'extension' | 'keyword';
+}
+
 interface CommandStoreState {
   query: string;
   extensions: ExtensionData[];
-  paths: { id: string; label: string; type: 'command' | 'extension' }[];
+  paths: CommandSelectedItem[];
 }
 
 interface CommandStoreActions {

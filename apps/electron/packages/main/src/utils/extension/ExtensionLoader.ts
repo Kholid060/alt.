@@ -8,6 +8,7 @@ import { ErrorLogger, logger, loggerBuilder } from '/@/lib/log';
 import { EXTENSION_FOLDER } from '../constant';
 import { ExtensionData } from '#common/interface/extension';
 
+
 const validatorLogger = loggerBuilder(['ExtensionLoader', 'manifestValidator']);
 
 async function extractExtManifest(manifestPath: string) {

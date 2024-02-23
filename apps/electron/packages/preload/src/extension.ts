@@ -3,9 +3,12 @@ import { EXTENSION_VIEW, PRELOAD_API_KEY } from '../../common/utils/constant/con
 import { sendIpcMessage } from '../../common/utils/sendIpcMessage';
 import { contextBridge } from 'electron';
 
-async function initExtensionAPI(manifest: ExtensionManifest) {
+async function initExtensionAPI(manifest: ExtensionManifest): Promise<typeof _extension> {
   return {
     manifest,
+    tabs: {
+      hello: 'a'
+    }
   };
 }
 

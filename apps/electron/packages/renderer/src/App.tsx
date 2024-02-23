@@ -6,6 +6,7 @@ import CommandFooter from './components/command/CommandFooter';
 import CommandContent from './components/command/CommandContent';
 import { useCommandStore } from './stores/command.store';
 import preloadAPI from './utils/preloadAPI';
+import { CommandCtxProvider } from './context/command.context';
 
 function App() {
   const setCommandStoreState = useCommandStore((state) => state.setState);
@@ -17,7 +18,7 @@ function App() {
   }, []);
 
   return (
-    <>
+    <CommandCtxProvider>
       {import.meta.env.DEV &&
         <UiButton
           size="icon"
@@ -33,7 +34,7 @@ function App() {
         <CommandContent />
         <CommandFooter />
       </UiCommand>
-    </>
+    </CommandCtxProvider>
   );
 }
 

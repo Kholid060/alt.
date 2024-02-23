@@ -13,21 +13,21 @@ const EXT_SRC_DIR = path.join(EXT_ROOT_DIR, 'src');
 const EXT_ICON_DIR = path.join(EXT_ROOT_DIR, 'icon');
 
 const SUPPORTED_ICON_SIZE = 256;
-const SUPPORTED_ICON_TYPE = ['.png', '.jpg'];
+const SUPPORTED_ICON_TYPE = ['.png'];
 
 const seenIcon = new Set<string>();
 
 async function validateIcon(iconName: string) {
   if (seenIcon.has(iconName) || iconName.startsWith('icon:')) return;
 
-  const iconExtName = path.extname(iconName);
-  if (!SUPPORTED_ICON_TYPE.includes(iconExtName)) {
-    throw new BuildError(`Unsupported "${iconName}" icon type, the icon must be PNG or JPEG.`);
-  }
-
-  const iconPath = path.join(EXT_ICON_DIR, iconName);
+  const iconPath = path.join(EXT_ICON_DIR, iconName + '.png');
   if (!fs.existsSync(iconPath)) {
     throw new BuildError(`Can't find "${iconName}" icon file`);
+  }
+
+  const iconExtName = path.extname(iconPath);
+  if (!SUPPORTED_ICON_TYPE.includes(iconExtName)) {
+    throw new BuildError(`Unsupported "${iconName}" icon type, the icon must be PNG`);
   }
 
   const iconSize = imageSize(iconPath);
@@ -80,10 +80,10 @@ async function buildCommands(manifest: ExtensionManifest) {
   const config: Options = {
     entry,
     format: 'esm',
-    publicDir: EXT_ICON_DIR,
-    external: ['@repo/command-api'],
-    onSuccess: () => {
-      return fs.writeJSON(path.join(EXT_ROOT_DIR, 'dist', 'manifest.json'), manifest);
+    external: ['@repo/command-api', 'react'],
+    onSuccess: async () => {
+      await fs.writeJSON(path.join(EXT_ROOT_DIR, 'dist', 'manifest.json'), manifest);
+      await fs.copy(EXT_ICON_DIR, path.join(EXT_ROOT_DIR, 'dist', 'icon'));
     },
   };
   await build(config);

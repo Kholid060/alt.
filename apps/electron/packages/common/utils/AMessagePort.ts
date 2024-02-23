@@ -1,5 +1,5 @@
 import { EventEmitter } from 'eventemitter3';
-import { MessagePortEvent } from '#common/interface/message-port-events';
+import { MessagePortEvent } from '../interface/message-port-events';
 
 class AMessagePort extends EventEmitter<MessagePortEvent> {
   port: MessagePort;
@@ -20,7 +20,7 @@ class AMessagePort extends EventEmitter<MessagePortEvent> {
       !event.data.name
     ) return;
 
-    // @ts-expect-error .-.
+    // @ts-expect-error
     this.emit(event.data.name, ...event.data.data);
   }
 

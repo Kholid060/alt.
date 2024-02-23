@@ -1,3 +1,4 @@
+import { EXTENSION_VIEW } from '#common/utils/constant/constant';
 import { BrowserWindow, MessageChannelMain, app, screen } from 'electron';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -54,6 +55,25 @@ export async function createCommandWindow() {
     }
   });
 
+  const frameFirstLoad = new Set<number>();
+  const { mainFrame } = browserWindow.webContents;
+
+  browserWindow.webContents.on('will-frame-navigate', (event) => {
+    const { processId, routingId, osProcessId, frameTreeNodeId } = event.frame;
+    console.log({ processId, routingId, osProcessId, frameTreeNodeId });
+
+    if (event.frame === mainFrame) return;
+    if (
+      event.frame.name === EXTENSION_VIEW.frameName &&
+      !frameFirstLoad.has(event.frame.routingId) &&
+      event.frame.parent === mainFrame
+    ) {
+      frameFirstLoad.add(event.frame.routingId);
+      return;
+    }
+
+    event.preventDefault();
+  });
   browserWindow.webContents.on('will-frame-navigate', (event) => {
     console.log(event);
     // event.preventDefault();

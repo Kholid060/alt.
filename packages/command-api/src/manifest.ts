@@ -10,7 +10,7 @@ export const EXTENSION_PERMISSIONS = [
   'notifications',
 ] as const;
 
-export const EXTENSION_COMMAND_TYPE = ['action', 'view'] as const;
+export const EXTENSION_COMMAND_TYPE = ['action', 'view', 'view:json'] as const;
 
 export const EXTENSION_COMMAND_CONTEXT = ['all', 'url'] as const;
 

@@ -1,12 +1,27 @@
 import { UiCommandInput } from '@repo/ui';
 import { SearchIcon, XIcon } from 'lucide-react';
+import { useShallow } from 'zustand/react/shallow';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCommandStore } from '/@/stores/command.store';
+import { useCommandCtx } from '/@/hooks/useCommandCtx';
+
+const commandKeys = new Set(['n', 'j', 'ArrowDown', 'p', 'k', 'ArrowUp', 'Home', 'End', 'Enter']);
 
 function CommandInput() {
-  const [query, setState] = useCommandStore((state) => [state.query, state.setState]);
+  const [query, setState] = useCommandStore(useShallow((state) => [state.query, state.setState]));
+
+  const commandCtx = useCommandCtx();
 
   function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    const messagePort = commandCtx.extMessagePort.current;
+    if (messagePort && commandKeys.has(event.key)) {
+      const { key, ctrlKey, altKey, metaKey } = event;
+      messagePort.sendMessage(
+        'extension:keydown-event',
+        { altKey, ctrlKey, isComposing: event.nativeEvent.isComposing, key, metaKey },
+      );
+    }
+
     if (
       event.code !== 'Backspace' ||
       (event.target as HTMLInputElement).value.trim().length !== 0
@@ -20,11 +35,19 @@ function CommandInput() {
 
     setState('paths', paths);
   }
+  function onValueChange(value: string) {
+    const messagePort = commandCtx.extMessagePort.current;
+    if (messagePort) {
+      messagePort.sendMessage('extension:query-change', value);
+    }
+
+    setState('query', value);
+  }
 
   return (
     <UiCommandInput
       value={query}
-      onValueChange={(value) => setState('query', value)}
+      onValueChange={onValueChange}
       placeholder="Search..."
       rootClass="px-4 border-b-0"
       className="text-base pl-0.5 py-0"

@@ -2,6 +2,7 @@
   "name": "clipboard-extension",
   "title": "Clipboard",
   "icon": "icon:Clipboard",
+  "author": "kholid060",
   "commands": [
     {
       "icon": "clipboard",
@@ -15,7 +16,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "test": "cliaa"
+    "build": "cliaa build"
   },
   "devDependencies": {
     "@repo/command-api": "*"

@@ -4,7 +4,8 @@
     "paths": {
       "/@/*": ["./src/*"],
       "#common/*": ["../common/*"]
-    }
+    },
+    "types": ["@repo/command-api/types/extension"]
   },
   "extends": ["@repo/typescript-config/vite.json"],
   "include": [

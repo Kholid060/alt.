@@ -1,13 +1,13 @@
 import { useEffect, useRef } from 'react';
 import AMessagePort from '#common/utils/AMessagePort';
 import { EXTENSION_VIEW } from '#common/utils/constant/constant';
-import { useCommandState } from '@repo/ui';
+import { useCommandCtx } from '/@/hooks/useCommandCtx';
 
 function CommandSandboxContent({ extensionId }: { extensionId: string }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const messagePort = useRef<AMessagePort | null>(null);
 
-  const searchQuery = useCommandState((state) => state.search);
+  const commandCtx = useCommandCtx();
 
   useEffect(() => {
     const onMessage = (event: MessageEvent) => {
@@ -21,6 +21,8 @@ function CommandSandboxContent({ extensionId }: { extensionId: string }) {
       messagePort.current = new AMessagePort(event.ports[0]);
       messagePort.current.sendMessage('extension:init');
 
+      commandCtx.updateMessagePort(messagePort.current);
+
       window.removeEventListener('message', onMessage);
     }
 
@@ -30,11 +32,6 @@ function CommandSandboxContent({ extensionId }: { extensionId: string }) {
       window.removeEventListener('message', onMessage);
     }
   }, []);
-  useEffect(() => {
-    if (!messagePort.current) return;
-
-    messagePort.current.sendMessage('extension:query-change', searchQuery);
-  }, [searchQuery]);
 
   return (
     <iframe
@@ -43,7 +40,7 @@ function CommandSandboxContent({ extensionId }: { extensionId: string }) {
       name={EXTENSION_VIEW.frameName}
       src={EXTENSION_VIEW.path + `?${EXTENSION_VIEW.idQuery}=${extensionId}`}
       sandbox="allow-scripts"
-      className="h-64 block"
+      className="h-64 block w-full"
     />
   )
 }

@@ -15,6 +15,6 @@ export default defineConfig((options: Options) => ({
   },
   external: ['tsup', 'fs-extra', 'zod-validation-error', 'commander'],
   minify: true,
-  clean: true,
+  clean: false,
   ...options,
 }));
