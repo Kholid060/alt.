@@ -1,4 +1,4 @@
-import type { InstalledAppDetail, PublicInstalledAppDetail } from '#common/interface/installed-apps';
+import type { InstalledAppDetail } from '#common/interface/installed-apps';
 import type { NativeImage } from 'electron';
 import { shell, app } from 'electron';
 import fs from 'fs-extra';
@@ -168,7 +168,7 @@ class InstalledApps {
     const appsTarget: Record<string, string> = {};
 
     const shortcuts = await globby(shortcutDirs);
-    const appPromise = await Promise.allSettled<Promise<PublicInstalledAppDetail | null>[]>(
+    const appPromise = await Promise.allSettled<Promise<_Extension.InstalledAppDetail | null>[]>(
       shortcuts.map(async (shortcut) => {
         const appDetail = await extractShortcutDetail(shortcut);
         if (!appDetail?.target || seenApps.has(appDetail.target)) return null;
@@ -194,7 +194,7 @@ class InstalledApps {
       }),
     );
 
-    const apps = appPromise.reduce<PublicInstalledAppDetail[]>((acc, curr) => {
+    const apps = appPromise.reduce<_Extension.InstalledAppDetail[]>((acc, curr) => {
       if (curr.status === 'fulfilled' && curr.value) {
         acc.push(curr.value);
       }

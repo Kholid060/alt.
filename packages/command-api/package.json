@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch"
+    "dev": "tsup --watch",
+    "build": "tsup && yarn build:ext-api",
+    "build:ext-api": "tsx ./scripts/ext-api.ts"
   },
   "bin": {
     "cliaa": "./dist/cli.js"
@@ -27,6 +28,7 @@
     "glob": "^10.3.10",
     "image-size": "^1.1.1",
     "semver": "^7.6.0",
+    "ts-morph": "^21.0.1",
     "tsup": "^8.0.2",
     "tsx": "^4.7.1",
     "zod-validation-error": "^3.0.2"

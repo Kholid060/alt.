@@ -8,7 +8,7 @@
     "skipLibCheck": true,
     "strict": true,
     "isolatedModules": true,
-    "types": ["node"],
+    "types": ["node", "@repo/command-api/types/extension"],
     "experimentalDecorators": true,
     "baseUrl": ".",
     "paths": {

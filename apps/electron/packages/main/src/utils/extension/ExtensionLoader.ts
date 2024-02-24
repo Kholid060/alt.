@@ -1,7 +1,7 @@
-import { app } from 'electron';
 import path from 'path';
 import fs from 'fs-extra';
-import { ExtensionManifest, ExtensionManifestSchema } from '@repo/command-api';
+import { nanoid } from 'nanoid/non-secure';
+import { ExtensionManifestSchema } from '@repo/command-api';
 import { globby } from 'globby';
 import validateSemver from 'semver/functions/valid';
 import { ErrorLogger, logger, loggerBuilder } from '/@/lib/log';
@@ -46,12 +46,16 @@ async function extractExtManifest(manifestPath: string) {
 class ExtensionLoader {
   static instance = new ExtensionLoader();
 
-  extensions: Map<string, ExtensionData>;
+  extensions: Map<string, ExtensionData & { $key: string }>;
 
+  // for accessing API
+  private keys = new Map<string, string>();
   private extFolderPosix = EXTENSION_FOLDER.replaceAll('\\', '/');
 
   constructor() {
+    this.keys = new Map();
     this.extensions = new Map();
+
     this._init();
   }
 
@@ -65,18 +69,36 @@ class ExtensionLoader {
 
   @ErrorLogger('ExtensionLoader', 'loadExtensions')
   private async loadExtensions() {
+    this.keys = new Map();
+    this.extensions = new Map();
+
     const extensionsManifestPath = await globby(path.posix.join(this.extFolderPosix, '**/manifest.json'));
     const extensionsManifest = await Promise.all(extensionsManifestPath.map(extractExtManifest));
 
     for (const extensionData of extensionsManifest) {
       if (!extensionData) continue;
 
-      this.extensions.set(extensionData.id, extensionData);
+      const extKey = nanoid(5);
+
+      this.keys.set(extKey, extensionData.id);
+      this.extensions.set(extensionData.id, { ...extensionData, $key: extKey });
     }
   }
 
   getExtensions(): ExtensionData[] {
-    return [...this.extensions.values()];
+    return [...this.extensions.values()].map((extension) => {
+      // @ts-ignore
+      delete extension.$key;
+
+      return extension;
+    });
+  }
+
+  getExtensionByKey(key: string) {
+    const extId = this.keys.get(key);
+    if (!extId) return null;
+
+    return this.extensions.get(extId);
   }
 
   getExtension(extensionId: string) {

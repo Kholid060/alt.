@@ -53,6 +53,7 @@
     "@repo/shared": "*",
     "@repo/ui": "*",
     "dayjs": "^1.11.10",
+    "dot-prop": "^8.0.2",
     "electron-log": "^5.1.1",
     "electron-store": "^8.1.0",
     "electron-updater": "6.1.7",

@@ -12,6 +12,9 @@ const config = {
   mode: process.env.MODE,
   root: PACKAGE_ROOT,
   envDir: PROJECT_ROOT,
+  ssr: {
+    noExternal: ['dot-prop']
+  },
   build: {
     ssr: true,
     sourcemap: 'inline',
@@ -34,6 +37,7 @@ const config = {
         // https://www.electronjs.org/docs/latest/tutorial/esm#esm-preload-scripts-must-have-the-mjs-extension
         entryFileNames: '[name].mjs',
       },
+      external: []
     },
     emptyOutDir: true,
     reportCompressedSize: false,
