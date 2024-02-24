@@ -8,12 +8,12 @@
     "skipLibCheck": true,
     "strict": true,
     "isolatedModules": true,
-    "types": ["node", "@repo/command-api/types/extension"],
+    "types": ["node"],
     "paths": {
       "#common/*": ["../common/*"]
     },
     "baseUrl": "."
   },
-  "include": ["src/**/*.ts", "../../types/**/*.d.ts"],
+  "include": ["src/**/*.ts", "./preload.d.ts", "../../types/**/*.d.ts"],
   "exclude": ["**/*.spec.ts", "**/*.test.ts"]
 }

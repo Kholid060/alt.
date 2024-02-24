@@ -1,11 +1,13 @@
-import { ExtensionManifest } from '@repo/command-api';
-import extApis from '@repo/command-api/dist/ext-api';
-import { EXTENSION_VIEW, PRELOAD_API_KEY } from '../../../common/utils/constant/constant';
+import type { ExtensionManifest } from '@repo/command-api';
+import { flatActionExtensionAPI } from '@repo/command-api/dist/flat-extension-api';
+import {
+  EXTENSION_VIEW,
+  PRELOAD_API_KEY,
+} from '../../../common/utils/constant/constant';
 import { sendIpcMessage } from '../../../common/utils/sendIpcMessage';
-import { IPCUserExtensionEventsMap } from '../../../common/interface/ipc-events';
+import type { IPCUserExtensionEventsMap } from '../../../common/interface/ipc-events';
 import { contextBridge } from 'electron';
 import { setProperty } from 'dot-prop';
-
 
 function setExtView(type: 'empty' | 'error' = 'empty') {
   contextBridge.exposeInMainWorld(PRELOAD_API_KEY.extension, {
@@ -22,7 +24,9 @@ export class ExtensionAPI {
     try {
       if (window.location.pathname !== EXTENSION_VIEW.path) return setExtView();
 
-      const extensionQuery = new URLSearchParams(window.location.search).get(EXTENSION_VIEW.idQuery);
+      const extensionQuery = new URLSearchParams(window.location.search).get(
+        EXTENSION_VIEW.idQuery,
+      );
       if (!extensionQuery) return setExtView();
 
       const [extensionId, commandId] = extensionQuery.split('::');
@@ -41,19 +45,17 @@ export class ExtensionAPI {
     }
   }
 
-  async getExtensionAPI(manifest: ExtensionManifest): Promise<typeof _extension> {
+  async getExtensionAPI(
+    manifest: ExtensionManifest,
+  ): Promise<typeof _extension> {
     const extensionAPI: Record<string, unknown> = {};
-    for (const [path, type] of extApis) {
+    for (const key in flatActionExtensionAPI) {
       setProperty(
         extensionAPI,
-        path,
-        type === 'function'
-          ? this.sendAction.bind(this, path)
-          : null,
+        key,
+        this.sendAction.bind(this, key as keyof IPCUserExtensionEventsMap),
       );
     }
-
-    console.log(extensionAPI);
 
     return {
       ...extensionAPI,
@@ -66,5 +68,5 @@ export class ExtensionAPI {
     ...args: Parameters<IPCUserExtensionEventsMap[T]>
   ) {
     return sendIpcMessage('user-extension', { key: this.key, name, args });
-  };
+  }
 }

@@ -21,7 +21,10 @@ export const ExtensionCommandSchema = z.object({
   icon: z.string().min(1).optional(),
   type: z.enum(EXTENSION_COMMAND_TYPE),
   keywords: z.string().array().optional(),
-  context: z.enum(EXTENSION_COMMAND_CONTEXT).default('all').or(z.string().startsWith('host:')),
+  context: z
+    .enum(EXTENSION_COMMAND_CONTEXT)
+    .default('all')
+    .or(z.string().startsWith('host:')),
 });
 
 export const ExtensionManifestSchema = z.object({
@@ -32,7 +35,10 @@ export const ExtensionManifestSchema = z.object({
   description: z.string().min(12).max(128),
   commands: ExtensionCommandSchema.array().min(1),
   permissions: z.enum(EXTENSION_PERMISSIONS).array().optional(),
-  name: z.string().regex(URL_FRIENDLY_REGEX).describe('The name must be URL friendly'),
+  name: z
+    .string()
+    .regex(URL_FRIENDLY_REGEX)
+    .describe('The name must be URL friendly'),
 });
 
 export type ExtensionCommand = z.infer<typeof ExtensionCommandSchema>;

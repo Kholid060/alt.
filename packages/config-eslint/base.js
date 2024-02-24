@@ -1,7 +1,4 @@
 module.exports = {
-  env: {
-    node: true,
-  },
   parser: '@typescript-eslint/parser',
   extends: [
     'eslint:recommended',
@@ -10,13 +7,15 @@ module.exports = {
   ],
   plugins: ['@typescript-eslint'],
   parserOptions: {
-    sourceType: 'module',
-    ecmaVersion: 2020,
+    ecmaFeatures: {
+      jsx: true
+    },
+    ecmaVersion: 'latest',
+    sourceType: 'module'
   },
   rules: {
     'comma-dangle': ['warn', 'always-multiline'],
     'semi': ['error', 'always'],
-    '@typescript-eslint/no-non-null-assertion': 'off',
     'quotes': [
       'warn',
       'single',
@@ -24,12 +23,25 @@ module.exports = {
         'avoidEscape': true,
       },
     ],
+    'prettier/prettier': [
+      'error',
+      {
+        endOfLine: 'auto',
+        singleQuote: true,
+      }
+    ],
     '@typescript-eslint/no-unused-vars': [
       'error',
       {
+        'args': 'all',
         'argsIgnorePattern': '^_',
+        'caughtErrors': 'all',
+        'caughtErrorsIgnorePattern': '^_',
+        'destructuredArrayIgnorePattern': '^_',
         'varsIgnorePattern': '^_',
-      },
-    ],
+        'ignoreRestSiblings': true
+      }
+    ]
   },
+  'ignorePatterns': ['node_modules'],
 };

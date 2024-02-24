@@ -1,14 +1,17 @@
-// TO-DO fix later!!!!!!!!!!
+// to-do aaaaaaaaa
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck
-import { IPCEvents, IPCUserExtensionEventsMap } from '#common/interface/ipc-events';
-import { ipcMain } from 'electron';
+import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events';
 import InstalledApps from './InstalledApps';
 import { onIpcMessage } from './ipc-messages-handler';
 
-type ExtEventHandler<P extends keyof IPCUserExtensionEventsMap> = IPCUserExtensionEventsMap[P];
+type ExtEventHandler<P extends keyof IPCUserExtensionEventsMap> =
+  IPCUserExtensionEventsMap[P];
 
-const queryInstalledApps: ExtEventHandler<'installedApps.query'> = async (query) => {
-  let apps = await InstalledApps.instance.getList();
+const queryInstalledApps: ExtEventHandler<'installedApps.query'> = async (
+  query,
+) => {
+  const apps = await InstalledApps.instance.getList();
 
   if (query instanceof RegExp) {
     return apps.filter((app) => query.test(app.name));
@@ -23,10 +26,10 @@ const queryInstalledApps: ExtEventHandler<'installedApps.query'> = async (query)
   }
 
   return apps.filter((app) => app.name.includes(query));
-}
+};
 
 onIpcMessage('user-extension', async (_, payload) => {
-  switch(payload.name) {
+  switch (payload.name) {
     case 'installedApps.launch':
       return true;
     case 'installedApps.query':

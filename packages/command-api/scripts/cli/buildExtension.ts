@@ -27,11 +27,16 @@ async function validateIcon(iconName: string) {
 
   const iconExtName = path.extname(iconPath);
   if (!SUPPORTED_ICON_TYPE.includes(iconExtName)) {
-    throw new BuildError(`Unsupported "${iconName}" icon type, the icon must be PNG`);
+    throw new BuildError(
+      `Unsupported "${iconName}" icon type, the icon must be PNG`,
+    );
   }
 
   const iconSize = imageSize(iconPath);
-  if (iconSize.height !== SUPPORTED_ICON_SIZE || iconSize.width !== SUPPORTED_ICON_SIZE) {
+  if (
+    iconSize.height !== SUPPORTED_ICON_SIZE ||
+    iconSize.width !== SUPPORTED_ICON_SIZE
+  ) {
     throw new BuildError(`"${iconName}" size must be 256x256`);
   }
 
@@ -51,17 +56,21 @@ async function getExtensionManifest() {
     throw logger.error(fromZodError(manifest.error).toString());
   }
   if (!semverValid(manifest.data.version)) {
-    throw logger.error(`"${manifest.data.version}" is invalid version. See https://semver.org/`);
+    throw logger.error(
+      `"${manifest.data.version}" is invalid version. See https://semver.org/`,
+    );
   }
 
   const extManifest = manifest.data;
 
   await validateIcon(extManifest.icon);
-  await Promise.all(extManifest.commands.map((command) => {
-    if (!command.icon) return Promise.resolve();
+  await Promise.all(
+    extManifest.commands.map((command) => {
+      if (!command.icon) return Promise.resolve();
 
-    return validateIcon(command.icon);
-  }));
+      return validateIcon(command.icon);
+    }),
+  );
 
   return extManifest;
 }
@@ -71,7 +80,9 @@ async function buildCommands(manifest: ExtensionManifest) {
   const entry: Options['entry'] = {};
   for (const command of manifest.commands) {
     if (seenCommand.has(command.name)) {
-      throw new BuildError(`The "${chalk.bold(command.name)}" command has duplicate`);
+      throw new BuildError(
+        `The "${chalk.bold(command.name)}" command has duplicate`,
+      );
     }
     seenCommand.add(command.name);
     entry[command.name] = path.join(EXT_SRC_DIR, `${command.name}`);
@@ -82,7 +93,10 @@ async function buildCommands(manifest: ExtensionManifest) {
     format: 'esm',
     external: ['@repo/command-api', 'react'],
     onSuccess: async () => {
-      await fs.writeJSON(path.join(EXT_ROOT_DIR, 'dist', 'manifest.json'), manifest);
+      await fs.writeJSON(
+        path.join(EXT_ROOT_DIR, 'dist', 'manifest.json'),
+        manifest,
+      );
       await fs.copy(EXT_ICON_DIR, path.join(EXT_ROOT_DIR, 'dist', 'icon'));
     },
   };
