@@ -8,6 +8,7 @@ import { nanoid } from 'nanoid/non-secure';
 import { APP_ICON_DIR } from './constant';
 import { store } from '../lib/store';
 import dayjs from 'dayjs';
+import type ExtensionAPI from '@repo/command-api/types/extension-api';
 
 const MAX_CACHE_AGE_DAY = 7;
 
@@ -29,7 +30,7 @@ function resolveEnvDir(dir: string) {
   });
 
   return isNoEnv ? null : resolveDir;
-};
+}
 
 async function readURLShortcut(path: string) {
   try {
@@ -88,7 +89,8 @@ async function extractShortcutDetail(shortcut: string) {
         };
       }
     } else {
-      const { target, icon, description, iconIndex } = shell.readShortcutLink(shortcut);
+      const { target, icon, description, iconIndex } =
+        shell.readShortcutLink(shortcut);
       appDetail = {
         ...appDetail,
         icon,
@@ -99,8 +101,7 @@ async function extractShortcutDetail(shortcut: string) {
     }
 
     return appDetail;
-  } catch (error) {
-    console.log('||||', filename, shortcut);
+  } catch (_error) {
     // Do nothing
   }
 
@@ -133,7 +134,10 @@ async function getAppIcon({
       appIcon = await app.getFileIcon(appPath, { size: 'normal' });
     }
 
-    await fs.writeFile(path.join(APP_ICON_DIR, `${appId}.png`), appIcon.toPNG());
+    await fs.writeFile(
+      path.join(APP_ICON_DIR, `${appId}.png`),
+      appIcon.toPNG(),
+    );
 
     return `${appId}.png`;
   } catch (error) {
@@ -152,14 +156,17 @@ class InstalledApps {
   async getList() {
     const storedData = store.get('installedApps');
 
-    const useCache = storedData.fetchedAt && (dayjs().diff(storedData.fetchedAt, 'day') <= MAX_CACHE_AGE_DAY);
+    const useCache =
+      storedData.fetchedAt &&
+      dayjs().diff(storedData.fetchedAt, 'day') <= MAX_CACHE_AGE_DAY;
     if (useCache && storedData.list.length > 0) return storedData.list;
 
     await fs.emptyDir(APP_ICON_DIR);
 
     const shortcutDirs = programShortcutDirs.reduce<string[]>((acc, str) => {
       const dir = resolveEnvDir(str);
-      if (dir) acc.push(path.join(dir, '/**/*.{lnk,url}').replaceAll('\\', '/'));
+      if (dir)
+        acc.push(path.join(dir, '/**/*.{lnk,url}').replaceAll('\\', '/'));
 
       return acc;
     }, []);
@@ -168,7 +175,9 @@ class InstalledApps {
     const appsTarget: Record<string, string> = {};
 
     const shortcuts = await globby(shortcutDirs);
-    const appPromise = await Promise.allSettled<Promise<_Extension.InstalledAppDetail | null>[]>(
+    const appPromise = await Promise.allSettled<
+      Promise<ExtensionAPI.installedApps.AppDetail | null>[]
+    >(
       shortcuts.map(async (shortcut) => {
         const appDetail = await extractShortcutDetail(shortcut);
         if (!appDetail?.target || seenApps.has(appDetail.target)) return null;
@@ -194,13 +203,15 @@ class InstalledApps {
       }),
     );
 
-    const apps = appPromise.reduce<_Extension.InstalledAppDetail[]>((acc, curr) => {
-      if (curr.status === 'fulfilled' && curr.value) {
-        acc.push(curr.value);
-      }
+    const apps = appPromise
+      .reduce<ExtensionAPI.installedApps.AppDetail[]>((acc, curr) => {
+        if (curr.status === 'fulfilled' && curr.value) {
+          acc.push(curr.value);
+        }
 
-      return acc;
-    }, []).sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1);
+        return acc;
+      }, [])
+      .sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1));
 
     store.set('installedApps', {
       list: apps,
@@ -211,8 +222,15 @@ class InstalledApps {
     return apps;
   }
 
+  getAppTarget(appId: string) {
+    return this.appTarget.get(appId);
+  }
+
   launchApp(appId: string) {
-    if (!this.appTarget.has(appId)) throw new Error("Can't find app");
+    const target = this.appTarget.get(appId);
+    if (!target) throw new Error("Can't find app");
+
+    return shell.openExternal(target);
   }
 }
 

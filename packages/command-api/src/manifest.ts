@@ -8,6 +8,7 @@ export const EXTENSION_PERMISSIONS = [
   'storage',
   'browser.tabs',
   'notifications',
+  'installed-apps',
 ] as const;
 
 export const EXTENSION_COMMAND_TYPE = ['action', 'view', 'view:json'] as const;

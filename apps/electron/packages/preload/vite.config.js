@@ -13,7 +13,12 @@ const config = {
   root: PACKAGE_ROOT,
   envDir: PROJECT_ROOT,
   ssr: {
-    noExternal: ['dot-prop']
+    noExternal: ['dot-prop'],
+  },
+  resolve: {
+    alias: {
+      '#common': join(PACKAGE_ROOT, '../common'),
+    },
   },
   build: {
     ssr: true,
@@ -22,11 +27,6 @@ const config = {
     outDir: 'dist',
     assetsDir: '.',
     minify: process.env.MODE !== 'development',
-    resolve: {
-      alias: {
-        '#common': join(PACKAGE_ROOT, '../common'),
-      },
-    },
     lib: {
       entry: ['src/index.ts'],
       formats: ['cjs'],
@@ -37,7 +37,6 @@ const config = {
         // https://www.electronjs.org/docs/latest/tutorial/esm#esm-preload-scripts-must-have-the-mjs-extension
         entryFileNames: '[name].mjs',
       },
-      external: []
     },
     emptyOutDir: true,
     reportCompressedSize: false,

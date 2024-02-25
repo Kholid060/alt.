@@ -33,14 +33,14 @@ export function ExtensionStateProvider(
       commandRef.current?.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, ...event }));
     }
 
-    messagePort.addListener('extension:query-change', onQueryChange);
-    messagePort.addListener('extension:keydown-event', onParentKeydown);
+    messagePort?.addListener('extension:query-change', onQueryChange);
+    messagePort?.addListener('extension:keydown-event', onParentKeydown);
 
     return () => {
-      messagePort.removeListener('extension:query-change', onQueryChange);
-      messagePort.removeListener('extension:keydown-event', onParentKeydown);
+      messagePort?.removeListener('extension:query-change', onQueryChange);
+      messagePort?.removeListener('extension:keydown-event', onParentKeydown);
     }
-  }, []);
+  }, [messagePort]);
 
   return (
     <ExtensionContext.Provider value={extStoreRef.current}>

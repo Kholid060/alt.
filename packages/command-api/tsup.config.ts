@@ -16,5 +16,9 @@ export default defineConfig((options: Options) => ({
   external: ['tsup', 'fs-extra', 'zod-validation-error', 'commander'],
   minify: true,
   clean: true,
+  async onSuccess() {
+    await new Promise((r) => setTimeout(r, 1500));
+    await import('./scripts/ext-api');
+  },
   ...options,
 }));

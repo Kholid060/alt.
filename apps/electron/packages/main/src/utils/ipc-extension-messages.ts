@@ -1,16 +1,45 @@
-// to-do aaaaaaaaa
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events';
 import InstalledApps from './InstalledApps';
 import { onIpcMessage } from './ipc-messages-handler';
+import { isExtHasApiPermission } from '#common/utils/check-ext-permission';
+import { ExtensionError } from '#common/errors/ExtensionError';
+import ExtensionLoader from './extension/ExtensionLoader';
+import { logger } from '../lib/log';
+import path from 'path';
 
-type ExtEventHandler<P extends keyof IPCUserExtensionEventsMap> =
-  IPCUserExtensionEventsMap[P];
+const onExtensionIPCEvent = (() => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handlers: Record<string, (...args: any[]) => any> = {};
 
-const queryInstalledApps: ExtEventHandler<'installedApps.query'> = async (
-  query,
-) => {
+  onIpcMessage('user-extension', (sender, { args, key, name }) => {
+    const extension = ExtensionLoader.instance.getExtensionByKey(key);
+    if (
+      !extension ||
+      isExtHasApiPermission(name, extension.manifest.permissions || [])
+    ) {
+      throw new ExtensionError("Doesn't have permission to access this API");
+    }
+
+    const handler = handlers[name];
+    if (!handler) throw new Error(`"${name}" doesn't have handler`);
+
+    return handler(sender, ...args);
+  });
+
+  return <
+    T extends keyof IPCUserExtensionEventsMap,
+    P extends Parameters<IPCUserExtensionEventsMap[T]>,
+  >(
+    name: T,
+    callback: (
+      ...args: [Electron.IpcMainInvokeEvent, ...P]
+    ) => ReturnType<IPCUserExtensionEventsMap[T]>,
+  ) => {
+    handlers[name] = callback;
+  };
+})();
+
+onExtensionIPCEvent('installedApps.query', async (_, query) => {
   const apps = await InstalledApps.instance.getList();
 
   if (query instanceof RegExp) {
@@ -26,13 +55,21 @@ const queryInstalledApps: ExtEventHandler<'installedApps.query'> = async (
   }
 
   return apps.filter((app) => app.name.includes(query));
-};
+});
 
-onIpcMessage('user-extension', async (_, payload) => {
-  switch (payload.name) {
-    case 'installedApps.launch':
-      return true;
-    case 'installedApps.query':
-      return await queryInstalledApps(...payload.args);
+onExtensionIPCEvent('installedApps.launch', async (_, appId) => {
+  try {
+    await InstalledApps.instance.launchApp(appId);
+
+    return true;
+  } catch (_error) {
+    const appTarget = InstalledApps.instance.getAppTarget(appId);
+    logger(
+      'error',
+      ['installedApps.launch'],
+      `Failed to launch "${path.basename(appTarget || '')}"`,
+    );
+
+    return false;
   }
 });

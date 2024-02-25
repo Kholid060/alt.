@@ -15,5 +15,5 @@ export interface IPCEvents {
     key: string;
     name: T;
     args: Parameters<IPCUserExtensionEventsMap[T]>;
-  }) => ReturnType<Awaited<IPCUserExtensionEventsMap[T]>>;
+  }) => Awaited<ReturnType<IPCUserExtensionEventsMap[T]>>;
 }

@@ -3,11 +3,14 @@ import { flatActionExtensionAPI } from '@repo/command-api/dist/flat-extension-ap
 import {
   EXTENSION_VIEW,
   PRELOAD_API_KEY,
-} from '../../../common/utils/constant/constant';
-import { sendIpcMessage } from '../../../common/utils/sendIpcMessage';
-import type { IPCUserExtensionEventsMap } from '../../../common/interface/ipc-events';
+} from '#common/utils/constant/constant';
+import { sendIpcMessage } from '#common/utils/sendIpcMessage';
+import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events';
 import { contextBridge } from 'electron';
 import { setProperty } from 'dot-prop';
+import { isExtHasApiPermission } from '#common/utils/check-ext-permission';
+import type { SetRequired } from 'type-fest';
+import { ExtensionError } from '#common/errors/ExtensionError';
 
 function setExtView(type: 'empty' | 'error' = 'empty') {
   contextBridge.exposeInMainWorld(PRELOAD_API_KEY.extension, {
@@ -17,6 +20,10 @@ function setExtView(type: 'empty' | 'error' = 'empty') {
 
 export class ExtensionAPI {
   private key: string = '';
+  private permissions: SetRequired<
+    ExtensionManifest,
+    'permissions'
+  >['permissions'] = [];
 
   constructor() {}
 
@@ -39,6 +46,8 @@ export class ExtensionAPI {
 
       const extensionApi = await this.getExtensionAPI(extensionData.manifest);
       contextBridge.exposeInMainWorld(PRELOAD_API_KEY.extension, extensionApi);
+
+      this.permissions = extensionData.manifest.permissions || [];
     } catch (error) {
       console.error(error);
       setExtView('error');
@@ -67,6 +76,10 @@ export class ExtensionAPI {
     name: T,
     ...args: Parameters<IPCUserExtensionEventsMap[T]>
   ) {
+    if (!isExtHasApiPermission(name, this.permissions)) {
+      throw new ExtensionError("Doesn't have permission to access this API");
+    }
+
     return sendIpcMessage('user-extension', { key: this.key, name, args });
   }
 }
