@@ -41,6 +41,7 @@ export class ExtensionAPI {
 
       const extensionData = await sendIpcMessage('extension:get', extensionId);
       if (!extensionData) return setExtView();
+      if ('$isError' in extensionData) throw new Error(extensionData.message);
 
       this.key = extensionData.$key;
 
@@ -72,7 +73,7 @@ export class ExtensionAPI {
     } as typeof _extension;
   }
 
-  private sendAction<T extends keyof IPCUserExtensionEventsMap>(
+  private async sendAction<T extends keyof IPCUserExtensionEventsMap>(
     name: T,
     ...args: Parameters<IPCUserExtensionEventsMap[T]>
   ) {
@@ -80,6 +81,15 @@ export class ExtensionAPI {
       throw new ExtensionError("Doesn't have permission to access this API");
     }
 
-    return sendIpcMessage('user-extension', { key: this.key, name, args });
+    const result = await sendIpcMessage('user-extension', {
+      name,
+      args,
+      key: this.key,
+    });
+    if (typeof result === 'object' && '$isError' in result) {
+      throw new Error(result.message);
+    }
+
+    return result;
   }
 }

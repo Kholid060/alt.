@@ -1,6 +1,6 @@
 import InstalledApps from './InstalledApps';
 import ExtensionLoader from './extension/ExtensionLoader';
-import type { IPCEvents } from '#common/interface/ipc-events';
+import type { IPCEventError, IPCEvents } from '#common/interface/ipc-events';
 import './ipc-extension-messages';
 import { ipcMain } from 'electron';
 
@@ -11,7 +11,7 @@ export function onIpcMessage<
   name: T,
   callback: (
     ...args: [Electron.IpcMainInvokeEvent, ...P]
-  ) => Promise<ReturnType<IPCEvents[T]>>,
+  ) => Promise<ReturnType<IPCEvents[T]> | IPCEventError>,
 ) {
   ipcMain.handle(name, async (event, ...args) =>
     callback(event, ...(args as P)),

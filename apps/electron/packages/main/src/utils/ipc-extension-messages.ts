@@ -11,19 +11,40 @@ const onExtensionIPCEvent = (() => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handlers: Record<string, (...args: any[]) => any> = {};
 
-  onIpcMessage('user-extension', (sender, { args, key, name }) => {
-    const extension = ExtensionLoader.instance.getExtensionByKey(key);
-    if (
-      !extension ||
-      isExtHasApiPermission(name, extension.manifest.permissions || [])
-    ) {
-      throw new ExtensionError("Doesn't have permission to access this API");
+  onIpcMessage('user-extension', async (sender, { args, key, name }) => {
+    try {
+      const extension = ExtensionLoader.instance.getExtensionByKey(key);
+      if (
+        !extension ||
+        !isExtHasApiPermission(name, extension.manifest.permissions || [])
+      ) {
+        throw new ExtensionError("Doesn't have permission to access this API");
+      }
+
+      const handler = handlers[name];
+      if (!handler) throw new Error(`"${name}" doesn't have handler`);
+
+      const result = await handler(sender, ...args);
+
+      return result;
+    } catch (error) {
+      if (error instanceof ExtensionError) {
+        return {
+          $isError: true,
+          message: error.message,
+        };
+      }
+
+      if (error instanceof Error) {
+        console.error(error);
+        logger('error', ['user-extension-handler', name], error.message);
+      }
+
+      return {
+        $isError: true,
+        message: 'Something went wrong',
+      };
     }
-
-    const handler = handlers[name];
-    if (!handler) throw new Error(`"${name}" doesn't have handler`);
-
-    return handler(sender, ...args);
   });
 
   return <

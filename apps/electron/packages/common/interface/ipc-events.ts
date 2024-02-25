@@ -4,6 +4,11 @@ import type { ExtensionData } from './extension';
 
 export type IPCUserExtensionEventsMap = FlatActionExtensionAPI;
 
+export interface IPCEventError {
+  $isError: true;
+  message: string;
+}
+
 export interface IPCEvents {
   'extension:list': () => ExtensionData[];
   'extension:init-message-port': () => MessagePort;

@@ -35,14 +35,15 @@ function Extension() {
         <ExtensionList.Item
           title="lorem"
           value="lorem"
-          onSelect={() => console.log(_extension.tabs.hello)}
           icon={<ExtensionList.ItemIcon icon={ExtensionIcon.Atom} />}
         />
         <ExtensionList.Item
           title="ipsum"
           value="ipsum"
           icon={<p>test</p>}
-          onSelect={() => _extension.installedApps.query('h').then(console.log)}
+          onSelect={() => {
+            _extension.installedApps.query('').then(console.log);
+          }}
         />
       </ExtensionList>
     </ExtensionStateProvider>
