@@ -8,7 +8,7 @@ import { nanoid } from 'nanoid/non-secure';
 import { APP_ICON_DIR } from './constant';
 import { store } from '../lib/store';
 import dayjs from 'dayjs';
-import type ExtensionAPI from '@repo/extension-api/types/extension-api';
+import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 
 const MAX_CACHE_AGE_DAY = 7;
 

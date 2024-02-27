@@ -1,18 +1,20 @@
 {
-  "name": "@repo/extension-api",
+  "name": "@repo/extension-core",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
+    "build": "yarn build:ext-api && tsup",
+    "dev": "yarn build:ext-api && tsup --watch",
+    "build:ext-api": "tsx ./scripts/ext-api/index.ts",
     "lint": "eslint . --ext js,mjs,cjs,ts,mts,cts,tsx"
   },
   "bin": {
-    "cliaa": "./dist/cli.js"
+    "cliaa": "./bin/cli.js"
   },
-  "main": "./dist/index.js",
+  "type": "module",
+  "main": "./dist/index.cjs",
   "types": "./dist/index.d.ts",
-  "module": "./dist/index.mjs",
+  "module": "./dist/index.js",
   "dependencies": {
     "@radix-ui/react-primitive": "^1.0.3",
     "browser-extension-url-match": "^1.0.0",

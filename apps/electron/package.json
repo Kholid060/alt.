@@ -50,7 +50,7 @@
   },
   "dependencies": {
     "@nut-tree/nut-js": "^3.1.2",
-    "@repo/extension-api": "*",
+    "@repo/extension-core": "*",
     "@repo/shared": "*",
     "@repo/ui": "*",
     "dayjs": "^1.11.10",

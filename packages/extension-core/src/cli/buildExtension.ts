@@ -6,7 +6,7 @@ import { build, InlineConfig } from 'vite';
 import { fromZodError } from 'zod-validation-error';
 import { BuildError, logger } from './utils/logger';
 import semverValid from 'semver/functions/valid';
-import { ExtensionManifestSchema, ExtensionManifest } from '../../src';
+import { ExtensionManifestSchema, ExtensionManifest } from '../client/manifest';
 import { PackageJson as PackageJsonType } from 'type-fest';
 
 type PackageJson = PackageJsonType & ExtensionManifest;
@@ -106,7 +106,7 @@ async function buildCommands(manifest: ExtensionManifest) {
         name: '[name].js',
       },
       rollupOptions: {
-        external: ['react', 'react/jsx-runtime', '@repo/extension-api'],
+        external: ['react', 'react/jsx-runtime', '@repo/extension-core'],
         output: {
           paths: {
             react: './react.js',

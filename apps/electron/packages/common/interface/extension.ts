@@ -1,4 +1,4 @@
-import { ExtensionManifest } from '@repo/extension-api';
+import type { ExtensionManifest } from '@repo/extension-core';
 
 export interface ExtensionData {
   id: string;

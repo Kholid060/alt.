@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs-extra';
 import { nanoid } from 'nanoid/non-secure';
-import { ExtensionManifestSchema } from '@repo/extension-api';
+import { ExtensionManifestSchema } from '@repo/extension-core';
 import { globby } from 'globby';
 import validateSemver from 'semver/functions/valid';
 import { ErrorLogger, logger, loggerBuilder } from '/@/lib/log';

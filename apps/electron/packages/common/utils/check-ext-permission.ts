@@ -1,5 +1,5 @@
-import type { EXTENSION_PERMISSIONS } from '@repo/extension-api';
-import type ExtensionAPI from '@repo/extension-api/types/extension-api';
+import type { EXTENSION_PERMISSIONS } from '@repo/extension-core';
+import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import type { NestedKeyOf } from '../interface/utils';
 
 export type ExtensionAPIPaths = NestedKeyOf<

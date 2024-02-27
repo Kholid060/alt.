@@ -1,11 +1,11 @@
-import type { ExtensionManifest } from '@repo/extension-api';
-import { flatActionExtensionAPI } from '@repo/extension-api/dist/flat-extension-api';
+import type { ExtensionManifest } from '@repo/extension-core';
+import { flatActionExtensionAPI } from '@repo/extension-core/dist/flat-extension-api';
 import {
   CUSTOM_SCHEME,
   PRELOAD_API_KEY,
 } from '#common/utils/constant/constant';
 import { sendIpcMessage } from '#common/utils/sendIpcMessage';
-import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events';
+import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.js';
 import { contextBridge } from 'electron';
 import { setProperty } from 'dot-prop';
 import { isExtHasApiPermission } from '#common/utils/check-ext-permission';
