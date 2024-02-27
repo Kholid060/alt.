@@ -13,6 +13,8 @@ function App() {
 
   useEffect(() => {
     preloadAPI.main.sendIpcMessage('extension:list').then((extensions) => {
+      if ('$isError' in extensions) return;
+
       setCommandStoreState('extensions', extensions);
     });
   }, []);

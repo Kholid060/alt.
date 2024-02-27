@@ -3,24 +3,28 @@ import { RefObject, createContext, useRef } from 'react';
 
 export interface CommandContextState {
   extMessagePort: RefObject<AMessagePort | null>;
-  updateMessagePort(port: AMessagePort | null): void;
+  setExtMessageChannel(port: MessageChannel): void;
+  extMessageChannel: RefObject<MessageChannel | null>;
 }
 
 export const CommandContext = createContext<CommandContextState>({
-  updateMessagePort() {},
+  setExtMessageChannel() {},
   extMessagePort: { current: null },
+  extMessageChannel: { current: null },
 });
 
 
 export function CommandCtxProvider({ children }: { children: React.ReactNode }) {
   const extMessagePort = useRef<AMessagePort | null>(null);
+  const extMessageChannel = useRef<MessageChannel | null>(null);
 
-  function updateMessagePort(port: AMessagePort | null) {
-    extMessagePort.current = port;
+  function setExtMessageChannel(channel: MessageChannel) {
+    extMessageChannel.current = channel;
+    extMessagePort.current = new AMessagePort(channel.port1);
   }
 
   return (
-    <CommandContext.Provider value={{ extMessagePort, updateMessagePort }}>
+    <CommandContext.Provider value={{ extMessagePort, extMessageChannel, setExtMessageChannel }}>
       {children}
     </CommandContext.Provider>
   )

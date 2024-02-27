@@ -14,7 +14,7 @@ function CommandContent() {
     const extension = paths.at(-2);
     if (extension?.type !== 'extension') return null;
 
-    return `${extension.id}::${command.id}`;
+    return { extId: extension.id, commandId: command.id };
   }, [paths]);
 
   return (
@@ -23,7 +23,7 @@ function CommandContent() {
       style={{ height: 'var(--cmdk-list-height)', transition: 'height 200ms ease' }}
     >
       {extViewId
-        ? <CommandExtensionContent extensionId={extViewId} />
+        ? <CommandExtensionContent extensionId={extViewId.extId} commandId={extViewId.commandId} />
         : <CommandList />
       }
     </UiCommandList>

@@ -1,5 +1,5 @@
-import type { ExtensionManifest } from '@repo/command-api';
-import { flatActionExtensionAPI } from '@repo/command-api/dist/flat-extension-api';
+import type { ExtensionManifest } from '@repo/extension-api';
+import { flatActionExtensionAPI } from '@repo/extension-api/dist/flat-extension-api';
 import {
   EXTENSION_VIEW,
   PRELOAD_API_KEY,
@@ -44,6 +44,8 @@ export class ExtensionAPI {
       if ('$isError' in extensionData) throw new Error(extensionData.message);
 
       this.key = extensionData.$key;
+
+      window.history.replaceState(null, '', window.location.pathname);
 
       const extensionApi = await this.getExtensionAPI(extensionData.manifest);
       contextBridge.exposeInMainWorld(PRELOAD_API_KEY.extension, extensionApi);

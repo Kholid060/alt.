@@ -1,9 +1,14 @@
-console.log('hola', _extension.manifest);
+import dayjs from 'dayjs';
+import { useEffect } from 'react';
 
 export default function Command() {
   function redirect() {
     window.location.href = 'https://lipsum.com'
   }
+
+  useEffect(() => {
+    console.log('Today date is', dayjs().format('DD MMMM YYYY'));
+  }, []);
 
   return (
     <>

@@ -1,5 +1,5 @@
-import type { FlatActionExtensionAPI } from '@repo/command-api/dist/flat-extension-api';
-import type ExtensionAPI from '@repo/command-api/types/extension-api';
+import type { FlatActionExtensionAPI } from '@repo/extension-api/dist/flat-extension-api';
+import type ExtensionAPI from '@repo/extension-api/types/extension-api';
 import type { ExtensionData } from './extension';
 
 export type IPCUserExtensionEventsMap = FlatActionExtensionAPI;

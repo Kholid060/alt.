@@ -2,11 +2,14 @@ import path from 'path';
 import fs from 'fs-extra';
 import chalk from 'chalk';
 import { imageSize } from 'image-size';
-import { build, Options } from 'tsup';
+import { build, InlineConfig } from 'vite';
 import { fromZodError } from 'zod-validation-error';
 import { BuildError, logger } from './utils/logger';
 import semverValid from 'semver/functions/valid';
 import { ExtensionManifestSchema, ExtensionManifest } from '../../src';
+import { PackageJson as PackageJsonType } from 'type-fest';
+
+type PackageJson = PackageJsonType & ExtensionManifest;
 
 const EXT_ROOT_DIR = process.cwd();
 const EXT_SRC_DIR = path.join(EXT_ROOT_DIR, 'src');
@@ -43,7 +46,7 @@ async function validateIcon(iconName: string) {
   seenIcon.add(iconName);
 }
 
-async function getExtensionManifest() {
+async function getPackageJSON(): Promise<PackageJson> {
   const packageJSONDir = path.join(EXT_ROOT_DIR, 'package.json');
   if (!fs.existsSync(packageJSONDir)) {
     throw logger.error(`Can't find "${chalk.bold('package.json')}" file`);
@@ -51,6 +54,10 @@ async function getExtensionManifest() {
 
   const packageJSON = await fs.readJSON(packageJSONDir);
 
+  return packageJSON;
+}
+
+async function getExtensionManifest(packageJSON: PackageJson) {
   const manifest = await ExtensionManifestSchema.safeParseAsync(packageJSON);
   if (!manifest.success) {
     throw logger.error(fromZodError(manifest.error).toString());
@@ -77,7 +84,7 @@ async function getExtensionManifest() {
 
 async function buildCommands(manifest: ExtensionManifest) {
   const seenCommand = new Set<string>();
-  const entry: Options['entry'] = {};
+  const entry: Record<string, string> = {};
   for (const command of manifest.commands) {
     if (seenCommand.has(command.name)) {
       throw new BuildError(
@@ -88,24 +95,41 @@ async function buildCommands(manifest: ExtensionManifest) {
     entry[command.name] = path.join(EXT_SRC_DIR, `${command.name}`);
   }
 
-  const config: Options = {
-    entry,
-    format: 'esm',
-    external: ['@repo/command-api', 'react'],
-    onSuccess: async () => {
-      await fs.writeJSON(
-        path.join(EXT_ROOT_DIR, 'dist', 'manifest.json'),
-        manifest,
-      );
-      await fs.copy(EXT_ICON_DIR, path.join(EXT_ROOT_DIR, 'dist', 'icon'));
+  const config: InlineConfig = {
+    define: {
+      'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
+    },
+    build: {
+      lib: {
+        entry,
+        formats: ['es'],
+        name: '[name].js',
+      },
+      rollupOptions: {
+        external: ['react', 'react/jsx-runtime', '@repo/extension-api'],
+        output: {
+          paths: {
+            react: './react.js',
+            'react/jsx-runtime': './react-runtime.js',
+          },
+        },
+      },
+      minify: false,
     },
   };
   await build(config);
+
+  await fs.writeJSON(
+    path.join(EXT_ROOT_DIR, 'dist', 'manifest.json'),
+    manifest,
+  );
+  await fs.copy(EXT_ICON_DIR, path.join(EXT_ROOT_DIR, 'dist', 'icon'));
 }
 
 async function buildExtension() {
   try {
-    const extensionManifest = await getExtensionManifest();
+    const packageJSON = await getPackageJSON();
+    const extensionManifest = await getExtensionManifest(packageJSON);
     await buildCommands(extensionManifest);
   } catch (error) {
     if (error instanceof BuildError) {

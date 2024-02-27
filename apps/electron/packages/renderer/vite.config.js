@@ -2,7 +2,7 @@
 
 import { chrome } from '../../.electron-vendors.cache.json';
 import react from '@vitejs/plugin-react';
-import { join } from 'node:path';
+import { join, extname } from 'node:path';
 
 const PACKAGE_ROOT = __dirname;
 const PROJECT_ROOT = join(PACKAGE_ROOT, '../..');
@@ -33,11 +33,14 @@ const config = {
     target: `chrome${chrome}`,
     outDir: 'dist',
     assetsDir: '.',
+    minify: process.env.MODE !== 'development',
     rollupOptions: {
       input: {
         main: join(PACKAGE_ROOT, 'index.html'),
-        extension: join(PACKAGE_ROOT, 'extension.html'),
       },
+      output: {
+        assetFileNames: `[name].[ext]`
+      }
     },
     emptyOutDir: true,
     reportCompressedSize: false,

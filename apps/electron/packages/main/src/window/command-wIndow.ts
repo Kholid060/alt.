@@ -1,5 +1,5 @@
-import { EXTENSION_VIEW } from '#common/utils/constant/constant';
-import { BrowserWindow, MessageChannelMain, app, screen } from 'electron';
+import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
+import { BrowserWindow, app, screen } from 'electron';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -14,8 +14,9 @@ export async function createCommandWindow() {
 
   const screenBound = activeScreen.bounds;
 
-  const windowYPos = (screenBound.height * 0.225) + screenBound.y;
-  const windowXPos = (screenBound.width / 2 - COMMNAND_WINDOW_BOUND.width / 2) + screenBound.x;
+  const windowYPos = screenBound.height * 0.225 + screenBound.y;
+  const windowXPos =
+    screenBound.width / 2 - COMMNAND_WINDOW_BOUND.width / 2 + screenBound.x;
 
   const browserWindow = new BrowserWindow({
     show: false, // Use the 'ready-to-show' event to show the instantiated BrowserWindow.
@@ -58,25 +59,28 @@ export async function createCommandWindow() {
   const frameFirstLoad = new Set<number>();
   const { mainFrame } = browserWindow.webContents;
 
-  browserWindow.webContents.on('will-frame-navigate', (event) => {
-    const { processId, routingId, osProcessId, frameTreeNodeId } = event.frame;
-    console.log({ processId, routingId, osProcessId, frameTreeNodeId });
-
-    if (event.frame === mainFrame) return;
+  browserWindow.webContents.on('frame-created', (event, { frame }) => {
     if (
-      event.frame.name === EXTENSION_VIEW.frameName &&
-      !frameFirstLoad.has(event.frame.routingId) &&
-      event.frame.parent === mainFrame
-    ) {
-      frameFirstLoad.add(event.frame.routingId);
+      frame === mainFrame ||
+      (frame.parent === mainFrame &&
+        frame.url.startsWith(CUSTOM_SCHEME.extension))
+    )
       return;
-    }
 
     event.preventDefault();
   });
   browserWindow.webContents.on('will-frame-navigate', (event) => {
-    console.log(event);
-    // event.preventDefault();
+    if (event.frame === mainFrame) return;
+    if (
+      event.url.startsWith(CUSTOM_SCHEME.extension) &&
+      !frameFirstLoad.has(event.frame.frameTreeNodeId) &&
+      event.frame.parent === mainFrame
+    ) {
+      frameFirstLoad.add(event.frame.frameTreeNodeId);
+      return;
+    }
+
+    event.preventDefault();
   });
 
   /**

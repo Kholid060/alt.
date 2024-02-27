@@ -1,5 +1,5 @@
 {
-  "name": "@repo/command-api",
+  "name": "@repo/extension-api",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
@@ -35,6 +35,8 @@
     "ts-morph": "^21.0.1",
     "tsup": "^8.0.2",
     "tsx": "^4.7.1",
+    "type-fest": "^4.10.3",
+    "vite": "^5.1.4",
     "zod-validation-error": "^3.0.2"
   }
 }

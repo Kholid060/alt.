@@ -4,9 +4,14 @@ import { restoreOrCreateCommandWindow } from './window/command-wIndow';
 import { platform } from 'node:process';
 import updater from 'electron-updater';
 import './utils/ipc-messages-handler';
-import { registerCustomProtocols } from './utils/custom-protocol';
+import {
+  registerCustomProtocols,
+  registerCustomProtocolsPrivileged,
+} from './utils/custom-protocol';
 
 Menu.setApplicationMenu(null);
+registerCustomProtocolsPrivileged();
+
 console.log(app.getPath('appData'), app.getPath('sessionData'));
 
 /**

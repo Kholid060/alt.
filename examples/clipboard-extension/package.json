@@ -19,6 +19,10 @@
     "build": "cliaa build"
   },
   "devDependencies": {
-    "@repo/command-api": "*"
+    "@repo/extension-api": "*"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.10",
+    "react": "^18.2.0"
   }
 }

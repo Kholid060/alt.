@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs-extra';
 import { nanoid } from 'nanoid/non-secure';
-import { ExtensionManifestSchema } from '@repo/command-api';
+import { ExtensionManifestSchema } from '@repo/extension-api';
 import { globby } from 'globby';
 import validateSemver from 'semver/functions/valid';
 import { ErrorLogger, logger, loggerBuilder } from '/@/lib/log';
@@ -35,7 +35,7 @@ async function extractExtManifest(manifestPath: string) {
 
   // Check commands file
   const commands = manifest.data.commands.filter((command) =>
-    fs.existsSync(path.join(extDir, `${command.name}.js`)),
+    fs.existsSync(path.join(extDir, `${command.name}.mjs`)),
   );
   if (commands.length === 0) {
     validatorLogger('error', `${extDirname}: commands empty`);

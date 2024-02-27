@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
     "jsx": "react-jsx",
-    "types": ["@repo/command-api/types/extension"]
+    "esModuleInterop": true
   }
 }

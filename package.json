@@ -1,4 +1,5 @@
 {
+  "name": "komand",
   "private": true,
   "scripts": {
     "build": "turbo build",

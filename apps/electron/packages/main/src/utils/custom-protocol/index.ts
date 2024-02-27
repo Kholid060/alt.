@@ -7,31 +7,54 @@ export interface CustomProtocol {
   handler: Parameters<typeof Electron.protocol.handle>[1];
 }
 
-export function createErrorResponse(
-  { message, code = 'Internal server error', status = 500, headers }:
-  { message: string; code?: string, status?: number, headers?: HeadersInit },
-) {
-  return Response.json({
-    code,
-    status,
-    message,
-  }, {
-    status,
-    headers,
+export function createErrorResponse({
+  message,
+  code = 'Internal server error',
+  status = 500,
+  headers,
+}: {
+  message: string;
+  code?: string;
+  status?: number;
+  headers?: HeadersInit;
+}) {
+  return Response.json(
+    {
+      code,
+      status,
+      message,
+    },
+    {
+      status,
+      headers,
+    },
+  );
+}
+
+const protocols = import.meta.glob('./*Protocol.ts', { eager: true });
+
+export function registerCustomProtocolsPrivileged() {
+  const protocolPrivilege: Electron.CustomScheme[] = [];
+
+  Object.values(protocols).forEach((protocol) => {
+    const customProtocol = (protocol as { default?: CustomProtocol }).default;
+    if (!customProtocol?.privilege) return;
+
+    protocolPrivilege.push({
+      scheme: customProtocol.scheme,
+      privileges: customProtocol.privilege,
+    });
   });
+
+  protocol.registerSchemesAsPrivileged(protocolPrivilege);
 }
 
 export function registerCustomProtocols() {
-  const protocols = import.meta.glob('./*Protocol.ts', { eager: true });
-  const privileges: Record<string, Electron.CustomScheme['privileges']> = {};
-
   Object.values(protocols).forEach((customProtocolModule) => {
-    const customProtocol = (customProtocolModule as { default?: CustomProtocol }).default;
+    const customProtocol = (
+      customProtocolModule as { default?: CustomProtocol }
+    ).default;
     if (!customProtocol) return;
-
-    if (customProtocol.privilege) {
-      privileges[customProtocol.scheme] = customProtocol.privilege;
-    }
 
     protocol.handle(customProtocol.scheme, async (request) => {
       try {
@@ -47,13 +70,4 @@ export function registerCustomProtocols() {
       }
     });
   });
-
-  const customPrivileges = Object.entries(privileges).map(([scheme, privileges]) => ({
-    scheme,
-    privileges,
-  }));
-  if (customPrivileges.length === 0) return;
-
-  protocol.registerSchemesAsPrivileged(customPrivileges);
 }
-

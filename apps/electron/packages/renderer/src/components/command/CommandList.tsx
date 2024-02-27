@@ -1,5 +1,5 @@
 import { UiCommandGroup, UiCommandItem, useCommandState } from '@repo/ui';
-import { commandIcons } from '/@/utils/command-icons';
+import { commandIcons } from '#common/utils/command-icons';
 import { Fragment } from 'react';
 import { CommandSelectedItem, useCommandStore } from '/@/stores/command.store';
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
@@ -36,7 +36,7 @@ function CommandPrefix({ id, icon, alt }: { icon: string; alt: string; id: strin
 
   return (
     <UiImage
-      src={`${CUSTOM_SCHEME.extIcon}://${id}/${icon}`}
+      src={`${CUSTOM_SCHEME.extension}://${id}/icon/${icon}`}
       alt={alt}
     />
   );
