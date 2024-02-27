@@ -8,7 +8,7 @@
     "skipLibCheck": true,
     "strict": true,
     "isolatedModules": true,
-    "types": ["node"],
+    "types": ["node", "vite/client"],
     "experimentalDecorators": true,
     "baseUrl": ".",
     "paths": {
@@ -16,6 +16,9 @@
       "#common/*": ["../common/*"],
     }
   },
-  "include": ["src/**/*.ts", "../../types/**/*.d.ts"],
+  "include": [
+    "**/*.ts",
+    "../../types/**/*.d.ts",
+  ],
   "exclude": ["**/*.spec.ts", "**/*.test.ts"]
 }

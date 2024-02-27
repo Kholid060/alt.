@@ -1,7 +1,7 @@
 import type { ExtensionManifest } from '@repo/extension-api';
 import { flatActionExtensionAPI } from '@repo/extension-api/dist/flat-extension-api';
 import {
-  EXTENSION_VIEW,
+  CUSTOM_SCHEME,
   PRELOAD_API_KEY,
 } from '#common/utils/constant/constant';
 import { sendIpcMessage } from '#common/utils/sendIpcMessage';
@@ -29,14 +29,12 @@ export class ExtensionAPI {
 
   async loadAPI() {
     try {
-      if (window.location.pathname !== EXTENSION_VIEW.path) return setExtView();
+      if (!window.location.href.startsWith(CUSTOM_SCHEME.extension))
+        return setExtView();
 
-      const extensionQuery = new URLSearchParams(window.location.search).get(
-        EXTENSION_VIEW.idQuery,
-      );
-      if (!extensionQuery) return setExtView();
-
-      const [extensionId, commandId] = extensionQuery.split('::');
+      const { 0: extensionId, 2: commandId } = window.location.pathname
+        .substring(2)
+        .split('/');
       if (!extensionId || !commandId) return setExtView();
 
       const extensionData = await sendIpcMessage('extension:get', extensionId);
@@ -44,8 +42,6 @@ export class ExtensionAPI {
       if ('$isError' in extensionData) throw new Error(extensionData.message);
 
       this.key = extensionData.$key;
-
-      window.history.replaceState(null, '', window.location.pathname);
 
       const extensionApi = await this.getExtensionAPI(extensionData.manifest);
       contextBridge.exposeInMainWorld(PRELOAD_API_KEY.extension, extensionApi);

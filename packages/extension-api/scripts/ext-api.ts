@@ -61,7 +61,7 @@ function getExtensionTypeValue(
   return `!EXPORT_TYPE_flat${type}ExtensionAPI = ${valueStr};\n`;
 }
 
-(async () => {
+async function buildExtensionAPI() {
   const project = new Project();
   project.addSourceFilesAtPaths(path.join(TYPES_DIR, '/**/extension-api.d.ts'));
 
@@ -143,4 +143,6 @@ function getExtensionTypeValue(
     ),
     'utf8',
   );
-})();
+}
+
+export default buildExtensionAPI;

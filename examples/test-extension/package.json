@@ -1,0 +1,27 @@
+{
+  "name": "testing-extension",
+  "title": "Extension for Testing",
+  "icon": "icon:Code2",
+  "author": "kholid060",
+  "commands": [
+    {
+      "name": "testing-page",
+      "title": "Testing Page",
+      "type": "view"
+    }
+  ],
+  "version": "1.0.0",
+  "description": "Clipboard extension",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "cliaa build"
+  },
+  "devDependencies": {
+    "@repo/extension-api": "*"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.10",
+    "react": "^18.2.0"
+  }
+}

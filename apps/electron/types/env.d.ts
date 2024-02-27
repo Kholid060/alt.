@@ -18,6 +18,8 @@ interface ImportMetaEnv {
 
   /** Current app version */
   readonly VITE_APP_VERSION: string;
+
+  readonly VITE_DISABLE_EXT_API_VALIDATION: boolean;
 }
 
 interface ImportMeta {

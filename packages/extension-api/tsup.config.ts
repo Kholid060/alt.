@@ -1,4 +1,5 @@
 import { defineConfig, Options } from 'tsup';
+import buildExtensionAPI from './scripts/ext-api';
 
 export default defineConfig((options: Options) => ({
   treeshake: true,
@@ -25,8 +26,7 @@ export default defineConfig((options: Options) => ({
   minify: true,
   clean: true,
   async onSuccess() {
-    await new Promise((r) => setTimeout(r, 1500));
-    await import('./scripts/ext-api');
+    buildExtensionAPI();
   },
   ...options,
 }));

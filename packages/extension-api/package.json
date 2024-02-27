@@ -3,9 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
+    "build": "tsup",
     "dev": "tsup --watch",
-    "build": "tsup && yarn build:ext-api",
-    "build:ext-api": "tsx ./scripts/ext-api.ts",
     "lint": "eslint . --ext js,mjs,cjs,ts,mts,cts,tsx"
   },
   "bin": {

@@ -2,10 +2,11 @@
 
 import { chrome } from '../../.electron-vendors.cache.json';
 import react from '@vitejs/plugin-react';
-import { join, extname } from 'node:path';
+import { join } from 'node:path';
 
 const PACKAGE_ROOT = __dirname;
 const PROJECT_ROOT = join(PACKAGE_ROOT, '../..');
+
 
 /**
  * @type {import('vite').UserConfig}
@@ -40,7 +41,8 @@ const config = {
       },
       output: {
         assetFileNames: `[name].[ext]`
-      }
+      },
+      external: ['**/*.dev.tsx'],
     },
     emptyOutDir: true,
     reportCompressedSize: false,
