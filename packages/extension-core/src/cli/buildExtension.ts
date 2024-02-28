@@ -6,8 +6,13 @@ import { build, InlineConfig } from 'vite';
 import { fromZodError } from 'zod-validation-error';
 import { BuildError, logger } from './utils/logger';
 import semverValid from 'semver/functions/valid';
+import semverClean from 'semver/functions/clean';
 import { ExtensionManifestSchema, ExtensionManifest } from '../client/manifest';
 import { PackageJson as PackageJsonType } from 'type-fest';
+import * as tmp from 'tmp';
+import { glob } from 'glob';
+
+tmp.setGracefulCleanup();
 
 type PackageJson = PackageJsonType & ExtensionManifest;
 
@@ -17,6 +22,8 @@ const EXT_ICON_DIR = path.join(EXT_ROOT_DIR, 'icon');
 
 const SUPPORTED_ICON_SIZE = 256;
 const SUPPORTED_ICON_TYPE = ['.png'];
+
+const EXT_API_PKG_NAME = '@repo/extension';
 
 const seenIcon = new Set<string>();
 
@@ -54,6 +61,12 @@ async function getPackageJSON(): Promise<PackageJson> {
 
   const packageJSON = await fs.readJSON(packageJSONDir);
 
+  const apiDepVersion =
+    packageJSON.devDependencies?.[EXT_API_PKG_NAME] ??
+    packageJSON.dependencies?.[EXT_API_PKG_NAME] ??
+    '';
+  packageJSON.$apiVersion = semverClean(apiDepVersion) ?? '*';
+
   return packageJSON;
 }
 
@@ -83,19 +96,45 @@ async function getExtensionManifest(packageJSON: PackageJson) {
 }
 
 async function buildCommands(manifest: ExtensionManifest) {
+  const EXT_COMMAND_FILE_EXTENSION = '.{js,jsx,ts,tsx}';
+
+  const cleanups: (() => void)[] = [];
   const seenCommand = new Set<string>();
   const entry: Record<string, string> = {};
+
   for (const command of manifest.commands) {
-    if (seenCommand.has(command.name)) {
+    const [commandFilePath] = await glob([
+      path.join(EXT_SRC_DIR, `${command.name}${EXT_COMMAND_FILE_EXTENSION}`),
+      path.join(
+        EXT_SRC_DIR,
+        `${command.name}/index${EXT_COMMAND_FILE_EXTENSION}`,
+      ),
+    ]);
+    if (!commandFilePath) {
       throw new BuildError(
-        `The "${chalk.bold(command.name)}" command has duplicate`,
+        `Can't find "${chalk.bold(command.name)}" command file`,
       );
     }
-    seenCommand.add(command.name);
+
+    if (seenCommand.has(command.name)) {
+      throw new BuildError(
+        `Couldn't resolve "${chalk.bold(command.name)}" command file`,
+      );
+    }
+
     entry[command.name] = path.join(EXT_SRC_DIR, `${command.name}`);
   }
 
+  const DEPS_MAP: Record<string, string> = {
+    react: '/@preload/react.js',
+    'react-dom': '/@preload/react-dom.js',
+    'react/jsx-runtime': '/@preload/react-runtime.js',
+  };
+
+  process.env.NODE_ENV = 'production';
+
   const config: InlineConfig = {
+    mode: process.env.MODE ?? 'production',
     define: {
       'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
     },
@@ -106,15 +145,24 @@ async function buildCommands(manifest: ExtensionManifest) {
         name: '[name].js',
       },
       rollupOptions: {
-        external: ['react', 'react/jsx-runtime', '@repo/extension-core'],
+        external: [...Object.keys(DEPS_MAP)],
         output: {
-          paths: {
-            react: './react.js',
-            'react/jsx-runtime': './react-runtime.js',
+          paths: (id) => {
+            return DEPS_MAP[id] || id;
+          },
+          manualChunks: {
+            [EXT_API_PKG_NAME]: [EXT_API_PKG_NAME],
+          },
+          chunkFileNames: (chunkInfo) => {
+            if (chunkInfo.name === EXT_API_PKG_NAME) {
+              return '@libs/$extension-api.js';
+            }
+
+            return `@libs/${chunkInfo.name}.js`;
           },
         },
       },
-      minify: false,
+      minify: true,
     },
   };
   await build(config);
@@ -124,6 +172,8 @@ async function buildCommands(manifest: ExtensionManifest) {
     manifest,
   );
   await fs.copy(EXT_ICON_DIR, path.join(EXT_ROOT_DIR, 'dist', 'icon'));
+
+  cleanups.forEach((cleanup) => cleanup());
 }
 
 async function buildExtension() {

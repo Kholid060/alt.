@@ -1,13 +1,22 @@
 {
   "name": "@repo/shared",
   "version": "0.0.0",
+  "type": "module",
   "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
     "lint": "eslint . --max-warnings 0"
   },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "devDependencies": {
     "@repo/eslint-config": "*",
-    "@repo/tailwind-config": "*",
     "@repo/typescript-config": "*",
-    "eslint": "^8.56.0"
+    "eslint": "^8.56.0",
+    "tsup": "^8.0.2"
+  },
+  "dependencies": {
+    "eventemitter3": "^5.0.1"
   }
 }

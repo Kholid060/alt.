@@ -88,7 +88,7 @@ function setupPreloadPackageWatcher({ ws }) {
   });
 }
 
-function setupExtensionPackageWatcher({ ws, resolvedUrls }) {
+function setupExtensionPackageWatcher({ resolvedUrls }) {
   process.env.VITE_DEV_SERVER_URL = resolvedUrls.local[0];
 
   return build({

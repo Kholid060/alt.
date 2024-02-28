@@ -1,40 +1,11 @@
-import 'vite/modulepreload-polyfill';
-import React, { Suspense, lazy } from 'react';
-import ReactDOM from 'react-dom/client';
-import { ExtensionStateProvider } from './context/extension.context';
-import AMessagePort from '#common/utils/AMessagePort';
+import type { ExtensionCommandRenderer } from '@repo/extension/dist/command-renderer/command-renderer';
 
-const extComponents = import.meta.glob('../components/extension/*.tsx', {
-  eager: true,
-});
-for (const key in extComponents) {
-  const { name, default: component } = extComponents[key] as {
-    name: string;
-    default: React.FC;
-  };
-  if (!name || !component) continue;
-
-  Object.defineProperty(window, name, {
-    get() {
-      return component;
-    },
-  });
-}
-
-function renderApp(messagePort: AMessagePort) {
-  const extViewPath = './@view';
-  const ExtensionView = lazy(() => import(/* @vite-ignore */ extViewPath));
-
-  ReactDOM.createRoot(document.getElementById('app')!).render(
-    <React.StrictMode>
-      <ExtensionStateProvider messagePort={messagePort}>
-        <Suspense>
-          <ExtensionView />
-        </Suspense>
-      </ExtensionStateProvider>
-    </React.StrictMode>,
-  );
-}
+const MODULE_MAP = {
+  css: '../@css',
+  react: '/@preload/react.js',
+  renderer: '../@renderer',
+  reactDOM: '/@preload/react-dom.js',
+};
 
 async function loadStyle(themeStyle: string) {
   try {
@@ -43,22 +14,39 @@ async function loadStyle(themeStyle: string) {
     themeStyleEl.textContent = themeStyle;
     document.head.appendChild(themeStyleEl);
 
-    if (!import.meta.env.DEV) {
-      const linkEl = document.createElement('link');
-      linkEl.rel = 'stylesheet';
-      linkEl.href = '@css';
+    if (import.meta.env) {
+      const { default: styleStr } = (await import(MODULE_MAP.css)) as {
+        default: string;
+      };
+      const styleEl = document.createElement('style');
+      styleEl.textContent = styleStr;
 
-      document.head.appendChild(linkEl);
+      document.head.appendChild(styleEl);
       return;
     }
 
-    const styleURL = '../@css';
-    const styleModule = await import(/* @vite-ignore */ styleURL);
+    const linkEl = document.createElement('link');
+    linkEl.rel = 'stylesheet';
+    linkEl.href = MODULE_MAP.css;
 
-    const styleEl = document.createElement('style');
-    styleEl.textContent = styleModule.default;
+    document.head.appendChild(linkEl);
+  } catch (error) {
+    console.error(error);
+  }
+}
 
-    document.head.appendChild(styleEl);
+async function renderApp(messagePort: MessagePort) {
+  try {
+    const { default: renderer } = (await import(MODULE_MAP.renderer)) as {
+      default: ExtensionCommandRenderer;
+    };
+
+    const reactDOM = await import(MODULE_MAP.reactDOM);
+    reactDOM.createRoot(document.querySelector('#app')!).render(
+      renderer({
+        messagePort,
+      }),
+    );
   } catch (error) {
     console.error(error);
   }
@@ -71,7 +59,7 @@ function onMessage({ ports, data }: MessageEvent) {
     throw new Error('Invalid payload');
 
   loadStyle(data.themeStyle).finally(() => {
-    renderApp(new AMessagePort(messagePort));
+    renderApp(messagePort);
   });
 
   window.removeEventListener('message', onMessage);

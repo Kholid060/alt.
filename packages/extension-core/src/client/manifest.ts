@@ -33,6 +33,7 @@ export const ExtensionManifestSchema = z.object({
   version: z.string().min(1),
   title: z.string().min(3).max(64),
   author: z.string().min(1).max(24),
+  $apiVersion: z.string().optional(),
   description: z.string().min(12).max(128),
   commands: ExtensionCommandSchema.array().min(1),
   permissions: z.enum(EXTENSION_PERMISSIONS).array().optional(),

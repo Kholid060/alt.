@@ -8,6 +8,10 @@ const PACKAGE_ROOT = __dirname;
 const PROJECT_ROOT = join(PACKAGE_ROOT, '../..');
 const MONOREPO_ROOT = join(PROJECT_ROOT, '../..');
 
+const NODE_MODULE_PATH = join(MONOREPO_ROOT, 'node_modules');
+const REACT_MODULE_DIR = join(NODE_MODULE_PATH, 'react', 'cjs');
+const REACT_DOM_MODULE_DIR = join(NODE_MODULE_PATH, 'react-dom', 'cjs');
+
 /**
  * @type {import('vite').UserConfig}
  * @see https://vitejs.dev/config/
@@ -46,27 +50,18 @@ const config = {
     lib: {
       entry: {
         index: './src/main.tsx',
-        react: join(
-          MONOREPO_ROOT,
-          'node_modules',
-          'react',
-          'cjs',
-          'react.production.min.js',
+        react: join(REACT_MODULE_DIR, 'react.production.min.js'),
+        'react.dev': join(REACT_MODULE_DIR, 'react.development.js'),
+        'react-runtime.dev': join(
+          REACT_MODULE_DIR,
+          'react-jsx-dev-runtime.development',
         ),
         'react-runtime': join(
-          MONOREPO_ROOT,
-          'node_modules',
-          'react',
-          'cjs',
+          REACT_MODULE_DIR,
           'react-jsx-runtime.production.min.js',
         ),
-        'react-dom': join(
-          MONOREPO_ROOT,
-          'node_modules',
-          'react-dom',
-          'cjs',
-          'react-dom.production.min.js',
-        ),
+        'react-dom': join(REACT_DOM_MODULE_DIR, 'react-dom.production.min.js'),
+        'react-dom.dev': join(REACT_DOM_MODULE_DIR, 'react-dom.development.js'),
       },
       formats: ['es'],
     },

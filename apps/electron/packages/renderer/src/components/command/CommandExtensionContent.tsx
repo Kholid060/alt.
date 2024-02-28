@@ -2,7 +2,13 @@ import { useRef } from 'react';
 import { EXTENSION_VIEW } from '#common/utils/constant/constant';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
 
-function CommandSandboxContent({ extensionId, commandId }: { extensionId: string; commandId: string }) {
+function CommandSandboxContent({
+  extensionId,
+  commandId,
+}: {
+  extensionId: string;
+  commandId: string;
+}) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const commandCtx = useCommandCtx();
@@ -10,18 +16,23 @@ function CommandSandboxContent({ extensionId, commandId }: { extensionId: string
   function onIframeLoad(event: React.SyntheticEvent<HTMLIFrameElement, Event>) {
     const iframe = event.target as HTMLIFrameElement;
 
-    let messagePort = commandCtx.extMessagePort.current;
     if (!commandCtx.extMessageChannel.current) {
       const messageChannel = new MessageChannel();
       commandCtx.setExtMessageChannel(messageChannel);
-      messagePort = commandCtx.extMessagePort.current!;
     }
 
     import('@repo/ui/theme.css?inline').then((themeStyle) => {
-      iframe.contentWindow?.postMessage({
-        type: 'init',
-        themeStyle: themeStyle.default,
-      }, '*', [commandCtx.extMessageChannel.current?.port2!]);
+      const port = commandCtx.extMessageChannel.current?.port2;
+      if (!port) throw new Error('Extension MessagePort is undefined');
+
+      iframe.contentWindow?.postMessage(
+        {
+          type: 'init',
+          themeStyle: themeStyle.default,
+        },
+        '*',
+        [port],
+      );
     });
   }
 
@@ -35,7 +46,7 @@ function CommandSandboxContent({ extensionId, commandId }: { extensionId: string
       className="h-64 block w-full"
       onLoad={onIframeLoad}
     />
-  )
+  );
 }
 
 export default CommandSandboxContent;

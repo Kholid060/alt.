@@ -35,7 +35,7 @@ async function extractExtManifest(manifestPath: string) {
 
   // Check commands file
   const commands = manifest.data.commands.filter((command) =>
-    fs.existsSync(path.join(extDir, `${command.name}.mjs`)),
+    fs.existsSync(path.join(extDir, `${command.name}.js`)),
   );
   if (commands.length === 0) {
     validatorLogger('error', `${extDirname}: commands empty`);

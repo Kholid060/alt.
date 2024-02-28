@@ -3,6 +3,7 @@ import { createErrorResponse, type CustomProtocol } from './index';
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
 import { net } from 'electron';
 import { fileURLToPath } from 'url';
+
 const extensionFilePath = fileURLToPath(
   new URL('./../../extension/dist/', import.meta.url),
 );
@@ -19,11 +20,9 @@ function handleCommandPath(extId: string, ...paths: string[]) {
     case '':
       path = extensionFilePath + 'index.html';
       break;
+    // Main js file
     case '@preload':
-      path =
-        paths[0] === '@view'
-          ? `${EXTENSION_FOLDER}/${extId}/${commandId}.mjs`
-          : extensionFilePath + paths.join('/');
+      path = extensionFilePath + paths.join('/');
       break;
     case '@css': {
       path =
@@ -39,7 +38,17 @@ function handleCommandPath(extId: string, ...paths: string[]) {
           : extensionFilePath + paths.join('/');
       break;
     }
+    case '@renderer':
+      path = `${EXTENSION_FOLDER}/${extId}/${commandId}.js`;
+      break;
+    case '@libs':
+      path = `${EXTENSION_FOLDER}/${extId}/@libs/${paths[0]}`;
+      break;
+    default:
+      path = `${extensionFilePath}${type}`;
   }
+
+  console.log('EXTENSION PROTOCOL =>', path, '||', { commandId, type, paths });
 
   if (!path) {
     return createErrorResponse({
@@ -65,6 +74,8 @@ const appIconProtocol: CustomProtocol = {
       }
       case 'command':
         return handleCommandPath(extId, ...paths);
+      case '@preload':
+        return net.fetch(`${extensionFilePath}${paths.join('/')}`);
     }
 
     return createErrorResponse({

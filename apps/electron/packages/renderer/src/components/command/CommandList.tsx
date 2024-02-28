@@ -18,20 +18,25 @@ function CommandIcon({ icon }: { icon: string }) {
 
   return (
     <span className="group-aria-selected:bg-secondary-hover  group-aria-selected:text-foreground text-muted-foreground inline-flex justify-center items-center bg-secondary rounded-sm border border-border/40 h-full w-full">
-      {typeof Icon === 'string'
-        ? Icon
-        : <Icon className="h-4 w-4" />
-      }
+      {typeof Icon === 'string' ? Icon : <Icon className="h-4 w-4" />}
     </span>
-  )
+  );
 }
 
-function CommandPrefix({ id, icon, alt }: { icon: string; alt: string; id: string }) {
+function CommandPrefix({
+  id,
+  icon,
+  alt,
+}: {
+  icon: string;
+  alt: string;
+  id: string;
+}) {
   if (icon.startsWith(iconPrefix)) {
     let iconName = icon.slice(iconPrefix.length) as CommandIconName;
     iconName = commandIcons[iconName] ? iconName : 'Command';
 
-    return <CommandIcon icon={iconName} />
+    return <CommandIcon icon={iconName} />;
   }
 
   return (
@@ -61,11 +66,11 @@ export function CommandItem({
       onSelect={onSelect}
       className="group aria-selected:bg-secondary min-h-12"
     >
-      {icon &&
+      {icon && (
         <span className="h-8 w-8 mr-2 inline-flex items-center justify-center">
           {icon}
         </span>
-      }
+      )}
       <div>
         <p className="leading-tight">{title}</p>
         <p className="text-muted-foreground leading-tight">{subtitle}</p>
@@ -76,39 +81,67 @@ export function CommandItem({
 
 function CommandExtensionList({ selectedExt }: CommonListProps) {
   const searchStr = useCommandState((state) => state.search);
-  const [extensions, setStoreState] = useCommandStore((state) => [state.extensions, state.setState]);
+  const [extensions, setStoreState] = useCommandStore((state) => [
+    state.extensions,
+    state.setState,
+  ]);
 
   return (
     <UiCommandGroup heading="Extensions">
       {extensions.map(({ id, manifest }) => {
-        const extensionIcon = <CommandPrefix alt={`${manifest.title} icon`} id={id} icon={manifest.icon} />;
+        const extensionIcon = (
+          <CommandPrefix
+            alt={`${manifest.title} icon`}
+            id={id}
+            icon={manifest.icon}
+          />
+        );
 
         return (
           <Fragment key={id + manifest.name}>
-            {!selectedExt &&
+            {!selectedExt && (
               <CommandItem
                 icon={extensionIcon}
                 title={manifest.title}
                 value={manifest.title}
                 subtitle={manifest.description}
-                onSelect={() => setStoreState('paths', [{ id, label: manifest.title, type: 'extension' }])}
-              />
-            }
-            {(selectedExt?.id === id || searchStr) && manifest.commands.map((command) =>
-              <CommandItem
-                key={manifest.name + command.name}
-                title={command.title}
-                value={manifest.name + ' ' + command.title}
-                subtitle={command.subtitle}
-                onSelect={() => {
+                onSelect={() =>
                   setStoreState('paths', [
                     { id, label: manifest.title, type: 'extension' },
-                    { id: command.name, label: command.title, type: 'command' }
-                  ]);
-                }}
-                icon={command.icon ? <CommandPrefix id={id} alt={command.name} icon={command.icon} /> : extensionIcon}
+                  ])
+                }
               />
             )}
+            {(selectedExt?.id === id || searchStr) &&
+              manifest.commands.map((command) => (
+                <CommandItem
+                  key={manifest.name + command.name}
+                  title={command.title}
+                  value={manifest.name + ' ' + command.title}
+                  subtitle={command.subtitle}
+                  onSelect={() => {
+                    setStoreState('paths', [
+                      { id, label: manifest.title, type: 'extension' },
+                      {
+                        id: command.name,
+                        label: command.title,
+                        type: 'command',
+                      },
+                    ]);
+                  }}
+                  icon={
+                    command.icon ? (
+                      <CommandPrefix
+                        id={id}
+                        alt={command.name}
+                        icon={command.icon}
+                      />
+                    ) : (
+                      extensionIcon
+                    )
+                  }
+                />
+              ))}
           </Fragment>
         );
       })}

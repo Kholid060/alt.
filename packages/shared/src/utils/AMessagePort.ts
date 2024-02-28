@@ -1,7 +1,10 @@
 import { EventEmitter } from 'eventemitter3';
-import { MessagePortEvent } from '../interface/message-port-events';
 
-class AMessagePort extends EventEmitter<MessagePortEvent> {
+interface AMessagePortEvents {}
+
+class AMessagePort<
+  T extends AMessagePortEvents = AMessagePortEvents,
+> extends EventEmitter<T> {
   port: MessagePort;
 
   constructor(port: MessagePort) {
@@ -12,21 +15,24 @@ class AMessagePort extends EventEmitter<MessagePortEvent> {
     this.port.start();
   }
 
-  private _messageHandler(event: MessageEvent<{ name: unknown; data: unknown }>) {
+  private _messageHandler(
+    event: MessageEvent<{ name: unknown; data: unknown }>,
+  ) {
     if (
       typeof event.data !== 'object' ||
       Array.isArray(event.data) ||
       !Array.isArray(event.data.data) ||
       !event.data.name
-    ) return;
+    )
+      return;
 
-    // @ts-expect-error
+    // @ts-expect-error expected!!!
     this.emit(event.data.name, ...event.data.data);
   }
 
-  sendMessage<K extends EventEmitter.EventNames<MessagePortEvent>>(
+  sendMessage<K extends EventEmitter.EventNames<T>>(
     name: K,
-    ...data: EventEmitter.EventArgs<MessagePortEvent, K>
+    ...data: EventEmitter.EventArgs<T, K>
   ) {
     this.port.postMessage({ data, name });
   }

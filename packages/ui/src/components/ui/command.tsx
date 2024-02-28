@@ -4,7 +4,7 @@ import { Command as CommandPrimitive, useCommandState } from 'cmdk';
 import { Search } from 'lucide-react';
 
 import { cn } from '@/utils/cn';
-import { Dialog, DialogContent } from '@/components/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 const UiCommand = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -37,9 +37,15 @@ const UiCommandDialog = ({ children, ...props }: CommandDialogProps) => {
 
 const UiCommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & { iconSlot?: React.ReactNode; rootClass?: string }
+  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & {
+    iconSlot?: React.ReactNode;
+    rootClass?: string;
+  }
 >(({ className, rootClass, iconSlot, ...props }, ref) => (
-  <div className={cn('flex items-center border-b px-3', rootClass)} cmdk-input-wrapper="">
+  <div
+    className={cn('flex items-center border-b px-3', rootClass)}
+    cmdk-input-wrapper=""
+  >
     {iconSlot || <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />}
     <CommandPrimitive.Input
       ref={ref}

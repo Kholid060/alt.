@@ -61,7 +61,12 @@ export function registerCustomProtocols() {
         return await customProtocol.handler(request);
       } catch (error) {
         if (error instanceof Error) {
-          logger('error', ['PROTOCOL', customProtocol.scheme], error.message);
+          logger(
+            'error',
+            ['PROTOCOL', customProtocol.scheme],
+            error.message,
+            request.url,
+          );
         }
 
         return createErrorResponse({

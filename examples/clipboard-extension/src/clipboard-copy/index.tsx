@@ -1,10 +1,12 @@
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
+import { ExtCommandList, ExtCommandListItem, commandRenderer } from '@repo/extension';
 
-export default function Command() {
+function CommandMain() {
   function redirect() {
     window.location.href = 'https://lipsum.com'
   }
+  console.log('rerender');
 
   useEffect(() => {
     console.log('Today date is', dayjs().format('DD MMMM YYYY'));
@@ -12,6 +14,9 @@ export default function Command() {
 
   return (
     <>
+      <ExtCommandList>
+        <ExtCommandListItem title="Hello world" />
+      </ExtCommandList>
       <p><a href="https://google.com">google</a></p>
       <p><a href="https://google.com" target="_blank">google blank</a></p>
       <p><a href="/">hola</a></p>
@@ -20,3 +25,5 @@ export default function Command() {
     </>
   );
 }
+
+export default commandRenderer(CommandMain);

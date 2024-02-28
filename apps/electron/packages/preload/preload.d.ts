@@ -3,12 +3,12 @@ import type * as MainPreload from './src/main';
 import type { PRELOAD_API_KEY } from '../common/utils/constant/constant';
 
 declare global {
-  const _extension: typeof ExtensionAPI;
-
   const __mainAPI: typeof MainPreload;
 
+  const _extension: typeof ExtensionAPI & { $commandId: string };
+
   interface Window {
-    [PRELOAD_API_KEY.main]: typeof MainPreload;
-    [PRELOAD_API_KEY.extension]: typeof ExtensionAPI;
+    [PRELOAD_API_KEY.main]: typeof __mainAPI;
+    [PRELOAD_API_KEY.extension]: typeof _extension;
   }
 }

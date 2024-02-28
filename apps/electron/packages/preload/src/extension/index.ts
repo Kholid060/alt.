@@ -44,7 +44,10 @@ export class ExtensionAPI {
       this.key = extensionData.$key;
 
       const extensionApi = await this.getExtensionAPI(extensionData.manifest);
-      contextBridge.exposeInMainWorld(PRELOAD_API_KEY.extension, extensionApi);
+      contextBridge.exposeInMainWorld(PRELOAD_API_KEY.extension, {
+        ...extensionApi,
+        $commandId: commandId,
+      });
 
       this.permissions = extensionData.manifest.permissions || [];
     } catch (error) {
