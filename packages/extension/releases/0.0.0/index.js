@@ -1,9 +1,17 @@
-import { default as t } from "./components/Icon.js";
-import { ExtCommandList as r, ExtCommandListItem as a } from "@repo/ui";
-import { default as f } from "./command-renderer/command-renderer.js";
+import { UiImage } from "@repo/ui";
+import { ExtIcon } from "./components/ext-icon";
+import {
+  ExtCommandList,
+  ExtCommandListItem,
+  ExtCommandListIcon
+} from "./components/command-list";
+import { default as default2 } from "./command-renderer/command-renderer";
 export {
-  r as ExtCommandList,
-  a as ExtCommandListItem,
-  t as Icon,
-  f as commandRenderer
+  ExtCommandList,
+  ExtCommandListIcon,
+  ExtCommandListItem,
+  ExtIcon,
+  UiImage as ExtImage,
+  default2 as commandRenderer
 };
+//# sourceMappingURL=index.js.map

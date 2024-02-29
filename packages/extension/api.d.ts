@@ -1,5 +1,9 @@
 import ExtensionAPI from '@repo/extension-core/types/extension-api';
 
-declare interface Window {
-  _extension: ExtensionAPI;
+declare global {
+  const _extension: typeof ExtensionAPI;
+
+  interface Window {
+    _extension: typeof ExtensionAPI;
+  }
 }

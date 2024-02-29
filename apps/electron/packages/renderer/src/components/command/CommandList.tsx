@@ -1,9 +1,11 @@
 import { UiCommandGroup, UiCommandItem, useCommandState } from '@repo/ui';
 import { commandIcons } from '#common/utils/command-icons';
-import { Fragment } from 'react';
+import { Fragment, memo } from 'react';
 import { CommandSelectedItem, useCommandStore } from '/@/stores/command.store';
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
-import UiImage from '../ui/UiImage';
+import { UiImage } from '@repo/ui';
+import { ExtCommandListItem, ExtCommandListIcon } from '@repo/extension';
+import { useShallow } from 'zustand/react/shallow';
 
 type CommandIconName = keyof typeof commandIcons;
 
@@ -12,16 +14,6 @@ interface CommonListProps {
 }
 
 const iconPrefix = 'icon:';
-
-function CommandIcon({ icon }: { icon: string }) {
-  const Icon = commandIcons[icon as CommandIconName] ?? icon;
-
-  return (
-    <span className="group-aria-selected:bg-secondary-hover  group-aria-selected:text-foreground text-muted-foreground inline-flex justify-center items-center bg-secondary rounded-sm border border-border/40 h-full w-full">
-      {typeof Icon === 'string' ? Icon : <Icon className="h-4 w-4" />}
-    </span>
-  );
-}
 
 function CommandPrefix({
   id,
@@ -36,7 +28,9 @@ function CommandPrefix({
     let iconName = icon.slice(iconPrefix.length) as CommandIconName;
     iconName = commandIcons[iconName] ? iconName : 'Command';
 
-    return <CommandIcon icon={iconName} />;
+    const Icon = commandIcons[iconName] ?? icon;
+
+    return <ExtCommandListIcon icon={Icon} />;
   }
 
   return (
@@ -81,10 +75,9 @@ export function CommandItem({
 
 function CommandExtensionList({ selectedExt }: CommonListProps) {
   const searchStr = useCommandState((state) => state.search);
-  const [extensions, setStoreState] = useCommandStore((state) => [
-    state.extensions,
-    state.setState,
-  ]);
+  const [extensions, setStoreState] = useCommandStore(
+    useShallow((state) => [state.extensions, state.setState]),
+  );
 
   return (
     <UiCommandGroup heading="Extensions">
@@ -100,8 +93,8 @@ function CommandExtensionList({ selectedExt }: CommonListProps) {
         return (
           <Fragment key={id + manifest.name}>
             {!selectedExt && (
-              <CommandItem
-                icon={extensionIcon}
+              <ExtCommandListItem
+                prefix={extensionIcon}
                 title={manifest.title}
                 value={manifest.title}
                 subtitle={manifest.description}
@@ -114,7 +107,7 @@ function CommandExtensionList({ selectedExt }: CommonListProps) {
             )}
             {(selectedExt?.id === id || searchStr) &&
               manifest.commands.map((command) => (
-                <CommandItem
+                <ExtCommandListItem
                   key={manifest.name + command.name}
                   title={command.title}
                   value={manifest.name + ' ' + command.title}
@@ -126,10 +119,11 @@ function CommandExtensionList({ selectedExt }: CommonListProps) {
                         id: command.name,
                         label: command.title,
                         type: 'command',
+                        meta: { type: command.type },
                       },
                     ]);
                   }}
-                  icon={
+                  prefix={
                     command.icon ? (
                       <CommandPrefix
                         id={id}
@@ -155,7 +149,7 @@ function CommandKeywordsList({ selectedExt }: CommonListProps) {
   return (
     <UiCommandGroup heading="Keywords">
       <CommandItem
-        icon={<CommandIcon icon="?" />}
+        icon={<ExtCommandListIcon icon="?" />}
         title={'Do Math'}
         value={'Do Math'}
       />
@@ -174,4 +168,4 @@ function CommandList() {
   );
 }
 
-export default CommandList;
+export default memo(CommandList);

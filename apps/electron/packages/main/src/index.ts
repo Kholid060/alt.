@@ -1,9 +1,9 @@
 import { Menu, app } from 'electron';
 import './utils/security-restrictions';
+import './utils/ipc-messages-handler';
 import { restoreOrCreateCommandWindow } from './window/command-wIndow';
 import { platform } from 'node:process';
 import updater from 'electron-updater';
-import './utils/ipc-messages-handler';
 import {
   registerCustomProtocols,
   registerCustomProtocolsPrivileged,

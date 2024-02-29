@@ -1,6 +1,6 @@
 {
   "extends": "@repo/typescript-config/vite.json",
-  "include": ["."],
+  "include": [".", "./api.d.ts"],
   "compilerOptions": {
     "paths": {
       "@/*": ["./src/*"]

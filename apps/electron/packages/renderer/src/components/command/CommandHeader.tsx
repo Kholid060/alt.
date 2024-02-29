@@ -5,10 +5,22 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useCommandStore } from '/@/stores/command.store';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
 
-const commandKeys = new Set(['n', 'j', 'ArrowDown', 'p', 'k', 'ArrowUp', 'Home', 'End', 'Enter']);
+const commandKeys = new Set([
+  'n',
+  'j',
+  'ArrowDown',
+  'p',
+  'k',
+  'ArrowUp',
+  'Home',
+  'End',
+  'Enter',
+]);
 
 function CommandInput() {
-  const [query, setState] = useCommandStore(useShallow((state) => [state.query, state.setState]));
+  const [query, setState] = useCommandStore(
+    useShallow((state) => [state.query, state.setState]),
+  );
 
   const commandCtx = useCommandCtx();
 
@@ -16,16 +28,20 @@ function CommandInput() {
     const messagePort = commandCtx.extMessagePort.current;
     if (messagePort && commandKeys.has(event.key)) {
       const { key, ctrlKey, altKey, metaKey } = event;
-      messagePort.sendMessage(
-        'extension:keydown-event',
-        { altKey, ctrlKey, isComposing: event.nativeEvent.isComposing, key, metaKey },
-      );
+      messagePort.sendMessage('extension:keydown-event', {
+        altKey,
+        ctrlKey,
+        isComposing: event.nativeEvent.isComposing,
+        key,
+        metaKey,
+      });
     }
 
     if (
       event.code !== 'Backspace' ||
       (event.target as HTMLInputElement).value.trim().length !== 0
-    ) return;
+    )
+      return;
 
     let { paths } = useCommandStore.getState();
     if (paths.length === 0) return;
@@ -81,7 +97,7 @@ function CommandBreadcrumb() {
 
   return (
     <AnimatePresence>
-      {paths.length > 0 &&
+      {paths.length > 0 && (
         <motion.div
           layout
           key="breadcrumb"
@@ -91,7 +107,7 @@ function CommandBreadcrumb() {
           className="text-xs overflow-hidden"
         >
           <div className="px-4 pt-2 flex items-center gap-1">
-            {paths.map((path, index) =>
+            {paths.map((path, index) => (
               <button
                 type="button"
                 key={path.id + index}
@@ -104,10 +120,10 @@ function CommandBreadcrumb() {
                   <XIcon className="h-4 w-4" />
                 </span>
               </button>
-            )}
+            ))}
           </div>
         </motion.div>
-      }
+      )}
     </AnimatePresence>
   );
 }

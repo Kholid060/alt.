@@ -14,11 +14,18 @@ export const ExtensionContext = createContext<ExtensionContextState>({
   query: '',
 });
 
-const CommandInput = forwardRef<HTMLInputElement, { value: string }>(({ value }, ref) => {
-  return (
-    <UiCommandInput ref={ref} value={value} rootClass="hidden" style={{ display: 'none' }} />
-  );
-});
+const CommandInput = forwardRef<HTMLInputElement, { value: string }>(
+  ({ value }, ref) => {
+    return (
+      <UiCommandInput
+        ref={ref}
+        value={value}
+        rootClass="hidden"
+        style={{ display: 'none' }}
+      />
+    );
+  },
+);
 CommandInput.displayName = 'CommandInput';
 
 export function ExtensionProvider({

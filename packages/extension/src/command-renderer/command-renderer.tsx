@@ -5,7 +5,7 @@ import { ExtensionMessagePortEvent } from '@/interfaces/message-events';
 
 export type ExtensionCommandView = () => React.ReactNode;
 export type ExtensionCommandRenderer = (detail: {
-  messagePort: MessagePort;
+  messagePort: AMessagePort<ExtensionMessagePortEvent>;
 }) => React.ReactNode;
 
 function commandRenderer(
@@ -14,13 +14,9 @@ function commandRenderer(
   const MemoView = React.memo(CommandView);
 
   return function ExtensionRoot({ messagePort }) {
-    const aMessagePort = new AMessagePort<ExtensionMessagePortEvent>(
-      messagePort,
-    );
-
     return (
       <React.StrictMode>
-        <ExtensionProvider messagePort={aMessagePort}>
+        <ExtensionProvider messagePort={messagePort}>
           <MemoView />
         </ExtensionProvider>
       </React.StrictMode>

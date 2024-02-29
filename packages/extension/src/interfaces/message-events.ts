@@ -7,6 +7,7 @@ export interface ExtensionMessagePortEvent {
       'key' | 'ctrlKey' | 'altKey' | 'metaKey' | 'isComposing'
     >,
   ];
+  'extension:finish-execute': [];
 }
 
 export type ExtensionMessagePortCallback<

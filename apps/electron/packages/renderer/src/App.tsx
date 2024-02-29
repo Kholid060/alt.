@@ -1,4 +1,4 @@
-import { CSSProperties, useEffect } from 'react';
+import { CSSProperties, useEffect, useState } from 'react';
 import { Code2Icon, GripHorizontalIcon } from 'lucide-react';
 import { UiButton, UiCommand } from '@repo/ui';
 import CommandHeader from './components/command/CommandHeader';
@@ -10,6 +10,7 @@ import { CommandCtxProvider } from './context/command.context';
 
 function App() {
   const setCommandStoreState = useCommandStore((state) => state.setState);
+  const [anu, setAnu] = useState(false);
 
   useEffect(() => {
     preloadAPI.main.sendIpcMessage('extension:list').then((extensions) => {
@@ -21,7 +22,7 @@ function App() {
 
   return (
     <CommandCtxProvider>
-      {import.meta.env.DEV &&
+      {import.meta.env.DEV && (
         <div className="flex items-center gap-2">
           <UiButton
             size="icon"
@@ -36,13 +37,13 @@ function App() {
             variant="secondary"
             className="mb-2"
             onClick={() => {
-              window.location.pathname = '/test-page'
+              setAnu(!anu);
             }}
           >
             <Code2Icon className="h-5 w-5" />
           </UiButton>
         </div>
-      }
+      )}
       <UiCommand className="border rounded-lg">
         <CommandHeader />
         <CommandContent />

@@ -25,8 +25,6 @@ export {
   DialogDescription,
 } from './components/ui/dialog';
 export { UiScrollArea, UiScrollBar } from './components/ui/scroll-area';
-
-export type { ExtCommandItemProps } from './components/extension/command-list';
-export { ExtCommandList, ExtCommandListItem } from './components/extension/command-list';
+export { UiImage } from './components/ui/image';
 
 export { cn } from './utils/cn';

@@ -1,14 +1,16 @@
-/// <reference types="react" />
+import * as react_jsx_runtime from 'react/jsx-runtime';
+import * as react from 'react';
 import { AMessagePort } from '@repo/shared';
-import { ExtensionMessagePortEvent } from '@/interfaces/message-events';
+import { ExtensionMessagePortEvent } from '../../interfaces/message-events.js';
+
 interface ExtensionContextState {
     query: string;
 }
-export declare const ExtensionContext: import("react").Context<ExtensionContextState>;
-export declare function ExtensionProvider({ children, messagePort, value, }: {
+declare const ExtensionContext: react.Context<ExtensionContextState>;
+declare function ExtensionProvider({ children, messagePort, value, }: {
     children: React.ReactNode;
     value?: string;
     messagePort: AMessagePort<ExtensionMessagePortEvent>;
-}): import("react/jsx-runtime").JSX.Element;
-export {};
-//# sourceMappingURL=extension.context.d.ts.map
+}): react_jsx_runtime.JSX.Element;
+
+export { ExtensionContext, ExtensionProvider };

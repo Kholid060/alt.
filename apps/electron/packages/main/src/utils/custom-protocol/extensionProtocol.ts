@@ -48,8 +48,6 @@ function handleCommandPath(extId: string, ...paths: string[]) {
       path = `${extensionFilePath}${type}`;
   }
 
-  console.log('EXTENSION PROTOCOL =>', path, '||', { commandId, type, paths });
-
   if (!path) {
     return createErrorResponse({
       status: 404,

@@ -1,4 +1,4 @@
-import type { FlatActionExtensionAPI } from '@repo/extension-core/types/flat-extension-api';
+import type { FlatActionExtensionAPI } from '@repo/extension-core/dist/flat-extension-api';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import type { ExtensionData } from './extension';
 

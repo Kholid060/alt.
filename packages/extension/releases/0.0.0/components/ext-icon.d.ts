@@ -1,11 +1,4 @@
-import { ExtensionManifest } from '@repo/extension-core/dist/index';
-export { default as Extension } from '@repo/extension-core/types/extension-api';
-export { UiImage as ExtImage } from '@repo/ui';
 import * as lucide_react from 'lucide-react';
-import { LucideIcon } from 'lucide-react';
-import * as react from 'react';
-import react__default from 'react';
-import { AMessagePort } from '@repo/shared';
 
 declare const ExtIcon: {
     Clipboard: lucide_react.LucideIcon;
@@ -160,39 +153,4 @@ declare const ExtIcon: {
     XCircle: lucide_react.LucideIcon;
 };
 
-declare const ExtCommandList: react.ForwardRefExoticComponent<Omit<{
-    children?: react.ReactNode;
-} & react.HTMLAttributes<HTMLDivElement> & react.RefAttributes<HTMLDivElement>, "ref"> & react.RefAttributes<HTMLDivElement>>;
-interface ExtCommandItemProps extends Omit<React.DetailsHTMLAttributes<HTMLDivElement>, 'children' | 'prefix'> {
-    title: string;
-    value?: string;
-    subtitle?: string;
-    onSelect?: () => void;
-    prefix?: React.ReactNode;
-}
-declare const ExtCommandListItem: react.ForwardRefExoticComponent<ExtCommandItemProps & {
-    children?: React.ReactNode;
-} & react.RefAttributes<HTMLDivElement>>;
-declare const ExtCommandListIcon: react.ForwardRefExoticComponent<{
-    icon: LucideIcon | string;
-} & react.RefAttributes<HTMLSpanElement>>;
-
-interface ExtensionMessagePortEvent {
-    'extension:init': [];
-    'extension:query-change': [string];
-    'extension:keydown-event': [
-        Pick<KeyboardEvent, 'key' | 'ctrlKey' | 'altKey' | 'metaKey' | 'isComposing'>
-    ];
-    'extension:finish-execute': [];
-}
-type ExtensionMessagePortCallback<T extends keyof ExtensionMessagePortEvent> = (...args: ExtensionMessagePortEvent[T]) => void;
-
-type ExtensionCommandView = () => react__default.ReactNode;
-type ExtensionCommandRenderer = (detail: {
-    messagePort: AMessagePort<ExtensionMessagePortEvent>;
-}) => react__default.ReactNode;
-declare function commandRenderer(CommandView: ExtensionCommandView): ExtensionCommandRenderer;
-
-type Manifest = Omit<ExtensionManifest, '$apiVersion'>;
-
-export { type ExtCommandItemProps, ExtCommandList, ExtCommandListIcon, ExtCommandListItem, ExtIcon, type ExtensionMessagePortCallback, type ExtensionMessagePortEvent, type Manifest, commandRenderer };
+export { ExtIcon };

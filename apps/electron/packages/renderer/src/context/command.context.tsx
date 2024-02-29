@@ -3,15 +3,13 @@ import { AMessagePort } from '@repo/shared';
 import { ExtensionMessagePortEvent } from '@repo/extension';
 
 export interface CommandContextState {
-  setExtMessageChannel(port: MessageChannel): void;
-  extMessageChannel: RefObject<MessageChannel | null>;
+  setExtMessagePort(port: MessagePort | null): void;
   extMessagePort: RefObject<AMessagePort<ExtensionMessagePortEvent> | null>;
 }
 
 export const CommandContext = createContext<CommandContextState>({
-  setExtMessageChannel() {},
+  setExtMessagePort() {},
   extMessagePort: { current: null },
-  extMessageChannel: { current: null },
 });
 
 export function CommandCtxProvider({
@@ -19,19 +17,24 @@ export function CommandCtxProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const extMessageChannel = useRef<MessageChannel | null>(null);
   const extMessagePort = useRef<AMessagePort<ExtensionMessagePortEvent> | null>(
     null,
   );
 
-  function setExtMessageChannel(channel: MessageChannel) {
-    extMessageChannel.current = channel;
-    extMessagePort.current = new AMessagePort(channel.port1);
+  function setExtMessagePort(port: MessagePort | null) {
+    if (!port && extMessagePort.current) {
+      extMessagePort.current.destroy();
+    }
+
+    extMessagePort.current = port ? new AMessagePort(port) : port;
   }
 
   return (
     <CommandContext.Provider
-      value={{ extMessagePort, extMessageChannel, setExtMessageChannel }}
+      value={{
+        extMessagePort,
+        setExtMessagePort: setExtMessagePort,
+      }}
     >
       {children}
     </CommandContext.Provider>

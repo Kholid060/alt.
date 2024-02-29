@@ -1,8 +1,11 @@
-import React from 'react';
-export type ExtensionCommandView = () => React.ReactNode;
-export type ExtensionCommandRenderer = (detail: {
-    messagePort: MessagePort;
-}) => React.ReactNode;
+import react__default from 'react';
+import { AMessagePort } from '@repo/shared';
+import { ExtensionMessagePortEvent } from '../interfaces/message-events.js';
+
+type ExtensionCommandView = () => react__default.ReactNode;
+type ExtensionCommandRenderer = (detail: {
+    messagePort: AMessagePort<ExtensionMessagePortEvent>;
+}) => react__default.ReactNode;
 declare function commandRenderer(CommandView: ExtensionCommandView): ExtensionCommandRenderer;
-export default commandRenderer;
-//# sourceMappingURL=command-renderer.d.ts.map
+
+export { type ExtensionCommandRenderer, type ExtensionCommandView, commandRenderer as default };

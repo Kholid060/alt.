@@ -3,5 +3,5 @@
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "types": ["@repo/extension/api"]
-  }
+  },
 }

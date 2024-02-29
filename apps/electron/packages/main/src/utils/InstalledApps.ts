@@ -159,7 +159,18 @@ class InstalledApps {
     const useCache =
       storedData.fetchedAt &&
       dayjs().diff(storedData.fetchedAt, 'day') <= MAX_CACHE_AGE_DAY;
-    if (useCache && storedData.list.length > 0) return storedData.list;
+    if (useCache && storedData.list.length > 0) {
+      if (this.appTarget.size === 0) {
+        this.appTarget = new Map(
+          storedData.list.map((app) => [
+            app.appId,
+            storedData.appsTarget[app.appId],
+          ]),
+        );
+      }
+
+      return storedData.list;
+    }
 
     await fs.emptyDir(APP_ICON_DIR);
 
@@ -223,6 +234,7 @@ class InstalledApps {
   }
 
   getAppTarget(appId: string) {
+    console.log(appId, this.appTarget);
     return this.appTarget.get(appId);
   }
 

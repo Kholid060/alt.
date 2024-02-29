@@ -1,68 +1,31 @@
-import type { ExtensionCommandRenderer } from '@repo/extension/dist/command-renderer/command-renderer';
+import type { ExtensionCommand } from '@repo/extension-core';
+import extViewRenderer from './utils/extViewRenderer';
+import extActionRenderer from './utils/extActionRenderer';
+import { AMessagePort } from '@repo/shared';
+import type { ExtensionMessagePortEvent } from '@repo/extension/dist/interfaces/message-events';
 
-const MODULE_MAP = {
-  css: '../@css',
-  react: '/@preload/react.js',
-  renderer: '../@renderer',
-  reactDOM: '/@preload/react-dom.js',
-};
-
-async function loadStyle(themeStyle: string) {
+async function onMessage({ ports, data }: MessageEvent) {
   try {
-    const themeStyleEl = document.createElement('style');
-    themeStyleEl.id = 'theme-style';
-    themeStyleEl.textContent = themeStyle;
-    document.head.appendChild(themeStyleEl);
+    const [port] = ports;
+    if (!port) throw new Error('Message port empty');
+    if (typeof data !== 'object' || data.type !== 'init' || !data.commandType)
+      throw new Error('Invalid payload');
 
-    if (import.meta.env) {
-      const { default: styleStr } = (await import(MODULE_MAP.css)) as {
-        default: string;
-      };
-      const styleEl = document.createElement('style');
-      styleEl.textContent = styleStr;
+    const messagePort = new AMessagePort<ExtensionMessagePortEvent>(port);
 
-      document.head.appendChild(styleEl);
-      return;
+    switch (data.commandType as ExtensionCommand['type']) {
+      case 'view':
+        await extViewRenderer(messagePort, data.themeStyle);
+        break;
+      case 'action':
+        await extActionRenderer(messagePort);
+        break;
     }
-
-    const linkEl = document.createElement('link');
-    linkEl.rel = 'stylesheet';
-    linkEl.href = MODULE_MAP.css;
-
-    document.head.appendChild(linkEl);
   } catch (error) {
     console.error(error);
+  } finally {
+    window.removeEventListener('message', onMessage);
   }
-}
-
-async function renderApp(messagePort: MessagePort) {
-  try {
-    const { default: renderer } = (await import(MODULE_MAP.renderer)) as {
-      default: ExtensionCommandRenderer;
-    };
-
-    const reactDOM = await import(MODULE_MAP.reactDOM);
-    reactDOM.createRoot(document.querySelector('#app')!).render(
-      renderer({
-        messagePort,
-      }),
-    );
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-function onMessage({ ports, data }: MessageEvent) {
-  const [messagePort] = ports;
-  if (!messagePort) throw new Error('Message port empty');
-  if (typeof data !== 'object' || data.type !== 'init' || !data.themeStyle)
-    throw new Error('Invalid payload');
-
-  loadStyle(data.themeStyle).finally(() => {
-    renderApp(messagePort);
-  });
-
-  window.removeEventListener('message', onMessage);
 }
 
 window.addEventListener('message', onMessage);

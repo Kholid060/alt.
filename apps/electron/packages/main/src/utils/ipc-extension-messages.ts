@@ -83,12 +83,13 @@ onExtensionIPCEvent('installedApps.launch', async (_, appId) => {
     await InstalledApps.instance.launchApp(appId);
 
     return true;
-  } catch (_error) {
+  } catch (error) {
     const appTarget = InstalledApps.instance.getAppTarget(appId);
+    console.log(appId, appTarget);
     logger(
       'error',
       ['installedApps.launch'],
-      `Failed to launch "${path.basename(appTarget || '')}"`,
+      `Failed to launch "${path.basename(appTarget || '')}" (${(error as Error).message})`,
     );
 
     return false;

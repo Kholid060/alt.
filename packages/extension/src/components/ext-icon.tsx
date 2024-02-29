@@ -151,7 +151,7 @@ import {
   XCircle,
 } from 'lucide-react';
 
-const Icon = {
+export const ExtIcon = {
   Clipboard,
   BadgeDollarSign,
   Atom,
@@ -303,5 +303,3 @@ const Icon = {
   WifiOff,
   XCircle,
 };
-
-export default Icon;

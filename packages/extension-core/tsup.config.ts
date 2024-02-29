@@ -21,6 +21,7 @@ export default defineConfig((options: Options) => ({
     'commander',
     'vite',
     'vite-plugin-resolve',
+    'glob',
   ],
   minify: true,
   clean: false,

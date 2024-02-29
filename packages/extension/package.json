@@ -5,8 +5,8 @@
   "types": "./dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "build": "vite build && yarn build:release",
-    "dev": "vite build --watch",
+    "build": "tsup && yarn build:release",
+    "dev": "tsup --watch",
     "build:release": "tsx ./scripts/generate-release.ts",
     "lint": "eslint . --ext js,mjs,cjs,ts,mts,cts,tsx"
   },

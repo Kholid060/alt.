@@ -1,12 +1,12 @@
+import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import Store from 'electron-store';
-import type { PublicInstalledAppDetail } from '#common/interface/installed-apps';
 
 export interface ElectronStore {
   installedApps: {
     fetchedAt: string | null;
-    list: PublicInstalledAppDetail[];
     appsTarget: Record<string, string>;
-  }
+    list: ExtensionAPI.installedApps.AppDetail[];
+  };
 }
 
 export const store = new Store<ElectronStore>({
