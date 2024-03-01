@@ -72,7 +72,7 @@ const buildExtApiTypes: BuildExtensionApi = async ({ actions, values }) => {
     getExtensionTypeValue('Value', values);
 
   await fs.writeFile(
-    path.join(DIST_DIR, `${extAPIFilename}.js`),
+    path.join(DIST_DIR, `${extAPIFilename}.cjs`),
     flatExtensionAPIValueTemplate(
       extAPIContent.replaceAll('!EXPORT_TYPE_', 'exports.'),
       'module.exports =',
@@ -81,7 +81,7 @@ const buildExtApiTypes: BuildExtensionApi = async ({ actions, values }) => {
   );
 
   await fs.writeFile(
-    path.join(DIST_DIR, `${extAPIFilename}.mjs`),
+    path.join(DIST_DIR, `${extAPIFilename}.js`),
     flatExtensionAPIValueTemplate(
       extAPIContent.replaceAll('!EXPORT_TYPE_', 'export const '),
       'export default',

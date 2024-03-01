@@ -1,7 +1,8 @@
 import { useRef } from 'react';
 
 function UiImage({
-  fallbackSrc, ...props
+  fallbackSrc,
+  ...props
 }: React.ImgHTMLAttributes<HTMLImageElement> & { fallbackSrc?: string }) {
   const usingFallback = useRef(false);
 
@@ -17,7 +18,7 @@ function UiImage({
         (event.target as HTMLImageElement).src = fallbackSrc;
       }}
     />
-  )
+  );
 }
 
 export default UiImage;

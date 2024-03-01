@@ -6,6 +6,7 @@ import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
 import { UiImage } from '@repo/ui';
 import { ExtCommandListItem, ExtCommandListIcon } from '@repo/extension';
 import { useShallow } from 'zustand/react/shallow';
+import emitter from '/@/lib/mitt';
 
 type CommandIconName = keyof typeof commandIcons;
 
@@ -113,6 +114,14 @@ function CommandExtensionList({ selectedExt }: CommonListProps) {
                   value={manifest.name + ' ' + command.title}
                   subtitle={command.subtitle}
                   onSelect={() => {
+                    if (command.type === 'action') {
+                      emitter.emit('execute-command', {
+                        extensionId: id,
+                        commandId: command.name,
+                      });
+                      return;
+                    }
+
                     setStoreState('paths', [
                       { id, label: manifest.title, type: 'extension' },
                       {

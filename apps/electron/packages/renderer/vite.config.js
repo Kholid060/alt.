@@ -7,7 +7,6 @@ import { join } from 'node:path';
 const PACKAGE_ROOT = __dirname;
 const PROJECT_ROOT = join(PACKAGE_ROOT, '../..');
 
-
 /**
  * @type {import('vite').UserConfig}
  * @see https://vitejs.dev/config/
@@ -40,7 +39,7 @@ const config = {
         main: join(PACKAGE_ROOT, 'index.html'),
       },
       output: {
-        assetFileNames: `[name].[ext]`
+        assetFileNames: '[name].[ext]',
       },
       external: ['**/*.dev.tsx'],
     },
@@ -50,9 +49,7 @@ const config = {
   optimizeDeps: {
     include: ['react/jsx-runtime'],
   },
-  plugins: [
-    react(),
-  ],
+  plugins: [react()],
 };
 
 export default config;

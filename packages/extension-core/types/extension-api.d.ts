@@ -4,8 +4,11 @@ declare namespace ExtensionAPI {
   export const manifest: ExtensionManifest;
 }
 
-declare namespace ExtensionAPI.tabs {
-  export const hello: string;
+declare namespace ExtensionAPI.clipboard {
+  export type ClipboardContentType = 'html' | 'text' | 'image';
+
+  export function read(format: ClipboardContentType): string;
+  export function write(format: ClipboardContentType): string;
 }
 
 declare namespace ExtensionAPI.installedApps {
@@ -16,16 +19,19 @@ declare namespace ExtensionAPI.installedApps {
     description?: string;
   }
 
-  export const query: (
+  export function query(
     query:
       | `startsWith:${string}`
       | `endsWith:${string}`
       | `exact:${string}`
       | string
       | RegExp,
-  ) => Promise<Extension.InstalledAppDetail[]>;
+  ): Promise<Extension.InstalledAppDetail[]>;
 
-  export const launch: (appId: string) => Promise<boolean>;
+  export function launch(appId: string): Promise<boolean>;
+
+  // @ext-api-value
+  export function getIconURL(appId: string): string;
 }
 
 export default ExtensionAPI;

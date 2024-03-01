@@ -5,5 +5,5 @@ export function extPathParser(path: string) {
     extId,
     commandId,
     isValid: Boolean(ext && extId && commandId),
-  }
+  };
 }

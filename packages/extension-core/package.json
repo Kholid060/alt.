@@ -18,6 +18,7 @@
   "dependencies": {
     "@radix-ui/react-primitive": "^1.0.3",
     "browser-extension-url-match": "^1.0.0",
+    "dot-prop": "^8.0.2",
     "globby": "^14.0.1",
     "tempy": "^3.1.0",
     "tmp": "^0.2.2",

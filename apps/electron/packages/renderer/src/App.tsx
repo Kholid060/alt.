@@ -7,6 +7,7 @@ import CommandContent from './components/command/CommandContent';
 import { useCommandStore } from './stores/command.store';
 import preloadAPI from './utils/preloadAPI';
 import { CommandCtxProvider } from './context/command.context';
+import AppExtensionSandbox from './components/app/AppExtensionSanbodx';
 
 function App() {
   const setCommandStoreState = useCommandStore((state) => state.setState);
@@ -49,6 +50,7 @@ function App() {
         <CommandContent />
         <CommandFooter />
       </UiCommand>
+      <AppExtensionSandbox />
     </CommandCtxProvider>
   );
 }

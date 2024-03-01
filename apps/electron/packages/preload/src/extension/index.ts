@@ -1,5 +1,5 @@
 import type { ExtensionManifest } from '@repo/extension-core';
-import { flatActionExtensionAPI } from '@repo/extension-core/dist/flat-extension-api';
+import extensionApiBuilder from '@repo/extension-core/dist/extensionApiBuilder';
 import {
   CUSTOM_SCHEME,
   PRELOAD_API_KEY,
@@ -7,7 +7,6 @@ import {
 import { sendIpcMessage } from '#common/utils/sendIpcMessage';
 import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.js';
 import { contextBridge } from 'electron';
-import { setProperty } from 'dot-prop';
 import { isExtHasApiPermission } from '#common/utils/check-ext-permission';
 import type { SetRequired } from 'type-fest';
 import { ExtensionError } from '#common/errors/ExtensionError';
@@ -59,19 +58,17 @@ export class ExtensionAPI {
   async getExtensionAPI(
     manifest: ExtensionManifest,
   ): Promise<typeof _extension> {
-    const extensionAPI: Record<string, unknown> = {};
-    for (const key in flatActionExtensionAPI) {
-      setProperty(
-        extensionAPI,
-        key,
-        this.sendAction.bind(this, key as keyof IPCUserExtensionEventsMap),
-      );
-    }
+    const extensionAPI = extensionApiBuilder({
+      context: this,
+      apiHandler: this.sendAction,
+      values: {
+        manifest,
+        'installedApps.getIconURL': (appId) =>
+          `${CUSTOM_SCHEME.appIcon}://${appId}.png`,
+      },
+    });
 
-    return {
-      ...extensionAPI,
-      manifest,
-    } as typeof _extension;
+    return extensionAPI;
   }
 
   private async sendAction<T extends keyof IPCUserExtensionEventsMap>(

@@ -13,7 +13,7 @@ const appIconProtocol: CustomProtocol = {
     return new Response(file, {
       status: 200,
       headers: {
-        type: 'image/png',
+        'Content-Type': 'image/png',
       },
     });
   },

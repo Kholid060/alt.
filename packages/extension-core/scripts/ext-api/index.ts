@@ -8,6 +8,7 @@ import {
 import buildExtApiTypes from './build-ext-types';
 import { emptyDir, ensureDir } from 'fs-extra';
 import { fileURLToPath } from 'url';
+import buildExtApiFile from './build-ext-file';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -15,11 +16,14 @@ const __dirname = path.dirname(__filename);
 const DIST_DIR = path.join(__dirname, '../../dist');
 const TYPES_DIR = path.join(__dirname, '../../types');
 
+const VALUE_API_COMMENT = '@ext-api-value';
+
 export type FlatExtApiType = [string, string];
 
 export type BuildExtensionApi = (apis: {
   values: FlatExtApiType[];
   actions: FlatExtApiType[];
+  requireValues: FlatExtApiType[];
 }) => Promise<void>;
 
 async function buildExtensionAPI() {
@@ -34,6 +38,7 @@ async function buildExtensionAPI() {
   if (!module) throw new Error("Can't find 'ExtensionAPI' module");
 
   const valuesExtApis: FlatExtApiType[] = [];
+  const requireValues: FlatExtApiType[] = [];
   const actionsExtApis: FlatExtApiType[] = [];
 
   const handleExportedDeclaration = (
@@ -53,18 +58,22 @@ async function buildExtensionAPI() {
             );
             break;
           }
+          case SyntaxKind.FunctionDeclaration:
           case SyntaxKind.VariableDeclaration: {
-            const finalPath = `${varPath}${varPath ? '.' : ''}${name}`;
-            const isFunc = item
-              .getChildren()
-              .some((child) => child.getKindName() === 'FunctionType');
+            const path = `${varPath}${varPath ? '.' : ''}${name}`;
+            const value: FlatExtApiType = [path, `typeof ExtensionAPI.${path}`];
 
-            const value: FlatExtApiType = [
-              finalPath,
-              `typeof ExtensionAPI.${finalPath}`,
-            ];
+            const isFunction =
+              item.getKind() === SyntaxKind.FunctionDeclaration;
 
-            isFunc ? actionsExtApis.push(value) : valuesExtApis.push(value);
+            isFunction ? actionsExtApis.push(value) : valuesExtApis.push(value);
+
+            const comment = item.getPreviousSiblingIfKind(
+              SyntaxKind.SingleLineCommentTrivia,
+            );
+            if (comment && comment.getText().includes(VALUE_API_COMMENT)) {
+              requireValues.push(value);
+            }
 
             break;
           }
@@ -75,7 +84,14 @@ async function buildExtensionAPI() {
 
   handleExportedDeclaration(module.getExportedDeclarations());
 
-  await buildExtApiTypes({ actions: actionsExtApis, values: valuesExtApis });
+  const payload: Parameters<BuildExtensionApi>[0] = {
+    requireValues,
+    values: valuesExtApis,
+    actions: actionsExtApis,
+  };
+
+  await buildExtApiTypes(payload);
+  await buildExtApiFile(payload);
 }
 
 buildExtensionAPI();

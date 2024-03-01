@@ -127,8 +127,8 @@ async function getAppIcon({
       if (!iconPath) {
         appIcon = await app.getFileIcon(appPath, { size: 'normal' });
       } else {
-        await fs.copyFile(iconPath, path.join(APP_ICON_DIR, `${appId}.ico`));
-        return `${appId}.ico`;
+        await fs.copyFile(iconPath, path.join(APP_ICON_DIR, `${appId}.png`));
+        return `${appId}.png`;
       }
     } else {
       appIcon = await app.getFileIcon(appPath, { size: 'normal' });
