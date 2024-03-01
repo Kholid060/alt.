@@ -1,5 +1,5 @@
-import { CSSProperties, useEffect, useState } from 'react';
-import { Code2Icon, GripHorizontalIcon } from 'lucide-react';
+import { CSSProperties, useEffect } from 'react';
+import { GripHorizontalIcon } from 'lucide-react';
 import { UiButton, UiCommand } from '@repo/ui';
 import CommandHeader from './components/command/CommandHeader';
 import CommandFooter from './components/command/CommandFooter';
@@ -7,11 +7,10 @@ import CommandContent from './components/command/CommandContent';
 import { useCommandStore } from './stores/command.store';
 import preloadAPI from './utils/preloadAPI';
 import { CommandCtxProvider } from './context/command.context';
-import AppExtensionSandbox from './components/app/AppExtensionSanbodx';
+import AppExtensionSandbox from './components/app/AppExtensionSandbox';
 
 function App() {
   const setCommandStoreState = useCommandStore((state) => state.setState);
-  const [anu, setAnu] = useState(false);
 
   useEffect(() => {
     preloadAPI.main.sendIpcMessage('extension:list').then((extensions) => {
@@ -33,16 +32,7 @@ function App() {
           >
             <GripHorizontalIcon className="h-5 w-5" />
           </UiButton>
-          <UiButton
-            size="icon"
-            variant="secondary"
-            className="mb-2"
-            onClick={() => {
-              setAnu(!anu);
-            }}
-          >
-            <Code2Icon className="h-5 w-5" />
-          </UiButton>
+          <button></button>
         </div>
       )}
       <UiCommand className="border rounded-lg">

@@ -3,6 +3,7 @@ import { EXTENSION_VIEW } from '#common/utils/constant/constant';
 import { ExtensionCommand } from '@repo/extension-core';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
 import { useCommandStore } from '/@/stores/command.store';
+import { ExtensionExecutionFinishReason } from '@repo/extension';
 
 function CommandSandboxContent({
   type,
@@ -12,8 +13,11 @@ function CommandSandboxContent({
 }: {
   commandId: string;
   extensionId: string;
-  onFinishExecute?: () => void;
   type: ExtensionCommand['type'];
+  onFinishExecute?: (
+    reason: ExtensionExecutionFinishReason,
+    message?: string,
+  ) => void;
 }) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const messageChannelRef = useRef<MessageChannel | null>(null);
@@ -27,8 +31,8 @@ function CommandSandboxContent({
     commandCtx.setExtMessagePort(port);
     const messagePort = commandCtx.extMessagePort.current!;
 
-    messagePort.addListener('extension:finish-execute', () => {
-      onFinishExecute?.();
+    messagePort.addListener('extension:finish-execute', (reason, message) => {
+      if (onFinishExecute) return onFinishExecute(reason, message);
 
       const currentPaths = useCommandStore.getState().paths;
       if (currentPaths.length === 0) return;

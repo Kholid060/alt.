@@ -177,13 +177,18 @@ declare const ExtCommandListIcon: react.ForwardRefExoticComponent<{
     icon: LucideIcon | string;
 } & react.RefAttributes<HTMLSpanElement>>;
 
+declare enum ExtensionExecutionFinishReason {
+    done = 0,
+    error = 1,
+    timeout = 2
+}
 interface ExtensionMessagePortEvent {
     'extension:init': [];
     'extension:query-change': [string];
     'extension:keydown-event': [
         Pick<KeyboardEvent, 'key' | 'ctrlKey' | 'altKey' | 'metaKey' | 'isComposing'>
     ];
-    'extension:finish-execute': [];
+    'extension:finish-execute': [ExtensionExecutionFinishReason, string?];
 }
 type ExtensionMessagePortCallback<T extends keyof ExtensionMessagePortEvent> = (...args: ExtensionMessagePortEvent[T]) => void;
 
@@ -195,4 +200,4 @@ declare function commandRenderer(CommandView: ExtensionCommandView): ExtensionCo
 
 type Manifest = Omit<ExtensionManifest, '$apiVersion'>;
 
-export { type ExtCommandItemProps, ExtCommandList, ExtCommandListIcon, ExtCommandListItem, ExtIcon, type ExtensionMessagePortCallback, type ExtensionMessagePortEvent, type Manifest, commandRenderer };
+export { type ExtCommandItemProps, ExtCommandList, ExtCommandListIcon, ExtCommandListItem, ExtIcon, ExtensionExecutionFinishReason, type ExtensionMessagePortCallback, type ExtensionMessagePortEvent, type Manifest, commandRenderer };

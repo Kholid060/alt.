@@ -1,3 +1,9 @@
+export enum ExtensionExecutionFinishReason {
+  done,
+  error,
+  timeout,
+}
+
 export interface ExtensionMessagePortEvent {
   'extension:init': [];
   'extension:query-change': [string];
@@ -7,7 +13,7 @@ export interface ExtensionMessagePortEvent {
       'key' | 'ctrlKey' | 'altKey' | 'metaKey' | 'isComposing'
     >,
   ];
-  'extension:finish-execute': [];
+  'extension:finish-execute': [ExtensionExecutionFinishReason, string?];
 }
 
 export type ExtensionMessagePortCallback<
