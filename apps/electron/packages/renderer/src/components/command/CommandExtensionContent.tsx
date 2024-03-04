@@ -57,7 +57,7 @@ function CommandSandboxContent({
 
       if (isView) {
         payload.themeStyle = (
-          await import('@repo/ui/theme.css?inline')
+          await import('@repo/ui/dist/theme.css?inline')
         ).default;
       }
 

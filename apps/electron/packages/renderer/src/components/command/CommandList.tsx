@@ -1,18 +1,13 @@
-import { UiCommandGroup, UiCommandItem, useCommandState } from '@repo/ui';
 import { commandIcons } from '#common/utils/command-icons';
-import { Fragment, memo } from 'react';
-import { CommandSelectedItem, useCommandStore } from '/@/stores/command.store';
+import { memo, useEffect, useMemo, useState } from 'react';
+import { useCommandStore } from '/@/stores/command.store';
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
-import { UiImage } from '@repo/ui';
-import { ExtCommandListItem, ExtCommandListIcon } from '@repo/extension';
+import { UiImage, UiListGroupItem, UiListItem, UiListItems } from '@repo/ui';
 import { useShallow } from 'zustand/react/shallow';
 import emitter from '/@/lib/mitt';
+import { UiList } from '@repo/ui';
 
 type CommandIconName = keyof typeof commandIcons;
-
-interface CommonListProps {
-  selectedExt: CommandSelectedItem;
-}
 
 const iconPrefix = 'icon:';
 
@@ -31,7 +26,7 @@ function CommandPrefix({
 
     const Icon = commandIcons[iconName] ?? icon;
 
-    return <ExtCommandListIcon icon={Icon} />;
+    return <UiList.Icon icon={Icon} />;
   }
 
   return (
@@ -42,139 +37,108 @@ function CommandPrefix({
   );
 }
 
-export function CommandItem({
-  icon,
-  title,
-  value,
-  onSelect,
-  subtitle,
-}: {
-  title: string;
-  value?: string;
-  subtitle?: string;
-  onSelect?: () => void;
-  icon?: React.ReactNode;
-}) {
-  return (
-    <UiCommandItem
-      value={value}
-      onSelect={onSelect}
-      className="group aria-selected:bg-secondary min-h-12"
-    >
-      {icon && (
-        <span className="h-8 w-8 mr-2 inline-flex items-center justify-center">
-          {icon}
-        </span>
-      )}
-      <div>
-        <p className="leading-tight">{title}</p>
-        <p className="text-muted-foreground leading-tight">{subtitle}</p>
-      </div>
-    </UiCommandItem>
-  );
-}
-
-function CommandExtensionList({ selectedExt }: CommonListProps) {
-  const searchStr = useCommandState((state) => state.search);
-  const [extensions, setStoreState] = useCommandStore(
-    useShallow((state) => [state.extensions, state.setState]),
-  );
-
-  return (
-    <UiCommandGroup heading="Extensions">
-      {extensions.map(({ id, manifest }) => {
-        const extensionIcon = (
-          <CommandPrefix
-            alt={`${manifest.title} icon`}
-            id={id}
-            icon={manifest.icon}
-          />
-        );
-
-        return (
-          <Fragment key={id + manifest.name}>
-            {!selectedExt && (
-              <ExtCommandListItem
-                prefix={extensionIcon}
-                title={manifest.title}
-                value={manifest.title}
-                subtitle={manifest.description}
-                onSelect={() =>
-                  setStoreState('paths', [
-                    { id, label: manifest.title, type: 'extension' },
-                  ])
-                }
-              />
-            )}
-            {(selectedExt?.id === id || searchStr) &&
-              manifest.commands.map((command) => (
-                <ExtCommandListItem
-                  key={manifest.name + command.name}
-                  title={command.title}
-                  value={manifest.name + ' ' + command.title}
-                  subtitle={command.subtitle}
-                  onSelect={() => {
-                    if (command.type === 'action') {
-                      emitter.emit('execute-command', {
-                        extensionId: id,
-                        commandId: command.name,
-                      });
-                      return;
-                    }
-
-                    setStoreState('paths', [
-                      { id, label: manifest.title, type: 'extension' },
-                      {
-                        id: command.name,
-                        label: command.title,
-                        type: 'command',
-                        meta: { type: command.type },
-                      },
-                    ]);
-                  }}
-                  prefix={
-                    command.icon ? (
-                      <CommandPrefix
-                        id={id}
-                        alt={command.name}
-                        icon={command.icon}
-                      />
-                    ) : (
-                      extensionIcon
-                    )
-                  }
-                />
-              ))}
-          </Fragment>
-        );
-      })}
-    </UiCommandGroup>
-  );
-}
-
-function CommandKeywordsList({ selectedExt }: CommonListProps) {
-  if (selectedExt) return null;
-
-  return (
-    <UiCommandGroup heading="Keywords">
-      <CommandItem
-        icon={<ExtCommandListIcon icon="?" />}
-        title={'Do Math'}
-        value={'Do Math'}
-      />
-    </UiCommandGroup>
-  );
-}
-
 function CommandList() {
-  const selectedExt = useCommandStore((state) => state.paths[0]);
-
-  return (
-    <>
-      <CommandExtensionList selectedExt={selectedExt} />
-      <CommandKeywordsList selectedExt={selectedExt} />
-    </>
+  const [extensions, selectedExt, setStoreState] = useCommandStore(
+    useShallow((state) => [state.extensions, state.paths[0], state.setState]),
   );
+
+  const [items, setItems] = useState<UiListItems>([]);
+
+  useEffect(() => {
+    const extensionItems: UiListItem[] = [];
+
+    extensions.forEach(({ id, manifest }) => {
+      const extensionIcon = (
+        <CommandPrefix
+          alt={`${manifest.title} icon`}
+          id={id}
+          icon={manifest.icon}
+        />
+      );
+
+      const item: UiListItem = {
+        value: id,
+        icon: extensionIcon,
+        title: manifest.title,
+        subtitle: manifest.description,
+        onSelected() {
+          setStoreState('paths', [
+            { id, label: manifest.title, type: 'extension' },
+          ]);
+        },
+      };
+      extensionItems.push(item);
+
+      const commands: UiListItem[] = manifest.commands.map((command) => ({
+        value: `command:${id}:${command.name}`,
+        subtitle: command.subtitle,
+        icon: command.icon ? (
+          <CommandPrefix id={id} alt={command.name} icon={command.icon} />
+        ) : (
+          extensionIcon
+        ),
+        searchOnly: true,
+        title: command.title,
+        onSelected() {
+          if (command.type === 'action') {
+            emitter.emit('execute-command', {
+              extensionId: id,
+              commandId: command.name,
+            });
+            return;
+          }
+
+          setStoreState('paths', [
+            { id, label: manifest.title, type: 'extension' },
+            {
+              id: command.name,
+              label: command.title,
+              type: 'command',
+              meta: { type: command.type },
+            },
+          ]);
+        },
+      }));
+
+      extensionItems.push(...commands);
+    });
+
+    setItems([
+      { label: 'Extensions', value: 'extensions', items: extensionItems },
+      {
+        label: 'Keywords',
+        items: [
+          {
+            title: 'Math',
+            value: 'math',
+            subtitle: 'Do math',
+            icon: <UiList.Icon icon="?" />,
+          },
+        ],
+      },
+    ]);
+  }, [extensions]);
+
+  const filteredItems = useMemo(() => {
+    if (selectedExt) {
+      const extensions = items.find(
+        (item) => item.value === 'extensions',
+      ) as UiListGroupItem;
+      if (!extensions) return [];
+
+      return extensions.items.reduce<UiListItem[]>((acc, item) => {
+        if (item.value.startsWith(`command:${selectedExt.id}`)) {
+          acc.push({ ...item, searchOnly: false });
+        }
+
+        return acc;
+      }, []);
+    }
+
+    return items;
+  }, [items, selectedExt]);
+
+  return <UiList items={filteredItems} />;
 }
 
 export default memo(CommandList);

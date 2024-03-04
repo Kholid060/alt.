@@ -1,9 +1,9 @@
-import { UiCommandInput } from '@repo/ui';
 import { SearchIcon, XIcon } from 'lucide-react';
-import { useShallow } from 'zustand/react/shallow';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useCommandStore } from '/@/stores/command.store';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
+import { useUiList } from '@repo/ui';
+import { useUiListStore } from '@repo/ui/dist/context/list.context';
 
 const commandKeys = new Set([
   'n',
@@ -18,11 +18,12 @@ const commandKeys = new Set([
 ]);
 
 function CommandInput() {
-  const [query, setState] = useCommandStore(
-    useShallow((state) => [state.query, state.setState]),
-  );
+  const setStoreState = useCommandStore((state) => state.setState);
 
   const commandCtx = useCommandCtx();
+  const uiListStore = useUiListStore();
+
+  const search = useUiList((state) => state.search);
 
   function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     const messagePort = commandCtx.extMessagePort.current;
@@ -37,19 +38,22 @@ function CommandInput() {
       });
     }
 
-    if (
-      event.code !== 'Backspace' ||
-      (event.target as HTMLInputElement).value.trim().length !== 0
-    )
-      return;
+    switch (event.code) {
+      case 'Backspace': {
+        if ((event.target as HTMLInputElement).value.trim().length !== 0)
+          return;
 
-    let { paths } = useCommandStore.getState();
-    if (paths.length === 0) return;
+        let { paths } = useCommandStore.getState();
+        if (paths.length === 0) return;
 
-    paths = [...paths];
-    paths.pop();
-
-    setState('paths', paths);
+        paths = [...paths];
+        paths.pop();
+        setStoreState('paths', paths);
+        break;
+      }
+      default:
+        uiListStore.listControllerKeyBind(event.nativeEvent);
+    }
   }
   function onValueChange(value: string) {
     const messagePort = commandCtx.extMessagePort.current;
@@ -57,23 +61,25 @@ function CommandInput() {
       messagePort.sendMessage('extension:query-change', value);
     }
 
-    setState('query', value);
+    uiListStore.setState('search', value);
   }
 
   return (
-    <UiCommandInput
-      value={query}
-      onValueChange={onValueChange}
-      placeholder="Search..."
-      rootClass="px-4 border-b-0"
-      className="text-base pl-0.5 py-0"
-      onKeyDown={onKeyDown}
-      iconSlot={
-        <span className="h-8 w-8 inline-flex items-center justify-center mr-2">
-          <SearchIcon className="h-5 w-5 text-muted-foreground opacity-75" />
-        </span>
-      }
-    />
+    <div className="flex items-center px-4">
+      <span className="h-8 w-8 inline-flex items-center justify-center ml-0.5">
+        <SearchIcon className="h-5 w-5 text-muted-foreground opacity-75" />
+      </span>
+      <input
+        type="text"
+        value={search}
+        placeholder="Search..."
+        className="h-11 flex-grow bg-transparent pl-2 ml-0.5 focus:outline-none"
+        onKeyDown={onKeyDown}
+        onChange={(event) =>
+          onValueChange((event.target as HTMLInputElement).value)
+        }
+      />
+    </div>
   );
 }
 

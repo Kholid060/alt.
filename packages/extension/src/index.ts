@@ -3,15 +3,16 @@ import ExtensionAPI from '@repo/extension-core/types/extension-api';
 
 type Manifest = Omit<ExtensionManifest, '$apiVersion'>;
 
-export { UiImage as ExtImage } from '@repo/ui';
+export { UiImage, UiList } from '@repo/ui';
+export type {
+  UiListGroupItem,
+  UiListItem,
+  UiListItems,
+  UiListProps,
+  UiListRef,
+} from '@repo/ui';
 
-export { ExtIcon } from './components/ext-icon';
-export type { ExtCommandItemProps } from './components/command-list';
-export {
-  ExtCommandList,
-  ExtCommandListItem,
-  ExtCommandListIcon,
-} from './components/command-list';
+export { ExtIcon as UiExtIcon } from './components/ext-icon';
 
 export { default as commandRenderer } from './command-renderer/command-renderer';
 
