@@ -5,10 +5,13 @@ declare namespace ExtensionAPI {
 }
 
 declare namespace ExtensionAPI.clipboard {
-  export type ClipboardContentType = 'html' | 'text' | 'image';
+  export type ClipboardContentType = 'html' | 'text' | 'image' | 'rtf';
 
-  export function read(format: ClipboardContentType): string;
-  export function write(format: ClipboardContentType): string;
+  export function read(format: ClipboardContentType): Promise<string>;
+  export function write(
+    format: ClipboardContentType,
+    value: string,
+  ): Promise<void>;
 }
 
 declare namespace ExtensionAPI.installedApps {

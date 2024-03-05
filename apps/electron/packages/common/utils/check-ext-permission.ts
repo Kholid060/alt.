@@ -13,6 +13,7 @@ export const API_PERMISSION_MAP: [
   ExtensionAPIPaths,
   Partial<ExtensionPermission>[],
 ][] = [
+  ['clipboard', ['clipboard']],
   ['installedApps', ['installed-apps']],
   ['installedApps.query', ['installed-apps']],
 ];
