@@ -1,5 +1,8 @@
 import { ipcRenderer } from 'electron';
-import type { IPCEventError, IPCEvents } from '../interface/ipc-events';
+import type {
+  IPCEventError,
+  IPCEvents,
+} from '../interface/ipc-events.interface';
 
 export const sendIpcMessage = <
   T extends keyof IPCEvents,

@@ -1,13 +1,13 @@
 import { Menu, app } from 'electron';
 import './utils/security-restrictions';
 import './utils/ipc-messages-handler';
-import { restoreOrCreateCommandWindow } from './window/command-wIndow';
 import { platform } from 'node:process';
 import updater from 'electron-updater';
 import {
   registerCustomProtocols,
   registerCustomProtocolsPrivileged,
 } from './utils/custom-protocol';
+import WindowsManager from './window/WindowsManager';
 
 Menu.setApplicationMenu(null);
 registerCustomProtocolsPrivileged();
@@ -22,7 +22,9 @@ if (!isSingleInstance) {
   app.quit();
   process.exit(0);
 }
-app.on('second-instance', restoreOrCreateCommandWindow);
+app.on('second-instance', () =>
+  WindowsManager.instance.restoreOrCreateWindow('command'),
+);
 
 /**
  * Disable Hardware Acceleration to save more system resources.
@@ -41,7 +43,9 @@ app.on('window-all-closed', () => {
 /**
  * @see https://www.electronjs.org/docs/latest/api/app#event-activate-macos Event: 'activate'.
  */
-app.on('activate', restoreOrCreateCommandWindow);
+app.on('activate', () =>
+  WindowsManager.instance.restoreOrCreateWindow('command'),
+);
 
 /**
  * Create the application window when the background process is ready.
@@ -50,7 +54,7 @@ app
   .whenReady()
   .then(() => {
     registerCustomProtocols();
-    restoreOrCreateCommandWindow();
+    WindowsManager.instance.restoreOrCreateWindow('command');
   })
   .catch((e) => console.error('Failed create window:', e));
 

@@ -1,4 +1,7 @@
-import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events';
+import type {
+  IPCEventError,
+  IPCUserExtensionEventsMap,
+} from '#common/interface/ipc-events.interface';
 import InstalledApps from './InstalledApps';
 import { onIpcMessage } from './ipc-messages-handler';
 import { isExtHasApiPermission } from '#common/utils/check-ext-permission';
@@ -6,12 +9,35 @@ import { ExtensionError } from '#common/errors/ExtensionError';
 import ExtensionLoader from './extension/ExtensionLoader';
 import { logger } from '../lib/log';
 import path from 'path';
+import { ipcMain } from 'electron';
+import WindowsManager from '../window/WindowsManager';
+import {
+  IPC_ON_EVENT,
+  IPC_POST_MESSAGE_EVENT,
+} from '#packages/common/utils/constant/constant';
+import ExtensionMessagePortHandler from './extension/ExtensionMessagePortHandler';
+
+export type ExtensionMessageHandler = <
+  T extends keyof IPCUserExtensionEventsMap,
+>(detail: {
+  key: string;
+  name: T;
+  sender: Electron.IpcMainInvokeEvent | null;
+  args: Parameters<IPCUserExtensionEventsMap[T]>;
+}) => Promise<
+  Awaited<ReturnType<IPCUserExtensionEventsMap[T]>> | IPCEventError
+>;
 
 const onExtensionIPCEvent = (() => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handlers: Record<string, (...args: any[]) => any> = {};
 
-  onIpcMessage('user-extension', async (sender, { args, key, name }) => {
+  const onExtensionEvent: ExtensionMessageHandler = async ({
+    sender,
+    args,
+    key,
+    name,
+  }) => {
     try {
       const extension = ExtensionLoader.instance.getExtensionByKey(key);
       if (
@@ -28,23 +54,44 @@ const onExtensionIPCEvent = (() => {
 
       return result;
     } catch (error) {
+      let errorPayload: IPCEventError = {
+        $isError: true,
+        message: 'Something went wrong',
+      };
+
       if (error instanceof ExtensionError) {
-        return {
+        errorPayload = {
           $isError: true,
           message: error.message,
         };
-      }
-
-      if (error instanceof Error) {
+      } else if (error instanceof Error) {
         console.error(error);
         logger('error', ['user-extension-handler', name], error.message);
       }
 
-      return {
-        $isError: true,
-        message: 'Something went wrong',
-      };
+      return errorPayload;
     }
+  };
+
+  onIpcMessage('user-extension', (sender, payload) =>
+    onExtensionEvent({ ...payload, sender }),
+  );
+
+  const extensionPortHandler = new ExtensionMessagePortHandler({
+    portMessageHandler: onExtensionEvent,
+  });
+  ipcMain.on(IPC_ON_EVENT.createExtensionPort, () => {
+    const extensionPort = extensionPortHandler.onRequestPort();
+    const commandWindow = WindowsManager.instance.getWindow('command');
+
+    commandWindow.webContents.postMessage(
+      IPC_POST_MESSAGE_EVENT.extensionPortCreated,
+      null,
+      [extensionPort],
+    );
+  });
+  ipcMain.on(IPC_ON_EVENT.deleteExtensionPort, () => {
+    extensionPortHandler.destroy();
   });
 
   return <
@@ -85,7 +132,6 @@ onExtensionIPCEvent('installedApps.launch', async (_, appId) => {
     return true;
   } catch (error) {
     const appTarget = InstalledApps.instance.getAppTarget(appId);
-    console.log(appId, appTarget);
     logger(
       'error',
       ['installedApps.launch'],

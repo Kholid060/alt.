@@ -1,6 +1,9 @@
 import InstalledApps from './InstalledApps';
 import ExtensionLoader from './extension/ExtensionLoader';
-import type { IPCEventError, IPCEvents } from '#common/interface/ipc-events';
+import type {
+  IPCEventError,
+  IPCEvents,
+} from '#common/interface/ipc-events.interface';
 import './ipc-extension-messages';
 import { ipcMain } from 'electron';
 

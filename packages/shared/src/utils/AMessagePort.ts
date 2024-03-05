@@ -1,11 +1,15 @@
 import { EventEmitter } from 'eventemitter3';
 
-interface AMessagePortEvents {}
+interface AMessagePortEvents {
+  __PLACEHOLDER__(): void;
+}
 
 class AMessagePort<
   T extends AMessagePortEvents = AMessagePortEvents,
 > extends EventEmitter<T> {
   port: MessagePort;
+
+  private messages = new Map<string, (...args: unknown[]) => unknown>();
 
   constructor(port: MessagePort) {
     super();
@@ -36,6 +40,20 @@ class AMessagePort<
   ) {
     this.port.postMessage({ data, name });
   }
+
+  // onAsyncMessage<K extends EventEmitter.EventNames<T>>(
+  //   name: K,
+  //   callback: (...args: Parameters<T[K]>) => Promise<ReturnType<T[K]>>,
+  // ): Promise<ReturnType<T[K]>> {
+  //   callback();
+  // }
+
+  // asyncSendMessage<K extends EventEmitter.EventNames<T>>(
+  //   name: K,
+  //   ...args: Parameters<T[K]>
+  // ): Promise<ReturnType<T[K]>> {
+  //   return Promise.resolve();
+  // }
 
   destroy() {
     this.removeAllListeners();

@@ -2,7 +2,7 @@ import { app, BrowserWindow } from 'electron';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-async function createWindow() {
+export async function createMainWindow() {
   const browserWindow = new BrowserWindow({
     show: false, // Use the 'ready-to-show' event to show the instantiated BrowserWindow.
     // type: 'toolbar',
@@ -65,16 +65,16 @@ async function createWindow() {
 /**
  * Restore an existing BrowserWindow or Create a new BrowserWindow.
  */
-export async function restoreOrCreateWindow() {
-  let window = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed());
+// export async function restoreOrCreateMainWindow() {
+//   let window = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed());
 
-  if (window === undefined) {
-    window = await createWindow();
-  }
+//   if (window === undefined) {
+//     window = await createMainWindow();
+//   }
 
-  if (window.isMinimized()) {
-    window.restore();
-  }
+//   if (window.isMinimized()) {
+//     window.restore();
+//   }
 
-  window.focus();
-}
+//   window.focus();
+// }

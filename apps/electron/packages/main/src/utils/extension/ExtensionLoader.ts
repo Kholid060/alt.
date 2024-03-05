@@ -6,7 +6,7 @@ import { globby } from 'globby';
 import validateSemver from 'semver/functions/valid';
 import { ErrorLogger, logger, loggerBuilder } from '/@/lib/log';
 import { EXTENSION_FOLDER } from '../constant';
-import type { ExtensionData } from '#common/interface/extension';
+import type { ExtensionData } from '#common/interface/extension.interface';
 
 const validatorLogger = loggerBuilder(['ExtensionLoader', 'manifestValidator']);
 

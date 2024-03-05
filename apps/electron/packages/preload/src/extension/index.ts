@@ -5,7 +5,7 @@ import {
   PRELOAD_API_KEY,
 } from '#common/utils/constant/constant';
 import { sendIpcMessage } from '#common/utils/sendIpcMessage';
-import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.js';
+import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
 import { contextBridge } from 'electron';
 import { isExtHasApiPermission } from '#common/utils/check-ext-permission';
 import type { SetRequired } from 'type-fest';
@@ -68,7 +68,7 @@ export class ExtensionAPI {
       },
     });
 
-    return extensionAPI;
+    return Object.freeze(extensionAPI);
   }
 
   private async sendAction<T extends keyof IPCUserExtensionEventsMap>(

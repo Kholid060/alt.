@@ -117,16 +117,16 @@ export async function createCommandWindow() {
 /**
  * Restore an existing BrowserWindow or Create a new BrowserWindow.
  */
-export async function restoreOrCreateCommandWindow() {
-  let window = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed());
+// export async function restoreOrCreateCommandWindow() {
+//   let window = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed());
 
-  if (window === undefined) {
-    window = await createCommandWindow();
-  }
+//   if (window === undefined) {
+//     window = await createCommandWindow();
+//   }
 
-  if (window.isMinimized()) {
-    window.restore();
-  }
+//   if (window.isMinimized()) {
+//     window.restore();
+//   }
 
-  window.focus();
-}
+//   window.focus();
+// }

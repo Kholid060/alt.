@@ -18,3 +18,12 @@ export const PRELOAD_API_KEY = {
   main: '__mainAPI',
   extension: '_extension',
 } as const;
+
+export const IPC_ON_EVENT = {
+  deleteExtensionPort: 'delete-extension-port',
+  createExtensionPort: 'create-extension-port',
+} as const;
+
+export const IPC_POST_MESSAGE_EVENT = {
+  extensionPortCreated: 'extension-port-created',
+} as const;
