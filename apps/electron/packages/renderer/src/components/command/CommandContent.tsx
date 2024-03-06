@@ -1,28 +1,24 @@
 import { cn } from '@repo/ui';
 import CommandList from './CommandList';
-import { useCommandStore } from '/@/stores/command.store';
 import CommandExtensionContent from './CommandExtensionContent';
-import { useEffect, useMemo, useRef } from 'react';
-import { ExtensionCommand } from '@repo/extension-core';
+import { useEffect, useRef } from 'react';
+import CommandRoute, { createCommandRoutes } from './CommandRoute';
+
+const routes = createCommandRoutes([
+  {
+    path: ['', '/extensions/:extensionId'],
+    element: <CommandList />,
+  },
+  {
+    name: 'extension-command-view',
+    path: '/extensions/:extensionId/:commandId/view',
+    element: <CommandExtensionContent />,
+  },
+]);
 
 function CommandContent() {
   const containerRef = useRef<HTMLDivElement>(null);
   const resizerContainerRef = useRef<HTMLDivElement>(null);
-  const paths = useCommandStore((state) => state.paths);
-
-  const extViewId = useMemo(() => {
-    const command = paths.at(-1);
-    if (command?.type !== 'command' || !command.meta?.type) return null;
-
-    const extension = paths.at(-2);
-    if (extension?.type !== 'extension') return null;
-
-    return {
-      extId: extension.id,
-      commandId: command.id,
-      commandType: command.meta.type as ExtensionCommand['type'],
-    };
-  }, [paths]);
 
   useEffect(() => {
     const resizeEl = resizerContainerRef.current;
@@ -48,9 +44,7 @@ function CommandContent() {
 
   return (
     <>
-      <div
-        className={cn('max-h-80 min-h-48 overflow-auto', !extViewId && 'p-2')}
-      >
+      <div className={cn('max-h-80 min-h-48 overflow-auto')}>
         <div
           ref={containerRef}
           style={{
@@ -59,25 +53,10 @@ function CommandContent() {
           }}
         >
           <div ref={resizerContainerRef}>
-            {extViewId && extViewId.commandType.startsWith('view') ? (
-              <CommandExtensionContent
-                type={extViewId.commandType}
-                extensionId={extViewId.extId}
-                commandId={extViewId.commandId}
-              />
-            ) : (
-              <CommandList />
-            )}
+            <CommandRoute routes={routes} />
           </div>
         </div>
       </div>
-      {extViewId && extViewId.commandType === 'action' && (
-        <CommandExtensionContent
-          type={extViewId.commandType}
-          extensionId={extViewId.extId}
-          commandId={extViewId.commandId}
-        />
-      )}
     </>
   );
 }

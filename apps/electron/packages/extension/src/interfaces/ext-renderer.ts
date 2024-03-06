@@ -2,6 +2,9 @@ import type { ExtensionMessagePortEvent } from '@repo/extension/dist/interfaces/
 import type { AMessagePort } from '@repo/shared';
 
 export type ExtensionRenderer<K extends unknown[] = []> = (
-  messagePort: AMessagePort<ExtensionMessagePortEvent>,
+  detail: {
+    messagePort: AMessagePort<ExtensionMessagePortEvent>;
+    commandArgs: Record<string, unknown>;
+  },
   ...args: K
 ) => Promise<void>;

@@ -7,10 +7,15 @@ import {
   createContext,
 } from 'react';
 
+export interface UiListSelectedItem<M = Record<string, unknown>> {
+  id: string;
+  metadata: M;
+  index: number[];
+}
+
 interface UiListState {
   search: string;
-  selectedId: string;
-  selectedIndex: number[];
+  selectedItem: UiListSelectedItem;
 }
 interface UiListStore {
   listController: React.RefObject<UiListController | null>;
@@ -19,7 +24,11 @@ interface UiListStore {
   snapshot(): UiListState;
   subscribe(callback: () => void): () => void;
   listControllerKeyBind(event: KeyboardEvent): void;
-  setSelectedItem(id: string, index: number[]): void;
+  setSelectedItem(
+    id: string,
+    index: number[],
+    metadata?: Record<string, unknown>,
+  ): void;
   setState<T extends keyof UiListState>(
     key: T,
     value: UiListState[T],
@@ -55,8 +64,11 @@ export function UiListProvider({ children }: { children: React.ReactNode }) {
   const listeners = useLazyRef<Set<() => void>>(() => new Set());
   const state = useLazyRef<UiListState>(() => ({
     search: '',
-    selectedId: '',
-    selectedIndex: [],
+    selectedItem: {
+      id: '',
+      index: [],
+      metadata: {},
+    },
   }));
   const listController = useRef<UiListController | null>(null);
 
@@ -71,11 +83,14 @@ export function UiListProvider({ children }: { children: React.ReactNode }) {
         state.current[key] = value;
         if (emit) store.emit();
       },
-      setSelectedItem(itemId: string, indexs: number[]) {
-        if (Object.is(state.current.selectedId, itemId)) return;
+      setSelectedItem(itemId, indexs, selectedItemMeta = {}) {
+        if (Object.is(state.current.selectedItem.id, itemId)) return;
 
-        state.current.selectedId = itemId;
-        state.current.selectedIndex = indexs;
+        state.current.selectedItem = {
+          id: itemId,
+          index: indexs,
+          metadata: selectedItemMeta,
+        };
 
         store.emit();
       },

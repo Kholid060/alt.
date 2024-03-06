@@ -1,31 +1,31 @@
 import { memo, useEffect, useRef } from 'react';
 import { EXTENSION_VIEW } from '#common/utils/constant/constant';
-import { ExtensionCommand } from '@repo/extension-core';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
-import { useCommandStore } from '/@/stores/command.store';
 import { ExtensionExecutionFinishReason } from '@repo/extension';
+import { useCommandRouteStore } from '/@/stores/command-route.store';
+import { useShallow } from 'zustand/react/shallow';
 
 function CommandSandboxContent({
-  type,
-  commandId,
-  extensionId,
   onFinishExecute,
 }: {
-  commandId: string;
-  extensionId: string;
-  type: ExtensionCommand['type'];
   onFinishExecute?: (
     reason: ExtensionExecutionFinishReason,
     message?: string,
   ) => void;
 }) {
+  const [parsedPath, breadcrumbs, pathData, navigate] = useCommandRouteStore(
+    useShallow((state) => [
+      state.parsedPath,
+      state.breadcrumbs,
+      state.pathData,
+      state.navigate,
+    ]),
+  );
+
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const messageChannelRef = useRef<MessageChannel | null>(null);
 
   const commandCtx = useCommandCtx();
-  const setCommandState = useCommandStore((state) => state.setState);
-
-  const isView = type.startsWith('view');
 
   function initPortListener(port: MessagePort) {
     commandCtx.setExtMessagePort(port);
@@ -34,12 +34,12 @@ function CommandSandboxContent({
     messagePort.addListener('extension:finish-execute', (reason, message) => {
       if (onFinishExecute) return onFinishExecute(reason, message);
 
-      const currentPaths = useCommandStore.getState().paths;
-      if (currentPaths.length === 0) return;
+      const copyBreadcrumbs = [...breadcrumbs];
+      copyBreadcrumbs.pop();
 
-      currentPaths.pop();
+      const lastPath = copyBreadcrumbs.at(-1)?.path ?? '';
 
-      setCommandState('paths', currentPaths);
+      navigate(lastPath, { breadcrumbs: copyBreadcrumbs });
     });
   }
   async function onIframeLoad(
@@ -51,15 +51,13 @@ function CommandSandboxContent({
 
       const payload = {
         type: 'init',
-        commandType: type,
         themeStyle: '',
+        commandArgs: pathData,
       };
 
-      if (isView) {
-        payload.themeStyle = (
-          await import('@repo/ui/dist/theme.css?inline')
-        ).default;
-      }
+      payload.themeStyle = (
+        await import('@repo/ui/dist/theme.css?inline')
+      ).default;
 
       initPortListener(messageChannelRef.current.port1);
 
@@ -85,9 +83,9 @@ function CommandSandboxContent({
       title="sandbox"
       ref={iframeRef}
       name={EXTENSION_VIEW.frameName}
-      src={`extension://${extensionId}/command/${commandId}/`}
+      src={`extension://${parsedPath.params.extensionId}/command/${parsedPath.params.commandId}/`}
       sandbox="allow-scripts"
-      className={isView ? 'h-64 block w-full' : 'hidden'}
+      className="h-64 block w-full"
       onLoad={onIframeLoad}
     />
   );

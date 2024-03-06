@@ -27,6 +27,7 @@ export interface UiListItem {
   icon?: React.ReactNode;
   onSelected?: () => void;
   detail?: React.ReactNode;
+  metadata?: Record<string, unknown>;
 }
 
 export type UiListItemMatch = Fuzzysort.Result;
@@ -88,7 +89,7 @@ function findNonSearchOnlyItem(
     groupOnly: boolean;
     direction: 'prev' | 'next';
   }>,
-) {
+): { item: UiListItem; index: number[] } | null {
   const { direction, groupOnly, startIndex } = {
     startIndex: [0],
     direction: 'next',
@@ -119,13 +120,14 @@ function findNonSearchOnlyItem(
 
       while (childIndex >= 0 && childIndex <= currentItem.items.length - 1) {
         const groupItem = currentItem.items[childIndex];
-        if (groupItem && !isSearchOnly(groupItem))
-          return { value: groupItem.value, index: [index, childIndex] };
+        if (groupItem && !isSearchOnly(groupItem)) {
+          return { item: groupItem, index: [index, childIndex] };
+        }
 
         childIndex += direction === 'prev' ? -1 : 1;
       }
     } else if (!isGroup && !groupOnly && !isSearchOnly(currentItem)) {
-      return { value: currentItem.value, index: [index] };
+      return { item: currentItem, index: [index] };
     }
 
     if (typeof childIndex === 'number') childIndex = 0;
@@ -196,12 +198,27 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
       return result.sort((a, z) => z.$score - a.$score);
     }, [query, shouldFilter, items]);
     const controller = useMemo<UiListController>(() => {
+      const setSelectedItem = (
+        selectedItem: {
+          index: number[];
+          item: UiListItem;
+        } | null,
+      ) => {
+        const { index, item } = selectedItem ?? {
+          index: [],
+          item: { value: '', metadata: {} },
+        };
+        listStore.setSelectedItem(item.value, index, item.metadata);
+      };
+
       return {
         selectItem() {
-          const [groupIndex, index] = listStore.snapshot().selectedIndex;
+          const [groupIndex, index] = listStore.snapshot().selectedItem.index;
 
           let currentItem = filteredItems[groupIndex];
-          if ('items' in currentItem) currentItem = currentItem.items[index];
+          if (currentItem && 'items' in currentItem) {
+            currentItem = currentItem.items[index];
+          }
 
           if (!currentItem) return;
 
@@ -210,9 +227,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
         },
         firstItem() {
           const firstItem = findNonSearchOnlyItem(filteredItems);
-          if (!firstItem) return;
-
-          listStore.setSelectedItem(firstItem.value, firstItem.index);
+          setSelectedItem(firstItem);
         },
         lastItem() {
           const lastItem = findNonSearchOnlyItem(filteredItems, {
@@ -221,10 +236,10 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
           });
           if (!lastItem) return;
 
-          listStore.setSelectedItem(lastItem.value, lastItem.index);
+          setSelectedItem(lastItem);
         },
         nextGroup() {
-          const [currentIndex] = listStore.snapshot().selectedIndex;
+          const [currentIndex] = listStore.snapshot().selectedItem.index;
           if (currentIndex === filteredItems.length - 1) return;
 
           const nextGroup = findNonSearchOnlyItem(filteredItems, {
@@ -233,10 +248,10 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
           });
           if (!nextGroup) return;
 
-          listStore.setSelectedItem(nextGroup.value, nextGroup.index);
+          setSelectedItem(nextGroup);
         },
         prevGroup() {
-          const [currentIndex] = listStore.snapshot().selectedIndex;
+          const [currentIndex] = listStore.snapshot().selectedItem.index;
           if (currentIndex === 0) return;
 
           const prevGroup = findNonSearchOnlyItem(filteredItems, {
@@ -245,10 +260,10 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
           });
           if (!prevGroup) return;
 
-          listStore.setSelectedItem(prevGroup.value, prevGroup.index);
+          setSelectedItem(prevGroup);
         },
         nextItem() {
-          const [groupIndex, index] = listStore.snapshot().selectedIndex;
+          const [groupIndex, index] = listStore.snapshot().selectedItem.index;
           const nextItem = findNonSearchOnlyItem(filteredItems, {
             startIndex:
               typeof index === 'number'
@@ -257,20 +272,20 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
           });
           if (!nextItem) return;
 
-          listStore.setSelectedItem(nextItem.value, nextItem.index);
+          setSelectedItem(nextItem);
         },
         prevItem() {
-          const [groupIndex, index] = listStore.snapshot().selectedIndex;
-          const nextItem = findNonSearchOnlyItem(filteredItems, {
+          const [groupIndex, index] = listStore.snapshot().selectedItem.index;
+          const prevItem = findNonSearchOnlyItem(filteredItems, {
             direction: 'prev',
             startIndex:
               typeof index === 'number'
                 ? [groupIndex, index - 1]
                 : [groupIndex - 1],
           });
-          if (!nextItem) return;
+          if (!prevItem) return;
 
-          listStore.setSelectedItem(nextItem.value, nextItem.index);
+          setSelectedItem(prevItem);
         },
       };
     }, [filteredItems]);
@@ -280,11 +295,14 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
     ]);
 
     const onPointerMove = useCallback(
-      (id: string, indexs: number[]) => {
-        if (disabledItemSelection || listStore.snapshot().selectedId === id)
+      (item: UiListItem, indexs: number[]) => {
+        if (
+          disabledItemSelection ||
+          listStore.snapshot().selectedItem.id === item.value
+        )
           return;
 
-        listStore.setSelectedItem(id, indexs);
+        listStore.setSelectedItem(item.value, indexs, item.metadata);
       },
       [onItemSelected],
     );
@@ -302,6 +320,11 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
       controller.firstItem();
       listStore.setController(controller);
     }, [filteredItems, disabledItemSelection]);
+    useEffect(() => {
+      return () => {
+        listStore.setSelectedItem('', []);
+      };
+    }, []);
 
     return (
       <div ref={containerRef} {...props}>
@@ -327,7 +350,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
                         renderItem={renderItem}
                         onClick={() => onItemClick(groupItem)}
                         onPointerMove={() =>
-                          onPointerMove(groupItem.value, [index, groupIndex])
+                          onPointerMove(groupItem, [index, groupIndex])
                         }
                       />
                     ),
@@ -347,7 +370,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
               value={item.value}
               renderItem={renderItem}
               onClick={() => onItemClick(item)}
-              onPointerMove={() => onPointerMove(item.value, [index])}
+              onPointerMove={() => onPointerMove(item, [index])}
             />
           );
         })}
@@ -373,7 +396,7 @@ function UiListItemRenderer({
 
   const itemValue = useRef(value || itemId);
   const isSelected = useUiList(
-    (state) => state.selectedId === itemValue.current,
+    (state) => state.selectedItem.id === itemValue.current,
   );
 
   const elRef = useRef<HTMLDivElement>(null);
@@ -388,13 +411,11 @@ function UiListItemRenderer({
     ) {
       parentEl.previousElementSibling?.scrollIntoView({
         block: 'nearest',
-        behavior: 'smooth',
       });
     }
 
     elRef.current.scrollIntoView({
       block: 'nearest',
-      behavior: 'smooth',
     });
   }, [isSelected]);
 

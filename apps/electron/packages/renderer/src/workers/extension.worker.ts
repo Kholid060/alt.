@@ -6,7 +6,9 @@ import {
 } from '#common/utils/constant/constant';
 import { ExtensionManifest } from '@repo/extension-core';
 
-type ExtensionCommand = () => void | Promise<void>;
+type ExtensionCommand = (payload: {
+  args?: Record<string, unknown>;
+}) => void | Promise<void>;
 
 async function loadExtensionCommand() {
   const [extensionId, commandId] = self.name.split(':');
@@ -24,8 +26,8 @@ async function loadExtensionCommand() {
 
 function initExtensionAPI({
   key,
-  manifest,
   port,
+  manifest,
 }: {
   key: string;
   port: MessagePort;
@@ -75,7 +77,7 @@ self.onmessage = async ({ ports, data }) => {
       manifest: data.manifest.permissions,
     });
 
-    await executeCommand();
+    await executeCommand({ args: data.commandArgs ?? {} });
 
     self.postMessage('finish');
   } catch (error) {

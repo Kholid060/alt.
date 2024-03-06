@@ -1,7 +1,11 @@
 import mitt from 'mitt';
 
 type MittEvent = {
-  'execute-command': { extensionId: string; commandId: string };
+  'execute-command': {
+    extensionId: string;
+    commandId: string;
+    args?: Record<string, unknown>;
+  };
 };
 
 export type MittEventHandler<T extends keyof MittEvent> = (

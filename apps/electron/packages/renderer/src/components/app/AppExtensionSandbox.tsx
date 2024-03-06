@@ -1,20 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import emitter, { MittEventHandler } from '/@/lib/mitt';
-import CommandExtensionContent from '../command/CommandExtensionContent';
 import createExtensionWorker from '/@/utils/createExtensionWorker';
 import preloadAPI from '/@/utils/preloadAPI';
 
-interface CommandExecution {
-  timerId: number;
-  commandId: string;
-  extensionId: string;
-}
 function AppExtensionSandbox() {
-  const [execute, setExecute] = useState<null | CommandExecution>(null);
   const currentWorker = useRef<Worker | null>(null);
 
   useEffect(() => {
     const onExecuteCommand: MittEventHandler<'execute-command'> = async ({
+      args = {},
       commandId,
       extensionId,
     }) => {
@@ -39,6 +33,7 @@ function AppExtensionSandbox() {
         const extensionWorker = await createExtensionWorker({
           commandId,
           extensionId,
+          commandArgs: args,
           key: extension.$key,
           manifest: extension.manifest,
           events: {
@@ -47,7 +42,6 @@ function AppExtensionSandbox() {
               clearWorker(worker);
             },
             onFinish: (worker) => clearWorker(worker),
-            onMessage: (worker) => clearWorker(worker),
           },
         });
         if (!extensionWorker) return;
@@ -65,16 +59,7 @@ function AppExtensionSandbox() {
     };
   }, []);
 
-  if (!execute) return null;
-
-  return (
-    <CommandExtensionContent
-      type="action"
-      commandId={execute.commandId}
-      extensionId={execute.extensionId}
-      onFinishExecute={() => setExecute(null)}
-    />
-  );
+  return null;
 }
 
 export default AppExtensionSandbox;

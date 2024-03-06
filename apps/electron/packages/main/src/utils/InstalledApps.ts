@@ -1,4 +1,4 @@
-import type { InstalledAppDetail } from '#common/interface/installed-apps';
+import type { InstalledAppDetail } from '#common/interface/installed-apps.interface';
 import type { NativeImage } from 'electron';
 import { shell, app } from 'electron';
 import fs from 'fs-extra';

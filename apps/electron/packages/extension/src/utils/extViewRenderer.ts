@@ -45,7 +45,7 @@ async function loadStyle(themeStyle: string) {
 }
 
 const extViewRenderer: ExtensionRenderer<[string]> = async (
-  messagePort,
+  { messagePort, commandArgs },
   theme,
 ) => {
   try {
@@ -59,6 +59,7 @@ const extViewRenderer: ExtensionRenderer<[string]> = async (
     reactDOM.createRoot(document.querySelector('#app')!).render(
       renderer({
         messagePort,
+        commandArgs,
       }),
     );
   } catch (error) {

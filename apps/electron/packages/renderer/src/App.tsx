@@ -1,6 +1,6 @@
 import { CSSProperties, useEffect } from 'react';
 import { GripHorizontalIcon } from 'lucide-react';
-import { UiButton } from '@repo/ui';
+import { UiButton, UiToaster } from '@repo/ui';
 import CommandHeader from './components/command/CommandHeader';
 import CommandFooter from './components/command/CommandFooter';
 import CommandContent from './components/command/CommandContent';
@@ -42,6 +42,7 @@ function App() {
           <CommandFooter />
         </div>
         <AppExtensionSandbox />
+        <UiToaster viewportClass="right-0 bottom-0 pointer-events-none items-end" />
       </CommandCtxProvider>
     </UiListProvider>
   );

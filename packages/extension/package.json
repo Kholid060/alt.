@@ -5,9 +5,8 @@
   "types": "./dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "build": "tsup && yarn build:release",
+    "build": "tsup",
     "dev": "tsup --watch",
-    "build:release": "tsx ./scripts/generate-release.ts",
     "lint": "eslint . --ext js,mjs,cjs,ts,mts,cts,tsx"
   },
   "dependencies": {

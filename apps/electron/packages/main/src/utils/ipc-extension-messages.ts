@@ -9,7 +9,8 @@ import { ExtensionError } from '#common/errors/ExtensionError';
 import ExtensionLoader from './extension/ExtensionLoader';
 import { logger } from '../lib/log';
 import path from 'path';
-import { NativeImage, clipboard, ipcMain, nativeImage } from 'electron';
+import type { NativeImage } from 'electron';
+import { clipboard, ipcMain, nativeImage } from 'electron';
 import WindowsManager from '../window/WindowsManager';
 import {
   IPC_ON_EVENT,

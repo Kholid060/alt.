@@ -10,9 +10,14 @@
       "icon": "clipboard",
       "name": "clipboard-copy",
       "title": "Clipboard Copy",
-      "type": "action"
+      "type": "action",
+      "arguments": [
+        { "name": "test", "placeholder": "Test", "type": "text" },
+        { "name": "select", "placeholder": "Select", "type": "select", "options": [{ "label": "Option 1", "value": "1" }, { "label": "Option 2", "value": "2" }] },
+        { "name": "toggle", "placeholder": "Toggle", "type": "toggle" }
+      ]
     },
-	{
+	  {
       "icon": "clipboard",
       "name": "clipboard-list",
       "title": "Clipboard List",

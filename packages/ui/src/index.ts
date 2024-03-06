@@ -35,7 +35,13 @@ export type {
   UiListRef,
 } from './components/ui/list';
 export { default as UiList } from './components/ui/list';
+export { UiSwitch } from './components/ui/switch';
+export { UiTooltip, UiTooltipProvider } from './components/ui/tooltip';
+export { UiToaster } from './components/ui/toaster';
 
 export { useUiList } from './context/list.context';
+
+export { useToast } from './hooks/useToast';
+export { useLazyRef } from './hooks/useLazyRef';
 
 export { cn } from './utils/cn';

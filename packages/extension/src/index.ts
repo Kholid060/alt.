@@ -17,5 +17,6 @@ export { ExtIcon as UiExtIcon } from './components/ext-icon';
 export { default as commandRenderer } from './command-renderer/command-renderer';
 
 export type * from './interfaces/message-events';
+export type * from './interfaces/command.interface';
 
 export type { Manifest, ExtensionAPI as Extension };

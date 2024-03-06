@@ -35,6 +35,7 @@ async function createExtensionWorker({
   commandId,
   extensionId,
   events = {},
+  commandArgs = {},
   timeout = MAX_COMMAND_EXECUTION_MS,
 }: {
   key: string;
@@ -42,6 +43,7 @@ async function createExtensionWorker({
   commandId: string;
   extensionId: string;
   manifest: ExtensionManifest;
+  commandArgs?: Record<string, unknown>;
   events?: Partial<{
     onError: (worker: Worker, event: ErrorEvent) => void;
     onFinish: <T = unknown>(worker: Worker, data: T) => void;
@@ -88,7 +90,7 @@ async function createExtensionWorker({
 
     messagePort = await createMessagePort();
     extensionWorker.postMessage(
-      { type: 'init', manifest, key },
+      { type: 'init', manifest, key, commandArgs },
       { transfer: [messagePort] },
     );
 

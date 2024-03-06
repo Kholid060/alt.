@@ -55,6 +55,7 @@
     "@repo/shared": "*",
     "@repo/ui": "*",
     "@tootallnate/quickjs-emscripten": "^0.23.0",
+    "better-sqlite3": "^9.4.3",
     "dayjs": "^1.11.10",
     "dot-prop": "^8.0.2",
     "electron-log": "^5.1.1",

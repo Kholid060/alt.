@@ -16,6 +16,36 @@ export const EXTENSION_COMMAND_TYPE = ['action', 'view', 'view:json'] as const;
 
 export const EXTENSION_COMMAND_CONTEXT = ['all', 'url'] as const;
 
+export const EXTENSION_COMMAND_ARGUMENT_TYPE = [
+  'toggle',
+  'select',
+  'input:text',
+  'input:number',
+] as const;
+
+const ExtensionCommandArgumentBaseSchema = z.object({
+  name: z.string().min(1).max(32),
+  required: z.boolean().optional(),
+  placeholder: z.string().optional(),
+  type: z.enum(EXTENSION_COMMAND_ARGUMENT_TYPE).exclude(['select']),
+});
+
+export const ExtensionCommandArgumentSchema = z.discriminatedUnion('type', [
+  ExtensionCommandArgumentBaseSchema,
+  ExtensionCommandArgumentBaseSchema.merge(
+    z.object({
+      type: z.literal('select'),
+      options: z
+        .object({
+          label: z.string().min(1),
+          value: z.string().min(1),
+        })
+        .array()
+        .max(4),
+    }),
+  ),
+]);
+
 export const ExtensionCommandSchema = z.object({
   name: z.string().min(1),
   subtitle: z.string().optional(),
@@ -23,6 +53,7 @@ export const ExtensionCommandSchema = z.object({
   icon: z.string().min(1).optional(),
   type: z.enum(EXTENSION_COMMAND_TYPE),
   keywords: z.string().array().optional(),
+  arguments: ExtensionCommandArgumentSchema.array().optional(),
   context: z
     .enum(EXTENSION_COMMAND_CONTEXT)
     .default('all')
@@ -43,6 +74,10 @@ export const ExtensionManifestSchema = z.object({
     .regex(URL_FRIENDLY_REGEX)
     .describe('The name must be URL friendly'),
 });
+
+export type ExtensionCommandArgument = z.infer<
+  typeof ExtensionCommandArgumentSchema
+>;
 
 export type ExtensionCommand = z.infer<typeof ExtensionCommandSchema>;
 

@@ -1,6 +1,6 @@
-import { UiCommand, UiCommandInput } from '@repo/ui';
+import { useUiListStore } from '@repo/ui/dist/context/list.context';
 import { AMessagePort } from '@repo/shared';
-import { createContext, forwardRef, useEffect, useRef, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import {
   ExtensionMessagePortCallback,
   ExtensionMessagePortEvent,
@@ -14,20 +14,6 @@ export const ExtensionContext = createContext<ExtensionContextState>({
   query: '',
 });
 
-const CommandInput = forwardRef<HTMLInputElement, { value: string }>(
-  ({ value }, ref) => {
-    return (
-      <UiCommandInput
-        ref={ref}
-        value={value}
-        rootClass="hidden"
-        style={{ display: 'none' }}
-      />
-    );
-  },
-);
-CommandInput.displayName = 'CommandInput';
-
 export function ExtensionProvider({
   children,
   messagePort,
@@ -37,7 +23,7 @@ export function ExtensionProvider({
   value?: string;
   messagePort: AMessagePort<ExtensionMessagePortEvent>;
 }) {
-  const commandRef = useRef<HTMLDivElement>(null);
+  const listStore = useUiListStore();
 
   const [query, setQuery] = useState(() => value ?? '');
 
@@ -46,11 +32,12 @@ export function ExtensionProvider({
       'extension:query-change'
     > = (newQuery) => {
       setQuery(newQuery);
+      listStore.setState('search', newQuery);
     };
     const onParentKeydown: ExtensionMessagePortCallback<
       'extension:keydown-event'
     > = (event) => {
-      commandRef.current?.dispatchEvent(
+      listStore.listControllerKeyBind(
         new KeyboardEvent('keydown', { bubbles: true, ...event }),
       );
     };
@@ -66,10 +53,7 @@ export function ExtensionProvider({
 
   return (
     <ExtensionContext.Provider value={{ query }}>
-      <UiCommand ref={commandRef}>
-        <CommandInput value={query} />
-        {children}
-      </UiCommand>
+      {children}
     </ExtensionContext.Provider>
   );
 }
