@@ -21,8 +21,8 @@ import { cn } from '@/utils/cn';
 export interface UiListItem {
   value: string;
   title: string;
+  alias?: string;
   subtitle?: string;
-  keywords?: string[];
   searchOnly?: boolean;
   icon?: React.ReactNode;
   onSelected?: () => void;
@@ -48,12 +48,15 @@ export interface UiListProps
   shouldFilter?: boolean;
   disabledItemSelection?: boolean;
   onItemSelected?: (item: UiListItem) => void;
-  renderGroupHeader?: (label: string) => React.ReactNode;
-  renderItem?: (detail: {
-    selected: boolean;
-    item: UiListItemQuery | UiListItem;
-    props: Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>;
-  }) => React.ReactNode;
+  renderGroupHeader?: (label: string, index: number) => React.ReactNode;
+  renderItem?: (
+    detail: {
+      selected: boolean;
+      item: UiListItemQuery | UiListItem;
+      props: Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>;
+    },
+    index: number,
+  ) => React.ReactNode;
 }
 
 export interface UiListItemQuery extends UiListItem {
@@ -140,6 +143,14 @@ export interface UiListRef {
   el: React.RefObject<HTMLDivElement>;
 }
 
+function searchItems(query: string, items: (UiListItemQuery | UiListItem)[]) {
+  return fuzzySort.go(query, items, {
+    limit: 100,
+    threshold: -20000,
+    keys: ['title', 'alias'],
+  });
+}
+
 const UiListRoot = forwardRef<UiListRef, UiListProps>(
   (
     {
@@ -164,21 +175,16 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
 
       const result: FilterItemResult = [];
 
-      const searchOptions = {
-        limit: 100,
-        threshold: -20000,
-        keys: ['title', 'keywords'],
-      };
-
       for (const item of items) {
         if ('items' in item) {
           let totalScore = 0;
-          const resultItems: UiListItemQuery[] = fuzzySort
-            .go(query, item.items, searchOptions)
-            .map((value) => {
-              totalScore += value.score;
-              return mapToResultItem(value, 0);
-            });
+          const resultItems: UiListItemQuery[] = searchItems(
+            query,
+            item.items,
+          ).map((value) => {
+            totalScore += value.score;
+            return mapToResultItem(value, 0);
+          });
 
           if (resultItems.length > 0) {
             result.push({
@@ -191,7 +197,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
           continue;
         }
 
-        const [resulItem] = fuzzySort.go(query, [item], searchOptions) ?? [];
+        const [resulItem] = searchItems(query, [item]) ?? [];
         if (resulItem) result.push(mapToResultItem(resulItem));
       }
 
@@ -333,7 +339,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
             return (
               <Fragment key={item.label}>
                 {renderGroupHeader ? (
-                  renderGroupHeader(item.label)
+                  renderGroupHeader(item.label, index)
                 ) : (
                   <UiListGroupHeading key={item.value || item.label}>
                     {item.label}
@@ -383,6 +389,7 @@ UiListRoot.displayName = 'UiListRoot';
 function UiListItemRenderer({
   item,
   value,
+  index,
   onClick,
   renderItem,
   onPointerMove,
@@ -420,11 +427,14 @@ function UiListItemRenderer({
   }, [isSelected]);
 
   if (renderItem) {
-    return renderItem({
-      item,
-      selected: isSelected,
-      props: { onPointerMove, onClick },
-    });
+    return renderItem(
+      {
+        item,
+        selected: isSelected,
+        props: { onPointerMove, onClick },
+      },
+      index,
+    );
   }
 
   return (

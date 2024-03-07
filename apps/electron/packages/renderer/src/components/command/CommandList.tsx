@@ -101,6 +101,7 @@ function CommandList() {
           extensionIcon
         ),
         searchOnly: true,
+        alias: command.alias,
         title: command.title,
         metadata: {
           command,
@@ -232,6 +233,29 @@ function CommandList() {
       className="p-2"
       items={filteredItems}
       onItemSelected={onItemSelected}
+      renderItem={({ item, props, selected }) => (
+        <UiList.Item
+          className="group/list-item"
+          icon={item.icon}
+          title={
+            <span>
+              {item.title}{' '}
+              {item.alias && (
+                <span className="group-hover/list-item:visible ml-2 invisible text-xs px-1.5 py-1 border rounded-sm text-muted-foreground group-aria-selected/list-item:visible">
+                  {item.alias}
+                </span>
+              )}
+            </span>
+          }
+          selected={selected}
+          {...props}
+        />
+      )}
+      renderGroupHeader={(label, index) => (
+        <UiList.GroupHeading className={index !== 0 ? 'mt-1 block' : ''}>
+          {label}
+        </UiList.GroupHeading>
+      )}
     />
   );
 }

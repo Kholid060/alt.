@@ -36,6 +36,7 @@ export type {
 } from './components/ui/list';
 export { default as UiList } from './components/ui/list';
 export { UiSwitch } from './components/ui/switch';
+export { UiInput } from './components/ui/input';
 export { UiTooltip, UiTooltipProvider } from './components/ui/tooltip';
 export { UiToaster } from './components/ui/toaster';
 

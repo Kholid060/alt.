@@ -80,7 +80,7 @@ const CommandInputArguments = forwardRef<
       {...props}
       ref={mergedRefs}
       style={{ translate: `${widthRef.current?.offsetWidth ?? 0}px 0` }}
-      className="flex items-center absolute top-1/2 -translate-y-1/2 left-4 text-sm h-7 gap-2  text-mauve-11"
+      className="flex items-center absolute top-1/2 -translate-y-1/2 left-4 text-sm h-7 gap-2"
     >
       {selectedCommand?.arguments?.map((argument) => {
         switch (argument.type) {
