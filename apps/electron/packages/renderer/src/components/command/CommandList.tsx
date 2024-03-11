@@ -1,24 +1,22 @@
 import { commandIcons } from '#common/utils/command-icons';
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useCommandStore } from '/@/stores/command.store';
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
-import {
-  UiImage,
-  UiListGroupItem,
-  UiListItem,
-  UiListItems,
-  useToast,
-} from '@repo/ui';
+import { UiImage, UiListItem, uiListItemsFilter } from '@repo/ui';
 import { useShallow } from 'zustand/react/shallow';
-import emitter from '/@/lib/mitt';
 import { UiList } from '@repo/ui';
-import { useCommandRouteStore } from '/@/stores/command-route.store';
-import { ExtensionCommand } from '@repo/extension-core';
+import { CommandListMetadata } from '/@/interface/command.interface';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
+import { useUiListStore } from '@repo/ui/dist/context/list.context';
+import { ToggleLeft } from 'lucide-react';
 
 type CommandIconName = keyof typeof commandIcons;
 
 const iconPrefix = 'icon:';
+
+const QUERY_PREFIX = {
+  EXT: 'ext:',
+};
 
 function CommandPrefix({
   id,
@@ -46,30 +44,64 @@ function CommandPrefix({
   );
 }
 
-export type CommandListItemMetadata =
-  | { type: 'extension'; extensionId: string }
-  | {
-      type: 'extension-command';
-      extensionId: string;
-      extensionLabel: string;
-      command: ExtensionCommand;
-    };
-
 function CommandList() {
-  const [extensions] = useCommandStore(
-    useShallow((state) => [state.extensions, state.setState]),
-  );
-  const [parsedPath, navigate] = useCommandRouteStore(
-    useShallow((state) => [state.parsedPath, state.navigate]),
-  );
+  const uiListStore = useUiListStore();
+  const extensions = useCommandStore(useShallow((state) => state.extensions));
 
-  const { toast } = useToast();
-  const commandCtx = useCommandCtx();
+  const [items, setItems] = useState<UiListItem<CommandListMetadata>[]>([]);
 
-  const [items, setItems] = useState<UiListItems>([]);
+  const { executeCommand } = useCommandCtx();
+
+  const customListFilter = useCallback((items: UiListItem[], query: string) => {
+    let cleanedQuery = query;
+    let commandItems = items;
+
+    if (
+      query.startsWith(QUERY_PREFIX.EXT) &&
+      query.length > QUERY_PREFIX.EXT.length + 2
+    ) {
+      cleanedQuery = query.slice(QUERY_PREFIX.EXT.length);
+      commandItems = commandItems.filter((item) => {
+        const metadata = item.metadata as CommandListMetadata;
+        if (metadata.type !== 'command') return false;
+
+        return metadata.extensionId === cleanedQuery;
+      });
+
+      return commandItems;
+    }
+
+    return uiListItemsFilter(commandItems, cleanedQuery)
+      .slice(0, 10)
+      .map((item) => ({ ...item, group: 'Search results' }));
+  }, []);
+  const onItemSelected = useCallback(
+    (item: UiListItem<CommandListMetadata>) => {
+      if (!item.metadata?.type) return;
+
+      switch (item.metadata.type) {
+        case 'command':
+          executeCommand({
+            command: item.metadata.command,
+            extension: {
+              id: item.metadata.extensionId,
+              name: item.metadata.extensionTitle,
+            },
+          });
+          break;
+        case 'extension':
+          uiListStore.setState(
+            'search',
+            `${QUERY_PREFIX.EXT}${item.metadata.extensionId}`,
+          );
+          break;
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
-    const extensionItems: UiListItem[] = [];
+    const extensionItems: UiListItem<CommandListMetadata>[] = [];
 
     extensions.forEach(({ id, manifest }) => {
       const extensionIcon = (
@@ -80,11 +112,25 @@ function CommandList() {
         />
       );
 
-      const item: UiListItem = {
+      const item: UiListItem<CommandListMetadata> = {
         value: id,
+        group: 'Extensions',
         icon: extensionIcon,
         title: manifest.title,
-        subtitle: manifest.description,
+        actions: [
+          {
+            icon: ToggleLeft,
+            title: 'Disable',
+            shortcut: {
+              key: 'x',
+              mod1: 'ctrlKey',
+            },
+            onAction() {
+              console.log('hello!');
+            },
+            value: 'toggle-disable-extension',
+          },
+        ],
         metadata: {
           extensionId: id,
           type: 'extension',
@@ -92,171 +138,49 @@ function CommandList() {
       };
       extensionItems.push(item);
 
-      const commands: UiListItem[] = manifest.commands.map((command) => ({
-        value: `command:${id}:${command.name}`,
-        subtitle: command.subtitle,
-        icon: command.icon ? (
-          <CommandPrefix id={id} alt={command.name} icon={command.icon} />
-        ) : (
-          extensionIcon
-        ),
-        searchOnly: true,
-        alias: command.alias,
-        title: command.title,
-        metadata: {
-          command,
-          extensionId: id,
-          type: 'extension-command',
-          extensionLabel: manifest.title,
+      const commands: UiListItem<CommandListMetadata>[] = manifest.commands.map(
+        (command) => {
+          return {
+            metadata: {
+              command,
+              type: 'command',
+              extensionId: id,
+              extensionTitle: manifest.title,
+            },
+            value: `command:${id}:${command.name}`,
+            subtitle: command.subtitle || manifest.title,
+            icon: command.icon ? (
+              <CommandPrefix id={id} alt={command.name} icon={command.icon} />
+            ) : (
+              extensionIcon
+            ),
+            group: 'Commands',
+            title: command.title,
+            keywords: [manifest.title],
+          };
         },
-      }));
+      );
 
       extensionItems.push(...commands);
     });
 
-    setItems([
-      { label: 'Extensions', value: 'extensions', items: extensionItems },
-      {
-        label: 'Keywords',
-        items: [
-          {
-            title: 'Math',
-            value: 'math',
-            subtitle: 'Do math',
-            icon: <UiList.Icon icon="?" />,
-          },
-        ],
-      },
-    ]);
+    setItems([...extensionItems]);
   }, [extensions]);
 
-  const filteredItems = useMemo(() => {
-    const extensionId = parsedPath.params?.extensionId;
-    if (extensionId) {
-      const extensions = items.find(
-        (item) => item.value === 'extensions',
-      ) as UiListGroupItem;
-      if (!extensions) return [];
-
-      return extensions.items.reduce<UiListItem[]>((acc, item) => {
-        if (item.value.startsWith(`command:${extensionId}`)) {
-          acc.push({ ...item, searchOnly: false });
-        }
-
-        return acc;
-      }, []);
-    }
-
-    return items;
-  }, [items, parsedPath.params]);
-
-  function executeCommand({
-    command,
-    extensionId,
-    extensionLabel,
-  }: Extract<CommandListItemMetadata, { type: 'extension-command' }>) {
-    const args: Record<string, unknown> = {};
-
-    if (command.arguments && command.arguments.length > 0) {
-      const commandArgs = commandCtx.extCommandArgs.current;
-      const argsValues =
-        commandArgs?.commandId === command.name ? commandArgs.args : {};
-
-      for (const arg of command.arguments) {
-        if (arg.required && arg.type !== 'toggle' && !argsValues[arg.name]) {
-          const element = document.querySelector<HTMLElement>(
-            `[data-command-argument="${arg.name}"]`,
-          );
-          element?.focus();
-
-          toast({
-            duration: 5000,
-            title: 'Fill out the field',
-            className: 'text-sm max-w-xs p-3 right-2 leading-tight',
-            description:
-              'Fill out the required fill before running the command',
-          });
-
-          return;
-        }
-
-        if (Object.hasOwn(argsValues, arg.name)) {
-          args[arg.name] = argsValues[arg.name];
-        }
-      }
-
-      commandCtx.setExtCommandArgs(
-        {
-          args: {},
-          commandId: '',
-        },
-        true,
-      );
-    }
-
-    if (command.type === 'view') {
-      navigate(`/extensions/${extensionId}/${command.name}/view`, {
-        breadcrumbs: [
-          { label: extensionLabel, path: '' },
-          { label: command.title, path: `/extensions/${extensionId}` },
-        ],
-        data: args,
-      });
-      return;
-    }
-
-    emitter.emit('execute-command', {
-      args,
-      extensionId,
-      commandId: command.name,
-    });
-  }
-  function onItemSelected(item: UiListItem) {
-    const metadata = item.metadata as CommandListItemMetadata;
-    if (!metadata) return;
-
-    switch (metadata.type) {
-      case 'extension':
-        navigate(`/extensions/${metadata.extensionId}`, {
-          breadcrumbs: [{ label: item.title, path: '' }],
-        });
-        break;
-      case 'extension-command': {
-        executeCommand(metadata);
-        break;
-      }
-    }
-  }
-
   return (
-    <UiList
-      className="p-2"
-      items={filteredItems}
-      onItemSelected={onItemSelected}
-      renderItem={({ item, props, selected }) => (
-        <UiList.Item
-          className="group/list-item"
-          icon={item.icon}
-          title={
-            <span>
-              {item.title}{' '}
-              {item.alias && (
-                <span className="group-hover/list-item:visible ml-2 invisible text-xs px-1.5 py-1 border rounded-sm text-muted-foreground group-aria-selected/list-item:visible">
-                  {item.alias}
-                </span>
-              )}
-            </span>
-          }
-          selected={selected}
-          {...props}
-        />
-      )}
-      renderGroupHeader={(label, index) => (
-        <UiList.GroupHeading className={index !== 0 ? 'mt-1 block' : ''}>
-          {label}
-        </UiList.GroupHeading>
-      )}
-    />
+    <>
+      <UiList
+        className="p-2"
+        items={items}
+        customFilter={customListFilter}
+        onItemSelected={onItemSelected}
+        renderGroupHeader={(label, index) => (
+          <UiList.GroupHeading className={`${index !== 0 ? 'mt-1 block' : ''}`}>
+            {label}
+          </UiList.GroupHeading>
+        )}
+      />
+    </>
   );
 }
 

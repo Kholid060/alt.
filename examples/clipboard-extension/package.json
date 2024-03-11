@@ -12,7 +12,7 @@
       "title": "Clipboard Copy",
       "type": "action",
       "arguments": [
-        { "name": "test", "placeholder": "Test", "type": "text" },
+        { "name": "test", "placeholder": "Test", "type": "input:text" },
         { "name": "select", "placeholder": "Select", "type": "select", "options": [{ "label": "Option 1", "value": "1" }, { "label": "Option 2", "value": "2" }] },
         { "name": "toggle", "placeholder": "Toggle", "type": "toggle" }
       ]
@@ -30,7 +30,8 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "cliaa build"
+    "build": "cliaa build",
+    "dev": "cliaa build --watch"
   },
   "devDependencies": {
     "@repo/extension": "*"

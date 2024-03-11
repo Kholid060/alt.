@@ -15,6 +15,7 @@ const generateRadixColors = (name: string, reverse = false) => {
 const config: Omit<Config, 'content'> = {
   darkMode: ['class'],
   plugins: [
+    require('tailwindcss-animate'),
     function ({ matchUtilities, theme }) {
       matchUtilities(
         {

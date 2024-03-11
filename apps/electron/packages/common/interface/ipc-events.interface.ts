@@ -10,6 +10,11 @@ export interface IPCEventError {
 }
 
 export interface IPCEvents {
+  'shell:open-url': (url: string) => void;
+  'clipboard:copy': (content: string) => void;
+  'clipboard:paste': (content: string) => void;
+  'shell:open-in-folder': (path: string) => void;
+  'shell:move-to-trash': (path: string) => void;
   'extension:list': () => ExtensionData[];
   'extension:init-message-port': () => MessagePort;
   'apps:get-list': () => ExtensionAPI.installedApps.AppDetail[];

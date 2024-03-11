@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs-extra';
 import chalk from 'chalk';
 import { imageSize } from 'image-size';
-import { build, InlineConfig } from 'vite';
+import { InlineConfig } from 'vite';
 import { fromZodError } from 'zod-validation-error';
 import { BuildError, logger } from './utils/logger';
 import semverValid from 'semver/functions/valid';
@@ -70,7 +70,9 @@ async function getPackageJSON(): Promise<PackageJson> {
   return packageJSON;
 }
 
-async function getExtensionManifest(packageJSON: PackageJson) {
+async function getExtensionManifest() {
+  const packageJSON = await getPackageJSON();
+
   const manifest = await ExtensionManifestSchema.safeParseAsync(packageJSON);
   if (!manifest.success) {
     throw logger.error(fromZodError(manifest.error).toString());
@@ -95,7 +97,7 @@ async function getExtensionManifest(packageJSON: PackageJson) {
   return extManifest;
 }
 
-async function buildCommands(manifest: ExtensionManifest) {
+async function buildCommands(manifest: ExtensionManifest, watch = false) {
   const EXT_COMMAND_FILE_EXTENSION = '.{js,jsx,ts,tsx}';
 
   const cleanups: (() => void)[] = [];
@@ -133,12 +135,18 @@ async function buildCommands(manifest: ExtensionManifest) {
 
   process.env.NODE_ENV = 'production';
 
+  const { build } = await import('vite');
   const config: InlineConfig = {
     mode: process.env.MODE ?? 'production',
     define: {
       'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
     },
     build: {
+      watch: watch
+        ? {
+            clearScreen: true,
+          }
+        : null,
       lib: {
         entry,
         formats: ['es'],
@@ -176,11 +184,10 @@ async function buildCommands(manifest: ExtensionManifest) {
   cleanups.forEach((cleanup) => cleanup());
 }
 
-async function buildExtension() {
+async function buildExtension(watch = false) {
   try {
-    const packageJSON = await getPackageJSON();
-    const extensionManifest = await getExtensionManifest(packageJSON);
-    await buildCommands(extensionManifest);
+    const extensionManifest = await getExtensionManifest();
+    await buildCommands(extensionManifest, watch);
   } catch (error) {
     if (error instanceof BuildError) {
       logger.error(error.message);

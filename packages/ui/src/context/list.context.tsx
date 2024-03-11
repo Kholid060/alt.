@@ -1,4 +1,5 @@
 import { useLazyRef } from '@/hooks/useLazyRef';
+import { KeyboardShortcut } from '@repo/shared';
 import {
   useContext,
   useSyncExternalStore,
@@ -7,10 +8,13 @@ import {
   createContext,
 } from 'react';
 
-export interface UiListSelectedItem<M = Record<string, unknown>> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface UiListSelectedItem<M = any> {
   id: string;
   metadata: M;
-  index: number[];
+  index: number;
+  actionIndex: number;
+  actions: { value: string; shortcut?: KeyboardShortcut }[];
 }
 
 interface UiListState {
@@ -24,11 +28,7 @@ interface UiListStore {
   snapshot(): UiListState;
   subscribe(callback: () => void): () => void;
   listControllerKeyBind(event: KeyboardEvent): void;
-  setSelectedItem(
-    id: string,
-    index: number[],
-    metadata?: Record<string, unknown>,
-  ): void;
+  setSelectedItem(detail: UiListSelectedItem): void;
   setState<T extends keyof UiListState>(
     key: T,
     value: UiListState[T],
@@ -58,7 +58,12 @@ export interface UiListController {
   prevGroup(): void;
   nextGroup(): void;
   selectItem(): void;
+  nextAction(): void;
+  prevAction(): void;
+  runActionByShortcut(event: KeyboardEvent): boolean;
 }
+
+const TEXT_FIELD_TAGS = ['INPUT', 'TEXTAREA'];
 
 export function UiListProvider({ children }: { children: React.ReactNode }) {
   const listeners = useLazyRef<Set<() => void>>(() => new Set());
@@ -66,8 +71,10 @@ export function UiListProvider({ children }: { children: React.ReactNode }) {
     search: '',
     selectedItem: {
       id: '',
-      index: [],
+      index: -1,
+      actions: [],
       metadata: {},
+      actionIndex: -1,
     },
   }));
   const listController = useRef<UiListController | null>(null);
@@ -83,13 +90,15 @@ export function UiListProvider({ children }: { children: React.ReactNode }) {
         state.current[key] = value;
         if (emit) store.emit();
       },
-      setSelectedItem(itemId, indexs, selectedItemMeta = {}) {
-        if (Object.is(state.current.selectedItem.id, itemId)) return;
+      setSelectedItem({ actionIndex, id, index, metadata, actions }) {
+        if (Object.is(state.current.selectedItem.id, id)) return;
 
         state.current.selectedItem = {
-          id: itemId,
-          index: indexs,
-          metadata: selectedItemMeta,
+          id,
+          index,
+          actions,
+          metadata,
+          actionIndex,
         };
 
         store.emit();
@@ -107,6 +116,10 @@ export function UiListProvider({ children }: { children: React.ReactNode }) {
       listControllerKeyBind(event) {
         const controller = listController.current;
         if (!controller) return;
+
+        const isRunningAction =
+          listController.current?.runActionByShortcut(event) ?? false;
+        if (isRunningAction) return;
 
         switch (event.key) {
           case 'Home':
@@ -129,6 +142,29 @@ export function UiListProvider({ children }: { children: React.ReactNode }) {
             event.preventDefault();
             event.altKey ? controller.nextGroup() : controller.nextItem();
             break;
+          case 'ArrowLeft':
+          case 'ArrowRight': {
+            const target = event.target as HTMLInputElement;
+            const toLeft = event.key === 'ArrowLeft';
+            const { id, actionIndex, actions } = state.current.selectedItem;
+
+            if (
+              !id ||
+              actions.length <= 0 ||
+              !TEXT_FIELD_TAGS.includes(target.tagName) ||
+              target.selectionStart !== target.selectionEnd ||
+              target.selectionStart !== target.value.length ||
+              (toLeft && actionIndex <= -1) ||
+              (!toLeft && actionIndex >= actions.length - 1)
+            )
+              return;
+
+            event.preventDefault();
+            state.current.selectedItem.actionIndex +=
+              event.key === 'ArrowLeft' ? -1 : 1;
+            store.emit();
+            break;
+          }
         }
       },
     }),

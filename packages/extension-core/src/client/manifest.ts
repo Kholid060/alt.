@@ -21,6 +21,7 @@ export const EXTENSION_COMMAND_ARGUMENT_TYPE = [
   'select',
   'input:text',
   'input:number',
+  'input:password',
 ] as const;
 
 const ExtensionCommandArgumentBaseSchema = z.object({
@@ -49,6 +50,7 @@ export const ExtensionCommandArgumentSchema = z.discriminatedUnion('type', [
 export const ExtensionCommandSchema = z.object({
   name: z.string().min(1),
   subtitle: z.string().optional(),
+  description: z.string().optional(),
   title: z.string().min(1).max(48),
   icon: z.string().min(1).optional(),
   type: z.enum(EXTENSION_COMMAND_TYPE),

@@ -1,7 +1,9 @@
-const { author, name, description, version } = require('./package.json');
+import packageJSON from './package.json' with { type: "json" };
+
+const { author, name, description, version } = packageJSON;
 
 /** @type {import('@repo/extension').Manifest} */
-const manifest = {
+export default {
   name,
   author,
   version,
@@ -24,5 +26,3 @@ const manifest = {
   ],
   permissions: ['installedApps'],
 }
-
-module.exports = manifest;

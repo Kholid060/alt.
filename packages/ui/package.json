@@ -9,7 +9,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "lint": "eslint . --ext js,mjs,cjs,ts,mts,cts,tsx",
-    "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist"
+    "clean": "rm -rf .turbo &&  rm -rf dist"
   },
   "devDependencies": {
     "@repo/eslint-config": "*",
@@ -22,6 +22,7 @@
   "type": "module",
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/react-scroll-area": "^1.0.5",
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-slot": "^1.0.2",
@@ -35,6 +36,7 @@
     "cmdk": "^0.2.1",
     "fuzzysort": "^2.0.4",
     "lucide-react": "^0.330.0",
+    "match-sorter": "^6.3.4",
     "next-themes": "^0.2.1",
     "react": "^18.2.0",
     "sonner": "^1.4.3",

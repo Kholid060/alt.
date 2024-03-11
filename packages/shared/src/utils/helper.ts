@@ -1,3 +1,6 @@
+import { KeyboardShortcut } from '../interfaces/keyboard.interface';
+import { SHORTCUT_KEY_DISPLAY_MAP } from './constant/shortcut.const';
+
 export function debounce<T extends unknown[]>(
   fn: (...args: T) => void,
   delay: number,
@@ -103,7 +106,21 @@ export function isValidURL(url: string) {
   try {
     new URL(url);
     return true;
-  } catch (error) {
+  } catch (_error) {
     return false;
   }
+}
+
+export function getShortcutStr(shortcut?: KeyboardShortcut, wrap = true) {
+  if (!shortcut) return '';
+
+  let str = SHORTCUT_KEY_DISPLAY_MAP[shortcut.mod1] ?? shortcut.mod1;
+  if (shortcut.mod2)
+    str += `+${SHORTCUT_KEY_DISPLAY_MAP[shortcut.mod2] ?? shortcut.mod2}`;
+
+  str += `+${SHORTCUT_KEY_DISPLAY_MAP[shortcut.key] ?? shortcut.key.toUpperCase()}`;
+
+  if (!wrap) return str;
+
+  return `(${str})`;
 }

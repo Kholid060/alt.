@@ -9,7 +9,7 @@ function CommandBreadcrumb() {
     useShallow((state) => [state.navigate, state.breadcrumbs]),
   );
 
-  function navigateBradcrumb(index: number) {
+  function navigateBreadcrumb(index: number) {
     navigate(breadcrumbs[index].path, {
       breadcrumbs: breadcrumbs.slice(0, index),
     });
@@ -21,7 +21,7 @@ function CommandBreadcrumb() {
       case 'Enter':
       case 'Backspace':
         event.stopPropagation();
-        navigateBradcrumb(index);
+        navigateBreadcrumb(index);
         break;
     }
   }
@@ -42,7 +42,7 @@ function CommandBreadcrumb() {
               <button
                 type="button"
                 key={item.path}
-                onClick={() => navigateBradcrumb(index)}
+                onClick={() => navigateBreadcrumb(index)}
                 onKeyDown={(event) => onBtnKeydown(event, index)}
                 className="relative overflow-hidden group bg-secondary py-1 px-2 inline-flex items-center rounded-sm text-muted-foreground transition-colors focus-visible:outline-none focus-visible:bg-primary-hover/30"
               >
@@ -61,7 +61,7 @@ function CommandBreadcrumb() {
 
 function CommandHeader() {
   return (
-    <div className="py-1 border-b">
+    <div className="py-1 border-b rounded-t-lg">
       <CommandBreadcrumb />
       <CommandInput />
     </div>

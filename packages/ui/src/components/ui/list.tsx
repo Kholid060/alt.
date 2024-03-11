@@ -1,141 +1,121 @@
 import {
   Fragment,
   forwardRef,
-  memo,
   useCallback,
   useEffect,
   useId,
   useImperativeHandle,
   useMemo,
   useRef,
+  useState,
 } from 'react';
-import * as fuzzySort from 'fuzzysort';
 import { LucideIcon } from 'lucide-react';
 import {
   UiListController,
   useUiList,
   useUiListStore,
 } from '@/context/list.context';
+import { matchSorter } from 'match-sorter';
 import { cn } from '@/utils/cn';
+import { UiTooltip } from './tooltip';
+import {
+  KeyboardShortcut,
+  SHORTCUT_MODIFIER,
+  SHORTCUT_KEYS,
+  getShortcutStr,
+} from '@repo/shared';
 
-export interface UiListItem {
+const SHORTCUT_MODIFIER_VALS = Object.values(SHORTCUT_MODIFIER);
+
+export interface UiListItemAction {
+  title: string;
+  value: string;
+  icon: LucideIcon;
+  onAction: () => void;
+  shortcut?: KeyboardShortcut;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface UiListItem<T = any> {
   value: string;
   title: string;
-  alias?: string;
+  metadata?: T;
+  group?: string;
   subtitle?: string;
+  keywords?: string[];
+  description?: string;
   searchOnly?: boolean;
   icon?: React.ReactNode;
   onSelected?: () => void;
   detail?: React.ReactNode;
-  metadata?: Record<string, unknown>;
+  actions?: UiListItemAction[];
+  suffix?: string | React.ReactNode;
 }
 
-export type UiListItemMatch = Fuzzysort.Result;
-
-export interface UiListGroupItem<T = UiListItem> {
-  items: T[];
-  label: string;
-  value?: string;
-}
-
-export type UiListItems = (UiListItem | UiListGroupItem)[];
+type UiListGroupItem = [string, UiListItem[]];
+type UiListFlatItems = (string | UiListItem)[];
 
 export interface UiListProps
   extends Omit<React.DetailsHTMLAttributes<HTMLDivElement>, 'children'> {
   search?: string;
-  items: UiListItems;
+  items: UiListItem[];
   selectedItem?: string;
   shouldFilter?: boolean;
   disabledItemSelection?: boolean;
   onItemSelected?: (item: UiListItem) => void;
+  customFilter?: (items: UiListItem[], query: string) => UiListItem[];
   renderGroupHeader?: (label: string, index: number) => React.ReactNode;
   renderItem?: (
     detail: {
       selected: boolean;
-      item: UiListItemQuery | UiListItem;
+      item: UiListItem;
+      ref: React.Ref<HTMLDivElement>;
       props: Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>;
     },
     index: number,
   ) => React.ReactNode;
 }
 
-export interface UiListItemQuery extends UiListItem {
-  $score: number;
-  $matches: Record<string, UiListItemMatch>;
-}
-
-interface UiListGroupItemQuery extends UiListGroupItem<UiListItemQuery> {
-  $score: number;
-}
-
-type FilterItemResult = (UiListItemQuery | UiListGroupItemQuery)[];
-function mapToResultItem(
-  item: Fuzzysort.KeysResult<UiListItem>,
-  score?: number,
-): UiListItemQuery {
-  return {
-    ...item.obj,
-    $score: score ?? item.score,
-    $matches: { title: item[0] },
-  };
-}
-
-function isSearchOnly(item: UiListItem | UiListItemQuery) {
-  if ('$score' in item) return false;
-
-  return item.searchOnly;
-}
 function findNonSearchOnlyItem(
-  items: FilterItemResult | UiListItems,
+  items: UiListFlatItems,
   options?: Partial<{
-    startIndex: number[];
-    groupOnly: boolean;
+    startIndex: number;
+    findGroup: boolean;
     direction: 'prev' | 'next';
   }>,
-): { item: UiListItem; index: number[] } | null {
-  const { direction, groupOnly, startIndex } = {
-    startIndex: [0],
+): { item: UiListItem; index: number } | null {
+  const { findGroup, direction, startIndex } = {
+    startIndex: 0,
     direction: 'next',
-    groupOnly: false,
+    findGroup: false,
     ...options,
   };
-  let [index, childIndex] = startIndex;
+  const isNext = direction === 'next';
 
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    if (
-      (direction === 'next' && index > items.length - 1) ||
-      (direction === 'prev' && index < 0)
-    )
-      return null;
-
+  for (
+    let index = startIndex;
+    index >= 0 && index < items.length;
+    index += isNext ? 1 : -1
+  ) {
     const currentItem = items[index];
-    if (!currentItem) return null;
+    if (!currentItem || typeof currentItem === 'string') continue;
 
-    const isGroup = 'items' in currentItem;
-    if (isGroup && (typeof childIndex !== 'number' || childIndex >= 0)) {
-      if (typeof childIndex !== 'number') {
-        childIndex =
-          direction === 'prev'
-            ? ((currentItem as UiListGroupItem).items?.length ?? 1) - 1
-            : 0;
-      }
+    if (findGroup) {
+      const startItem = items[startIndex] as UiListItem;
+      const nextOrPrevItem = items[index - 1];
 
-      while (childIndex >= 0 && childIndex <= currentItem.items.length - 1) {
-        const groupItem = currentItem.items[childIndex];
-        if (groupItem && !isSearchOnly(groupItem)) {
-          return { item: groupItem, index: [index, childIndex] };
-        }
-
-        childIndex += direction === 'prev' ? -1 : 1;
-      }
-    } else if (!isGroup && !groupOnly && !isSearchOnly(currentItem)) {
-      return { item: currentItem, index: [index] };
+      if (
+        startItem.group === currentItem.group ||
+        startItem.group === nextOrPrevItem ||
+        typeof nextOrPrevItem !== 'string'
+      )
+        continue;
     }
 
-    if (typeof childIndex === 'number') childIndex = 0;
-    index += direction === 'next' ? 1 : -1;
+    return { item: currentItem, index };
   }
+
+  return null;
 }
 
 export interface UiListRef {
@@ -143,11 +123,16 @@ export interface UiListRef {
   el: React.RefObject<HTMLDivElement>;
 }
 
-function searchItems(query: string, items: (UiListItemQuery | UiListItem)[]) {
-  return fuzzySort.go(query, items, {
-    limit: 100,
-    threshold: -20000,
-    keys: ['title', 'alias'],
+export function uiListItemsFilter(items: UiListItem[], query: string) {
+  return matchSorter(items, query, {
+    keys: [
+      'title',
+      {
+        threshold: matchSorter.rankings.STARTS_WITH,
+        key: 'keywords',
+      },
+      { minRanking: matchSorter.rankings.EQUAL, key: 'subtitle' },
+    ],
   });
 }
 
@@ -157,6 +142,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
       items,
       search,
       renderItem,
+      customFilter,
       onItemSelected,
       renderGroupHeader,
       shouldFilter = true,
@@ -170,66 +156,134 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
 
     const containerRef = useRef<HTMLDivElement>(null);
 
-    const filteredItems = useMemo(() => {
-      if (!shouldFilter || !query?.trim()) return items;
+    const filteredItems = useMemo<UiListFlatItems>(() => {
+      let itemList: UiListItem[] = items;
+      if (shouldFilter && query?.trim()) {
+        itemList = customFilter
+          ? customFilter(itemList, query)
+          : uiListItemsFilter(itemList, query);
+      }
 
-      const result: FilterItemResult = [];
+      const groupedItems: (UiListItem | [string, UiListItem[]])[] = [];
+      const groupIndexMap = new Map<string, number>();
 
-      for (const item of items) {
-        if ('items' in item) {
-          let totalScore = 0;
-          const resultItems: UiListItemQuery[] = searchItems(
-            query,
-            item.items,
-          ).map((value) => {
-            totalScore += value.score;
-            return mapToResultItem(value, 0);
-          });
-
-          if (resultItems.length > 0) {
-            result.push({
-              label: item.label,
-              $score: totalScore,
-              items: resultItems,
-            });
-          }
-
+      for (const item of itemList) {
+        if (!item.group) {
+          groupedItems.push(item);
           continue;
         }
 
-        const [resulItem] = searchItems(query, [item]) ?? [];
-        if (resulItem) result.push(mapToResultItem(resulItem));
+        let groupIndex = groupIndexMap.get(item.group);
+        if (typeof groupIndex !== 'number') {
+          groupIndex = groupedItems.length;
+          groupIndexMap.set(item.group, groupIndex);
+          groupedItems.push([item.group, [item]]);
+          continue;
+        }
+
+        (groupedItems[groupIndex] as UiListGroupItem)[1].push(item);
       }
 
-      return result.sort((a, z) => z.$score - a.$score);
-    }, [query, shouldFilter, items]);
+      return groupedItems.flat(2);
+    }, [query, shouldFilter, items, customFilter]);
     const controller = useMemo<UiListController>(() => {
       const setSelectedItem = (
         selectedItem: {
-          index: number[];
-          item: UiListItem;
+          index: number;
+          item: Pick<UiListItem, 'value' | 'metadata' | 'actions'>;
         } | null,
       ) => {
         const { index, item } = selectedItem ?? {
-          index: [],
+          index: -1,
           item: { value: '', metadata: {} },
         };
-        listStore.setSelectedItem(item.value, index, item.metadata);
+        listStore.setSelectedItem({
+          index,
+          id: item.value,
+          actionIndex: -1,
+          metadata: item.metadata,
+          actions:
+            item.actions?.map((action) => ({
+              value: action.value,
+              shortcut: action.shortcut,
+            })) ?? [],
+        });
       };
 
       return {
         selectItem() {
-          const [groupIndex, index] = listStore.snapshot().selectedItem.index;
+          const { index, actionIndex } = listStore.snapshot().selectedItem;
+          const currentItem = filteredItems[index];
 
-          let currentItem = filteredItems[groupIndex];
-          if (currentItem && 'items' in currentItem) {
-            currentItem = currentItem.items[index];
+          if (!currentItem || typeof currentItem === 'string') return;
+
+          if (
+            actionIndex >= 0 &&
+            currentItem.actions &&
+            currentItem.actions[actionIndex]
+          ) {
+            currentItem.actions[actionIndex].onAction();
+            return;
           }
-
-          if (!currentItem) return;
 
           onItemSelected?.(currentItem);
           currentItem.onSelected?.();
+        },
+        runActionByShortcut(event) {
+          const { index } = listStore.snapshot().selectedItem;
+          const item = filteredItems[index];
+          if (
+            !item ||
+            typeof item === 'string' ||
+            !item.actions ||
+            item.actions.length === 0
+          )
+            return false;
+
+          const { altKey, ctrlKey, metaKey, shiftKey } = event;
+          if (!altKey && !ctrlKey && !metaKey && !shiftKey) return false;
+
+          const itemAction = item.actions.find(({ shortcut }) => {
+            if (!shortcut) return;
+
+            const isModMatch = SHORTCUT_MODIFIER_VALS.some((mod) => {
+              if (mod === 'mod') return ctrlKey || metaKey;
+
+              return event[mod];
+            });
+            const isKeyMatch = Object.hasOwn(SHORTCUT_KEYS, event.key);
+
+            return isModMatch && isKeyMatch;
+          });
+
+          if (itemAction) {
+            itemAction.onAction();
+            event.preventDefault();
+          }
+
+          return Boolean(itemAction);
+        },
+        nextAction() {
+          const { actionIndex, actions, ...rest } =
+            listStore.snapshot().selectedItem;
+          if (actionIndex >= actions.length - 1) return;
+
+          listStore.setSelectedItem({
+            ...rest,
+            actions,
+            actionIndex: actionIndex + 1,
+          });
+        },
+        prevAction() {
+          const { actionIndex, actions, ...rest } =
+            listStore.snapshot().selectedItem;
+          if (actionIndex <= 0) return;
+
+          listStore.setSelectedItem({
+            ...rest,
+            actions,
+            actionIndex: actionIndex - 1,
+          });
         },
         firstItem() {
           const firstItem = findNonSearchOnlyItem(filteredItems);
@@ -238,56 +292,51 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
         lastItem() {
           const lastItem = findNonSearchOnlyItem(filteredItems, {
             direction: 'prev',
-            startIndex: [filteredItems.length - 1],
+            startIndex: filteredItems.length - 1,
           });
           if (!lastItem) return;
 
           setSelectedItem(lastItem);
         },
         nextGroup() {
-          const [currentIndex] = listStore.snapshot().selectedItem.index;
+          const currentIndex = listStore.snapshot().selectedItem.index;
           if (currentIndex === filteredItems.length - 1) return;
 
           const nextGroup = findNonSearchOnlyItem(filteredItems, {
-            groupOnly: true,
-            startIndex: [currentIndex + 1],
+            findGroup: true,
+            startIndex: currentIndex,
           });
           if (!nextGroup) return;
 
           setSelectedItem(nextGroup);
         },
         prevGroup() {
-          const [currentIndex] = listStore.snapshot().selectedItem.index;
+          const currentIndex = listStore.snapshot().selectedItem.index;
           if (currentIndex === 0) return;
 
           const prevGroup = findNonSearchOnlyItem(filteredItems, {
-            groupOnly: true,
-            startIndex: [currentIndex - 1],
+            findGroup: true,
+            direction: 'prev',
+            startIndex: currentIndex,
           });
           if (!prevGroup) return;
 
           setSelectedItem(prevGroup);
         },
         nextItem() {
-          const [groupIndex, index] = listStore.snapshot().selectedItem.index;
+          const index = listStore.snapshot().selectedItem.index;
           const nextItem = findNonSearchOnlyItem(filteredItems, {
-            startIndex:
-              typeof index === 'number'
-                ? [groupIndex, index + 1]
-                : [groupIndex + 1],
+            startIndex: index + 1,
           });
           if (!nextItem) return;
 
           setSelectedItem(nextItem);
         },
         prevItem() {
-          const [groupIndex, index] = listStore.snapshot().selectedItem.index;
+          const index = listStore.snapshot().selectedItem.index;
           const prevItem = findNonSearchOnlyItem(filteredItems, {
             direction: 'prev',
-            startIndex:
-              typeof index === 'number'
-                ? [groupIndex, index - 1]
-                : [groupIndex - 1],
+            startIndex: index - 1,
           });
           if (!prevItem) return;
 
@@ -301,14 +350,24 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
     ]);
 
     const onPointerMove = useCallback(
-      (item: UiListItem, indexs: number[]) => {
+      (item: UiListItem, index: number) => {
         if (
           disabledItemSelection ||
           listStore.snapshot().selectedItem.id === item.value
         )
           return;
 
-        listStore.setSelectedItem(item.value, indexs, item.metadata);
+        listStore.setSelectedItem({
+          index,
+          id: item.value,
+          actionIndex: -1,
+          metadata: item.metadata,
+          actions:
+            item.actions?.map((action) => ({
+              value: action.value,
+              shortcut: action.shortcut,
+            })) ?? [],
+        });
       },
       [onItemSelected],
     );
@@ -328,40 +387,27 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
     }, [filteredItems, disabledItemSelection]);
     useEffect(() => {
       return () => {
-        listStore.setSelectedItem('', []);
+        listStore.setSelectedItem({
+          id: '',
+          index: -1,
+          actions: [],
+          metadata: {},
+          actionIndex: -1,
+        });
       };
     }, []);
 
     return (
       <div ref={containerRef} {...props}>
         {filteredItems.map((item, index) => {
-          if ('items' in item) {
+          if (typeof item === 'string') {
             return (
-              <Fragment key={item.label}>
+              <Fragment key={item}>
                 {renderGroupHeader ? (
-                  renderGroupHeader(item.label, index)
+                  renderGroupHeader(item, index)
                 ) : (
-                  <UiListGroupHeading key={item.value || item.label}>
-                    {item.label}
-                  </UiListGroupHeading>
+                  <UiListGroupHeading key={item}>{item}</UiListGroupHeading>
                 )}
-                <div className="group-list">
-                  {item.items.map((groupItem, groupIndex) =>
-                    groupItem.searchOnly && !query?.trim() ? null : (
-                      <UiListItemRenderer
-                        item={groupItem}
-                        index={groupIndex}
-                        key={groupItem.value}
-                        value={groupItem.value}
-                        renderItem={renderItem}
-                        onClick={() => onItemClick(groupItem)}
-                        onPointerMove={() =>
-                          onPointerMove(groupItem, [index, groupIndex])
-                        }
-                      />
-                    ),
-                  )}
-                </div>
               </Fragment>
             );
           }
@@ -376,7 +422,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
               value={item.value}
               renderItem={renderItem}
               onClick={() => onItemClick(item)}
-              onPointerMove={() => onPointerMove(item, [index])}
+              onPointerMove={() => onPointerMove(item, index)}
             />
           );
         })}
@@ -396,7 +442,7 @@ function UiListItemRenderer({
 }: {
   value: string;
   index: number;
-  item: UiListItemQuery | UiListItem;
+  item: UiListItem;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> &
   Pick<UiListProps, 'renderItem'>) {
   const itemId = useId();
@@ -430,6 +476,7 @@ function UiListItemRenderer({
     return renderItem(
       {
         item,
+        ref: elRef,
         selected: isSelected,
         props: { onPointerMove, onClick },
       },
@@ -443,31 +490,15 @@ function UiListItemRenderer({
       icon={item.icon}
       title={item.title}
       value={item.value}
+      actions={item.actions}
       selected={isSelected}
       subtitle={item.subtitle}
+      description={item.description}
       onClick={onClick}
       onPointerMove={onPointerMove}
     />
   );
 }
-
-const UiListHighlightResult = memo(
-  ({
-    match,
-    children,
-    ...props
-  }: React.HTMLAttributes<HTMLSpanElement> & { match: UiListItemMatch }) => {
-    const highlights = fuzzySort.highlight(match, (m, i) => (
-      <span key={i} {...props}>
-        {m}
-      </span>
-    ));
-    if (!highlights) return children;
-
-    return <>{highlights.map((char) => char)}</>;
-  },
-);
-UiListHighlightResult.displayName = 'UiListGroupHeading';
 
 const UiListGroupHeading = forwardRef<
   HTMLDivElement,
@@ -488,23 +519,77 @@ const UiListGroupHeading = forwardRef<
 });
 UiListGroupHeading.displayName = 'UiListGroupHeading';
 
+function UiListItemActions({ actions }: { actions: UiListItemAction[] }) {
+  const actionIndex = useUiList((state) => state.selectedItem.actionIndex);
+  const [openTooltip, setOpenTooltip] = useState(-1);
+
+  useEffect(() => {
+    setOpenTooltip(actionIndex);
+  }, [actionIndex]);
+
+  return (
+    <div className="flex items-center">
+      {actions.map(
+        ({ icon: Icon, onAction, title, value, shortcut }, index) => (
+          <UiTooltip
+            key={value}
+            alignOffset={4}
+            open={openTooltip === index}
+            label={`${title} ${getShortcutStr(shortcut)}`}
+            onOpenChange={(isOpen) => setOpenTooltip(isOpen ? index : -1)}
+          >
+            <button
+              tabIndex={-1}
+              aria-pressed={actionIndex === index}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+
+                onAction?.();
+              }}
+              className="h-9 w-9 aria-pressed:bg-secondary hover:bg-secondary rounded-sm inline-flex items-center justify-center"
+            >
+              <Icon className="h-5 w-5" />
+            </button>
+          </UiTooltip>
+        ),
+      )}
+    </div>
+  );
+}
+
 interface UiListItemProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'title'> {
   value?: string;
   selected?: boolean;
+  actions?: UiListItemAction[];
   icon?: string | React.ReactNode;
   title: string | React.ReactNode;
+  suffix?: string | React.ReactNode;
   subtitle?: string | React.ReactNode;
+  description?: string | React.ReactNode;
 }
 const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
   (
-    { title, icon, subtitle, selected, className, value, children, ...props },
+    {
+      icon,
+      title,
+      value,
+      suffix,
+      actions,
+      subtitle,
+      selected,
+      children,
+      className,
+      description,
+      ...props
+    },
     ref,
   ) => {
     return (
       <div
         className={cn(
-          'relative group min-h-11 flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-secondary aria-selected:text-accent-foreground',
+          'relative group min-h-12 flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-secondary/50 aria-selected:text-accent-foreground',
           className,
         )}
         {...props}
@@ -521,9 +606,20 @@ const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
               </span>
             )}
             <div className="flex-1">
-              <p className="leading-tight">{title}</p>
-              <p className="text-muted-foreground leading-tight">{subtitle}</p>
+              <p className="leading-tight">
+                {title}
+                <span className="text-muted-foreground leading-tight ml-2 text-xs">
+                  {subtitle}
+                </span>
+              </p>
+              <span className="text-muted-foreground leading-tight">
+                {description}
+              </span>
             </div>
+            {suffix}
+            {actions && actions.length > 0 && selected && (
+              <UiListItemActions actions={actions} />
+            )}
           </>
         )}
       </div>
@@ -537,7 +633,7 @@ const UiListIcon = forwardRef<HTMLSpanElement, { icon: LucideIcon | string }>(
     return (
       <span
         ref={ref}
-        className="group-aria-selected:bg-secondary-hover group-aria-selected:text-foreground text-muted-foreground inline-flex justify-center items-center bg-secondary rounded-sm border border-border/40 h-full w-full"
+        className="group-aria-selected:text-foreground text-muted-foreground inline-flex justify-center items-center bg-card rounded-sm border border-border/40 h-full w-full"
       >
         {typeof Icon === 'string' ? Icon : <Icon className="h-4 w-4" />}
       </span>

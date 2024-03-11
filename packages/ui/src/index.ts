@@ -27,18 +27,22 @@ export {
 export { UiScrollArea, UiScrollBar } from './components/ui/scroll-area';
 export { UiImage } from './components/ui/image';
 export type {
-  UiListGroupItem,
   UiListItem,
-  UiListItemQuery,
   UiListProps,
-  UiListItems,
   UiListRef,
+  UiListItemAction,
 } from './components/ui/list';
-export { default as UiList } from './components/ui/list';
+export { default as UiList, uiListItemsFilter } from './components/ui/list';
 export { UiSwitch } from './components/ui/switch';
 export { UiInput } from './components/ui/input';
+export { UiKbd } from './components/ui/kbd';
 export { UiTooltip, UiTooltipProvider } from './components/ui/tooltip';
 export { UiToaster } from './components/ui/toaster';
+export {
+  UiPopover,
+  UiPopoverContent,
+  UiPopoverTrigger,
+} from './components/ui/popover';
 
 export { useUiList } from './context/list.context';
 

@@ -2,8 +2,8 @@ import { defineConfig, Options } from 'tsup';
 
 export default defineConfig((options: Options) => [
   {
-    treeshake: true,
     splitting: true,
+    treeshake: !options.watch,
     env: {
       NODE_ENV: 'production',
     },
@@ -11,10 +11,10 @@ export default defineConfig((options: Options) => [
     entry: ['./src/**/!(index).ts?(x)'],
     format: ['esm'],
     dts: true,
-    minify: true,
+    minify: !options.watch,
     external: ['react', '@radix-ui/react-primitive'],
-    esbuildOptions(options) {
-      options.outbase = './src';
+    esbuildOptions(esbuildOpts) {
+      esbuildOpts.outbase = './src';
     },
     ...options,
   },
