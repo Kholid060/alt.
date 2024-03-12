@@ -1,18 +1,20 @@
 import { XIcon } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useCommandRouteStore } from '/@/stores/command-route.store';
 import { useShallow } from 'zustand/react/shallow';
 import CommandInput from './CommandInput';
+import { useCommandStore } from '/@/stores/command.store';
+import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 
 function CommandBreadcrumb() {
-  const [navigate, breadcrumbs] = useCommandRouteStore(
-    useShallow((state) => [state.navigate, state.breadcrumbs]),
+  const [breadcrumbs, setCommandStore] = useCommandStore(
+    useShallow((state) => [state.breadcrumbs, state.setState]),
   );
 
+  const navigate = useCommandNavigate();
+
   function navigateBreadcrumb(index: number) {
-    navigate(breadcrumbs[index].path, {
-      breadcrumbs: breadcrumbs.slice(0, index),
-    });
+    setCommandStore('breadcrumbs', breadcrumbs.slice(0, index));
+    navigate(breadcrumbs[index].path);
   }
   function onBtnKeydown(event: React.KeyboardEvent, index: number) {
     if (event.repeat || breadcrumbs.length == 0) return;

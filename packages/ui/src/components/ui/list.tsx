@@ -20,12 +20,12 @@ import { cn } from '@/utils/cn';
 import { UiTooltip } from './tooltip';
 import {
   KeyboardShortcut,
-  SHORTCUT_MODIFIER,
-  SHORTCUT_KEYS,
   getShortcutStr,
+  KeyboardShortcutModifier,
 } from '@repo/shared';
+import mergeRefs from '@/utils/mergeRefs';
 
-const SHORTCUT_MODIFIER_VALS = Object.values(SHORTCUT_MODIFIER);
+const ITEM_SELECTED_EVENT = 'ui-list-item-selected';
 
 export interface UiListItemAction {
   title: string;
@@ -226,6 +226,11 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
             return;
           }
 
+          const itemEl = document.querySelector<HTMLElement>(
+            `[data-item-value="${currentItem.value}"]`,
+          );
+          itemEl?.dispatchEvent(new Event(ITEM_SELECTED_EVENT));
+
           onItemSelected?.(currentItem);
           currentItem.onSelected?.();
         },
@@ -243,15 +248,19 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
           const { altKey, ctrlKey, metaKey, shiftKey } = event;
           if (!altKey && !ctrlKey && !metaKey && !shiftKey) return false;
 
+          const checkShortcutMod = (mod: KeyboardShortcutModifier) => {
+            if (mod === 'mod') return ctrlKey || metaKey;
+
+            return event[mod];
+          };
           const itemAction = item.actions.find(({ shortcut }) => {
             if (!shortcut) return;
 
-            const isModMatch = SHORTCUT_MODIFIER_VALS.some((mod) => {
-              if (mod === 'mod') return ctrlKey || metaKey;
-
-              return event[mod];
-            });
-            const isKeyMatch = Object.hasOwn(SHORTCUT_KEYS, event.key);
+            const isModMatch =
+              checkShortcutMod(shortcut.mod1) &&
+              (shortcut.mod2 ? checkShortcutMod(shortcut.mod2) : true);
+            const isKeyMatch =
+              event.key.toLowerCase() === shortcut.key.toLowerCase();
 
             return isModMatch && isKeyMatch;
           });
@@ -384,6 +393,10 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
 
       controller.firstItem();
       listStore.setController(controller);
+
+      return () => {
+        listStore.setController(null);
+      };
     }, [filteredItems, disabledItemSelection]);
     useEffect(() => {
       return () => {
@@ -490,6 +503,7 @@ function UiListItemRenderer({
       icon={item.icon}
       title={item.title}
       value={item.value}
+      suffix={item.suffix}
       actions={item.actions}
       selected={isSelected}
       subtitle={item.subtitle}
@@ -528,12 +542,13 @@ function UiListItemActions({ actions }: { actions: UiListItemAction[] }) {
   }, [actionIndex]);
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center absolute rounded-sm top-0 h-full right-0 pr-2 bg-card">
       {actions.map(
         ({ icon: Icon, onAction, title, value, shortcut }, index) => (
           <UiTooltip
             key={value}
-            alignOffset={4}
+            align="end"
+            sideOffset={4}
             open={openTooltip === index}
             label={`${title} ${getShortcutStr(shortcut)}`}
             onOpenChange={(isOpen) => setOpenTooltip(isOpen ? index : -1)}
@@ -567,6 +582,7 @@ interface UiListItemProps
   title: string | React.ReactNode;
   suffix?: string | React.ReactNode;
   subtitle?: string | React.ReactNode;
+  onSelected?: (value: string | undefined) => void;
   description?: string | React.ReactNode;
 }
 const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
@@ -581,27 +597,45 @@ const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
       selected,
       children,
       className,
+      onSelected,
       description,
       ...props
     },
     ref,
   ) => {
+    const elementRef = useRef<HTMLDivElement>(null);
+
+    const mergedRef = mergeRefs(ref, elementRef);
+
+    useEffect(() => {
+      const element = elementRef.current;
+      if (!element) return;
+
+      const onSelectedEvent = () => onSelected?.(value);
+      element.addEventListener(ITEM_SELECTED_EVENT, onSelectedEvent);
+
+      return () => {
+        element.removeEventListener(ITEM_SELECTED_EVENT, onSelectedEvent);
+      };
+    }, [onSelected, value]);
+
     return (
       <div
         className={cn(
-          'relative group min-h-12 flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-secondary/50 aria-selected:text-accent-foreground',
+          'relative group/item min-h-12 flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-card aria-selected:text-accent-foreground',
           className,
         )}
         {...props}
         aria-selected={selected}
-        ref={ref}
+        ref={mergedRef}
+        data-item-value={value}
       >
         {children ? (
           children
         ) : (
           <>
             {icon && (
-              <span className="h-8 w-8 mr-2 inline-flex items-center justify-center group-aria-selected:text-foreground text-muted-foreground">
+              <span className="h-8 w-8 mr-2 inline-flex items-center justify-center group-aria-selected/item:text-foreground text-muted-foreground">
                 {icon}
               </span>
             )}
@@ -633,7 +667,7 @@ const UiListIcon = forwardRef<HTMLSpanElement, { icon: LucideIcon | string }>(
     return (
       <span
         ref={ref}
-        className="group-aria-selected:text-foreground text-muted-foreground inline-flex justify-center items-center bg-card rounded-sm border border-border/40 h-full w-full"
+        className="group-aria-selected/item:text-foreground text-muted-foreground inline-flex justify-center items-center bg-card rounded-sm border border-border/40 h-full w-full"
       >
         {typeof Icon === 'string' ? Icon : <Icon className="h-4 w-4" />}
       </span>

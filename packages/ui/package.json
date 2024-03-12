@@ -29,6 +29,7 @@
     "@radix-ui/react-switch": "^1.0.3",
     "@radix-ui/react-toast": "^1.1.5",
     "@radix-ui/react-tooltip": "^1.0.7",
+    "@repo/shared": "*",
     "@types/react": "^18.2.46",
     "autoprefixer": "^10.4.16",
     "class-variance-authority": "^0.7.0",

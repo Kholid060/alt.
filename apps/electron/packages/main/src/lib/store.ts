@@ -7,10 +7,35 @@ export interface ElectronStore {
     appsTarget: Record<string, string>;
     list: ExtensionAPI.installedApps.AppDetail[];
   };
+  localExtensions: Record<
+    string,
+    {
+      id: string;
+      path: string;
+    }
+  >;
 }
 
 export const store = new Store<ElectronStore>({
   schema: {
+    localExtensions: {
+      type: 'object',
+      patternProperties: {
+        '.*': {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+            },
+            path: {
+              type: 'string',
+            },
+          },
+          required: ['path', 'id'],
+          additionalProperties: false,
+        },
+      },
+    },
     installedApps: {
       type: 'object',
       properties: {

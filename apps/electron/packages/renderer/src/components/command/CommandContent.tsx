@@ -1,20 +1,6 @@
 import { cn } from '@repo/ui';
-import CommandList from './CommandList';
-import CommandExtensionContent from './CommandExtensionContent';
 import { useEffect, useRef } from 'react';
-import CommandRoute, { createCommandRoutes } from './CommandRoute';
-
-const routes = createCommandRoutes([
-  {
-    path: ['', '/extensions/:extensionId'],
-    element: <CommandList />,
-  },
-  {
-    name: 'extension-command-view',
-    path: '/extensions/:extensionId/:commandId/view',
-    element: <CommandExtensionContent />,
-  },
-]);
+import { CommandRouteOutlet } from '../../context/command-route.context';
 
 function CommandContent() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -53,7 +39,7 @@ function CommandContent() {
           }}
         >
           <div ref={resizerContainerRef}>
-            <CommandRoute routes={routes} />
+            <CommandRouteOutlet />
           </div>
         </div>
       </div>

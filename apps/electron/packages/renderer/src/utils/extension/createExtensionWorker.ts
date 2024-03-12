@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid';
 import { ExtensionManifest } from '@repo/extension-core';
-import ExtensionWorker from '../workers/extension.worker?worker';
-import preloadAPI from './preloadAPI';
+import ExtensionWorker from '/@/workers/extension.worker?worker';
+import preloadAPI from '../preloadAPI';
 
 const MAX_COMMAND_EXECUTION_MS = 120_000; // 2 mins
 const CREATE_MESSAGE_PORT_TIMEOUT_MS = 5000; // 5 seconds

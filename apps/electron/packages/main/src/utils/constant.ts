@@ -12,3 +12,5 @@ export const EXTENSION_FOLDER = path.join(
   app.getPath('userData'),
   'extensions',
 );
+
+export const EXTENSION_LOCAL_ID_PREFIX = 'local__';

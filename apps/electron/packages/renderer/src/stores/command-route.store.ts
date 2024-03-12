@@ -1,43 +1,63 @@
-import { create } from 'zustand';
-import { subscribeWithSelector } from 'zustand/middleware';
+import { createStore } from 'zustand';
+import {
+  CommandRoutes,
+  CommandRouteActive,
+} from '../interface/command-route.interface';
 
-export interface CommandRouteBreadcrumb {
-  path: string;
-  label: string;
+interface CommandRouteProps {
+  routes: CommandRoutes;
 }
 
-export interface CommandRouteStoreState {
-  path: string;
-  pathData: unknown;
-  breadcrumbs: CommandRouteBreadcrumb[];
-  parsedPath: { name?: string; params: Record<string, unknown> };
+export interface CommandRouteState extends CommandRouteProps {
+  currentRoute: CommandRouteActive | null;
 }
 
-interface CommandRouteStoreActions {
-  setParsedPath: (detail: CommandRouteStoreState['parsedPath']) => void;
-  navigate: (
-    pathname: string,
-    payload?: { breadcrumbs?: CommandRouteBreadcrumb[]; data?: unknown },
-  ) => void;
+export interface CommandRouteActions {
+  navigate: (path: string, detail?: { data?: unknown }) => void;
 }
 
-type CommandRouteStore = CommandRouteStoreState & CommandRouteStoreActions;
+export type CommandRouteStore = ReturnType<typeof createCommandRouteStore>;
 
-const initialState: CommandRouteStoreState = {
-  path: '',
-  pathData: null,
-  breadcrumbs: [],
-  parsedPath: { params: {} },
+export type CommandRouteStoreData = CommandRouteState & CommandRouteActions;
+
+export const createCommandRouteStore = (
+  initProps?: Partial<CommandRouteProps>,
+) => {
+  const initState: CommandRouteState = {
+    routes: {},
+    currentRoute: {
+      path: '',
+      name: '',
+      data: null,
+      params: {},
+      basePath: '',
+    },
+  };
+
+  return createStore<CommandRouteStoreData>()((set, get) => ({
+    ...initState,
+    ...initProps,
+    navigate(path, detail = {}) {
+      let currentRoute: CommandRouteActive | null = null;
+      const routes = get().routes;
+
+      for (const key in routes) {
+        const route = routes[key];
+        const parsedPath = route.path.exec({ pathname: path });
+        if (!parsedPath) continue;
+
+        currentRoute = {
+          path,
+          data: detail.data,
+          name: route.name ?? '',
+          basePath: route.basePath,
+          params: parsedPath.pathname.groups,
+        };
+
+        break;
+      }
+
+      set({ currentRoute });
+    },
+  }));
 };
-
-export const useCommandRouteStore = create(
-  subscribeWithSelector<CommandRouteStore>((set) => ({
-    ...initialState,
-    setParsedPath(detail) {
-      set({ parsedPath: detail });
-    },
-    navigate(pathname, { breadcrumbs = [], data } = {}) {
-      set({ path: pathname, breadcrumbs, pathData: data });
-    },
-  })),
-);

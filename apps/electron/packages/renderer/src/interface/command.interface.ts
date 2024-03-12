@@ -1,4 +1,5 @@
 import { ExtensionCommand } from '@repo/extension-core';
+import { UiListItem } from '@repo/ui';
 import { SetRequired } from 'type-fest';
 
 interface CommandActionBase {
@@ -46,18 +47,32 @@ export type CommandActions =
   | CommandActionMoveToTrash
   | CommandActionCustom;
 
-export interface CommandListMetadataCommandItem {
-  type: 'command';
-  extensionId: string;
-  extensionTitle: string;
-  command: ExtensionCommand;
+export interface CommandListItemCommandBuiltIn extends UiListItem {
+  group: 'Commands';
+  metadata: {
+    type: 'builtin-command';
+  };
 }
 
-export interface CommandListMetadataExtensionItem {
-  type: 'extension';
-  extensionId: string;
+export interface CommandListItemCommand extends UiListItem {
+  group: 'Commands';
+  metadata: {
+    type: 'command';
+    extensionId: string;
+    extensionTitle: string;
+    command: ExtensionCommand;
+  };
 }
 
-export type CommandListMetadata =
-  | CommandListMetadataExtensionItem
-  | CommandListMetadataCommandItem;
+export interface CommandListItemExtension extends UiListItem {
+  group: 'Extensions';
+  metadata: {
+    type: 'extension';
+    extensionId: string;
+  };
+}
+
+export type CommandListItems =
+  | CommandListItemCommand
+  | CommandListItemExtension
+  | CommandListItemCommandBuiltIn;

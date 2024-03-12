@@ -2,8 +2,9 @@ import { memo, useEffect, useRef } from 'react';
 import { EXTENSION_VIEW } from '#common/utils/constant/constant';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
 import { ExtensionExecutionFinishReason } from '@repo/extension';
-import { useCommandRouteStore } from '/@/stores/command-route.store';
 import { useShallow } from 'zustand/react/shallow';
+import { useCommandStore } from '/@/stores/command.store';
+import { useCommandRoute } from '/@/hooks/useCommandRoute';
 
 function CommandSandboxContent({
   onFinishExecute,
@@ -13,14 +14,14 @@ function CommandSandboxContent({
     message?: string,
   ) => void;
 }) {
-  const [parsedPath, breadcrumbs, pathData, navigate] = useCommandRouteStore(
-    useShallow((state) => [
-      state.parsedPath,
-      state.breadcrumbs,
-      state.pathData,
-      state.navigate,
-    ]),
+  const [breadcrumbs, setCommandStore] = useCommandStore(
+    useShallow((state) => [state.breadcrumbs, state.setState]),
   );
+
+  const [navigate, activeRoute] = useCommandRoute((state) => [
+    state.navigate,
+    state.currentRoute,
+  ]);
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const messageChannelRef = useRef<MessageChannel | null>(null);
@@ -39,7 +40,8 @@ function CommandSandboxContent({
 
       const lastPath = copyBreadcrumbs.at(-1)?.path ?? '';
 
-      navigate(lastPath, { breadcrumbs: copyBreadcrumbs });
+      setCommandStore('breadcrumbs', copyBreadcrumbs);
+      navigate(lastPath);
     });
   }
   async function onIframeLoad(
@@ -52,7 +54,7 @@ function CommandSandboxContent({
       const payload = {
         type: 'init',
         themeStyle: '',
-        commandArgs: pathData,
+        commandArgs: activeRoute?.data ?? {},
       };
 
       payload.themeStyle = (
@@ -83,7 +85,7 @@ function CommandSandboxContent({
       title="sandbox"
       ref={iframeRef}
       name={EXTENSION_VIEW.frameName}
-      src={`extension://${parsedPath.params.extensionId}/command/${parsedPath.params.commandId}/`}
+      src={`extension://${activeRoute?.params.extensionId}/command/${activeRoute?.params.commandId}/`}
       sandbox="allow-scripts"
       className="h-64 block w-full"
       onLoad={onIframeLoad}

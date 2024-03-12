@@ -1,8 +1,9 @@
-import { EXTENSION_FOLDER } from '../constant';
+import { EXTENSION_FOLDER, EXTENSION_LOCAL_ID_PREFIX } from '../constant';
 import { createErrorResponse, type CustomProtocol } from './index';
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
 import { net } from 'electron';
 import { fileURLToPath } from 'url';
+import { store } from '/@/lib/store';
 
 const extensionFilePath = fileURLToPath(
   new URL('./../../extension/dist/', import.meta.url),
@@ -10,6 +11,14 @@ const extensionFilePath = fileURLToPath(
 
 const devServer = import.meta.env.DEV && import.meta.env.VITE_DEV_SERVER_URL;
 
+function getExtensionFolder(extensionId: string) {
+  let extensionFolderDir = `${EXTENSION_FOLDER}/${extensionId}/icon`;
+  if (extensionId.startsWith(EXTENSION_LOCAL_ID_PREFIX)) {
+    extensionFolderDir = store.get(`localExtensions.${extensionId}.path`, '');
+  }
+
+  return extensionFolderDir;
+}
 function handleCommandPath(extId: string, ...paths: string[]) {
   let path: string = '';
 
@@ -39,10 +48,10 @@ function handleCommandPath(extId: string, ...paths: string[]) {
       break;
     }
     case '@renderer':
-      path = `${EXTENSION_FOLDER}/${extId}/${commandId}.js`;
+      path = `${getExtensionFolder(extId)}/${commandId}.js`;
       break;
     case '@libs':
-      path = `${EXTENSION_FOLDER}/${extId}/@libs/${paths[0]}`;
+      path = `${getExtensionFolder(extId)}/@libs/${paths[0]}`;
       break;
     default:
       path = `${extensionFilePath}${type}`;
@@ -68,7 +77,7 @@ const appIconProtocol: CustomProtocol = {
 
     switch (type) {
       case 'icon': {
-        return net.fetch(`${EXTENSION_FOLDER}/${extId}/icon/${paths[0]}.png`);
+        return net.fetch(`${getExtensionFolder(extId)}/icon/${paths[0]}.png`);
       }
       case 'command':
         return handleCommandPath(extId, ...paths);

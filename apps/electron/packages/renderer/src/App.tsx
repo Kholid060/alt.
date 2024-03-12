@@ -8,6 +8,24 @@ import preloadAPI from './utils/preloadAPI';
 import { CommandCtxProvider } from './context/command.context';
 import AppExtensionSandbox from './components/app/AppExtensionSandbox';
 import { UiListProvider } from '@repo/ui/dist/context/list.context';
+import {
+  CommandRouteProvider,
+  createCommandRoutes,
+} from './context/command-route.context';
+import CommandExtensionContent from './components/command/CommandExtensionContent';
+import CommandList from './components/command/CommandList';
+
+const routes = createCommandRoutes([
+  {
+    path: '',
+    element: CommandList,
+  },
+  {
+    name: 'extension-command-view',
+    path: '/extensions/:extensionId/:commandId/view',
+    element: CommandExtensionContent,
+  },
+]);
 
 function App() {
   const setCommandStoreState = useCommandStore((state) => state.setState);
@@ -22,17 +40,19 @@ function App() {
   return (
     <UiTooltipProvider>
       <CommandCtxProvider>
-        <div className="p-0.5">
-          <UiListProvider>
-            <div className="bg-background border rounded-lg w-full">
-              <CommandHeader />
-              <CommandContent />
-            </div>
-          </UiListProvider>
-          <CommandFooter />
-          <AppExtensionSandbox />
-          <UiToaster viewportClass="right-0 bottom-0 pointer-events-none items-end" />
-        </div>
+        <CommandRouteProvider routes={routes}>
+          <div className="p-0.5">
+            <UiListProvider>
+              <div className="bg-background border rounded-lg w-full">
+                <CommandHeader />
+                <CommandContent />
+              </div>
+            </UiListProvider>
+            <CommandFooter />
+            <AppExtensionSandbox />
+            <UiToaster viewportClass="right-0 bottom-0 pointer-events-none items-end" />
+          </div>
+        </CommandRouteProvider>
       </CommandCtxProvider>
     </UiTooltipProvider>
   );

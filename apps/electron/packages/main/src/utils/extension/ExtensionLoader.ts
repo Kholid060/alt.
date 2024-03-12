@@ -7,8 +7,11 @@ import validateSemver from 'semver/functions/valid';
 import { ErrorLogger, logger, loggerBuilder } from '/@/lib/log';
 import { EXTENSION_FOLDER } from '../constant';
 import type { ExtensionData } from '#common/interface/extension.interface';
+import { store } from '/@/lib/store';
 
 const validatorLogger = loggerBuilder(['ExtensionLoader', 'manifestValidator']);
+
+const EXTENSION_DIR_POSIX = EXTENSION_FOLDER.replaceAll('\\', '/');
 
 async function extractExtManifest(manifestPath: string) {
   const manifestJSON = await fs.readJSON(manifestPath);
@@ -56,7 +59,6 @@ class ExtensionLoader {
   // for accessing API
   private keys = new Map<string, string>();
   private keysMap = new Map<string, string>();
-  private extFolderPosix = EXTENSION_FOLDER.replaceAll('\\', '/');
 
   constructor() {
     this.keys = new Map();
@@ -79,25 +81,45 @@ class ExtensionLoader {
     this._extensions = new Map();
 
     const extensionsManifestPath = await globby(
-      path.posix.join(this.extFolderPosix, '**/manifest.json'),
+      path.posix.join(EXTENSION_DIR_POSIX, '**/manifest.json'),
     );
+
     const extensionsManifest = await Promise.all(
       extensionsManifestPath.map(extractExtManifest),
+    );
+
+    await Promise.all(
+      Object.values(store.get('localExtensions', {})).map(async (localExt) => {
+        const extData = await extractExtManifest(
+          path.posix.join(localExt.path, 'manifest.json'),
+        );
+        if (!extData) return;
+
+        extensionsManifest.push({
+          isLocal: true,
+          id: localExt.id,
+          manifest: extData?.manifest,
+        } as ExtensionData);
+      }),
     );
 
     for (const extensionData of extensionsManifest) {
       if (!extensionData) continue;
 
-      const extKey = nanoid(5);
-
-      this.keys.set(extKey, extensionData.id);
-      this.keysMap.set(extensionData.id, extKey);
-      this._extensions.set(extensionData.id, extensionData);
+      this.addExtension(extensionData);
     }
   }
 
   get extensions(): ExtensionData[] {
     return [...this._extensions.values()];
+  }
+
+  addExtension(extensionData: ExtensionData) {
+    const extKey = nanoid(5);
+
+    this.keys.set(extKey, extensionData.id);
+    this.keysMap.set(extensionData.id, extKey);
+    this._extensions.set(extensionData.id, extensionData);
   }
 
   getExtensionByKey(key: string) {

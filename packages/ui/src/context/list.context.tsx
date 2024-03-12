@@ -23,7 +23,7 @@ interface UiListState {
 }
 interface UiListStore {
   listController: React.RefObject<UiListController | null>;
-  setController(controller: UiListController): void;
+  setController(controller: UiListController | null): void;
   emit(): void;
   snapshot(): UiListState;
   subscribe(callback: () => void): () => void;

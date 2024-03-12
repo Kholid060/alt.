@@ -1,29 +1,6 @@
 export type { ButtonProps } from './components/ui/button';
 export { UiButton, uiButtonVariants } from './components/ui/button';
-export {
-  UiCommand,
-  UiCommandList,
-  UiCommandItem,
-  UiCommandInput,
-  UiCommandEmpty,
-  UiCommandGroup,
-  UiCommandDialog,
-  useCommandState,
-  UiCommandShortcut,
-  UiCommandSeparator,
-} from './components/ui/command';
-export {
-  Dialog,
-  DialogPortal,
-  DialogOverlay,
-  DialogClose,
-  DialogTrigger,
-  DialogContent,
-  DialogHeader,
-  DialogFooter,
-  DialogTitle,
-  DialogDescription,
-} from './components/ui/dialog';
+export { UiDialog } from './components/ui/dialog';
 export { UiScrollArea, UiScrollBar } from './components/ui/scroll-area';
 export { UiImage } from './components/ui/image';
 export type {
@@ -43,6 +20,16 @@ export {
   UiPopoverContent,
   UiPopoverTrigger,
 } from './components/ui/popover';
+export {
+  UiSelect,
+  UiSelectRoot,
+  uiSelectVariants,
+} from './components/ui/select';
+export type {
+  UiSelectOptionProps,
+  UiSelectOptionRef,
+  UiSelectProps,
+} from './components/ui/select';
 
 export { useUiList } from './context/list.context';
 

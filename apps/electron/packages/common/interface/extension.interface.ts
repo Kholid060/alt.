@@ -5,6 +5,7 @@ import type {
 
 export interface ExtensionData {
   id: string;
+  isLocal?: boolean;
   manifest: ExtensionManifest;
 }
 

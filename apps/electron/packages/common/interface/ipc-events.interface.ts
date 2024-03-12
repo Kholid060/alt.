@@ -9,21 +9,47 @@ export interface IPCEventError {
   message: string;
 }
 
-export interface IPCEvents {
+export interface IPCShellEvents {
   'shell:open-url': (url: string) => void;
-  'clipboard:copy': (content: string) => void;
-  'clipboard:paste': (content: string) => void;
   'shell:open-in-folder': (path: string) => void;
   'shell:move-to-trash': (path: string) => void;
-  'extension:list': () => ExtensionData[];
-  'extension:init-message-port': () => MessagePort;
+}
+
+export interface IPCAppsEvents {
   'apps:get-list': () => ExtensionAPI.installedApps.AppDetail[];
+}
+
+export interface IPCClipboardEvents {
+  'clipboard:copy': (content: string) => void;
+  'clipboard:paste': (content: string) => void;
+}
+
+export interface IPCExtensionEvents {
+  'extension:list': () => ExtensionData[];
+  'extension:import': () => ExtensionData | null;
+  'extension:init-message-port': () => MessagePort;
   'extension:get': (
     extensionId: string,
   ) => (ExtensionData & { $key: string }) | null;
+}
+
+export interface IPCUserExtensionEvents {
   'user-extension': <T extends keyof IPCUserExtensionEventsMap>(detail: {
     key: string;
     name: T;
     args: Parameters<IPCUserExtensionEventsMap[T]>;
   }) => Awaited<ReturnType<IPCUserExtensionEventsMap[T]>>;
 }
+
+export interface IPCDialogEvents {
+  'dialog:open': (
+    options: Electron.OpenDialogOptions,
+  ) => Electron.OpenDialogReturnValue;
+}
+
+export type IPCEvents = IPCShellEvents &
+  IPCAppsEvents &
+  IPCDialogEvents &
+  IPCClipboardEvents &
+  IPCExtensionEvents &
+  IPCUserExtensionEvents;

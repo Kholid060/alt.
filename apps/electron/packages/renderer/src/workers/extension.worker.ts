@@ -1,5 +1,5 @@
 import extensionApiBuilder from '@repo/extension-core/dist/extensionApiBuilder';
-import ExtensionWorkerMessagePort from '../utils/ExtensionWorkerMessagePort';
+import ExtensionWorkerMessagePort from '../utils/extension/ExtensionWorkerMessagePort';
 import {
   CUSTOM_SCHEME,
   PRELOAD_API_KEY,

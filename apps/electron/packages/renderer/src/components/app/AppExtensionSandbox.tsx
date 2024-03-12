@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import emitter, { MittEventHandler } from '/@/lib/mitt';
-import createExtensionWorker from '/@/utils/createExtensionWorker';
+import createExtensionWorker from '../../utils/extension/createExtensionWorker';
 import preloadAPI from '/@/utils/preloadAPI';
 
 function AppExtensionSandbox() {

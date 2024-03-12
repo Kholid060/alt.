@@ -3,14 +3,14 @@ import {
   UiListSelectedItem,
   useUiListStore,
 } from '@repo/ui/dist/context/list.context';
-import { SearchIcon } from 'lucide-react';
+import { ChevronDownIcon, SearchIcon } from 'lucide-react';
 import { forwardRef, useRef, useEffect, useCallback } from 'react';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
-import { useCommandRouteStore } from '/@/stores/command-route.store';
 import { mergeRefs } from '/@/utils/helper';
 import { ExtensionCommandArgument } from '@repo/extension-core';
 import { useCommandStore } from '/@/stores/command.store';
-import { CommandListMetadata } from '/@/interface/command.interface';
+import { CommandListItems } from '/@/interface/command.interface';
+import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 
 const CommandInputArguments = forwardRef<
   HTMLDivElement,
@@ -24,8 +24,7 @@ const CommandInputArguments = forwardRef<
 >(({ onArgumentsChange, onArgFieldFocus, ...props }, ref) => {
   const selectedItem = useUiList(
     (state) => state.selectedItem,
-  ) as UiListSelectedItem<CommandListMetadata>;
-
+  ) as UiListSelectedItem<CommandListItems['metadata']>;
   const setCommandArgs = useCommandStore((state) => state.setCommandArgs);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -61,38 +60,39 @@ const CommandInputArguments = forwardRef<
       className="flex items-center absolute top-1/2 -translate-y-1/2 left-4 text-sm h-7 gap-2"
     >
       {selectedCommand?.command.arguments?.map((argument) => {
+        const key = argument.name;
         switch (argument.type) {
           case 'select':
             return (
-              <select
-                key={argument.name}
-                required={argument.required}
-                data-command-argument={argument.name}
-                className="bg-secondary hover:bg-secondary-hover rounded-sm px-2 max-w-28 h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                onKeyDownCapture={(event) => {
-                  if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-                    event.stopPropagation();
-                  }
-                }}
-                onChange={(event) => {
-                  setCommandArgs({
-                    args: { [argument.name]: event.target.value },
-                  });
-                }}
-                onFocus={() => onArgFieldFocus?.(argument.name)}
-              >
-                <option value="" disabled>
-                  {argument.placeholder || 'Select'}
-                </option>
-                {argument.options.map((option) => (
-                  <option
-                    key={argument.name + option.value}
-                    value={option.value}
-                  >
-                    {option.label}
+              <div className="rounded-sm relative max-w-28 h-full focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background">
+                <select
+                  key={key}
+                  required={argument.required}
+                  data-command-argument={argument.name}
+                  className="appearance-none transition-colors bg-secondary hover:bg-secondary-hover w-full h-full pl-2 pr-6 focus:outline-none rounded-sm"
+                  onKeyDownCapture={(event) => {
+                    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                      event.stopPropagation();
+                    }
+                  }}
+                  onChange={(event) => {
+                    setCommandArgs({
+                      args: { [argument.name]: event.target.value },
+                    });
+                  }}
+                  onFocus={() => onArgFieldFocus?.(argument.name)}
+                >
+                  <option value="" disabled>
+                    {argument.placeholder || 'Select'}
                   </option>
-                ))}
-              </select>
+                  {argument.options.map((option) => (
+                    <option key={key + option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+                <ChevronDownIcon className="h-4 w-4 right-1.5 top-1/2 -translate-y-1/2 absolute" />
+              </div>
             );
           case 'input:text':
           case 'input:number':
@@ -101,7 +101,7 @@ const CommandInputArguments = forwardRef<
             return (
               <input
                 type={type}
-                key={argument.name}
+                key={key}
                 required={argument.required}
                 data-command-argument={argument.name}
                 placeholder={argument.placeholder}
@@ -121,10 +121,7 @@ const CommandInputArguments = forwardRef<
           }
           case 'toggle':
             return (
-              <span
-                key={argument.name}
-                className="inline-flex items-center gap-1"
-              >
+              <span key={key} className="inline-flex items-center gap-1">
                 <UiSwitch
                   size="sm"
                   data-command-argument={argument.name}
@@ -195,10 +192,12 @@ const commandKeys = new Set([
 ]);
 
 function CommandInput() {
-  const navigate = useCommandRouteStore((state) => state.navigate);
+  const navigate = useCommandNavigate();
 
   const commandCtx = useCommandCtx();
   const uiListStore = useUiListStore();
+
+  const setCommandStore = useCommandStore((state) => state.setState);
 
   const spanRef = useRef<HTMLSpanElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -244,15 +243,14 @@ function CommandInput() {
     argumentContainerRef.current.style.translate = `${translateX}px 0px`;
   }
   function navigateBack() {
-    let { breadcrumbs } = useCommandRouteStore.getState();
+    let { breadcrumbs } = useCommandStore.getState();
     if (breadcrumbs.length === 0) return;
 
     breadcrumbs = [...breadcrumbs];
     breadcrumbs.pop();
 
-    navigate(breadcrumbs.at(-1)?.path ?? '', {
-      breadcrumbs,
-    });
+    setCommandStore('breadcrumbs', breadcrumbs);
+    navigate(breadcrumbs.at(-1)?.path ?? '');
   }
   function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     const target = event.target as HTMLInputElement;

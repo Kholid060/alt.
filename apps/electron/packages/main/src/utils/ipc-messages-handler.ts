@@ -5,7 +5,8 @@ import type {
   IPCEvents,
 } from '#common/interface/ipc-events.interface';
 import './ipc-extension-messages';
-import { ipcMain } from 'electron';
+import { dialog, ipcMain } from 'electron';
+import { extensionImport } from './extension/extensionImport';
 
 export function onIpcMessage<
   T extends keyof IPCEvents,
@@ -27,5 +28,10 @@ onIpcMessage('extension:list', () =>
 onIpcMessage('extension:get', (_, extId) =>
   Promise.resolve(ExtensionLoader.instance.getExtension(extId)),
 );
+onIpcMessage('extension:import', () => extensionImport());
 
 onIpcMessage('apps:get-list', () => InstalledApps.instance.getList());
+
+onIpcMessage('dialog:open', (_, options) => {
+  return dialog.showOpenDialog(options);
+});
