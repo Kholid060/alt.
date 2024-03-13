@@ -1,6 +1,6 @@
 import { MessageChannelMain } from 'electron';
-import type { ExtensionMessageHandler } from '../ipc-extension-messages';
 import { isObject } from '@repo/shared';
+import type { ExtensionMessageHandler } from './extension-api-event';
 
 class ExtensionMessagePortHandler {
   private messageChannel: MessageChannelMain | null = null;
@@ -16,7 +16,7 @@ class ExtensionMessagePortHandler {
     this.onPortMessage = this.onPortMessage.bind(this);
   }
 
-  onRequestPort() {
+  createMessagePort() {
     this.messageChannel = new MessageChannelMain();
 
     this.messageChannel.port2.start();

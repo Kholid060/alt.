@@ -8,15 +8,21 @@ export type ExtensionAPIPaths = NestedKeyOf<
 
 type ExtensionPermission = (typeof EXTENSION_PERMISSIONS)[number];
 
-// SORT BY ITS DEEP
 export const API_PERMISSION_MAP: [
   ExtensionAPIPaths,
   Partial<ExtensionPermission>[],
 ][] = [
+  ['fs', ['fs']],
   ['clipboard', ['clipboard']],
   ['installedApps', ['installed-apps']],
+  ['fs.exists', ['fs', 'fs.read']],
+  ['fs.readFile', ['fs', 'fs.read']],
+  ['fs.readJSON', ['fs', 'fs.read']],
+  ['fs.writeFile', ['fs', 'fs.write']],
+  ['fs.appendFile', ['fs', 'fs.write']],
   ['installedApps.query', ['installed-apps']],
 ];
+// SORT BY ITS DEEP
 API_PERMISSION_MAP.sort(
   (a, z) => a[0].split('.').length - z[0].split('.').length,
 );

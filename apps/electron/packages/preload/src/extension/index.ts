@@ -76,7 +76,9 @@ export class ExtensionAPI {
     ...args: Parameters<IPCUserExtensionEventsMap[T]>
   ) {
     if (!isExtHasApiPermission(name, this.permissions)) {
-      throw new ExtensionError("Doesn't have permission to access this API");
+      throw new ExtensionError(
+        `Doesn't have permission to access the "${name}" API`,
+      );
     }
 
     const result = await sendIpcMessage('user-extension', {

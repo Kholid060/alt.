@@ -37,4 +37,35 @@ declare namespace ExtensionAPI.installedApps {
   export function getIconURL(appId: string): string;
 }
 
+declare namespace ExtensionAPI.fs {
+  interface WriteOptions {
+    encoding: string;
+    stringType: 'base64';
+  }
+  interface ReadOptions {
+    encoding: string;
+  }
+  export function readFile(
+    path: string,
+    options?: Partial<ReadOptions>,
+  ): Promise<Uint8Array | string>;
+
+  export function writeFile(
+    path: string,
+    data: string | Uint8Array,
+    options?: Partial<WriteOptions>,
+  ): Promise<void>;
+
+  export function appendFile(
+    path: string,
+    data: string | Uint8Array,
+    options?: Partial<WriteOptions>,
+  ): Promise<void>;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  export function readJSON(path: string): Promise<Record<any, any>>;
+
+  export function exists(path: string): Promise<boolean>;
+}
+
 export default ExtensionAPI;

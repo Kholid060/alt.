@@ -6,4 +6,8 @@ declare global {
   interface Window {
     _extension: typeof ExtensionAPI;
   }
+
+  interface File {
+    path: string;
+  }
 }

@@ -564,7 +564,7 @@ function UiListItemActions({ actions }: { actions: UiListItemAction[] }) {
               }}
               className="h-9 w-9 aria-pressed:bg-secondary hover:bg-secondary rounded-sm inline-flex items-center justify-center"
             >
-              <Icon className="h-5 w-5" />
+              <Icon className="h-4 w-4" />
             </button>
           </UiTooltip>
         ),

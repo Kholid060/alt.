@@ -9,7 +9,9 @@ export type ExtensionCommandView = (
   props: CommandLaunchProps,
 ) => React.ReactNode;
 export type ExtensionCommandRenderer = (detail: {
-  messagePort: AMessagePort<ExtensionMessagePortEvent>;
+  messagePort: AMessagePort<
+    ExtensionMessagePortEvent & { __PLACEHOLDER__: () => void }
+  >;
   commandArgs: Record<string, unknown>;
 }) => React.ReactNode;
 

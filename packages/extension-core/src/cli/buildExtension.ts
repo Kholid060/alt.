@@ -1,29 +1,9 @@
-import path from 'path';
-import fs from 'fs-extra';
-import chalk from 'chalk';
-import { imageSize } from 'image-size';
-import { InlineConfig } from 'vite';
-import { fromZodError } from 'zod-validation-error';
+import { InlineConfig, Rollup } from 'vite';
 import { BuildError, logger } from './utils/logger';
-import semverValid from 'semver/functions/valid';
-import semverClean from 'semver/functions/clean';
-import { ExtensionManifestSchema, ExtensionManifest } from '../client/manifest';
-import { PackageJson as PackageJsonType } from 'type-fest';
 import * as tmp from 'tmp';
-import { glob } from 'glob';
+import ManifestUtils, { EXT_API_PKG_NAME } from './utils/ManifestUtils';
 
 tmp.setGracefulCleanup();
-
-type PackageJson = PackageJsonType & ExtensionManifest;
-
-const EXT_ROOT_DIR = process.cwd();
-const EXT_SRC_DIR = path.join(EXT_ROOT_DIR, 'src');
-const EXT_ICON_DIR = path.join(EXT_ROOT_DIR, '/public/icon');
-
-const SUPPORTED_ICON_SIZE = 256;
-const SUPPORTED_ICON_TYPE = ['.png'];
-
-const EXT_API_PKG_NAME = '@repo/extension';
 
 const DEPS_MAP: Record<string, string> = {
   react: '/@preload/react.js',
@@ -31,111 +11,23 @@ const DEPS_MAP: Record<string, string> = {
   'react/jsx-runtime': '/@preload/react-runtime.js',
 };
 
-const seenIcon = new Set<string>();
+const manifestUtils = new ManifestUtils(process.cwd());
 
-async function validateIcon(iconName: string) {
-  if (seenIcon.has(iconName) || iconName.startsWith('icon:')) return;
+let commandIds = new Set<string>();
 
-  const iconPath = path.join(EXT_ICON_DIR, iconName + '.png');
-  if (!fs.existsSync(iconPath)) {
-    throw new BuildError(`Can't find "${iconName}" icon file`);
-  }
+async function buildCommands(watch = false) {
+  const manifest = await manifestUtils.getExtensionManifest();
+  const commands = await manifestUtils.getExtensionCommands(manifest);
 
-  const iconExtName = path.extname(iconPath);
-  if (!SUPPORTED_ICON_TYPE.includes(iconExtName)) {
-    throw new BuildError(
-      `Unsupported "${iconName}" icon type, the icon must be PNG`,
-    );
-  }
+  const packageJSONPath = manifestUtils.getExtPath('package.json');
 
-  const iconSize = imageSize(iconPath);
-  if (
-    iconSize.height !== SUPPORTED_ICON_SIZE ||
-    iconSize.width !== SUPPORTED_ICON_SIZE
-  ) {
-    throw new BuildError(`"${iconName}" size must be 256x256`);
-  }
-
-  seenIcon.add(iconName);
-}
-
-async function getPackageJSON(): Promise<PackageJson> {
-  const packageJSONDir = path.join(EXT_ROOT_DIR, 'package.json');
-  if (!fs.existsSync(packageJSONDir)) {
-    throw logger.error(`Can't find "${chalk.bold('package.json')}" file`);
-  }
-
-  const packageJSON = await fs.readJSON(packageJSONDir);
-
-  const apiDepVersion =
-    packageJSON.devDependencies?.[EXT_API_PKG_NAME] ??
-    packageJSON.dependencies?.[EXT_API_PKG_NAME] ??
-    '';
-  packageJSON.$apiVersion = semverClean(apiDepVersion) ?? '*';
-
-  return packageJSON;
-}
-
-async function getExtensionManifest() {
-  const packageJSON = await getPackageJSON();
-
-  const manifest = await ExtensionManifestSchema.safeParseAsync(packageJSON);
-  if (!manifest.success) {
-    throw logger.error(fromZodError(manifest.error).toString());
-  }
-  if (!semverValid(manifest.data.version)) {
-    throw logger.error(
-      `"${manifest.data.version}" is invalid version. See https://semver.org/`,
-    );
-  }
-
-  const extManifest = manifest.data;
-
-  await validateIcon(extManifest.icon);
-  await Promise.all(
-    extManifest.commands.map((command) => {
-      if (!command.icon) return Promise.resolve();
-
-      return validateIcon(command.icon);
-    }),
-  );
-
-  return extManifest;
-}
-
-async function buildCommands(manifest: ExtensionManifest, watch = false) {
-  const EXT_COMMAND_FILE_EXTENSION = '.{js,jsx,ts,tsx}';
-
-  const cleanups: (() => void)[] = [];
-  const seenCommand = new Set<string>();
-  const entry: Record<string, string> = {};
-
-  for (const command of manifest.commands) {
-    const [commandFilePath] = await glob([
-      path.join(EXT_SRC_DIR, `${command.name}${EXT_COMMAND_FILE_EXTENSION}`),
-      path.join(
-        EXT_SRC_DIR,
-        `${command.name}/index${EXT_COMMAND_FILE_EXTENSION}`,
-      ),
-    ]);
-    if (!commandFilePath) {
-      throw new BuildError(
-        `Can't find "${chalk.bold(command.name)}" command file`,
-      );
-    }
-
-    if (seenCommand.has(command.name)) {
-      throw new BuildError(
-        `Couldn't resolve "${chalk.bold(command.name)}" command file`,
-      );
-    }
-
-    entry[command.name] = path.join(EXT_SRC_DIR, `${command.name}`);
-  }
+  commandIds = new Set(Object.keys(commands));
 
   process.env.NODE_ENV = 'production';
 
   const { build } = await import('vite');
+
+  let watcher: Rollup.RollupWatcher | null = null;
   const config: InlineConfig = {
     mode: process.env.MODE ?? 'production',
     define: {
@@ -149,7 +41,7 @@ async function buildCommands(manifest: ExtensionManifest, watch = false) {
           }
         : null,
       lib: {
-        entry,
+        entry: commands,
         formats: ['es'],
         name: '[name].js',
       },
@@ -176,29 +68,50 @@ async function buildCommands(manifest: ExtensionManifest, watch = false) {
     plugins: [
       {
         name: 'build-manifest',
+        buildStart() {
+          this.addWatchFile(packageJSONPath);
+        },
         async buildEnd() {
-          await fs.writeJSON(
-            path.join(EXT_ROOT_DIR, 'dist', 'manifest.json'),
-            manifest,
-          );
+          await manifestUtils.writeManifestFile(manifest);
         },
       },
     ],
   };
-  await build(config);
 
-  await fs.writeJSON(
-    path.join(EXT_ROOT_DIR, 'dist', 'manifest.json'),
-    manifest,
-  );
+  const buildResult = await build(config);
+  if ('close' in buildResult) {
+    watcher = buildResult;
+    watcher.on('change', async (id, change) => {
+      if (id !== packageJSONPath || change.event !== 'update') return;
 
-  cleanups.forEach((cleanup) => cleanup());
+      const currentManifest = await manifestUtils.getExtensionManifest();
+      const newCommands = new Set(
+        currentManifest.commands.map((command) => command.name),
+      );
+
+      let restartWatch = newCommands.size !== commandIds.size;
+      if (!restartWatch) {
+        restartWatch = [...commandIds].every((id) => newCommands.has(id));
+        console.log(commandIds, newCommands);
+      }
+
+      await manifestUtils.writeManifestFile(currentManifest);
+
+      if (!restartWatch) return;
+
+      console.log('Restart watcher');
+
+      watcher?.close();
+      buildExtension(watch);
+    });
+  }
+
+  await manifestUtils.writeManifestFile(manifest);
 }
 
 async function buildExtension(watch = false) {
   try {
-    const extensionManifest = await getExtensionManifest();
-    await buildCommands(extensionManifest, watch);
+    await buildCommands(watch);
   } catch (error) {
     if (error instanceof BuildError) {
       logger.error(error.message);

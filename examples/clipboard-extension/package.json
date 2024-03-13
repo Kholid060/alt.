@@ -23,7 +23,7 @@
       "type": "view"
     }
   ],
-  "permissions": ["installed-apps"],
+  "permissions": ["installed-apps", "fs"],
   "version": "1.0.0",
   "description": "Clipboard extension",
   "main": "index.js",

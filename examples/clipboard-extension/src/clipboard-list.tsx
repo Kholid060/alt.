@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
-import { UiList, commandRenderer, Extension, UiImage } from '@repo/extension';
+import { ChangeEvent, useEffect, useState } from 'react';
+import { UiList, commandRenderer, Extension, UiImage, UiInput } from '@repo/extension';
 
 function CommandMain() {
   const [apps, setApps] = useState<Extension.installedApps.AppDetail[]>([]);
@@ -15,14 +15,24 @@ function CommandMain() {
     value: app.appId,
     icon: <UiImage src={_extension.installedApps.getIconURL(app.appId)} style={{ height: '100%', width: '100%' }} />
   }));
+  
+  async function onInputFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    try {
+      const file = event.target.files[0];
+      const fileExists = await _extension.fs.exists(file.path);
+      console.log({ fileExists });
+
+      const data = await _extension.fs.readFile(file.path);
+      console.log('READ', data);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
-    <>
-    {apps.length === 0
-      ? <p>Loading...</p>
-      : <UiList items={items} />
-    }
-    </>
+    <div className="p-4">
+      <UiInput type="file" onChange={onInputFileChange} />
+    </div>
   );
 }
 

@@ -3,14 +3,8 @@ import ExtensionAPI from '@repo/extension-core/types/extension-api';
 
 type Manifest = Omit<ExtensionManifest, '$apiVersion'>;
 
-export { UiImage, UiList } from '@repo/ui';
-export type {
-  UiListGroupItem,
-  UiListItem,
-  UiListItems,
-  UiListProps,
-  UiListRef,
-} from '@repo/ui';
+export { UiImage, UiList, UiInput, UiSelect, UiSwitch } from '@repo/ui';
+export type { UiListItem, UiListProps, UiListRef } from '@repo/ui';
 
 export { ExtIcon as UiExtIcon } from './components/ext-icon';
 

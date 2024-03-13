@@ -6,6 +6,8 @@ export const EXTENSION_PERMISSIONS = [
   'fs',
   'sqlite',
   'storage',
+  'fs.read',
+  'fs.write',
   'clipboard',
   'browser.tabs',
   'notifications',
