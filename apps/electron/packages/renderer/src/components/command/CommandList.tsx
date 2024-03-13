@@ -53,13 +53,15 @@ function CommandPrefix({
 }
 
 function CommandList() {
-  const [extensions, setCommandStore, addExtension] = useCommandStore(
-    useShallow((state) => [
-      state.extensions,
-      state.setState,
-      state.addExtension,
-    ]),
-  );
+  const [extensions, setCommandStore, addExtension, updateExtension] =
+    useCommandStore(
+      useShallow((state) => [
+        state.extensions,
+        state.setState,
+        state.addExtension,
+        state.updateExtension,
+      ]),
+    );
 
   const { toast } = useToast();
   const uiListStore = useUiListStore();
@@ -186,8 +188,26 @@ function CommandList() {
         ? [
             {
               icon: RotateCcwIcon,
-              onAction() {
-                console.log('Reload extension');
+              async onAction() {
+                try {
+                  const result = await preloadAPI.main.sendIpcMessage(
+                    'extension:reload',
+                    extension.id,
+                  );
+                  if (!result) return;
+
+                  if ('$isError' in result) {
+                    toast({
+                      title: 'Error!',
+                      description: result.message,
+                    });
+                    return;
+                  }
+
+                  updateExtension(extension.id, result);
+                } catch (error) {
+                  console.error(error);
+                }
               },
               title: 'Reload extension',
               value: 'reload-extension',

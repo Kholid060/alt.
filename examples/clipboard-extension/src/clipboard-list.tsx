@@ -19,7 +19,7 @@ function CommandMain() {
   return (
     <>
     {apps.length === 0
-      ? <p>Loading....</p>
+      ? <p>Loading...</p>
       : <UiList items={items} />
     }
     </>

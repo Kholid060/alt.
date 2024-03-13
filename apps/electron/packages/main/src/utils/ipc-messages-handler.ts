@@ -29,6 +29,9 @@ onIpcMessage('extension:get', (_, extId) =>
   Promise.resolve(ExtensionLoader.instance.getExtension(extId)),
 );
 onIpcMessage('extension:import', () => extensionImport());
+onIpcMessage('extension:reload', (_, extId) =>
+  ExtensionLoader.instance.reloadExtension(extId),
+);
 
 onIpcMessage('apps:get-list', () => InstalledApps.instance.getList());
 

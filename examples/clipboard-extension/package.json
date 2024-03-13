@@ -13,8 +13,7 @@
       "type": "action",
       "arguments": [
         { "name": "test", "placeholder": "Test", "type": "input:text" },
-        { "name": "select", "placeholder": "Select", "type": "select", "options": [{ "label": "Option 1", "value": "1" }, { "label": "Option 2", "value": "2" }] },
-        { "name": "toggle", "placeholder": "Toggle", "type": "toggle" }
+        { "name": "select", "placeholder": "Select", "type": "select", "options": [{ "label": "Option 1", "value": "1" }, { "label": "Option 2", "value": "2" }] }
       ]
     },
 	  {

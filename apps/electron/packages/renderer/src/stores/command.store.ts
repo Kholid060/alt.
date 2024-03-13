@@ -28,6 +28,7 @@ interface CommandStoreActions {
     replace?: boolean,
   ) => void;
   addExtension: (data: ExtensionData) => void;
+  updateExtension: (id: string, data: Partial<ExtensionData>) => void;
   setState: <T extends keyof CommandStoreState>(
     name: T,
     value: CommandStoreState[T],
@@ -73,6 +74,21 @@ export const useCommandStore = create<CommandStore>()(
     addExtension(data) {
       set((state) => {
         state.extensions.push(data);
+      });
+    },
+    updateExtension(extId, data) {
+      set((state) => {
+        const index = state.extensions.findIndex(
+          (extension) => extension.id === extId,
+        );
+        if (index === -1) return;
+
+        delete data.id;
+
+        state.extensions[index] = {
+          ...state.extensions[index],
+          ...data,
+        };
       });
     },
     setState(name, value) {

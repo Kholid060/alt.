@@ -26,6 +26,7 @@ export interface IPCClipboardEvents {
 
 export interface IPCExtensionEvents {
   'extension:list': () => ExtensionData[];
+  'extension:reload': (extId: string) => ExtensionData | null;
   'extension:import': () => ExtensionData | null;
   'extension:init-message-port': () => MessagePort;
   'extension:get': (

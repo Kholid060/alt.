@@ -18,12 +18,18 @@ type PackageJson = PackageJsonType & ExtensionManifest;
 
 const EXT_ROOT_DIR = process.cwd();
 const EXT_SRC_DIR = path.join(EXT_ROOT_DIR, 'src');
-const EXT_ICON_DIR = path.join(EXT_ROOT_DIR, 'icon');
+const EXT_ICON_DIR = path.join(EXT_ROOT_DIR, '/public/icon');
 
 const SUPPORTED_ICON_SIZE = 256;
 const SUPPORTED_ICON_TYPE = ['.png'];
 
 const EXT_API_PKG_NAME = '@repo/extension';
+
+const DEPS_MAP: Record<string, string> = {
+  react: '/@preload/react.js',
+  'react-dom': '/@preload/react-dom.js',
+  'react/jsx-runtime': '/@preload/react-runtime.js',
+};
 
 const seenIcon = new Set<string>();
 
@@ -127,12 +133,6 @@ async function buildCommands(manifest: ExtensionManifest, watch = false) {
     entry[command.name] = path.join(EXT_SRC_DIR, `${command.name}`);
   }
 
-  const DEPS_MAP: Record<string, string> = {
-    react: '/@preload/react.js',
-    'react-dom': '/@preload/react-dom.js',
-    'react/jsx-runtime': '/@preload/react-runtime.js',
-  };
-
   process.env.NODE_ENV = 'production';
 
   const { build } = await import('vite');
@@ -141,6 +141,7 @@ async function buildCommands(manifest: ExtensionManifest, watch = false) {
     define: {
       'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
     },
+    publicDir: './public',
     build: {
       watch: watch
         ? {
@@ -172,6 +173,17 @@ async function buildCommands(manifest: ExtensionManifest, watch = false) {
       },
       minify: true,
     },
+    plugins: [
+      {
+        name: 'build-manifest',
+        async buildEnd() {
+          await fs.writeJSON(
+            path.join(EXT_ROOT_DIR, 'dist', 'manifest.json'),
+            manifest,
+          );
+        },
+      },
+    ],
   };
   await build(config);
 
@@ -179,7 +191,6 @@ async function buildCommands(manifest: ExtensionManifest, watch = false) {
     path.join(EXT_ROOT_DIR, 'dist', 'manifest.json'),
     manifest,
   );
-  await fs.copy(EXT_ICON_DIR, path.join(EXT_ROOT_DIR, 'dist', 'icon'));
 
   cleanups.forEach((cleanup) => cleanup());
 }

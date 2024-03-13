@@ -8,6 +8,7 @@ import { ErrorLogger, logger, loggerBuilder } from '/@/lib/log';
 import { EXTENSION_FOLDER } from '../constant';
 import type { ExtensionData } from '#common/interface/extension.interface';
 import { store } from '/@/lib/store';
+import { ExtensionError } from '#packages/common/errors/ExtensionError';
 
 const validatorLogger = loggerBuilder(['ExtensionLoader', 'manifestValidator']);
 
@@ -98,7 +99,7 @@ class ExtensionLoader {
         extensionsManifest.push({
           isLocal: true,
           id: localExt.id,
-          manifest: extData?.manifest,
+          manifest: extData.manifest,
         } as ExtensionData);
       }),
     );
@@ -112,6 +113,29 @@ class ExtensionLoader {
 
   get extensions(): ExtensionData[] {
     return [...this._extensions.values()];
+  }
+
+  async reloadExtension(extId: string) {
+    const extPath = store.get<string, string>(
+      `localExtensions.${extId}.path`,
+      '',
+    );
+    if (!extPath) throw new ExtensionError("Can't find extension");
+
+    const extData = await extractExtManifest(
+      path.posix.join(extPath, 'manifest.json'),
+    );
+    if (!extData) return null;
+
+    const extensionData: ExtensionData = {
+      id: extId,
+      isLocal: true,
+      manifest: extData.manifest,
+    };
+
+    this._extensions.set(extId, extensionData);
+
+    return extensionData;
   }
 
   addExtension(extensionData: ExtensionData) {
