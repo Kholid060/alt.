@@ -14,6 +14,7 @@ import ExtensionLoader from './ExtensionLoader';
 import ExtensionMessagePortHandler from './ExtensionMessagePortHandler';
 import { logger } from '/@/lib/log';
 import WindowsManager from '/@/window/WindowsManager';
+import type { ExtensionData } from '#packages/common/interface/extension.interface';
 
 export type ExtensionMessageHandler = <
   T extends keyof IPCUserExtensionEventsMap,
@@ -50,7 +51,7 @@ export const onExtensionIPCEvent = (() => {
       const handler = handlers[name];
       if (!handler) throw new Error(`"${name}" doesn't have handler`);
 
-      const result = await handler(sender, ...args);
+      const result = await handler({ sender, extension }, ...args);
 
       return result;
     } catch (error) {
@@ -100,7 +101,13 @@ export const onExtensionIPCEvent = (() => {
   >(
     name: T,
     callback: (
-      ...args: [Electron.IpcMainInvokeEvent, ...P]
+      ...args: [
+        detail: {
+          sender: Electron.IpcMainInvokeEvent;
+          extension: ExtensionData;
+        },
+        ...P,
+      ]
     ) => ReturnType<IPCUserExtensionEventsMap[T]>,
   ) => {
     handlers[name] = callback;

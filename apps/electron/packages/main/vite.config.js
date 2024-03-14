@@ -1,5 +1,6 @@
 import { node } from '../../.electron-vendors.cache.json';
 import { join } from 'node:path';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 const PACKAGE_ROOT = __dirname;
 const PROJECT_ROOT = join(PACKAGE_ROOT, '../..');
@@ -38,6 +39,16 @@ const config = {
     emptyOutDir: true,
     reportCompressedSize: false,
   },
+  plugins: [
+    viteStaticCopy({
+      targets: [
+        {
+          src: 'src/db/migrations',
+          dest: ''
+        }
+      ]
+    })
+  ]
 };
 
 export default config;

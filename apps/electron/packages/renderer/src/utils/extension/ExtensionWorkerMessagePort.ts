@@ -47,7 +47,7 @@ class ExtensionWorkerMessagePort {
     const promise = this.messages.get(data.messageId);
     if (!promise) return;
 
-    if (isObject(data.result) && '$isError' in data.result) {
+    if (isObject(data.result) && data.result !== null && '$isError' in data.result) {
       promise.reject(new Error(data.result.message));
       this.messages.delete(data.messageId);
       return;

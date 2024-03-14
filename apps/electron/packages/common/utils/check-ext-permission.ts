@@ -13,6 +13,7 @@ export const API_PERMISSION_MAP: [
   Partial<ExtensionPermission>[],
 ][] = [
   ['fs', ['fs']],
+  ['storage', ['storage']],
   ['clipboard', ['clipboard']],
   ['installedApps', ['installed-apps']],
   ['fs.exists', ['fs', 'fs.read']],

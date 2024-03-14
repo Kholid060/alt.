@@ -12,18 +12,40 @@
       "title": "Clipboard Copy",
       "type": "action",
       "arguments": [
-        { "name": "test", "placeholder": "Test", "type": "input:text" },
-        { "name": "select", "placeholder": "Select", "type": "select", "options": [{ "label": "Option 1", "value": "1" }, { "label": "Option 2", "value": "2" }] }
+        {
+          "name": "test",
+          "placeholder": "Test",
+          "type": "input:text"
+        },
+        {
+          "name": "select",
+          "placeholder": "Select",
+          "type": "select",
+          "options": [
+            {
+              "label": "Option 1",
+              "value": "1"
+            },
+            {
+              "label": "Option 2",
+              "value": "2"
+            }
+          ]
+        }
       ]
     },
-	  {
+    {
       "icon": "clipboard",
       "name": "clipboard-list",
       "title": "Clipboard List",
       "type": "view"
     }
   ],
-  "permissions": ["installed-apps", "fs"],
+  "permissions": [
+    "installed-apps",
+    "fs",
+    "storage"
+  ],
   "version": "1.0.0",
   "description": "Clipboard extension",
   "main": "index.js",
@@ -33,7 +55,7 @@
     "dev": "cliaa build --watch"
   },
   "devDependencies": {
-    "@repo/extension": "*"
+    "@repo/extension": "workspace:*"
   },
   "dependencies": {
     "dayjs": "^1.11.10",

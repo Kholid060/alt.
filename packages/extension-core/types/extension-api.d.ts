@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ExtensionManifest } from '../dist/index';
 
 declare namespace ExtensionAPI {
@@ -62,10 +63,30 @@ declare namespace ExtensionAPI.fs {
     options?: Partial<WriteOptions>,
   ): Promise<void>;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   export function readJSON(path: string): Promise<Record<any, any>>;
 
   export function exists(path: string): Promise<boolean>;
+}
+
+declare namespace ExtensionAPI.storage {
+  type Values =
+    | string
+    | boolean
+    | number
+    | null
+    | Record<string | number, any>
+    | Array<any>;
+
+  export function get(key: string): Promise<Values>;
+  export function get(key: string[]): Promise<Record<string, Values>>;
+
+  export function getAll(): Promise<Record<string, Values>>;
+
+  export function set(key: string, value: Values): Promise<void>;
+
+  export function remove(key: string | string[]): Promise<void>;
+
+  export function clear(): Promise<void>;
 }
 
 export default ExtensionAPI;

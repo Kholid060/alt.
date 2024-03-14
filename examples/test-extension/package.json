@@ -18,7 +18,7 @@
     "build": "cliaa build"
   },
   "devDependencies": {
-    "@repo/extension-core": "*"
+    "@repo/extension-core": "workspace:*"
   },
   "dependencies": {
     "dayjs": "^1.11.10",

@@ -41,6 +41,8 @@ async function buildExtensionAPI() {
   const requireValues: FlatExtApiType[] = [];
   const actionsExtApis: FlatExtApiType[] = [];
 
+  const seenAPIPath = new Set<string>();
+
   const handleExportedDeclaration = (
     declarations: ReadonlyMap<string, ExportedDeclarations[]>,
     varPath: string = '',
@@ -61,6 +63,10 @@ async function buildExtensionAPI() {
           case SyntaxKind.FunctionDeclaration:
           case SyntaxKind.VariableDeclaration: {
             const path = `${varPath}${varPath ? '.' : ''}${name}`;
+            if (seenAPIPath.has(path)) continue;
+
+            seenAPIPath.add(path);
+
             const value: FlatExtApiType = [path, `typeof ExtensionAPI.${path}`];
 
             const isFunction =

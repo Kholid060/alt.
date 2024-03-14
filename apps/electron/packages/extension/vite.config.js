@@ -8,7 +8,7 @@ const PACKAGE_ROOT = __dirname;
 const PROJECT_ROOT = join(PACKAGE_ROOT, '../..');
 const MONOREPO_ROOT = join(PROJECT_ROOT, '../..');
 
-const NODE_MODULE_PATH = join(MONOREPO_ROOT, 'node_modules');
+const NODE_MODULE_PATH = join(PROJECT_ROOT, 'node_modules');
 const REACT_MODULE_DIR = join(NODE_MODULE_PATH, 'react', 'cjs');
 const REACT_DOM_MODULE_DIR = join(NODE_MODULE_PATH, 'react-dom', 'cjs');
 

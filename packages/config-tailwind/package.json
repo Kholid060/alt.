@@ -7,7 +7,7 @@
   },
   "devDependencies": {
     "@radix-ui/colors": "^3.0.0",
-    "@repo/typescript-config": "*",
+    "@repo/typescript-config": "workspace:*",
     "tailwindcss": "^3.4.1",
     "tailwindcss-animate": "^1.0.7",
     "windy-radix-palette": "^2.0.0-beta.7"
