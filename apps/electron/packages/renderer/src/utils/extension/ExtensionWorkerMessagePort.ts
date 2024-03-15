@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ExtensionPermissions } from '#common/interface/extension.interface';
 import { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
 import { isObject } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
@@ -14,20 +13,10 @@ class ExtensionWorkerMessagePort {
 
   extensionKey: string;
   messagePort: MessagePort;
-  permissions: ExtensionPermissions[];
 
-  constructor({
-    key,
-    messagePort,
-    permissions,
-  }: {
-    key: string;
-    messagePort: MessagePort;
-    permissions: ExtensionPermissions[];
-  }) {
+  constructor({ key, messagePort }: { key: string; messagePort: MessagePort }) {
     this.extensionKey = key;
     this.messagePort = messagePort;
-    this.permissions = permissions;
 
     this.onMessage = this.onMessage.bind(this);
 
@@ -47,7 +36,11 @@ class ExtensionWorkerMessagePort {
     const promise = this.messages.get(data.messageId);
     if (!promise) return;
 
-    if (isObject(data.result) && data.result !== null && '$isError' in data.result) {
+    if (
+      isObject(data.result) &&
+      data.result !== null &&
+      '$isError' in data.result
+    ) {
       promise.reject(new Error(data.result.message));
       this.messages.delete(data.messageId);
       return;

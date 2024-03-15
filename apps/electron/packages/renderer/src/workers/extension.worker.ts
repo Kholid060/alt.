@@ -36,14 +36,21 @@ function initExtensionAPI({
   const extensionWorkerMessage = new ExtensionWorkerMessagePort({
     key: key,
     messagePort: port,
-    permissions: manifest.permissions ?? [],
   });
 
   const extensionAPI = Object.freeze(
     extensionApiBuilder({
       values: {
         manifest: manifest,
-        'installedApps.getIconURL': (appId) =>
+        'ui.searchPanel.onChanged': {
+          addListener() {},
+          removeListener() {},
+        },
+        'ui.searchPanel.onKeydown': {
+          addListener() {},
+          removeListener() {},
+        },
+        'shell.installedApps.getIconURL': (appId) =>
           `${CUSTOM_SCHEME.appIcon}://${appId}.png`,
       },
       context: extensionWorkerMessage,

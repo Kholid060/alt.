@@ -22,7 +22,7 @@ export function ExtensionProvider({
   children: React.ReactNode;
   value?: string;
   messagePort: AMessagePort<
-    ExtensionMessagePortEvent & { __PLACEHOLDER__: () => void }
+    ExtensionMessagePortEvent
   >;
 }) {
   const listStore = useUiListStore();

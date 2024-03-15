@@ -15,7 +15,13 @@ declare namespace ExtensionAPI.clipboard {
   ): Promise<void>;
 }
 
-declare namespace ExtensionAPI.installedApps {
+declare namespace ExtensionAPI.shell {
+  export function moveToTrash(path: string | string[]): Promise<void>;
+
+  export function showItemInFolder(path: string): Promise<void>;
+}
+
+declare namespace ExtensionAPI.shell.installedApps {
   export interface AppDetail {
     name: string;
     appId: string;
@@ -87,6 +93,25 @@ declare namespace ExtensionAPI.storage {
   export function remove(key: string | string[]): Promise<void>;
 
   export function clear(): Promise<void>;
+}
+
+declare namespace ExtensionAPI.ui.searchPanel {
+  interface KeydownEvent {
+    key: boolean;
+    altKey: boolean;
+    ctrlKey: boolean;
+    metaKey: boolean;
+    shiftKey: boolean;
+  }
+
+  export const onChanged: {
+    removeListener(callback: () => void): void;
+    addListener(callback: (value: string) => void): void;
+  }
+  export const onKeydown: {
+    removeListener(callback: () => void): void;
+    addListener(callback: (event: KeydownEvent) => void): void;
+  }
 }
 
 export default ExtensionAPI;

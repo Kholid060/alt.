@@ -6,7 +6,6 @@ import CommandContent from './components/command/CommandContent';
 import { useCommandStore } from './stores/command.store';
 import preloadAPI from './utils/preloadAPI';
 import { CommandCtxProvider } from './context/command.context';
-import AppExtensionSandbox from './components/app/AppExtensionSandbox';
 import { UiListProvider } from '@repo/ui/dist/context/list.context';
 import {
   CommandRouteProvider,
@@ -49,7 +48,6 @@ function App() {
               </div>
             </UiListProvider>
             <CommandFooter />
-            <AppExtensionSandbox />
             <UiToaster viewportClass="right-0 bottom-0 pointer-events-none items-end" />
           </div>
         </CommandRouteProvider>

@@ -2,8 +2,9 @@ import path from 'path';
 import InstalledApps from '../../InstalledApps';
 import { onExtensionIPCEvent } from '../extension-api-event';
 import { logger } from '/@/lib/log';
+import { shell } from 'electron';
 
-onExtensionIPCEvent('installedApps.query', async (_, query) => {
+onExtensionIPCEvent('shell.installedApps.query', async (_, query) => {
   const apps = await InstalledApps.instance.getList();
 
   if (query instanceof RegExp) {
@@ -21,7 +22,7 @@ onExtensionIPCEvent('installedApps.query', async (_, query) => {
   return apps.filter((app) => app.name.includes(query));
 });
 
-onExtensionIPCEvent('installedApps.launch', async (_, appId) => {
+onExtensionIPCEvent('shell.installedApps.launch', async (_, appId) => {
   try {
     await InstalledApps.instance.launchApp(appId);
 
@@ -36,4 +37,15 @@ onExtensionIPCEvent('installedApps.launch', async (_, appId) => {
 
     return false;
   }
+});
+
+onExtensionIPCEvent('shell.moveToTrash', async (_, itemPath) => {
+  const itemPaths = Array.isArray(itemPath) ? itemPath : [itemPath];
+  await Promise.all(itemPaths.map((item) => shell.trashItem(item)));
+});
+
+onExtensionIPCEvent('shell.showItemInFolder', (_, itemPath) => {
+  shell.showItemInFolder(itemPath);
+
+  return Promise.resolve();
 });

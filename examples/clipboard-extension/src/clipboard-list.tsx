@@ -3,17 +3,24 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { UiList, commandRenderer, Extension, UiImage, UiInput } from '@repo/extension';
 
 function CommandMain() {
-  const [apps, setApps] = useState<Extension.installedApps.AppDetail[]>([]);
+  const [apps, setApps] = useState<Extension.shell.installedApps.AppDetail[]>([]);
 
   useEffect(() => {
     console.log('Today date is', dayjs().format('DD MMMM YYYY'));
-    _extension.installedApps.query('').then(setApps);
+    _extension.shell.installedApps.query('').then(setApps);
+
+    _extension.ui.searchPanel.onChanged.addListener((value) => {
+      console.log('onChange', value);
+    });
+    _extension.ui.searchPanel.onKeydown.addListener((value) => {
+      console.log('onKeydown', value);
+    });
   }, []);
 
   const items = apps.map((app) => ({
     title: app.name,
     value: app.appId,
-    icon: <UiImage src={_extension.installedApps.getIconURL(app.appId)} style={{ height: '100%', width: '100%' }} />
+    icon: <UiImage src={_extension.shell.installedApps.getIconURL(app.appId)} style={{ height: '100%', width: '100%' }} />
   }));
   
   async function onInputFileChange(event: React.ChangeEvent<HTMLInputElement>) {

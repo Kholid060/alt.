@@ -1,6 +1,5 @@
 import { UiButton } from '@repo/ui';
 import { GripHorizontalIcon } from 'lucide-react';
-import CommandActions from './CommandActions';
 
 function CommandFooter() {
   return (
@@ -18,7 +17,6 @@ function CommandFooter() {
         </div>
       )}
       <div className="flex-grow"></div>
-      <CommandActions />
     </div>
   );
 }

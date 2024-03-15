@@ -44,11 +44,11 @@ const config = {
       targets: [
         {
           src: 'src/db/migrations',
-          dest: ''
-        }
-      ]
-    })
-  ]
+          dest: '',
+        },
+      ],
+    }),
+  ],
 };
 
 export default config;

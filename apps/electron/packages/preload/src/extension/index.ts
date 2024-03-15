@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ExtensionManifest } from '@repo/extension-core';
+import type { ExtensionMessagePortEvent } from '@repo/extension';
 import extensionApiBuilder from '@repo/extension-core/dist/extensionApiBuilder';
 import {
   CUSTOM_SCHEME,
@@ -24,7 +26,42 @@ export class ExtensionAPI {
     'permissions'
   >['permissions'] = [];
 
-  constructor() {}
+  private messagePort: MessagePort | null = null;
+  private messageListeners: Record<string, ((...args: any[]) => any)[]> = {};
+
+  constructor() {
+    window.addEventListener(
+      'message',
+      (event) => {
+        const [port] = event.ports;
+        if (!port) return;
+
+        this.messagePort = port;
+        port.addEventListener('message', this.onMessagePort.bind(this));
+      },
+      { once: true },
+    );
+  }
+
+  private onMessagePort<T extends keyof ExtensionMessagePortEvent>({
+    data,
+  }: MessageEvent<{ name: T; data: ExtensionMessagePortEvent[T] }>) {
+    switch (data.name) {
+      case 'extension:query-change':
+        this.emitMessageEvents('ui.searchPanel.onChanged', ...data.data);
+        break;
+      case 'extension:keydown-event':
+        this.emitMessageEvents('ui.searchPanel.onKeydown', ...data.data);
+        break;
+    }
+  }
+
+  private emitMessageEvents(name: string, ...args: unknown[]) {
+    const listeners = this.messageListeners[name];
+    if (!listeners) return;
+
+    listeners.forEach((listener) => listener(...args));
+  }
 
   async loadAPI() {
     try {
@@ -55,6 +92,27 @@ export class ExtensionAPI {
     }
   }
 
+  private addEventHandler(key: string) {
+    return {
+      addListener: (callback: (...args: any[]) => void) => {
+        if (!this.messageListeners[key]) {
+          this.messageListeners[key] = [];
+        }
+
+        this.messageListeners[key].push(callback);
+      },
+      removeListener: (callback: (...args: any[]) => void) => {
+        const listeners = this.messageListeners[key];
+        if (!listeners) return;
+
+        const index = listeners.indexOf(callback);
+        if (index === -1) return;
+
+        this.messageListeners[key].splice(index, 1);
+      },
+    };
+  }
+
   async getExtensionAPI(
     manifest: ExtensionManifest,
   ): Promise<typeof _extension> {
@@ -63,7 +121,13 @@ export class ExtensionAPI {
       apiHandler: this.sendAction,
       values: {
         manifest,
-        'installedApps.getIconURL': (appId) =>
+        'ui.searchPanel.onChanged': this.addEventHandler(
+          'ui.searchPanel.onChanged',
+        ),
+        'ui.searchPanel.onKeydown': this.addEventHandler(
+          'ui.searchPanel.onKeydown',
+        ),
+        'shell.installedApps.getIconURL': (appId) =>
           `${CUSTOM_SCHEME.appIcon}://${appId}.png`,
       },
     });

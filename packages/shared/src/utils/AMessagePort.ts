@@ -1,8 +1,6 @@
 import { EventEmitter } from 'eventemitter3';
 
-interface AMessagePortEvents {
-  __PLACEHOLDER__(): void;
-}
+interface AMessagePortEvents {}
 
 class AMessagePort<
   T extends AMessagePortEvents = AMessagePortEvents,

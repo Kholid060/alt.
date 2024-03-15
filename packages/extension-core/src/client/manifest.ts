@@ -4,6 +4,7 @@ export const URL_FRIENDLY_REGEX = /^[a-zA-Z0-9_-]*$/;
 
 export const EXTENSION_PERMISSIONS = [
   'fs',
+  'shell',
   'sqlite',
   'storage',
   'fs.read',

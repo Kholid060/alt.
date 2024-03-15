@@ -16,7 +16,7 @@ export interface IPCShellEvents {
 }
 
 export interface IPCAppsEvents {
-  'apps:get-list': () => ExtensionAPI.installedApps.AppDetail[];
+  'apps:get-list': () => ExtensionAPI.shell.installedApps.AppDetail[];
 }
 
 export interface IPCClipboardEvents {

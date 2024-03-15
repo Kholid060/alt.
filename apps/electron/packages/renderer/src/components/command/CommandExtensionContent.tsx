@@ -4,7 +4,7 @@ import { useCommandCtx } from '/@/hooks/useCommandCtx';
 import { ExtensionExecutionFinishReason } from '@repo/extension';
 import { useShallow } from 'zustand/react/shallow';
 import { useCommandStore } from '/@/stores/command.store';
-import { useCommandRoute } from '/@/hooks/useCommandRoute';
+import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
 
 function CommandSandboxContent({
   onFinishExecute,
@@ -18,10 +18,8 @@ function CommandSandboxContent({
     useShallow((state) => [state.breadcrumbs, state.setState]),
   );
 
-  const [navigate, activeRoute] = useCommandRoute((state) => [
-    state.navigate,
-    state.currentRoute,
-  ]);
+  const navigate = useCommandNavigate();
+  const activeRoute = useCommandRoute((state) => state.currentRoute);
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const messageChannelRef = useRef<MessageChannel | null>(null);

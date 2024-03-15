@@ -55,16 +55,13 @@ export const onExtensionIPCEvent = (() => {
 
       return result;
     } catch (error) {
-      let errorPayload: IPCEventError = {
+      const errorPayload: IPCEventError = {
         $isError: true,
         message: 'Something went wrong',
       };
 
       if (error instanceof ExtensionError) {
-        errorPayload = {
-          $isError: true,
-          message: error.message,
-        };
+        errorPayload.message = error.message;
       } else if (error instanceof Error) {
         console.error(error);
         logger('error', ['user-extension-handler', name], error.message);

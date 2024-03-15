@@ -1,74 +1,73 @@
 // .electron-vendors.cache.json
-var chrome = "122";
+var chrome = '122';
 
 // packages/extension/vite.config.js
-import react from "file:///E:/command/node_modules/@vitejs/plugin-react/dist/index.mjs";
-import { join } from "node:path";
-var __vite_injected_original_dirname = "E:\\command\\apps\\electron\\packages\\extension";
+import react from 'file:///E:/command/node_modules/@vitejs/plugin-react/dist/index.mjs';
+import { join } from 'node:path';
+var __vite_injected_original_dirname =
+  'E:\\command\\apps\\electron\\packages\\extension';
 var PACKAGE_ROOT = __vite_injected_original_dirname;
-var PROJECT_ROOT = join(PACKAGE_ROOT, "../..");
-var MONOREPO_ROOT = join(PROJECT_ROOT, "../..");
-var NODE_MODULE_PATH = join(MONOREPO_ROOT, "node_modules");
-var REACT_MODULE_DIR = join(NODE_MODULE_PATH, "react", "cjs");
-var REACT_DOM_MODULE_DIR = join(NODE_MODULE_PATH, "react-dom", "cjs");
+var PROJECT_ROOT = join(PACKAGE_ROOT, '../..');
+var MONOREPO_ROOT = join(PROJECT_ROOT, '../..');
+var NODE_MODULE_PATH = join(MONOREPO_ROOT, 'node_modules');
+var REACT_MODULE_DIR = join(NODE_MODULE_PATH, 'react', 'cjs');
+var REACT_DOM_MODULE_DIR = join(NODE_MODULE_PATH, 'react-dom', 'cjs');
 var config = {
   mode: process.env.MODE,
   root: PACKAGE_ROOT,
   envDir: PROJECT_ROOT,
   resolve: {
     alias: {
-      "#packages": join(PACKAGE_ROOT, "../"),
-      "/@/": join(PACKAGE_ROOT, "src") + "/",
-      "#common": join(PACKAGE_ROOT, "../common")
-    }
+      '#packages': join(PACKAGE_ROOT, '../'),
+      '/@/': join(PACKAGE_ROOT, 'src') + '/',
+      '#common': join(PACKAGE_ROOT, '../common'),
+    },
   },
   define: {
-    "process.env.NODE_ENV": `'${process.env.NODE_ENV}'`
+    'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
   },
   build: {
     sourcemap: false,
     target: `chrome${chrome}`,
-    outDir: "dist",
-    assetsDir: ".",
-    minify: process.env.MODE !== "development",
+    outDir: 'dist',
+    assetsDir: '.',
+    minify: process.env.MODE !== 'development',
     rollupOptions: {
-      external: ["react", "react/jsx-runtime", "react-dom"],
+      external: ['react', 'react/jsx-runtime', 'react-dom'],
       output: {
-        entryFileNames: "[name].js",
+        entryFileNames: '[name].js',
         paths: {
-          react: "./react.js",
-          "react-dom": "./react-dom.js",
-          "react/jsx-runtime": "./react-runtime.js"
-        }
-      }
+          react: './react.js',
+          'react-dom': './react-dom.js',
+          'react/jsx-runtime': './react-runtime.js',
+        },
+      },
     },
     lib: {
       entry: {
-        index: "./src/main.tsx",
-        react: join(REACT_MODULE_DIR, "react.production.min.js"),
-        "react.dev": join(REACT_MODULE_DIR, "react.development.js"),
-        "react-runtime.dev": join(
+        index: './src/main.tsx',
+        react: join(REACT_MODULE_DIR, 'react.production.min.js'),
+        'react.dev': join(REACT_MODULE_DIR, 'react.development.js'),
+        'react-runtime.dev': join(
           REACT_MODULE_DIR,
-          "react-jsx-dev-runtime.development"
+          'react-jsx-dev-runtime.development',
         ),
-        "react-runtime": join(
+        'react-runtime': join(
           REACT_MODULE_DIR,
-          "react-jsx-runtime.production.min.js"
+          'react-jsx-runtime.production.min.js',
         ),
-        "react-dom": join(REACT_DOM_MODULE_DIR, "react-dom.production.min.js"),
-        "react-dom.dev": join(REACT_DOM_MODULE_DIR, "react-dom.development.js")
+        'react-dom': join(REACT_DOM_MODULE_DIR, 'react-dom.production.min.js'),
+        'react-dom.dev': join(REACT_DOM_MODULE_DIR, 'react-dom.development.js'),
       },
-      formats: ["es"]
+      formats: ['es'],
     },
-    emptyOutDir: true
+    emptyOutDir: true,
   },
   optimizeDeps: {
-    include: ["react/jsx-runtime"]
+    include: ['react/jsx-runtime'],
   },
-  plugins: [react()]
+  plugins: [react()],
 };
 var vite_config_default = config;
-export {
-  vite_config_default as default
-};
+export { vite_config_default as default };
 //# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAic291cmNlcyI6IFsiLmVsZWN0cm9uLXZlbmRvcnMuY2FjaGUuanNvbiIsICJwYWNrYWdlcy9leHRlbnNpb24vdml0ZS5jb25maWcuanMiXSwKICAic291cmNlc0NvbnRlbnQiOiBbIntcImNocm9tZVwiOlwiMTIyXCIsXCJub2RlXCI6XCIyMFwifSIsICJjb25zdCBfX3ZpdGVfaW5qZWN0ZWRfb3JpZ2luYWxfZGlybmFtZSA9IFwiRTpcXFxcY29tbWFuZFxcXFxhcHBzXFxcXGVsZWN0cm9uXFxcXHBhY2thZ2VzXFxcXGV4dGVuc2lvblwiO2NvbnN0IF9fdml0ZV9pbmplY3RlZF9vcmlnaW5hbF9maWxlbmFtZSA9IFwiRTpcXFxcY29tbWFuZFxcXFxhcHBzXFxcXGVsZWN0cm9uXFxcXHBhY2thZ2VzXFxcXGV4dGVuc2lvblxcXFx2aXRlLmNvbmZpZy5qc1wiO2NvbnN0IF9fdml0ZV9pbmplY3RlZF9vcmlnaW5hbF9pbXBvcnRfbWV0YV91cmwgPSBcImZpbGU6Ly8vRTovY29tbWFuZC9hcHBzL2VsZWN0cm9uL3BhY2thZ2VzL2V4dGVuc2lvbi92aXRlLmNvbmZpZy5qc1wiOy8qIGVzbGludC1lbnYgbm9kZSAqL1xuXG5pbXBvcnQgeyBjaHJvbWUgfSBmcm9tICcuLi8uLi8uZWxlY3Ryb24tdmVuZG9ycy5jYWNoZS5qc29uJztcbmltcG9ydCByZWFjdCBmcm9tICdAdml0ZWpzL3BsdWdpbi1yZWFjdCc7XG5pbXBvcnQgeyBqb2luIH0gZnJvbSAnbm9kZTpwYXRoJztcblxuY29uc3QgUEFDS0FHRV9ST09UID0gX19kaXJuYW1lO1xuY29uc3QgUFJPSkVDVF9ST09UID0gam9pbihQQUNLQUdFX1JPT1QsICcuLi8uLicpO1xuY29uc3QgTU9OT1JFUE9fUk9PVCA9IGpvaW4oUFJPSkVDVF9ST09ULCAnLi4vLi4nKTtcblxuY29uc3QgTk9ERV9NT0RVTEVfUEFUSCA9IGpvaW4oTU9OT1JFUE9fUk9PVCwgJ25vZGVfbW9kdWxlcycpO1xuY29uc3QgUkVBQ1RfTU9EVUxFX0RJUiA9IGpvaW4oTk9ERV9NT0RVTEVfUEFUSCwgJ3JlYWN0JywgJ2NqcycpO1xuY29uc3QgUkVBQ1RfRE9NX01PRFVMRV9ESVIgPSBqb2luKE5PREVfTU9EVUxFX1BBVEgsICdyZWFjdC1kb20nLCAnY2pzJyk7XG5cbi8qKlxuICogQHR5cGUge2ltcG9ydCgndml0ZScpLlVzZXJDb25maWd9XG4gKiBAc2VlIGh0dHBzOi8vdml0ZWpzLmRldi9jb25maWcvXG4gKi9cbmNvbnN0IGNvbmZpZyA9IHtcbiAgbW9kZTogcHJvY2Vzcy5lbnYuTU9ERSxcbiAgcm9vdDogUEFDS0FHRV9ST09ULFxuICBlbnZEaXI6IFBST0pFQ1RfUk9PVCxcbiAgcmVzb2x2ZToge1xuICAgIGFsaWFzOiB7XG4gICAgICAnI3BhY2thZ2VzJzogam9pbihQQUNLQUdFX1JPT1QsICcuLi8nKSxcbiAgICAgICcvQC8nOiBqb2luKFBBQ0tBR0VfUk9PVCwgJ3NyYycpICsgJy8nLFxuICAgICAgJyNjb21tb24nOiBqb2luKFBBQ0tBR0VfUk9PVCwgJy4uL2NvbW1vbicpLFxuICAgIH0sXG4gIH0sXG4gIGRlZmluZToge1xuICAgICdwcm9jZXNzLmVudi5OT0RFX0VOVic6IGAnJHtwcm9jZXNzLmVudi5OT0RFX0VOVn0nYCxcbiAgfSxcbiAgYnVpbGQ6IHtcbiAgICBzb3VyY2VtYXA6IGZhbHNlLFxuICAgIHRhcmdldDogYGNocm9tZSR7Y2hyb21lfWAsXG4gICAgb3V0RGlyOiAnZGlzdCcsXG4gICAgYXNzZXRzRGlyOiAnLicsXG4gICAgbWluaWZ5OiBwcm9jZXNzLmVudi5NT0RFICE9PSAnZGV2ZWxvcG1lbnQnLFxuICAgIHJvbGx1cE9wdGlvbnM6IHtcbiAgICAgIGV4dGVybmFsOiBbJ3JlYWN0JywgJ3JlYWN0L2pzeC1ydW50aW1lJywgJ3JlYWN0LWRvbSddLFxuICAgICAgb3V0cHV0OiB7XG4gICAgICAgIGVudHJ5RmlsZU5hbWVzOiAnW25hbWVdLmpzJyxcbiAgICAgICAgcGF0aHM6IHtcbiAgICAgICAgICByZWFjdDogJy4vcmVhY3QuanMnLFxuICAgICAgICAgICdyZWFjdC1kb20nOiAnLi9yZWFjdC1kb20uanMnLFxuICAgICAgICAgICdyZWFjdC9qc3gtcnVudGltZSc6ICcuL3JlYWN0LXJ1bnRpbWUuanMnLFxuICAgICAgICB9LFxuICAgICAgfSxcbiAgICB9LFxuICAgIGxpYjoge1xuICAgICAgZW50cnk6IHtcbiAgICAgICAgaW5kZXg6ICcuL3NyYy9tYWluLnRzeCcsXG4gICAgICAgIHJlYWN0OiBqb2luKFJFQUNUX01PRFVMRV9ESVIsICdyZWFjdC5wcm9kdWN0aW9uLm1pbi5qcycpLFxuICAgICAgICAncmVhY3QuZGV2Jzogam9pbihSRUFDVF9NT0RVTEVfRElSLCAncmVhY3QuZGV2ZWxvcG1lbnQuanMnKSxcbiAgICAgICAgJ3JlYWN0LXJ1bnRpbWUuZGV2Jzogam9pbihcbiAgICAgICAgICBSRUFDVF9NT0RVTEVfRElSLFxuICAgICAgICAgICdyZWFjdC1qc3gtZGV2LXJ1bnRpbWUuZGV2ZWxvcG1lbnQnLFxuICAgICAgICApLFxuICAgICAgICAncmVhY3QtcnVudGltZSc6IGpvaW4oXG4gICAgICAgICAgUkVBQ1RfTU9EVUxFX0RJUixcbiAgICAgICAgICAncmVhY3QtanN4LXJ1bnRpbWUucHJvZHVjdGlvbi5taW4uanMnLFxuICAgICAgICApLFxuICAgICAgICAncmVhY3QtZG9tJzogam9pbihSRUFDVF9ET01fTU9EVUxFX0RJUiwgJ3JlYWN0LWRvbS5wcm9kdWN0aW9uLm1pbi5qcycpLFxuICAgICAgICAncmVhY3QtZG9tLmRldic6IGpvaW4oUkVBQ1RfRE9NX01PRFVMRV9ESVIsICdyZWFjdC1kb20uZGV2ZWxvcG1lbnQuanMnKSxcbiAgICAgIH0sXG4gICAgICBmb3JtYXRzOiBbJ2VzJ10sXG4gICAgfSxcbiAgICBlbXB0eU91dERpcjogdHJ1ZSxcbiAgfSxcbiAgb3B0aW1pemVEZXBzOiB7XG4gICAgaW5jbHVkZTogWydyZWFjdC9qc3gtcnVudGltZSddLFxuICB9LFxuICBwbHVnaW5zOiBbcmVhY3QoKV0sXG59O1xuXG5leHBvcnQgZGVmYXVsdCBjb25maWc7XG4iXSwKICAibWFwcGluZ3MiOiAiO0FBQUMsYUFBUzs7O0FDR1YsT0FBTyxXQUFXO0FBQ2xCLFNBQVMsWUFBWTtBQUpyQixJQUFNLG1DQUFtQztBQU16QyxJQUFNLGVBQWU7QUFDckIsSUFBTSxlQUFlLEtBQUssY0FBYyxPQUFPO0FBQy9DLElBQU0sZ0JBQWdCLEtBQUssY0FBYyxPQUFPO0FBRWhELElBQU0sbUJBQW1CLEtBQUssZUFBZSxjQUFjO0FBQzNELElBQU0sbUJBQW1CLEtBQUssa0JBQWtCLFNBQVMsS0FBSztBQUM5RCxJQUFNLHVCQUF1QixLQUFLLGtCQUFrQixhQUFhLEtBQUs7QUFNdEUsSUFBTSxTQUFTO0FBQUEsRUFDYixNQUFNLFFBQVEsSUFBSTtBQUFBLEVBQ2xCLE1BQU07QUFBQSxFQUNOLFFBQVE7QUFBQSxFQUNSLFNBQVM7QUFBQSxJQUNQLE9BQU87QUFBQSxNQUNMLGFBQWEsS0FBSyxjQUFjLEtBQUs7QUFBQSxNQUNyQyxPQUFPLEtBQUssY0FBYyxLQUFLLElBQUk7QUFBQSxNQUNuQyxXQUFXLEtBQUssY0FBYyxXQUFXO0FBQUEsSUFDM0M7QUFBQSxFQUNGO0FBQUEsRUFDQSxRQUFRO0FBQUEsSUFDTix3QkFBd0IsSUFBSSxRQUFRLElBQUksUUFBUTtBQUFBLEVBQ2xEO0FBQUEsRUFDQSxPQUFPO0FBQUEsSUFDTCxXQUFXO0FBQUEsSUFDWCxRQUFRLFNBQVMsTUFBTTtBQUFBLElBQ3ZCLFFBQVE7QUFBQSxJQUNSLFdBQVc7QUFBQSxJQUNYLFFBQVEsUUFBUSxJQUFJLFNBQVM7QUFBQSxJQUM3QixlQUFlO0FBQUEsTUFDYixVQUFVLENBQUMsU0FBUyxxQkFBcUIsV0FBVztBQUFBLE1BQ3BELFFBQVE7QUFBQSxRQUNOLGdCQUFnQjtBQUFBLFFBQ2hCLE9BQU87QUFBQSxVQUNMLE9BQU87QUFBQSxVQUNQLGFBQWE7QUFBQSxVQUNiLHFCQUFxQjtBQUFBLFFBQ3ZCO0FBQUEsTUFDRjtBQUFBLElBQ0Y7QUFBQSxJQUNBLEtBQUs7QUFBQSxNQUNILE9BQU87QUFBQSxRQUNMLE9BQU87QUFBQSxRQUNQLE9BQU8sS0FBSyxrQkFBa0IseUJBQXlCO0FBQUEsUUFDdkQsYUFBYSxLQUFLLGtCQUFrQixzQkFBc0I7QUFBQSxRQUMxRCxxQkFBcUI7QUFBQSxVQUNuQjtBQUFBLFVBQ0E7QUFBQSxRQUNGO0FBQUEsUUFDQSxpQkFBaUI7QUFBQSxVQUNmO0FBQUEsVUFDQTtBQUFBLFFBQ0Y7QUFBQSxRQUNBLGFBQWEsS0FBSyxzQkFBc0IsNkJBQTZCO0FBQUEsUUFDckUsaUJBQWlCLEtBQUssc0JBQXNCLDBCQUEwQjtBQUFBLE1BQ3hFO0FBQUEsTUFDQSxTQUFTLENBQUMsSUFBSTtBQUFBLElBQ2hCO0FBQUEsSUFDQSxhQUFhO0FBQUEsRUFDZjtBQUFBLEVBQ0EsY0FBYztBQUFBLElBQ1osU0FBUyxDQUFDLG1CQUFtQjtBQUFBLEVBQy9CO0FBQUEsRUFDQSxTQUFTLENBQUMsTUFBTSxDQUFDO0FBQ25CO0FBRUEsSUFBTyxzQkFBUTsiLAogICJuYW1lcyI6IFtdCn0K

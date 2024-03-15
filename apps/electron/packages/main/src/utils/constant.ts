@@ -13,9 +13,6 @@ export const EXTENSION_FOLDER = path.join(
   'extensions',
 );
 
-export const DATABASE_FOLDER = path.join(
-  app.getPath('userData'),
-  'Database',
-);
+export const DATABASE_FOLDER = path.join(app.getPath('userData'), 'Database');
 
 export const EXTENSION_LOCAL_ID_PREFIX = 'local__';

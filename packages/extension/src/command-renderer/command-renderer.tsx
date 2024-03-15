@@ -10,7 +10,7 @@ export type ExtensionCommandView = (
 ) => React.ReactNode;
 export type ExtensionCommandRenderer = (detail: {
   messagePort: AMessagePort<
-    ExtensionMessagePortEvent & { __PLACEHOLDER__: () => void }
+    ExtensionMessagePortEvent
   >;
   commandArgs: Record<string, unknown>;
 }) => React.ReactNode;
