@@ -67,12 +67,37 @@ class ManifestUtils {
     return packageJSON;
   }
 
+  private async resolveExtensionManifest() {
+    let [manifestFilePath] = await glob('./manifest.{js,json}');
+    if (!manifestFilePath) {
+      throw new BuildError("Couldn't find Manifest file");
+    }
+
+    manifestFilePath = path.join(this.basePath, manifestFilePath);
+    let manifestObject: unknown | null = null;
+
+    const isJSON = path.extname(manifestFilePath) === '.json';
+    if (isJSON) {
+      manifestObject = await fs.readJSON(manifestFilePath);
+    } else {
+      const script = await import(`file://${manifestFilePath}`);
+      manifestObject = script.default ?? null;
+    }
+
+    return manifestObject;
+  }
+
   async getExtensionManifest(): Promise<ExtensionManifest> {
-    const packageJSON = await this.getPackageJSON();
+    const packageJSON = await this.resolveExtensionManifest();
 
     const manifest = await ExtensionManifestSchema.safeParseAsync(packageJSON);
     if (!manifest.success) {
-      throw logger.error(fromZodError(manifest.error).toString());
+      throw logger.error(
+        fromZodError(manifest.error, {
+          prefix: 'Manifest Validation',
+          includePath: true,
+        }).toString(),
+      );
     }
     if (!semverValid(manifest.data.version)) {
       throw logger.error(
@@ -102,38 +127,47 @@ class ManifestUtils {
 
   async getExtensionCommands(manifest: ExtensionManifest) {
     const seenCommand = new Set<string>();
+
+    const scripts: Record<string, string> = {};
     const commands: Record<string, string> = {};
 
-    for (const command of manifest.commands) {
-      const [commandFilePath] = await glob([
-        path.join(
-          this.getExtPath('src'),
-          `${command.name}${EXT_COMMAND_FILE_EXTENSION}`,
-        ),
-        path.join(
-          this.getExtPath('src'),
-          `${command.name}/index${EXT_COMMAND_FILE_EXTENSION}`,
-        ),
-      ]);
-      if (!commandFilePath) {
-        throw new BuildError(
-          `Can't find "${chalk.bold(command.name)}" command file`,
+    await Promise.all(
+      manifest.commands.map(async (command) => {
+        const [commandFilePath] = await glob(
+          command.type === 'script'
+            ? path.join(this.getExtPath('src'), command.name)
+            : [
+                path.join(
+                  this.getExtPath('src'),
+                  `${command.name}${EXT_COMMAND_FILE_EXTENSION}`,
+                ),
+                path.join(
+                  this.getExtPath('src'),
+                  `${command.name}/index${EXT_COMMAND_FILE_EXTENSION}`,
+                ),
+              ],
         );
-      }
+        if (!commandFilePath) {
+          throw new BuildError(
+            `Couldn't find "${chalk.bold(command.name)}" command file`,
+          );
+        }
 
-      if (seenCommand.has(command.name)) {
-        throw new BuildError(
-          `Couldn't resolve "${chalk.bold(command.name)}" command file`,
-        );
-      }
+        if (seenCommand.has(command.name)) {
+          throw new BuildError(
+            `Couldn't resolve "${chalk.bold(command.name)}" command file`,
+          );
+        }
 
-      commands[command.name] = path.join(
-        this.getExtPath('src'),
-        `${command.name}`,
-      );
-    }
+        if (command.type === 'script') {
+          scripts[command.name] = commandFilePath;
+        } else {
+          commands[command.name] = commandFilePath;
+        }
+      }),
+    );
 
-    return commands;
+    return { commands, scripts };
   }
 
   private async validateIcon(iconName: string) {
@@ -141,7 +175,7 @@ class ManifestUtils {
 
     const iconPath = path.join(this.getExtPath('icon'), iconName + '.png');
     if (!fs.existsSync(iconPath)) {
-      throw new BuildError(`Can't find "${iconName}" icon file`);
+      throw new BuildError(`Couldn't find "${iconName}" icon file`);
     }
 
     const iconExtName = path.extname(iconPath);

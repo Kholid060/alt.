@@ -25,6 +25,11 @@ export interface IPCClipboardEvents {
 }
 
 export interface IPCExtensionEvents {
+  'extension:run-script-command': (detail: {
+    commandId: string;
+    extensionId: string;
+    args: Record<string, unknown>;
+  }) => { success: boolean; errorMessage: string };
   'extension:list': () => ExtensionData[];
   'extension:reload': (extId: string) => ExtensionData | null;
   'extension:import': () => ExtensionData | null;
@@ -54,3 +59,14 @@ export type IPCEvents = IPCShellEvents &
   IPCClipboardEvents &
   IPCExtensionEvents &
   IPCUserExtensionEvents;
+
+export interface IPCSendEvents {
+  'command-script:message': [
+    {
+      message: string;
+      commandId: string;
+      extensionId: string;
+      type: 'error' | 'message' | 'start' | 'finish';
+    },
+  ];
+}

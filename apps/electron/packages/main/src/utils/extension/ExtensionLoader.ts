@@ -5,7 +5,7 @@ import { ExtensionManifestSchema } from '@repo/extension-core';
 import { globby } from 'globby';
 import validateSemver from 'semver/functions/valid';
 import { ErrorLogger, logger, loggerBuilder } from '/@/lib/log';
-import { EXTENSION_FOLDER } from '../constant';
+import { EXTENSION_FOLDER, EXTENSION_LOCAL_ID_PREFIX } from '../constant';
 import type { ExtensionData } from '#common/interface/extension.interface';
 import { store } from '/@/lib/store';
 import { ExtensionError } from '#packages/common/errors/ExtensionError';
@@ -50,6 +50,15 @@ async function extractExtManifest(manifestPath: string) {
     id: extDirname,
     manifest: manifest.data,
   };
+}
+
+export function getExtensionFolder(extensionId: string) {
+  let extensionFolderDir = `${EXTENSION_FOLDER}/${extensionId}/icon`;
+  if (extensionId.startsWith(EXTENSION_LOCAL_ID_PREFIX)) {
+    extensionFolderDir = store.get(`localExtensions.${extensionId}.path`, '');
+  }
+
+  return extensionFolderDir;
 }
 
 class ExtensionLoader {

@@ -30,7 +30,7 @@ function App() {
   const setCommandStoreState = useCommandStore((state) => state.setState);
 
   useEffect(() => {
-    preloadAPI.main.sendIpcMessage('extension:list').then((extensions) => {
+    preloadAPI.main.invokeIpcMessage('extension:list').then((extensions) => {
       if ('$isError' in extensions) return;
       setCommandStoreState('extensions', extensions);
     });

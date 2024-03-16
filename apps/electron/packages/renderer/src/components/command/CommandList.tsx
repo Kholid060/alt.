@@ -15,7 +15,7 @@ import { ExtensionCommand } from '@repo/extension-core';
 import emitter from '/@/lib/mitt';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import preloadAPI from '/@/utils/preloadAPI';
-import { BlocksIcon, HardDriveIcon, RotateCcwIcon } from 'lucide-react';
+import { BlocksIcon, RotateCcwIcon } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 
 type CommandIconName = keyof typeof commandIcons;
@@ -145,6 +145,13 @@ function CommandList() {
         data: args,
       });
       return;
+    } else if (command.type === 'script') {
+      preloadAPI.main.invokeIpcMessage('extension:run-script-command', {
+        args,
+        commandId: command.name,
+        extensionId: extension.id,
+      });
+      return;
     }
 
     emitter.emit('execute-command', {
@@ -180,9 +187,7 @@ function CommandList() {
           `${QUERY_PREFIX.EXT}${item.metadata.extensionId}`,
         ),
       suffix: extension.isLocal ? (
-        <span className="bg-orange-400 text-black p-[3px] rounded-full">
-          <HardDriveIcon className="h-[14px] w-[14px]" />
-        </span>
+        <span className="text-xs text-muted-foreground">Local Extension</span>
       ) : undefined,
       actions: extension.isLocal
         ? [
@@ -190,7 +195,7 @@ function CommandList() {
               icon: RotateCcwIcon,
               async onAction() {
                 try {
-                  const result = await preloadAPI.main.sendIpcMessage(
+                  const result = await preloadAPI.main.invokeIpcMessage(
                     'extension:reload',
                     extension.id,
                   );
@@ -233,6 +238,12 @@ function CommandList() {
             extension: { id: extension.id, name: extension.manifest.title },
           }),
         subtitle: command.subtitle || extension.manifest.title,
+        suffix:
+          command.type === 'script' ? (
+            <span className="text-xs text-muted-foreground">
+              Command Script
+            </span>
+          ) : undefined,
         icon: command.icon ? (
           <CommandPrefix
             id={extension.id}
@@ -257,7 +268,8 @@ function CommandList() {
       value: 'import-extension',
       icon: <UiList.Icon icon={BlocksIcon} />,
       async onSelected() {
-        const result = await preloadAPI.main.sendIpcMessage('extension:import');
+        const result =
+          await preloadAPI.main.invokeIpcMessage('extension:import');
         if (!result) return;
 
         if ('$isError' in result) {

@@ -1,9 +1,8 @@
-import { EXTENSION_FOLDER, EXTENSION_LOCAL_ID_PREFIX } from '../constant';
 import { createErrorResponse, type CustomProtocol } from './index';
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
 import { net } from 'electron';
 import { fileURLToPath } from 'url';
-import { store } from '/@/lib/store';
+import { getExtensionFolder } from '../extension/ExtensionLoader';
 
 const extensionFilePath = fileURLToPath(
   new URL('./../../extension/dist/', import.meta.url),
@@ -11,14 +10,6 @@ const extensionFilePath = fileURLToPath(
 
 const devServer = import.meta.env.DEV && import.meta.env.VITE_DEV_SERVER_URL;
 
-function getExtensionFolder(extensionId: string) {
-  let extensionFolderDir = `${EXTENSION_FOLDER}/${extensionId}/icon`;
-  if (extensionId.startsWith(EXTENSION_LOCAL_ID_PREFIX)) {
-    extensionFolderDir = store.get(`localExtensions.${extensionId}.path`, '');
-  }
-
-  return extensionFolderDir;
-}
 function handleCommandPath(extId: string, ...paths: string[]) {
   let path: string = '';
 

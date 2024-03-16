@@ -542,7 +542,7 @@ function UiListItemActions({ actions }: { actions: UiListItemAction[] }) {
   }, [actionIndex]);
 
   return (
-    <div className="flex items-center absolute rounded-sm top-0 h-full right-0 pr-2 bg-card">
+    <div className="flex items-center absolute rounded-sm top-0 h-full right-0 pr-2 pl-5 bg-gradient-to-tl from-40% from-card to-100% to-transparent">
       {actions.map(
         ({ icon: Icon, onAction, title, value, shortcut }, index) => (
           <UiTooltip

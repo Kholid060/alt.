@@ -60,7 +60,7 @@ const CommandInputArguments = forwardRef<
       className="flex items-center absolute top-1/2 -translate-y-1/2 left-4 text-sm h-7 gap-2"
     >
       {selectedCommand?.command.arguments?.map((argument) => {
-        const key = argument.name;
+        const key = selectedCommand.command.name + argument.name;
         switch (argument.type) {
           case 'select':
             return (

@@ -187,7 +187,7 @@ class InstalledApps {
 
     const shortcuts = await globby(shortcutDirs);
     const appPromise = await Promise.allSettled<
-      Promise<ExtensionAPI.installedApps.AppDetail | null>[]
+      Promise<ExtensionAPI.shell.installedApps.AppDetail | null>[]
     >(
       shortcuts.map(async (shortcut) => {
         const appDetail = await extractShortcutDetail(shortcut);
@@ -215,7 +215,7 @@ class InstalledApps {
     );
 
     const apps = appPromise
-      .reduce<ExtensionAPI.installedApps.AppDetail[]>((acc, curr) => {
+      .reduce<ExtensionAPI.shell.installedApps.AppDetail[]>((acc, curr) => {
         if (curr.status === 'fulfilled' && curr.value) {
           acc.push(curr.value);
         }

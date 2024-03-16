@@ -1,26 +1,10 @@
 import InstalledApps from './InstalledApps';
 import ExtensionLoader from './extension/ExtensionLoader';
-import type {
-  IPCEventError,
-  IPCEvents,
-} from '#common/interface/ipc-events.interface';
 import './ipc-extension-messages';
-import { dialog, ipcMain } from 'electron';
+import { dialog } from 'electron';
 import { extensionImport } from './extension/extensionImport';
-
-export function onIpcMessage<
-  T extends keyof IPCEvents,
-  P extends Parameters<IPCEvents[T]>,
->(
-  name: T,
-  callback: (
-    ...args: [Electron.IpcMainInvokeEvent, ...P]
-  ) => Promise<ReturnType<IPCEvents[T]> | IPCEventError>,
-) {
-  ipcMain.handle(name, async (event, ...args) =>
-    callback(event, ...(args as P)),
-  );
-}
+import ExtensionCommandScriptRunner from './extension/ExtensionCommandScriptRunner';
+import { onIpcMessage } from './ipc-main';
 
 onIpcMessage('extension:list', () =>
   Promise.resolve(ExtensionLoader.instance.extensions),
@@ -32,6 +16,21 @@ onIpcMessage('extension:import', () => extensionImport());
 onIpcMessage('extension:reload', (_, extId) =>
   ExtensionLoader.instance.reloadExtension(extId),
 );
+onIpcMessage('extension:run-script-command', async (_, detail) => {
+  try {
+    await ExtensionCommandScriptRunner.instance.runScript(detail);
+
+    return {
+      success: true,
+      errorMessage: '',
+    };
+  } catch (error) {
+    return {
+      success: false,
+      errorMessage: (error as Error).message,
+    };
+  }
+});
 
 onIpcMessage('apps:get-list', () => InstalledApps.instance.getList());
 

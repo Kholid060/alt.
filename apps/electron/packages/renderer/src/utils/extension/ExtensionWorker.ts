@@ -140,7 +140,7 @@ class ExtensionWorker {
     args?: Record<string, unknown>;
   }) {
     try {
-      const extension = await preloadAPI.main.sendIpcMessage(
+      const extension = await preloadAPI.main.invokeIpcMessage(
         'extension:get',
         extensionId,
       );

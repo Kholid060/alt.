@@ -1,55 +1,10 @@
 {
   "name": "clipboard-extension",
-  "title": "Clipboard",
-  "icon": "icon:Clipboard",
   "author": "kholid060",
   "type": "module",
   "sideEffects": false,
-  "commands": [
-    {
-      "icon": "clipboard",
-      "name": "clipboard-copy",
-      "title": "Clipboard Copy",
-      "type": "action",
-      "arguments": [
-        {
-          "name": "test",
-          "placeholder": "Test",
-          "type": "input:text"
-        },
-        {
-          "name": "select",
-          "placeholder": "Select",
-          "type": "select",
-          "options": [
-            {
-              "label": "Option 1",
-              "value": "1"
-            },
-            {
-              "label": "Option 2",
-              "value": "2"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "icon": "clipboard",
-      "name": "clipboard-list",
-      "title": "Clipboard List",
-      "type": "view"
-    }
-  ],
-  "permissions": [
-    "installed-apps",
-    "fs",
-    "shell",
-    "storage"
-  ],
   "version": "1.0.0",
   "description": "Clipboard extension",
-  "main": "index.js",
   "license": "MIT",
   "scripts": {
     "build": "cliaa build",

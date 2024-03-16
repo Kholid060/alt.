@@ -19,6 +19,8 @@ declare namespace ExtensionAPI.shell {
   export function moveToTrash(path: string | string[]): Promise<void>;
 
   export function showItemInFolder(path: string): Promise<void>;
+
+  export function openURL(url: string): Promise<void>;
 }
 
 declare namespace ExtensionAPI.shell.installedApps {
@@ -107,11 +109,11 @@ declare namespace ExtensionAPI.ui.searchPanel {
   export const onChanged: {
     removeListener(callback: () => void): void;
     addListener(callback: (value: string) => void): void;
-  }
+  };
   export const onKeydown: {
     removeListener(callback: () => void): void;
     addListener(callback: (event: KeydownEvent) => void): void;
-  }
+  };
 }
 
 export default ExtensionAPI;

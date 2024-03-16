@@ -9,12 +9,12 @@ import {
   IPC_POST_MESSAGE_EVENT,
 } from '#packages/common/utils/constant/constant';
 import { ipcMain } from 'electron';
-import { onIpcMessage } from '../ipc-messages-handler';
 import ExtensionLoader from './ExtensionLoader';
 import ExtensionMessagePortHandler from './ExtensionMessagePortHandler';
 import { logger } from '/@/lib/log';
 import WindowsManager from '/@/window/WindowsManager';
 import type { ExtensionData } from '#packages/common/interface/extension.interface';
+import { onIpcMessage } from '../ipc-main';
 
 export type ExtensionMessageHandler = <
   T extends keyof IPCUserExtensionEventsMap,

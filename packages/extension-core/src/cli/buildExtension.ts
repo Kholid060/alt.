@@ -1,9 +1,8 @@
 import { InlineConfig, Rollup } from 'vite';
 import { BuildError, logger } from './utils/logger';
-import * as tmp from 'tmp';
 import ManifestUtils, { EXT_API_PKG_NAME } from './utils/ManifestUtils';
-
-tmp.setGracefulCleanup();
+import path from 'path';
+import fs from 'fs-extra';
 
 const DEPS_MAP: Record<string, string> = {
   react: '/@preload/react.js',
@@ -13,19 +12,31 @@ const DEPS_MAP: Record<string, string> = {
 
 const manifestUtils = new ManifestUtils(process.cwd());
 
+const OUT_DIR = path.join(process.cwd(), 'dist');
+fs.ensureDirSync(OUT_DIR);
+
 let commandIds = new Set<string>();
 
 async function buildCommands(watch = false) {
   const manifest = await manifestUtils.getExtensionManifest();
-  const commands = await manifestUtils.getExtensionCommands(manifest);
+  const { commands, scripts } =
+    await manifestUtils.getExtensionCommands(manifest);
 
   const packageJSONPath = manifestUtils.getExtPath('package.json');
 
   commandIds = new Set(Object.keys(commands));
+  const scriptsPath = new Set(Object.values(scripts));
 
   process.env.NODE_ENV = 'production';
 
   const { build } = await import('vite');
+  const copyScripts = () => {
+    return Promise.allSettled(
+      Object.values(scripts).map((script) =>
+        fs.copy(script, path.join(OUT_DIR, path.basename(script))),
+      ),
+    );
+  };
 
   let watcher: Rollup.RollupWatcher | null = null;
   const config: InlineConfig = {
@@ -35,6 +46,7 @@ async function buildCommands(watch = false) {
     },
     publicDir: './public',
     build: {
+      outDir: OUT_DIR,
       watch: watch
         ? {
             clearScreen: true,
@@ -70,8 +82,12 @@ async function buildCommands(watch = false) {
         name: 'build-manifest',
         buildStart() {
           this.addWatchFile(packageJSONPath);
+          Object.values(scripts).forEach((script) => {
+            this.addWatchFile(script);
+          });
         },
         async buildEnd() {
+          await copyScripts();
           await manifestUtils.writeManifestFile(manifest);
         },
       },
@@ -82,30 +98,39 @@ async function buildCommands(watch = false) {
   if ('close' in buildResult) {
     watcher = buildResult;
     watcher.on('change', async (id, change) => {
-      if (id !== packageJSONPath || change.event !== 'update') return;
+      if (change.event !== 'update') return;
 
-      const currentManifest = await manifestUtils.getExtensionManifest();
-      const newCommands = new Set(
-        currentManifest.commands.map((command) => command.name),
-      );
+      if (id === packageJSONPath) {
+        const currentManifest = await manifestUtils.getExtensionManifest();
+        const newCommands = new Set(
+          currentManifest.commands.map((command) => command.name),
+        );
 
-      let restartWatch = newCommands.size !== commandIds.size;
-      if (!restartWatch) {
-        restartWatch = [...commandIds].every((id) => newCommands.has(id));
-        console.log(commandIds, newCommands);
+        let restartWatch = newCommands.size !== commandIds.size;
+        if (!restartWatch) {
+          restartWatch = [...commandIds].every((id) => newCommands.has(id));
+        }
+
+        await manifestUtils.writeManifestFile(currentManifest);
+
+        if (!restartWatch) return;
+
+        console.log('Restart watcher');
+
+        watcher?.close();
+        buildExtension(watch);
+        return;
       }
 
-      await manifestUtils.writeManifestFile(currentManifest);
-
-      if (!restartWatch) return;
-
-      console.log('Restart watcher');
-
-      watcher?.close();
-      buildExtension(watch);
+      if (scriptsPath.has(id)) {
+        const scriptFilename = path.basename(id);
+        console.log(`Updating "${scriptFilename}" script`);
+        await fs.copy(id, path.join(OUT_DIR, scriptFilename));
+      }
     });
   }
 
+  await copyScripts();
   await manifestUtils.writeManifestFile(manifest);
 }
 

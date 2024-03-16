@@ -15,7 +15,12 @@ export const EXTENSION_PERMISSIONS = [
   'installed-apps',
 ] as const;
 
-export const EXTENSION_COMMAND_TYPE = ['action', 'view', 'view:json'] as const;
+export const EXTENSION_COMMAND_TYPE = [
+  'view',
+  'action',
+  'script',
+  'view:json',
+] as const;
 
 export const EXTENSION_COMMAND_CONTEXT = ['all', 'url'] as const;
 

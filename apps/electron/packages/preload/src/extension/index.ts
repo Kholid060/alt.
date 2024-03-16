@@ -6,7 +6,7 @@ import {
   CUSTOM_SCHEME,
   PRELOAD_API_KEY,
 } from '#common/utils/constant/constant';
-import { sendIpcMessage } from '#common/utils/sendIpcMessage';
+import { invokeIpcMessage } from '#common/utils/ipc-renderer';
 import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
 import { contextBridge } from 'electron';
 import { isExtHasApiPermission } from '#common/utils/check-ext-permission';
@@ -73,7 +73,10 @@ export class ExtensionAPI {
         .split('/');
       if (!extensionId || !commandId) return setExtView();
 
-      const extensionData = await sendIpcMessage('extension:get', extensionId);
+      const extensionData = await invokeIpcMessage(
+        'extension:get',
+        extensionId,
+      );
       if (!extensionData) return setExtView();
       if ('$isError' in extensionData) throw new Error(extensionData.message);
 
@@ -145,7 +148,7 @@ export class ExtensionAPI {
       );
     }
 
-    const result = await sendIpcMessage('user-extension', {
+    const result = await invokeIpcMessage('user-extension', {
       name,
       args,
       key: this.key,
