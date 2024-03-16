@@ -1,19 +1,111 @@
-import { UiButton } from '@repo/ui';
-import { GripHorizontalIcon } from 'lucide-react';
+import { UiImage } from '@repo/ui';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useCommandStore } from '/@/stores/command.store';
+import { commandIcons } from '#common/utils/command-icons';
+import { Loader2Icon } from 'lucide-react';
+
+function CommandHeaderPanel() {
+  const header = useCommandStore((state) => state.statusPanel.header);
+
+  let headerIcon: React.ReactNode = null;
+  if (header?.icon) {
+    if (header.icon.startsWith('icon:')) {
+      let iconName = header.icon.slice(
+        'icon:'.length,
+      ) as keyof typeof commandIcons;
+      iconName = commandIcons[iconName] ? iconName : 'Command';
+
+      const Icon = commandIcons[iconName] ?? header.icon;
+      headerIcon = <Icon className="w-5 h-5 mr-2" />;
+    } else {
+      headerIcon = (
+        <UiImage
+          className="h-6 w-6 object-cover mr-2"
+          src={header.icon}
+          alt={`${header.title} icon`}
+        />
+      );
+    }
+  }
+
+  return (
+    <AnimatePresence>
+      {header && (
+        <motion.div
+          initial={{ y: -100 }}
+          animate={{ y: 0 }}
+          exit={{ y: -100 }}
+          transition={{ type: 'spring', bounce: 0.2, duration: 0.35 }}
+          className="flex items-center bg-background rounded-md border px-3 text-sm h-9 max-w-[50%]"
+        >
+          {headerIcon}
+          <p className="leading-tight line-clamp-1">{header.title}</p>
+          <p className="text-xs ml-3 line-clamp-1 text-muted-foreground leading-tight">
+            {header.subtitle}
+          </p>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function CommandStatusPanel() {
+  const status = useCommandStore((state) => state.statusPanel.status);
+
+  let indicator: React.ReactNode = null;
+  if (status?.type) {
+    switch (status.type) {
+      case 'loading':
+        indicator = (
+          <span className="mr-2">
+            <Loader2Icon className="animate-spin h-5 w-5" />
+          </span>
+        );
+        break;
+      case 'success':
+        indicator = (
+          <span className="relative flex h-3 w-3 mr-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-sky-500"></span>
+          </span>
+        );
+
+        break;
+      case 'error':
+        indicator = (
+          <span className="relative flex h-3 w-3 mr-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+          </span>
+        );
+        break;
+    }
+  }
+
+  return (
+    <AnimatePresence>
+      {status && (
+        <motion.div
+          initial={{ y: -100 }}
+          animate={{ y: 0 }}
+          exit={{ y: -100 }}
+          transition={{ type: 'spring', bounce: 0.2, duration: 0.35 }}
+          className="flex items-center bg-background rounded-md border px-3 text-sm h-9 max-w-[50%]"
+        >
+          {indicator}
+          <p className="leading-tight line-clamp-1">{status.title}</p>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
 
 function CommandFooter() {
   return (
-    <div className="flex items-center gap-4 mt-1 text-sm bg-background rounded-lg border">
-      {import.meta.env.DEV && (
-        <UiButton
-          size="icon"
-          variant="secondary"
-          className="mb-2 cursor-move"
-          style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
-        >
-          <GripHorizontalIcon className="h-5 w-5" />
-        </UiButton>
-      )}
+    <div className="flex items-center gap-4 mt-2">
+      <CommandHeaderPanel />
+      <div className="flex-grow"></div>
+      <CommandStatusPanel />
     </div>
   );
 }

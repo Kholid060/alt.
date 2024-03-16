@@ -2,7 +2,6 @@ import { memo, useEffect, useRef } from 'react';
 import { EXTENSION_VIEW } from '#common/utils/constant/constant';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
 import { ExtensionExecutionFinishReason } from '@repo/extension';
-import { useShallow } from 'zustand/react/shallow';
 import { useCommandStore } from '/@/stores/command.store';
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
 
@@ -14,9 +13,7 @@ function CommandSandboxContent({
     message?: string,
   ) => void;
 }) {
-  const [breadcrumbs, setCommandStore] = useCommandStore(
-    useShallow((state) => [state.breadcrumbs, state.setState]),
-  );
+  const setCommandStore = useCommandStore((state) => state.setState);
 
   const navigate = useCommandNavigate();
   const activeRoute = useCommandRoute((state) => state.currentRoute);
@@ -33,13 +30,11 @@ function CommandSandboxContent({
     messagePort.addListener('extension:finish-execute', (reason, message) => {
       if (onFinishExecute) return onFinishExecute(reason, message);
 
-      const copyBreadcrumbs = [...breadcrumbs];
-      copyBreadcrumbs.pop();
-
-      const lastPath = copyBreadcrumbs.at(-1)?.path ?? '';
-
-      setCommandStore('breadcrumbs', copyBreadcrumbs);
-      navigate(lastPath);
+      setCommandStore('statusPanel', {
+        header: null,
+        status: null,
+      });
+      navigate('');
     });
   }
   async function onIframeLoad(
@@ -85,7 +80,7 @@ function CommandSandboxContent({
       name={EXTENSION_VIEW.frameName}
       src={`extension://${activeRoute?.params.extensionId}/command/${activeRoute?.params.commandId}/`}
       sandbox="allow-scripts"
-      className="h-64 block w-full"
+      className="h-80 block w-full"
       onLoad={onIframeLoad}
     />
   );

@@ -23,6 +23,9 @@ function ipcMessageListener(type: 'on' | 'off') {
     ) => void,
   ) => {
     ipcRenderer[type](name, listener as () => void);
+
+    if (type === 'on')
+      return () => ipcRenderer.off(name, listener as () => void);
   };
 }
 

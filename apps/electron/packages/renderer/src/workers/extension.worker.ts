@@ -86,10 +86,13 @@ self.onmessage = async ({ ports, data }) => {
 
     await executeCommand({ args: data.commandArgs ?? {} });
 
-    self.postMessage('finish');
+    self.postMessage({ type: 'finish', id: data.workerId });
   } catch (error) {
-    console.error(error);
-    self.postMessage('error', (error as Error).message);
+    self.postMessage({
+      type: 'error',
+      id: data.workerId,
+      message: (error as Error).message,
+    });
   } finally {
     self.close();
   }

@@ -2,6 +2,7 @@ import { nanoid } from 'nanoid';
 import { ExtensionManifest } from '@repo/extension-core';
 import ExtensionWorkerScript from '/@/workers/extension.worker?worker';
 import preloadAPI from '../preloadAPI';
+import { isObject } from '@repo/shared';
 
 const MAX_COMMAND_EXECUTION_MS = 120_000; // 2 mins
 const CREATE_MESSAGE_PORT_TIMEOUT_MS = 5000; // 5 seconds
@@ -79,8 +80,9 @@ class ExtensionWorker {
       });
       if (!extensionWorker) return null;
 
+      const workerId = nanoid(5);
+
       workerTimeout = setTimeout(() => {
-        console.log('WORKER TIMEOUT');
         extensionWorker?.terminate();
         events.onFinish?.(extensionWorker!, undefined);
       }, timeout);
@@ -89,14 +91,18 @@ class ExtensionWorker {
         events.onError?.(extensionWorker!, event);
       };
       extensionWorker.onmessage = (event) => {
+        if (!isObject(event.data) || event.data?.id !== workerId) return;
+
         events.onMessage?.(extensionWorker!, event);
 
-        switch (event.data) {
+        const { type, message } = event.data ?? {};
+
+        switch (type) {
           case 'error':
             clearTimeout(workerTimeout!);
             events.onError?.(
               extensionWorker!,
-              new ErrorEvent('error', { message: event.data }),
+              new ErrorEvent('error', { message }),
             );
             break;
           case 'finish':
@@ -112,7 +118,7 @@ class ExtensionWorker {
       if (messagePort) transfer.push(messagePort);
 
       extensionWorker.postMessage(
-        { type: 'init', manifest, key, commandArgs },
+        { type: 'init', manifest, key, commandArgs, workerId },
         { transfer },
       );
 
@@ -130,14 +136,18 @@ class ExtensionWorker {
 
   async executeActionCommand({
     args,
+    onError,
+    onFinish,
     commandId,
     messagePort,
     extensionId,
   }: {
     commandId: string;
     extensionId: string;
+    onFinish?: () => void;
     messagePort?: MessagePort;
     args?: Record<string, unknown>;
+    onError?: (message?: string) => void;
   }) {
     try {
       const extension = await preloadAPI.main.invokeIpcMessage(
@@ -166,10 +176,13 @@ class ExtensionWorker {
         manifest: extension.manifest,
         events: {
           onError: (worker, event) => {
-            console.error(event);
+            clearWorker(worker);
+            onError?.(event.message);
+          },
+          onFinish: (worker) => {
+            onFinish?.();
             clearWorker(worker);
           },
-          onFinish: (worker) => clearWorker(worker),
         },
       });
       if (!extensionWorker) return;

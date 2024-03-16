@@ -243,14 +243,11 @@ function CommandInput() {
     argumentContainerRef.current.style.translate = `${translateX}px 0px`;
   }
   function navigateBack() {
-    let { breadcrumbs } = useCommandStore.getState();
-    if (breadcrumbs.length === 0) return;
-
-    breadcrumbs = [...breadcrumbs];
-    breadcrumbs.pop();
-
-    setCommandStore('breadcrumbs', breadcrumbs);
-    navigate(breadcrumbs.at(-1)?.path ?? '');
+    setCommandStore('statusPanel', {
+      header: null,
+      status: null,
+    });
+    navigate('');
   }
   function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     const target = event.target as HTMLInputElement;

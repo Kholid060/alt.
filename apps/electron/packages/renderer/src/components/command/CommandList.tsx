@@ -1,6 +1,6 @@
 import { commandIcons } from '#common/utils/command-icons';
 import { memo, useCallback } from 'react';
-import { useCommandStore } from '/@/stores/command.store';
+import { CommandStatusPanel, useCommandStore } from '/@/stores/command.store';
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
 import { UiImage, UiListItem, uiListItemsFilter, useToast } from '@repo/ui';
 import { UiList } from '@repo/ui';
@@ -139,8 +139,22 @@ function CommandList() {
       );
     }
 
+    const commandHeader: CommandStatusPanel['header'] = {
+      title: command.title,
+      subtitle: extension.name,
+      icon: !command.icon
+        ? undefined
+        : command.icon.startsWith(iconPrefix)
+          ? command.icon
+          : `${CUSTOM_SCHEME.extension}://${extension.id}/icon/${command.icon}`,
+    };
+
+    setCommandStore('statusPanel', {
+      status: null,
+      header: commandHeader,
+    });
+
     if (command.type === 'view') {
-      setCommandStore('breadcrumbs', [{ label: extension.name, path: '' }]);
       navigate(`/extensions/${extension.id}/${command.name}/view`, {
         data: args,
       });

@@ -3,6 +3,9 @@ import { AMessagePort } from '@repo/shared';
 import { ExtensionMessagePortEvent } from '@repo/extension';
 import emitter, { MittEventHandler } from '../lib/mitt';
 import ExtensionWorker from '../utils/extension/ExtensionWorker';
+import { useCommandStore } from '../stores/command.store';
+import { useShallow } from 'zustand/react/shallow';
+import preloadAPI from '../utils/preloadAPI';
 
 export interface CommandContextState {
   setExtMessagePort(port: MessagePort | null): void;
@@ -22,6 +25,9 @@ export function CommandCtxProvider({
   const extMessagePort = useRef<AMessagePort<ExtensionMessagePortEvent> | null>(
     null,
   );
+  const [updateStatusPanel, setCommandStore] = useCommandStore(
+    useShallow((state) => [state.updateStatusPanel, state.setState]),
+  );
 
   function setExtMessagePort(port: MessagePort | null) {
     if (!port && extMessagePort.current) {
@@ -32,6 +38,13 @@ export function CommandCtxProvider({
   }
 
   useEffect(() => {
+    const clearPanel = () => {
+      setCommandStore('statusPanel', {
+        header: null,
+        status: null,
+      });
+    };
+
     const onExecuteCommand: MittEventHandler<'execute-command'> = async (
       payload,
     ) => {
@@ -41,12 +54,47 @@ export function CommandCtxProvider({
       ExtensionWorker.instance.executeActionCommand({
         ...payload,
         messagePort: port1,
+        onFinish() {
+          setCommandStore('statusPanel', {
+            header: null,
+            status: null,
+          });
+        },
+        onError(message) {
+          if (!message) {
+            clearPanel();
+            return;
+          }
+
+          updateStatusPanel('status', {
+            type: 'error',
+            title: `Error: ${message}`,
+          });
+          setTimeout(clearPanel, 4000);
+        },
       });
     };
 
+    const offCommandScriptMessageEvent = preloadAPI.main.ipcMessage.on(
+      'command-script:message',
+      (_, detail) => {
+        switch (detail.type) {
+          case 'finish':
+          case 'error': {
+            updateStatusPanel('status', {
+              title: detail.message,
+              type: detail.type === 'error' ? 'error' : 'success',
+            });
+            setTimeout(clearPanel, 4000);
+            break;
+          }
+        }
+      },
+    );
     emitter.on('execute-command', onExecuteCommand);
 
     return () => {
+      offCommandScriptMessageEvent?.();
       emitter.off('execute-command', onExecuteCommand);
     };
   }, []);

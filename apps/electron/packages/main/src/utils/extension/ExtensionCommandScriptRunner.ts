@@ -113,7 +113,9 @@ class ExtensionCommandScriptRunner {
         commandId,
         extensionId,
         type: isSuccess ? 'finish' : 'error',
-        message: isSuccess ? '' : `Process finish with exit code ${code}`,
+        message: isSuccess
+          ? this.runningScripts[scriptId].lastMessage
+          : `Process finish with exit code ${code}`,
       });
 
       delete this.runningScripts[scriptId];

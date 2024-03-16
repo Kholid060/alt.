@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { UiToaster, UiTooltipProvider } from '@repo/ui';
+import { UiButton, UiToaster, UiTooltipProvider } from '@repo/ui';
 import CommandHeader from './components/command/CommandHeader';
 import CommandFooter from './components/command/CommandFooter';
 import CommandContent from './components/command/CommandContent';
@@ -13,6 +13,7 @@ import {
 } from './context/command-route.context';
 import CommandExtensionContent from './components/command/CommandExtensionContent';
 import CommandList from './components/command/CommandList';
+import { GripHorizontalIcon } from 'lucide-react';
 
 const routes = createCommandRoutes([
   {
@@ -41,8 +42,18 @@ function App() {
       <CommandCtxProvider>
         <CommandRouteProvider routes={routes}>
           <div className="p-0.5">
+            {import.meta.env.DEV && (
+              <UiButton
+                size="sm"
+                variant="secondary"
+                className="cursor-move"
+                style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
+              >
+                <GripHorizontalIcon className="h-5 w-5" />
+              </UiButton>
+            )}
             <UiListProvider>
-              <div className="bg-background border rounded-lg w-full">
+              <div className="bg-background border rounded-lg w-full z-10 relative">
                 <CommandHeader />
                 <CommandContent />
               </div>

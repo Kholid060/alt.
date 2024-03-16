@@ -25,6 +25,6 @@ export function sendIpcMessageToWindow(window: BrowserWindow) {
     name: T,
     ...args: IPCSendEvents[T]
   ) => {
-    window.webContents.send(name, args);
+    window.webContents.send(name, ...args);
   };
 }
