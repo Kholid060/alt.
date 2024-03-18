@@ -69,8 +69,10 @@ export function CommandCtxProvider({
           updateStatusPanel('status', {
             type: 'error',
             title: `Error: ${message}`,
+            onClose() {
+              clearPanel();
+            },
           });
-          setTimeout(clearPanel, 4000);
         },
       });
     };
@@ -81,11 +83,15 @@ export function CommandCtxProvider({
         switch (detail.type) {
           case 'finish':
           case 'error': {
+            const isError = detail.type === 'error';
             updateStatusPanel('status', {
-              title: detail.message,
-              type: detail.type === 'error' ? 'error' : 'success',
+              description: detail.message,
+              title: isError ? 'Error!' : 'Script finish running',
+              type: isError ? 'error' : 'success',
+              onClose() {
+                clearPanel();
+              },
             });
-            setTimeout(clearPanel, 4000);
             break;
           }
         }

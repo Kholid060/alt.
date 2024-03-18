@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useCommandStore } from '/@/stores/command.store';
 import { commandIcons } from '#common/utils/command-icons';
 import { Loader2Icon } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 
 function CommandHeaderPanel() {
   const header = useCommandStore((state) => state.statusPanel.header);
@@ -36,7 +38,7 @@ function CommandHeaderPanel() {
           animate={{ y: 0 }}
           exit={{ y: -100 }}
           transition={{ type: 'spring', bounce: 0.2, duration: 0.35 }}
-          className="flex items-center bg-background rounded-md border px-3 text-sm h-9 max-w-[50%]"
+          className="flex items-center bg-background rounded-md border px-3 text-sm h-9 max-w-[50%] min-w-24"
         >
           {headerIcon}
           <p className="leading-tight line-clamp-1">{header.title}</p>
@@ -50,7 +52,10 @@ function CommandHeaderPanel() {
 }
 
 function CommandStatusPanel() {
-  const status = useCommandStore((state) => state.statusPanel.status);
+  const [status, updateStatusPanel] = useCommandStore(
+    useShallow((state) => [state.statusPanel.status, state.updateStatusPanel]),
+  );
+  const statusTimeout = useRef<NodeJS.Timeout | number>(-1);
 
   let indicator: React.ReactNode = null;
   if (status?.type) {
@@ -82,6 +87,22 @@ function CommandStatusPanel() {
     }
   }
 
+  useEffect(() => {
+    const timeout = statusTimeout.current;
+    clearTimeout(timeout);
+
+    if (status) {
+      statusTimeout.current = setTimeout(() => {
+        updateStatusPanel('status', null);
+        status.onClose?.();
+      }, status.timeout || 4000);
+    }
+
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [status, updateStatusPanel]);
+
   return (
     <AnimatePresence>
       {status && (
@@ -90,10 +111,15 @@ function CommandStatusPanel() {
           animate={{ y: 0 }}
           exit={{ y: -100 }}
           transition={{ type: 'spring', bounce: 0.2, duration: 0.35 }}
-          className="flex items-center bg-background rounded-md border px-3 text-sm h-9 max-w-[50%]"
+          className="flex items-center bg-background rounded-md border px-3 text-sm py-1.5 max-w-[50%] min-w-24"
         >
           {indicator}
-          <p className="leading-tight line-clamp-1">{status.title}</p>
+          <div>
+            <p className="leading-tight line-clamp-1">{status.title}</p>
+            <p className="leading-tight line-clamp-1 text-xs text-muted-foreground">
+              {status.description}
+            </p>
+          </div>
         </motion.div>
       )}
     </AnimatePresence>
@@ -102,7 +128,7 @@ function CommandStatusPanel() {
 
 function CommandFooter() {
   return (
-    <div className="flex items-center gap-4 mt-2">
+    <div className="flex items-start gap-4 mt-2">
       <CommandHeaderPanel />
       <div className="flex-grow"></div>
       <CommandStatusPanel />

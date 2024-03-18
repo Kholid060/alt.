@@ -7,11 +7,13 @@ import WindowsManager from '/@/window/WindowsManager';
 import { sendIpcMessageToWindow } from '../ipc-main';
 import { snakeCase } from 'lodash-es';
 import { logger } from '/@/lib/log';
+import { ExtensionError } from '#packages/common/errors/ExtensionError';
 
 const FILE_EXT_COMMAND_MAP: Record<string, string> = {
   '.sh': 'sh',
   '.js': 'node',
   '.py': 'python',
+  '.ps1': 'powershell',
 };
 const ARGS_PREFIX = '__ARGS__';
 
@@ -47,13 +49,13 @@ class ExtensionCommandScriptRunner {
   }) {
     const scriptPath = path.join(getExtensionFolder(extensionId), commandId);
     if (!fs.existsSync(scriptPath)) {
-      throw new Error(`Couldn't find "${commandId}" command`);
+      throw new ExtensionError(`Couldn't find "${commandId}" command`);
     }
 
     const fileExt = path.extname(commandId);
     const fileCommand = FILE_EXT_COMMAND_MAP[fileExt];
     if (!fileCommand) {
-      throw new Error(`"${fileExt}" is not supported`);
+      throw new ExtensionError(`"${fileExt}" is not supported`);
     }
 
     let isCommandExists = this.existedCommandCache.has(fileCommand);

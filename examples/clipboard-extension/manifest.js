@@ -53,9 +53,9 @@ export default {
       type: 'script',
       arguments: [
         {
-        name: 'test',
-        placeholder: 'Test',
-        type: 'input:text'
+          name: 'test',
+          placeholder: 'Test',
+          type: 'input:text'
         }
       ],
     },
@@ -66,9 +66,9 @@ export default {
       type: 'script',
       arguments: [
         {
-        name: 'test',
-        placeholder: 'Test',
-        type: 'input:text'
+          name: 'test',
+          placeholder: 'Test',
+          type: 'input:text'
         }
       ],
     },
@@ -79,12 +79,26 @@ export default {
       type: 'script',
       arguments: [
         {
-        name: 'test',
-        placeholder: 'Test',
-        type: 'input:text'
+          name: 'test',
+          placeholder: 'Test',
+          type: 'input:text'
         }
       ],
-    }
+    },
+    {
+      icon: 'icon:Terminal',
+      name: 'powershell-script.ps1',
+      title: 'Powershell',
+      type: 'script',
+      arguments: [
+        {
+          name: 'test',
+          placeholder: 'Test',
+          type: 'input:text',
+          required: true,
+        }
+      ],
+    },
   ],
   permissions: [
     'fs',

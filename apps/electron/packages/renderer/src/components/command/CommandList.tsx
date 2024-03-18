@@ -2,7 +2,7 @@ import { commandIcons } from '#common/utils/command-icons';
 import { memo, useCallback } from 'react';
 import { CommandStatusPanel, useCommandStore } from '/@/stores/command.store';
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
-import { UiImage, UiListItem, uiListItemsFilter, useToast } from '@repo/ui';
+import { UiImage, UiListItem, uiListItemsFilter } from '@repo/ui';
 import { UiList } from '@repo/ui';
 import {
   CommandListItemCommand,
@@ -53,17 +53,22 @@ function CommandPrefix({
 }
 
 function CommandList() {
-  const [extensions, setCommandStore, addExtension, updateExtension] =
-    useCommandStore(
-      useShallow((state) => [
-        state.extensions,
-        state.setState,
-        state.addExtension,
-        state.updateExtension,
-      ]),
-    );
+  const [
+    extensions,
+    setCommandStore,
+    addExtension,
+    updateExtension,
+    updateStatusPanel,
+  ] = useCommandStore(
+    useShallow((state) => [
+      state.extensions,
+      state.setState,
+      state.addExtension,
+      state.updateExtension,
+      state.updateStatusPanel,
+    ]),
+  );
 
-  const { toast } = useToast();
   const uiListStore = useUiListStore();
   const navigate = useCommandNavigate();
 
@@ -114,12 +119,10 @@ function CommandList() {
           );
           element?.focus();
 
-          toast({
-            duration: 5000,
-            title: 'Fill out the field',
-            className: 'text-sm max-w-xs p-3 right-2 leading-tight',
-            description:
-              'Fill out the required fill before running the command',
+          updateStatusPanel('status', {
+            type: 'error',
+            timeout: 5000,
+            title: 'Fill out the required fill before running the command',
           });
 
           return;
@@ -149,25 +152,44 @@ function CommandList() {
           : `${CUSTOM_SCHEME.extension}://${extension.id}/icon/${command.icon}`,
     };
 
-    setCommandStore('statusPanel', {
-      status: null,
-      header: commandHeader,
-    });
-
     if (command.type === 'view') {
+      setCommandStore('statusPanel', {
+        status: null,
+        header: commandHeader,
+      });
       navigate(`/extensions/${extension.id}/${command.name}/view`, {
         data: args,
       });
       return;
     } else if (command.type === 'script') {
-      preloadAPI.main.invokeIpcMessage('extension:run-script-command', {
-        args,
-        commandId: command.name,
-        extensionId: extension.id,
-      });
+      preloadAPI.main
+        .invokeIpcMessage('extension:run-script-command', {
+          args,
+          commandId: command.name,
+          extensionId: extension.id,
+        })
+        .then((result) => {
+          if ('$isError' in result) {
+            updateStatusPanel('status', {
+              type: 'error',
+              title: 'Error!',
+              description: result.message,
+            });
+            return;
+          }
+
+          setCommandStore('statusPanel', {
+            status: null,
+            header: commandHeader,
+          });
+        });
       return;
     }
 
+    setCommandStore('statusPanel', {
+      status: null,
+      header: commandHeader,
+    });
     emitter.emit('execute-command', {
       args,
       commandId: command.name,
@@ -216,7 +238,8 @@ function CommandList() {
                   if (!result) return;
 
                   if ('$isError' in result) {
-                    toast({
+                    updateStatusPanel('status', {
+                      type: 'error',
                       title: 'Error!',
                       description: result.message,
                     });
@@ -287,7 +310,8 @@ function CommandList() {
         if (!result) return;
 
         if ('$isError' in result) {
-          toast({
+          updateStatusPanel('status', {
+            type: 'error',
             title: 'Error!',
             description: result.message,
           });

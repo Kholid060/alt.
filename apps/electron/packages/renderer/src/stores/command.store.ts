@@ -21,6 +21,9 @@ export interface CommandStatusPanel {
   } | null;
   status: {
     title: string;
+    timeout?: number;
+    onClose?: () => void;
+    description?: string;
     type: 'loading' | 'error' | 'success';
   } | null;
 }

@@ -26,8 +26,8 @@ onIpcMessage('extension:run-script-command', async (_, detail) => {
     };
   } catch (error) {
     return {
-      success: false,
-      errorMessage: (error as Error).message,
+      $isError: true,
+      message: (error as Error).message,
     };
   }
 });
