@@ -147,13 +147,16 @@ export function UiListProvider({ children }: { children: React.ReactNode }) {
             const target = event.target as HTMLInputElement;
             const toLeft = event.key === 'ArrowLeft';
             const { id, actionIndex, actions } = state.current.selectedItem;
+            const isInTextField = target
+              ? !TEXT_FIELD_TAGS.includes(target.tagName) ||
+                target.selectionStart !== target.selectionEnd ||
+                target.selectionStart !== target.value.length
+              : false;
 
             if (
               !id ||
               actions.length <= 0 ||
-              !TEXT_FIELD_TAGS.includes(target.tagName) ||
-              target.selectionStart !== target.selectionEnd ||
-              target.selectionStart !== target.value.length ||
+              isInTextField ||
               (toLeft && actionIndex <= -1) ||
               (!toLeft && actionIndex >= actions.length - 1)
             )

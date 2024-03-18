@@ -9,10 +9,13 @@ declare namespace ExtensionAPI.clipboard {
   export type ClipboardContentType = 'html' | 'text' | 'image' | 'rtf';
 
   export function read(format: ClipboardContentType): Promise<string>;
+
   export function write(
     format: ClipboardContentType,
     value: string,
   ): Promise<void>;
+
+  export function paste(value: any): Promise<void>;
 }
 
 declare namespace ExtensionAPI.shell {

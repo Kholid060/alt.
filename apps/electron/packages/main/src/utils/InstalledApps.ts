@@ -242,7 +242,9 @@ class InstalledApps {
     const target = this.appTarget.get(appId);
     if (!target) throw new Error("Can't find app");
 
-    return shell.openExternal(target);
+    return shell.openExternal(target, {
+      workingDirectory: app.getPath('desktop'),
+    });
   }
 }
 

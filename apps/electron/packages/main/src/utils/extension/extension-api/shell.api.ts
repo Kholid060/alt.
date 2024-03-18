@@ -3,6 +3,7 @@ import InstalledApps from '../../InstalledApps';
 import { onExtensionIPCEvent } from '../extension-api-event';
 import { logger } from '/@/lib/log';
 import { shell } from 'electron';
+import { ExtensionError } from '#packages/common/errors/ExtensionError';
 
 onExtensionIPCEvent('shell.installedApps.query', async (_, query) => {
   const apps = await InstalledApps.instance.getList();
@@ -46,6 +47,16 @@ onExtensionIPCEvent('shell.moveToTrash', async (_, itemPath) => {
 
 onExtensionIPCEvent('shell.showItemInFolder', (_, itemPath) => {
   shell.showItemInFolder(itemPath);
+
+  return Promise.resolve();
+});
+
+onExtensionIPCEvent('shell.openURL', (_, url) => {
+  if (!url.startsWith('http')) {
+    throw new ExtensionError('Invalid URL');
+  }
+
+  shell.openExternal(url);
 
   return Promise.resolve();
 });

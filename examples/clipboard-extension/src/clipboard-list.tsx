@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { ChangeEvent, useEffect, useState } from 'react';
-import { UiList, commandRenderer, Extension, UiImage, UiInput } from '@repo/extension';
+import { UiList, commandRenderer, Extension, UiImage, UiInput, UiListItem, UiExtIcon } from '@repo/extension';
 
 function CommandMain() {
   const [apps, setApps] = useState<Extension.shell.installedApps.AppDetail[]>([]);
@@ -17,28 +17,28 @@ function CommandMain() {
     });
   }, []);
 
-  const items = apps.map((app) => ({
+  const items: UiListItem[] = apps.map((app) => ({
     title: app.name,
     value: app.appId,
+    onSelected() {
+      _extension.shell.installedApps.launch(app.appId);
+    },
+    actions: [
+      {
+        icon: UiExtIcon.Clipboard,
+        title: 'Paste',
+        value: 'paste',
+        onAction() {
+          _extension.clipboard.paste(app.name);
+        },
+      }
+    ],
     icon: <UiImage src={_extension.shell.installedApps.getIconURL(app.appId)} style={{ height: '100%', width: '100%' }} />
   }));
-  
-  async function onInputFileChange(event: React.ChangeEvent<HTMLInputElement>) {
-    try {
-      const file = event.target.files[0];
-      const fileExists = await _extension.fs.exists(file.path);
-      console.log({ fileExists });
-
-      const data = await _extension.fs.readFile(file.path);
-      console.log('READ', data);
-    } catch (error) {
-      console.error(error);
-    }
-  }
 
   return (
-    <div className="p-4">
-      <UiInput type="file" onChange={onInputFileChange} />
+    <div className="p-2">
+      <UiList items={items} />
     </div>
   );
 }

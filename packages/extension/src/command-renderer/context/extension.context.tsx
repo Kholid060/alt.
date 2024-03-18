@@ -21,9 +21,7 @@ export function ExtensionProvider({
 }: {
   children: React.ReactNode;
   value?: string;
-  messagePort: AMessagePort<
-    ExtensionMessagePortEvent
-  >;
+  messagePort: AMessagePort<ExtensionMessagePortEvent>;
 }) {
   const listStore = useUiListStore();
 

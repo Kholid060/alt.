@@ -5,16 +5,13 @@ import dts from 'vite-plugin-dts';
 
 const entries = {
   ...Object.fromEntries(
-    globbySync(['src/**/*.{tsx,ts}']).map(
-      (file) => [
-        file.substring('/src'.length, file.length).replace(extname(file), ''),
-        file,
-      ],
-    ),
+    globbySync(['src/**/*.{tsx,ts}']).map((file) => [
+      file.substring('/src'.length, file.length).replace(extname(file), ''),
+      file,
+    ]),
   ),
   index: './src/index.ts',
 };
-
 
 export default defineConfig({
   mode: process.env.MODE ?? 'production',

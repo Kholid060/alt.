@@ -38,7 +38,7 @@ function CommandHeaderPanel() {
           animate={{ y: 0 }}
           exit={{ y: -100 }}
           transition={{ type: 'spring', bounce: 0.2, duration: 0.35 }}
-          className="flex items-center bg-background rounded-md border px-3 text-sm h-9 max-w-[50%] min-w-24"
+          className="flex items-center bg-background rounded-md border px-3 text-sm h-9 min-w-24"
         >
           {headerIcon}
           <p className="leading-tight line-clamp-1">{header.title}</p>
@@ -111,7 +111,7 @@ function CommandStatusPanel() {
           animate={{ y: 0 }}
           exit={{ y: -100 }}
           transition={{ type: 'spring', bounce: 0.2, duration: 0.35 }}
-          className="flex items-center bg-background rounded-md border px-3 text-sm py-1.5 max-w-[50%] min-w-24"
+          className="flex items-center bg-background rounded-md border px-3 text-sm py-1.5 min-w-24"
         >
           {indicator}
           <div>

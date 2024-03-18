@@ -103,6 +103,7 @@ export default {
   permissions: [
     'fs',
     'shell',
-    'storage'
+    'storage',
+    'clipboard',
   ],
 }

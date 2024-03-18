@@ -3,14 +3,14 @@ import {
   UiListSelectedItem,
   useUiListStore,
 } from '@repo/ui/dist/context/list.context';
-import { ChevronDownIcon, SearchIcon } from 'lucide-react';
+import { ArrowLeftIcon, ChevronDownIcon, SearchIcon } from 'lucide-react';
 import { forwardRef, useRef, useEffect, useCallback } from 'react';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
 import { mergeRefs } from '/@/utils/helper';
 import { ExtensionCommandArgument } from '@repo/extension-core';
 import { useCommandStore } from '/@/stores/command.store';
 import { CommandListItems } from '/@/interface/command.interface';
-import { useCommandNavigate } from '/@/hooks/useCommandRoute';
+import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
 
 const CommandInputArguments = forwardRef<
   HTMLDivElement,
@@ -77,6 +77,7 @@ const CommandInputArguments = forwardRef<
                   }}
                   onChange={(event) => {
                     setCommandArgs({
+                      commandId: selectedCommand.command.name,
                       args: { [argument.name]: event.target.value },
                     });
                   }}
@@ -110,6 +111,7 @@ const CommandInputArguments = forwardRef<
                 onChange={(event) => {
                   const target = event.target as HTMLInputElement;
                   setCommandArgs({
+                    commandId: selectedCommand.command.name,
                     args: {
                       [argument.name]:
                         type === 'number' ? target.valueAsNumber : target.value,
@@ -128,6 +130,7 @@ const CommandInputArguments = forwardRef<
                   onFocus={() => onArgFieldFocus?.(argument.name)}
                   onCheckedChange={(checked) => {
                     setCommandArgs({
+                      commandId: selectedCommand.command.name,
                       args: { [argument.name]: checked },
                     });
                   }}
@@ -181,15 +184,40 @@ CommandInputTextField.displayName = 'CommandInputTextField';
 const commandKeys = new Set([
   'n',
   'j',
-  'ArrowDown',
   'p',
   'k',
-  'ArrowUp',
-  'Home',
   'End',
+  'Home',
   'Enter',
   'Escape',
+  'ArrowUp',
+  'ArrowDown',
+  'ArrowLeft',
+  'ArrowRight',
 ]);
+
+function CommandInputIcon({ onNavigateBack }: { onNavigateBack?: () => void }) {
+  const currentRoute = useCommandRoute((state) => state.currentRoute);
+
+  const isCanNavigateBack = currentRoute?.name === 'extension-command-view';
+
+  return (
+    <button
+      disabled={!isCanNavigateBack}
+      className="h-8 w-8 inline-flex items-center justify-center mr-2 text-muted-foreground flex-shrink-0"
+      onKeyDown={(event) => {
+        event.stopPropagation();
+      }}
+      onClick={onNavigateBack}
+    >
+      {isCanNavigateBack ? (
+        <ArrowLeftIcon className="h-5 w-5" />
+      ) : (
+        <SearchIcon className="h-5 w-5 text-muted-foreground opacity-75" />
+      )}
+    </button>
+  );
+}
 
 function CommandInput() {
   const navigate = useCommandNavigate();
@@ -303,9 +331,7 @@ function CommandInput() {
       tabIndex={-1}
       onKeyDown={onKeyDown}
     >
-      <span className="h-8 w-8 inline-flex items-center justify-center mr-2 flex-shrink-0">
-        <SearchIcon className="h-5 w-5 text-muted-foreground opacity-75" />
-      </span>
+      <CommandInputIcon onNavigateBack={navigateBack} />
       <div className="flex-grow relative h-full">
         <CommandInputTextField
           ref={inputRef}

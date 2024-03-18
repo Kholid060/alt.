@@ -11,7 +11,9 @@
     "dev": "cliaa build --watch"
   },
   "devDependencies": {
-    "@repo/extension": "workspace:*"
+    "@repo/extension": "workspace:*",
+    "@types/react": "^18.2.66",
+    "typescript": "^5.4.2"
   },
   "dependencies": {
     "dayjs": "^1.11.10",

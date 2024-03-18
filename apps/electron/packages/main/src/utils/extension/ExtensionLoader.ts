@@ -38,17 +38,21 @@ async function extractExtManifest(manifestPath: string) {
   }
 
   // Check commands file
-  const commands = manifest.data.commands.filter((command) =>
-    fs.existsSync(path.join(extDir, `${command.name}.js`)),
-  );
-  if (commands.length === 0) {
-    validatorLogger('error', `${extDirname}: commands empty`);
-    return null;
-  }
+  const commands = manifest.data.commands.filter((command) => {
+    let filename = `${command.name}.js`;
+    if (command.type === 'script') {
+      filename = command.name;
+    }
+
+    return fs.existsSync(path.join(extDir, filename));
+  });
 
   return {
     id: extDirname,
-    manifest: manifest.data,
+    manifest: {
+      ...manifest.data,
+      commands,
+    },
   };
 }
 

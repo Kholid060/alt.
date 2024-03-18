@@ -2,7 +2,9 @@ import { ExtensionError } from '#packages/common/errors/ExtensionError';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import type { NativeImage } from 'electron';
 import { clipboard, nativeImage } from 'electron';
+import { keyboard, Key } from '@nut-tree/nut-js';
 import { onExtensionIPCEvent } from '../extension-api-event';
+import WindowsManager from '/@/window/WindowsManager';
 
 onExtensionIPCEvent('clipboard.read', async (_, format) => {
   switch (format) {
@@ -36,4 +38,21 @@ onExtensionIPCEvent('clipboard.write', async (_, format, value) => {
   clipboard.write({
     [format]: clipboardVal,
   });
+});
+
+onExtensionIPCEvent('clipboard.paste', async (_, value) => {
+  const content = typeof value === 'string' ? value : JSON.stringify(value);
+  clipboard.writeText(content);
+
+  const commandWindow = WindowsManager.instance.getWindow('command');
+  commandWindow.blur();
+
+  const keys = [
+    process.platform === 'darwin' ? Key.LeftCmd : Key.LeftControl,
+    Key.V,
+  ];
+  await keyboard.pressKey(...keys);
+  await keyboard.releaseKey(...keys);
+
+  commandWindow.focus();
 });
