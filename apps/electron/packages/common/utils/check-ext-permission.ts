@@ -14,6 +14,7 @@ export const API_PERMISSION_MAP: [
 ][] = [
   ['fs', ['fs']],
   ['shell', ['shell']],
+  ['sqlite', ['sqlite']],
   ['storage', ['storage']],
   ['clipboard', ['clipboard']],
   ['fs.exists', ['fs', 'fs.read']],

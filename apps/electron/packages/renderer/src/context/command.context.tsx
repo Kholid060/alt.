@@ -68,7 +68,8 @@ export function CommandCtxProvider({
 
           updateStatusPanel('status', {
             type: 'error',
-            title: `Error: ${message}`,
+            title: 'Error!',
+            description: message,
             onClose() {
               clearPanel();
             },

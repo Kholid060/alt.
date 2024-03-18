@@ -49,6 +49,18 @@ declare namespace ExtensionAPI.shell.installedApps {
   export function getIconURL(appId: string): string;
 }
 
+declare namespace ExtensionAPI.sqlite {
+  interface QueryOptions {
+    selectAll: boolean;
+  }
+
+  export function query<T = any>(
+    sqlQuery: string,
+    params?: unknown[],
+    options?: Partial<QueryOptions>,
+  ): Promise<T>;
+}
+
 declare namespace ExtensionAPI.fs {
   interface WriteOptions {
     encoding: string;
