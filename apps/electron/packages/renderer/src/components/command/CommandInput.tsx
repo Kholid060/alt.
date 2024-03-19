@@ -11,6 +11,7 @@ import { ExtensionCommandArgument } from '@repo/extension-core';
 import { useCommandStore } from '/@/stores/command.store';
 import { CommandListItems } from '/@/interface/command.interface';
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
+import { useCommandPanelStore } from '/@/stores/command-panel.store';
 
 const CommandInputArguments = forwardRef<
   HTMLDivElement,
@@ -225,7 +226,7 @@ function CommandInput() {
   const commandCtx = useCommandCtx();
   const uiListStore = useUiListStore();
 
-  const setCommandStore = useCommandStore((state) => state.setState);
+  const clearPanel = useCommandPanelStore.use.clearAll();
 
   const spanRef = useRef<HTMLSpanElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -271,10 +272,7 @@ function CommandInput() {
     argumentContainerRef.current.style.translate = `${translateX}px 0px`;
   }
   function navigateBack() {
-    setCommandStore('statusPanel', {
-      header: null,
-      status: null,
-    });
+    clearPanel();
     navigate('');
   }
   function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {

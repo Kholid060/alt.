@@ -27,3 +27,5 @@ export const IPC_ON_EVENT = {
 export const IPC_POST_MESSAGE_EVENT = {
   extensionPortCreated: 'extension-port-created',
 } as const;
+
+export const APP_DEEP_LINK = 'app-app';

@@ -36,6 +36,8 @@ class WindowsManager {
     }
 
     window.focus();
+
+    return window;
   }
 
   async createWindow(name: keyof Windows) {

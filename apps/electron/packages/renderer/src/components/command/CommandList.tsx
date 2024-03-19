@@ -1,7 +1,7 @@
 import { commandIcons } from '#common/utils/command-icons';
 import { memo, useCallback } from 'react';
-import { CommandStatusPanel, useCommandStore } from '/@/stores/command.store';
-import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
+import { useCommandStore } from '/@/stores/command.store';
+import { APP_DEEP_LINK, CUSTOM_SCHEME } from '#common/utils/constant/constant';
 import { UiImage, UiListItem, uiListItemsFilter } from '@repo/ui';
 import { UiList } from '@repo/ui';
 import {
@@ -12,11 +12,11 @@ import {
 } from '/@/interface/command.interface';
 import { useUiListStore } from '@repo/ui/dist/context/list.context';
 import { ExtensionCommand } from '@repo/extension-core';
-import emitter from '/@/lib/mitt';
-import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import preloadAPI from '/@/utils/preloadAPI';
-import { BlocksIcon, RotateCcwIcon } from 'lucide-react';
+import { BlocksIcon, LinkIcon, RotateCcwIcon } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
+import { useCommandPanelStore } from '/@/stores/command-panel.store';
+import { useCommand } from '/@/hooks/useCommand';
 
 type CommandIconName = keyof typeof commandIcons;
 
@@ -53,24 +53,18 @@ function CommandPrefix({
 }
 
 function CommandList() {
-  const [
-    extensions,
-    setCommandStore,
-    addExtension,
-    updateExtension,
-    updateStatusPanel,
-  ] = useCommandStore(
+  const [extensions, addExtension, updateExtension] = useCommandStore(
     useShallow((state) => [
       state.extensions,
-      state.setState,
       state.addExtension,
       state.updateExtension,
-      state.updateStatusPanel,
     ]),
   );
 
+  const addPanelStatus = useCommandPanelStore.use.addStatus();
+
   const uiListStore = useUiListStore();
-  const navigate = useCommandNavigate();
+  const { executeCommand } = useCommand();
 
   const customListFilter = useCallback((items: UiListItem[], query: string) => {
     let cleanedQuery = query;
@@ -96,12 +90,12 @@ function CommandList() {
       .map((item) => ({ ...item, group: 'Search results' }));
   }, []);
 
-  function executeCommand({
+  function startExecuteCommand({
     command,
     extension,
   }: {
-    extension: { id: string; name: string };
     command: ExtensionCommand;
+    extension: { id: string; name: string };
   }) {
     const args: Record<string, unknown> = {};
     const commandStore = useCommandStore.getState();
@@ -119,9 +113,10 @@ function CommandList() {
           );
           element?.focus();
 
-          updateStatusPanel('status', {
+          addPanelStatus({
             type: 'error',
             timeout: 5000,
+            name: 'command-missing-args',
             title: 'Fill out the required fill before running the command',
           });
 
@@ -142,58 +137,11 @@ function CommandList() {
       );
     }
 
-    const commandHeader: CommandStatusPanel['header'] = {
-      title: command.title,
-      subtitle: extension.name,
-      icon: !command.icon
-        ? undefined
-        : command.icon.startsWith(iconPrefix)
-          ? command.icon
-          : `${CUSTOM_SCHEME.extension}://${extension.id}/icon/${command.icon}`,
-    };
-
-    if (command.type === 'view') {
-      setCommandStore('statusPanel', {
-        status: null,
-        header: commandHeader,
-      });
-      navigate(`/extensions/${extension.id}/${command.name}/view`, {
-        data: args,
-      });
-      return;
-    } else if (command.type === 'script') {
-      preloadAPI.main
-        .invokeIpcMessage('extension:run-script-command', {
-          args,
-          commandId: command.name,
-          extensionId: extension.id,
-        })
-        .then((result) => {
-          if ('$isError' in result) {
-            updateStatusPanel('status', {
-              type: 'error',
-              title: 'Error!',
-              description: result.message,
-            });
-            return;
-          }
-
-          setCommandStore('statusPanel', {
-            status: null,
-            header: commandHeader,
-          });
-        });
-      return;
-    }
-
-    setCommandStore('statusPanel', {
-      status: null,
-      header: commandHeader,
-    });
-    emitter.emit('execute-command', {
+    executeCommand({
       args,
-      commandId: command.name,
+      command,
       extensionId: extension.id,
+      extensionName: extension.name,
     });
   }
 
@@ -238,7 +186,7 @@ function CommandList() {
                   if (!result) return;
 
                   if ('$isError' in result) {
-                    updateStatusPanel('status', {
+                    addPanelStatus({
                       type: 'error',
                       title: 'Error!',
                       description: result.message,
@@ -270,7 +218,7 @@ function CommandList() {
         },
         value: `command:${extension.id}:${command.name}`,
         onSelected: () =>
-          executeCommand({
+          startExecuteCommand({
             command,
             extension: { id: extension.id, name: extension.manifest.title },
           }),
@@ -290,6 +238,28 @@ function CommandList() {
         ) : (
           extensionIcon
         ),
+        actions: [
+          {
+            onAction() {
+              preloadAPI.main
+                .invokeIpcMessage(
+                  'clipboard:copy',
+                  `${APP_DEEP_LINK}://extensions/${extension.id}/${command.name}`,
+                )
+                .then((value) => {
+                  if (value && '$isError' in value) return;
+
+                  addPanelStatus({
+                    type: 'success',
+                    title: 'Copied to clipboard',
+                  });
+                });
+            },
+            icon: LinkIcon,
+            title: 'Copy Deep Link',
+            value: 'copy-deeplink',
+          },
+        ],
         group: 'Commands',
         title: command.title,
         keywords: [extension.manifest.title],
@@ -310,7 +280,7 @@ function CommandList() {
         if (!result) return;
 
         if ('$isError' in result) {
-          updateStatusPanel('status', {
+          addPanelStatus({
             type: 'error',
             title: 'Error!',
             description: result.message,

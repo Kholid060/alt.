@@ -1,6 +1,7 @@
 import type { FlatActionExtensionAPI } from '@repo/extension-core/dist/flat-extension-api';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import type { ExtensionData } from './extension.interface';
+import type { ExtensionCommand } from '@repo/extension-core';
 
 export type IPCUserExtensionEventsMap = FlatActionExtensionAPI;
 
@@ -67,6 +68,14 @@ export interface IPCSendEvents {
       commandId: string;
       extensionId: string;
       type: 'error' | 'message' | 'start' | 'finish';
+    },
+  ];
+  'command:execute': [
+    {
+      extensionId: string;
+      extensionName: string;
+      command: ExtensionCommand;
+      args: Record<string, unknown>;
     },
   ];
 }

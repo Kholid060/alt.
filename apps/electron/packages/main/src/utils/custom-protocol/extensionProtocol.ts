@@ -2,7 +2,9 @@ import { createErrorResponse, type CustomProtocol } from './index';
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
 import { net } from 'electron';
 import { fileURLToPath } from 'url';
-import { getExtensionFolder } from '../extension/ExtensionLoader';
+import ExtensionLoader, {
+  getExtensionFolder,
+} from '../extension/ExtensionLoader';
 
 const extensionFilePath = fileURLToPath(
   new URL('./../../extension/dist/', import.meta.url),
@@ -67,9 +69,8 @@ const appIconProtocol: CustomProtocol = {
       .split('/');
 
     switch (type) {
-      case 'icon': {
-        return net.fetch(`${getExtensionFolder(extId)}/icon/${paths[0]}.png`);
-      }
+      case 'icon':
+        return net.fetch(ExtensionLoader.instance.getIconPath(extId, paths[0]));
       case 'command':
         return handleCommandPath(extId, ...paths);
       case '@preload':

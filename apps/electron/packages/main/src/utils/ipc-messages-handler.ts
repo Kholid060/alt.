@@ -1,7 +1,7 @@
 import InstalledApps from './InstalledApps';
 import ExtensionLoader from './extension/ExtensionLoader';
 import './ipc-extension-messages';
-import { dialog } from 'electron';
+import { clipboard, dialog } from 'electron';
 import { extensionImport } from './extension/extensionImport';
 import ExtensionCommandScriptRunner from './extension/ExtensionCommandScriptRunner';
 import { onIpcMessage } from './ipc-main';
@@ -36,4 +36,10 @@ onIpcMessage('apps:get-list', () => InstalledApps.instance.getList());
 
 onIpcMessage('dialog:open', (_, options) => {
   return dialog.showOpenDialog(options);
+});
+
+onIpcMessage('clipboard:copy', (_, content) => {
+  clipboard.writeText(content);
+
+  return Promise.resolve();
 });

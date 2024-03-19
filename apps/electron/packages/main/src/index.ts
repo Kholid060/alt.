@@ -8,6 +8,9 @@ import {
   registerCustomProtocolsPrivileged,
 } from './utils/custom-protocol';
 import WindowsManager from './window/WindowsManager';
+import { APP_DEEP_LINK } from '#packages/common/utils/constant/constant';
+import path from 'node:path';
+import deepLinkHandler from './utils/deepLinkHandler';
 
 Menu.setApplicationMenu(null);
 registerCustomProtocolsPrivileged();
@@ -21,10 +24,27 @@ const isSingleInstance = app.requestSingleInstanceLock();
 if (!isSingleInstance) {
   app.quit();
   process.exit(0);
+} else {
+  // Register deep link
+  if (process.defaultApp) {
+    if (process.argv.length >= 2) {
+      app.setAsDefaultProtocolClient(APP_DEEP_LINK, process.execPath, [
+        path.resolve(process.argv[2]),
+      ]);
+    }
+  } else {
+    app.setAsDefaultProtocolClient(APP_DEEP_LINK, process.execPath);
+  }
 }
-app.on('second-instance', () =>
-  WindowsManager.instance.restoreOrCreateWindow('command'),
-);
+
+app.on('second-instance', (_event, commandLine) => {
+  const deepLink = commandLine ? commandLine.pop() : null;
+  if (!deepLink || !deepLink.startsWith(APP_DEEP_LINK)) {
+    return;
+  }
+
+  deepLinkHandler(deepLink);
+});
 
 /**
  * Disable Hardware Acceleration to save more system resources.

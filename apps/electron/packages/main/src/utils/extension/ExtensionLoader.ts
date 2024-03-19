@@ -128,6 +128,10 @@ class ExtensionLoader {
     return [...this._extensions.values()];
   }
 
+  getIconPath(extensionId: string, iconName: string) {
+    return `${getExtensionFolder(extensionId)}/icon/${iconName}.png`;
+  }
+
   async reloadExtension(extId: string) {
     const extPath = store.get<string, string>(
       `localExtensions.${extId}.path`,

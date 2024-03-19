@@ -1,13 +1,11 @@
 import { UiImage } from '@repo/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useCommandStore } from '/@/stores/command.store';
 import { commandIcons } from '#common/utils/command-icons';
 import { Loader2Icon } from 'lucide-react';
-import { useEffect, useRef } from 'react';
-import { useShallow } from 'zustand/react/shallow';
+import { useCommandPanelStore } from '/@/stores/command-panel.store';
 
 function CommandHeaderPanel() {
-  const header = useCommandStore((state) => state.statusPanel.header);
+  const header = useCommandPanelStore((state) => state.header);
 
   let headerIcon: React.ReactNode = null;
   if (header?.icon) {
@@ -52,10 +50,7 @@ function CommandHeaderPanel() {
 }
 
 function CommandStatusPanel() {
-  const [status, updateStatusPanel] = useCommandStore(
-    useShallow((state) => [state.statusPanel.status, state.updateStatusPanel]),
-  );
-  const statusTimeout = useRef<NodeJS.Timeout | number>(-1);
+  const status = useCommandPanelStore((state) => state.status.at(-1));
 
   let indicator: React.ReactNode = null;
   if (status?.type) {
@@ -86,22 +81,6 @@ function CommandStatusPanel() {
         break;
     }
   }
-
-  useEffect(() => {
-    const timeout = statusTimeout.current;
-    clearTimeout(timeout);
-
-    if (status) {
-      statusTimeout.current = setTimeout(() => {
-        updateStatusPanel('status', null);
-        status.onClose?.();
-      }, status.timeout || 4000);
-    }
-
-    return () => {
-      clearTimeout(timeout);
-    };
-  }, [status, updateStatusPanel]);
 
   return (
     <AnimatePresence>

@@ -14,6 +14,7 @@ import {
 import CommandExtensionContent from './components/command/CommandExtensionContent';
 import CommandList from './components/command/CommandList';
 import { GripHorizontalIcon } from 'lucide-react';
+import CommandEventListener from './components/command/CommandEventListener';
 
 const routes = createCommandRoutes([
   {
@@ -61,6 +62,7 @@ function App() {
             <CommandFooter />
             <UiToaster viewportClass="right-0 bottom-0 pointer-events-none items-end" />
           </div>
+          <CommandEventListener />
         </CommandRouteProvider>
       </CommandCtxProvider>
     </UiTooltipProvider>

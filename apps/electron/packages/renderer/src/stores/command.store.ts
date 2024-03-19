@@ -13,26 +13,10 @@ interface ExtensionCommandArgs {
   args: Record<string, unknown>;
 }
 
-export interface CommandStatusPanel {
-  header: {
-    icon?: string;
-    title: string;
-    subtitle?: string;
-  } | null;
-  status: {
-    title: string;
-    timeout?: number;
-    onClose?: () => void;
-    description?: string;
-    type: 'loading' | 'error' | 'success';
-  } | null;
-}
-
 interface CommandStoreState {
   query: string;
   actions: CommandActions[];
   extensions: ExtensionData[];
-  statusPanel: CommandStatusPanel;
   commandArgs: ExtensionCommandArgs;
   breadcrumbs: CommandRouteBreadcrumb[];
 }
@@ -45,10 +29,6 @@ interface CommandStoreActions {
   ) => void;
   addExtension: (data: ExtensionData) => void;
   updateExtension: (id: string, data: Partial<ExtensionData>) => void;
-  updateStatusPanel: <K extends keyof CommandStatusPanel>(
-    key: K,
-    value: CommandStatusPanel[K],
-  ) => void;
   setState: <T extends keyof CommandStoreState>(
     name: T,
     value: CommandStoreState[T],
@@ -60,10 +40,6 @@ const initialState: CommandStoreState = {
   actions: [],
   extensions: [],
   breadcrumbs: [],
-  statusPanel: {
-    header: null,
-    status: null,
-  },
   commandArgs: {
     args: {},
     commandId: '',
@@ -93,11 +69,6 @@ export const useCommandStore = create<CommandStore>()(
           ...data,
           args: { ...currentVal.args, ...(data?.args ?? {}) },
         },
-      });
-    },
-    updateStatusPanel(key, value) {
-      set((state) => {
-        state.statusPanel[key] = value;
       });
     },
     addExtension(data) {

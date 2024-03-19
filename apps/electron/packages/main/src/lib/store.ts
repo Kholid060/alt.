@@ -5,7 +5,7 @@ export interface ElectronStore {
   installedApps: {
     fetchedAt: string | null;
     appsTarget: Record<string, string>;
-    list: ExtensionAPI.installedApps.AppDetail[];
+    list: ExtensionAPI.shell.installedApps.AppDetail[];
   };
   localExtensions: Record<
     string,
@@ -14,9 +14,11 @@ export interface ElectronStore {
       path: string;
     }
   >;
+  bypassCommands: string[];
 }
 
 export const store = new Store<ElectronStore>({
+  encryptionKey: Buffer.from(import.meta.env.VITE_STORE_KEY),
   schema: {
     localExtensions: {
       type: 'object',
@@ -34,6 +36,13 @@ export const store = new Store<ElectronStore>({
           required: ['path', 'id'],
           additionalProperties: false,
         },
+      },
+    },
+    bypassCommands: {
+      type: 'array',
+      items: {
+        type: 'string',
+        minLength: 1,
       },
     },
     installedApps: {
