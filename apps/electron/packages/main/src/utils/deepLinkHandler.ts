@@ -8,6 +8,7 @@ import { parseJSON } from '@repo/shared';
 import { sendIpcMessageToWindow } from './ipc-main';
 import ExtensionCommandScriptRunner from './extension/ExtensionCommandScriptRunner';
 import { store } from '../lib/store';
+import { CommandLaunchBy } from '@repo/extension';
 
 function convertArgValue(argument: ExtensionCommandArgument, value: string) {
   let convertedValue: unknown = value;
@@ -115,7 +116,10 @@ async function deepLinkHandler(deepLink: string) {
     if (command.type === 'script') {
       await ExtensionCommandScriptRunner.instance.runScript({
         extensionId,
-        args: commandArgs,
+        launchContext: {
+          args: commandArgs,
+          launchBy: CommandLaunchBy.DEEP_LINK,
+        },
         commandId: commandName,
       });
       return;
@@ -124,7 +128,10 @@ async function deepLinkHandler(deepLink: string) {
     sendIpcMessageToWindow(commandWindow)('command:execute', {
       command,
       extensionId,
-      args: commandArgs,
+      launchContext: {
+        args: commandArgs,
+        launchBy: CommandLaunchBy.DEEP_LINK,
+      },
       extensionName: extension.manifest.title,
     });
   } catch (error) {

@@ -7,9 +7,12 @@
 }
 
 @layer base {
+  html {
+    background-color: var(--background);
+  }
   body {
-    color: theme('colors.foreground');
     overflow: hidden;
+    color: theme('colors.foreground');
   }
   * {
     border-color: rgb(var(--border));

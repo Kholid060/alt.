@@ -4,6 +4,7 @@ import { useCommandPanelStore } from '../stores/command-panel.store';
 import emitter from '../lib/mitt';
 import preloadAPI from '../utils/preloadAPI';
 import { useCommandNavigate } from './useCommandRoute';
+import { CommandLaunchContext } from '@repo/extension';
 
 export function useCommand() {
   const setPanelHeader = useCommandPanelStore.use.setHeader();
@@ -13,15 +14,15 @@ export function useCommand() {
   const navigate = useCommandNavigate();
 
   function executeCommand({
-    args,
     command,
     extensionId,
     extensionName,
+    launchContext,
   }: {
-    command: ExtensionCommand;
     extensionId: string;
     extensionName: string;
-    args: Record<string, unknown>;
+    command: ExtensionCommand;
+    launchContext: CommandLaunchContext;
   }) {
     const updatePanelHeader = () => {
       setPanelHeader({
@@ -35,12 +36,12 @@ export function useCommand() {
     if (command.type === 'view') {
       updatePanelHeader();
       navigate(`/extensions/${extensionId}/${command.name}/view`, {
-        data: args,
+        data: launchContext,
       });
     } else if (command.type === 'script') {
       preloadAPI.main
         .invokeIpcMessage('extension:run-script-command', {
-          args,
+          launchContext,
           commandId: command.name,
           extensionId: extensionId,
         })
@@ -59,7 +60,7 @@ export function useCommand() {
     } else {
       updatePanelHeader();
       emitter.emit('execute-command', {
-        args,
+        launchContext,
         commandId: command.name,
         extensionId: extensionId,
       });

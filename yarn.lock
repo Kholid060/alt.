@@ -2919,6 +2919,7 @@ __metadata:
     next-themes: "npm:^0.2.1"
     prettier: "npm:^3.2.5"
     react: "npm:^18.2.0"
+    react-dom: "npm:^18.2.0"
     sonner: "npm:^1.4.3"
     tailwind-merge: "npm:^2.2.1"
     tsup: "npm:^8.0.2"

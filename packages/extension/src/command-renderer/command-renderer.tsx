@@ -3,15 +3,15 @@ import { ExtensionProvider } from './context/extension.context';
 import { AMessagePort } from '@repo/shared';
 import { ExtensionMessagePortEvent } from '@/interfaces/message-events';
 import { UiListProvider } from '@repo/ui/dist/context/list.context';
-import { CommandLaunchProps } from '@/interfaces/command.interface';
+import { CommandLaunchContext } from '@/interfaces/command.interface';
 import { UiTooltipProvider } from '@repo/ui';
 
 export type ExtensionCommandView = (
-  props: CommandLaunchProps,
+  props: CommandLaunchContext,
 ) => React.ReactNode;
 export type ExtensionCommandRenderer = (detail: {
   messagePort: AMessagePort<ExtensionMessagePortEvent>;
-  commandArgs: Record<string, unknown>;
+  context: CommandLaunchContext;
 }) => React.ReactNode;
 
 function commandRenderer(
@@ -19,13 +19,13 @@ function commandRenderer(
 ): ExtensionCommandRenderer {
   const MemoView = React.memo(CommandView);
 
-  return function ExtensionRoot({ messagePort, commandArgs }) {
+  return function ExtensionRoot({ messagePort, context }) {
     return (
       <React.StrictMode>
         <UiListProvider>
           <UiTooltipProvider>
             <ExtensionProvider messagePort={messagePort}>
-              <MemoView args={commandArgs} />
+              <MemoView {...context} />
             </ExtensionProvider>
           </UiTooltipProvider>
         </UiListProvider>

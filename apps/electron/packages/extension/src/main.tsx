@@ -1,8 +1,12 @@
 import extViewRenderer from './utils/extViewRenderer';
 import { AMessagePort } from '@repo/shared';
 import type { ExtensionMessagePortEvent } from '@repo/extension/dist/interfaces/message-events';
+import type { ExtensionCommandViewInitMessage } from '#common/interface/extension.interface';
 
-async function onMessage({ ports, data }: MessageEvent) {
+async function onMessage({
+  ports,
+  data,
+}: MessageEvent<ExtensionCommandViewInitMessage>) {
   try {
     const [port] = ports;
     if (!port) throw new Error('Message port empty');
@@ -12,7 +16,7 @@ async function onMessage({ ports, data }: MessageEvent) {
     const messagePort = new AMessagePort<ExtensionMessagePortEvent>(port);
 
     await extViewRenderer(
-      { commandArgs: data.commandArgs, messagePort },
+      { launchContext: data.launchContext, messagePort },
       data.themeStyle,
     );
   } catch (error) {

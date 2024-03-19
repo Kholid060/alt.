@@ -1,10 +1,11 @@
+import { CommandLaunchContext } from '@repo/extension';
 import mitt from 'mitt';
 
 type MittEvent = {
   'execute-command': {
-    extensionId: string;
     commandId: string;
-    args?: Record<string, unknown>;
+    extensionId: string;
+    launchContext: CommandLaunchContext;
   };
 };
 

@@ -1,9 +1,13 @@
 import { memo, useEffect, useRef } from 'react';
 import { EXTENSION_VIEW } from '#common/utils/constant/constant';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
-import { ExtensionExecutionFinishReason } from '@repo/extension';
-import { useCommandStore } from '/@/stores/command.store';
+import {
+  CommandLaunchContext,
+  ExtensionExecutionFinishReason,
+} from '@repo/extension';
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
+import { useCommandPanelStore } from '/@/stores/command-panel.store';
+import { ExtensionCommandViewInitMessage } from '#common/interface/extension.interface';
 
 function CommandSandboxContent({
   onFinishExecute,
@@ -13,7 +17,7 @@ function CommandSandboxContent({
     message?: string,
   ) => void;
 }) {
-  const setCommandStore = useCommandStore((state) => state.setState);
+  const clearPanelStore = useCommandPanelStore((state) => state.clearAll);
 
   const navigate = useCommandNavigate();
   const activeRoute = useCommandRoute((state) => state.currentRoute);
@@ -30,24 +34,23 @@ function CommandSandboxContent({
     messagePort.addListener('extension:finish-execute', (reason, message) => {
       if (onFinishExecute) return onFinishExecute(reason, message);
 
-      setCommandStore('statusPanel', {
-        header: null,
-        status: null,
-      });
+      clearPanelStore();
       navigate('');
     });
   }
   async function onIframeLoad(
     event: React.SyntheticEvent<HTMLIFrameElement, Event>,
   ) {
+    if (!activeRoute?.data) return;
+
     try {
       const iframe = event.target as HTMLIFrameElement;
       messageChannelRef.current = new MessageChannel();
 
-      const payload = {
+      const payload: ExtensionCommandViewInitMessage = {
         type: 'init',
         themeStyle: '',
-        commandArgs: activeRoute?.data ?? {},
+        launchContext: activeRoute.data as CommandLaunchContext,
       };
 
       payload.themeStyle = (
@@ -72,6 +75,11 @@ function CommandSandboxContent({
       commandCtx.setExtMessagePort(null);
     };
   }, [commandCtx]);
+  useEffect(() => {
+    if (!activeRoute?.data) {
+      navigate('');
+    }
+  }, [activeRoute]);
 
   return (
     <iframe

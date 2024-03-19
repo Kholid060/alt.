@@ -3,6 +3,8 @@ import { ExtensionManifest } from '@repo/extension-core';
 import ExtensionWorkerScript from '/@/workers/extension.worker?worker';
 import preloadAPI from '../preloadAPI';
 import { isObject } from '@repo/shared';
+import { CommandWorkerInitMessage } from '/@/interface/command.interface';
+import { CommandLaunchContext } from '@repo/extension';
 
 const MAX_COMMAND_EXECUTION_MS = 120_000; // 2 mins
 const CREATE_MESSAGE_PORT_TIMEOUT_MS = 5000; // 5 seconds
@@ -53,7 +55,7 @@ class ExtensionWorker {
     extensionId,
     events = {},
     messagePort,
-    commandArgs = {},
+    launchContext,
     timeout = MAX_COMMAND_EXECUTION_MS,
   }: {
     key: string;
@@ -62,7 +64,7 @@ class ExtensionWorker {
     extensionId: string;
     messagePort?: MessagePort;
     manifest: ExtensionManifest;
-    commandArgs?: Record<string, unknown>;
+    launchContext: CommandLaunchContext;
     events?: Partial<{
       onError: (worker: Worker, event: ErrorEvent) => void;
       onFinish: <T = unknown>(worker: Worker, data: T) => void;
@@ -118,7 +120,13 @@ class ExtensionWorker {
       if (messagePort) transfer.push(messagePort);
 
       extensionWorker.postMessage(
-        { type: 'init', manifest, key, commandArgs, workerId },
+        {
+          key,
+          manifest,
+          workerId,
+          type: 'init',
+          launchContext: launchContext,
+        } as CommandWorkerInitMessage,
         { transfer },
       );
 
@@ -135,18 +143,18 @@ class ExtensionWorker {
   }
 
   async executeActionCommand({
-    args,
     onError,
     onFinish,
     commandId,
     messagePort,
     extensionId,
+    launchContext,
   }: {
     commandId: string;
     extensionId: string;
     onFinish?: () => void;
     messagePort?: MessagePort;
-    args?: Record<string, unknown>;
+    launchContext: CommandLaunchContext;
     onError?: (message?: string) => void;
   }) {
     try {
@@ -171,7 +179,7 @@ class ExtensionWorker {
         commandId,
         extensionId,
         messagePort,
-        commandArgs: args,
+        launchContext,
         key: extension.$key,
         manifest: extension.manifest,
         events: {

@@ -1,3 +1,4 @@
+import type { CommandLaunchContext } from '@repo/extension';
 import type {
   EXTENSION_PERMISSIONS,
   ExtensionManifest,
@@ -10,3 +11,9 @@ export interface ExtensionData {
 }
 
 export type ExtensionPermissions = (typeof EXTENSION_PERMISSIONS)[number];
+
+export interface ExtensionCommandViewInitMessage {
+  type: 'init';
+  themeStyle: string;
+  launchContext: CommandLaunchContext;
+}

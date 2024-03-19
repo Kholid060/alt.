@@ -1,4 +1,5 @@
-import { ExtensionCommand } from '@repo/extension-core';
+import { CommandLaunchContext } from '@repo/extension';
+import { ExtensionCommand, ExtensionManifest } from '@repo/extension-core';
 import { UiListItem } from '@repo/ui';
 import { SetRequired } from 'type-fest';
 
@@ -76,3 +77,11 @@ export type CommandListItems =
   | CommandListItemCommand
   | CommandListItemExtension
   | CommandListItemCommandBuiltIn;
+
+export interface CommandWorkerInitMessage {
+  key: string;
+  type: 'init';
+  workerId: string;
+  manifest: ExtensionManifest;
+  launchContext: CommandLaunchContext;
+}

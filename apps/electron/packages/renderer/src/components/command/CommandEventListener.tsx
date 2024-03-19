@@ -16,8 +16,8 @@ function CommandEventListener() {
     ]),
   );
 
-  const { setExtMessagePort } = useCommandCtx();
   const { executeCommand } = useCommand();
+  const { setExtMessagePort } = useCommandCtx();
 
   useEffect(() => {
     const clearPanel = () => {
@@ -78,11 +78,11 @@ function CommandEventListener() {
     );
     const offCommandExecute = preloadAPI.main.ipcMessage.on(
       'command:execute',
-      (_, { command, args, extensionId, extensionName }) => {
+      (_, { command, launchContext, extensionId, extensionName }) => {
         executeCommand({
-          args,
           command,
           extensionId,
+          launchContext,
           extensionName,
         });
       },

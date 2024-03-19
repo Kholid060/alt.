@@ -148,12 +148,12 @@ export class ExtensionAPI {
       );
     }
 
-    const result = await invokeIpcMessage('user-extension', {
+    const result = (await invokeIpcMessage('user-extension', {
       name,
       args,
       key: this.key,
-    });
-    if (typeof result === 'object' && '$isError' in result) {
+    })) as any;
+    if (typeof result === 'object' && result && '$isError' in result) {
       throw new Error(result.message);
     }
 

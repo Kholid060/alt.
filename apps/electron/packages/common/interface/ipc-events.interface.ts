@@ -2,6 +2,7 @@ import type { FlatActionExtensionAPI } from '@repo/extension-core/dist/flat-exte
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import type { ExtensionData } from './extension.interface';
 import type { ExtensionCommand } from '@repo/extension-core';
+import type { CommandLaunchContext } from '@repo/extension';
 
 export type IPCUserExtensionEventsMap = FlatActionExtensionAPI;
 
@@ -29,7 +30,7 @@ export interface IPCExtensionEvents {
   'extension:run-script-command': (detail: {
     commandId: string;
     extensionId: string;
-    args: Record<string, unknown>;
+    launchContext: CommandLaunchContext;
   }) => { success: boolean; errorMessage: string };
   'extension:list': () => ExtensionData[];
   'extension:reload': (extId: string) => ExtensionData | null;
@@ -75,7 +76,7 @@ export interface IPCSendEvents {
       extensionId: string;
       extensionName: string;
       command: ExtensionCommand;
-      args: Record<string, unknown>;
+      launchContext: CommandLaunchContext;
     },
   ];
 }

@@ -8,6 +8,7 @@ import { sendIpcMessageToWindow } from '../ipc-main';
 import { snakeCase } from 'lodash-es';
 import { logger } from '/@/lib/log';
 import { ExtensionError } from '#packages/common/errors/ExtensionError';
+import type { CommandLaunchContext } from '@repo/extension';
 
 const FILE_EXT_COMMAND_MAP: Record<string, string> = {
   '.sh': 'sh',
@@ -39,13 +40,13 @@ class ExtensionCommandScriptRunner {
   }
 
   async runScript({
-    args,
     commandId,
     extensionId,
+    launchContext,
   }: {
     commandId: string;
     extensionId: string;
-    args: Record<string, unknown>;
+    launchContext: CommandLaunchContext;
   }) {
     const scriptPath = path.join(getExtensionFolder(extensionId), commandId);
     if (!fs.existsSync(scriptPath)) {
@@ -71,11 +72,12 @@ class ExtensionCommandScriptRunner {
     const controller = new AbortController();
 
     const env = Object.fromEntries(
-      Object.entries(args).map(([key, value]) => [
+      Object.entries(launchContext.args).map(([key, value]) => [
         `${ARGS_PREFIX}${snakeCase(key)}`.toUpperCase(),
         value,
       ]),
     ) as Record<string, string>;
+    env['__LAUNCH_BY'] = launchContext.launchBy;
 
     const ls = spawn(fileCommand, [scriptPath], {
       env,

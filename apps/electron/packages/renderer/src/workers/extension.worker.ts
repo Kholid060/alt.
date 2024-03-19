@@ -5,10 +5,10 @@ import {
   PRELOAD_API_KEY,
 } from '#common/utils/constant/constant';
 import { ExtensionManifest } from '@repo/extension-core';
+import { CommandWorkerInitMessage } from '../interface/command.interface';
+import { CommandLaunchContext } from '@repo/extension';
 
-type ExtensionCommand = (payload: {
-  args?: Record<string, unknown>;
-}) => void | Promise<void>;
+type ExtensionCommand = (payload: CommandLaunchContext) => void | Promise<void>;
 
 async function loadExtensionCommand() {
   const [extensionId, commandId] = self.name.split(':');
@@ -64,7 +64,10 @@ function initExtensionAPI({
   });
 }
 
-self.onmessage = async ({ ports, data }) => {
+self.onmessage = async ({
+  ports,
+  data,
+}: MessageEvent<CommandWorkerInitMessage>) => {
   try {
     if (!ports.length || data?.type !== 'init' || !data.key || !data.manifest) {
       self.close();
@@ -81,10 +84,10 @@ self.onmessage = async ({ ports, data }) => {
     initExtensionAPI({
       key: data.key,
       port: ports[0],
-      manifest: data.manifest.permissions,
+      manifest: data.manifest,
     });
 
-    await executeCommand({ args: data.commandArgs ?? {} });
+    await executeCommand(data.launchContext);
 
     self.postMessage({ type: 'finish', id: data.workerId });
   } catch (error) {

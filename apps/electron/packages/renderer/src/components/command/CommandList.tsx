@@ -17,6 +17,7 @@ import { BlocksIcon, LinkIcon, RotateCcwIcon } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { useCommand } from '/@/hooks/useCommand';
+import { CommandLaunchBy } from '@repo/extension';
 
 type CommandIconName = keyof typeof commandIcons;
 
@@ -138,7 +139,10 @@ function CommandList() {
     }
 
     executeCommand({
-      args,
+      launchContext: {
+        args,
+        launchBy: CommandLaunchBy.USER,
+      },
       command,
       extensionId: extension.id,
       extensionName: extension.name,
