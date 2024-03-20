@@ -2,7 +2,12 @@ import { commandIcons } from '#common/utils/command-icons';
 import { memo, useCallback } from 'react';
 import { useCommandStore } from '/@/stores/command.store';
 import { APP_DEEP_LINK, CUSTOM_SCHEME } from '#common/utils/constant/constant';
-import { UiImage, UiListItem, uiListItemsFilter } from '@repo/ui';
+import {
+  UiImage,
+  UiListItem,
+  UiListItemAction,
+  uiListItemsFilter,
+} from '@repo/ui';
 import { UiList } from '@repo/ui';
 import {
   CommandListItemCommand,
@@ -13,7 +18,12 @@ import {
 import { useUiListStore } from '@repo/ui/dist/context/list.context';
 import { ExtensionCommand } from '@repo/extension-core';
 import preloadAPI from '/@/utils/preloadAPI';
-import { BlocksIcon, LinkIcon, RotateCcwIcon } from 'lucide-react';
+import {
+  AlertTriangleIcon,
+  BlocksIcon,
+  LinkIcon,
+  RotateCcwIcon,
+} from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { useCommand } from '/@/hooks/useCommand';
@@ -29,12 +39,12 @@ const QUERY_PREFIX = {
 
 function CommandPrefix({
   id,
-  icon,
   alt,
+  icon,
 }: {
-  icon: string;
-  alt: string;
   id: string;
+  alt: string;
+  icon: string;
 }) {
   if (icon.startsWith(iconPrefix)) {
     let iconName = icon.slice(iconPrefix.length) as CommandIconName;
@@ -54,13 +64,15 @@ function CommandPrefix({
 }
 
 function CommandList() {
-  const [extensions, addExtension, updateExtension] = useCommandStore(
-    useShallow((state) => [
-      state.extensions,
-      state.addExtension,
-      state.updateExtension,
-    ]),
-  );
+  const [extensions, setCommandStore, addExtension, updateExtension] =
+    useCommandStore(
+      useShallow((state) => [
+        state.extensions,
+        state.setState,
+        state.addExtension,
+        state.updateExtension,
+      ]),
+    );
 
   const addPanelStatus = useCommandPanelStore.use.addStatus();
 
@@ -152,19 +164,67 @@ function CommandList() {
   const extensionCommands = extensions.reduce<
     (CommandListItemCommand | CommandListItemExtension)[]
   >((acc, extension) => {
-    const extensionIcon = (
+    const extensionIcon = extension.isError ? (
+      <UiList.Icon icon={extension.title[0].toUpperCase()} />
+    ) : (
       <CommandPrefix
-        alt={`${extension.manifest.title} icon`}
+        alt={`${extension.title} icon`}
         id={extension.id}
         icon={extension.manifest.icon}
       />
     );
+    const extensionActions: UiListItemAction[] = [];
+
+    if (extension.isLocal) {
+      extensionActions.push({
+        icon: RotateCcwIcon,
+        async onAction() {
+          try {
+            const result = await preloadAPI.main.invokeIpcMessage(
+              'extension:reload',
+              extension.id,
+            );
+            if (!result) return;
+
+            if ('$isError' in result) {
+              addPanelStatus({
+                type: 'error',
+                title: 'Error!',
+                description: result.message,
+              });
+              return;
+            }
+
+            updateExtension(extension.id, result);
+          } catch (error) {
+            console.error(error);
+          }
+        },
+        title: 'Reload extension',
+        value: 'reload-extension',
+        shortcut: { key: 'r', mod1: 'mod', mod2: 'shiftKey' },
+      });
+    }
+    if (extension.isError) {
+      extensionActions.push({
+        icon: AlertTriangleIcon,
+        onAction() {
+          setCommandStore('errorOverlay', {
+            title: `Error on "${extension.title}" extension`,
+            content: extension.errorMessage ?? '',
+          });
+        },
+        value: 'errors',
+        title: 'See errors',
+        color: 'destructive',
+      });
+    }
 
     const item: CommandListItemExtension = {
       value: extension.id,
       group: 'Extensions',
       icon: extensionIcon,
-      title: extension.manifest.title,
+      title: extension.title,
       metadata: {
         type: 'extension',
         extensionId: extension.id,
@@ -175,42 +235,16 @@ function CommandList() {
           `${QUERY_PREFIX.EXT}${item.metadata.extensionId}`,
         ),
       suffix: extension.isLocal ? (
-        <span className="text-xs text-muted-foreground">Local Extension</span>
+        <>
+          <span className="text-xs text-muted-foreground">Local Extension</span>
+          <AlertTriangleIcon className="h-4 w-4 text-destructive-text ml-2" />
+        </>
       ) : undefined,
-      actions: extension.isLocal
-        ? [
-            {
-              icon: RotateCcwIcon,
-              async onAction() {
-                try {
-                  const result = await preloadAPI.main.invokeIpcMessage(
-                    'extension:reload',
-                    extension.id,
-                  );
-                  if (!result) return;
-
-                  if ('$isError' in result) {
-                    addPanelStatus({
-                      type: 'error',
-                      title: 'Error!',
-                      description: result.message,
-                    });
-                    return;
-                  }
-
-                  updateExtension(extension.id, result);
-                } catch (error) {
-                  console.error(error);
-                }
-              },
-              title: 'Reload extension',
-              value: 'reload-extension',
-              shortcut: { key: 'r', mod1: 'mod', mod2: 'shiftKey' },
-            },
-          ]
-        : [],
+      actions: extensionActions,
     };
     acc.push(item);
+
+    if (extension.isError) return acc;
 
     extension.manifest.commands.forEach((command) => {
       acc.unshift({
@@ -218,15 +252,15 @@ function CommandList() {
           command,
           type: 'command',
           extensionId: extension.id,
-          extensionTitle: extension.manifest.title,
+          extensionTitle: extension.title,
         },
         value: `command:${extension.id}:${command.name}`,
         onSelected: () =>
           startExecuteCommand({
             command,
-            extension: { id: extension.id, name: extension.manifest.title },
+            extension: { id: extension.id, name: extension.title },
           }),
-        subtitle: command.subtitle || extension.manifest.title,
+        subtitle: command.subtitle || extension.title,
         suffix:
           command.type === 'script' ? (
             <span className="text-xs text-muted-foreground">
@@ -266,7 +300,7 @@ function CommandList() {
         ],
         group: 'Commands',
         title: command.title,
-        keywords: [extension.manifest.title],
+        keywords: [extension.title],
       });
     });
 
@@ -279,20 +313,27 @@ function CommandList() {
       value: 'import-extension',
       icon: <UiList.Icon icon={BlocksIcon} />,
       async onSelected() {
-        const result =
-          await preloadAPI.main.invokeIpcMessage('extension:import');
-        if (!result) return;
+        try {
+          const result =
+            await preloadAPI.main.invokeIpcMessage('extension:import');
+          if (!result) return;
 
-        if ('$isError' in result) {
+          if ('$isError' in result) {
+            await preloadAPI.main.invokeIpcMessage('dialog:message-box', {
+              type: 'error',
+              message: `Error when trying to import extension:\n\n${result.message}`,
+            });
+            return;
+          }
+
+          addExtension(result);
+        } catch (_error) {
           addPanelStatus({
             type: 'error',
             title: 'Error!',
-            description: result.message,
+            description: 'Something went wrong',
           });
-          return;
         }
-
-        addExtension(result);
       },
       metadata: { type: 'builtin-command' },
     },

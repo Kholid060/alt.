@@ -101,6 +101,7 @@
     "which": "^4.0.0",
     "workerpool": "^9.1.0",
     "zod": "^3.22.4",
+    "zod-validation-error": "^3.0.3",
     "zustand": "^4.5.1"
   }
 }

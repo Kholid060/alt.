@@ -2,9 +2,7 @@ import { createErrorResponse, type CustomProtocol } from './index';
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
 import { net } from 'electron';
 import { fileURLToPath } from 'url';
-import ExtensionLoader, {
-  getExtensionFolder,
-} from '../extension/ExtensionLoader';
+import ExtensionLoader from '../extension/ExtensionLoader';
 
 const extensionFilePath = fileURLToPath(
   new URL('./../../extension/dist/', import.meta.url),
@@ -13,7 +11,7 @@ const extensionFilePath = fileURLToPath(
 const devServer = import.meta.env.DEV && import.meta.env.VITE_DEV_SERVER_URL;
 
 function handleCommandPath(extId: string, ...paths: string[]) {
-  let path: string = '';
+  let path: string | null = '';
 
   const commandId = paths.shift();
   const type = paths.shift() || '';
@@ -41,10 +39,10 @@ function handleCommandPath(extId: string, ...paths: string[]) {
       break;
     }
     case '@renderer':
-      path = `${getExtensionFolder(extId)}/${commandId}.js`;
+      path = ExtensionLoader.instance.getPath(extId, 'base', `${commandId}.js`);
       break;
     case '@libs':
-      path = `${getExtensionFolder(extId)}/@libs/${paths[0]}`;
+      path = ExtensionLoader.instance.getPath(extId, 'libs', paths[0]);
       break;
     default:
       path = `${extensionFilePath}${type}`;
@@ -69,8 +67,22 @@ const appIconProtocol: CustomProtocol = {
       .split('/');
 
     switch (type) {
-      case 'icon':
-        return net.fetch(ExtensionLoader.instance.getIconPath(extId, paths[0]));
+      case 'icon': {
+        const iconPath = ExtensionLoader.instance.getPath(
+          extId,
+          'icon',
+          `${paths[0]}.png`,
+        );
+        if (!iconPath) {
+          return createErrorResponse({
+            status: 404,
+            code: 'not-found',
+            message: 'Not found',
+          });
+        }
+
+        return net.fetch(iconPath);
+      }
       case 'command':
         return handleCommandPath(extId, ...paths);
       case '@preload':

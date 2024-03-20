@@ -1,13 +1,13 @@
 import path from 'node:path';
 import fs from 'fs-extra';
 import which from 'which';
-import { getExtensionFolder } from './ExtensionLoader';
+import ExtensionLoader from './ExtensionLoader';
 import { spawn } from 'node:child_process';
 import WindowsManager from '/@/window/WindowsManager';
 import { sendIpcMessageToWindow } from '../ipc-main';
 import { snakeCase } from 'lodash-es';
 import { logger } from '/@/lib/log';
-import { ExtensionError } from '#packages/common/errors/ExtensionError';
+import { ExtensionError } from '#packages/common/errors/custom-errors';
 import type { CommandLaunchContext } from '@repo/extension';
 
 const FILE_EXT_COMMAND_MAP: Record<string, string> = {
@@ -48,8 +48,12 @@ class ExtensionCommandScriptRunner {
     extensionId: string;
     launchContext: CommandLaunchContext;
   }) {
-    const scriptPath = path.join(getExtensionFolder(extensionId), commandId);
-    if (!fs.existsSync(scriptPath)) {
+    const scriptPath = ExtensionLoader.instance.getPath(
+      extensionId,
+      'base',
+      commandId,
+    );
+    if (!scriptPath || !fs.existsSync(scriptPath)) {
       throw new ExtensionError(`Couldn't find "${commandId}" command`);
     }
 

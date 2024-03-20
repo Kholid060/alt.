@@ -11,7 +11,7 @@ import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.int
 import { contextBridge } from 'electron';
 import { isExtHasApiPermission } from '#common/utils/check-ext-permission';
 import type { SetRequired } from 'type-fest';
-import { ExtensionError } from '#common/errors/ExtensionError';
+import { ExtensionError } from '#common/errors/custom-errors';
 
 function setExtView(type: 'empty' | 'error' = 'empty') {
   contextBridge.exposeInMainWorld(PRELOAD_API_KEY.extension, {

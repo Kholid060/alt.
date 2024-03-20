@@ -1,20 +1,36 @@
 import path from 'path';
 import fs from 'fs-extra';
-import { nanoid } from 'nanoid/non-secure';
+import { nanoid } from 'nanoid';
+import type { ExtensionManifest } from '@repo/extension-core';
 import { ExtensionManifestSchema } from '@repo/extension-core';
-import { globby } from 'globby';
 import validateSemver from 'semver/functions/valid';
 import { ErrorLogger, logger, loggerBuilder } from '/@/lib/log';
-import { EXTENSION_FOLDER, EXTENSION_LOCAL_ID_PREFIX } from '../constant';
-import type { ExtensionData } from '#common/interface/extension.interface';
-import { store } from '/@/lib/store';
-import { ExtensionError } from '#packages/common/errors/ExtensionError';
+import { EXTENSION_FOLDER } from '../constant';
+import type {
+  ExtensionData,
+  ExtensionDataBase,
+} from '#common/interface/extension.interface';
+import {
+  ExtensionError,
+  ValidationError,
+} from '#packages/common/errors/custom-errors';
+import extensionsDB from '/@/db/extension.db';
+import { fromZodError } from 'zod-validation-error';
+import { extensions } from '/@/db/schema/extension.schema';
 
 const validatorLogger = loggerBuilder(['ExtensionLoader', 'manifestValidator']);
 
-const EXTENSION_DIR_POSIX = EXTENSION_FOLDER.replaceAll('\\', '/');
+async function extractExtManifest(
+  manifestPath: string,
+): Promise<ExtensionManifest | { isError: true; message: string }> {
+  if (!fs.existsSync(manifestPath)) {
+    return {
+      isError: true,
+      message:
+        'Could not load the extension manifest. Check if the extension manifest.json file exists.',
+    };
+  }
 
-async function extractExtManifest(manifestPath: string) {
   const manifestJSON = await fs.readJSON(manifestPath);
   const manifest = await ExtensionManifestSchema.safeParseAsync(manifestJSON);
 
@@ -26,15 +42,21 @@ async function extractExtManifest(manifestPath: string) {
       'error',
       `${extDirname}: ${JSON.stringify(manifest.error.format())}`,
     );
-    return null;
+    return {
+      isError: true,
+      message: fromZodError(manifest.error, { prefix: 'Manifest Error' })
+        .message,
+    };
   }
 
   if (!validateSemver(manifest.data.version)) {
-    validatorLogger(
-      'error',
-      `${extDirname}: "${manifest.data.version}" is invalid version`,
-    );
-    return null;
+    const errorMessage = `"${manifest.data.version}" is invalid version`;
+    validatorLogger('error', `${extDirname}: ${errorMessage}`);
+
+    return {
+      isError: true,
+      message: `Manifest Error: ${errorMessage}`,
+    };
   }
 
   // Check commands file
@@ -48,27 +70,41 @@ async function extractExtManifest(manifestPath: string) {
   });
 
   return {
-    id: extDirname,
-    manifest: {
-      ...manifest.data,
-      commands,
-    },
+    ...manifest.data,
+    commands,
   };
 }
 
-export function getExtensionFolder(extensionId: string) {
-  let extensionFolderDir = `${EXTENSION_FOLDER}/${extensionId}/icon`;
-  if (extensionId.startsWith(EXTENSION_LOCAL_ID_PREFIX)) {
-    extensionFolderDir = store.get(`localExtensions.${extensionId}.path`, '');
+async function getExtensionDataManifest(
+  extension: ExtensionDataBase & { path: string },
+): Promise<ExtensionDataWithPath> {
+  const extensionManifest = await extractExtManifest(
+    path.join(extension.path, 'manifest.json'),
+  );
+
+  if ('isError' in extensionManifest) {
+    return {
+      ...extension,
+      isError: true,
+      errorMessage: extensionManifest.message,
+    };
   }
 
-  return extensionFolderDir;
+  return {
+    ...extension,
+    isError: false,
+    manifest: extensionManifest as ExtensionManifest,
+  };
 }
+
+type ExtensionDataWithPath = ExtensionData & {
+  path: string;
+};
 
 class ExtensionLoader {
   static instance = new ExtensionLoader();
 
-  _extensions: Map<string, ExtensionData>;
+  _extensions: Map<string, ExtensionDataWithPath>;
 
   // for accessing API
   private keys = new Map<string, string>();
@@ -94,68 +130,124 @@ class ExtensionLoader {
     this.keys = new Map();
     this._extensions = new Map();
 
-    const extensionsManifestPath = await globby(
-      path.posix.join(EXTENSION_DIR_POSIX, '**/manifest.json'),
-    );
-
-    const extensionsManifest = await Promise.all(
-      extensionsManifestPath.map(extractExtManifest),
-    );
-
+    const extensionsDbData = await extensionsDB.query.extensions.findMany({
+      columns: {
+        id: true,
+        name: true,
+        path: true,
+        title: true,
+        version: true,
+        isLocal: true,
+        description: true,
+      },
+    });
     await Promise.all(
-      Object.values(store.get('localExtensions', {})).map(async (localExt) => {
-        const extData = await extractExtManifest(
-          path.posix.join(localExt.path, 'manifest.json'),
-        );
-        if (!extData) return;
-
-        extensionsManifest.push({
-          isLocal: true,
-          id: localExt.id,
-          manifest: extData.manifest,
-        } as ExtensionData);
+      extensionsDbData.map(async (extension) => {
+        const extensionData = await getExtensionDataManifest(extension);
+        this.addExtension(extensionData);
       }),
     );
-
-    for (const extensionData of extensionsManifest) {
-      if (!extensionData) continue;
-
-      this.addExtension(extensionData);
-    }
   }
 
   get extensions(): ExtensionData[] {
     return [...this._extensions.values()];
   }
 
-  getIconPath(extensionId: string, iconName: string) {
-    return `${getExtensionFolder(extensionId)}/icon/${iconName}.png`;
+  getPath(
+    extensionId: string,
+    type: 'base' | 'icon' | 'libs',
+    ...paths: string[]
+  ) {
+    const extension = this._extensions.get(extensionId);
+    if (!extension) return null;
+
+    let basePath = '';
+
+    switch (type) {
+      case 'base':
+        basePath = extension.path;
+        break;
+      case 'icon':
+        basePath = `${extension.path}/icon`;
+        break;
+      case 'libs':
+        basePath = `${extension.path}/@libs`;
+        break;
+    }
+
+    return basePath + `${paths.length === 0 ? '' : `/${paths.join('/')}`}`;
+  }
+
+  async importExtension(manifestPath: string): Promise<ExtensionData | null> {
+    const normalizeManifestPath = path.normalize(manifestPath);
+
+    let isAlreadyAdded = false;
+    this._extensions.forEach((extension) => {
+      if (
+        isAlreadyAdded ||
+        path.normalize(extension.path) !== normalizeManifestPath
+      )
+        return;
+
+      isAlreadyAdded = true;
+    });
+
+    if (isAlreadyAdded) return null;
+
+    const manifest = await extractExtManifest(manifestPath);
+    if ('isError' in manifest) {
+      throw new ValidationError(manifest.message);
+    }
+
+    const id = nanoid();
+    const { description, name, title, version } = manifest;
+    const extensionData: ExtensionDataWithPath = {
+      id,
+      name,
+      title,
+      version,
+      manifest,
+      description,
+      isLocal: true,
+      isError: false,
+      path: path.dirname(manifestPath),
+    };
+
+    await extensionsDB.insert(extensions).values(extensionData);
+    this.addExtension(extensionData);
+
+    const { path: _, ...extension } = extensionData;
+
+    return extension;
   }
 
   async reloadExtension(extId: string) {
-    const extPath = store.get<string, string>(
-      `localExtensions.${extId}.path`,
-      '',
-    );
-    if (!extPath) throw new ExtensionError("Can't find extension");
+    const extension = await extensionsDB.query.extensions.findFirst({
+      columns: {
+        id: true,
+        name: true,
+        path: true,
+        title: true,
+        isLocal: true,
+        version: true,
+        description: true,
+      },
+      where(fields, operators) {
+        return operators.and(
+          operators.eq(fields.id, extId),
+          operators.eq(fields.isLocal, true),
+        );
+      },
+    });
+    if (!extension) throw new ExtensionError("Couldn't find extension");
 
-    const extData = await extractExtManifest(
-      path.posix.join(extPath, 'manifest.json'),
-    );
-    if (!extData) return null;
-
-    const extensionData: ExtensionData = {
-      id: extId,
-      isLocal: true,
-      manifest: extData.manifest,
-    };
-
+    const extensionData = await getExtensionDataManifest(extension);
     this._extensions.set(extId, extensionData);
 
     return extensionData;
   }
 
-  addExtension(extensionData: ExtensionData) {
+  addExtension(extensionData: ExtensionDataWithPath) {
     const extKey = nanoid(5);
 
     this.keys.set(extKey, extensionData.id);

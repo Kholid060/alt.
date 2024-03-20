@@ -3,7 +3,7 @@ import InstalledApps from '../../InstalledApps';
 import { onExtensionIPCEvent } from '../extension-api-event';
 import { logger } from '/@/lib/log';
 import { shell } from 'electron';
-import { ExtensionError } from '#packages/common/errors/ExtensionError';
+import { ExtensionError } from '#packages/common/errors/custom-errors';
 
 onExtensionIPCEvent('shell.installedApps.query', async (_, query) => {
   const apps = await InstalledApps.instance.getList();

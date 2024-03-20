@@ -4,9 +4,9 @@ export { UiDialog } from './components/ui/dialog';
 export { UiScrollArea, UiScrollBar } from './components/ui/scroll-area';
 export { UiImage } from './components/ui/image';
 export type {
+  UiListRef,
   UiListItem,
   UiListProps,
-  UiListRef,
   UiListItemAction,
 } from './components/ui/list';
 export { default as UiList, uiListItemsFilter } from './components/ui/list';
@@ -26,9 +26,9 @@ export {
   uiSelectVariants,
 } from './components/ui/select';
 export type {
+  UiSelectProps,
   UiSelectOptionProps,
   UiSelectOptionRef,
-  UiSelectProps,
 } from './components/ui/select';
 
 export { useUiList } from './context/list.context';

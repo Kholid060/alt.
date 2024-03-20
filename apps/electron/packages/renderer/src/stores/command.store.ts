@@ -2,11 +2,7 @@ import { ExtensionData } from '#common/interface/extension.interface';
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { CommandActions } from '../interface/command.interface';
-
-export interface CommandRouteBreadcrumb {
-  path: string;
-  label: string;
-}
+import createStoreSelectors from '../utils/createStoreSelector';
 
 interface ExtensionCommandArgs {
   commandId: string;
@@ -18,7 +14,12 @@ interface CommandStoreState {
   actions: CommandActions[];
   extensions: ExtensionData[];
   commandArgs: ExtensionCommandArgs;
-  breadcrumbs: CommandRouteBreadcrumb[];
+  errorOverlay: CommandOverlayData | null;
+}
+
+interface CommandOverlayData {
+  title: string;
+  content: string;
 }
 
 interface CommandStoreActions {
@@ -39,7 +40,7 @@ const initialState: CommandStoreState = {
   query: '',
   actions: [],
   extensions: [],
-  breadcrumbs: [],
+  errorOverlay: null,
   commandArgs: {
     args: {},
     commandId: '',
@@ -48,7 +49,7 @@ const initialState: CommandStoreState = {
 
 type CommandStore = CommandStoreState & CommandStoreActions;
 
-export const useCommandStore = create<CommandStore>()(
+const commandStore = create<CommandStore>()(
   immer((set, get) => ({
     ...initialState,
     setCommandArgs(data, replace) {
@@ -88,7 +89,7 @@ export const useCommandStore = create<CommandStore>()(
         state.extensions[index] = {
           ...state.extensions[index],
           ...data,
-        };
+        } as ExtensionData;
       });
     },
     setState(name, value) {
@@ -99,3 +100,5 @@ export const useCommandStore = create<CommandStore>()(
     },
   })),
 );
+
+export const useCommandStore = createStoreSelectors(commandStore);

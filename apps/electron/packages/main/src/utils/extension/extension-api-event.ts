@@ -1,4 +1,4 @@
-import { ExtensionError } from '#packages/common/errors/ExtensionError';
+import { ExtensionError } from '#packages/common/errors/custom-errors';
 import type {
   IPCEventError,
   IPCUserExtensionEventsMap,

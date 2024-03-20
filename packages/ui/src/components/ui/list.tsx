@@ -33,6 +33,7 @@ export interface UiListItemAction {
   icon: LucideIcon;
   onAction: () => void;
   shortcut?: KeyboardShortcut;
+  color?: 'default' | 'primary' | 'destructive';
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,8 +49,8 @@ export interface UiListItem<T = any> {
   icon?: React.ReactNode;
   onSelected?: () => void;
   detail?: React.ReactNode;
-  actions?: UiListItemAction[];
   suffix?: string | React.ReactNode;
+  actions?: UiListItemAction[];
 }
 
 type UiListGroupItem = [string, UiListItem[]];
@@ -533,6 +534,14 @@ const UiListGroupHeading = forwardRef<
 });
 UiListGroupHeading.displayName = 'UiListGroupHeading';
 
+const uiListItemActionColors: Record<
+  Required<UiListItemAction>['color'],
+  string
+> = {
+  default: '',
+  primary: 'text-primary',
+  destructive: 'text-destructive-text',
+};
 function UiListItemActions({ actions }: { actions: UiListItemAction[] }) {
   const actionIndex = useUiList((state) => state.selectedItem.actionIndex);
   const [openTooltip, setOpenTooltip] = useState(-1);
@@ -544,7 +553,10 @@ function UiListItemActions({ actions }: { actions: UiListItemAction[] }) {
   return (
     <div className="flex items-center absolute rounded-sm top-0 h-full right-0 pr-2 pl-6 pointer-events-none bg-gradient-to-tl from-40% from-card to-100% to-transparent">
       {actions.map(
-        ({ icon: Icon, onAction, title, value, shortcut }, index) => (
+        (
+          { icon: Icon, onAction, title, value, shortcut, color = 'default' },
+          index,
+        ) => (
           <UiTooltip
             key={value}
             align="end"
@@ -564,7 +576,9 @@ function UiListItemActions({ actions }: { actions: UiListItemAction[] }) {
               }}
               className="h-9 w-9 aria-pressed:bg-secondary hover:bg-secondary rounded-sm inline-flex items-center justify-center pointer-events-auto"
             >
-              <Icon className="h-4 w-4" />
+              <Icon
+                className={`h-4 w-4 ${uiListItemActionColors[color ?? 'default'] ?? ''}`}
+              />
             </button>
           </UiTooltip>
         ),

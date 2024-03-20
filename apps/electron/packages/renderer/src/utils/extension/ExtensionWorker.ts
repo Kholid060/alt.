@@ -162,8 +162,9 @@ class ExtensionWorker {
         'extension:get',
         extensionId,
       );
-      if (!extension) return;
-      if ('$isError' in extension) throw new Error(extension.message);
+      if (extension && '$isError' in extension)
+        throw new Error(extension.message);
+      if (!extension || extension.isError) return;
 
       const clearWorker = (worker?: Worker) => {
         if (worker || this.worker) console.log('CLEAR WORKER');

@@ -2923,6 +2923,7 @@ __metadata:
     sonner: "npm:^1.4.3"
     tailwind-merge: "npm:^2.2.1"
     tsup: "npm:^8.0.2"
+    type-fest: "npm:^4.13.0"
     typescript: "npm:^5.3.3"
     zustand: "npm:^4.5.1"
   languageName: unknown
@@ -6297,6 +6298,7 @@ __metadata:
     which: "npm:^4.0.0"
     workerpool: "npm:^9.1.0"
     zod: "npm:^3.22.4"
+    zod-validation-error: "npm:^3.0.3"
     zustand: "npm:^4.5.1"
   languageName: unknown
   linkType: soft
@@ -12322,6 +12324,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"type-fest@npm:^4.13.0":
+  version: 4.13.0
+  resolution: "type-fest@npm:4.13.0"
+  checksum: 10c0/9259549d37dec14ac0f759af42fb6305f08ba46f74bf066caec6b925a674c0021e3921586d41ce0c60d5e1721348d0ff86fff5f9fb5fa12176dd5f2572822c51
+  languageName: node
+  linkType: hard
+
 "type@npm:^2.7.2":
   version: 2.7.2
   resolution: "type@npm:2.7.2"
@@ -13273,7 +13282,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod-validation-error@npm:^3.0.2":
+"zod-validation-error@npm:^3.0.2, zod-validation-error@npm:^3.0.3":
   version: 3.0.3
   resolution: "zod-validation-error@npm:3.0.3"
   peerDependencies:

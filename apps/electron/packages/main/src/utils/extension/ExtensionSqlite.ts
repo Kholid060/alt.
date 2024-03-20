@@ -2,7 +2,7 @@ import Database from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs-extra';
 import { DATABASE_FOLDER } from '../constant';
-import { ExtensionError } from '#packages/common/errors/ExtensionError';
+import { ExtensionError } from '#packages/common/errors/custom-errors';
 
 type SqliteDatabase = ReturnType<typeof Database>;
 

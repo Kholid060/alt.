@@ -9,6 +9,8 @@ import { ExtensionManifest, ExtensionManifestSchema } from '../../client';
 import { fromZodError } from 'zod-validation-error';
 import imageSize from 'image-size';
 import { glob } from 'glob';
+import { z } from 'zod';
+import { errorMap } from 'zod-validation-error';
 
 export type PackageJson = PackageJsonType & ExtensionManifest;
 
@@ -20,6 +22,7 @@ const SUPPORTED_ICON_SIZE = 256;
 const SUPPORTED_ICON_TYPE = ['.png'];
 const EXT_COMMAND_FILE_EXTENSION = '.{js,jsx,ts,tsx}';
 
+z.setErrorMap(errorMap);
 class ManifestUtils {
   private seenExtIcon = new Set<string>();
 

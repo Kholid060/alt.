@@ -63,6 +63,7 @@ const config: Omit<Config, 'content'> = {
         },
         destructive: {
           DEFAULT: rgbVarColor('destructive'),
+          text: rgbVarColor('destructive-text'),
           foreground: rgbVarColor('destructive-foreground'),
         },
         muted: {

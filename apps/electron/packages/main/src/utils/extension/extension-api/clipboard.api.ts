@@ -1,4 +1,4 @@
-import { ExtensionError } from '#packages/common/errors/ExtensionError';
+import { ExtensionError } from '#packages/common/errors/custom-errors';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import type { NativeImage } from 'electron';
 import { clipboard, nativeImage } from 'electron';

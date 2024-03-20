@@ -6,7 +6,7 @@ import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import { DATABASE_FOLDER } from '../utils/constant';
 import { fileURLToPath } from 'url';
 import { app } from 'electron';
-import { extensionsStorage } from './schema/extension.schema';
+import * as extensionsSchema from './schema/extension.schema';
 
 fs.ensureDir(DATABASE_FOLDER);
 
@@ -14,7 +14,7 @@ const dbPath = path.join(DATABASE_FOLDER, 'extensions.db');
 
 const sqlite = new Database(dbPath);
 const extensionsDB = drizzle(sqlite, {
-  schema: { extensionsStorage },
+  schema: { ...extensionsSchema },
 });
 
 migrate(extensionsDB, {

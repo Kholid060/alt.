@@ -53,6 +53,9 @@ export interface IPCDialogEvents {
   'dialog:open': (
     options: Electron.OpenDialogOptions,
   ) => Electron.OpenDialogReturnValue;
+  'dialog:message-box': (
+    options: Electron.MessageBoxOptions,
+  ) => Electron.MessageBoxReturnValue;
 }
 
 export type IPCEvents = IPCShellEvents &

@@ -2,7 +2,6 @@ import InstalledApps from './InstalledApps';
 import ExtensionLoader from './extension/ExtensionLoader';
 import './ipc-extension-messages';
 import { clipboard, dialog } from 'electron';
-import { extensionImport } from './extension/extensionImport';
 import ExtensionCommandScriptRunner from './extension/ExtensionCommandScriptRunner';
 import { onIpcMessage } from './ipc-main';
 
@@ -12,7 +11,23 @@ onIpcMessage('extension:list', () =>
 onIpcMessage('extension:get', (_, extId) =>
   Promise.resolve(ExtensionLoader.instance.getExtension(extId)),
 );
-onIpcMessage('extension:import', () => extensionImport());
+onIpcMessage('extension:import', async () => {
+  const {
+    canceled,
+    filePaths: [manifestPath],
+  } = await dialog.showOpenDialog({
+    buttonLabel: 'Import',
+    properties: ['openFile'],
+    title: 'Import Extension',
+    filters: [{ extensions: ['json'], name: 'Extension manifest' }],
+  });
+  if (canceled || !manifestPath) return null;
+
+  const extensionData =
+    await ExtensionLoader.instance.importExtension(manifestPath);
+
+  return extensionData;
+});
 onIpcMessage('extension:reload', (_, extId) =>
   ExtensionLoader.instance.reloadExtension(extId),
 );
@@ -36,6 +51,9 @@ onIpcMessage('apps:get-list', () => InstalledApps.instance.getList());
 
 onIpcMessage('dialog:open', (_, options) => {
   return dialog.showOpenDialog(options);
+});
+onIpcMessage('dialog:message-box', (_, options) => {
+  return dialog.showMessageBox(options);
 });
 
 onIpcMessage('clipboard:copy', (_, content) => {
