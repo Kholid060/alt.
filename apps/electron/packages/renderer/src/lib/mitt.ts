@@ -5,6 +5,7 @@ type MittEvent = {
   'execute-command': {
     commandId: string;
     extensionId: string;
+    commandTitle: string;
     launchContext: CommandLaunchContext;
   };
 };

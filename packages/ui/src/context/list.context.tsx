@@ -14,7 +14,11 @@ export interface UiListSelectedItem<M = any> {
   metadata: M;
   index: number;
   actionIndex: number;
-  actions: { value: string; shortcut?: KeyboardShortcut }[];
+  actions: {
+    value: string;
+    onAction: () => void;
+    shortcut?: KeyboardShortcut;
+  }[];
 }
 
 interface UiListState {
@@ -28,7 +32,9 @@ interface UiListStore {
   snapshot(): UiListState;
   subscribe(callback: () => void): () => void;
   listControllerKeyBind(event: KeyboardEvent): void;
-  setSelectedItem(detail: UiListSelectedItem): void;
+  setSelectedItem(detail: UiListSelectedItem, replace?: true): void;
+  setSelectedItem(detail: Partial<UiListSelectedItem>, replace?: false): void;
+  setSelectedItem(detail: Partial<UiListSelectedItem>, replace: false): void;
   setState<T extends keyof UiListState>(
     key: T,
     value: UiListState[T],
@@ -90,16 +96,17 @@ export function UiListProvider({ children }: { children: React.ReactNode }) {
         state.current[key] = value;
         if (emit) store.emit();
       },
-      setSelectedItem({ actionIndex, id, index, metadata, actions }) {
-        if (Object.is(state.current.selectedItem.id, id)) return;
+      setSelectedItem(payload, replace = true) {
+        if (Object.is(state.current.selectedItem.id, payload.id)) return;
 
-        state.current.selectedItem = {
-          id,
-          index,
-          actions,
-          metadata,
-          actionIndex,
-        };
+        if (replace) {
+          state.current.selectedItem = payload as UiListSelectedItem;
+        } else {
+          state.current.selectedItem = {
+            ...state.current.selectedItem,
+            ...payload,
+          };
+        }
 
         store.emit();
       },

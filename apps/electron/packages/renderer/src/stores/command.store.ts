@@ -14,11 +14,12 @@ interface CommandStoreState {
   actions: CommandActions[];
   extensions: ExtensionData[];
   commandArgs: ExtensionCommandArgs;
-  errorOverlay: CommandOverlayData | null;
+  extensionErrors: Record<string, CommandErrorOverlayData[]>;
+  errorOverlay: { title: string; errors: CommandErrorOverlayData[] } | null;
 }
 
-interface CommandOverlayData {
-  title: string;
+interface CommandErrorOverlayData {
+  title?: string;
   content: string;
 }
 
@@ -29,18 +30,27 @@ interface CommandStoreActions {
     replace?: boolean,
   ) => void;
   addExtension: (data: ExtensionData) => void;
+  addExtensionError: (extId: string, error: CommandErrorOverlayData) => void;
   updateExtension: (id: string, data: Partial<ExtensionData>) => void;
   setState: <T extends keyof CommandStoreState>(
     name: T,
     value: CommandStoreState[T],
   ) => void;
+  showExtensionErrorOverlay(detail: {
+    title: string;
+    extensionId: string;
+    errors?: CommandErrorOverlayData[];
+  }): void;
 }
+
+const MAX_EXTENSION_ERROR_ITEMS = 20;
 
 const initialState: CommandStoreState = {
   query: '',
   actions: [],
   extensions: [],
   errorOverlay: null,
+  extensionErrors: {},
   commandArgs: {
     args: {},
     commandId: '',
@@ -52,6 +62,29 @@ type CommandStore = CommandStoreState & CommandStoreActions;
 const commandStore = create<CommandStore>()(
   immer((set, get) => ({
     ...initialState,
+    showExtensionErrorOverlay({ extensionId, title, errors }) {
+      set((state) => {
+        state.errorOverlay = {
+          title,
+          errors: [
+            ...(errors ?? []),
+            ...(state.extensionErrors[extensionId] ?? []),
+          ],
+        };
+      });
+    },
+    addExtensionError(extId, error) {
+      set((state) => {
+        if (!state.extensionErrors[extId]) {
+          state.extensionErrors[extId] = [];
+        }
+        if (state.extensionErrors[extId].length >= MAX_EXTENSION_ERROR_ITEMS) {
+          state.extensionErrors[extId].pop();
+        }
+
+        state.extensionErrors[extId].unshift(error);
+      });
+    },
     setCommandArgs(data, replace) {
       if (replace) {
         const commandArgs: ExtensionCommandArgs = {

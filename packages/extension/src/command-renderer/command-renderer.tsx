@@ -21,15 +21,13 @@ function commandRenderer(
 
   return function ExtensionRoot({ messagePort, context }) {
     return (
-      <React.StrictMode>
-        <UiListProvider>
-          <UiTooltipProvider>
-            <ExtensionProvider messagePort={messagePort}>
-              <MemoView {...context} />
-            </ExtensionProvider>
-          </UiTooltipProvider>
-        </UiListProvider>
-      </React.StrictMode>
+      <UiListProvider>
+        <UiTooltipProvider>
+          <ExtensionProvider messagePort={messagePort}>
+            <MemoView {...context} />
+          </ExtensionProvider>
+        </UiTooltipProvider>
+      </UiListProvider>
     );
   };
 }

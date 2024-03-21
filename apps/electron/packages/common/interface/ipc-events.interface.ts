@@ -71,7 +71,8 @@ export interface IPCSendEvents {
       message: string;
       commandId: string;
       extensionId: string;
-      type: 'error' | 'message' | 'start' | 'finish';
+      commandTitle: string;
+      type: 'error' | 'message' | 'start' | 'finish' | 'stderr';
     },
   ];
   'command:execute': [

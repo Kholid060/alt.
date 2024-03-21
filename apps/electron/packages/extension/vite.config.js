@@ -40,9 +40,11 @@ const config = {
       output: {
         entryFileNames: '[name].js',
         paths: {
-          react: './react.js',
-          'react-dom': './react-dom.js',
-          'react/jsx-runtime': './react-runtime.js',
+          react: '/@preload/react.js',
+          'react-dom': '/@preload/react-dom.js',
+          'react/jsx-runtime': '/@preload/react-runtime.js',
+          'react/react-jsx-dev-runtime.development':
+            '/@preload/react-runtime.dev.js',
         },
       },
     },

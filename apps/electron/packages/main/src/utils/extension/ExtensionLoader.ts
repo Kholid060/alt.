@@ -153,6 +153,30 @@ class ExtensionLoader {
     return [...this._extensions.values()];
   }
 
+  getCommand(extensionId: string, commandId: string) {
+    const extension = this.getExtension(extensionId);
+    const commandFilePath = this.getPath(extensionId, 'base', commandId);
+    const command =
+      extension &&
+      !extension.isError &&
+      extension.manifest.commands.find((command) => command.name === commandId);
+
+    if (
+      !command ||
+      !extension ||
+      extension.isError ||
+      !commandFilePath ||
+      !fs.existsSync(commandFilePath)
+    ) {
+      return null;
+    }
+
+    return {
+      ...command,
+      filePath: commandFilePath,
+    };
+  }
+
   getPath(
     extensionId: string,
     type: 'base' | 'icon' | 'libs',

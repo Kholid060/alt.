@@ -1,11 +1,11 @@
 import { commandIcons } from '#common/utils/command-icons';
 import { memo, useCallback } from 'react';
 import { useCommandStore } from '/@/stores/command.store';
-import { APP_DEEP_LINK, CUSTOM_SCHEME } from '#common/utils/constant/constant';
+import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
 import {
   UiImage,
   UiListItem,
-  UiListItemAction,
+  UiListRenderItemDetail,
   uiListItemsFilter,
 } from '@repo/ui';
 import { UiList } from '@repo/ui';
@@ -15,19 +15,12 @@ import {
   CommandListItemExtension,
   CommandListItems,
 } from '/@/interface/command.interface';
-import { useUiListStore } from '@repo/ui/dist/context/list.context';
-import { ExtensionCommand } from '@repo/extension-core';
 import preloadAPI from '/@/utils/preloadAPI';
-import {
-  AlertTriangleIcon,
-  BlocksIcon,
-  LinkIcon,
-  RotateCcwIcon,
-} from 'lucide-react';
+import { BlocksIcon } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
-import { useCommand } from '/@/hooks/useCommand';
-import { CommandLaunchBy } from '@repo/extension';
+import ListItemCommand from '../components/list-item/ListItemCommand';
+import ListItemExtension from '../components/list-item/ListItemExtension';
 
 type CommandIconName = keyof typeof commandIcons;
 
@@ -63,21 +56,19 @@ function CommandPrefix({
   );
 }
 
+export interface ListItemRenderDetail<
+  T extends CommandListItems['metadata']['type'],
+> extends Omit<UiListRenderItemDetail, 'ref'> {
+  itemRef: UiListRenderItemDetail['ref'];
+  item: Extract<CommandListItems, { metadata: { type: T } }>;
+}
+
 function CommandList() {
-  const [extensions, setCommandStore, addExtension, updateExtension] =
-    useCommandStore(
-      useShallow((state) => [
-        state.extensions,
-        state.setState,
-        state.addExtension,
-        state.updateExtension,
-      ]),
-    );
+  const [extensions, addExtension] = useCommandStore(
+    useShallow((state) => [state.extensions, state.addExtension]),
+  );
 
   const addPanelStatus = useCommandPanelStore.use.addStatus();
-
-  const uiListStore = useUiListStore();
-  const { executeCommand } = useCommand();
 
   const customListFilter = useCallback((items: UiListItem[], query: string) => {
     let cleanedQuery = query;
@@ -103,64 +94,6 @@ function CommandList() {
       .map((item) => ({ ...item, group: 'Search results' }));
   }, []);
 
-  function startExecuteCommand({
-    command,
-    extension,
-  }: {
-    command: ExtensionCommand;
-    extension: { id: string; name: string };
-  }) {
-    const args: Record<string, unknown> = {};
-    const commandStore = useCommandStore.getState();
-
-    if (command.arguments && command.arguments.length > 0) {
-      const argsValues =
-        commandStore.commandArgs?.commandId === command.name
-          ? commandStore.commandArgs.args
-          : {};
-
-      for (const arg of command.arguments) {
-        if (arg.required && arg.type !== 'toggle' && !argsValues[arg.name]) {
-          const element = document.querySelector<HTMLElement>(
-            `[data-command-argument="${arg.name}"]`,
-          );
-          element?.focus();
-
-          addPanelStatus({
-            type: 'error',
-            timeout: 5000,
-            name: 'command-missing-args',
-            title: 'Fill out the required fill before running the command',
-          });
-
-          return;
-        }
-
-        if (Object.hasOwn(argsValues, arg.name)) {
-          args[arg.name] = argsValues[arg.name];
-        }
-      }
-
-      commandStore.setCommandArgs(
-        {
-          args: {},
-          commandId: '',
-        },
-        true,
-      );
-    }
-
-    executeCommand({
-      launchContext: {
-        args,
-        launchBy: CommandLaunchBy.USER,
-      },
-      command,
-      extensionId: extension.id,
-      extensionName: extension.name,
-    });
-  }
-
   const extensionCommands = extensions.reduce<
     (CommandListItemCommand | CommandListItemExtension)[]
   >((acc, extension) => {
@@ -173,52 +106,6 @@ function CommandList() {
         icon={extension.manifest.icon}
       />
     );
-    const extensionActions: UiListItemAction[] = [];
-
-    if (extension.isLocal) {
-      extensionActions.push({
-        icon: RotateCcwIcon,
-        async onAction() {
-          try {
-            const result = await preloadAPI.main.invokeIpcMessage(
-              'extension:reload',
-              extension.id,
-            );
-            if (!result) return;
-
-            if ('$isError' in result) {
-              addPanelStatus({
-                type: 'error',
-                title: 'Error!',
-                description: result.message,
-              });
-              return;
-            }
-
-            updateExtension(extension.id, result);
-          } catch (error) {
-            console.error(error);
-          }
-        },
-        title: 'Reload extension',
-        value: 'reload-extension',
-        shortcut: { key: 'r', mod1: 'mod', mod2: 'shiftKey' },
-      });
-    }
-    if (extension.isError) {
-      extensionActions.push({
-        icon: AlertTriangleIcon,
-        onAction() {
-          setCommandStore('errorOverlay', {
-            title: `Error on "${extension.title}" extension`,
-            content: extension.errorMessage ?? '',
-          });
-        },
-        value: 'errors',
-        title: 'See errors',
-        color: 'destructive',
-      });
-    }
 
     const item: CommandListItemExtension = {
       value: extension.id,
@@ -226,21 +113,9 @@ function CommandList() {
       icon: extensionIcon,
       title: extension.title,
       metadata: {
+        extension,
         type: 'extension',
-        extensionId: extension.id,
       },
-      onSelected: () =>
-        uiListStore.setState(
-          'search',
-          `${QUERY_PREFIX.EXT}${item.metadata.extensionId}`,
-        ),
-      suffix: extension.isLocal ? (
-        <>
-          <span className="text-xs text-muted-foreground">Local Extension</span>
-          <AlertTriangleIcon className="h-4 w-4 text-destructive-text ml-2" />
-        </>
-      ) : undefined,
-      actions: extensionActions,
     };
     acc.push(item);
 
@@ -255,18 +130,7 @@ function CommandList() {
           extensionTitle: extension.title,
         },
         value: `command:${extension.id}:${command.name}`,
-        onSelected: () =>
-          startExecuteCommand({
-            command,
-            extension: { id: extension.id, name: extension.title },
-          }),
         subtitle: command.subtitle || extension.title,
-        suffix:
-          command.type === 'script' ? (
-            <span className="text-xs text-muted-foreground">
-              Command Script
-            </span>
-          ) : undefined,
         icon: command.icon ? (
           <CommandPrefix
             id={extension.id}
@@ -276,28 +140,6 @@ function CommandList() {
         ) : (
           extensionIcon
         ),
-        actions: [
-          {
-            onAction() {
-              preloadAPI.main
-                .invokeIpcMessage(
-                  'clipboard:copy',
-                  `${APP_DEEP_LINK}://extensions/${extension.id}/${command.name}`,
-                )
-                .then((value) => {
-                  if (value && '$isError' in value) return;
-
-                  addPanelStatus({
-                    type: 'success',
-                    title: 'Copied to clipboard',
-                  });
-                });
-            },
-            icon: LinkIcon,
-            title: 'Copy Deep Link',
-            value: 'copy-deeplink',
-          },
-        ],
         group: 'Commands',
         title: command.title,
         keywords: [extension.title],
@@ -335,7 +177,9 @@ function CommandList() {
           });
         }
       },
-      metadata: { type: 'builtin-command' },
+      metadata: {
+        type: 'builtin-command',
+      },
     },
   ];
 
@@ -345,6 +189,37 @@ function CommandList() {
         className="p-2"
         items={[...extensionCommands, ...builtInCommands]}
         customFilter={customListFilter}
+        renderItem={({ ref, item, ...detail }) => {
+          const commandItem = item as CommandListItems;
+          switch (commandItem.metadata.type) {
+            case 'builtin-command':
+              return (
+                <UiList.Item
+                  ref={ref}
+                  selected={detail.selected}
+                  {...{ ...detail.props, ...commandItem }}
+                />
+              );
+            case 'command':
+              return (
+                <ListItemCommand
+                  itemRef={ref}
+                  item={commandItem as CommandListItemCommand}
+                  {...{ ...detail }}
+                />
+              );
+            case 'extension':
+              return (
+                <ListItemExtension
+                  itemRef={ref}
+                  item={commandItem as CommandListItemExtension}
+                  {...{ ...detail }}
+                />
+              );
+            default:
+              return null;
+          }
+        }}
         renderGroupHeader={(label, index) => (
           <UiList.GroupHeading className={`${index !== 0 ? 'mt-1 block' : ''}`}>
             {label}

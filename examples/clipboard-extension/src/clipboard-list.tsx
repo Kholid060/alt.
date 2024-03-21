@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { UiList, commandRenderer, Extension, UiImage, UiInput, UiListItem, UiExtIcon } from '@repo/extension';
+import ItemList from './components/ItemList';
 
 function CommandMain() {
   const [apps, setApps] = useState<Extension.shell.installedApps.AppDetail[]>([]);
@@ -38,6 +39,7 @@ function CommandMain() {
 
   return (
     <div className="p-2">
+      <ItemList />
       <UiList items={items} />
     </div>
   );

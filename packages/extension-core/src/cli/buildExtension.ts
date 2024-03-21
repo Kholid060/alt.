@@ -45,8 +45,15 @@ async function buildCommands(watch = false) {
       'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
     },
     publicDir: './public',
+    esbuild: watch
+      ? {
+          keepNames: true,
+          minifyIdentifiers: true,
+        }
+      : undefined,
     build: {
       outDir: OUT_DIR,
+      sourcemap: watch ? 'inline' : false,
       watch: watch
         ? {
             clearScreen: true,
@@ -75,7 +82,6 @@ async function buildCommands(watch = false) {
           },
         },
       },
-      minify: true,
     },
     plugins: [
       {

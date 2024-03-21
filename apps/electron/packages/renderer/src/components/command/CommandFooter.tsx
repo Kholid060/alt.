@@ -36,7 +36,7 @@ function CommandHeaderPanel() {
           animate={{ y: 0 }}
           exit={{ y: -100 }}
           transition={{ type: 'spring', bounce: 0.2, duration: 0.35 }}
-          className="flex items-center bg-background rounded-md border px-3 text-sm h-9 min-w-24"
+          className="flex items-center bg-background rounded-md border px-3 text-sm min-w-24 min-h-9"
         >
           {headerIcon}
           <p className="leading-tight line-clamp-1">{header.title}</p>
@@ -90,7 +90,7 @@ function CommandStatusPanel() {
           animate={{ y: 0 }}
           exit={{ y: -100 }}
           transition={{ type: 'spring', bounce: 0.2, duration: 0.35 }}
-          className="flex items-center bg-background rounded-md border px-3 text-sm py-1.5 min-w-24"
+          className="flex items-center bg-background rounded-md border px-3 text-sm py-1.5 min-w-24 min-h-9"
         >
           {indicator}
           <div>
@@ -107,7 +107,7 @@ function CommandStatusPanel() {
 
 function CommandFooter() {
   return (
-    <div className="flex items-start gap-4 mt-2">
+    <div className="flex items-start gap-2 mt-2">
       <CommandHeaderPanel />
       <div className="flex-grow"></div>
       <CommandStatusPanel />

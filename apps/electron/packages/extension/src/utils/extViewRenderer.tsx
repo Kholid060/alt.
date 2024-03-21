@@ -2,6 +2,13 @@ import type { ExtensionCommandRenderer } from '@repo/extension/dist/command-rend
 import { MODULE_MAP } from './constant';
 import type { ExtensionRenderer } from '../interfaces/ext-renderer';
 import type ReactDOM from 'react-dom/client';
+import React from 'react';
+import type { FallbackProps } from 'react-error-boundary';
+import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
+import { mapStackTrace } from 'sourcemapped-stacktrace';
+import type { AMessagePort } from '@repo/shared';
+import type { ExtensionMessagePortEvent } from '@repo/extension/dist/interfaces/message-events';
+import { UiButton } from '@repo/ui';
 
 async function loadStyle(themeStyle: string) {
   try {
@@ -44,6 +51,43 @@ async function loadStyle(themeStyle: string) {
   }
 }
 
+function ErrorBoundaryFallback({
+  error,
+  messagePort,
+}: FallbackProps & { messagePort: AMessagePort<ExtensionMessagePortEvent> }) {
+  const [mappedStack, setMappedStack] = React.useState('');
+
+  React.useEffect(() => {
+    mapStackTrace(error.stack, (stackTrace) => {
+      setMappedStack(
+        error.stack.slice(0, error.stack.indexOf('\n')) +
+          '\n' +
+          stackTrace.join('\n'),
+      );
+    });
+  }, [error]);
+
+  return (
+    <div className="h-full w-full p-4">
+      <div className="flex items-start">
+        <p className="text-destructive-text gap-4 font-semibold flex-1">
+          {error.message}
+        </p>
+        <UiButton
+          size="sm"
+          variant="secondary"
+          onClick={() => messagePort.sendMessage('extension:reload')}
+        >
+          Reload
+        </UiButton>
+      </div>
+      <div className="p-4 bg-card rounded-lg text-sm mt-4 whitespace-pre-wrap font-mono text-muted-foreground">
+        {mappedStack}
+      </div>
+    </div>
+  );
+}
+
 const extViewRenderer: ExtensionRenderer<[string]> = async (
   { messagePort, launchContext },
   theme,
@@ -55,12 +99,22 @@ const extViewRenderer: ExtensionRenderer<[string]> = async (
       default: ExtensionCommandRenderer;
     };
 
+    const commandView = renderer({
+      messagePort,
+      context: launchContext,
+    });
+
     const reactDOM = (await import(MODULE_MAP.reactDOM)) as typeof ReactDOM;
     reactDOM.createRoot(document.querySelector('#app')!).render(
-      renderer({
-        messagePort,
-        context: launchContext,
-      }),
+      <React.StrictMode>
+        <ReactErrorBoundary
+          FallbackComponent={(props) => (
+            <ErrorBoundaryFallback {...{ ...props, messagePort }} />
+          )}
+        >
+          {commandView}
+        </ReactErrorBoundary>
+      </React.StrictMode>,
     );
   } catch (error) {
     console.error(error);

@@ -6,6 +6,7 @@ import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import ExtensionWorker from '/@/utils/extension/ExtensionWorker';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
 import { useCommand } from '/@/hooks/useCommand';
+import { useCommandStore } from '/@/stores/command.store';
 
 function CommandEventListener() {
   const [clearAllStatus, addStatus, setHeader] = useCommandPanelStore(
@@ -15,6 +16,7 @@ function CommandEventListener() {
       state.setHeader,
     ]),
   );
+  const addExtensionError = useCommandStore.use.addExtensionError();
 
   const { executeCommand } = useCommand();
   const { setExtMessagePort } = useCommandCtx();
@@ -51,6 +53,10 @@ function CommandEventListener() {
               clearPanel();
             },
           });
+          addExtensionError(payload.extensionId, {
+            content: message,
+            title: `Error in "${payload.commandTitle}" command`,
+          });
         },
       });
     };
@@ -63,8 +69,19 @@ function CommandEventListener() {
           case 'finish':
           case 'error': {
             const isError = detail.type === 'error';
+
+            if (isError) {
+              addExtensionError(detail.extensionId, {
+                content: detail.message,
+                title: `Error in "${detail.commandTitle}" command`,
+              });
+            }
+
             addStatus({
-              description: detail.message,
+              description: detail.message.slice(
+                0,
+                detail.message.indexOf('\n'),
+              ),
               title: isError ? 'Error!' : 'Script finish running',
               type: isError ? 'error' : 'success',
               onClose() {

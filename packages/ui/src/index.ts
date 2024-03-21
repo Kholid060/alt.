@@ -8,6 +8,7 @@ export type {
   UiListItem,
   UiListProps,
   UiListItemAction,
+  UiListRenderItemDetail,
 } from './components/ui/list';
 export { default as UiList, uiListItemsFilter } from './components/ui/list';
 export { UiSwitch } from './components/ui/switch';
@@ -27,9 +28,15 @@ export {
 } from './components/ui/select';
 export type {
   UiSelectProps,
-  UiSelectOptionProps,
   UiSelectOptionRef,
+  UiSelectOptionProps,
 } from './components/ui/select';
+export {
+  UiAccordion,
+  UiAccordionItem,
+  UiAccordionTrigger,
+  UiAccordionContent,
+} from './components/ui/accordion';
 
 export { useUiList } from './context/list.context';
 

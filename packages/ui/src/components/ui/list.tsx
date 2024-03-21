@@ -67,14 +67,16 @@ export interface UiListProps
   customFilter?: (items: UiListItem[], query: string) => UiListItem[];
   renderGroupHeader?: (label: string, index: number) => React.ReactNode;
   renderItem?: (
-    detail: {
-      selected: boolean;
-      item: UiListItem;
-      ref: React.Ref<HTMLDivElement>;
-      props: Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>;
-    },
+    detail: UiListRenderItemDetail,
     index: number,
   ) => React.ReactNode;
+}
+
+export interface UiListRenderItemDetail {
+  selected: boolean;
+  item: UiListItem;
+  ref: React.Ref<HTMLDivElement>;
+  props: Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>;
 }
 
 function findNonSearchOnlyItem(
@@ -206,6 +208,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
           actions:
             item.actions?.map((action) => ({
               value: action.value,
+              onAction: action.onAction,
               shortcut: action.shortcut,
             })) ?? [],
         });
@@ -236,15 +239,8 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
           currentItem.onSelected?.();
         },
         runActionByShortcut(event) {
-          const { index } = listStore.snapshot().selectedItem;
-          const item = filteredItems[index];
-          if (
-            !item ||
-            typeof item === 'string' ||
-            !item.actions ||
-            item.actions.length === 0
-          )
-            return false;
+          const { actions } = listStore.snapshot().selectedItem;
+          if (!actions) return false;
 
           const { altKey, ctrlKey, metaKey, shiftKey } = event;
           if (!altKey && !ctrlKey && !metaKey && !shiftKey) return false;
@@ -254,7 +250,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
 
             return event[mod];
           };
-          const itemAction = item.actions.find(({ shortcut }) => {
+          const itemAction = actions.find(({ shortcut }) => {
             if (!shortcut) return;
 
             const isModMatch =
@@ -367,17 +363,16 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
         )
           return;
 
-        listStore.setSelectedItem({
-          index,
-          id: item.value,
-          actionIndex: -1,
-          metadata: item.metadata,
-          actions:
-            item.actions?.map((action) => ({
-              value: action.value,
-              shortcut: action.shortcut,
-            })) ?? [],
-        });
+        listStore.setSelectedItem(
+          {
+            index,
+            actions: [],
+            id: item.value,
+            actionIndex: -1,
+            metadata: item.metadata,
+          },
+          true,
+        );
       },
       [onItemSelected],
     );
@@ -543,12 +538,26 @@ const uiListItemActionColors: Record<
   destructive: 'text-destructive-text',
 };
 function UiListItemActions({ actions }: { actions: UiListItemAction[] }) {
+  const listStore = useUiListStore();
   const actionIndex = useUiList((state) => state.selectedItem.actionIndex);
+
   const [openTooltip, setOpenTooltip] = useState(-1);
 
   useEffect(() => {
     setOpenTooltip(actionIndex);
   }, [actionIndex]);
+  useEffect(() => {
+    listStore.setSelectedItem(
+      {
+        actions: actions.map((action) => ({
+          value: action.value,
+          shortcut: action.shortcut,
+          onAction: action.onAction,
+        })),
+      },
+      false,
+    );
+  }, [actions]);
 
   return (
     <div className="flex items-center absolute rounded-sm top-0 h-full right-0 pr-2 pl-6 pointer-events-none bg-gradient-to-tl from-40% from-card to-100% to-transparent">
@@ -607,6 +616,7 @@ const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
       value,
       suffix,
       actions,
+      onClick,
       subtitle,
       selected,
       children,
@@ -634,6 +644,7 @@ const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
     }, [onSelected, value]);
 
     return (
+      // eslint-disable-next-line jsx-a11y/interactive-supports-focus, jsx-a11y/click-events-have-key-events
       <div
         className={cn(
           'relative group/item min-h-12 flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-card aria-selected:text-accent-foreground',
@@ -643,6 +654,11 @@ const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
         aria-selected={selected}
         ref={mergedRef}
         data-item-value={value}
+        role="option"
+        onClick={(event) => {
+          onClick?.(event);
+          onSelected?.(value);
+        }}
       >
         {children ? (
           children

@@ -63,6 +63,7 @@ export function useCommand() {
         launchContext,
         commandId: command.name,
         extensionId: extensionId,
+        commandTitle: command.title,
       });
     }
   }

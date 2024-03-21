@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { EXTENSION_VIEW } from '#common/utils/constant/constant';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
 import {
@@ -27,6 +27,8 @@ function CommandSandboxContent({
 
   const commandCtx = useCommandCtx();
 
+  const [iframeKey, setIframeKey] = useState(0);
+
   function initPortListener(port: MessagePort) {
     commandCtx.setExtMessagePort(port);
     const messagePort = commandCtx.extMessagePort.current!;
@@ -37,14 +39,15 @@ function CommandSandboxContent({
       clearPanelStore();
       navigate('');
     });
+    messagePort.addListener('extension:reload', () => {
+      setIframeKey((prevVal) => prevVal + 1);
+    });
   }
-  async function onIframeLoad(
-    event: React.SyntheticEvent<HTMLIFrameElement, Event>,
-  ) {
-    if (!activeRoute?.data) return;
+  async function onIframeLoad() {
+    if (!activeRoute?.data || !iframeRef.current) return;
 
     try {
-      const iframe = event.target as HTMLIFrameElement;
+      const iframe = iframeRef.current;
       messageChannelRef.current = new MessageChannel();
 
       const payload: ExtensionCommandViewInitMessage = {
@@ -83,6 +86,7 @@ function CommandSandboxContent({
 
   return (
     <iframe
+      key={iframeKey}
       title="sandbox"
       ref={iframeRef}
       name={EXTENSION_VIEW.frameName}

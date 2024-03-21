@@ -6,6 +6,7 @@ export enum ExtensionExecutionFinishReason {
 
 export interface ExtensionMessagePortEvent {
   'extension:init': [];
+  'extension:reload': [];
   'extension:query-change': [string];
   'extension:keydown-event': [
     Pick<

@@ -1,5 +1,4 @@
 import path from 'node:path';
-import fs from 'fs-extra';
 import which from 'which';
 import ExtensionLoader from './ExtensionLoader';
 import { spawn } from 'node:child_process';
@@ -32,7 +31,7 @@ class ExtensionCommandScriptRunner {
 
   runningScripts: Record<
     string,
-    { controller: AbortController; lastMessage: string }
+    { controller: AbortController; lastMessage: string; errorMessage: string }
   >;
 
   constructor() {
@@ -48,13 +47,10 @@ class ExtensionCommandScriptRunner {
     extensionId: string;
     launchContext: CommandLaunchContext;
   }) {
-    const scriptPath = ExtensionLoader.instance.getPath(
-      extensionId,
-      'base',
-      commandId,
-    );
-    if (!scriptPath || !fs.existsSync(scriptPath)) {
-      throw new ExtensionError(`Couldn't find "${commandId}" command`);
+    const extension = ExtensionLoader.instance.getExtension(extensionId);
+    const command = ExtensionLoader.instance.getCommand(extensionId, commandId);
+    if (!command || !extension) {
+      throw new ExtensionError("Couldn't find command");
     }
 
     const fileExt = path.extname(commandId);
@@ -83,7 +79,12 @@ class ExtensionCommandScriptRunner {
     ) as Record<string, string>;
     env['__LAUNCH_BY'] = launchContext.launchBy;
 
-    const ls = spawn(fileCommand, [scriptPath], {
+    const spawnArgs: string[] = [command.filePath];
+    if (fileCommand === 'sh') {
+      spawnArgs.unshift('-e');
+    }
+
+    const ls = spawn(fileCommand, spawnArgs, {
       env,
       signal: controller.signal,
     });
@@ -91,12 +92,14 @@ class ExtensionCommandScriptRunner {
       this.runningScripts[scriptId] = {
         controller,
         lastMessage: '',
+        errorMessage: '',
       };
       sencIpcMessage('command-script:message', {
         commandId,
         extensionId,
         message: '',
         type: 'start',
+        commandTitle: command.title,
       });
     });
     ls.addListener('error', (error) => {
@@ -106,6 +109,7 @@ class ExtensionCommandScriptRunner {
         extensionId,
         type: 'error',
         message: error.message,
+        commandTitle: command.title,
       });
       delete this.runningScripts[scriptId];
 
@@ -117,18 +121,23 @@ class ExtensionCommandScriptRunner {
     });
     ls.addListener('exit', (code) => {
       const isSuccess = code === 0;
+      const { lastMessage, errorMessage } = this.runningScripts[scriptId] ?? {};
+
       sencIpcMessage('command-script:message', {
         commandId,
         extensionId,
+        commandTitle: command.title,
         type: isSuccess ? 'finish' : 'error',
         message: isSuccess
-          ? this.runningScripts[scriptId].lastMessage
-          : `Process finish with exit code ${code}`,
+          ? lastMessage
+          : `Process finish with exit code ${code} \n\n ${errorMessage}`,
       });
 
       delete this.runningScripts[scriptId];
     });
     ls.stdout.addListener('data', (data) => {
+      if (!this.runningScripts[scriptId]) return;
+
       const message = data.toString();
       this.runningScripts[scriptId].lastMessage = message;
       sencIpcMessage('command-script:message', {
@@ -136,6 +145,19 @@ class ExtensionCommandScriptRunner {
         commandId,
         extensionId,
         type: 'message',
+        commandTitle: command.title,
+      });
+    });
+    ls.stderr.addListener('data', (chunk) => {
+      if (!extension.isLocal || !this.runningScripts[scriptId]) return;
+
+      this.runningScripts[scriptId].errorMessage += `${chunk.toString()}\n`;
+      sencIpcMessage('command-script:message', {
+        commandId,
+        extensionId,
+        type: 'stderr',
+        message: chunk.toString(),
+        commandTitle: command.title,
       });
     });
   }
