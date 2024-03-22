@@ -6,3 +6,12 @@
   font-named-instance: "Regular";
   src: url("../fonts/InterVariable.woff2") format("woff2");
 }
+
+/* roboto-mono-regular - latin */
+@font-face {
+  font-display: swap;
+  font-family: 'Roboto Mono';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/roboto-mono-v23-latin-regular.woff2') format('woff2');
+}

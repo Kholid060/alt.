@@ -5754,6 +5754,55 @@ __metadata:
   languageName: node
   linkType: hard
 
+"browser-extension@workspace:apps/browser-extension":
+  version: 0.0.0-use.local
+  resolution: "browser-extension@workspace:apps/browser-extension"
+  dependencies:
+    "@commitlint/cli": "npm:18.4.4"
+    "@commitlint/config-conventional": "npm:18.1.0"
+    "@rollup/plugin-sucrase": "npm:^5.0.2"
+    "@rollup/plugin-typescript": "npm:11.1.6"
+    "@testing-library/react": "npm:14.0.0"
+    "@types/chrome": "npm:0.0.251"
+    "@types/node": "npm:20.8.10"
+    "@types/react": "npm:18.2.37"
+    "@types/react-dom": "npm:18.2.18"
+    "@types/ws": "npm:8.5.8"
+    "@typescript-eslint/eslint-plugin": "npm:6.10.0"
+    "@typescript-eslint/parser": "npm:6.18.1"
+    "@vitejs/plugin-react": "npm:4.2.0"
+    chokidar: "npm:3.5.3"
+    construct-style-sheets-polyfill: "npm:3.1.0"
+    cross-env: "npm:7.0.3"
+    eslint: "npm:8.56.0"
+    eslint-config-airbnb-typescript: "npm:17.1.0"
+    eslint-config-prettier: "npm:9.0.0"
+    eslint-plugin-import: "npm:2.29.1"
+    eslint-plugin-jsx-a11y: "npm:6.8.0"
+    eslint-plugin-prettier: "npm:5.1.3"
+    eslint-plugin-react: "npm:7.33.2"
+    eslint-plugin-react-hooks: "npm:4.6.0"
+    fs-extra: "npm:11.1.1"
+    husky: "npm:8.0.3"
+    jsdom: "npm:^22.1.0"
+    lint-staged: "npm:15.2.0"
+    magic-string: "npm:^0.30.6"
+    npm-run-all: "npm:4.1.5"
+    prettier: "npm:3.2.5"
+    react: "npm:18.2.0"
+    react-dom: "npm:18.2.0"
+    rollup: "npm:4.3.0"
+    sass: "npm:1.69.5"
+    ts-loader: "npm:9.5.0"
+    tslib: "npm:2.6.2"
+    typescript: "npm:5.2.2"
+    vite: "npm:5.0.12"
+    vitest: "npm:^1.2.2"
+    webextension-polyfill: "npm:0.10.0"
+    ws: "npm:8.14.2"
+  languageName: unknown
+  linkType: soft
+
 "browserslist@npm:^4.22.2, browserslist@npm:^4.23.0":
   version: 4.23.0
   resolution: "browserslist@npm:4.23.0"
@@ -6124,55 +6173,6 @@ __metadata:
   checksum: 10c0/594754e1303672171cc04e50f6c398ae16128eb134a88f801bf5354fd96f205320f23536a045d9abd8b51024a149696e51231565891d4efdab8846021ecf88e6
   languageName: node
   linkType: hard
-
-"chrome-extension-boilerplate-react-vite@workspace:apps/browser-extension":
-  version: 0.0.0-use.local
-  resolution: "chrome-extension-boilerplate-react-vite@workspace:apps/browser-extension"
-  dependencies:
-    "@commitlint/cli": "npm:18.4.4"
-    "@commitlint/config-conventional": "npm:18.1.0"
-    "@rollup/plugin-sucrase": "npm:^5.0.2"
-    "@rollup/plugin-typescript": "npm:11.1.6"
-    "@testing-library/react": "npm:14.0.0"
-    "@types/chrome": "npm:0.0.251"
-    "@types/node": "npm:20.8.10"
-    "@types/react": "npm:18.2.37"
-    "@types/react-dom": "npm:18.2.18"
-    "@types/ws": "npm:8.5.8"
-    "@typescript-eslint/eslint-plugin": "npm:6.10.0"
-    "@typescript-eslint/parser": "npm:6.18.1"
-    "@vitejs/plugin-react": "npm:4.2.0"
-    chokidar: "npm:3.5.3"
-    construct-style-sheets-polyfill: "npm:3.1.0"
-    cross-env: "npm:7.0.3"
-    eslint: "npm:8.56.0"
-    eslint-config-airbnb-typescript: "npm:17.1.0"
-    eslint-config-prettier: "npm:9.0.0"
-    eslint-plugin-import: "npm:2.29.1"
-    eslint-plugin-jsx-a11y: "npm:6.8.0"
-    eslint-plugin-prettier: "npm:5.1.3"
-    eslint-plugin-react: "npm:7.33.2"
-    eslint-plugin-react-hooks: "npm:4.6.0"
-    fs-extra: "npm:11.1.1"
-    husky: "npm:8.0.3"
-    jsdom: "npm:^22.1.0"
-    lint-staged: "npm:15.2.0"
-    magic-string: "npm:^0.30.6"
-    npm-run-all: "npm:4.1.5"
-    prettier: "npm:3.2.5"
-    react: "npm:18.2.0"
-    react-dom: "npm:18.2.0"
-    rollup: "npm:4.3.0"
-    sass: "npm:1.69.5"
-    ts-loader: "npm:9.5.0"
-    tslib: "npm:2.6.2"
-    typescript: "npm:5.2.2"
-    vite: "npm:5.0.12"
-    vitest: "npm:^1.2.2"
-    webextension-polyfill: "npm:0.10.0"
-    ws: "npm:8.14.2"
-  languageName: unknown
-  linkType: soft
 
 "chromium-pickle-js@npm:^0.2.0":
   version: 0.2.0
@@ -7511,6 +7511,7 @@ __metadata:
     tailwindcss: "npm:^3.4.1"
     type-fest: "npm:^4.11.0"
     typescript: "npm:5.3.3"
+    uWebSockets.js: "https://github.com/uNetworking/uWebSockets.js#v20.43.0"
     unplugin-auto-expose: "npm:0.3.0"
     vite: "npm:5.1.1"
     vite-plugin-static-copy: "npm:^1.0.1"
@@ -15059,6 +15060,13 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 10c0/fcf6658073d07283910d9a0e04b1d5d0ebc822c04dbb7abdd74c3151c7aa92fcddbac7d799404e358197222006ccdc4c0db219d223d2ee4ccd9e2b01333b49be
+  languageName: node
+  linkType: hard
+
+"uWebSockets.js@https://github.com/uNetworking/uWebSockets.js#v20.43.0":
+  version: 20.43.0
+  resolution: "uWebSockets.js@https://github.com/uNetworking/uWebSockets.js.git#commit=1977b5039938ad863d42fc4958d48c17e5a1fa06"
+  checksum: 10c0/0d1d94bbde0773944d2059694c62388d85399433531faeec2b49a8c411a5dc7706e561367bc9cb076c5dd4e1cff30dde5d81be304dcd526136b61b4a0c2166e5
   languageName: node
   linkType: hard
 

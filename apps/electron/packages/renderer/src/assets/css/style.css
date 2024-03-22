@@ -4,6 +4,7 @@
 
 :root {
   --font-sans: 'Inter';
+  --font-mono: 'Roboto Mono';
 }
 
 @layer base {
