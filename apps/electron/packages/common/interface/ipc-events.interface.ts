@@ -1,8 +1,13 @@
 import type { FlatActionExtensionAPI } from '@repo/extension-core/dist/flat-extension-api';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
-import type { ExtensionData } from './extension.interface';
-import type { ExtensionCommand } from '@repo/extension-core';
+import type {
+  ExtensionConfigData,
+  ExtensionData,
+  ExtensionDataBase,
+} from './extension.interface';
+import type { ExtensionCommand, ExtensionConfig } from '@repo/extension-core';
 import type { CommandLaunchContext } from '@repo/extension';
+import type { PartialDeep } from 'type-fest';
 
 export type IPCUserExtensionEventsMap = FlatActionExtensionAPI;
 
@@ -41,10 +46,34 @@ export interface IPCExtensionEvents {
   ) => (ExtensionData & { $key: string }) | null;
 }
 
+export interface IPCExtensionConfigEvents {
+  'extension-config:exists': (configId: string) => boolean;
+  'extension-config:get': (configId: string) => ExtensionConfigData | null;
+  'extension-config:need-input': (
+    extensionId: string,
+    commandId: string,
+  ) =>
+    | { requireInput: false }
+    | {
+        requireInput: true;
+        config: ExtensionConfig[];
+        type: 'extension' | 'command';
+      };
+  'extension-config:update': (
+    configId: string,
+    data: PartialDeep<Pick<ExtensionConfigData, 'value'>>,
+  ) => void;
+  'extension-config:set': (
+    configId: string,
+    data: Omit<ExtensionConfigData, 'configId' | 'id'>,
+  ) => void;
+}
+
 export interface IPCUserExtensionEvents {
   'user-extension': <T extends keyof IPCUserExtensionEventsMap>(detail: {
     key: string;
     name: T;
+    commandId: string;
     args: Parameters<IPCUserExtensionEventsMap[T]>;
   }) => Awaited<ReturnType<IPCUserExtensionEventsMap[T]>>;
 }
@@ -63,7 +92,8 @@ export type IPCEvents = IPCShellEvents &
   IPCDialogEvents &
   IPCClipboardEvents &
   IPCExtensionEvents &
-  IPCUserExtensionEvents;
+  IPCUserExtensionEvents &
+  IPCExtensionConfigEvents;
 
 export interface IPCSendEvents {
   'command-script:message': [
@@ -77,9 +107,20 @@ export interface IPCSendEvents {
   ];
   'command:execute': [
     {
-      extensionId: string;
-      extensionName: string;
+      commandIcon: string;
       command: ExtensionCommand;
+      extension: ExtensionDataBase;
+      launchContext: CommandLaunchContext;
+    },
+  ];
+  'extension-config:open': [
+    {
+      configId: string;
+      runCommand: boolean;
+      commandIcon: string;
+      commandTitle: string;
+      extensionName: string;
+      config: ExtensionConfig[];
       launchContext: CommandLaunchContext;
     },
   ];

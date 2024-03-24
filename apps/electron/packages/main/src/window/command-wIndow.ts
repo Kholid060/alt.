@@ -24,8 +24,6 @@ export async function createCommandWindow() {
     x: windowXPos,
     y: windowYPos,
     transparent: true,
-    maximizable: false,
-    minimizable: false,
     resizable: import.meta.env.DEV,
     width: COMMNAND_WINDOW_BOUND.width,
     minHeight: COMMNAND_WINDOW_BOUND.minHeight,

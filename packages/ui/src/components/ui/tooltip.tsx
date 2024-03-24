@@ -8,7 +8,8 @@ export const UiTooltipProvider = TooltipPrimitive.Provider;
 interface UiTooltipProps
   extends React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>,
     React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Root> {
-  label: string | React.ReactNode;
+  label?: string | React.ReactNode;
+  renderLabel?: React.ReactNode;
 }
 
 export const UiTooltip = React.forwardRef<
@@ -17,12 +18,13 @@ export const UiTooltip = React.forwardRef<
 >(
   (
     {
-      children,
-      sideOffset,
-      className,
-      label,
-      defaultOpen,
       open,
+      children,
+      className,
+      sideOffset,
+      label = '',
+      defaultOpen,
+      renderLabel,
       onOpenChange,
       delayDuration = 500,
       disableHoverableContent,
@@ -49,7 +51,7 @@ export const UiTooltip = React.forwardRef<
         )}
         {...props}
       >
-        {label}
+        {renderLabel ? renderLabel : label}
       </TooltipPrimitive.Content>
     </TooltipPrimitive.Root>
   ),

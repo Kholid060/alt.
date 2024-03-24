@@ -21,12 +21,12 @@ function setExtView(type: 'empty' | 'error' = 'empty') {
 
 export class ExtensionAPI {
   private key: string = '';
+  private commandId: string = '';
   private permissions: SetRequired<
     ExtensionManifest,
     'permissions'
   >['permissions'] = [];
 
-  private messagePort: MessagePort | null = null;
   private messageListeners: Record<string, ((...args: any[]) => any)[]> = {};
 
   constructor() {
@@ -36,7 +36,6 @@ export class ExtensionAPI {
         const [port] = event.ports;
         if (!port) return;
 
-        this.messagePort = port;
         port.addEventListener('message', this.onMessagePort.bind(this));
       },
       { once: true },
@@ -73,12 +72,15 @@ export class ExtensionAPI {
         .split('/');
       if (!extensionId || !commandId) return setExtView();
 
+      this.commandId = commandId;
+
       const extensionData = await invokeIpcMessage(
         'extension:get',
         extensionId,
       );
-      if (!extensionData) return setExtView();
-      if ('$isError' in extensionData) throw new Error(extensionData.message);
+      if (extensionData && '$isError' in extensionData)
+        throw new Error(extensionData.message);
+      if (!extensionData || extensionData.isError) return setExtView();
 
       this.key = extensionData.$key;
 
@@ -152,6 +154,7 @@ export class ExtensionAPI {
       name,
       args,
       key: this.key,
+      commandId: this.commandId,
     })) as any;
     if (typeof result === 'object' && result && '$isError' in result) {
       throw new Error(result.message);

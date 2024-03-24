@@ -1,4 +1,7 @@
-import { ExtensionData } from '#common/interface/extension.interface';
+import {
+  ExtensionData,
+  ExtensionDataBase,
+} from '#common/interface/extension.interface';
 import { CommandLaunchContext } from '@repo/extension';
 import { ExtensionCommand, ExtensionManifest } from '@repo/extension-core';
 import { UiListItem } from '@repo/ui';
@@ -60,9 +63,9 @@ export interface CommandListItemCommand extends UiListItem {
   group: 'Commands';
   metadata: {
     type: 'command';
-    extensionId: string;
-    extensionTitle: string;
+    commandIcon: string;
     command: ExtensionCommand;
+    extension: ExtensionDataBase;
   };
 }
 

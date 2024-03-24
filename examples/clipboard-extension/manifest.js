@@ -10,7 +10,9 @@ export default {
   description,
   title: 'Clipboard',
   icon: 'icon:Clipboard',
-  extensionType: 'default',
+  config: [
+    { name: 'number', type: 'input:number', title: 'Input number', placeholder: 'Number placeholder', required: true },
+  ],
   commands: [
     {
       icon: 'clipboard',
@@ -44,7 +46,16 @@ export default {
       icon: 'clipboard',
       name: 'clipboard-list',
       title: 'Clipboard List',
-      type: 'view'
+      type: 'view',
+      config: [
+        { name: 'number', type: 'input:number', title: 'Input number', placeholder: 'Number placeholder', defaultValue: 10 },
+        { name: 'config-file', type: 'input:file', title: 'Select config file', placeholder: 'File placeholder', required: true, fileFilter: [{ extensions: ['json', 'yaml'], name: 'Config file' }] },
+        { name: 'all-file', type: 'input:file', title: 'Select any file', placeholder: 'File placeholder', required: true },
+        { name: 'text', type: 'input:text', title: 'Text', placeholder: 'Text placeholder', defaultValue: 'Hello world' },
+        { name: 'dir', type: 'input:directory', title: 'Input DIR', placeholder: 'Directory placeholder', description: 'Select a direcotry' },
+        { name: 'select', type: 'select', title: 'Select', placeholder: 'Directory placeholder', options: [{ label: 'Option 1', value: 'option-1' }, { label: 'Option 2', value: 'option-2' }] },
+        { name: 'toggle', type: 'toggle', title: 'Toggle' }
+      ],
     },
     {
       icon: 'icon:Terminal',

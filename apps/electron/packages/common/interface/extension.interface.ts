@@ -32,3 +32,10 @@ export interface ExtensionCommandViewInitMessage {
   themeStyle: string;
   launchContext: CommandLaunchContext;
 }
+
+export interface ExtensionConfigData {
+  id: number;
+  configId: string;
+  extensionId: string;
+  value: Record<string, unknown>;
+}

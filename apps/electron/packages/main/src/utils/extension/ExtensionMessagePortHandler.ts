@@ -44,6 +44,7 @@ class ExtensionMessagePortHandler {
       key: data.key,
       args: data.args,
       name: data.name,
+      commandId: data.commandId,
     });
 
     this.messageChannel.port2.postMessage({

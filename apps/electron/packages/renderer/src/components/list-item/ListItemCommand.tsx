@@ -1,13 +1,14 @@
-import { UiList } from '@repo/ui';
+import { UiList, UiListItemAction } from '@repo/ui';
 import { ListItemRenderDetail } from '/@/routes/CommandList';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { APP_DEEP_LINK } from '#common/utils/constant/constant';
-import { LinkIcon } from 'lucide-react';
+import { BoltIcon, LinkIcon } from 'lucide-react';
 import { useCommandStore } from '/@/stores/command.store';
-import { ExtensionCommand } from '@repo/extension-core';
 import { useCommand } from '/@/hooks/useCommand';
 import { CommandLaunchBy } from '@repo/extension';
+import { useCommandNavigate } from '/@/hooks/useCommandRoute';
+import { getExtIconURL } from '/@/utils/helper';
 
 function ListItemCommand({
   item,
@@ -17,17 +18,12 @@ function ListItemCommand({
 }: ListItemRenderDetail<'command'>) {
   const addPanelStatus = useCommandPanelStore.use.addStatus();
 
+  const navigate = useCommandNavigate();
   const { executeCommand } = useCommand();
 
-  const { command, extensionId, extensionTitle } = item.metadata;
+  const { command, commandIcon, extension } = item.metadata;
 
-  function startExecuteCommand({
-    command,
-    extension,
-  }: {
-    command: ExtensionCommand;
-    extension: { id: string; name: string };
-  }) {
+  function startExecuteCommand() {
     const args: Record<string, unknown> = {};
     const commandStore = useCommandStore.getState();
 
@@ -69,13 +65,56 @@ function ListItemCommand({
     }
 
     executeCommand({
+      command,
+      extension,
+      commandIcon,
       launchContext: {
         args,
         launchBy: CommandLaunchBy.USER,
       },
-      command,
-      extensionId: extension.id,
-      extensionName: extension.name,
+    });
+  }
+
+  const actions: UiListItemAction[] = [
+    {
+      onAction() {
+        preloadAPI.main
+          .invokeIpcMessage(
+            'clipboard:copy',
+            `${APP_DEEP_LINK}://extensions/${extension.id}/${command.name}`,
+          )
+          .then((value) => {
+            if (value && '$isError' in value) return;
+
+            addPanelStatus({
+              type: 'success',
+              title: 'Copied to clipboard',
+            });
+          });
+      },
+      icon: LinkIcon,
+      title: 'Copy Deep Link',
+      value: 'copy-deeplink',
+    },
+  ];
+  if (command.config && command.config.length > 0) {
+    actions.push({
+      icon: BoltIcon,
+      onAction() {
+        navigate(`/configs/${extension.id}:${command.name}`, {
+          data: {
+            config: command.config,
+          },
+          panelHeader: {
+            title: command.title,
+            subtitle: extension.title,
+            icon: getExtIconURL(commandIcon, extension.id),
+          },
+        });
+      },
+      title: 'Config',
+      value: 'config',
+      shortcut: { key: ',', mod1: 'ctrlKey' },
     });
   }
 
@@ -83,39 +122,13 @@ function ListItemCommand({
     <UiList.Item
       ref={itemRef}
       {...{ ...props, ...item, selected }}
-      actions={[
-        {
-          onAction() {
-            preloadAPI.main
-              .invokeIpcMessage(
-                'clipboard:copy',
-                `${APP_DEEP_LINK}://extensions/${extensionId}/${command.name}`,
-              )
-              .then((value) => {
-                if (value && '$isError' in value) return;
-
-                addPanelStatus({
-                  type: 'success',
-                  title: 'Copied to clipboard',
-                });
-              });
-          },
-          icon: LinkIcon,
-          title: 'Copy Deep Link',
-          value: 'copy-deeplink',
-        },
-      ]}
+      actions={actions}
       suffix={
         command.type === 'script' ? (
           <span className="text-xs text-muted-foreground">Command Script</span>
         ) : undefined
       }
-      onSelected={() =>
-        startExecuteCommand({
-          command,
-          extension: { id: extensionId, name: extensionTitle },
-        })
-      }
+      onSelected={startExecuteCommand}
     />
   );
 }

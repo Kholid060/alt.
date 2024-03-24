@@ -4,7 +4,16 @@ import './ipc-extension-messages';
 import { clipboard, dialog } from 'electron';
 import ExtensionCommandScriptRunner from './extension/ExtensionCommandScriptRunner';
 import { onIpcMessage } from './ipc-main';
+import extensionsDB from '../db/extension.db';
+import type { ExtensionConfigData } from '#packages/common/interface/extension.interface';
+import { configs } from '../db/schema/extension.schema';
+import { eq } from 'drizzle-orm';
+import { ExtensionError } from '#packages/common/errors/custom-errors';
+import { getExtensionConfigDefaultValue } from './helper';
+import ExtensionsDBController from '../db/controller/extensions-db.controller';
+import type { IPCExtensionConfigEvents } from '#packages/common/interface/ipc-events.interface';
 
+/** EXTENSION */
 onIpcMessage('extension:list', () =>
   Promise.resolve(ExtensionLoader.instance.extensions),
 );
@@ -47,8 +56,10 @@ onIpcMessage('extension:run-script-command', async (_, detail) => {
   }
 });
 
+/** APPS */
 onIpcMessage('apps:get-list', () => InstalledApps.instance.getList());
 
+/** DIALOG */
 onIpcMessage('dialog:open', (_, options) => {
   return dialog.showOpenDialog(options);
 });
@@ -56,8 +67,93 @@ onIpcMessage('dialog:message-box', (_, options) => {
   return dialog.showMessageBox(options);
 });
 
+/** CLIPBOARD */
 onIpcMessage('clipboard:copy', (_, content) => {
   clipboard.writeText(content);
 
   return Promise.resolve();
 });
+
+/** EXTENSION CONFIG */
+onIpcMessage('extension-config:get', async (_, configId) => {
+  const result = (await extensionsDB.query.configs.findFirst({
+    where: (fields, { eq }) => eq(fields.configId, configId),
+  })) as ExtensionConfigData;
+
+  return result ?? null;
+});
+onIpcMessage('extension-config:set', async (_, configId, data) => {
+  await extensionsDB.insert(configs).values({
+    ...data,
+    configId,
+  });
+});
+onIpcMessage('extension-config:update', async (_, configId, data) => {
+  await extensionsDB
+    .update(configs)
+    .set(data)
+    .where(eq(configs.configId, configId));
+});
+onIpcMessage('extension-config:exists', (_, configId) => {
+  return ExtensionsDBController.configExists(configId);
+});
+
+const extensionConfigNeedInputCache = new Set<string>();
+onIpcMessage(
+  'extension-config:need-input',
+  async (_, extensionId, commandId) => {
+    type ReturnValue = ReturnType<
+      IPCExtensionConfigEvents['extension-config:need-input']
+    >;
+
+    const commandConfigId = `${extensionId}:${commandId}`;
+    if (extensionConfigNeedInputCache.has(commandConfigId)) {
+      return { requireInput: false } as ReturnValue;
+    }
+
+    const extension = ExtensionLoader.instance.getExtension(extensionId);
+    if (!extension || extension.isError) {
+      throw new ExtensionError('Extension not found');
+    }
+
+    const extensionConfig = getExtensionConfigDefaultValue(
+      extension.manifest.config ?? [],
+    );
+    if (extensionConfig.requireInput) {
+      const extensionConfigExists = await ExtensionsDBController.configExists(
+        extension.id,
+      );
+      if (!extensionConfigExists) {
+        return {
+          requireInput: true,
+          type: 'extension',
+          config: extension.manifest.config,
+        } as ReturnValue;
+      }
+    }
+
+    const command = extension.manifest.commands.find(
+      (command) => command.name === commandId,
+    );
+    if (!command) throw new ExtensionError('Command not found');
+
+    const commandConfig = getExtensionConfigDefaultValue(command.config ?? []);
+    if (commandConfig.requireInput) {
+      const commandConfigExists =
+        await ExtensionsDBController.configExists(commandConfigId);
+      if (!commandConfigExists) {
+        return {
+          type: 'command',
+          requireInput: true,
+          config: command.config,
+        } as ReturnValue;
+      }
+    }
+
+    extensionConfigNeedInputCache.add(commandConfigId);
+
+    return {
+      requireInput: false,
+    } as ReturnValue;
+  },
+);

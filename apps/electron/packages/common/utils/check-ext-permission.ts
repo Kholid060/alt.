@@ -13,6 +13,7 @@ export const API_PERMISSION_MAP: [
   Partial<ExtensionPermission>[],
 ][] = [
   ['fs', ['fs']],
+  ['runtime', []],
   ['shell', ['shell']],
   ['sqlite', ['sqlite']],
   ['storage', ['storage']],
@@ -36,6 +37,8 @@ export function isExtHasApiPermission(
     apiPath.startsWith(path),
   );
   if (!apiPermission) throw new Error(`"${apiPath}" doesn't have permission`);
+
+  if (apiPermission[1].length === 0) return true;
 
   return permissions.some((permission) =>
     apiPermission[1].includes(permission),

@@ -1,5 +1,11 @@
 import { relations, sql } from 'drizzle-orm';
-import { text, integer, sqliteTable, blob } from 'drizzle-orm/sqlite-core';
+import {
+  text,
+  integer,
+  sqliteTable,
+  blob,
+  uniqueIndex,
+} from 'drizzle-orm/sqlite-core';
 
 export const extensions = sqliteTable('extensions', {
   id: text('id').primaryKey(),
@@ -8,42 +14,63 @@ export const extensions = sqliteTable('extensions', {
   title: text('title').notNull(),
   version: text('version').notNull(),
   description: text('description').notNull(),
-  isLocal: integer('isLocal', { mode: 'boolean' })
+  isLocal: integer('is_local', { mode: 'boolean' })
     .notNull()
     .$default(() => false),
-  createdAt: text('createdAt')
+  createdAt: text('created_at')
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
-  updatedAt: text('updatedAt')
+  updatedAt: text('updated_at')
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
 });
 export type NewExtension = typeof extensions.$inferInsert;
 
 export const extensionsRelations = relations(extensions, ({ many }) => ({
-  storages: many(extensionsStorage),
+  configs: many(configs),
+  storages: many(storages),
 }));
 
-export const extensionsStorage = sqliteTable('extensions-storage', {
+export const storages = sqliteTable('storages', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-  createdAt: text('createdAt')
+  createdAt: text('created_at')
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
-  updatedAt: text('updatedAt')
+  updatedAt: text('updated_at')
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
-  extensionId: text('extensionId').notNull(),
+  extensionId: text('extension_id').notNull(),
   key: text('key').notNull(),
   value: blob('value', { mode: 'buffer' }).notNull(),
 });
-export type NewExtensionStorage = typeof extensionsStorage.$inferInsert;
+export type NewExtensionStorage = typeof storages.$inferInsert;
+export type SelectExtensionStorage = typeof storages.$inferSelect;
 
-export const extensionsStorageRelations = relations(
-  extensionsStorage,
-  ({ one }) => ({
-    extension: one(extensions, {
-      fields: [extensionsStorage.extensionId],
-      references: [extensions.id],
-    }),
+export const extensionsStorageRelations = relations(storages, ({ one }) => ({
+  extension: one(extensions, {
+    fields: [storages.extensionId],
+    references: [extensions.id],
+  }),
+}));
+
+export const configs = sqliteTable(
+  'configs',
+  {
+    id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+    extensionId: text('extension_id').notNull(),
+    configId: text('config_id').unique().notNull(),
+    value: text('value', { mode: 'json' }).notNull(),
+  },
+  (table) => ({
+    configIdIdx: uniqueIndex('config_id_idx').on(table.configId),
   }),
 );
+export type NewExtensionConfig = typeof configs.$inferInsert;
+export type SelectExtensionConfig = typeof configs.$inferSelect;
+
+export const extensionsConfigRelations = relations(configs, ({ one }) => ({
+  extension: one(extensions, {
+    fields: [configs.extensionId],
+    references: [extensions.id],
+  }),
+}));

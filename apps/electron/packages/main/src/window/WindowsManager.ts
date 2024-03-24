@@ -24,12 +24,7 @@ class WindowsManager {
   constructor() {}
 
   async restoreOrCreateWindow(name: keyof Windows) {
-    let window = this.windows.get(name);
-
-    if (window === undefined || window.isDestroyed()) {
-      window = await windows[name]();
-      this.windows.set(name, window);
-    }
+    const window = await this.createWindow(name);
 
     if (window.isMinimized()) {
       window.restore();

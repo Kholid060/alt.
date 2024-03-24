@@ -203,7 +203,7 @@ class ExtensionLoader {
   }
 
   async importExtension(manifestPath: string): Promise<ExtensionData | null> {
-    const normalizeManifestPath = path.normalize(manifestPath);
+    const normalizeManifestPath = path.normalize(path.dirname(manifestPath));
 
     let isAlreadyAdded = false;
     this._extensions.forEach((extension) => {
@@ -234,7 +234,7 @@ class ExtensionLoader {
       description,
       isLocal: true,
       isError: false,
-      path: path.dirname(manifestPath),
+      path: normalizeManifestPath,
     };
 
     await extensionsDB.insert(extensions).values(extensionData);

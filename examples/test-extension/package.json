@@ -14,11 +14,14 @@
   "description": "Clipboard extension",
   "main": "index.js",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "build": "cliaa build"
   },
   "devDependencies": {
-    "@repo/extension-core": "workspace:*"
+    "@repo/extension": "workspace:*",
+    "@repo/extension-core": "workspace:*",
+    "typescript": "^5.4.3"
   },
   "dependencies": {
     "dayjs": "^1.11.10",

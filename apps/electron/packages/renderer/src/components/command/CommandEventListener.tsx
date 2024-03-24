@@ -7,6 +7,7 @@ import ExtensionWorker from '/@/utils/extension/ExtensionWorker';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
 import { useCommand } from '/@/hooks/useCommand';
 import { useCommandStore } from '/@/stores/command.store';
+import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 
 function CommandEventListener() {
   const [clearAllStatus, addStatus, setHeader] = useCommandPanelStore(
@@ -18,8 +19,10 @@ function CommandEventListener() {
   );
   const addExtensionError = useCommandStore.use.addExtensionError();
 
-  const { executeCommand } = useCommand();
+  const navigate = useCommandNavigate();
+
   const { setExtMessagePort } = useCommandCtx();
+  const { executeCommand, checkCommandConfig } = useCommand();
 
   useEffect(() => {
     const clearPanel = () => {
@@ -27,15 +30,28 @@ function CommandEventListener() {
       clearAllStatus();
     };
 
-    const onExecuteCommand: MittEventHandler<'execute-command'> = async (
-      payload,
-    ) => {
+    const onExecuteCommand: MittEventHandler<'execute-command'> = async ({
+      command,
+      extension,
+      commandIcon,
+      launchContext,
+    }) => {
+      const isConfigInputted = await checkCommandConfig({
+        command,
+        extension,
+        commandIcon,
+        launchContext,
+      });
+      if (!isConfigInputted) return;
+
       const { port1, port2 } = new MessageChannel();
       setExtMessagePort(port2);
 
       ExtensionWorker.instance.executeActionCommand({
-        ...payload,
         messagePort: port1,
+        commandId: command.name,
+        extensionId: extension.id,
+        launchContext: launchContext,
         onFinish() {
           clearPanel();
         },
@@ -53,9 +69,9 @@ function CommandEventListener() {
               clearPanel();
             },
           });
-          addExtensionError(payload.extensionId, {
+          addExtensionError(extension.id, {
             content: message,
-            title: `Error in "${payload.commandTitle}" command`,
+            title: `Error in "${command.title}" command`,
           });
         },
       });
@@ -95,21 +111,37 @@ function CommandEventListener() {
     );
     const offCommandExecute = preloadAPI.main.ipcMessage.on(
       'command:execute',
-      (_, { command, launchContext, extensionId, extensionName }) => {
+      async (_, { command, launchContext, commandIcon, extension }) => {
         executeCommand({
           command,
-          extensionId,
+          extension,
+          commandIcon,
           launchContext,
-          extensionName,
+        });
+      },
+    );
+    const offOpenExtConfig = preloadAPI.main.ipcMessage.on(
+      'extension-config:open',
+      (_, payload) => {
+        navigate(`/configs/${payload.configId}`, {
+          data: payload,
+          panelHeader: {
+            icon: payload.commandIcon,
+            title: payload.commandTitle,
+            subtitle: payload.extensionName,
+          },
         });
       },
     );
 
     return () => {
+      offOpenExtConfig?.();
       offCommandExecute?.();
       offCommandScriptMessageEvent?.();
       emitter.off('execute-command', onExecuteCommand);
     };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return null;

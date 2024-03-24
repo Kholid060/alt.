@@ -1,11 +1,12 @@
 import { UiList, UiListItemAction } from '@repo/ui';
 import { ListItemRenderDetail } from '/@/routes/CommandList';
-import { RotateCcwIcon, AlertTriangleIcon } from 'lucide-react';
+import { RotateCcwIcon, AlertTriangleIcon, BoltIcon } from 'lucide-react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandStore } from '/@/stores/command.store';
 import { useShallow } from 'zustand/react/shallow';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { useUiListStore } from '@repo/ui/dist/context/list.context';
+import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 
 function ListItemExtension({
   item,
@@ -25,6 +26,7 @@ function ListItemExtension({
   const addPanelStatus = useCommandPanelStore.use.addStatus();
 
   const uiListStore = useUiListStore();
+  const navigate = useCommandNavigate();
 
   const { extension } = item.metadata;
 
@@ -80,6 +82,27 @@ function ListItemExtension({
       value: 'errors',
       title: 'See errors',
       color: 'destructive',
+    });
+  } else if (
+    extension.manifest.config &&
+    extension.manifest.config?.length > 0
+  ) {
+    actions.push({
+      icon: BoltIcon,
+      onAction() {
+        navigate(`/configs/${extension.id}`, {
+          data: {
+            config: extension.manifest.config,
+          },
+          panelHeader: {
+            title: extension.title,
+            icon: extension.manifest.icon,
+          },
+        });
+      },
+      title: 'Config',
+      value: 'config',
+      shortcut: { key: ',', mod1: 'ctrlKey' },
     });
   }
 

@@ -12,7 +12,6 @@ export default defineConfig((options: Options) => [
     format: ['esm'],
     dts: true,
     minify: !options.watch,
-    external: ['react', '@radix-ui/react-primitive', 'react-dom'],
     esbuildOptions(esbuildOpts) {
       esbuildOpts.outbase = './src';
     },

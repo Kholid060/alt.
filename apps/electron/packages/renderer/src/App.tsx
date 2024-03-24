@@ -16,16 +16,22 @@ import CommandList from './routes/CommandList';
 import { GripHorizontalIcon } from 'lucide-react';
 import CommandEventListener from './components/command/CommandEventListener';
 import CommandErrorOverlay from './components/command/CommandErrorOverlay';
+import ConfigInput from './routes/ConfigInput';
 
 const routes = createCommandRoutes([
   {
     path: '',
+    name: 'home',
     element: CommandList,
   },
   {
     name: 'extension-command-view',
     path: '/extensions/:extensionId/:commandId/view',
     element: CommandExtensionContent,
+  },
+  {
+    element: ConfigInput,
+    path: '/configs/:configId',
   },
 ]);
 

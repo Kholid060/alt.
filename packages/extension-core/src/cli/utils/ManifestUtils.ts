@@ -91,14 +91,15 @@ class ManifestUtils {
   }
 
   async getExtensionManifest(): Promise<ExtensionManifest> {
-    const packageJSON = await this.resolveExtensionManifest();
+    const manifestFile = await this.resolveExtensionManifest();
 
-    const manifest = await ExtensionManifestSchema.safeParseAsync(packageJSON);
+    const manifest = await ExtensionManifestSchema.safeParseAsync(manifestFile);
     if (!manifest.success) {
       throw logger.error(
         fromZodError(manifest.error, {
-          prefix: 'Manifest Validation',
+          prefix: '',
           includePath: true,
+          prefixSeparator: '',
         }).toString(),
       );
     }

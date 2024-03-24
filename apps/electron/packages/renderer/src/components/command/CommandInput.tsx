@@ -200,7 +200,7 @@ const commandKeys = new Set([
 function CommandInputIcon({ onNavigateBack }: { onNavigateBack?: () => void }) {
   const currentRoute = useCommandRoute((state) => state.currentRoute);
 
-  const isCanNavigateBack = currentRoute?.name === 'extension-command-view';
+  const isCanNavigateBack = currentRoute?.path !== '';
 
   return (
     <button

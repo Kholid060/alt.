@@ -15,8 +15,9 @@ export interface CommandRouteActive {
   path: string;
   name: string;
   basePath: string;
-  data: null | unknown;
-  params: Record<string, unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: null | any;
+  params: Record<string, string | undefined>;
 }
 
 export interface CommandRouteContextState {

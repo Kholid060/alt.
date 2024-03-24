@@ -53,5 +53,5 @@ export function CommandRouteOutlet() {
   const Component = activeRoute ? routes[activeRoute.basePath]?.element : null;
   if (!Component) return;
 
-  return <Component />;
+  return <Component key={activeRoute?.path} />;
 }

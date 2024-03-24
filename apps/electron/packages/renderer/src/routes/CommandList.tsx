@@ -1,9 +1,6 @@
-import { commandIcons } from '#common/utils/command-icons';
 import { memo, useCallback } from 'react';
 import { useCommandStore } from '/@/stores/command.store';
-import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
 import {
-  UiImage,
   UiListItem,
   UiListRenderItemDetail,
   uiListItemsFilter,
@@ -21,40 +18,12 @@ import { useShallow } from 'zustand/react/shallow';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import ListItemCommand from '../components/list-item/ListItemCommand';
 import ListItemExtension from '../components/list-item/ListItemExtension';
-
-type CommandIconName = keyof typeof commandIcons;
-
-const iconPrefix = 'icon:';
+import UiExtensionIcon from '../components/ui/UiExtensionIcon';
+import { useCommandNavigate } from '../hooks/useCommandRoute';
 
 const QUERY_PREFIX = {
   EXT: 'ext:',
 };
-
-function CommandPrefix({
-  id,
-  alt,
-  icon,
-}: {
-  id: string;
-  alt: string;
-  icon: string;
-}) {
-  if (icon.startsWith(iconPrefix)) {
-    let iconName = icon.slice(iconPrefix.length) as CommandIconName;
-    iconName = commandIcons[iconName] ? iconName : 'Command';
-
-    const Icon = commandIcons[iconName] ?? icon;
-
-    return <UiList.Icon icon={Icon} />;
-  }
-
-  return (
-    <UiImage
-      src={`${CUSTOM_SCHEME.extension}://${id}/icon/${icon}`}
-      alt={alt}
-    />
-  );
-}
 
 export interface ListItemRenderDetail<
   T extends CommandListItems['metadata']['type'],
@@ -69,6 +38,7 @@ function CommandList() {
   );
 
   const addPanelStatus = useCommandPanelStore.use.addStatus();
+  const navigate = useCommandNavigate();
 
   const customListFilter = useCallback((items: UiListItem[], query: string) => {
     let cleanedQuery = query;
@@ -83,7 +53,7 @@ function CommandList() {
         const metadata = item.metadata as CommandListItems['metadata'];
         if (metadata.type !== 'command') return false;
 
-        return metadata.extensionId === cleanedQuery;
+        return metadata.extension.id === cleanedQuery;
       });
 
       return commandItems;
@@ -100,10 +70,11 @@ function CommandList() {
     const extensionIcon = extension.isError ? (
       <UiList.Icon icon={extension.title[0].toUpperCase()} />
     ) : (
-      <CommandPrefix
+      <UiExtensionIcon
         alt={`${extension.title} icon`}
         id={extension.id}
         icon={extension.manifest.icon}
+        iconWrapper={(icon) => <UiList.Icon icon={icon} />}
       />
     );
 
@@ -121,21 +92,24 @@ function CommandList() {
 
     if (extension.isError) return acc;
 
+    const { manifest: _, ...extensionPayload } = extension;
+
     extension.manifest.commands.forEach((command) => {
       acc.unshift({
         metadata: {
           command,
           type: 'command',
-          extensionId: extension.id,
-          extensionTitle: extension.title,
+          extension: extensionPayload,
+          commandIcon: command.icon ?? extension.manifest.icon,
         },
         value: `command:${extension.id}:${command.name}`,
         subtitle: command.subtitle || extension.title,
         icon: command.icon ? (
-          <CommandPrefix
+          <UiExtensionIcon
             id={extension.id}
             alt={command.name}
             icon={command.icon}
+            iconWrapper={(icon) => <UiList.Icon icon={icon} />}
           />
         ) : (
           extensionIcon
@@ -169,6 +143,21 @@ function CommandList() {
           }
 
           addExtension(result);
+
+          const inputExtensionConfig =
+            !result.isError &&
+            result.manifest.config?.some((item) => item.required);
+          if (inputExtensionConfig) {
+            navigate(`/configs/${result.id}`, {
+              data: {
+                config: result.manifest.config,
+              },
+              panelHeader: {
+                title: result.title,
+                icon: result.manifest.icon,
+              },
+            });
+          }
         } catch (_error) {
           addPanelStatus({
             type: 'error',

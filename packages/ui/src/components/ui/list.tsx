@@ -19,8 +19,8 @@ import { matchSorter } from 'match-sorter';
 import { cn } from '@/utils/cn';
 import { UiTooltip } from './tooltip';
 import {
-  KeyboardShortcut,
   getShortcutStr,
+  KeyboardShortcut,
   KeyboardShortcutModifier,
 } from '@repo/shared';
 import mergeRefs from '@/utils/mergeRefs';
@@ -63,7 +63,7 @@ export interface UiListProps
   selectedItem?: string;
   shouldFilter?: boolean;
   disabledItemSelection?: boolean;
-  onItemSelected?: (item: UiListItem) => void;
+  onItemSelected?: (value: string) => void;
   customFilter?: (items: UiListItem[], query: string) => UiListItem[];
   renderGroupHeader?: (label: string, index: number) => React.ReactNode;
   renderItem?: (
@@ -216,26 +216,23 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
 
       return {
         selectItem() {
-          const { index, actionIndex } = listStore.snapshot().selectedItem;
+          const { index, actionIndex, actions, id } =
+            listStore.snapshot().selectedItem;
           const currentItem = filteredItems[index];
 
-          if (!currentItem || typeof currentItem === 'string') return;
+          if (!id || !currentItem || typeof currentItem === 'string') return;
 
-          if (
-            actionIndex >= 0 &&
-            currentItem.actions &&
-            currentItem.actions[actionIndex]
-          ) {
-            currentItem.actions[actionIndex].onAction();
+          if (actionIndex >= 0 && actions && actions[actionIndex]) {
+            actions[actionIndex].onAction();
             return;
           }
 
           const itemEl = document.querySelector<HTMLElement>(
-            `[data-item-value="${currentItem.value}"]`,
+            `[data-item-value="${id}"]`,
           );
           itemEl?.dispatchEvent(new Event(ITEM_SELECTED_EVENT));
 
-          onItemSelected?.(currentItem);
+          onItemSelected?.(id);
           currentItem.onSelected?.();
         },
         runActionByShortcut(event) {
@@ -379,7 +376,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
     const onItemClick = useCallback(
       (item: UiListItem) => {
         item.onSelected?.();
-        onItemSelected?.(item);
+        onItemSelected?.(item.value);
       },
       [onItemSelected],
     );
@@ -656,8 +653,8 @@ const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
         data-item-value={value}
         role="option"
         onClick={(event) => {
-          onClick?.(event);
-          onSelected?.(value);
+          if (!onSelected) onClick?.(event);
+          else onSelected(value);
         }}
       >
         {children ? (

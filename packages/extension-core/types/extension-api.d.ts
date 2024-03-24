@@ -26,6 +26,14 @@ declare namespace ExtensionAPI.shell {
   export function openURL(url: string): Promise<void>;
 }
 
+declare namespace ExtensionAPI.runtime {}
+
+declare namespace ExtensionAPI.runtime.config {
+  export function getValues<T extends object = Record<string, unknown>>(
+    type?: 'extension' | 'command',
+  ): Promise<T>;
+}
+
 declare namespace ExtensionAPI.shell.installedApps {
   export interface AppDetail {
     name: string;
@@ -100,8 +108,7 @@ declare namespace ExtensionAPI.storage {
     | Record<string | number, any>
     | Array<any>;
 
-  export function get(key: string): Promise<Values>;
-  export function get(key: string[]): Promise<Record<string, Values>>;
+  export function get(key: string | string[]): Promise<Record<string, Values>>;
 
   export function getAll(): Promise<Record<string, Values>>;
 

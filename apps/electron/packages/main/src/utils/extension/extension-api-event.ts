@@ -19,8 +19,9 @@ import { onIpcMessage } from '../ipc-main';
 export type ExtensionMessageHandler = <
   T extends keyof IPCUserExtensionEventsMap,
 >(detail: {
-  key: string;
   name: T;
+  key: string;
+  commandId: string;
   sender: Electron.IpcMainInvokeEvent | null;
   args: Parameters<IPCUserExtensionEventsMap[T]>;
 }) => Promise<
@@ -32,15 +33,17 @@ export const onExtensionIPCEvent = (() => {
   const handlers: Record<string, (...args: any[]) => any> = {};
 
   const onExtensionEvent: ExtensionMessageHandler = async ({
-    sender,
-    args,
     key,
     name,
+    args,
+    sender,
+    commandId,
   }) => {
     try {
       const extension = ExtensionLoader.instance.getExtensionByKey(key);
       if (
         !extension ||
+        extension.isError ||
         !isExtHasApiPermission(name, extension.manifest.permissions || [])
       ) {
         throw new ExtensionError(
@@ -51,7 +54,7 @@ export const onExtensionIPCEvent = (() => {
       const handler = handlers[name];
       if (!handler) throw new Error(`"${name}" doesn't have handler`);
 
-      const result = await handler({ sender, extension }, ...args);
+      const result = await handler({ sender, extension, commandId }, ...args);
 
       return result;
     } catch (error) {
@@ -100,8 +103,9 @@ export const onExtensionIPCEvent = (() => {
     callback: (
       ...args: [
         detail: {
-          sender: Electron.IpcMainInvokeEvent;
+          commandId: string;
           extension: ExtensionData;
+          sender: Electron.IpcMainInvokeEvent;
         },
         ...P,
       ]

@@ -11,11 +11,21 @@ class ExtensionWorkerMessagePort {
     { resolve(value: unknown): void; reject(reason?: any): void }
   > = new Map();
 
+  commandId: string;
   extensionKey: string;
   messagePort: MessagePort;
 
-  constructor({ key, messagePort }: { key: string; messagePort: MessagePort }) {
+  constructor({
+    key,
+    commandId,
+    messagePort,
+  }: {
+    key: string;
+    commandId: string;
+    messagePort: MessagePort;
+  }) {
     this.extensionKey = key;
+    this.commandId = commandId;
     this.messagePort = messagePort;
 
     this.onMessage = this.onMessage.bind(this);
@@ -78,6 +88,7 @@ class ExtensionWorkerMessagePort {
         args,
         messageId,
         key: this.extensionKey,
+        commandId: this.commandId,
       });
     });
   }

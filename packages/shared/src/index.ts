@@ -4,6 +4,7 @@ export { default as AMessagePort } from './utils/AMessagePort';
 export {
   SHORTCUT_KEYS,
   SHORTCUT_MODIFIER,
+  SHORTCUT_KEY_DISPLAY_MAP,
 } from './utils/constant/shortcut.const';
 
 export type {

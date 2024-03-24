@@ -1,5 +1,4 @@
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
-import { ExtensionCommand } from '@repo/extension-core';
 
 export function extPathParser(path: string) {
   const [_, ext, extId, commandId] = path.split('/');
@@ -34,9 +33,8 @@ export function mergeRefs<T>(
   };
 }
 
-export function getCommandIcon(command: ExtensionCommand, extensionId: string) {
-  if (!command.icon) return undefined;
-  if (command.icon.startsWith('icon:')) return command.icon;
+export function getExtIconURL(icon: string, extensionId: string) {
+  if (icon.startsWith('icon:')) return icon;
 
-  return `${CUSTOM_SCHEME.extension}://${extensionId}/icon/${command.icon}`;
+  return `${CUSTOM_SCHEME.extension}://${extensionId}/icon/${icon}`;
 }

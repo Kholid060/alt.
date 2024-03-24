@@ -10,10 +10,7 @@ import { CommandLaunchContext } from '@repo/extension';
 
 type ExtensionCommand = (payload: CommandLaunchContext) => void | Promise<void>;
 
-async function loadExtensionCommand() {
-  const [extensionId, commandId] = self.name.split(':');
-  self.name = '';
-
+async function loadExtensionCommand(extensionId: string, commandId: string) {
   const filePath = `${CUSTOM_SCHEME.extension}://${extensionId}/command/${commandId}/@renderer`;
   const { default: executeCommand } = (await import(
     /* @vite-ignore */ filePath
@@ -28,13 +25,16 @@ function initExtensionAPI({
   key,
   port,
   manifest,
+  commandId,
 }: {
   key: string;
+  commandId: string;
   port: MessagePort;
   manifest: ExtensionManifest;
 }) {
   const extensionWorkerMessage = new ExtensionWorkerMessagePort({
     key: key,
+    commandId,
     messagePort: port,
   });
 
@@ -74,7 +74,10 @@ self.onmessage = async ({
       return;
     }
 
-    const executeCommand = await loadExtensionCommand();
+    const [extensionId, commandId] = self.name.split(':');
+    self.name = '';
+
+    const executeCommand = await loadExtensionCommand(extensionId, commandId);
     if (typeof executeCommand !== 'function') {
       throw new Error('The extension command is not a function');
     }
@@ -82,6 +85,7 @@ self.onmessage = async ({
     self.onmessage = null;
 
     initExtensionAPI({
+      commandId,
       key: data.key,
       port: ports[0],
       manifest: data.manifest,

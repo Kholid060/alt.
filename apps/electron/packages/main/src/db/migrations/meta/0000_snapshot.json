@@ -1,9 +1,61 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "ef914d35-189c-4db6-b943-885ee2119a43",
+  "id": "6cf3333d-2c3f-4254-af44-ebe2a93d90f8",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
+    "configs": {
+      "name": "configs",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "extension_id": {
+          "name": "extension_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "config_id": {
+          "name": "config_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "configs_config_id_unique": {
+          "name": "configs_config_id_unique",
+          "columns": [
+            "config_id"
+          ],
+          "isUnique": true
+        },
+        "config_id_idx": {
+          "name": "config_id_idx",
+          "columns": [
+            "config_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "extensions": {
       "name": "extensions",
       "columns": {
@@ -49,23 +101,23 @@
           "notNull": true,
           "autoincrement": false
         },
-        "isLocal": {
-          "name": "isLocal",
+        "is_local": {
+          "name": "is_local",
           "type": "integer",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
         },
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "CURRENT_TIMESTAMP"
         },
-        "updatedAt": {
-          "name": "updatedAt",
+        "updated_at": {
+          "name": "updated_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -78,8 +130,8 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
-    "extensions-storage": {
-      "name": "extensions-storage",
+    "storages": {
+      "name": "storages",
       "columns": {
         "id": {
           "name": "id",
@@ -88,24 +140,24 @@
           "notNull": true,
           "autoincrement": true
         },
-        "createdAt": {
-          "name": "createdAt",
+        "created_at": {
+          "name": "created_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "CURRENT_TIMESTAMP"
         },
-        "updatedAt": {
-          "name": "updatedAt",
+        "updated_at": {
+          "name": "updated_at",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
           "default": "CURRENT_TIMESTAMP"
         },
-        "extensionId": {
-          "name": "extensionId",
+        "extension_id": {
+          "name": "extension_id",
           "type": "text",
           "primaryKey": false,
           "notNull": true,

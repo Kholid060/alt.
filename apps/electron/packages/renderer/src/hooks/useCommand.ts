@@ -1,10 +1,18 @@
 import { ExtensionCommand } from '@repo/extension-core';
-import { getCommandIcon } from '../utils/helper';
+import { getExtIconURL } from '../utils/helper';
 import { useCommandPanelStore } from '../stores/command-panel.store';
 import emitter from '../lib/mitt';
 import preloadAPI from '../utils/preloadAPI';
 import { useCommandNavigate } from './useCommandRoute';
 import { CommandLaunchContext } from '@repo/extension';
+import { ExtensionDataBase } from '#common/interface/extension.interface';
+
+export interface ExecuteCommandPayload {
+  commandIcon: string;
+  command: ExtensionCommand;
+  extension: ExtensionDataBase;
+  launchContext: CommandLaunchContext;
+}
 
 export function useCommand() {
   const setPanelHeader = useCommandPanelStore.use.setHeader();
@@ -13,29 +21,75 @@ export function useCommand() {
 
   const navigate = useCommandNavigate();
 
-  function executeCommand({
+  async function checkCommandConfig({
     command,
-    extensionId,
-    extensionName,
+    extension,
+    commandIcon,
     launchContext,
-  }: {
-    extensionId: string;
-    extensionName: string;
-    command: ExtensionCommand;
-    launchContext: CommandLaunchContext;
-  }) {
+  }: ExecuteCommandPayload) {
+    if (!command.config || command.config.length === 0) return true;
+
+    const configState = await preloadAPI.main.invokeIpcMessage(
+      'extension-config:need-input',
+      extension.id,
+      command.name,
+    );
+    if ('$isError' in configState) {
+      addPanelStatus({
+        type: 'error',
+        title: configState.message,
+      });
+      return false;
+    }
+
+    if (configState.requireInput) {
+      const isCommand = configState.type === 'command';
+      const configId = isCommand
+        ? `${extension.id}:${command.name}`
+        : extension.id;
+      navigate(`/configs/${configId}`, {
+        panelHeader: {
+          subtitle: isCommand ? extension.name : '',
+          icon: getExtIconURL(commandIcon, extension.id),
+          title: isCommand ? command.title : extension.name,
+        },
+        data: {
+          config: configState.config,
+          executeCommand: { launchContext, command, extension, commandIcon },
+        },
+      });
+
+      return false;
+    }
+
+    return true;
+  }
+  async function executeCommand({
+    command,
+    extension,
+    commandIcon,
+    launchContext,
+  }: ExecuteCommandPayload) {
+    const isConfigInputted = await checkCommandConfig({
+      command,
+      extension,
+      commandIcon,
+      launchContext,
+    });
+    if (!isConfigInputted) return;
+
     const updatePanelHeader = () => {
       setPanelHeader({
         title: command.title,
-        subtitle: extensionName,
-        icon: getCommandIcon(command, extensionId),
+        subtitle: extension.title,
+        icon: getExtIconURL(commandIcon, extension.id),
       });
       removePanelStatus('command-missing-args');
     };
 
     if (command.type === 'view') {
       updatePanelHeader();
-      navigate(`/extensions/${extensionId}/${command.name}/view`, {
+      navigate(`/extensions/${extension.id}/${command.name}/view`, {
         data: launchContext,
       });
     } else if (command.type === 'script') {
@@ -43,7 +97,7 @@ export function useCommand() {
         .invokeIpcMessage('extension:run-script-command', {
           launchContext,
           commandId: command.name,
-          extensionId: extensionId,
+          extensionId: extension.id,
         })
         .then((result) => {
           if ('$isError' in result) {
@@ -60,13 +114,13 @@ export function useCommand() {
     } else {
       updatePanelHeader();
       emitter.emit('execute-command', {
+        command,
+        extension,
+        commandIcon,
         launchContext,
-        commandId: command.name,
-        extensionId: extensionId,
-        commandTitle: command.title,
       });
     }
   }
 
-  return { executeCommand };
+  return { executeCommand, checkCommandConfig };
 }
