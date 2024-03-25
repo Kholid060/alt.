@@ -11,11 +11,12 @@ import WindowsManager from './window/WindowsManager';
 import { APP_DEEP_LINK } from '#packages/common/utils/constant/constant';
 import path from 'node:path';
 import deepLinkHandler from './utils/deepLinkHandler';
+import ServerService from './services/server.service';
 
 Menu.setApplicationMenu(null);
 registerCustomProtocolsPrivileged();
 
-console.log(app.getPath('appData'), app.getPath('sessionData'));
+ServerService.instance.init();
 
 /**
  * Prevent electron from running multiple instances.

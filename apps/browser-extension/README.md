@@ -155,7 +155,7 @@ export function attachTwindStyle<T extends { adoptedStyleSheets: unknown }>(
 <summary>src/pages/popup/index.tsx</summary>
 
 ```tsx
-import { attachTwindStyle } from '@src/shared/style/twind';
+import { attachTwindStyle } from '/@/shared/style/twind';
 
 ...
 attachTwindStyle(appContainer, document);
@@ -171,7 +171,7 @@ root.render(<Popup />);
 <summary>src/pages/content/ui/root.tsx</summary>
 
 ```tsx
-import { attachTwindStyle } from '@src/shared/style/twind';
+import { attachTwindStyle } from '/@/shared/style/twind';
 
 ...
 attachTwindStyle(rootIntoShadow, shadowRoot);

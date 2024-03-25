@@ -7,8 +7,5 @@ export {
   SHORTCUT_KEY_DISPLAY_MAP,
 } from './utils/constant/shortcut.const';
 
-export type {
-  KeyboardShortcut,
-  KeyboardShortcutKeys,
-  KeyboardShortcutModifier,
-} from './interfaces/keyboard.interface';
+export type * from './interfaces/keyboard.interface';
+export type * from './interfaces/extension-websocket.interface';

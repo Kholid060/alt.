@@ -1,12 +1,12 @@
+import WebsocketService from '@root/src/service/websocket.service';
 import reloadOnUpdate from 'virtual:reload-on-update-in-background-script';
 import 'webextension-polyfill';
+import BackgroundTabManager from './BackgroundTabManager';
 
 reloadOnUpdate('pages/background');
 
-/**
- * Extension reloading is necessary because the browser automatically caches the css.
- * If you do not use the css of the content script, please delete it.
- */
-reloadOnUpdate('pages/content/style.scss');
+WebsocketService.instance.init().then(() => {
+  BackgroundTabManager.instance.init();
+});
 
 console.log('background loaded');

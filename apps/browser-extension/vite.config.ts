@@ -15,7 +15,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@root': rootDir,
-      '@src': srcDir,
+      '/@/': srcDir,
       '@assets': resolve(srcDir, 'assets'),
       '@pages': pagesDir,
     },
@@ -32,16 +32,8 @@ export default defineConfig({
     emptyOutDir: !isDev,
     rollupOptions: {
       input: {
-        devtools: resolve(pagesDir, 'devtools', 'index.html'),
-        panel: resolve(pagesDir, 'panel', 'index.html'),
         contentInjected: resolve(pagesDir, 'content', 'injected', 'index.ts'),
-        contentUI: resolve(pagesDir, 'content', 'ui', 'index.ts'),
         background: resolve(pagesDir, 'background', 'index.ts'),
-        contentStyle: resolve(pagesDir, 'content', 'style.scss'),
-        popup: resolve(pagesDir, 'popup', 'index.html'),
-        newtab: resolve(pagesDir, 'newtab', 'index.html'),
-        options: resolve(pagesDir, 'options', 'index.html'),
-        sidepanel: resolve(pagesDir, 'sidepanel', 'index.html'),
       },
       output: {
         entryFileNames: 'src/pages/[name]/index.js',
@@ -53,11 +45,5 @@ export default defineConfig({
         },
       },
     },
-  },
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    include: ['**/*.test.ts', '**/*.test.tsx'],
-    setupFiles: './test-utils/vitest.setup.js',
   },
 });
