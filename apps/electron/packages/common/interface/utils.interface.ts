@@ -11,3 +11,8 @@ export type NestedKeyOf<ObjectType extends object> = {
 export type KeysMatchingValueType<T, V> = {
   [K in keyof T]: T[K] extends V ? K : never;
 }[keyof T];
+
+export type PickEventParameters<T, K extends keyof T> = {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [P in K]: T[K] extends (...args: any[]) => any ? Parameters<T[K]> : [];
+};

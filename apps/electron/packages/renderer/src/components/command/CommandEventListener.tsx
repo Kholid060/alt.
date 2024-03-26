@@ -18,6 +18,7 @@ function CommandEventListener() {
     ]),
   );
   const addExtensionError = useCommandStore.use.addExtensionError();
+  const setCommandStore = useCommandStore.use.setState();
 
   const navigate = useCommandNavigate();
 
@@ -133,10 +134,17 @@ function CommandEventListener() {
         });
       },
     );
+    const offBrowserTabsActive = preloadAPI.main.ipcMessage.on(
+      'browser:tabs:active',
+      (_, browserTab) => {
+        setCommandStore('activeBrowserTab', browserTab);
+      },
+    );
 
     return () => {
       offOpenExtConfig?.();
       offCommandExecute?.();
+      offBrowserTabsActive?.();
       offCommandScriptMessageEvent?.();
       emitter.off('execute-command', onExecuteCommand);
     };

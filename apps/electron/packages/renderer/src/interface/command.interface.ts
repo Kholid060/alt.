@@ -53,14 +53,12 @@ export type CommandActions =
   | CommandActionCustom;
 
 export interface CommandListItemCommandBuiltIn extends UiListItem {
-  group: 'Commands';
   metadata: {
     type: 'builtin-command';
   };
 }
 
 export interface CommandListItemCommand extends UiListItem {
-  group: 'Commands';
   metadata: {
     type: 'command';
     commandIcon: string;
@@ -70,7 +68,6 @@ export interface CommandListItemCommand extends UiListItem {
 }
 
 export interface CommandListItemExtension extends UiListItem {
-  group: 'Extensions';
   metadata: {
     type: 'extension';
     extension: ExtensionData;

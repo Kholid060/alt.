@@ -31,7 +31,7 @@ class WebsocketService {
     });
   }
 
-  sendEvent<T extends keyof ExtensionWSClientToServerEvents>(
+  emitEvent<T extends keyof ExtensionWSClientToServerEvents>(
     name: T,
     ...args: Parameters<ExtensionWSClientToServerEvents[T]>
   ) {
@@ -39,7 +39,7 @@ class WebsocketService {
       throw new Error("Socket hasn't been initialized");
     }
 
-    this.socket.send(name, ...args);
+    this.socket.emit(name, ...args);
   }
 }
 

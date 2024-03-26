@@ -11,12 +11,10 @@ import WindowsManager from './window/WindowsManager';
 import { APP_DEEP_LINK } from '#packages/common/utils/constant/constant';
 import path from 'node:path';
 import deepLinkHandler from './utils/deepLinkHandler';
-import ServerService from './services/server.service';
+import ServerService from './services/server/server.service';
 
 Menu.setApplicationMenu(null);
 registerCustomProtocolsPrivileged();
-
-ServerService.instance.init();
 
 /**
  * Prevent electron from running multiple instances.
@@ -75,7 +73,9 @@ app
   .whenReady()
   .then(() => {
     registerCustomProtocols();
-    WindowsManager.instance.restoreOrCreateWindow('command');
+    WindowsManager.instance.restoreOrCreateWindow('command').then(() => {
+      ServerService.instance.init();
+    });
   })
   .catch((e) => console.error('Failed create window:', e));
 

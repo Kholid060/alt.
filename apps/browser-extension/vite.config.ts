@@ -37,10 +37,15 @@ export default defineConfig({
       },
       output: {
         entryFileNames: 'src/pages/[name]/index.js',
-        chunkFileNames: isDev ? 'assets/js/[name].js' : 'assets/js/[name].[hash].js',
-        assetFileNames: assetInfo => {
-          const { name } = path.parse(assetInfo.name);
-          const assetFileName = name === 'contentStyle' ? `${name}${getCacheInvalidationKey()}` : name;
+        chunkFileNames: isDev
+          ? 'assets/js/[name].js'
+          : 'assets/js/[name].[hash].js',
+        assetFileNames: (assetInfo) => {
+          const { name } = path.parse(assetInfo.name as string);
+          const assetFileName =
+            name === 'contentStyle'
+              ? `${name}${getCacheInvalidationKey()}`
+              : name;
           return `assets/[ext]/${assetFileName}.chunk.[ext]`;
         },
       },

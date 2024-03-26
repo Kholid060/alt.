@@ -1,6 +1,6 @@
 import type { ServerOptions } from 'socket.io';
 import { Server } from 'socket.io';
-import ExtensionNamespaceService from './extension-namespace.service';
+import ExtensionWSNamespace from './ws-namespaces/extensions.ws-namespace';
 
 class WebsocketService {
   private static _instance: WebsocketService | null = null;
@@ -14,9 +14,6 @@ class WebsocketService {
   }
 
   private io: Server | null = null;
-  private extensionNamespace: ExtensionNamespaceService | null = null;
-
-  constructor() {}
 
   initServer(port: number, options: Partial<ServerOptions> = {}) {
     this.io = new Server(port, {
@@ -26,8 +23,7 @@ class WebsocketService {
       ...options,
     });
 
-    const extensionNamespace = this.io.of('/extensions');
-    this.extensionNamespace = new ExtensionNamespaceService(extensionNamespace);
+    ExtensionWSNamespace.instance.init(this.io);
 
     console.log(`Server starting on port ${port}`);
   }

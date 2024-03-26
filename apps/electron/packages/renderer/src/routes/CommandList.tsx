@@ -1,4 +1,4 @@
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { useCommandStore } from '/@/stores/command.store';
 import {
   UiListItem,
@@ -36,6 +36,7 @@ function CommandList() {
   const [extensions, addExtension] = useCommandStore(
     useShallow((state) => [state.extensions, state.addExtension]),
   );
+  const activeBrowserTab = useCommandStore.use.activeBrowserTab();
 
   const addPanelStatus = useCommandPanelStore.use.addStatus();
   const navigate = useCommandNavigate();
@@ -64,64 +65,98 @@ function CommandList() {
       .map((item) => ({ ...item, group: 'Search results' }));
   }, []);
 
-  const extensionCommands = extensions.reduce<
-    (CommandListItemCommand | CommandListItemExtension)[]
-  >((acc, extension) => {
-    const extensionIcon = extension.isError ? (
-      <UiList.Icon icon={extension.title[0].toUpperCase()} />
-    ) : (
-      <UiExtensionIcon
-        alt={`${extension.title} icon`}
-        id={extension.id}
-        icon={extension.manifest.icon}
-        iconWrapper={(icon) => <UiList.Icon icon={icon} />}
-      />
-    );
+  const extensionCommands = useMemo(() => {
+    type Item = CommandListItemCommand | CommandListItemExtension;
 
-    const item: CommandListItemExtension = {
-      value: extension.id,
-      group: 'Extensions',
-      icon: extensionIcon,
-      title: extension.title,
-      metadata: {
-        extension,
-        type: 'extension',
-      },
-    };
-    acc.push(item);
+    const extItems: Item[] = [];
+    const commandItems: Item[] = [];
+    const suggestionItems: Item[] = [];
 
-    if (extension.isError) return acc;
+    extensions.forEach((extension) => {
+      const extensionIcon = extension.isError ? (
+        <UiList.Icon icon={extension.title[0].toUpperCase()} />
+      ) : (
+        <UiExtensionIcon
+          alt={`${extension.title} icon`}
+          id={extension.id}
+          icon={extension.manifest.icon}
+          iconWrapper={(icon) => <UiList.Icon icon={icon} />}
+        />
+      );
 
-    const { manifest: _, ...extensionPayload } = extension;
-
-    extension.manifest.commands.forEach((command) => {
-      acc.unshift({
+      const item: CommandListItemExtension = {
+        value: extension.id,
+        group: 'Extensions',
+        icon: extensionIcon,
+        title: extension.title,
         metadata: {
-          command,
-          type: 'command',
-          extension: extensionPayload,
-          commandIcon: command.icon ?? extension.manifest.icon,
+          extension,
+          type: 'extension',
         },
-        value: `command:${extension.id}:${command.name}`,
-        subtitle: command.subtitle || extension.title,
-        icon: command.icon ? (
-          <UiExtensionIcon
-            id={extension.id}
-            alt={command.name}
-            icon={command.icon}
-            iconWrapper={(icon) => <UiList.Icon icon={icon} />}
-          />
-        ) : (
-          extensionIcon
-        ),
-        group: 'Commands',
-        title: command.title,
-        keywords: [extension.title],
+      };
+      extItems.push(item);
+
+      if (extension.isError) return;
+
+      const { manifest: _, ...extensionPayload } = extension;
+
+      extension.manifest.commands.forEach((command) => {
+        let isInSuggestion = false;
+        const showCommands = command.context
+          ? command.context.some((context) => {
+              if (context.startsWith('host')) {
+                if (!activeBrowserTab) return false;
+
+                const hostCtx = context.slice(
+                  context.indexOf(':') + 1,
+                  context.length - 1,
+                );
+                isInSuggestion = new URLPattern(hostCtx).test(
+                  activeBrowserTab.url,
+                );
+
+                return isInSuggestion;
+              } else if (context === 'all') {
+                return true;
+              }
+
+              return false;
+            })
+          : true;
+
+        if (!showCommands) return;
+
+        const commandItem: Item = {
+          metadata: {
+            command,
+            type: 'command',
+            extension: extensionPayload,
+            commandIcon: command.icon ?? extension.manifest.icon,
+          },
+          value: `command:${extension.id}:${command.name}`,
+          subtitle: command.subtitle || extension.title,
+          icon: command.icon ? (
+            <UiExtensionIcon
+              id={extension.id}
+              alt={command.name}
+              icon={command.icon}
+              iconWrapper={(icon) => <UiList.Icon icon={icon} />}
+            />
+          ) : (
+            extensionIcon
+          ),
+          title: command.title,
+          group: isInSuggestion ? 'Suggestions' : 'Commands',
+        };
+
+        isInSuggestion
+          ? suggestionItems.push(commandItem)
+          : commandItems.push(commandItem);
       });
     });
 
-    return acc;
-  }, []);
+    return { extItems, suggestionItems, commandItems };
+  }, [extensions, activeBrowserTab]);
   const builtInCommands: CommandListItemCommandBuiltIn[] = [
     {
       group: 'Commands',
@@ -176,7 +211,12 @@ function CommandList() {
     <>
       <UiList
         className="p-2"
-        items={[...extensionCommands, ...builtInCommands]}
+        items={[
+          ...extensionCommands.suggestionItems,
+          ...extensionCommands.commandItems,
+          ...extensionCommands.extItems,
+          ...builtInCommands,
+        ]}
         customFilter={customListFilter}
         renderItem={({ ref, item, ...detail }) => {
           const commandItem = item as CommandListItems;

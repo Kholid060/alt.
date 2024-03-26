@@ -6369,6 +6369,7 @@ __metadata:
   resolution: "clipboard-extension@workspace:examples/clipboard-extension"
   dependencies:
     "@repo/extension": "workspace:*"
+    "@repo/extension-core": "workspace:*"
     "@types/react": "npm:^18.2.66"
     dayjs: "npm:^1.11.10"
     react: "npm:^18.2.0"

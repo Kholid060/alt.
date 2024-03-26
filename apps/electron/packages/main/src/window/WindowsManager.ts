@@ -45,9 +45,21 @@ class WindowsManager {
     return window;
   }
 
-  getWindow(name: keyof Windows) {
+  getWindow(name: keyof Windows, options?: { noThrow: false }): BrowserWindow;
+  getWindow(
+    name: keyof Windows,
+    options?: { noThrow: true },
+  ): BrowserWindow | null;
+  getWindow(
+    name: keyof Windows,
+    options?: { noThrow: boolean },
+  ): BrowserWindow | null {
     const window = this.windows.get(name);
-    if (!window) throw new Error(`${name} window hasn't been initialized`);
+    if (!window) {
+      if (options?.noThrow) return null;
+
+      throw new Error(`${name} window hasn't been initialized`);
+    }
 
     return window;
   }

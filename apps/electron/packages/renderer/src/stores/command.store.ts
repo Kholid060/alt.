@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { CommandActions } from '../interface/command.interface';
 import createStoreSelectors from '../utils/createStoreSelector';
+import { BrowserExtensionTab } from '@repo/shared';
 
 interface ExtensionCommandArgs {
   commandId: string;
@@ -14,6 +15,7 @@ interface CommandStoreState {
   actions: CommandActions[];
   extensions: ExtensionData[];
   commandArgs: ExtensionCommandArgs;
+  activeBrowserTab: BrowserExtensionTab | null;
   extensionErrors: Record<string, CommandErrorOverlayData[]>;
   errorOverlay: { title: string; errors: CommandErrorOverlayData[] } | null;
 }
@@ -51,6 +53,7 @@ const initialState: CommandStoreState = {
   extensions: [],
   errorOverlay: null,
   extensionErrors: {},
+  activeBrowserTab: null,
   commandArgs: {
     args: {},
     commandId: '',

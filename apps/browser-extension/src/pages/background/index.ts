@@ -1,6 +1,5 @@
 import WebsocketService from '@root/src/service/websocket.service';
 import reloadOnUpdate from 'virtual:reload-on-update-in-background-script';
-import 'webextension-polyfill';
 import BackgroundTabManager from './BackgroundTabManager';
 
 reloadOnUpdate('pages/background');

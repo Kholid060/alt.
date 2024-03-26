@@ -22,7 +22,7 @@ export const EXTENSION_COMMAND_TYPE = [
   'view:json',
 ] as const;
 
-export const EXTENSION_COMMAND_CONTEXT = ['all', 'url'] as const;
+export const EXTENSION_COMMAND_CONTEXT = ['all'] as const;
 
 export const EXTENSION_COMMAND_ARGUMENT_TYPE = [
   'toggle',
@@ -113,9 +113,12 @@ export const ExtensionCommandSchema = z.object({
   config: ExtensionConfigSchema.array().optional(),
   arguments: ExtensionCommandArgumentSchema.array().optional(),
   context: z
-    .enum(EXTENSION_COMMAND_CONTEXT)
-    .default('all')
-    .or(z.string().startsWith('host:')),
+    .custom<'all' | `host:${string}`>(
+      (val) =>
+        typeof val === 'string' && (val.startsWith('host') || val === 'all'),
+    )
+    .array()
+    .optional(),
 });
 
 export const ExtensionManifestSchema = z.object({

@@ -2,7 +2,7 @@ export interface BrowserExtensionTab { title: string; url: string; id: number; w
 
 export interface ExtensionWSClientToServerEvents {
   ping: () => void;
-  'active-browser-tab': (tab: BrowserExtensionTab | null) => void;
+  'tabs:active': (tab: BrowserExtensionTab | null) => void;
 }
 
 export interface ExtensionWSServerToClientEvents {

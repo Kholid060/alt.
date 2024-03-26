@@ -8,6 +8,7 @@ import type {
 import type { ExtensionCommand, ExtensionConfig } from '@repo/extension-core';
 import type { CommandLaunchContext } from '@repo/extension';
 import type { PartialDeep } from 'type-fest';
+import type { ServerPortEvent } from './server-port-event.interface';
 
 export type IPCUserExtensionEventsMap = FlatActionExtensionAPI;
 
@@ -124,4 +125,5 @@ export interface IPCSendEvents {
       launchContext: CommandLaunchContext;
     },
   ];
+  'browser:tabs:active': Parameters<ServerPortEvent['tabs:active']>;
 }

@@ -12,6 +12,7 @@
   },
   "devDependencies": {
     "@repo/extension": "workspace:*",
+    "@repo/extension-core": "workspace:*",
     "@types/react": "^18.2.66",
     "typescript": "^5.4.2"
   },

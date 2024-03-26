@@ -48,17 +48,16 @@ class BackgroundTabManager {
           windowId: this.activeTab.windowId!,
         }
       : null;
-    WebsocketService.instance.sendEvent('active-browser-tab', payload);
+    WebsocketService.instance.emitEvent('tabs:active', payload);
   }
 
   private async onWindowsFocusChanged(windowId: number) {
-    console.log('===', windowId);
     if (windowId === browser.windows.WINDOW_ID_NONE) {
       // double-check, the windowId is also -1 when changing active tab for some reason
       const currentWindow = await browser.windows.getCurrent();
       if (currentWindow.focused) return;
 
-      WebsocketService.instance.sendEvent('active-browser-tab', null);
+      WebsocketService.instance.emitEvent('tabs:active', null);
       this.isWindowFocus = false;
     } else {
       this.isWindowFocus = true;
