@@ -23,6 +23,7 @@ export const API_PERMISSION_MAP: [
   ['fs.readJSON', ['fs', 'fs.read']],
   ['fs.writeFile', ['fs', 'fs.write']],
   ['fs.appendFile', ['fs', 'fs.write']],
+  ['browser.activeTab', ['browser.activeTab']],
 ];
 // SORT BY ITS DEEP
 API_PERMISSION_MAP.sort(

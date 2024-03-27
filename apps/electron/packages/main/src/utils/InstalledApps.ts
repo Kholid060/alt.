@@ -234,7 +234,6 @@ class InstalledApps {
   }
 
   getAppTarget(appId: string) {
-    console.log(appId, this.appTarget);
     return this.appTarget.get(appId);
   }
 

@@ -13,7 +13,7 @@ import ExtensionLoader from './ExtensionLoader';
 import ExtensionMessagePortHandler from './ExtensionMessagePortHandler';
 import { logger } from '/@/lib/log';
 import WindowsManager from '/@/window/WindowsManager';
-import type { ExtensionData } from '#packages/common/interface/extension.interface';
+import type { ExtensionDataValid } from '#packages/common/interface/extension.interface';
 import { onIpcMessage } from '../ipc-main';
 
 export type ExtensionMessageHandler = <
@@ -104,7 +104,7 @@ export const onExtensionIPCEvent = (() => {
       ...args: [
         detail: {
           commandId: string;
-          extension: ExtensionData;
+          extension: ExtensionDataValid;
           sender: Electron.IpcMainInvokeEvent;
         },
         ...P,

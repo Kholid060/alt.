@@ -138,4 +138,15 @@ declare namespace ExtensionAPI.ui.searchPanel {
   };
 }
 
+declare namespace ExtensionAPI.browser.activeTab {
+  interface ActiveTab {
+    url: string;
+    title: string;
+  }
+
+  export function get(): Promise<ActiveTab | null>;
+
+  export function reload(): Promise<void>;
+}
+
 export default ExtensionAPI;

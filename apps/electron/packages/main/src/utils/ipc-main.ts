@@ -23,7 +23,6 @@ export function onIpcMessage<
     try {
       return await callback(event, ...(args as P));
     } catch (error) {
-      console.log(error);
       if (error instanceof ExtensionError || error instanceof ValidationError) {
         return {
           $isError: true,

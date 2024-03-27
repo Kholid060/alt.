@@ -3,6 +3,8 @@ import type {
   ExtensionWSClientToServerEvents,
   ExtensionWSServerToClientEvents,
 } from '@repo/shared';
+import getBrowserInfo from '../utils/getBrowserInfo';
+import { websocketEventsListener } from './websocket.service-events';
 
 class WebsocketService {
   private static _instance: WebsocketService | null = null;
@@ -18,16 +20,19 @@ class WebsocketService {
     ExtensionWSClientToServerEvents
   > | null = null;
 
-  init() {
-    return new Promise<void>((resolve) => {
+  async init() {
+    const browserInfo = await getBrowserInfo();
+
+    await new Promise<void>((resolve) => {
       this.socket = io('ws://localhost:4567/extensions', {
+        auth: { browserInfo },
         transports: ['websocket'],
       });
       this.socket.on('connect', () => {
         resolve();
+        websocketEventsListener(this.socket!);
         console.log('WEBSOCKET CONNECTED');
       });
-      console.log(this.socket);
     });
   }
 

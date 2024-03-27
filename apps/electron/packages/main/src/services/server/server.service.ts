@@ -23,15 +23,13 @@ class ServerService {
 
   private serverProcess: UtilityProcess | null = null;
 
-  messagePort: PromiseMessagePort<ServerPortEvent> | null = null;
+  _messagePort: PromiseMessagePort<ServerPortEvent> | null = null;
 
-  constructor() {
-    this.messagePortListener = this.messagePortListener.bind(this);
-  }
+  constructor() {}
 
   init() {
     const { port1, port2 } = new MessageChannelMain();
-    this.messagePort = new PromiseMessagePort(port2);
+    this._messagePort = new PromiseMessagePort(port2);
 
     this.serverProcess = utilityProcess.fork(SERVER_FILE_PATH, []);
     this.serverProcess.postMessage('init', [port1]);
@@ -43,11 +41,20 @@ class ServerService {
       console.log('SERVER (stdout) => ', chunk.toString());
     });
 
-    initServerServiceEventListener(this.messagePort);
+    initServerServiceEventListener.call(this);
   }
 
-  messagePortListener({ data }: Electron.MessageEvent) {
-    console.log('message', data);
+  get messagePort() {
+    if (!this._messagePort) {
+      throw new Error("MessagePort hasn't been initialized");
+    }
+
+    return this._messagePort;
+  }
+
+  destroy() {
+    this.serverProcess?.kill();
+    this._messagePort?.destroy();
   }
 }
 

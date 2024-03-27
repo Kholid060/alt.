@@ -1,4 +1,5 @@
-import MessagePortService from './service/message-port.service';
+import { initMessagePortEventListeners } from './service/message-port/message-port-event';
+import MessagePortService from './service/message-port/message-port.service';
 import WebsocketService from './service/websocket/websocket.service';
 
 const PORT = 4567;
@@ -15,5 +16,7 @@ const PORT = 4567;
 
     MessagePortService.instance.init(ports[0]);
     WebsocketService.instance.initServer(PORT);
+
+    initMessagePortEventListeners();
   });
 })();

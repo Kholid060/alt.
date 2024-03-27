@@ -23,10 +23,12 @@
     "@repo/shared": "workspace:*",
     "@types/webextension-polyfill": "^0.10.7",
     "construct-style-sheets-polyfill": "3.1.0",
+    "nanoid": "^5.0.6",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "socket.io-client": "^4.7.5",
     "type-fest": "^4.14.0",
+    "ua-parser-js": "^1.0.37",
     "webextension-polyfill": "0.10.0"
   },
   "devDependencies": {
@@ -41,6 +43,7 @@
     "@types/node": "20.8.10",
     "@types/react": "18.2.37",
     "@types/react-dom": "18.2.18",
+    "@types/ua-parser-js": "^0.7.39",
     "@types/ws": "8.5.8",
     "@typescript-eslint/eslint-plugin": "6.10.0",
     "@typescript-eslint/parser": "6.18.1",

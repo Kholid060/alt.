@@ -1,10 +1,13 @@
-import MessagePortService from '../../message-port.service';
+import MessagePortService from '../../message-port/message-port.service';
 import ExtensionWSNamespace from '../ws-namespaces/extensions.ws-namespace';
 
-const onEvent = ExtensionWSNamespace.instance.onSocketEvent.bind(
-  ExtensionWSNamespace.instance,
+ExtensionWSNamespace.instance.onSocketEvent(
+  'tabs:active',
+  ({ browserInfo }, tab) => {
+    MessagePortService.instance.sendMessage(
+      'tabs:active',
+      { browserId: browserInfo.id },
+      tab,
+    );
+  },
 );
-
-onEvent('tabs:active', (tab) => {
-  MessagePortService.instance.sendMessage('tabs:active', tab);
-});

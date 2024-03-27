@@ -10,9 +10,9 @@ export const EXTENSION_PERMISSIONS = [
   'fs.read',
   'fs.write',
   'clipboard',
-  'browser.tabs',
   'notifications',
   'installed-apps',
+  'browser.activeTab',
 ] as const;
 
 export const EXTENSION_COMMAND_TYPE = [

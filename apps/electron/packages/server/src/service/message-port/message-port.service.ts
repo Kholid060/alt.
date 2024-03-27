@@ -49,6 +49,8 @@ class MessagePortService {
   init(messagePort: Electron.MessagePortMain) {
     this.messagePort = messagePort;
     this.messagePort.addListener('message', this._onMessagePortEvent);
+
+    this.messagePort.start();
   }
 
   sendMessage<T extends keyof ServerPortEvent>(

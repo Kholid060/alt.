@@ -3,9 +3,9 @@
     "typeRoots": ["./src/global.d.ts", "node_modules/@types"],
     "paths": {
       "@root/*": ["./*"],
-      "/@/*": ["src/*"],
-      "@assets/*": ["src/assets/*"],
-      "@pages/*": ["src/pages/*"],
+      "/@/*": ["./src/*"],
+      "@assets/*": ["./src/assets/*"],
+      "@pages/*": ["./src/pages/*"],
       "virtual:reload-on-update-in-background-script": ["./src/global.d.ts"],
       "virtual:reload-on-update-in-view": ["./src/global.d.ts"]
     }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export type ObjectWithPrefix<T, P extends string> = {
   [K in keyof T as K extends string ? `${P}.${K}` : never]: T[K];
 };
@@ -16,3 +17,13 @@ export type PickEventParameters<T, K extends keyof T> = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [P in K]: T[K] extends (...args: any[]) => any ? Parameters<T[K]> : [];
 };
+
+export type Last<T extends any[]> = T extends [...infer _I, infer L]
+  ? L
+  : T extends [...infer _I, (infer L)?]
+    ? L | undefined
+    : never;
+
+export type AllButLast<T extends any[]> = T extends [...infer H, infer _L]
+  ? H
+  : any[];
