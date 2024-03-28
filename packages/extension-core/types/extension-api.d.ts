@@ -147,6 +147,8 @@ declare namespace ExtensionAPI.browser.activeTab {
   export function get(): Promise<ActiveTab | null>;
 
   export function reload(): Promise<void>;
+
+  export function click(selector: string): Promise<void>;
 }
 
 export default ExtensionAPI;

@@ -1,6 +1,7 @@
 import type { BrowserWindow } from 'electron';
 import { createCommandWindow } from './command-window';
 import { createMainWindow } from './main-window';
+import type { IPCSendEvents } from '#packages/common/interface/ipc-events.interface';
 
 const windows = {
   main: createMainWindow,
@@ -62,6 +63,15 @@ class WindowsManager {
     }
 
     return window;
+  }
+
+  sendMessageToWindow<T extends keyof IPCSendEvents>(
+    windowName: keyof Windows,
+    eventName: T,
+    ...args: IPCSendEvents[T]
+  ) {
+    const window = this.getWindow(windowName);
+    return window.webContents.send(eventName, ...args);
   }
 }
 

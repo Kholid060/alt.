@@ -29,4 +29,10 @@ class WebsocketService {
   }
 }
 
+export function initDefaultWebsocketServer() {
+  const PORT = 4567;
+
+  return WebsocketService.instance.initServer(PORT);
+}
+
 export default WebsocketService;

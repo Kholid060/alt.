@@ -3,15 +3,28 @@ import {
   ExtensionWSClientToServerEvents,
 } from '@repo/shared';
 import { Socket } from 'socket.io-client';
-import Browser from 'webextension-polyfill';
+import TabService from './tab.service';
 
 export function websocketEventsListener(
   io: Socket<ExtensionWSServerToClientEvents, ExtensionWSClientToServerEvents>,
 ) {
   io.on('tabs:reload', async (tab, callback) => {
     try {
-      await Browser.tabs.reload(tab.tabId);
+      await TabService.reload(tab.tabId);
       callback();
+    } catch (error) {
+      callback({
+        error: true,
+        errorMessage: (error as Error).message,
+      });
+    }
+  });
+  io.on('tabs:click', async (tab, selector, callback) => {
+    try {
+      await TabService.click(tab.tabId, selector);
+      console.log(selector);
+      callback();
+      // await Browser.tabs.moveInSuccession()
     } catch (error) {
       callback({
         error: true,

@@ -59,8 +59,8 @@ async function deepLinkHandler(deepLink: string) {
       const { response } = await dialog.showMessageBox({
         type: 'question',
         icon: commandIcon,
-        title: `$APP_NAME - Run ${command.title} command?`,
-        message:
+        message: `Run ${command.title} command?`,
+        detail:
           'This command was initiated from outside of the app. If you didn\'t initiate this, click the "Cancel" button.',
         buttons: ['Cancel', 'Run Anyway', 'Always Run'],
       });

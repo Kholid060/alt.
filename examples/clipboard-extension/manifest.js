@@ -19,7 +19,7 @@ export default {
       name: 'clipboard-copy',
       title: 'Clipboard Copy',
       type: 'action',
-      context: ['host:https://*.google.com/*'],
+      context: ['host:https://*.google.com/*', 'all'],
       arguments: [
         {
           name: 'test',

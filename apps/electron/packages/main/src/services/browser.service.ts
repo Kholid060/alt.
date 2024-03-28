@@ -1,5 +1,5 @@
 import type { BrowserExtensionTab, BrowserInfo } from '@repo/shared';
-import ServerService from './server.service';
+import { ExtensionError } from '#packages/common/errors/custom-errors';
 
 interface ActiveBrowser {
   id: string;
@@ -16,29 +16,20 @@ class BrowserService {
     return this._instance;
   }
 
-  browsers: Map<string, BrowserInfo>;
   activeBrowser: ActiveBrowser | null;
+  browsers: Map<string, BrowserInfo>;
 
   constructor() {
     this.browsers = new Map();
     this.activeBrowser = null;
   }
 
-  private _getActiveTab() {
-    if (!this.activeBrowser) throw new Error('No active browser');
-    if (!this.activeBrowser.tab) throw new Error('No active browser tab');
+  getActiveTab() {
+    if (!this.activeBrowser) throw new ExtensionError('No active browser');
+    if (!this.activeBrowser.tab)
+      throw new ExtensionError('No active browser tab');
 
     return { ...this.activeBrowser.tab, browserId: this.activeBrowser.id };
-  }
-
-  async reloadActiveTab() {
-    const { browserId, id, windowId } = this._getActiveTab();
-
-    await ServerService.instance.messagePort.sendMessage('tabs:reload', {
-      windowId,
-      browserId,
-      tabId: id,
-    });
   }
 }
 

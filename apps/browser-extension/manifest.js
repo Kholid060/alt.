@@ -15,11 +15,12 @@ const manifest = {
   name: '__MSG_extensionName__',
   version: packageJson.version,
   description: '__MSG_extensionDescription__',
-  permissions: ['storage', 'tabs'],
+  permissions: ['storage', 'tabs', 'scripting'],
   background: {
     service_worker: 'src/pages/background/index.js',
     type: 'module',
   },
+  host_permissions: ['http://*/**/*', 'https://*/**/*'],
   icons: {
     128: 'icon-128.png',
   },
