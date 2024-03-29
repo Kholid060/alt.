@@ -22,9 +22,18 @@ export function websocketEventsListener(
   io.on('tabs:click', async (tab, selector, callback) => {
     try {
       await TabService.click(tab.tabId, selector);
-      console.log(selector);
       callback();
-      // await Browser.tabs.moveInSuccession()
+    } catch (error) {
+      callback({
+        error: true,
+        errorMessage: (error as Error).message,
+      });
+    }
+  });
+  io.on('tabs:type', async (tab, { selector, text, options }, callback) => {
+    try {
+      await TabService.type(tab.tabId, { selector, text, options });
+      callback();
     } catch (error) {
       callback({
         error: true,

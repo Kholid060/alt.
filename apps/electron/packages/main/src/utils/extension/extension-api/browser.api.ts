@@ -42,3 +42,27 @@ onExtensionIPCEvent('browser.activeTab.click', async (_, selector) => {
     throw new ExtensionError(result.errorMessage);
   }
 });
+
+onExtensionIPCEvent(
+  'browser.activeTab.type',
+  async (_, selector, text, options) => {
+    const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
+
+    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck(
+      browserId,
+      'tabs:type',
+      {
+        windowId,
+        tabId: id,
+      },
+      {
+        text,
+        options,
+        selector,
+      },
+    );
+    if (result?.error) {
+      throw new ExtensionError(result.errorMessage);
+    }
+  },
+);

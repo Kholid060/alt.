@@ -1,7 +1,13 @@
+import { KeyboardBrowserTypeOptions } from '@repo/shared';
 import Browser from 'webextension-polyfill';
 
 export interface RuntimeEvent {
   'element:click': (selector: string) => void;
+  'element:keyboard-type': (
+    selector: string,
+    text: string,
+    options?: Partial<KeyboardBrowserTypeOptions>,
+  ) => void;
 }
 
 export interface RuntimeEventPayload {

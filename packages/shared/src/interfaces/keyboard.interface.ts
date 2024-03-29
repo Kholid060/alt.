@@ -14,3 +14,8 @@ export interface KeyboardShortcut {
   mod1: KeyboardShortcutModifier;
   mod2?: KeyboardShortcutModifier;
 }
+
+export interface KeyboardBrowserTypeOptions {
+  delay: number;
+  clearValue: boolean;
+}

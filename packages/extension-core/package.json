@@ -17,6 +17,7 @@
   "module": "./dist/index.js",
   "dependencies": {
     "@radix-ui/react-primitive": "^1.0.3",
+    "@repo/shared": "workspace:*",
     "browser-extension-url-match": "^1.0.0",
     "dot-prop": "^8.0.2",
     "globby": "^14.0.1",
