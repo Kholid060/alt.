@@ -41,4 +41,15 @@ export function websocketEventsListener(
       });
     }
   });
+  io.on('tabs:get-text', async (tab, { selector, options }, callback) => {
+    try {
+      const result = await TabService.getText(tab.tabId, selector, options);
+      callback(result);
+    } catch (error) {
+      callback({
+        error: true,
+        errorMessage: (error as Error).message,
+      });
+    }
+  });
 }

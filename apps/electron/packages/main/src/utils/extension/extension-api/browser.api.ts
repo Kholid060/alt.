@@ -1,4 +1,5 @@
 import { ExtensionError } from '#packages/common/errors/custom-errors';
+import { isObject } from '@repo/shared';
 import { onExtensionIPCEvent } from '../extension-api-event';
 import BrowserService from '/@/services/browser.service';
 import ExtensionWSNamespace from '/@/services/websocket/ws-namespaces/extensions.ws-namespace';
@@ -64,5 +65,27 @@ onExtensionIPCEvent(
     if (result?.error) {
       throw new ExtensionError(result.errorMessage);
     }
+  },
+);
+
+onExtensionIPCEvent(
+  'browser.activeTab.getText',
+  async (_, selector, options) => {
+    const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
+
+    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck(
+      browserId,
+      'tabs:get-text',
+      {
+        windowId,
+        tabId: id,
+      },
+      { selector: selector ?? 'html', options },
+    );
+    if (isObject(result) && 'error' in result) {
+      throw new ExtensionError(result.errorMessage);
+    }
+
+    return result;
   },
 );

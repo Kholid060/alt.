@@ -59,8 +59,8 @@ export function parseJSON<T = unknown, K = unknown>(
   }
 }
 
-export function isObject<T>(input: T) {
-  return typeof input === 'object' && !Array.isArray(input);
+export function isObject(input: unknown): input is object {
+  return typeof input === 'object' && !Array.isArray(input) && input !== null;
 }
 
 export function sleep(ms = 1000) {

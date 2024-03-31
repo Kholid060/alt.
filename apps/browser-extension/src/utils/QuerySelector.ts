@@ -37,7 +37,7 @@ function queryElementWithRetry<T extends null | Node | Node[]>(
 
       const result = query();
       const retry = Array.isArray(result) ? result.length === 0 : !result;
-      console.log({ result, retry });
+
       if (retry) {
         setTimeout(() => {
           startQuery(retryCount + 1);

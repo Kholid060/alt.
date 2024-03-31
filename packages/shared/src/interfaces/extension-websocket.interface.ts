@@ -8,6 +8,10 @@ export interface BrowserExtensionTab {
   windowId: number;
 }
 
+export interface BrowserGetTextOptions {
+  onlyVisibleText: boolean;
+}
+
 export interface WSAckErrorResult {
   error: boolean;
   errorMessage: string;
@@ -42,6 +46,14 @@ export interface ExtensionWSServerToClientEvents {
       options?: Partial<KeyboardBrowserTypeOptions>;
     },
     cb: WSAckCallback<void>,
+  ) => void;
+  'tabs:get-text': (
+    tab: ExtensionBrowserTabDetail,
+    detail: {
+      selector: string;
+      options?: Partial<BrowserGetTextOptions>;
+    },
+    cb: WSAckCallback<string>,
   ) => void;
 }
 

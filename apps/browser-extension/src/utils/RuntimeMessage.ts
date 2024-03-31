@@ -46,7 +46,7 @@ class RuntimeMessage {
         { sender: Browser.Runtime.MessageSender },
         ...Parameters<RuntimeEvent[T]>,
       ]
-    ) => ReturnType<RuntimeEvent[T]>,
+    ) => Promise<ReturnType<RuntimeEvent[T]>>,
   ) {
     this.listeners.set(name, callback);
   }

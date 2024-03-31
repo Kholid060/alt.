@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ExtensionManifest } from '../src/client/manifest';
-import { KeyboardBrowserTypeOptions } from '@repo/shared';
+import {
+  BrowserGetTextOptions,
+  KeyboardBrowserTypeOptions,
+} from '@repo/shared';
 
 declare namespace ExtensionAPI {
   export const manifest: ExtensionManifest;
@@ -140,6 +143,7 @@ declare namespace ExtensionAPI.ui.searchPanel {
 }
 
 declare namespace ExtensionAPI.browser {
+  type GetTextOptions = BrowserGetTextOptions;
   type KeyboardTypeOptions = KeyboardBrowserTypeOptions;
 }
 
@@ -154,6 +158,11 @@ declare namespace ExtensionAPI.browser.activeTab {
   export function reload(): Promise<void>;
 
   export function click(selector: string): Promise<void>;
+
+  export function getText(
+    selector?: string,
+    options?: Partial<ExtensionAPI.browser.GetTextOptions>,
+  ): Promise<string>;
 
   export function type(
     selector: string,

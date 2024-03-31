@@ -24,3 +24,20 @@ RuntimeMessage.instance.onMessage(
     await KeyboardDriver.type(element, text, options);
   },
 );
+
+RuntimeMessage.instance.onMessage(
+  'element:get-text',
+  async (_, selector, options) => {
+    const element = selector
+      ? await QuerySelector.find(selector)
+      : document.body;
+    if (!element && selector) throw CUSTOM_ERRORS.EL_NOT_FOUND(selector);
+    console.log(options);
+    let text = element?.textContent ?? '';
+    if (element instanceof HTMLElement && options?.onlyVisibleText) {
+      text = element.innerText;
+    }
+
+    return text;
+  },
+);
