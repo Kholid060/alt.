@@ -1,5 +1,5 @@
 import WebsocketService from '@root/src/service/websocket.service';
-import browser from 'webextension-polyfill';
+import Browser from 'webextension-polyfill';
 import { BrowserExtensionTab } from '@repo/shared';
 
 class BackgroundTabManager {
@@ -12,7 +12,7 @@ class BackgroundTabManager {
   }
 
   isWindowFocus: boolean;
-  activeTab: browser.Tabs.Tab | null = null;
+  activeTab: Browser.Tabs.Tab | null = null;
 
   constructor() {
     this.activeTab = null;
@@ -23,11 +23,22 @@ class BackgroundTabManager {
     this.onWindowsFocusChanged = this.onWindowsFocusChanged.bind(this);
   }
 
-  init() {
-    browser.tabs.onUpdated.addListener(this.onTabsUpdated);
-    browser.tabs.onActivated.addListener(this.onTabsActivated);
+  async init() {
+    Browser.tabs.onUpdated.addListener(this.onTabsUpdated);
+    Browser.tabs.onActivated.addListener(this.onTabsActivated);
 
-    browser.windows.onFocusChanged.addListener(this.onWindowsFocusChanged);
+    Browser.windows.onFocusChanged.addListener(this.onWindowsFocusChanged);
+
+    const currentWindow = await Browser.windows.getCurrent();
+    this.isWindowFocus = currentWindow.focused;
+
+    if (currentWindow.focused) {
+      const [activeTab] = await Browser.tabs.query({
+        active: true,
+        windowId: currentWindow.id,
+      });
+      this.updateActiveTab(activeTab);
+    }
   }
 
   private sendActiveTabToApp() {
@@ -52,9 +63,9 @@ class BackgroundTabManager {
   }
 
   private async onWindowsFocusChanged(windowId: number) {
-    if (windowId === browser.windows.WINDOW_ID_NONE) {
+    if (windowId === Browser.windows.WINDOW_ID_NONE) {
       // double-check, the windowId is also -1 when changing active tab for some reason
-      const currentWindow = await browser.windows.getCurrent();
+      const currentWindow = await Browser.windows.getCurrent();
       if (currentWindow.focused) return;
 
       WebsocketService.instance.emitEvent('tabs:active', null);
@@ -63,7 +74,7 @@ class BackgroundTabManager {
       this.isWindowFocus = true;
 
       if (!this.activeTab || this.activeTab.windowId !== windowId) {
-        const [activeTab] = await browser.tabs.query({
+        const [activeTab] = await Browser.tabs.query({
           active: true,
           currentWindow: true,
         });
@@ -74,16 +85,16 @@ class BackgroundTabManager {
     }
   }
 
-  private onTabsActivated(activeInfo: browser.Tabs.OnActivatedActiveInfoType) {
-    browser.tabs.get(activeInfo.tabId).then((activeTab) => {
+  private onTabsActivated(activeInfo: Browser.Tabs.OnActivatedActiveInfoType) {
+    Browser.tabs.get(activeInfo.tabId).then((activeTab) => {
       this.updateActiveTab(activeTab);
     });
   }
 
   private onTabsUpdated(
     tabId: number,
-    changeInfo: browser.Tabs.OnUpdatedChangeInfoType,
-    tab: browser.Tabs.Tab,
+    changeInfo: Browser.Tabs.OnUpdatedChangeInfoType,
+    tab: Browser.Tabs.Tab,
   ) {
     if (
       !this.activeTab ||
@@ -97,10 +108,20 @@ class BackgroundTabManager {
     }
   }
 
-  private updateActiveTab(tab: browser.Tabs.Tab | null) {
+  private updateActiveTab(tab: Browser.Tabs.Tab | null) {
     this.activeTab = tab;
 
     this.sendActiveTabToApp();
+  }
+
+  destroy() {
+    Browser.tabs.onUpdated.removeListener(this.onTabsUpdated);
+    Browser.tabs.onActivated.removeListener(this.onTabsActivated);
+
+    Browser.windows.onFocusChanged.removeListener(this.onWindowsFocusChanged);
+
+    this.activeTab = null;
+    this.isWindowFocus = false;
   }
 }
 

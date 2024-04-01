@@ -22,6 +22,9 @@ export default defineConfig({
   },
   plugins: [...getPlugins(isDev), react()],
   publicDir: resolve(rootDir, 'public'),
+  define: {
+    __IS_FIREFOX__: Boolean(process.env.__FIREFOX__),
+  },
   build: {
     outDir: resolve(rootDir, 'dist'),
     /** Can slow down build speed. */

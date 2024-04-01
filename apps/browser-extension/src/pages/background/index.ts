@@ -1,11 +1,8 @@
-import WebsocketService from '@root/src/service/websocket.service';
 import reloadOnUpdate from 'virtual:reload-on-update-in-background-script';
-import BackgroundTabManager from './BackgroundTabManager';
+import { initWebsocketService } from './service-init';
 
 reloadOnUpdate('pages/background');
 
-WebsocketService.instance.init().then(() => {
-  BackgroundTabManager.instance.init();
-});
+initWebsocketService();
 
 console.log('background loaded');

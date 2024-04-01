@@ -29,3 +29,9 @@ declare module '*.json' {
   const content: string;
   export default content;
 }
+
+declare const __IS_FIREFOX__: boolean;
+
+declare interface Element {
+  openOrClosedShadowRoot(): ShadowRoot | null;
+}

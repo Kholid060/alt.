@@ -5,8 +5,14 @@ import type {
 } from '@repo/shared';
 import getBrowserInfo from '../utils/getBrowserInfo';
 import { websocketEventsListener } from './websocket.service-events';
+import EventEmitter from 'eventemitter3';
 
-class WebsocketService {
+interface WSEvent {
+  connect: [];
+  disconnect: [reason: Socket.DisconnectReason];
+}
+
+class WebsocketService extends EventEmitter<WSEvent> {
   private static _instance: WebsocketService | null = null;
   static get instance() {
     if (!this._instance) {
@@ -15,24 +21,29 @@ class WebsocketService {
     return this._instance;
   }
 
-  private socket: Socket<
+  socket: Socket<
     ExtensionWSServerToClientEvents,
     ExtensionWSClientToServerEvents
   > | null = null;
 
+  constructor() {
+    super();
+  }
+
   async init() {
     const browserInfo = await getBrowserInfo();
 
-    await new Promise<void>((resolve) => {
-      this.socket = io('ws://localhost:4567/extensions', {
-        auth: { browserInfo },
-        transports: ['websocket'],
-      });
-      this.socket.on('connect', () => {
-        resolve();
-        websocketEventsListener(this.socket!);
-        console.log('WEBSOCKET CONNECTED');
-      });
+    this.socket = io('ws://localhost:4567/extensions', {
+      auth: { browserInfo },
+      transports: ['websocket'],
+    });
+    this.socket.on('connect', () => {
+      this.emit('connect');
+      websocketEventsListener(this.socket!);
+      console.log('WEBSOCKET CONNECTED');
+    });
+    this.socket.on('disconnect', (reason) => {
+      this.emit('disconnect', reason);
     });
   }
 

@@ -14,6 +14,7 @@ const manifest = {
    */
   name: '__MSG_extensionName__',
   version: packageJson.version,
+  action: {},
   description: '__MSG_extensionDescription__',
   permissions: ['storage', 'tabs', 'scripting'],
   background: {
