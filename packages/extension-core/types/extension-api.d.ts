@@ -125,7 +125,7 @@ declare namespace ExtensionAPI.storage {
 
 declare namespace ExtensionAPI.ui.searchPanel {
   interface KeydownEvent {
-    key: boolean;
+    key: string;
     altKey: boolean;
     ctrlKey: boolean;
     metaKey: boolean;

@@ -92,6 +92,11 @@ export function useCommand() {
       navigate(`/extensions/${extension.id}/${command.name}/view`, {
         data: launchContext,
       });
+    } else if (command.type === 'view:json') {
+      updatePanelHeader();
+      navigate(`/extensions/${extension.id}/${command.name}/view-json`, {
+        data: launchContext,
+      });
     } else if (command.type === 'script') {
       preloadAPI.main
         .invokeIpcMessage('extension:run-script-command', {

@@ -11,10 +11,12 @@ function UiExtensionIcon({
   alt,
   icon,
   iconWrapper,
+  extensionIcon = true,
 }: {
   id: string;
   alt: string;
   icon: string;
+  extensionIcon?: boolean;
   iconWrapper?: (icon: LucideIcon) => React.ReactNode;
 }) {
   if (icon.startsWith(iconPrefix)) {
@@ -31,7 +33,9 @@ function UiExtensionIcon({
 
   return (
     <UiImage
-      src={`${CUSTOM_SCHEME.extension}://${id}/icon/${icon}`}
+      src={
+        extensionIcon ? `${CUSTOM_SCHEME.extension}://${id}/icon/${icon}` : icon
+      }
       alt={alt}
     />
   );

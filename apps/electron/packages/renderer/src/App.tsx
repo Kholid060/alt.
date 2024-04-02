@@ -11,12 +11,13 @@ import {
   CommandRouteProvider,
   createCommandRoutes,
 } from './context/command-route.context';
-import CommandExtensionContent from './routes/CommandExtensionContent';
+import CommandView from './routes/CommandView';
 import CommandList from './routes/CommandList';
 import { GripHorizontalIcon } from 'lucide-react';
 import CommandEventListener from './components/command/CommandEventListener';
 import CommandErrorOverlay from './components/command/CommandErrorOverlay';
 import ConfigInput from './routes/ConfigInput';
+import CommandViewJSON from './routes/CommandViewJSON';
 
 const routes = createCommandRoutes([
   {
@@ -27,7 +28,12 @@ const routes = createCommandRoutes([
   {
     name: 'extension-command-view',
     path: '/extensions/:extensionId/:commandId/view',
-    element: CommandExtensionContent,
+    element: CommandView,
+  },
+  {
+    name: 'extension-command-view-json',
+    path: '/extensions/:extensionId/:commandId/view-json',
+    element: CommandViewJSON,
   },
   {
     element: ConfigInput,

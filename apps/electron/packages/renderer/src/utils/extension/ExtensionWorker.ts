@@ -1,12 +1,12 @@
 import { nanoid } from 'nanoid';
-import { ExtensionManifest } from '@repo/extension-core';
+import { ExtensionCommand, ExtensionManifest } from '@repo/extension-core';
 import ExtensionWorkerScript from '/@/workers/extension.worker?worker';
 import preloadAPI from '../preloadAPI';
 import { isObject } from '@repo/shared';
 import { CommandWorkerInitMessage } from '/@/interface/command.interface';
 import { CommandLaunchContext } from '@repo/extension';
 
-const MAX_COMMAND_EXECUTION_MS = 120_000; // 2 mins
+const MAX_COMMAND_EXECUTION_MS = 300_000; // 5 mins
 const CREATE_MESSAGE_PORT_TIMEOUT_MS = 5000; // 5 seconds
 
 function createMessagePort() {
@@ -50,8 +50,8 @@ class ExtensionWorker {
 
   async createWorker({
     key,
+    command,
     manifest,
-    commandId,
     extensionId,
     events = {},
     messagePort,
@@ -60,8 +60,8 @@ class ExtensionWorker {
   }: {
     key: string;
     timeout?: number;
-    commandId: string;
     extensionId: string;
+    command: ExtensionCommand;
     messagePort?: MessagePort;
     manifest: ExtensionManifest;
     launchContext: CommandLaunchContext;
@@ -70,7 +70,7 @@ class ExtensionWorker {
       onFinish: <T = unknown>(worker: Worker, data: T) => void;
       onMessage: (worker: Worker, event: MessageEvent) => void;
     }>;
-  }) {
+  }): Promise<Worker | null> {
     let extensionWorker: Worker | null = null;
     let mainMessagePort: MessagePort | null = null;
 
@@ -78,21 +78,25 @@ class ExtensionWorker {
 
     try {
       extensionWorker = new ExtensionWorkerScript({
-        name: `${extensionId}:${commandId}`,
+        name: `${extensionId}:${command.name}`,
       });
       if (!extensionWorker) return null;
 
       const workerId = nanoid(5);
 
-      workerTimeout = setTimeout(() => {
-        extensionWorker?.terminate();
-        events.onFinish?.(extensionWorker!, undefined);
-      }, timeout);
+      if (workerTimeout !== 0) {
+        workerTimeout = setTimeout(() => {
+          extensionWorker?.terminate();
+          events.onFinish?.(extensionWorker!, undefined);
+        }, timeout);
+      }
 
       extensionWorker.onerror = (event) => {
         events.onError?.(extensionWorker!, event);
       };
-      extensionWorker.onmessage = (event) => {
+      extensionWorker.onmessage = (
+        event: MessageEvent<{ id: string; type: string; message: string }>,
+      ) => {
         if (!isObject(event.data) || event.data?.id !== workerId) return;
 
         events.onMessage?.(extensionWorker!, event);
@@ -125,6 +129,7 @@ class ExtensionWorker {
           manifest,
           workerId,
           type: 'init',
+          commandType: command.type,
           launchContext: launchContext,
         } as CommandWorkerInitMessage,
         { transfer },
@@ -140,66 +145,6 @@ class ExtensionWorker {
     }
 
     return null;
-  }
-
-  async executeActionCommand({
-    onError,
-    onFinish,
-    commandId,
-    messagePort,
-    extensionId,
-    launchContext,
-  }: {
-    commandId: string;
-    extensionId: string;
-    onFinish?: () => void;
-    messagePort?: MessagePort;
-    launchContext: CommandLaunchContext;
-    onError?: (message?: string) => void;
-  }) {
-    try {
-      const extension = await preloadAPI.main.invokeIpcMessage(
-        'extension:get',
-        extensionId,
-      );
-      if (extension && '$isError' in extension)
-        throw new Error(extension.message);
-      if (!extension || extension.isError) return;
-
-      const clearWorker = (worker?: Worker) => {
-        if (worker || this.worker) console.log('CLEAR WORKER');
-
-        worker?.terminate();
-
-        preloadAPI.main.deleteMainMessagePort();
-        this.worker?.terminate();
-        this.worker = null;
-      };
-
-      const extensionWorker = await this.createWorker({
-        commandId,
-        extensionId,
-        messagePort,
-        launchContext,
-        key: extension.$key,
-        manifest: extension.manifest,
-        events: {
-          onError: (worker, event) => {
-            clearWorker(worker);
-            onError?.(event.message);
-          },
-          onFinish: (worker) => {
-            onFinish?.();
-            clearWorker(worker);
-          },
-        },
-      });
-      if (!extensionWorker) return;
-
-      this.worker = extensionWorker;
-    } catch (error) {
-      console.error(error);
-    }
   }
 }
 

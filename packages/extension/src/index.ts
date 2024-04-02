@@ -12,6 +12,8 @@ export { default as commandRenderer } from './command-renderer/command-renderer'
 
 export type * from './interfaces/message-events';
 export type * from './interfaces/command.interface';
+export type * from './interfaces/command-action.interface';
+export type * from './interfaces/command-json-view.interface';
 
 export { CommandLaunchBy } from './interfaces/command.interface';
 

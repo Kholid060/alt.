@@ -1,24 +1,11 @@
 import { memo, useEffect, useRef, useState } from 'react';
 import { EXTENSION_VIEW } from '#common/utils/constant/constant';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
-import {
-  CommandLaunchContext,
-  ExtensionExecutionFinishReason,
-} from '@repo/extension';
+import { CommandLaunchContext } from '@repo/extension';
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
-import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { ExtensionCommandViewInitMessage } from '#common/interface/extension.interface';
 
-function CommandSandboxContent({
-  onFinishExecute,
-}: {
-  onFinishExecute?: (
-    reason: ExtensionExecutionFinishReason,
-    message?: string,
-  ) => void;
-}) {
-  const clearPanelStore = useCommandPanelStore((state) => state.clearAll);
-
+function CommandView() {
   const navigate = useCommandNavigate();
   const activeRoute = useCommandRoute((state) => state.currentRoute);
 
@@ -33,12 +20,6 @@ function CommandSandboxContent({
     commandCtx.setExtMessagePort(port);
     const messagePort = commandCtx.extMessagePort.current!;
 
-    messagePort.addListener('extension:finish-execute', (reason, message) => {
-      if (onFinishExecute) return onFinishExecute(reason, message);
-
-      clearPanelStore();
-      navigate('');
-    });
     messagePort.addListener('extension:reload', () => {
       setIframeKey((prevVal) => prevVal + 1);
     });
@@ -98,4 +79,4 @@ function CommandSandboxContent({
   );
 }
 
-export default memo(CommandSandboxContent);
+export default memo(CommandView);

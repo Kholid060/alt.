@@ -1,3 +1,5 @@
+import ExtensionAPI from '@repo/extension-core/types/extension-api';
+
 export enum ExtensionExecutionFinishReason {
   done,
   error,
@@ -7,12 +9,9 @@ export enum ExtensionExecutionFinishReason {
 export interface ExtensionMessagePortEvent {
   'extension:init': [];
   'extension:reload': [];
-  'extension:query-change': [string];
+  'extension:query-change': [query: string];
   'extension:keydown-event': [
-    Pick<
-      KeyboardEvent,
-      'key' | 'ctrlKey' | 'altKey' | 'metaKey' | 'isComposing'
-    >,
+    KeydownEvent: ExtensionAPI.ui.searchPanel.KeydownEvent,
   ];
   'extension:finish-execute': [ExtensionExecutionFinishReason, string?];
 }

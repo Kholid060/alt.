@@ -37,43 +37,63 @@ function CommandEventListener() {
       commandIcon,
       launchContext,
     }) => {
+      const extensionData = await preloadAPI.main.invokeIpcMessage(
+        'extension:get',
+        extension.id,
+      );
+      if (
+        !extensionData ||
+        '$isError' in extensionData ||
+        extensionData.isError
+      )
+        return;
+
       const isConfigInputted = await checkCommandConfig({
         command,
-        extension,
         commandIcon,
         launchContext,
+        extension: extensionData,
       });
       if (!isConfigInputted) return;
 
       const { port1, port2 } = new MessageChannel();
       setExtMessagePort(port2);
 
-      ExtensionWorker.instance.executeActionCommand({
+      await ExtensionWorker.instance.createWorker({
+        command,
+        launchContext,
         messagePort: port1,
-        commandId: command.name,
+        key: extensionData.$key,
         extensionId: extension.id,
-        launchContext: launchContext,
-        onFinish() {
-          clearPanel();
-        },
-        onError(message) {
-          if (!message) {
-            clearPanel();
-            return;
-          }
+        manifest: extensionData.manifest,
+        events: {
+          onError: (worker, event) => {
+            worker.terminate();
+            preloadAPI.main.deleteMainMessagePort();
 
-          addStatus({
-            type: 'error',
-            title: 'Error!',
-            description: message,
-            onClose() {
+            if (!event.message) {
               clearPanel();
-            },
-          });
-          addExtensionError(extension.id, {
-            content: message,
-            title: `Error in "${command.title}" command`,
-          });
+              return;
+            }
+
+            addStatus({
+              type: 'error',
+              title: 'Error!',
+              description: event.message,
+              onClose() {
+                clearPanel();
+              },
+            });
+            addExtensionError(extension.id, {
+              content: event.message,
+              title: `Error in "${command.title}" command`,
+            });
+          },
+          onFinish: (worker) => {
+            clearPanel();
+            worker.terminate();
+            preloadAPI.main.deleteMainMessagePort();
+          },
         },
       });
     };

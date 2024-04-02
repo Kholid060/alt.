@@ -70,7 +70,9 @@ class WindowsManager {
     eventName: T,
     ...args: IPCSendEvents[T]
   ) {
-    const window = this.getWindow(windowName);
+    const window = this.getWindow(windowName, { noThrow: true });
+    if (!window) return null;
+
     return window.webContents.send(eventName, ...args);
   }
 }

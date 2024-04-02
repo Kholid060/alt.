@@ -15,6 +15,12 @@ export default {
   ],
   commands: [
     {
+      name: 'calculcate',
+      title: 'Calculate',
+      type: 'view:json',
+      icon: 'icon:Calculator'
+    },
+    {
       icon: 'clipboard',
       name: 'clipboard-copy',
       title: 'Clipboard Copy',

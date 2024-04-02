@@ -32,7 +32,7 @@ const CommandInputArguments = forwardRef<
 
   const mergedRefs = mergeRefs(ref, containerRef);
   const selectedCommand =
-    selectedItem && selectedItem.metadata.type === 'command'
+    selectedItem && selectedItem.metadata?.type === 'command'
       ? selectedItem.metadata
       : null;
 
@@ -287,13 +287,13 @@ function CommandInput() {
 
     const messagePort = commandCtx.extMessagePort.current;
     if (messagePort && commandKeys.has(event.key)) {
-      const { key, ctrlKey, altKey, metaKey } = event;
+      const { key, ctrlKey, altKey, metaKey, shiftKey } = event;
       messagePort.sendMessage('extension:keydown-event', {
         key,
         altKey,
         ctrlKey,
         metaKey,
-        isComposing: event.nativeEvent.isComposing,
+        shiftKey,
       });
     }
 
