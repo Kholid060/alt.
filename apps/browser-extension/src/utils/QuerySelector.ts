@@ -24,7 +24,7 @@ function getQueryOptions(
     ...options,
   };
 }
-function queryElementWithRetry<T extends null | Node | Node[]>(
+function queryElementWithRetry<T = null | Node | Node[]>(
   query: () => T,
   {
     retryTimeout,
@@ -178,24 +178,38 @@ class QuerySelector {
     return shadowDOM;
   }
 
-  static find(selector: string, options?: Partial<QuerySelectorOptions>) {
+  static find<T = Element>(
+    selector: string,
+    options?: Partial<QuerySelectorOptions>,
+  ) {
     const { elCtx, retryCount, retryTimeout } = getQueryOptions(options);
     const elementContext = this.getElementContext(selector, elCtx);
 
-    return queryElementWithRetry(
+    return queryElementWithRetry<T | null>(
       () =>
-        this.basicQuery(elementContext.selector, false, elementContext.elCtx),
+        this.basicQuery(
+          elementContext.selector,
+          false,
+          elementContext.elCtx,
+        ) as T,
       { retryCount, retryTimeout },
     );
   }
 
-  static findAll(selector: string, options?: Partial<QuerySelectorOptions>) {
+  static findAll<T = Element[]>(
+    selector: string,
+    options?: Partial<QuerySelectorOptions>,
+  ) {
     const { elCtx, retryCount, retryTimeout } = getQueryOptions(options);
     const elementContext = this.getElementContext(selector, elCtx);
 
-    return queryElementWithRetry(
+    return queryElementWithRetry<T>(
       () =>
-        this.basicQuery(elementContext.selector, true, elementContext.elCtx),
+        this.basicQuery(
+          elementContext.selector,
+          true,
+          elementContext.elCtx,
+        ) as T,
       {
         retryCount,
         retryTimeout,

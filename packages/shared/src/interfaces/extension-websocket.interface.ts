@@ -55,6 +55,12 @@ export interface ExtensionWSServerToClientEvents {
     },
     cb: WSAckCallback<string>,
   ) => void;
+  'tabs:select': (
+    tab: ExtensionBrowserTabDetail,
+    selector: string,
+    values: string[],
+    cb: WSAckCallback<string[]>,
+  ) => void;
 }
 
 export interface ExtensionWSInterServerEvenets {}

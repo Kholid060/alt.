@@ -169,6 +169,11 @@ declare namespace ExtensionAPI.browser.activeTab {
     text: string,
     options?: Partial<ExtensionAPI.browser.KeyboardTypeOptions>,
   ): Promise<void>;
+
+  export function select(
+    selector: string,
+    ...values: string[]
+  ): Promise<string[]>;
 }
 
 export default ExtensionAPI;

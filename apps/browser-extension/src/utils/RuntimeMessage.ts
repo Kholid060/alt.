@@ -43,7 +43,7 @@ class RuntimeMessage {
     name: T,
     callback: (
       ...args: [
-        { sender: Browser.Runtime.MessageSender },
+        detail: { sender: Browser.Runtime.MessageSender },
         ...Parameters<RuntimeEvent[T]>,
       ]
     ) => Promise<ReturnType<RuntimeEvent[T]>>,

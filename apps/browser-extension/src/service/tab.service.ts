@@ -6,23 +6,28 @@ import {
   KeyboardBrowserTypeOptions,
 } from '@repo/shared';
 
+interface TabTarget {
+  tabId: number;
+  frameId?: number;
+}
+
 class TabService {
   static reload(tabId: number) {
     return Browser.tabs.reload(tabId);
   }
 
-  static async click(tabId: number, selector: string) {
+  static async click({ tabId, frameId = 0 }: TabTarget, selector: string) {
     await injectContentHandlerScript(tabId);
     await RuntimeMessage.instance.sendMessageToTab({
       tabId,
-      frameId: 0,
+      frameId,
       args: [selector],
       name: 'element:click',
     });
   }
 
   static async type(
-    tabId: number,
+    { tabId, frameId = 0 }: TabTarget,
     {
       selector,
       text,
@@ -36,13 +41,14 @@ class TabService {
     await injectContentHandlerScript(tabId);
     await RuntimeMessage.instance.sendMessageToTab({
       tabId,
+      frameId,
       name: 'element:keyboard-type',
       args: [selector, text, options],
     });
   }
 
   static async getText(
-    tabId: number,
+    { tabId, frameId = 0 }: TabTarget,
     selector?: string,
     options?: Partial<BrowserGetTextOptions>,
   ) {
@@ -54,9 +60,23 @@ class TabService {
 
     return await RuntimeMessage.instance.sendMessageToTab({
       tabId,
-      frameId: 0,
+      frameId,
       name: 'element:get-text',
       args: [selector, getTextOptions],
+    });
+  }
+
+  static async select(
+    { tabId, frameId = 0 }: TabTarget,
+    selector: string,
+    ...values: string[]
+  ) {
+    await injectContentHandlerScript(tabId);
+    return await RuntimeMessage.instance.sendMessageToTab({
+      tabId,
+      frameId,
+      name: 'element:select',
+      args: [selector, ...values],
     });
   }
 }

@@ -1,7 +1,6 @@
 import { ExtensionData } from '#common/interface/extension.interface';
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import { CommandActions } from '../interface/command.interface';
 import createStoreSelectors from '../utils/createStoreSelector';
 import { BrowserExtensionTab } from '@repo/shared';
 
@@ -12,7 +11,6 @@ interface ExtensionCommandArgs {
 
 interface CommandStoreState {
   query: string;
-  actions: CommandActions[];
   extensions: ExtensionData[];
   commandArgs: ExtensionCommandArgs;
   activeBrowserTab: BrowserExtensionTab | null;
@@ -49,7 +47,6 @@ const MAX_EXTENSION_ERROR_ITEMS = 20;
 
 const initialState: CommandStoreState = {
   query: '',
-  actions: [],
   extensions: [],
   errorOverlay: null,
   extensionErrors: {},

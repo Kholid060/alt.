@@ -6,6 +6,7 @@ import Browser from 'webextension-polyfill';
 
 export interface RuntimeEvent {
   'element:click': (selector: string) => void;
+  'element:select': (selector: string, ...values: string[]) => string[];
   'element:get-text': (
     selector?: string,
     options?: Partial<BrowserGetTextOptions>,

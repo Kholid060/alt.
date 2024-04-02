@@ -1,8 +1,13 @@
 import { ExtensionError } from '#packages/common/errors/custom-errors';
+import type { WSAckErrorResult } from '@repo/shared';
 import { isObject } from '@repo/shared';
 import { onExtensionIPCEvent } from '../extension-api-event';
 import BrowserService from '/@/services/browser.service';
 import ExtensionWSNamespace from '/@/services/websocket/ws-namespaces/extensions.ws-namespace';
+
+function isWSAckError(result: unknown): result is WSAckErrorResult {
+  return Boolean(result) && isObject(result) && 'error' in result;
+}
 
 onExtensionIPCEvent('browser.activeTab.get', () => {
   const activeTab = BrowserService.instance.activeBrowser?.tab;
@@ -22,7 +27,7 @@ onExtensionIPCEvent('browser.activeTab.reload', async () => {
       tabId: id,
     },
   );
-  if (result?.error) {
+  if (isWSAckError(result)) {
     throw new ExtensionError(result.errorMessage);
   }
 });
@@ -39,7 +44,7 @@ onExtensionIPCEvent('browser.activeTab.click', async (_, selector) => {
     },
     selector,
   );
-  if (result?.error) {
+  if (isWSAckError(result)) {
     throw new ExtensionError(result.errorMessage);
   }
 });
@@ -62,7 +67,7 @@ onExtensionIPCEvent(
         selector,
       },
     );
-    if (result?.error) {
+    if (isWSAckError(result)) {
       throw new ExtensionError(result.errorMessage);
     }
   },
@@ -82,7 +87,30 @@ onExtensionIPCEvent(
       },
       { selector: selector ?? 'html', options },
     );
-    if (isObject(result) && 'error' in result) {
+    if (isWSAckError(result)) {
+      throw new ExtensionError(result.errorMessage);
+    }
+
+    return result;
+  },
+);
+
+onExtensionIPCEvent(
+  'browser.activeTab.select',
+  async (_, selector, ...values) => {
+    const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
+
+    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck(
+      browserId,
+      'tabs:select',
+      {
+        windowId,
+        tabId: id,
+      },
+      selector,
+      values,
+    );
+    if (isWSAckError(result)) {
       throw new ExtensionError(result.errorMessage);
     }
 

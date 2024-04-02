@@ -12,7 +12,9 @@ const rootDir = resolve(__dirname, '..', '..');
 const distDir = resolve(rootDir, 'dist');
 const manifestFile = resolve(rootDir, 'manifest.js');
 
-const getManifestWithCacheBurst = (): Promise<{ default: chrome.runtime.ManifestV3 }> => {
+const getManifestWithCacheBurst = (): Promise<{
+  default: chrome.runtime.ManifestV3;
+}> => {
   const withCacheBurst = (path: string) => `${path}?${Date.now().toString()}`;
   /**
    * In Windows, import() doesn't work without file:// protocol.
@@ -24,20 +26,29 @@ const getManifestWithCacheBurst = (): Promise<{ default: chrome.runtime.Manifest
   return import(withCacheBurst(manifestFile));
 };
 
-export default function makeManifest(config?: { getCacheInvalidationKey?: () => string }): PluginOption {
-  function makeManifest(manifest: chrome.runtime.ManifestV3, to: string, cacheKey?: string) {
+export default function makeManifest(config?: {
+  getCacheInvalidationKey?: () => string;
+}): PluginOption {
+  function makeManifest(
+    manifest: chrome.runtime.ManifestV3,
+    to: string,
+    cacheKey?: string,
+  ) {
     if (!fs.existsSync(to)) {
       fs.mkdirSync(to);
     }
     const manifestPath = resolve(to, 'manifest.json');
     if (cacheKey && manifest.content_scripts) {
       // Naming change for cache invalidation
-      manifest.content_scripts.forEach(script => {
-        script.css &&= script.css.map(css => css.replace('<KEY>', cacheKey));
+      manifest.content_scripts.forEach((script) => {
+        script.css &&= script.css.map((css) => css.replace('<KEY>', cacheKey));
       });
     }
 
-    fs.writeFileSync(manifestPath, ManifestParser.convertManifestToString(manifest));
+    fs.writeFileSync(
+      manifestPath,
+      ManifestParser.convertManifestToString(manifest),
+    );
 
     colorLog(`Manifest file copy complete: ${manifestPath}`, 'success');
   }
@@ -48,7 +59,7 @@ export default function makeManifest(config?: { getCacheInvalidationKey?: () => 
       this.addWatchFile(manifestFile);
     },
     async writeBundle() {
-      const invalidationKey = config.getCacheInvalidationKey?.();
+      const invalidationKey = config?.getCacheInvalidationKey?.();
       const manifest = await getManifestWithCacheBurst();
       makeManifest(manifest.default, distDir, invalidationKey);
     },
