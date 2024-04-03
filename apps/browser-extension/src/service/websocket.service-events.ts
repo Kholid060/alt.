@@ -135,4 +135,18 @@ export function websocketEventsListener(
       callback(result);
     }),
   );
+
+  io.on(
+    'tabs:get-attributes',
+    wsAckHandler(async (tab, selector, attrNames, callback) => {
+      const result = await TabService.getAttributes(
+        {
+          tabId: tab.tabId,
+        },
+        selector,
+        attrNames ?? undefined,
+      );
+      callback(result);
+    }),
+  );
 }

@@ -150,3 +150,29 @@ RuntimeMessage.instance.onMessage(
     });
   },
 );
+
+RuntimeMessage.instance.onMessage(
+  'element:get-attributes',
+  async (_, selector, attrNames) => {
+    const element = await QuerySelector.find(selector);
+    if (!element) throw CUSTOM_ERRORS.EL_NOT_FOUND(selector);
+
+    if (!attrNames) {
+      return Object.fromEntries(
+        Array.from(element.attributes).map((attr) => [attr.name, attr.value]),
+      );
+    }
+    if (Array.isArray(attrNames)) {
+      const result: Record<string, string> = {};
+      attrNames.forEach((name) => {
+        if (!element.hasAttribute(name)) return;
+
+        result[name] = element.getAttribute(name)!;
+      });
+
+      return result;
+    }
+
+    return element.getAttribute(attrNames);
+  },
+);

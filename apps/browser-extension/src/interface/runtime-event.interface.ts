@@ -33,6 +33,10 @@ export interface RuntimeEvent {
     text: string,
     options?: Partial<KeyboardBrowserTypeOptions>,
   ) => void;
+  'element:get-attributes': (
+    selector: string,
+    attrNames?: string | string[],
+  ) => string | null | Record<string, string>;
 }
 
 export interface RuntimeEventPayload {

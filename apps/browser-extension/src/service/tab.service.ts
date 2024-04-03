@@ -126,6 +126,20 @@ class TabService {
       args: [selector, key, options],
     });
   }
+
+  static async getAttributes(
+    { tabId, frameId = 0 }: TabTarget,
+    selector: string,
+    attrNames?: string | string[],
+  ) {
+    await injectContentHandlerScript(tabId);
+    return await RuntimeMessage.instance.sendMessageToTab({
+      tabId,
+      frameId,
+      name: 'element:get-attributes',
+      args: [selector, attrNames],
+    });
+  }
 }
 
 export default TabService;

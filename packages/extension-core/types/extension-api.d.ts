@@ -189,6 +189,19 @@ declare namespace ExtensionAPI.browser.activeTab {
     options?: Partial<ExtensionAPI.browser.GetTextOptions>,
   ): Promise<string>;
 
+  export function getAttributes(
+    selector: string,
+    attrNames: string,
+  ): Promise<string | null>;
+  export function getAttributes(
+    selector: string,
+    attrNames?: string[],
+  ): Promise<Record<string, string>>;
+  export function getAttributes(
+    selector: string,
+    attrNames?: string | string[],
+  ): Promise<string | null | Record<string, string>>;
+
   export function type(
     selector: string,
     text: string,

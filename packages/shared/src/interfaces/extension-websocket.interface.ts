@@ -86,6 +86,12 @@ export interface ExtensionWSServerToClientEvents {
     options: KeyboardKeyDownOptions & KeyboardKeyUpOptions,
     cb: WSAckCallback<void>,
   ) => void;
+  'tabs:get-attributes': (
+    tab: ExtensionBrowserTabDetail,
+    selector: string,
+    attrNames: string | string[] | null,
+    cb: WSAckCallback<string | null | Record<string, string>>,
+  ) => void;
 }
 
 export interface ExtensionWSInterServerEvenets {}

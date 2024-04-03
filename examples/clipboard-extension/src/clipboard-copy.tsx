@@ -12,5 +12,7 @@ export default async function CommandMain(context: CommandLaunchContext) {
   // await _extension.browser.activeTab.type(`textarea[name="q"],[contenteditable="true"]`, 'Hello world\ntestst', { delay: 10, clearValue: true });
   // console.log(await _extension.browser.activeTab.getText())
   // console.log(await _extension.browser.activeTab.select('select', 'css', 'html'))
-  await _extension.browser.activeTab.press('input', 'a');
+  console.log(await _extension.browser.activeTab.getAttributes('input'));
+  console.log(await _extension.browser.activeTab.getAttributes('input', 'type'));
+  console.log(await _extension.browser.activeTab.getAttributes('input', ['type', 'id']));
 }
