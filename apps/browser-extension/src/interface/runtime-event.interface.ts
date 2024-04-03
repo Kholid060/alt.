@@ -1,3 +1,4 @@
+import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import {
   BrowserGetTextOptions,
   KeyboardBrowserTypeOptions,
@@ -7,6 +8,16 @@ import Browser from 'webextension-polyfill';
 export interface RuntimeEvent {
   'element:click': (selector: string) => void;
   'element:select': (selector: string, ...values: string[]) => string[];
+  'element:key-down': (
+    selector: string,
+    key: string,
+    options?: ExtensionAPI.browser.KeyDownOptions,
+  ) => void;
+  'element:key-up': (
+    selector: string,
+    key: string,
+    options?: ExtensionAPI.browser.KeyUpOptions,
+  ) => void;
   'element:get-text': (
     selector?: string,
     options?: Partial<BrowserGetTextOptions>,

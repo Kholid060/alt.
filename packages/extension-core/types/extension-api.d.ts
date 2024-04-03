@@ -1,9 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ExtensionManifest } from '../src/client/manifest';
-import {
-  BrowserGetTextOptions,
+import type { ExtensionManifest } from '../src/client/manifest';
+import type {
+  USKeyboardKeys,
+  KeyboardModifiersType,
   KeyboardBrowserTypeOptions,
 } from '@repo/shared';
+
+type OmitFirstArg<F> = F extends (x: any, ...args: infer P) => infer R
+  ? (...args: P) => R
+  : never;
 
 declare namespace ExtensionAPI {
   export const manifest: ExtensionManifest;
@@ -144,7 +149,19 @@ declare namespace ExtensionAPI.ui.searchPanel {
 
 declare namespace ExtensionAPI.browser {
   type GetTextOptions = BrowserGetTextOptions;
+
+  type KeyboardKeys = USKeyboardKeys;
+  type KeyboardModifiers = KeyboardModifiersType;
   type KeyboardTypeOptions = KeyboardBrowserTypeOptions;
+
+  interface KeyDownOptions {
+    text?: string;
+    modifiers?: KeyboardModifiers[];
+  }
+  interface KeyUpOptions {
+    delay?: number;
+    modifiers?: KeyboardModifiers[];
+  }
 }
 
 declare namespace ExtensionAPI.browser.activeTab {
@@ -158,6 +175,18 @@ declare namespace ExtensionAPI.browser.activeTab {
   export function reload(): Promise<void>;
 
   export function click(selector: string): Promise<void>;
+
+  export function keyDown(
+    selector: string,
+    key: ExtensionAPI.browser.KeyboardKeys,
+    options?: ExtensionAPI.browser.KeyDownOptions,
+  ): Promise<void>;
+
+  export function keyUp(
+    selector: string,
+    key: ExtensionAPI.browser.KeyboardKeys,
+    options?: ExtensionAPI.browser.KeyUpOptions,
+  ): Promise<void>;
 
   export function getText(
     selector?: string,
@@ -174,6 +203,12 @@ declare namespace ExtensionAPI.browser.activeTab {
     selector: string,
     ...values: string[]
   ): Promise<string[]>;
+
+  export function press(
+    selector: string,
+    key: string,
+    modifiers?: ExtensionAPI.browser.KeyboardModifiers[],
+  ): Promise<void>;
 }
 
 export default ExtensionAPI;

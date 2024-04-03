@@ -117,3 +117,51 @@ onExtensionIPCEvent(
     return result;
   },
 );
+
+onExtensionIPCEvent(
+  'browser.activeTab.keyDown',
+  async (_, selector, key, options) => {
+    const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
+
+    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck(
+      browserId,
+      'tabs:key-down',
+      {
+        windowId,
+        tabId: id,
+      },
+      selector,
+      key,
+      options ?? {},
+    );
+    if (isWSAckError(result)) {
+      throw new ExtensionError(result.errorMessage);
+    }
+
+    return result;
+  },
+);
+
+onExtensionIPCEvent(
+  'browser.activeTab.keyUp',
+  async (_, selector, key, options) => {
+    const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
+
+    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck(
+      browserId,
+      'tabs:key-up',
+      {
+        windowId,
+        tabId: id,
+      },
+      selector,
+      key,
+      options ?? {},
+    );
+    if (isWSAckError(result)) {
+      throw new ExtensionError(result.errorMessage);
+    }
+
+    return result;
+  },
+);

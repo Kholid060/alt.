@@ -5,6 +5,7 @@ import {
   BrowserGetTextOptions,
   KeyboardBrowserTypeOptions,
 } from '@repo/shared';
+import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 
 interface TabTarget {
   tabId: number;
@@ -77,6 +78,36 @@ class TabService {
       frameId,
       name: 'element:select',
       args: [selector, ...values],
+    });
+  }
+
+  static async keyDown(
+    { tabId, frameId = 0 }: TabTarget,
+    selector: string,
+    key: string,
+    options?: ExtensionAPI.browser.KeyDownOptions,
+  ) {
+    await injectContentHandlerScript(tabId);
+    return await RuntimeMessage.instance.sendMessageToTab({
+      tabId,
+      frameId,
+      name: 'element:key-down',
+      args: [selector, key, options],
+    });
+  }
+
+  static async keyUp(
+    { tabId, frameId = 0 }: TabTarget,
+    selector: string,
+    key: string,
+    options?: ExtensionAPI.browser.KeyUpOptions,
+  ) {
+    await injectContentHandlerScript(tabId);
+    return await RuntimeMessage.instance.sendMessageToTab({
+      tabId,
+      frameId,
+      name: 'element:key-up',
+      args: [selector, key, options],
     });
   }
 }

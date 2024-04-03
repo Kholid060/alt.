@@ -1,12 +1,15 @@
 import { SetRequired } from 'type-fest';
-import { USKeyboard, USKeyboardDetail } from '../UsKeyboardLayout';
 import * as elementUtils from '../elements-utils';
 import * as selectionUtils from '../selection-utils';
-import { KeyboardBrowserTypeOptions, sleep } from '@repo/shared';
+import {
+  KeyboardBrowserTypeOptions,
+  USKeyboard,
+  USKeyboardDetail,
+  sleep,
+} from '@repo/shared';
+import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 
-type ModifierKeys = 'ctrl' | 'shift' | 'alt' | 'meta' | 'cmd';
-
-function getModifierEventData(mods: ModifierKeys[]) {
+function getModifierEventData(mods: ExtensionAPI.browser.KeyboardModifiers[]) {
   const modsData: Pick<
     KeyboardEventInit,
     'altKey' | 'shiftKey' | 'metaKey' | 'ctrlKey'
@@ -56,7 +59,7 @@ type KeyboardEventInitData = KeyboardEventInit & {
 };
 function getKeyboardEventInit(
   key: string,
-  modifiers: ModifierKeys[] = [],
+  modifiers: ExtensionAPI.browser.KeyboardModifiers[] = [],
 ): KeyboardEventInitData {
   const modsData = getModifierEventData(modifiers);
   const keyDetail = getKeyDetail(key);
@@ -149,12 +152,12 @@ function getInputEventType(
 }
 
 interface TypeCharOptions {
-  modifiers: ModifierKeys[];
+  modifiers: ExtensionAPI.browser.KeyboardModifiers[];
 }
 
 interface KeyEventDetail {
   el: Element;
-  modifiers?: ModifierKeys[];
+  modifiers?: ExtensionAPI.browser.KeyboardModifiers[];
   key: string | KeyboardEventInitData;
 }
 
@@ -172,7 +175,7 @@ class KeyboardDriver {
     return { dispatched: el.dispatchEvent(keyboardEvent), eventData };
   }
 
-  static keyDown(detail: KeyEventDetail) {
+  static keyDown(detail: KeyEventDetail & { text?: string }) {
     const { dispatched, eventData } = this._fireKeyboardEvent(
       'keydown',
       detail,
@@ -187,7 +190,7 @@ class KeyboardDriver {
     } else {
       triggerInputEvent = selectionUtils.replaceSelection(
         detail.el,
-        eventData.realKey,
+        detail.text || eventData.realKey,
       );
     }
 

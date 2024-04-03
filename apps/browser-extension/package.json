@@ -20,6 +20,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@repo/extension-core": "workspace:*",
     "@repo/shared": "workspace:*",
     "@types/webextension-polyfill": "^0.10.7",
     "construct-style-sheets-polyfill": "3.1.0",

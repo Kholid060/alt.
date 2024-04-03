@@ -91,3 +91,32 @@ RuntimeMessage.instance.onMessage(
     return selectedValues;
   },
 );
+
+RuntimeMessage.instance.onMessage(
+  'element:key-down',
+  async (_, selector, key, options) => {
+    const element = await QuerySelector.find(selector);
+    if (!element) throw CUSTOM_ERRORS.EL_NOT_FOUND(selector);
+
+    KeyboardDriver.keyDown({
+      key,
+      el: element,
+      text: options?.text,
+      modifiers: options?.modifiers,
+    });
+  },
+);
+
+RuntimeMessage.instance.onMessage(
+  'element:key-up',
+  async (_, selector, key, options) => {
+    const element = await QuerySelector.find(selector);
+    if (!element) throw CUSTOM_ERRORS.EL_NOT_FOUND(selector);
+
+    KeyboardDriver.keyUp({
+      key,
+      el: element,
+      modifiers: options?.modifiers,
+    });
+  },
+);

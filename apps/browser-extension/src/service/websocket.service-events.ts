@@ -90,4 +90,34 @@ export function websocketEventsListener(
       callback(result);
     }),
   );
+
+  io.on(
+    'tabs:key-down',
+    wsAckHandler(async (tab, selector, key, options, callback) => {
+      const result = await TabService.keyDown(
+        {
+          tabId: tab.tabId,
+        },
+        selector,
+        key,
+        options,
+      );
+      callback(result);
+    }),
+  );
+
+  io.on(
+    'tabs:key-up',
+    wsAckHandler(async (tab, selector, key, options, callback) => {
+      const result = await TabService.keyUp(
+        {
+          tabId: tab.tabId,
+        },
+        selector,
+        key,
+        options,
+      );
+      callback(result);
+    }),
+  );
 }

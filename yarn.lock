@@ -5968,6 +5968,7 @@ __metadata:
     "@commitlint/cli": "npm:18.4.4"
     "@commitlint/config-conventional": "npm:18.1.0"
     "@repo/eslint-config": "workspace:*"
+    "@repo/extension-core": "workspace:*"
     "@repo/shared": "workspace:*"
     "@repo/typescript-config": "workspace:*"
     "@rollup/plugin-sucrase": "npm:^5.0.2"

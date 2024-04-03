@@ -19,3 +19,5 @@ export interface KeyboardBrowserTypeOptions {
   delay: number;
   clearValue: boolean;
 }
+
+export type KeyboardModifiers = 'ctrl' | 'shift' | 'alt' | 'meta' | 'cmd';

@@ -1,5 +1,8 @@
 import type { BrowserInfo } from '../validation/browser-info.validation';
-import { KeyboardBrowserTypeOptions } from './keyboard.interface';
+import {
+  KeyboardBrowserTypeOptions,
+  KeyboardModifiers,
+} from './keyboard.interface';
 
 export interface BrowserExtensionTab {
   title: string;
@@ -60,6 +63,20 @@ export interface ExtensionWSServerToClientEvents {
     selector: string,
     values: string[],
     cb: WSAckCallback<string[]>,
+  ) => void;
+  'tabs:key-down': (
+    tab: ExtensionBrowserTabDetail,
+    selector: string,
+    key: string,
+    options: { text?: string; modifiers?: KeyboardModifiers[] },
+    cb: WSAckCallback<void>,
+  ) => void;
+  'tabs:key-up': (
+    tab: ExtensionBrowserTabDetail,
+    selector: string,
+    key: string,
+    options: { delay?: number; modifiers?: KeyboardModifiers[] },
+    cb: WSAckCallback<void>,
   ) => void;
 }
 

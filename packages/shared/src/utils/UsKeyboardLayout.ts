@@ -10,7 +10,7 @@ export interface USKeyboardDetail {
   shiftKeyCode?: number;
 }
 
-export const USKeyboard: Record<string, USKeyboardDetail> = {
+const USKeyboardKeysDetail = {
   '0': { keyCode: 48, key: '0', code: 'Digit0' },
   '1': { keyCode: 49, key: '1', code: 'Digit1' },
   '2': { keyCode: 50, key: '2', code: 'Digit2' },
@@ -406,3 +406,8 @@ export const USKeyboard: Record<string, USKeyboardDetail> = {
   '}': { keyCode: 221, key: '}', code: 'BracketRight' },
   '"': { keyCode: 222, key: '"', code: 'Quote' },
 };
+
+export const USKeyboard: Record<string, USKeyboardDetail> =
+  USKeyboardKeysDetail;
+
+export type USKeyboardKeys = keyof typeof USKeyboardKeysDetail;
