@@ -165,3 +165,27 @@ onExtensionIPCEvent(
     return result;
   },
 );
+
+onExtensionIPCEvent(
+  'browser.activeTab.press',
+  async (_, selector, key, options) => {
+    const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
+
+    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck(
+      browserId,
+      'tabs:press',
+      {
+        windowId,
+        tabId: id,
+      },
+      selector,
+      key,
+      options ?? {},
+    );
+    if (isWSAckError(result)) {
+      throw new ExtensionError(result.errorMessage);
+    }
+
+    return result;
+  },
+);

@@ -3,6 +3,8 @@ import type { ExtensionManifest } from '../src/client/manifest';
 import type {
   USKeyboardKeys,
   KeyboardModifiersType,
+  KeyboardKeyUpOptionsType,
+  KeyboardKeyDownOptionsType,
   KeyboardBrowserTypeOptions,
 } from '@repo/shared';
 
@@ -154,14 +156,8 @@ declare namespace ExtensionAPI.browser {
   type KeyboardModifiers = KeyboardModifiersType;
   type KeyboardTypeOptions = KeyboardBrowserTypeOptions;
 
-  interface KeyDownOptions {
-    text?: string;
-    modifiers?: KeyboardModifiers[];
-  }
-  interface KeyUpOptions {
-    delay?: number;
-    modifiers?: KeyboardModifiers[];
-  }
+  type KeyUpOptions = KeyboardKeyUpOptionsType;
+  type KeyDownOptions = KeyboardKeyDownOptionsType;
 }
 
 declare namespace ExtensionAPI.browser.activeTab {
@@ -207,7 +203,8 @@ declare namespace ExtensionAPI.browser.activeTab {
   export function press(
     selector: string,
     key: string,
-    modifiers?: ExtensionAPI.browser.KeyboardModifiers[],
+    options?: ExtensionAPI.browser.KeyDownOptions &
+      ExtensionAPI.browser.KeyUpOptions,
   ): Promise<void>;
 }
 

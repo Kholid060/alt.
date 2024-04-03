@@ -18,6 +18,12 @@ export interface RuntimeEvent {
     key: string,
     options?: ExtensionAPI.browser.KeyUpOptions,
   ) => void;
+  'element:press': (
+    selector: string,
+    key: string,
+    options?: ExtensionAPI.browser.KeyUpOptions &
+      ExtensionAPI.browser.KeyDownOptions,
+  ) => void;
   'element:get-text': (
     selector?: string,
     options?: Partial<BrowserGetTextOptions>,

@@ -110,6 +110,22 @@ class TabService {
       args: [selector, key, options],
     });
   }
+
+  static async press(
+    { tabId, frameId = 0 }: TabTarget,
+    selector: string,
+    key: string,
+    options?: ExtensionAPI.browser.KeyUpOptions &
+      ExtensionAPI.browser.KeyDownOptions,
+  ) {
+    await injectContentHandlerScript(tabId);
+    return await RuntimeMessage.instance.sendMessageToTab({
+      tabId,
+      frameId,
+      name: 'element:press',
+      args: [selector, key, options],
+    });
+  }
 }
 
 export default TabService;

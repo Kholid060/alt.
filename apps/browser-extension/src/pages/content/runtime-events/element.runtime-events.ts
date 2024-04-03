@@ -1,3 +1,4 @@
+import { sleep } from '@repo/shared';
 import QuerySelector from '@root/src/utils/QuerySelector';
 import RuntimeMessage from '@root/src/utils/RuntimeMessage';
 import KeyboardDriver from '@root/src/utils/driver/KeyboardDriver';
@@ -112,6 +113,35 @@ RuntimeMessage.instance.onMessage(
   async (_, selector, key, options) => {
     const element = await QuerySelector.find(selector);
     if (!element) throw CUSTOM_ERRORS.EL_NOT_FOUND(selector);
+
+    if (options.delay && options.delay > 0) {
+      await sleep(options.delay);
+    }
+
+    KeyboardDriver.keyUp({
+      key,
+      el: element,
+      modifiers: options?.modifiers,
+    });
+  },
+);
+
+RuntimeMessage.instance.onMessage(
+  'element:press',
+  async (_, selector, key, options) => {
+    const element = await QuerySelector.find(selector);
+    if (!element) throw CUSTOM_ERRORS.EL_NOT_FOUND(selector);
+
+    KeyboardDriver.keyDown({
+      key,
+      el: element,
+      text: options?.text,
+      modifiers: options?.modifiers,
+    });
+
+    if (options?.delay && options.delay > 0) {
+      await sleep(options.delay);
+    }
 
     KeyboardDriver.keyUp({
       key,

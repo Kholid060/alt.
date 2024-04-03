@@ -120,4 +120,19 @@ export function websocketEventsListener(
       callback(result);
     }),
   );
+
+  io.on(
+    'tabs:press',
+    wsAckHandler(async (tab, selector, key, options, callback) => {
+      const result = await TabService.press(
+        {
+          tabId: tab.tabId,
+        },
+        selector,
+        key,
+        options,
+      );
+      callback(result);
+    }),
+  );
 }

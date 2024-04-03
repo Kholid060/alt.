@@ -21,3 +21,13 @@ export interface KeyboardBrowserTypeOptions {
 }
 
 export type KeyboardModifiers = 'ctrl' | 'shift' | 'alt' | 'meta' | 'cmd';
+
+export interface KeyboardKeyDownOptions {
+  text?: string;
+  modifiers?: KeyboardModifiers[];
+}
+
+export interface KeyboardKeyUpOptions {
+  delay?: number;
+  modifiers?: KeyboardModifiers[];
+}
