@@ -59,7 +59,9 @@ export function parseJSON<T = unknown, K = unknown>(
   }
 }
 
-export function isObject(input: unknown): input is object {
+export function isObject(
+  input: unknown,
+): input is Record<number | string | symbol, unknown> {
   return typeof input === 'object' && !Array.isArray(input) && input !== null;
 }
 

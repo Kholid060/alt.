@@ -4,7 +4,7 @@ import {
   BrowserInfoValidation,
   type ExtensionSocketData,
   type ExtensionWSClientToServerEvents,
-  type ExtensionWSInterServerEvenets,
+  type ExtensionWSInterServerEvents,
   type ExtensionWSServerToClientEvents,
 } from '@repo/shared';
 import type { Namespace, Server } from 'socket.io';
@@ -14,7 +14,7 @@ import { initExtensionWSEventsListener } from '../ws-events/extensions.ws-event'
 export type ExtensionNamespace = Namespace<
   ExtensionWSClientToServerEvents,
   ExtensionWSServerToClientEvents,
-  ExtensionWSInterServerEvenets,
+  ExtensionWSInterServerEvents,
   ExtensionSocketData
 >;
 

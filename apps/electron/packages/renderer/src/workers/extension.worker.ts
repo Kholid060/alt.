@@ -12,7 +12,9 @@ import {
   CommandViewJSONLaunchContext,
   ExtensionMessagePortEvent,
 } from '@repo/extension';
-import { AMessagePort } from '@repo/shared';
+import { AMessagePort, EventMapEmit } from '@repo/shared';
+import { createExtensionElementHandle } from '#common/utils/extension/extension-element-handle';
+import { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
 
 type ExtensionCommand = (
   payload: CommandLaunchContext | CommandViewJSONLaunchContext,
@@ -70,6 +72,25 @@ function initExtensionAPI({
           removeListener(callback) {
             aMessagePort.removeListener('extension:keydown-event', callback);
           },
+        },
+        'browser.activeTab.findElement': (selector) => {
+          return createExtensionElementHandle({
+            selector,
+            sendMessage: extensionWorkerMessage.sendMessage.bind(
+              extensionWorkerMessage,
+            ) as EventMapEmit<IPCUserExtensionEventsMap>,
+          });
+        },
+        'browser.activeTab.findAllElements': (selector) => {
+          return createExtensionElementHandle(
+            {
+              selector,
+              sendMessage: extensionWorkerMessage.sendMessage.bind(
+                extensionWorkerMessage,
+              ) as EventMapEmit<IPCUserExtensionEventsMap>,
+            },
+            true,
+          );
         },
         'shell.installedApps.getIconURL': (appId) =>
           `${CUSTOM_SCHEME.appIcon}://${appId}.png`,

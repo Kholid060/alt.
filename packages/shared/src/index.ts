@@ -16,5 +16,6 @@ export type {
   USKeyboardDetail,
 } from './utils/UsKeyboardLayout';
 
+export type * from './interfaces/utils.interface';
 export type * from './interfaces/keyboard.interface';
 export type * from './interfaces/extension-websocket.interface';

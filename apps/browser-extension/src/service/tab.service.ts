@@ -3,6 +3,7 @@ import { injectContentHandlerScript } from '../utils/background-content-utils';
 import RuntimeMessage from '../utils/RuntimeMessage';
 import {
   BrowserGetTextOptions,
+  ExtensionBrowserElementSelector,
   KeyboardBrowserTypeOptions,
 } from '@repo/shared';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
@@ -17,7 +18,10 @@ class TabService {
     return Browser.tabs.reload(tabId);
   }
 
-  static async click({ tabId, frameId = 0 }: TabTarget, selector: string) {
+  static async click(
+    { tabId, frameId = 0 }: TabTarget,
+    selector: ExtensionBrowserElementSelector,
+  ) {
     await injectContentHandlerScript(tabId);
     await RuntimeMessage.instance.sendMessageToTab({
       tabId,
@@ -34,7 +38,7 @@ class TabService {
       text,
       options,
     }: {
-      selector: string;
+      selector: ExtensionBrowserElementSelector;
       text: string;
       options?: Partial<KeyboardBrowserTypeOptions>;
     },
@@ -50,7 +54,7 @@ class TabService {
 
   static async getText(
     { tabId, frameId = 0 }: TabTarget,
-    selector?: string,
+    selector?: ExtensionBrowserElementSelector,
     options?: Partial<BrowserGetTextOptions>,
   ) {
     const getTextOptions: BrowserGetTextOptions = {
@@ -69,7 +73,7 @@ class TabService {
 
   static async select(
     { tabId, frameId = 0 }: TabTarget,
-    selector: string,
+    selector: ExtensionBrowserElementSelector,
     ...values: string[]
   ) {
     await injectContentHandlerScript(tabId);
@@ -83,7 +87,7 @@ class TabService {
 
   static async keyDown(
     { tabId, frameId = 0 }: TabTarget,
-    selector: string,
+    selector: ExtensionBrowserElementSelector,
     key: string,
     options?: ExtensionAPI.browser.KeyDownOptions,
   ) {
@@ -98,7 +102,7 @@ class TabService {
 
   static async keyUp(
     { tabId, frameId = 0 }: TabTarget,
-    selector: string,
+    selector: ExtensionBrowserElementSelector,
     key: string,
     options?: ExtensionAPI.browser.KeyUpOptions,
   ) {
@@ -113,7 +117,7 @@ class TabService {
 
   static async press(
     { tabId, frameId = 0 }: TabTarget,
-    selector: string,
+    selector: ExtensionBrowserElementSelector,
     key: string,
     options?: ExtensionAPI.browser.KeyUpOptions &
       ExtensionAPI.browser.KeyDownOptions,
@@ -129,7 +133,7 @@ class TabService {
 
   static async getAttributes(
     { tabId, frameId = 0 }: TabTarget,
-    selector: string,
+    selector: ExtensionBrowserElementSelector,
     attrNames?: string | string[],
   ) {
     await injectContentHandlerScript(tabId);
@@ -138,6 +142,20 @@ class TabService {
       frameId,
       name: 'element:get-attributes',
       args: [selector, attrNames],
+    });
+  }
+
+  static async elementExist(
+    { tabId, frameId = 0 }: TabTarget,
+    { selector }: ExtensionBrowserElementSelector,
+    multiple: boolean = false,
+  ) {
+    await injectContentHandlerScript(tabId);
+    return await RuntimeMessage.instance.sendMessageToTab({
+      tabId,
+      frameId,
+      name: 'element:element-exists',
+      args: [selector, multiple],
     });
   }
 }

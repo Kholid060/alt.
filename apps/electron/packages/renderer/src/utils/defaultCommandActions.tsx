@@ -63,7 +63,6 @@ const defaultCommandActions: {
           args: ['text', data.content],
         })
         .then((result) => {
-          console.log(result, data);
           resultHandler({ addStatus, result }, () => {
             addStatus({
               type: 'success',

@@ -18,6 +18,16 @@ function CommandMain() {
     });
   }, []);
 
+  const customItem: UiListItem[] = [
+    {
+      title: 'Hello world',
+      value: 'testing',
+      async onSelected() {
+        const inputEl = await _extension.browser.activeTab.findElement('input');
+        await inputEl.type('hello');
+      }
+    }
+  ]
   const items: UiListItem[] = apps.map((app) => ({
     title: app.name,
     value: app.appId,
@@ -40,7 +50,7 @@ function CommandMain() {
   return (
     <div className="p-2">
       <ItemList />
-      <UiList items={items} />
+      <UiList items={[...customItem,...items]} />
     </div>
   );
 }

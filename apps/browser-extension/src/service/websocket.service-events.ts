@@ -52,7 +52,7 @@ export function websocketEventsListener(
 
   io.on(
     'tabs:type',
-    wsAckHandler(async (tab, { selector, text, options }, callback) => {
+    wsAckHandler(async (tab, selector, text, options, callback) => {
       await TabService.type(
         {
           tabId: tab.tabId,
@@ -65,7 +65,7 @@ export function websocketEventsListener(
 
   io.on(
     'tabs:get-text',
-    wsAckHandler(async (tab, { selector, options }, callback) => {
+    wsAckHandler(async (tab, selector, options, callback) => {
       const result = await TabService.getText(
         {
           tabId: tab.tabId,
@@ -145,6 +145,20 @@ export function websocketEventsListener(
         },
         selector,
         attrNames ?? undefined,
+      );
+      callback(result);
+    }),
+  );
+
+  io.on(
+    'tabs:element-exists',
+    wsAckHandler(async (tab, selector, multiple, callback) => {
+      const result = await TabService.elementExist(
+        {
+          tabId: tab.tabId,
+        },
+        selector,
+        multiple,
       );
       callback(result);
     }),

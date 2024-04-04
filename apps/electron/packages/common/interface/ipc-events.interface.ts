@@ -10,7 +10,15 @@ import type { CommandLaunchContext } from '@repo/extension';
 import type { PartialDeep } from 'type-fest';
 import type { BrowserExtensionTab } from '@repo/shared';
 
-export type IPCUserExtensionEventsMap = FlatActionExtensionAPI;
+export interface IPCUserExtensionCustomEventsMap {
+  'browser.activeTab.elementExists': (
+    selector: string,
+    multiple?: boolean,
+  ) => Promise<boolean | number[]>;
+}
+
+export type IPCUserExtensionEventsMap = FlatActionExtensionAPI &
+  IPCUserExtensionCustomEventsMap;
 
 export interface IPCEventError {
   $isError: true;

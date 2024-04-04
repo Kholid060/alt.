@@ -1,6 +1,7 @@
 import { MessageChannelMain } from 'electron';
 import { isObject } from '@repo/shared';
 import type { ExtensionMessageHandler } from './extension-api-event';
+import type { IPCUserExtensionEventsMap } from '#packages/common/interface/ipc-events.interface';
 
 class ExtensionMessagePortHandler {
   private messageChannel: MessageChannelMain | null = null;
@@ -42,9 +43,11 @@ class ExtensionMessagePortHandler {
     const result = await this.portMessageHandler({
       sender: null,
       key: data.key,
-      args: data.args,
-      name: data.name,
-      commandId: data.commandId,
+      commandId: data.commandId as string,
+      name: data.name as keyof IPCUserExtensionEventsMap,
+      args: data.args as Parameters<
+        IPCUserExtensionEventsMap[keyof IPCUserExtensionEventsMap]
+      >,
     });
 
     this.messageChannel.port2.postMessage({

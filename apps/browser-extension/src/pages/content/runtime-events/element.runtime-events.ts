@@ -1,4 +1,4 @@
-import { sleep } from '@repo/shared';
+import { ExtensionBrowserElementSelector, sleep } from '@repo/shared';
 import QuerySelector from '@root/src/utils/QuerySelector';
 import RuntimeMessage from '@root/src/utils/RuntimeMessage';
 import KeyboardDriver from '@root/src/utils/driver/KeyboardDriver';
@@ -11,18 +11,57 @@ const CUSTOM_ERRORS = {
     new Error(`Element is not a "${elName}" element`),
 };
 
-RuntimeMessage.instance.onMessage('element:click', async (_, selector) => {
+let elementCache: { el: Element | Element[] | null; selector: string } | null =
+  null;
+
+async function queryElement({
+  selector,
+  elementIndex,
+}: ExtensionBrowserElementSelector): Promise<Element> {
+  if (elementCache?.selector === selector) {
+    if (typeof elementIndex === 'number') {
+      const element = Array.isArray(elementCache.el)
+        ? elementCache.el[elementIndex ?? 0]
+        : null;
+      if (element) return element;
+    } else if (!Array.isArray(elementCache.el) && elementCache.el) {
+      return elementCache.el;
+    }
+  }
+
+  if (typeof elementIndex === 'number') {
+    const elements = await QuerySelector.findAll(selector);
+    if (!elements || !elements[elementIndex])
+      throw CUSTOM_ERRORS.EL_NOT_FOUND(selector);
+
+    elementCache = {
+      selector,
+      el: elements,
+    };
+
+    return elements[elementIndex];
+  }
+
   const element = await QuerySelector.find(selector);
   if (!element) throw CUSTOM_ERRORS.EL_NOT_FOUND(selector);
 
+  elementCache = {
+    selector,
+    el: element,
+  };
+
+  return element;
+}
+
+RuntimeMessage.instance.onMessage('element:click', async (_, selector) => {
+  const element = await queryElement(selector);
   MouseDriver.click(element);
 });
 
 RuntimeMessage.instance.onMessage(
   'element:keyboard-type',
   async (_, selector, text, options) => {
-    const element = await QuerySelector.find(selector);
-    if (!element) throw CUSTOM_ERRORS.EL_NOT_FOUND(selector);
+    const element = await queryElement(selector);
 
     await KeyboardDriver.type(element, text, options);
   },
@@ -31,10 +70,7 @@ RuntimeMessage.instance.onMessage(
 RuntimeMessage.instance.onMessage(
   'element:get-text',
   async (_, selector, options) => {
-    const element = selector
-      ? await QuerySelector.find(selector)
-      : document.body;
-    if (!element && selector) throw CUSTOM_ERRORS.EL_NOT_FOUND(selector);
+    const element = selector ? await queryElement(selector) : document.body;
 
     let text = element?.textContent ?? '';
     if (element instanceof HTMLElement && options?.onlyVisibleText) {
@@ -48,9 +84,8 @@ RuntimeMessage.instance.onMessage(
 RuntimeMessage.instance.onMessage(
   'element:select',
   async (_, selector, ...values) => {
-    const element = await QuerySelector.find<HTMLSelectElement>(selector);
+    const element = (await queryElement(selector)) as HTMLSelectElement;
 
-    if (!element) throw CUSTOM_ERRORS.EL_NOT_FOUND(selector);
     if (element.tagName !== 'SELECT')
       throw CUSTOM_ERRORS.INVALID_ELEMENT(element.tagName);
 
@@ -96,8 +131,7 @@ RuntimeMessage.instance.onMessage(
 RuntimeMessage.instance.onMessage(
   'element:key-down',
   async (_, selector, key, options) => {
-    const element = await QuerySelector.find(selector);
-    if (!element) throw CUSTOM_ERRORS.EL_NOT_FOUND(selector);
+    const element = await queryElement(selector);
 
     KeyboardDriver.keyDown({
       key,
@@ -111,8 +145,7 @@ RuntimeMessage.instance.onMessage(
 RuntimeMessage.instance.onMessage(
   'element:key-up',
   async (_, selector, key, options) => {
-    const element = await QuerySelector.find(selector);
-    if (!element) throw CUSTOM_ERRORS.EL_NOT_FOUND(selector);
+    const element = await queryElement(selector);
 
     if (options.delay && options.delay > 0) {
       await sleep(options.delay);
@@ -129,8 +162,7 @@ RuntimeMessage.instance.onMessage(
 RuntimeMessage.instance.onMessage(
   'element:press',
   async (_, selector, key, options) => {
-    const element = await QuerySelector.find(selector);
-    if (!element) throw CUSTOM_ERRORS.EL_NOT_FOUND(selector);
+    const element = await queryElement(selector);
 
     KeyboardDriver.keyDown({
       key,
@@ -154,8 +186,7 @@ RuntimeMessage.instance.onMessage(
 RuntimeMessage.instance.onMessage(
   'element:get-attributes',
   async (_, selector, attrNames) => {
-    const element = await QuerySelector.find(selector);
-    if (!element) throw CUSTOM_ERRORS.EL_NOT_FOUND(selector);
+    const element = await queryElement(selector);
 
     if (!attrNames) {
       return Object.fromEntries(
@@ -174,5 +205,18 @@ RuntimeMessage.instance.onMessage(
     }
 
     return element.getAttribute(attrNames);
+  },
+);
+
+RuntimeMessage.instance.onMessage(
+  'element:element-exists',
+  async (_, selector, multiple) => {
+    if (multiple) {
+      const elements = await QuerySelector.findAll(selector);
+      return elements?.map((_, index) => index) ?? [];
+    }
+
+    const element = await QuerySelector.find(selector);
+    return Boolean(element);
   },
 );

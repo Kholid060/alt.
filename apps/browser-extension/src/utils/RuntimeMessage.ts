@@ -5,6 +5,13 @@ import {
 } from '../interface/runtime-event.interface';
 import { isObject } from '@repo/shared';
 
+export type RuntimeEventListener<T extends keyof RuntimeEvent> = (
+  ...args: [
+    detail: { sender: Browser.Runtime.MessageSender },
+    ...Parameters<RuntimeEvent[T]>,
+  ]
+) => Promise<ReturnType<RuntimeEvent[T]>>;
+
 class RuntimeMessage {
   private static _instance: RuntimeMessage | null = null;
   static get instance() {
@@ -41,12 +48,7 @@ class RuntimeMessage {
 
   onMessage<T extends keyof RuntimeEvent>(
     name: T,
-    callback: (
-      ...args: [
-        detail: { sender: Browser.Runtime.MessageSender },
-        ...Parameters<RuntimeEvent[T]>,
-      ]
-    ) => Promise<ReturnType<RuntimeEvent[T]>>,
+    callback: RuntimeEventListener<T>,
   ) {
     this.listeners.set(name, callback);
   }

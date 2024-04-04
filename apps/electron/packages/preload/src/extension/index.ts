@@ -12,6 +12,8 @@ import { contextBridge } from 'electron';
 import { isExtHasApiPermission } from '#common/utils/check-ext-permission';
 import type { SetRequired } from 'type-fest';
 import { ExtensionError } from '#common/errors/custom-errors';
+import { createExtensionElementHandle } from '#common/utils/extension/extension-element-handle';
+import type { EventMapEmit } from '@repo/shared';
 
 function setExtView(type: 'empty' | 'error' = 'empty') {
   contextBridge.exposeInMainWorld(PRELOAD_API_KEY.extension, {
@@ -134,6 +136,25 @@ export class ExtensionAPI {
         ),
         'shell.installedApps.getIconURL': (appId) =>
           `${CUSTOM_SCHEME.appIcon}://${appId}.png`,
+        'browser.activeTab.findElement': (selector) => {
+          return createExtensionElementHandle({
+            selector,
+            sendMessage: this.sendAction.bind(
+              this,
+            ) as EventMapEmit<IPCUserExtensionEventsMap>,
+          });
+        },
+        'browser.activeTab.findAllElements': (selector) => {
+          return createExtensionElementHandle(
+            {
+              selector,
+              sendMessage: this.sendAction.bind(
+                this,
+              ) as EventMapEmit<IPCUserExtensionEventsMap>,
+            },
+            true,
+          );
+        },
       },
     });
 

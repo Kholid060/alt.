@@ -22,6 +22,6 @@ export async function injectContentHandlerScript(tabId: number) {
       tabId,
       allFrames: true,
     },
-    files: ['./src/pages/contentInjected/index.js'],
+    files: ['./src/pages/content-script/index.js'],
   });
 }

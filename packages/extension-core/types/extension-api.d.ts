@@ -6,6 +6,7 @@ import type {
   KeyboardKeyUpOptionsType,
   KeyboardKeyDownOptionsType,
   KeyboardBrowserTypeOptions,
+  ExtensionBrowserElementSelector,
 } from '@repo/shared';
 
 type OmitFirstArg<F> = F extends (x: any, ...args: infer P) => infer R
@@ -158,6 +159,24 @@ declare namespace ExtensionAPI.browser {
 
   type KeyUpOptions = KeyboardKeyUpOptionsType;
   type KeyDownOptions = KeyboardKeyDownOptionsType;
+  type KeyPressOptions = KeyUpOptions & KeyDownOptions;
+
+  type ElementSelector = ElementSelectorDetail | string;
+  type ElementSelectorDetail = ExtensionBrowserElementSelector;
+
+  interface ElementHandle {
+    type: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.type>;
+    click: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.click>;
+    press: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.press>;
+    keyUp: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.keyUp>;
+    select: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.select>;
+    getText: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.getText>;
+    keyDown: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.keyDown>;
+    getText: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.getText>;
+    getAttributes: OmitFirstArg<
+      typeof ExtensionAPI.browser.activeTab.getAttributes
+    >;
+  }
 }
 
 declare namespace ExtensionAPI.browser.activeTab {
@@ -170,55 +189,67 @@ declare namespace ExtensionAPI.browser.activeTab {
 
   export function reload(): Promise<void>;
 
-  export function click(selector: string): Promise<void>;
+  export function click(
+    selector: ExtensionAPI.browser.ElementSelector,
+  ): Promise<void>;
 
   export function keyDown(
-    selector: string,
+    selector: ExtensionAPI.browser.ElementSelector,
     key: ExtensionAPI.browser.KeyboardKeys,
     options?: ExtensionAPI.browser.KeyDownOptions,
   ): Promise<void>;
 
   export function keyUp(
-    selector: string,
+    selector: ExtensionAPI.browser.ElementSelector,
     key: ExtensionAPI.browser.KeyboardKeys,
     options?: ExtensionAPI.browser.KeyUpOptions,
   ): Promise<void>;
 
   export function getText(
-    selector?: string,
+    selector?: ExtensionAPI.browser.ElementSelector,
     options?: Partial<ExtensionAPI.browser.GetTextOptions>,
   ): Promise<string>;
 
   export function getAttributes(
-    selector: string,
+    selector: ExtensionAPI.browser.ElementSelector,
     attrNames: string,
   ): Promise<string | null>;
   export function getAttributes(
-    selector: string,
+    selector: ExtensionAPI.browser.ElementSelector,
     attrNames?: string[],
   ): Promise<Record<string, string>>;
   export function getAttributes(
-    selector: string,
+    selector: ExtensionAPI.browser.ElementSelector,
     attrNames?: string | string[],
   ): Promise<string | null | Record<string, string>>;
 
   export function type(
-    selector: string,
+    selector: ExtensionAPI.browser.ElementSelector,
     text: string,
     options?: Partial<ExtensionAPI.browser.KeyboardTypeOptions>,
   ): Promise<void>;
 
   export function select(
-    selector: string,
+    selector: ExtensionAPI.browser.ElementSelector,
     ...values: string[]
   ): Promise<string[]>;
 
   export function press(
-    selector: string,
+    selector: ExtensionAPI.browser.ElementSelector,
     key: string,
     options?: ExtensionAPI.browser.KeyDownOptions &
       ExtensionAPI.browser.KeyUpOptions,
   ): Promise<void>;
+
+  // @ext-api-value
+  export function findElement(
+    selector: string,
+  ): Promise<ExtensionAPI.browser.ElementHandle | null>;
+
+  // @ext-api-value
+  export function findAllElements(
+    selector: string,
+  ): Promise<ExtensionAPI.browser.ElementHandle[]>;
 }
 
 export default ExtensionAPI;

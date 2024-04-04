@@ -1,42 +1,50 @@
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import {
   BrowserGetTextOptions,
+  ExtensionBrowserElementSelector,
   KeyboardBrowserTypeOptions,
 } from '@repo/shared';
 import Browser from 'webextension-polyfill';
 
 export interface RuntimeEvent {
-  'element:click': (selector: string) => void;
-  'element:select': (selector: string, ...values: string[]) => string[];
+  'element:click': (selector: ExtensionBrowserElementSelector) => void;
+  'element:select': (
+    selector: ExtensionBrowserElementSelector,
+    ...values: string[]
+  ) => string[];
   'element:key-down': (
-    selector: string,
+    selector: ExtensionBrowserElementSelector,
     key: string,
     options?: ExtensionAPI.browser.KeyDownOptions,
   ) => void;
   'element:key-up': (
-    selector: string,
+    selector: ExtensionBrowserElementSelector,
     key: string,
     options?: ExtensionAPI.browser.KeyUpOptions,
   ) => void;
   'element:press': (
-    selector: string,
+    selector: ExtensionBrowserElementSelector,
     key: string,
     options?: ExtensionAPI.browser.KeyUpOptions &
       ExtensionAPI.browser.KeyDownOptions,
   ) => void;
   'element:get-text': (
-    selector?: string,
+    selector?: ExtensionBrowserElementSelector,
     options?: Partial<BrowserGetTextOptions>,
   ) => string;
   'element:keyboard-type': (
-    selector: string,
+    selector: ExtensionBrowserElementSelector,
     text: string,
     options?: Partial<KeyboardBrowserTypeOptions>,
   ) => void;
   'element:get-attributes': (
-    selector: string,
+    selector: ExtensionBrowserElementSelector,
     attrNames?: string | string[],
   ) => string | null | Record<string, string>;
+  'element:element-exists': (
+    selector: string,
+    multiple?: boolean,
+  ) => boolean | number[];
 }
 
 export interface RuntimeEventPayload {

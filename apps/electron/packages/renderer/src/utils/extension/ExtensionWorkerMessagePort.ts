@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
+import { isIPCEventError } from '#common/utils/helper';
 import { isObject } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 
@@ -46,11 +47,7 @@ class ExtensionWorkerMessagePort {
     const promise = this.messages.get(data.messageId);
     if (!promise) return;
 
-    if (
-      isObject(data.result) &&
-      data.result !== null &&
-      '$isError' in data.result
-    ) {
+    if (isIPCEventError(data.result)) {
       promise.reject(new Error(data.result.message));
       this.messages.delete(data.messageId);
       return;

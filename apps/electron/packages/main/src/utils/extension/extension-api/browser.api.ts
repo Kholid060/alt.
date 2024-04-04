@@ -1,13 +1,17 @@
 import { ExtensionError } from '#packages/common/errors/custom-errors';
-import type { WSAckErrorResult } from '@repo/shared';
-import { isObject } from '@repo/shared';
 import { onExtensionIPCEvent } from '../extension-api-event';
 import BrowserService from '/@/services/browser.service';
 import ExtensionWSNamespace from '/@/services/websocket/ws-namespaces/extensions.ws-namespace';
+import {
+  extensionBrowserElementHandle,
+  isWSAckError,
+} from '../ExtensionBrowserElementHandle';
+import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 
-function isWSAckError(result: unknown): result is WSAckErrorResult {
-  return Boolean(result) && isObject(result) && 'error' in result;
-}
+const getElementSelector = (
+  selector: ExtensionAPI.browser.ElementSelector,
+): ExtensionAPI.browser.ElementSelectorDetail =>
+  typeof selector === 'string' ? getElementSelector(selector) : selector;
 
 onExtensionIPCEvent('browser.activeTab.get', () => {
   const activeTab = BrowserService.instance.activeBrowser?.tab;
@@ -32,202 +36,84 @@ onExtensionIPCEvent('browser.activeTab.reload', async () => {
   }
 });
 
-onExtensionIPCEvent('browser.activeTab.click', async (_, selector) => {
-  const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
+onExtensionIPCEvent('browser.activeTab.click', (_, selector) => {
+  return extensionBrowserElementHandle('click', getElementSelector(selector));
+});
 
-  const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck(
-    browserId,
-    'tabs:click',
-    {
-      windowId,
-      tabId: id,
-    },
-    selector,
+onExtensionIPCEvent('browser.activeTab.type', (_, selector, text, options) => {
+  return extensionBrowserElementHandle(
+    'type',
+    getElementSelector(selector),
+    text,
+    options ?? {},
   );
-  if (isWSAckError(result)) {
-    throw new ExtensionError(result.errorMessage);
-  }
+});
+
+onExtensionIPCEvent('browser.activeTab.getText', (_, selector, options) => {
+  return extensionBrowserElementHandle(
+    'getText',
+    getElementSelector(selector ?? 'html'),
+    options,
+  );
+});
+
+onExtensionIPCEvent('browser.activeTab.select', (_, selector, ...values) => {
+  return extensionBrowserElementHandle(
+    'select',
+    getElementSelector(selector),
+    values,
+  );
+});
+
+onExtensionIPCEvent('browser.activeTab.keyDown', (_, selector, ...args) => {
+  return extensionBrowserElementHandle(
+    'keyDown',
+    getElementSelector(selector),
+    ...args,
+  );
+});
+
+onExtensionIPCEvent('browser.activeTab.keyUp', (_, selector, ...args) => {
+  return extensionBrowserElementHandle(
+    'keyUp',
+    getElementSelector(selector),
+    ...args,
+  );
+});
+
+onExtensionIPCEvent('browser.activeTab.press', (_, selector, ...args) => {
+  return extensionBrowserElementHandle(
+    'press',
+    getElementSelector(selector),
+    ...args,
+  );
 });
 
 onExtensionIPCEvent(
-  'browser.activeTab.type',
-  async (_, selector, text, options) => {
-    const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
-
-    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck(
-      browserId,
-      'tabs:type',
-      {
-        windowId,
-        tabId: id,
-      },
-      {
-        text,
-        options,
-        selector,
-      },
-    );
-    if (isWSAckError(result)) {
-      throw new ExtensionError(result.errorMessage);
-    }
-  },
-);
-
-onExtensionIPCEvent(
-  'browser.activeTab.getText',
-  async (_, selector, options) => {
-    const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
-
-    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck(
-      browserId,
-      'tabs:get-text',
-      {
-        windowId,
-        tabId: id,
-      },
-      { selector: selector ?? 'html', options },
-    );
-    if (isWSAckError(result)) {
-      throw new ExtensionError(result.errorMessage);
-    }
-
-    return result;
-  },
-);
-
-onExtensionIPCEvent(
-  'browser.activeTab.select',
-  async (_, selector, ...values) => {
-    const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
-
-    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck(
-      browserId,
-      'tabs:select',
-      {
-        windowId,
-        tabId: id,
-      },
-      selector,
-      values,
-    );
-    if (isWSAckError(result)) {
-      throw new ExtensionError(result.errorMessage);
-    }
-
-    return result;
-  },
-);
-
-onExtensionIPCEvent(
-  'browser.activeTab.keyDown',
-  async (_, selector, key, options) => {
-    const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
-
-    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck(
-      browserId,
-      'tabs:key-down',
-      {
-        windowId,
-        tabId: id,
-      },
-      selector,
-      key,
-      options ?? {},
-    );
-    if (isWSAckError(result)) {
-      throw new ExtensionError(result.errorMessage);
-    }
-
-    return result;
-  },
-);
-
-onExtensionIPCEvent(
-  'browser.activeTab.keyUp',
-  async (_, selector, key, options) => {
-    const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
-
-    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck(
-      browserId,
-      'tabs:key-up',
-      {
-        windowId,
-        tabId: id,
-      },
-      selector,
-      key,
-      options ?? {},
-    );
-    if (isWSAckError(result)) {
-      throw new ExtensionError(result.errorMessage);
-    }
-
-    return result;
-  },
-);
-
-onExtensionIPCEvent(
-  'browser.activeTab.press',
-  async (_, selector, key, options) => {
-    const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
-
-    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck(
-      browserId,
-      'tabs:press',
-      {
-        windowId,
-        tabId: id,
-      },
-      selector,
-      key,
-      options ?? {},
-    );
-    if (isWSAckError(result)) {
-      throw new ExtensionError(result.errorMessage);
-    }
-
-    return result;
-  },
-);
-
-onExtensionIPCEvent(
-  'browser.activeTab.press',
-  async (_, selector, key, options) => {
-    const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
-
-    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck(
-      browserId,
-      'tabs:press',
-      {
-        windowId,
-        tabId: id,
-      },
-      selector,
-      key,
-      options ?? {},
-    );
-    if (isWSAckError(result)) {
-      throw new ExtensionError(result.errorMessage);
-    }
-
-    return result;
-  },
-);
-
-onExtensionIPCEvent(
   'browser.activeTab.getAttributes',
-  async (_, selector, attrNames) => {
+  (_, selector, attrNames) => {
+    return extensionBrowserElementHandle(
+      'getAttributes',
+      getElementSelector(selector),
+      attrNames ?? null,
+    );
+  },
+);
+
+onExtensionIPCEvent(
+  'browser.activeTab.elementExists',
+  async (_, selector, multiple) => {
     const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
 
     const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck(
       browserId,
-      'tabs:get-attributes',
+      'tabs:element-exists',
       {
         windowId,
         tabId: id,
       },
-      selector,
-      attrNames ?? null,
+      { selector },
+      multiple ?? false,
     );
     if (isWSAckError(result)) {
       throw new ExtensionError(result.errorMessage);

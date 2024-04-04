@@ -32,69 +32,52 @@ export interface ExtensionBrowserTabDetail {
   windowId: number;
 }
 
-export interface ExtensionWSServerToClientEvents {
-  'tabs:reload': (
-    tab: ExtensionBrowserTabDetail,
-    cb: WSAckCallback<void>,
-  ) => void;
-  'tabs:click': (
-    tab: ExtensionBrowserTabDetail,
-    selector: string,
-    cb: WSAckCallback<void>,
-  ) => void;
-  'tabs:type': (
-    tab: ExtensionBrowserTabDetail,
-    detail: {
-      selector: string;
-      text: string;
-      options?: Partial<KeyboardBrowserTypeOptions>;
-    },
-    cb: WSAckCallback<void>,
-  ) => void;
-  'tabs:get-text': (
-    tab: ExtensionBrowserTabDetail,
-    detail: {
-      selector: string;
-      options?: Partial<BrowserGetTextOptions>;
-    },
-    cb: WSAckCallback<string>,
-  ) => void;
-  'tabs:select': (
-    tab: ExtensionBrowserTabDetail,
-    selector: string,
-    values: string[],
-    cb: WSAckCallback<string[]>,
-  ) => void;
-  'tabs:key-down': (
-    tab: ExtensionBrowserTabDetail,
-    selector: string,
-    key: string,
-    options: KeyboardKeyDownOptions,
-    cb: WSAckCallback<void>,
-  ) => void;
-  'tabs:key-up': (
-    tab: ExtensionBrowserTabDetail,
-    selector: string,
-    key: string,
-    options: KeyboardKeyUpOptions,
-    cb: WSAckCallback<void>,
-  ) => void;
-  'tabs:press': (
-    tab: ExtensionBrowserTabDetail,
-    selector: string,
-    key: string,
-    options: KeyboardKeyDownOptions & KeyboardKeyUpOptions,
-    cb: WSAckCallback<void>,
-  ) => void;
-  'tabs:get-attributes': (
-    tab: ExtensionBrowserTabDetail,
-    selector: string,
-    attrNames: string | string[] | null,
-    cb: WSAckCallback<string | null | Record<string, string>>,
-  ) => void;
+export interface ExtensionBrowserElementSelector {
+  selector: string;
+  elementIndex?: number;
 }
 
-export interface ExtensionWSInterServerEvenets {}
+type ExtensionWSAckHandler<T extends unknown[] = [], R = void> = (
+  tab: ExtensionBrowserTabDetail,
+  ...args: [...T, cb: WSAckCallback<R>]
+) => void;
+
+type ExtensionWSAckElementHandler<
+  T extends unknown[] = [],
+  R = void,
+> = ExtensionWSAckHandler<[selector: ExtensionBrowserElementSelector, ...T], R>;
+
+export interface ExtensionWSServerToClientEvents {
+  'tabs:reload': ExtensionWSAckHandler;
+  'tabs:click': ExtensionWSAckElementHandler;
+  'tabs:type': ExtensionWSAckElementHandler<
+    [text: string, options: Partial<KeyboardBrowserTypeOptions>]
+  >;
+  'tabs:get-text': ExtensionWSAckElementHandler<
+    [options: Partial<BrowserGetTextOptions>],
+    string
+  >;
+  'tabs:select': ExtensionWSAckElementHandler<[values: string[]], string[]>;
+  'tabs:key-down': ExtensionWSAckElementHandler<
+    [key: string, options: KeyboardKeyDownOptions]
+  >;
+  'tabs:key-up': ExtensionWSAckElementHandler<
+    [key: string, options: KeyboardKeyUpOptions]
+  >;
+  'tabs:press': ExtensionWSAckElementHandler<
+    [key: string, options: KeyboardKeyDownOptions & KeyboardKeyUpOptions]
+  >;
+  'tabs:get-attributes': ExtensionWSAckElementHandler<
+    [attrNames: string | string[] | null],
+    string | null | Record<string, string>
+  >;
+  'tabs:element-exists': ExtensionWSAckElementHandler<
+    [multiple: boolean],
+    boolean | number[]
+  >;
+}
+
+export interface ExtensionWSInterServerEvents {}
 
 export interface ExtensionSocketData {
   browserInfo: BrowserInfo;
