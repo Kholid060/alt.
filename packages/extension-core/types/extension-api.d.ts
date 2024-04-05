@@ -131,6 +131,22 @@ declare namespace ExtensionAPI.storage {
   export function clear(): Promise<void>;
 }
 
+declare namespace ExtensionAPI.ui {
+  interface ToastOptions {
+    title: string;
+    timeout?: number;
+    description?: string;
+    type?: 'loading' | 'error' | 'success';
+  }
+  interface Toast extends ToastOptions {
+    hide(): void;
+    show(options?: Partial<ToastOptions>): void;
+  }
+
+  // @ext-api-value
+  export function createToast(options: ToastOptions): Toast;
+}
+
 declare namespace ExtensionAPI.ui.searchPanel {
   interface KeydownEvent {
     key: string;

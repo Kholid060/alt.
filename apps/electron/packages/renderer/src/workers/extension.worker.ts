@@ -15,6 +15,11 @@ import {
 import { AMessagePort, EventMapEmit } from '@repo/shared';
 import { createExtensionElementHandle } from '#common/utils/extension/extension-element-handle';
 import { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
+import {
+  extensionAPIGetIconURL,
+  extensionAPISearchPanelEvent,
+  extensionAPIUiToast,
+} from '#common/utils/extension/extension-api-value';
 
 type ExtensionCommand = (
   payload: CommandLaunchContext | CommandViewJSONLaunchContext,
@@ -56,23 +61,10 @@ function initExtensionAPI({
   const extensionAPI = Object.freeze(
     extensionApiBuilder({
       values: {
-        manifest: manifest,
-        'ui.searchPanel.onChanged': {
-          addListener(callback) {
-            aMessagePort.addListener('extension:query-change', callback);
-          },
-          removeListener(callback) {
-            aMessagePort.removeListener('extension:query-change', callback);
-          },
-        },
-        'ui.searchPanel.onKeydown': {
-          addListener(callback) {
-            aMessagePort.addListener('extension:keydown-event', callback);
-          },
-          removeListener(callback) {
-            aMessagePort.removeListener('extension:keydown-event', callback);
-          },
-        },
+        manifest,
+        ...extensionAPIGetIconURL(),
+        ...extensionAPIUiToast(aMessagePort),
+        ...extensionAPISearchPanelEvent(aMessagePort),
         'browser.activeTab.findElement': (selector) => {
           return createExtensionElementHandle({
             selector,
@@ -92,8 +84,6 @@ function initExtensionAPI({
             true,
           );
         },
-        'shell.installedApps.getIconURL': (appId) =>
-          `${CUSTOM_SCHEME.appIcon}://${appId}.png`,
       },
       context: extensionWorkerMessage,
       apiHandler: extensionWorkerMessage.sendMessage,

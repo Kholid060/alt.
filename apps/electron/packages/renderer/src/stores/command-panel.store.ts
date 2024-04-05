@@ -27,7 +27,7 @@ export interface CommandPanelStoreState {
 export interface CommandPanelStoreActions {
   clearAll(): void;
   clearAllStatus(): void;
-  removeStatus(statusId: string): void;
+  removeStatus(statusIdOrName: string): void;
   setHeader(header: CommandPanelHeader | null): void;
   addStatus(status: Omit<CommandPanelStatus, 'id'>): string;
 }
@@ -58,21 +58,23 @@ const commandPanelStore = create<
       });
 
       const timeoutMs = status.timeout ?? DEFAULT_TIMEOUT_MS;
-      const timeout = setTimeout(() => {
-        status?.onClose?.();
+      if (timeoutMs > 0) {
+        const timeout = setTimeout(() => {
+          status?.onClose?.();
 
-        set((state) => {
-          const statusIndex = state.status.findIndex(
-            (item) => item.id === statusId,
-          );
-          if (statusIndex === -1) return;
+          set((state) => {
+            const statusIndex = state.status.findIndex(
+              (item) => item.id === statusId,
+            );
+            if (statusIndex === -1) return;
 
-          state.status.splice(statusIndex, 1);
-        });
-        commandPanelStatusTimeouts.delete(statusId);
-      }, timeoutMs);
+            state.status.splice(statusIndex, 1);
+          });
+          commandPanelStatusTimeouts.delete(statusId);
+        }, timeoutMs);
 
-      commandPanelStatusTimeouts.set(statusId, timeout);
+        commandPanelStatusTimeouts.set(statusId, timeout);
+      }
 
       return statusId;
     },

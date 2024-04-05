@@ -13,7 +13,7 @@ const config = {
   root: PACKAGE_ROOT,
   envDir: PROJECT_ROOT,
   ssr: {
-    noExternal: ['dot-prop'],
+    noExternal: ['eventemitter3', 'nanoid'],
   },
   resolve: {
     alias: {

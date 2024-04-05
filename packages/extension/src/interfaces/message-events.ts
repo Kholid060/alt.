@@ -13,6 +13,11 @@ export interface ExtensionMessagePortEvent {
   'extension:keydown-event': [
     KeydownEvent: ExtensionAPI.ui.searchPanel.KeydownEvent,
   ];
+  'extension:show-toast': [
+    toastId: string,
+    options: Required<ExtensionAPI.ui.ToastOptions>,
+  ];
+  'extension:hide-toast': [toastId: string];
   'extension:finish-execute': [ExtensionExecutionFinishReason, string?];
 }
 

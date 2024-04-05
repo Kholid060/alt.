@@ -36,13 +36,13 @@ function apiFileTypeTemplate(values: FlatExtApiType[]) {
 import type ExtensionAPI from '../types/extension-api';
 import type { FlatValueExtensionAPI } from './flat-extension-api';
 
-interface ExtApiValues extends FlatValueExtensionAPI {
+export interface ExtensionAPIValues extends FlatValueExtensionAPI {
   ${values.map(([path, value]) => `'${path}': ${value};`).join('\t\n')}
 }
 
 declare function ${EXT_API_FILENAME}(detail: {
   context?: unknown;
-  values: ExtApiValues;
+  values: ExtensionAPIValues;
   apiHandler: (...args: any[]) => Promise<unknown>;
 }): ExtensionAPI;
 

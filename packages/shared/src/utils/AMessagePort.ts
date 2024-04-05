@@ -7,8 +7,6 @@ class AMessagePort<
 > extends EventEmitter<T> {
   port: MessagePort;
 
-  private messages = new Map<string, (...args: unknown[]) => unknown>();
-
   constructor(port: MessagePort) {
     super();
     this.port = port;
@@ -18,7 +16,7 @@ class AMessagePort<
   }
 
   private _messageHandler(
-    event: MessageEvent<{ name: unknown; data: unknown }>,
+    event: MessageEvent<{ name: unknown; data: unknown[] }>,
   ) {
     if (
       typeof event.data !== 'object' ||
@@ -38,20 +36,6 @@ class AMessagePort<
   ) {
     this.port.postMessage({ data, name });
   }
-
-  // onAsyncMessage<K extends EventEmitter.EventNames<T>>(
-  //   name: K,
-  //   callback: (...args: Parameters<T[K]>) => Promise<ReturnType<T[K]>>,
-  // ): Promise<ReturnType<T[K]>> {
-  //   callback();
-  // }
-
-  // asyncSendMessage<K extends EventEmitter.EventNames<T>>(
-  //   name: K,
-  //   ...args: Parameters<T[K]>
-  // ): Promise<ReturnType<T[K]>> {
-  //   return Promise.resolve();
-  // }
 
   destroy() {
     this.removeAllListeners();

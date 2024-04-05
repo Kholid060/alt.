@@ -20,6 +20,15 @@ export default async function CommandMain(context: CommandLaunchContext) {
   // await inputEl[0].type('hello world')
   // console.log(await inputEl[0].getAttributes());
 
+  const toast = _extension.ui.createToast({ title: 'Hello world' });
+  toast.show();
+
+  await new Promise((r) => setTimeout(r, 1000));
+
+  toast.hide();
+
+  await new Promise((r) => setTimeout(r, 5000));
+
   const paragraphsEl = await _extension.browser.activeTab.findAllElements('p');
   console.log(await paragraphsEl[0]?.getText(), '\n\n\n', await paragraphsEl[1]?.getText());
 }

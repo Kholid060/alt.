@@ -14,6 +14,12 @@ import type { SetRequired } from 'type-fest';
 import { ExtensionError } from '#common/errors/custom-errors';
 import { createExtensionElementHandle } from '#common/utils/extension/extension-element-handle';
 import type { EventMapEmit } from '@repo/shared';
+import { AMessagePort } from '@repo/shared';
+import {
+  extensionAPIGetIconURL,
+  extensionAPISearchPanelEvent,
+  extensionAPIUiToast,
+} from '#common/utils/extension/extension-api-value';
 
 function setExtView(type: 'empty' | 'error' = 'empty') {
   contextBridge.exposeInMainWorld(PRELOAD_API_KEY.extension, {
@@ -29,39 +35,10 @@ export class ExtensionAPI {
     'permissions'
   >['permissions'] = [];
 
-  private messageListeners: Record<string, ((...args: any[]) => any)[]> = {};
+  aMessagePort: AMessagePort<ExtensionMessagePortEvent>;
 
-  constructor() {
-    window.addEventListener(
-      'message',
-      (event) => {
-        const [port] = event.ports;
-        if (!port) return;
-
-        port.addEventListener('message', this.onMessagePort.bind(this));
-      },
-      { once: true },
-    );
-  }
-
-  private onMessagePort<T extends keyof ExtensionMessagePortEvent>({
-    data,
-  }: MessageEvent<{ name: T; data: ExtensionMessagePortEvent[T] }>) {
-    switch (data.name) {
-      case 'extension:query-change':
-        this.emitMessageEvents('ui.searchPanel.onChanged', ...data.data);
-        break;
-      case 'extension:keydown-event':
-        this.emitMessageEvents('ui.searchPanel.onKeydown', ...data.data);
-        break;
-    }
-  }
-
-  private emitMessageEvents(name: string, ...args: unknown[]) {
-    const listeners = this.messageListeners[name];
-    if (!listeners) return;
-
-    listeners.forEach((listener) => listener(...args));
+  constructor(messagePort: MessagePort) {
+    this.aMessagePort = new AMessagePort(messagePort);
   }
 
   async loadAPI() {
@@ -99,27 +76,6 @@ export class ExtensionAPI {
     }
   }
 
-  private addEventHandler(key: string) {
-    return {
-      addListener: (callback: (...args: any[]) => void) => {
-        if (!this.messageListeners[key]) {
-          this.messageListeners[key] = [];
-        }
-
-        this.messageListeners[key].push(callback);
-      },
-      removeListener: (callback: (...args: any[]) => void) => {
-        const listeners = this.messageListeners[key];
-        if (!listeners) return;
-
-        const index = listeners.indexOf(callback);
-        if (index === -1) return;
-
-        this.messageListeners[key].splice(index, 1);
-      },
-    };
-  }
-
   async getExtensionAPI(
     manifest: ExtensionManifest,
   ): Promise<typeof _extension> {
@@ -128,14 +84,9 @@ export class ExtensionAPI {
       apiHandler: this.sendAction,
       values: {
         manifest,
-        'ui.searchPanel.onChanged': this.addEventHandler(
-          'ui.searchPanel.onChanged',
-        ),
-        'ui.searchPanel.onKeydown': this.addEventHandler(
-          'ui.searchPanel.onKeydown',
-        ),
-        'shell.installedApps.getIconURL': (appId) =>
-          `${CUSTOM_SCHEME.appIcon}://${appId}.png`,
+        ...extensionAPIGetIconURL(),
+        ...extensionAPIUiToast(this.aMessagePort),
+        ...extensionAPISearchPanelEvent(this.aMessagePort),
         'browser.activeTab.findElement': (selector) => {
           return createExtensionElementHandle({
             selector,

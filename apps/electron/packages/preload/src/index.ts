@@ -11,7 +11,16 @@ import {
     if (process.isMainFrame) {
       contextBridge.exposeInMainWorld(PRELOAD_API_KEY.main, { ...mainPreload });
     } else if (window.location.href.startsWith(CUSTOM_SCHEME.extension)) {
-      await new ExtensionAPI().loadAPI();
+      window.addEventListener(
+        'message',
+        ({ ports }) => {
+          const [port] = ports;
+          if (!port) throw new Error('PORT IS EMPTY');
+
+          new ExtensionAPI(port).loadAPI();
+        },
+        { once: true },
+      );
     }
   } catch (error) {
     console.error(error);

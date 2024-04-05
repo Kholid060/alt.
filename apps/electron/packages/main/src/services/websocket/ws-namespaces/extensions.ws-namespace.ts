@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { BrowserInfo } from '@repo/shared';
-import {
-  BrowserInfoValidation,
-  type ExtensionSocketData,
-  type ExtensionWSClientToServerEvents,
-  type ExtensionWSInterServerEvents,
-  type ExtensionWSServerToClientEvents,
+import type {
+  BrowserInfo,
+  ExtensionSocketData,
+  ExtensionWSClientToServerEvents,
+  ExtensionWSInterServerEvents,
+  ExtensionWSServerToClientEvents,
 } from '@repo/shared';
 import type { Namespace, Server } from 'socket.io';
 import type { AllButLast, Last } from 'socket.io/dist/typed-events';
 import { initExtensionWSEventsListener } from '../ws-events/extensions.ws-event';
+import { z } from 'zod';
 
 export type ExtensionNamespace = Namespace<
   ExtensionWSClientToServerEvents,
@@ -24,6 +24,12 @@ interface SocketEvents {
 }
 
 const BROWSER_EMIT_TIMEOUT_MS = 10_000;
+
+const BrowserInfoValidation = z.object({
+  id: z.string(),
+  name: z.string(),
+  version: z.string(),
+}) satisfies z.ZodType<BrowserInfo>;
 
 class ExtensionWSNamespace {
   private static _instance: ExtensionWSNamespace | null = null;
@@ -50,7 +56,7 @@ class ExtensionWSNamespace {
     this._namespace = server.of('/extensions');
 
     this._namespace.use((socket, next) => {
-      const browserInfo = socket.handshake.auth?.browserInfo;
+      const browserInfo: BrowserInfo = socket.handshake.auth?.browserInfo;
       const browserInfoValidation =
         BrowserInfoValidation.safeParse(browserInfo);
       if (!browserInfoValidation.success) {

@@ -1,4 +1,3 @@
-import type { BrowserInfo } from '../validation/browser-info.validation';
 import {
   KeyboardKeyUpOptions,
   KeyboardKeyDownOptions,
@@ -10,6 +9,12 @@ export interface BrowserExtensionTab {
   url: string;
   id: number;
   windowId: number;
+}
+
+export interface BrowserInfo {
+  id: string;
+  name: string;
+  version: string;
 }
 
 export interface BrowserGetTextOptions {

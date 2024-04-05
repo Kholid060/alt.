@@ -6,6 +6,10 @@ import ItemList from './components/ItemList';
 function CommandMain() {
   const [apps, setApps] = useState<Extension.shell.installedApps.AppDetail[]>([]);
 
+  const toast = _extension.ui.createToast({
+    title: 'Toast',
+  });
+
   useEffect(() => {
     console.log('Today date is', dayjs().format('DD MMMM YYYY'));
     _extension.shell.installedApps.query('').then(setApps);
@@ -26,6 +30,25 @@ function CommandMain() {
         const inputEl = await _extension.browser.activeTab.findElement('input');
         await inputEl.type('hello');
       }
+    },
+    {
+      title: 'Toast',
+      value: 'toast',
+      onSelected() {
+        console.log('toast');
+        toast.show({ type: 'loading' });
+      },
+      actions: [
+        {
+          title: 'Hide toast',
+          value: 'hide-toast',
+          color: 'destructive',
+          icon: UiExtIcon.Bike,
+          onAction() {
+            toast.hide();
+          }
+        }
+      ]
     }
   ]
   const items: UiListItem[] = apps.map((app) => ({

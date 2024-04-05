@@ -7,9 +7,6 @@ export {
   SHORTCUT_KEY_DISPLAY_MAP,
 } from './utils/constant/shortcut.const';
 
-export { BrowserInfoValidation } from './validation/browser-info.validation';
-export type { BrowserInfo } from './validation/browser-info.validation';
-
 export { USKeyboard } from './utils/UsKeyboardLayout';
 export type {
   USKeyboardKeys,
