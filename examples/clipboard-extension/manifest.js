@@ -124,6 +124,7 @@ export default {
     'sqlite',
     'storage',
     'clipboard',
+    'notifications',
     'browser.activeTab',
   ],
 }

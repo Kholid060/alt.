@@ -19,6 +19,7 @@ export const API_PERMISSION_MAP: [
   ['sqlite', ['sqlite']],
   ['storage', ['storage']],
   ['clipboard', ['clipboard']],
+  ['notifications', ['notifications']],
   ['fs.exists', ['fs', 'fs.read']],
   ['fs.readFile', ['fs', 'fs.read']],
   ['fs.readJSON', ['fs', 'fs.read']],

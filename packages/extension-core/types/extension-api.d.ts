@@ -30,6 +30,17 @@ declare namespace ExtensionAPI.clipboard {
   export function paste(value: any): Promise<void>;
 }
 
+declare namespace ExtensionAPI.notifications {
+  interface NotificationOptions {
+    title: string;
+    body?: string;
+    silent?: boolean;
+    subtitle?: string;
+  }
+
+  export function create(options: NotificationOptions): Promise<boolean>;
+}
+
 declare namespace ExtensionAPI.shell {
   export function moveToTrash(path: string | string[]): Promise<void>;
 

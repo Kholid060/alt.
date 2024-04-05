@@ -6,6 +6,12 @@ export default async function CommandMain(context: CommandLaunchContext) {
   console.log(JSON.stringify(context));
   // await new Promise((r) => setTimeout(r, 4000));
 
+  await _extension.notifications.create({
+    body: 'huh',
+    subtitle: 'subtitle?',
+    title: 'Hello worldo',
+  });
+
   // await _extension.storage.set('test', 'hello world');
   // await _extension.shell.showItemInFolder(filePath);
   // console.log(await _extension.browser.activeTab.get());

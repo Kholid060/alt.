@@ -5,3 +5,4 @@ import './extension/extension-api/runtime.api';
 import './extension/extension-api/browser.api';
 import './extension/extension-api/storage.api';
 import './extension/extension-api/clipboard.api';
+import './extension/extension-api/notifications.api';
