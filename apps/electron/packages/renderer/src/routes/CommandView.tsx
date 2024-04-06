@@ -46,6 +46,8 @@ function CommandView() {
       iframe.contentWindow?.postMessage(payload, '*', [
         messageChannelRef.current.port2,
       ]);
+
+      iframe.style.visibility = 'visible';
     } catch (error) {
       console.error(error);
     }
@@ -74,6 +76,7 @@ function CommandView() {
       src={`extension://${activeRoute?.params.extensionId}/command/${activeRoute?.params.commandId}/`}
       sandbox="allow-scripts"
       className="h-80 block w-full"
+      style={{ visibility: 'hidden' }}
       onLoad={onIframeLoad}
     />
   );

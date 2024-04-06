@@ -44,8 +44,11 @@ onExtensionIPCEvent('clipboard.paste', async (_, value) => {
   const content = typeof value === 'string' ? value : JSON.stringify(value);
   clipboard.writeText(content);
 
-  const commandWindow = WindowsManager.instance.getWindow('command');
-  commandWindow.blur();
+  const commandWindow = WindowsManager.instance.getWindow('command', {
+    noThrow: true,
+  });
+  const isWindowFocus = commandWindow?.isFocused();
+  if (isWindowFocus) commandWindow?.blur();
 
   const keys = [
     process.platform === 'darwin' ? Key.LeftCmd : Key.LeftControl,
@@ -54,5 +57,5 @@ onExtensionIPCEvent('clipboard.paste', async (_, value) => {
   await keyboard.pressKey(...keys);
   await keyboard.releaseKey(...keys);
 
-  commandWindow.focus();
+  if (isWindowFocus) commandWindow?.focus();
 });

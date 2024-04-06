@@ -11,6 +11,7 @@ interface ExtensionCommandArgs {
 
 interface CommandStoreState {
   query: string;
+  isWindowHidden: boolean;
   extensions: ExtensionData[];
   commandArgs: ExtensionCommandArgs;
   activeBrowserTab: BrowserExtensionTab | null;
@@ -50,6 +51,7 @@ const initialState: CommandStoreState = {
   extensions: [],
   errorOverlay: null,
   extensionErrors: {},
+  isWindowHidden: false,
   activeBrowserTab: null,
   commandArgs: {
     args: {},

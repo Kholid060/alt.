@@ -16,3 +16,7 @@ export const EXTENSION_FOLDER = path.join(
 export const DATABASE_FOLDER = path.join(app.getPath('userData'), 'Database');
 
 export const EXTENSION_LOCAL_ID_PREFIX = 'local__';
+
+export const GLOBAL_SHORTCUTS = {
+  toggleCommandWindow: 'Alt+.',
+} as const;

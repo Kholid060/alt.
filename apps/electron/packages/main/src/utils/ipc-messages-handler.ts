@@ -1,7 +1,7 @@
 import InstalledApps from './InstalledApps';
 import ExtensionLoader from './extension/ExtensionLoader';
 import './ipc-extension-messages';
-import { clipboard, dialog } from 'electron';
+import { BrowserWindow, clipboard, dialog } from 'electron';
 import ExtensionCommandScriptRunner from './extension/ExtensionCommandScriptRunner';
 import { onIpcMessage } from './ipc-main';
 import extensionsDB from '../db/extension.db';
@@ -157,3 +157,19 @@ onIpcMessage(
     } as ReturnValue;
   },
 );
+
+onIpcMessage('app:open-devtools', ({ sender }) => {
+  sender.openDevTools();
+  return Promise.resolve();
+});
+onIpcMessage('app:toggle-lock-window', ({ sender }) => {
+  const browserWindow = BrowserWindow.fromWebContents(sender);
+  if (!browserWindow) return Promise.resolve();
+
+  const isLocked = browserWindow.isAlwaysOnTop();
+  browserWindow.setAlwaysOnTop(!isLocked);
+  browserWindow.setResizable(isLocked);
+  browserWindow.setSkipTaskbar(!isLocked);
+
+  return Promise.resolve();
+});

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { UiButton, UiTooltipProvider } from '@repo/ui';
+import { UiTooltipProvider } from '@repo/ui';
 import CommandHeader from './components/command/CommandHeader';
 import CommandFooter from './components/command/CommandFooter';
 import CommandContent from './components/command/CommandContent';
@@ -13,11 +13,12 @@ import {
 } from './context/command-route.context';
 import CommandView from './routes/CommandView';
 import CommandList from './routes/CommandList';
-import { GripHorizontalIcon } from 'lucide-react';
 import CommandEventListener from './components/command/CommandEventListener';
 import CommandErrorOverlay from './components/command/CommandErrorOverlay';
 import ConfigInput from './routes/ConfigInput';
 import CommandViewJSON from './routes/CommandViewJSON';
+import AppDevtools from './components/app/AppDevtools';
+import AppEventListener from './components/app/AppEventListener';
 
 const routes = createCommandRoutes([
   {
@@ -55,18 +56,10 @@ function App() {
     <UiTooltipProvider>
       <CommandCtxProvider>
         <CommandRouteProvider routes={routes}>
+          <AppEventListener />
           <div className="p-0.5">
-            {import.meta.env.DEV && (
-              <UiButton
-                size="icon"
-                variant="secondary"
-                className="cursor-move mb-2"
-                style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
-              >
-                <GripHorizontalIcon className="h-5 w-5" />
-              </UiButton>
-            )}
             <UiListProvider>
+              <AppDevtools />
               <div className="bg-background border rounded-lg w-full z-10 relative">
                 <CommandHeader />
                 <CommandContent />

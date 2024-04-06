@@ -1,4 +1,5 @@
 import type { ExtensionConfig } from '@repo/extension-core';
+import type { BrowserWindow, Display } from 'electron';
 
 export function getExtensionConfigDefaultValue(config: ExtensionConfig[]): {
   requireInput: boolean;
@@ -17,4 +18,22 @@ export function getExtensionConfigDefaultValue(config: ExtensionConfig[]): {
   });
 
   return { defaultValues, requireInput: false };
+}
+
+export function centerWindow(
+  window: BrowserWindow,
+  display: Display,
+  offset: { x?: number; y?: number } = {},
+) {
+  const windowBounds = window.getBounds();
+  const displayBound = display.bounds;
+
+  const windowYPos = displayBound.height * 0.225 + displayBound.y;
+  const windowXPos =
+    displayBound.width / 2 - windowBounds.width / 2 + displayBound.x;
+
+  window.setPosition(
+    Math.floor(windowXPos - (offset.x ?? 0)),
+    Math.floor(windowYPos - (offset.y ?? 0)),
+  );
 }

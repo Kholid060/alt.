@@ -9,6 +9,7 @@ const windows = {
 };
 
 type Windows = typeof windows;
+type WindowNames = keyof Windows;
 
 class WindowsManager {
   private static _instance: WindowsManager | null = null;
@@ -20,11 +21,12 @@ class WindowsManager {
     return this._instance;
   }
 
-  private windows: Map<keyof Windows, BrowserWindow> = new Map();
+  private windows: Map<WindowNames, BrowserWindow> = new Map();
+  private windowsHiddenState: Map<WindowNames, boolean> = new Map();
 
   constructor() {}
 
-  async restoreOrCreateWindow(name: keyof Windows) {
+  async restoreOrCreateWindow(name: WindowNames) {
     const window = await this.createWindow(name);
 
     if (window.isMinimized()) {
@@ -36,23 +38,37 @@ class WindowsManager {
     return window;
   }
 
-  async createWindow(name: keyof Windows) {
+  async createWindow(name: WindowNames) {
     let window = this.windows.get(name);
     if (window && !window.isDestroyed()) return window;
 
     window = await windows[name]();
     this.windows.set(name, window);
+    this.windowsHiddenState.set(name, !window.isVisible());
+
+    window.on('hide', () => {
+      this.windowsHiddenState.set(name, true);
+      this.sendMessageToWindow(window, 'window:visibility-change', true);
+    });
+    window.on('show', () => {
+      this.windowsHiddenState.set(name, false);
+      this.sendMessageToWindow(window, 'window:visibility-change', false);
+    });
 
     return window;
   }
 
-  getWindow(name: keyof Windows, options?: { noThrow: false }): BrowserWindow;
+  isWindowHidden(name: WindowNames) {
+    return this.windowsHiddenState.get(name) ?? true;
+  }
+
+  getWindow(name: WindowNames, options?: { noThrow: false }): BrowserWindow;
   getWindow(
-    name: keyof Windows,
+    name: WindowNames,
     options?: { noThrow: true },
   ): BrowserWindow | null;
   getWindow(
-    name: keyof Windows,
+    name: WindowNames,
     options?: { noThrow: boolean },
   ): BrowserWindow | null {
     const window = this.windows.get(name);
@@ -66,11 +82,14 @@ class WindowsManager {
   }
 
   sendMessageToWindow<T extends keyof IPCSendEvents>(
-    windowName: keyof Windows,
+    browserWindow: WindowNames | BrowserWindow,
     eventName: T,
     ...args: IPCSendEvents[T]
   ) {
-    const window = this.getWindow(windowName, { noThrow: true });
+    const window =
+      typeof browserWindow === 'string'
+        ? this.getWindow(browserWindow, { noThrow: true })
+        : browserWindow;
     if (!window) return null;
 
     return window.webContents.send(eventName, ...args);

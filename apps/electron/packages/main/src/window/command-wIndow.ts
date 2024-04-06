@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const COMMNAND_WINDOW_BOUND = {
   width: 650,
-  minHeight: 300,
+  minHeight: 400,
 } as const;
 
 export async function createCommandWindow() {
@@ -20,14 +20,16 @@ export async function createCommandWindow() {
 
   const browserWindow = new BrowserWindow({
     show: false, // Use the 'ready-to-show' event to show the instantiated BrowserWindow.
+    modal: true,
     frame: false,
     x: windowXPos,
     y: windowYPos,
+    resizable: false,
+    skipTaskbar: true,
+    alwaysOnTop: true,
     transparent: true,
-    resizable: import.meta.env.DEV,
     width: COMMNAND_WINDOW_BOUND.width,
     minHeight: COMMNAND_WINDOW_BOUND.minHeight,
-    alwaysOnTop: !import.meta.env.DEV,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -48,10 +50,6 @@ export async function createCommandWindow() {
    */
   browserWindow.on('ready-to-show', () => {
     browserWindow?.show();
-
-    if (import.meta.env.DEV) {
-      browserWindow?.webContents.openDevTools();
-    }
   });
 
   const frameFirstLoad = new Set<number>();
@@ -79,6 +77,9 @@ export async function createCommandWindow() {
     }
 
     event.preventDefault();
+  });
+  browserWindow.on('blur', () => {
+    browserWindow.hide();
   });
 
   /**

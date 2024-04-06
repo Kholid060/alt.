@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { commandIcons } from '#common/utils/command-icons';
 import { Loader2Icon } from 'lucide-react';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
+import { useCommandStore } from '/@/stores/command.store';
 
 function CommandHeaderPanel() {
   const header = useCommandPanelStore((state) => state.header);
@@ -106,6 +107,10 @@ function CommandStatusPanel() {
 }
 
 function CommandFooter() {
+  const isWindowHidden = useCommandStore.use.isWindowHidden();
+
+  if (isWindowHidden) return null;
+
   return (
     <div className="flex items-start gap-2 mt-2">
       <CommandHeaderPanel />

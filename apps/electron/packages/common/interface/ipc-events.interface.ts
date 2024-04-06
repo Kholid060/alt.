@@ -25,6 +25,11 @@ export interface IPCEventError {
   message: string;
 }
 
+export interface IPCAppEvents {
+  'app:open-devtools': () => void;
+  'app:toggle-lock-window': () => void;
+}
+
 export interface IPCShellEvents {
   'shell:open-url': (url: string) => void;
   'shell:open-in-folder': (path: string) => void;
@@ -97,6 +102,7 @@ export interface IPCDialogEvents {
 }
 
 export type IPCEvents = IPCShellEvents &
+  IPCAppEvents &
   IPCAppsEvents &
   IPCDialogEvents &
   IPCClipboardEvents &
@@ -133,5 +139,6 @@ export interface IPCSendEvents {
       launchContext: CommandLaunchContext;
     },
   ];
+  'window:visibility-change': [isHidden: boolean];
   'browser:tabs:active': [BrowserExtensionTab | null];
 }
