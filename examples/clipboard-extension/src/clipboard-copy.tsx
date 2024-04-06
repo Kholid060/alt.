@@ -6,11 +6,10 @@ export default async function CommandMain(context: CommandLaunchContext) {
   console.log(JSON.stringify(context));
   // await new Promise((r) => setTimeout(r, 4000));
 
-  await _extension.notifications.create({
-    body: 'huh',
-    subtitle: 'subtitle?',
-    title: 'Hello worldo',
-  });
+  await _extension.mainWindow.close();
+
+  await _extension.clipboard.paste('Hello world');
+
 
   // await _extension.storage.set('test', 'hello world');
   // await _extension.shell.showItemInFolder(filePath);
@@ -30,6 +29,12 @@ export default async function CommandMain(context: CommandLaunchContext) {
   toast.show();
 
   await new Promise((r) => setTimeout(r, 1000));
+
+  await _extension.notifications.create({
+    body: 'huh',
+    subtitle: 'subtitle?',
+    title: 'Hello worldo',
+  });
 
   toast.hide();
 

@@ -43,6 +43,8 @@ class WindowsManager {
     if (window && !window.isDestroyed()) return window;
 
     window = await windows[name]();
+    if (!window) throw new Error('Invalid window name');
+
     this.windows.set(name, window);
     this.windowsHiddenState.set(name, !window.isVisible());
 

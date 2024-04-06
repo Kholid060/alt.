@@ -12,6 +12,7 @@ import { ExtensionError } from '#packages/common/errors/custom-errors';
 import { getExtensionConfigDefaultValue } from './helper';
 import ExtensionsDBController from '../db/controller/extensions-db.controller';
 import type { IPCExtensionConfigEvents } from '#packages/common/interface/ipc-events.interface';
+import WindowsManager from '../window/WindowsManager';
 
 /** EXTENSION */
 onIpcMessage('extension:list', () =>
@@ -170,6 +171,13 @@ onIpcMessage('app:toggle-lock-window', ({ sender }) => {
   browserWindow.setAlwaysOnTop(!isLocked);
   browserWindow.setResizable(isLocked);
   browserWindow.setSkipTaskbar(!isLocked);
+
+  return Promise.resolve();
+});
+onIpcMessage('app:close-command-window', () => {
+  const commandWindow = WindowsManager.instance.getWindow('command');
+  commandWindow.blur();
+  commandWindow.hide();
 
   return Promise.resolve();
 });

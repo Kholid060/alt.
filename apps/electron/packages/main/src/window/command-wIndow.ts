@@ -3,9 +3,11 @@ import { BrowserWindow, app, screen } from 'electron';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const COMMNAND_WINDOW_BOUND = {
+export const COMMNAND_WINDOW_BOUND = {
   width: 650,
+  maxWidth: 650,
   minHeight: 400,
+  maxHeight: 600,
 } as const;
 
 export async function createCommandWindow() {
@@ -26,10 +28,10 @@ export async function createCommandWindow() {
     y: windowYPos,
     resizable: false,
     skipTaskbar: true,
-    alwaysOnTop: true,
     transparent: true,
-    width: COMMNAND_WINDOW_BOUND.width,
-    minHeight: COMMNAND_WINDOW_BOUND.minHeight,
+    minimizable: false,
+    maximizable: false,
+    ...COMMNAND_WINDOW_BOUND,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -38,18 +40,6 @@ export async function createCommandWindow() {
       webviewTag: false, // The webview tag is not recommended. Consider alternatives like an iframe or Electron's BrowserView. @see https://www.electronjs.org/docs/latest/api/webview-tag#warning
       preload: join(app.getAppPath(), 'packages/preload/dist/index.mjs'),
     },
-  });
-
-  /**
-   * If the 'show' property of the BrowserWindow's constructor is omitted from the initialization options,
-   * it then defaults to 'true'. This can cause flickering as the window loads the html content,
-   * and it also has show problematic behaviour with the closing of the window.
-   * Use `show: false` and listen to the  `ready-to-show` event to show the window.
-   *
-   * @see https://github.com/electron/electron/issues/25012 for the afford mentioned issue.
-   */
-  browserWindow.on('ready-to-show', () => {
-    browserWindow?.show();
   });
 
   const frameFirstLoad = new Set<number>();
@@ -77,9 +67,6 @@ export async function createCommandWindow() {
     }
 
     event.preventDefault();
-  });
-  browserWindow.on('blur', () => {
-    browserWindow.hide();
   });
 
   /**

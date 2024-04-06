@@ -165,6 +165,7 @@ function CommandList() {
       icon: <UiList.Icon icon={BlocksIcon} />,
       async onSelected() {
         try {
+          console.trace();
           const result =
             await preloadAPI.main.invokeIpcMessage('extension:import');
           if (!result) return;

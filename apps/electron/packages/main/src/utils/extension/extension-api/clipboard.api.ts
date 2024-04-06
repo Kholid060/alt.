@@ -47,6 +47,8 @@ onExtensionIPCEvent('clipboard.paste', async (_, value) => {
   const commandWindow = WindowsManager.instance.getWindow('command', {
     noThrow: true,
   });
+  const hiddenState = WindowsManager.instance.isWindowHidden('command');
+
   const isWindowFocus = commandWindow?.isFocused();
   if (isWindowFocus) commandWindow?.blur();
 
@@ -57,5 +59,6 @@ onExtensionIPCEvent('clipboard.paste', async (_, value) => {
   await keyboard.pressKey(...keys);
   await keyboard.releaseKey(...keys);
 
-  if (isWindowFocus) commandWindow?.focus();
+  if (!hiddenState && !commandWindow?.isVisible()) commandWindow?.show();
+  else if (isWindowFocus) commandWindow?.focus();
 });

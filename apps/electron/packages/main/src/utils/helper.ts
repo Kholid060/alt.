@@ -20,10 +20,16 @@ export function getExtensionConfigDefaultValue(config: ExtensionConfig[]): {
   return { defaultValues, requireInput: false };
 }
 
+interface CenterWindowOptions {
+  width?: number;
+  height?: number;
+  offsetX?: number;
+  offsetY?: number;
+}
 export function centerWindow(
   window: BrowserWindow,
   display: Display,
-  offset: { x?: number; y?: number } = {},
+  { height, offsetX, offsetY, width }: CenterWindowOptions = {},
 ) {
   const windowBounds = window.getBounds();
   const displayBound = display.bounds;
@@ -32,8 +38,10 @@ export function centerWindow(
   const windowXPos =
     displayBound.width / 2 - windowBounds.width / 2 + displayBound.x;
 
-  window.setPosition(
-    Math.floor(windowXPos - (offset.x ?? 0)),
-    Math.floor(windowYPos - (offset.y ?? 0)),
-  );
+  window.setBounds({
+    width,
+    height,
+    x: Math.floor(windowXPos - (offsetX ?? 0)),
+    y: Math.floor(windowYPos - (offsetY ?? 0)),
+  });
 }

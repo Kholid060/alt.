@@ -279,4 +279,8 @@ declare namespace ExtensionAPI.browser.activeTab {
   ): Promise<ExtensionAPI.browser.ElementHandle[]>;
 }
 
+declare namespace ExtensionAPI.mainWindow {
+  export function close(): Promise<void>;
+}
+
 export default ExtensionAPI;

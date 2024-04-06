@@ -4,7 +4,7 @@ import {
   useUiListStore,
 } from '@repo/ui/dist/context/list.context';
 import { ArrowLeftIcon, ChevronDownIcon, SearchIcon } from 'lucide-react';
-import { forwardRef, useRef, useEffect, useCallback } from 'react';
+import { forwardRef, useRef, useEffect, useCallback, useContext } from 'react';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
 import { mergeRefs } from '/@/utils/helper';
 import { ExtensionCommandArgument } from '@repo/extension-core';
@@ -12,6 +12,8 @@ import { useCommandStore } from '/@/stores/command.store';
 import { CommandListItems } from '/@/interface/command.interface';
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
+import { CommandRouteContext } from '/@/context/command-route.context';
+import preloadAPI from '/@/utils/preloadAPI';
 
 const CommandInputArguments = forwardRef<
   HTMLDivElement,
@@ -228,6 +230,8 @@ function CommandInput() {
 
   const clearPanel = useCommandPanelStore.use.clearAll();
 
+  const commandRouteCtx = useContext(CommandRouteContext);
+
   const spanRef = useRef<HTMLSpanElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const argumentContainerRef = useRef<HTMLDivElement>(null);
@@ -272,6 +276,14 @@ function CommandInput() {
     argumentContainerRef.current.style.translate = `${translateX}px 0px`;
   }
   function navigateBack() {
+    if (commandRouteCtx) {
+      const currentRoute = commandRouteCtx.getState().currentRoute;
+      if (!currentRoute?.path) {
+        preloadAPI.main.invokeIpcMessage('app:close-command-window');
+        return;
+      }
+    }
+
     clearPanel();
     navigate('');
   }

@@ -233,7 +233,6 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
           itemEl?.dispatchEvent(new Event(ITEM_SELECTED_EVENT));
 
           onItemSelected?.(id);
-          currentItem.onSelected?.();
         },
         runActionByShortcut(event) {
           const { actions } = listStore.snapshot().selectedItem;

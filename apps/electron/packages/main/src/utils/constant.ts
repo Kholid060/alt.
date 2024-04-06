@@ -19,4 +19,5 @@ export const EXTENSION_LOCAL_ID_PREFIX = 'local__';
 
 export const GLOBAL_SHORTCUTS = {
   toggleCommandWindow: 'Alt+.',
+  closeCommandWindow: 'Escape',
 } as const;

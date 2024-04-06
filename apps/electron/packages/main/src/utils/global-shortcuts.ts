@@ -2,6 +2,7 @@ import { globalShortcut, screen } from 'electron';
 import { GLOBAL_SHORTCUTS } from './constant';
 import WindowsManager from '../window/WindowsManager';
 import { centerWindow } from './helper';
+import { COMMNAND_WINDOW_BOUND } from '../window/command-window';
 
 function registerCommandWindowShortcut() {
   globalShortcut.register(GLOBAL_SHORTCUTS.toggleCommandWindow, () => {
@@ -19,7 +20,10 @@ function registerCommandWindowShortcut() {
     const cursorPosition = screen.getCursorScreenPoint();
     const display = screen.getDisplayNearestPoint(cursorPosition);
 
-    centerWindow(commandWindow, display);
+    centerWindow(commandWindow, display, {
+      width: COMMNAND_WINDOW_BOUND.width,
+      height: COMMNAND_WINDOW_BOUND.maxHeight,
+    });
 
     if (isHidden) commandWindow.show();
   });

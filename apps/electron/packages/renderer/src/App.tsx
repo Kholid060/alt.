@@ -50,6 +50,17 @@ function App() {
       if ('$isError' in extensions) return;
       setCommandStoreState('extensions', extensions);
     });
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        preloadAPI.main.invokeIpcMessage('app:close-command-window');
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
   }, []);
 
   return (
