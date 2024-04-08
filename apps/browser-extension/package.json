@@ -20,6 +20,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@medv/finder": "^3.2.0",
     "@repo/extension-core": "workspace:*",
     "@repo/shared": "workspace:*",
     "@types/webextension-polyfill": "^0.10.7",

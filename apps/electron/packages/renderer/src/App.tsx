@@ -19,6 +19,7 @@ import ConfigInput from './routes/ConfigInput';
 import CommandViewJSON from './routes/CommandViewJSON';
 import AppDevtools from './components/app/AppDevtools';
 import AppEventListener from './components/app/AppEventListener';
+import ExtensionWorker from './utils/extension/ExtensionWorker';
 
 const routes = createCommandRoutes([
   {
@@ -52,6 +53,8 @@ function App() {
     });
 
     const onVisibilityChange = () => {
+      if (ExtensionWorker.instance.worker) return;
+
       if (document.visibilityState === 'hidden') {
         preloadAPI.main.invokeIpcMessage('app:close-command-window');
       }

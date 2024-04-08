@@ -54,6 +54,16 @@ type ExtensionWSAckElementHandler<
 
 export interface ExtensionWSServerToClientEvents {
   'tabs:reload': ExtensionWSAckHandler;
+  'tabs:select-element': ExtensionWSAckHandler<
+    [
+      options: {
+        title?: string;
+        description?: string;
+        filter?: { selector?: string };
+      },
+    ],
+    { canceled: boolean; selector: string }
+  >;
   'tabs:click': ExtensionWSAckElementHandler;
   'tabs:type': ExtensionWSAckElementHandler<
     [text: string, options: Partial<KeyboardBrowserTypeOptions>]

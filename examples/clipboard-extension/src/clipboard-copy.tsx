@@ -6,6 +6,7 @@ export default async function CommandMain(context: CommandLaunchContext) {
   console.log(JSON.stringify(context));
   // await new Promise((r) => setTimeout(r, 4000));
 
+
   await _extension.mainWindow.close();
 
   await _extension.clipboard.paste('Hello world');
@@ -25,21 +26,28 @@ export default async function CommandMain(context: CommandLaunchContext) {
   // await inputEl[0].type('hello world')
   // console.log(await inputEl[0].getAttributes());
 
-  const toast = _extension.ui.createToast({ title: 'Hello world' });
-  toast.show();
+  const selectedEl = await _extension.browser.activeTab.selectElement();
+  console.log({selector: selectedEl});
+  if (!selectedEl.canceled) {
+    const text = await (await _extension.browser.activeTab.findElement(selectedEl.selector)).getText();
+    console.log(text);
+  }
 
-  await new Promise((r) => setTimeout(r, 1000));
+  // const toast = _extension.ui.createToast({ title: 'Hello world' });
+  // toast.show();
 
-  await _extension.notifications.create({
-    body: 'huh',
-    subtitle: 'subtitle?',
-    title: 'Hello worldo',
-  });
+  // await new Promise((r) => setTimeout(r, 1000));
 
-  toast.hide();
+  // await _extension.notifications.create({
+  //   body: 'huh',
+  //   subtitle: 'subtitle?',
+  //   title: 'Hello worldo',
+  // });
 
-  await new Promise((r) => setTimeout(r, 5000));
+  // toast.hide();
 
-  const paragraphsEl = await _extension.browser.activeTab.findAllElements('p');
-  console.log(await paragraphsEl[0]?.getText(), '\n\n\n', await paragraphsEl[1]?.getText());
+  // await new Promise((r) => setTimeout(r, 5000));
+
+  // const paragraphsEl = await _extension.browser.activeTab.findAllElements('p');
+  // console.log(await paragraphsEl[0]?.getText(), '\n\n\n', await paragraphsEl[1]?.getText());
 }

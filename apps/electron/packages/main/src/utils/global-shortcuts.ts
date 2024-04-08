@@ -13,6 +13,7 @@ function registerCommandWindowShortcut() {
 
     const isHidden = WindowsManager.instance.isWindowHidden('command');
     if (!isHidden) {
+      commandWindow.minimize();
       commandWindow.hide();
       return;
     }
@@ -25,7 +26,11 @@ function registerCommandWindowShortcut() {
       height: COMMNAND_WINDOW_BOUND.maxHeight,
     });
 
-    if (isHidden) commandWindow.show();
+    if (isHidden) {
+      commandWindow.moveTop();
+      commandWindow.show();
+      commandWindow.setBounds({ width: COMMNAND_WINDOW_BOUND.width });
+    }
   });
 }
 

@@ -3,6 +3,7 @@ import QuerySelector from '@root/src/utils/QuerySelector';
 import RuntimeMessage from '@root/src/utils/RuntimeMessage';
 import KeyboardDriver from '@root/src/utils/driver/KeyboardDriver';
 import MouseDriver from '@root/src/utils/driver/MouseDriver';
+import ElementSelector from '../element-selector';
 
 const CUSTOM_ERRORS = {
   EL_NOT_FOUND: (selector: string) =>
@@ -218,5 +219,22 @@ RuntimeMessage.instance.onMessage(
 
     const element = await QuerySelector.find(selector);
     return Boolean(element);
+  },
+);
+
+let elementSelectorInstance: ElementSelector | null = null;
+RuntimeMessage.instance.onMessage(
+  'element:select-element',
+  async (_, options) => {
+    if (elementSelectorInstance) {
+      throw new Error('Element selector already initialized');
+    }
+
+    elementSelectorInstance = new ElementSelector(options ?? {});
+    const result = await elementSelectorInstance.start();
+
+    elementSelectorInstance = null;
+
+    return result;
   },
 );

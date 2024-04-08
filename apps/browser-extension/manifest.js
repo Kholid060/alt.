@@ -29,7 +29,7 @@ const manifest = {
     {
       resources: [
         'assets/js/*.js',
-        'assets/css/*.css',
+        'assets/fonts/*.woff2',
         'icon-128.png',
         'icon-34.png',
       ],

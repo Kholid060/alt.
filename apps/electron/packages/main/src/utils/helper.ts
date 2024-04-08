@@ -1,5 +1,7 @@
 import type { ExtensionConfig } from '@repo/extension-core';
 import type { BrowserWindow, Display } from 'electron';
+import WindowsManager from '../window/WindowsManager';
+import { sleep } from '@repo/shared';
 
 export function getExtensionConfigDefaultValue(config: ExtensionConfig[]): {
   requireInput: boolean;
@@ -44,4 +46,33 @@ export function centerWindow(
     x: Math.floor(windowXPos - (offsetX ?? 0)),
     y: Math.floor(windowYPos - (offsetY ?? 0)),
   });
+}
+
+export async function tempHideCommandWindow<
+  T extends (...args: unknown[]) => unknown | Promise<unknown>,
+>(callback: T): Promise<ReturnType<T>> {
+  const commandWindow = WindowsManager.instance.getWindow('command', {
+    noThrow: true,
+  });
+  const hiddenState = WindowsManager.instance.isWindowHidden('command');
+  const isWindowFocus = commandWindow?.isFocused();
+
+  try {
+    if (isWindowFocus) {
+      commandWindow?.minimize();
+      commandWindow?.hide();
+    }
+
+    const result = await callback();
+
+    return result as ReturnType<T>;
+  } finally {
+    if (isWindowFocus || (!hiddenState && !commandWindow?.isVisible())) {
+      commandWindow?.moveTop();
+      commandWindow?.show();
+      commandWindow?.focus();
+
+      await sleep(250);
+    }
+  }
 }

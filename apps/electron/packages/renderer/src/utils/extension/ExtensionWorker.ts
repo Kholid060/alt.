@@ -6,7 +6,7 @@ import { isObject } from '@repo/shared';
 import { CommandWorkerInitMessage } from '/@/interface/command.interface';
 import { CommandLaunchContext } from '@repo/extension';
 
-const MAX_COMMAND_EXECUTION_MS = 300_000; // 5 mins
+const MAX_COMMAND_EXECUTION_MS = 900_000; // 15 mins
 const CREATE_MESSAGE_PORT_TIMEOUT_MS = 5000; // 5 seconds
 
 function createMessagePort() {

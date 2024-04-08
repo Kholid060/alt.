@@ -161,18 +161,24 @@ class ExtensionWSNamespace {
     return socket.emit(name, ...args);
   }
 
-  emitToBrowserWithAck<T extends keyof ExtensionWSServerToClientEvents>(
-    browserId: string,
-    name: T,
-    ...args: AllButLast<Parameters<ExtensionWSServerToClientEvents[T]>>
-  ): Promise<
+  emitToBrowserWithAck<T extends keyof ExtensionWSServerToClientEvents>({
+    args,
+    name,
+    timeout,
+    browserId,
+  }: {
+    name: T;
+    timeout?: number;
+    browserId: string;
+    args: AllButLast<Parameters<ExtensionWSServerToClientEvents[T]>>;
+  }): Promise<
     Parameters<Last<Parameters<ExtensionWSServerToClientEvents[T]>>>[0]
   > {
     const socket = this.getBrowserSocket(browserId);
     if (!socket) throw new Error("Couldn't find browser socket");
 
     return socket
-      .timeout(BROWSER_EMIT_TIMEOUT_MS)
+      .timeout(timeout ?? BROWSER_EMIT_TIMEOUT_MS)
       .emitWithAck(name as never, ...(args as never));
   }
 }

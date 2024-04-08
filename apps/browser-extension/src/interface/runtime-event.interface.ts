@@ -45,6 +45,9 @@ export interface RuntimeEvent {
     selector: string,
     multiple?: boolean,
   ) => boolean | number[];
+  'element:select-element': (
+    filter?: ExtensionAPI.browser.activeTab.SelectElementOptions,
+  ) => { canceled: boolean; selector: string };
 }
 
 export interface RuntimeEventPayload {

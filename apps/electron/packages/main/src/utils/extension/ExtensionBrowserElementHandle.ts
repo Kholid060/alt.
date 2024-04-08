@@ -30,13 +30,12 @@ export async function extensionBrowserElementHandle<
 >(name: T, ...args: AllButFirstOrLast<P>) {
   const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
 
-  const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck(
+  const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
     browserId,
-    elementHandlerWSEventMap[name],
+    name: elementHandlerWSEventMap[name],
     // @ts-expect-error omitted first and last params
-    { tabId: id, windowId },
-    ...args,
-  );
+    args: [{ tabId: id, windowId }, ...args],
+  });
   if (isWSAckError(result)) {
     throw new ExtensionError(result.errorMessage);
   }

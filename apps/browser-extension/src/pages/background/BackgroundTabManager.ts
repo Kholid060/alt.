@@ -73,7 +73,7 @@ class BackgroundTabManager {
     } else {
       this.isWindowFocus = true;
 
-      if (!this.activeTab || this.activeTab.windowId !== windowId) {
+      if (!this.activeTab || this.activeTab?.windowId !== windowId) {
         const [activeTab] = await Browser.tabs.query({
           active: true,
           currentWindow: true,

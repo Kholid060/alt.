@@ -4,7 +4,7 @@ import type { NativeImage } from 'electron';
 import { clipboard, nativeImage } from 'electron';
 import { keyboard, Key } from '@nut-tree/nut-js';
 import { onExtensionIPCEvent } from '../extension-api-event';
-import WindowsManager from '/@/window/WindowsManager';
+import { tempHideCommandWindow } from '../../helper';
 
 onExtensionIPCEvent('clipboard.read', async (_, format) => {
   switch (format) {
@@ -44,21 +44,12 @@ onExtensionIPCEvent('clipboard.paste', async (_, value) => {
   const content = typeof value === 'string' ? value : JSON.stringify(value);
   clipboard.writeText(content);
 
-  const commandWindow = WindowsManager.instance.getWindow('command', {
-    noThrow: true,
+  await tempHideCommandWindow(async () => {
+    const keys = [
+      process.platform === 'darwin' ? Key.LeftCmd : Key.LeftControl,
+      Key.V,
+    ];
+    await keyboard.pressKey(...keys);
+    await keyboard.releaseKey(...keys);
   });
-  const hiddenState = WindowsManager.instance.isWindowHidden('command');
-
-  const isWindowFocus = commandWindow?.isFocused();
-  if (isWindowFocus) commandWindow?.blur();
-
-  const keys = [
-    process.platform === 'darwin' ? Key.LeftCmd : Key.LeftControl,
-    Key.V,
-  ];
-  await keyboard.pressKey(...keys);
-  await keyboard.releaseKey(...keys);
-
-  if (!hiddenState && !commandWindow?.isVisible()) commandWindow?.show();
-  else if (isWindowFocus) commandWindow?.focus();
 });

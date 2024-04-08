@@ -167,8 +167,7 @@ onIpcMessage('app:toggle-lock-window', ({ sender }) => {
   const browserWindow = BrowserWindow.fromWebContents(sender);
   if (!browserWindow) return Promise.resolve();
 
-  const isLocked = browserWindow.isAlwaysOnTop();
-  browserWindow.setAlwaysOnTop(!isLocked);
+  const isLocked = !browserWindow.isResizable();
   browserWindow.setResizable(isLocked);
   browserWindow.setSkipTaskbar(!isLocked);
 
@@ -176,7 +175,7 @@ onIpcMessage('app:toggle-lock-window', ({ sender }) => {
 });
 onIpcMessage('app:close-command-window', () => {
   const commandWindow = WindowsManager.instance.getWindow('command');
-  commandWindow.blur();
+  commandWindow.minimize();
   commandWindow.hide();
 
   return Promise.resolve();

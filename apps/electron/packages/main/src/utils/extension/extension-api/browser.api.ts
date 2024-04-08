@@ -7,6 +7,7 @@ import {
   isWSAckError,
 } from '../ExtensionBrowserElementHandle';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
+import { tempHideCommandWindow } from '../../helper';
 
 const getElementSelector = (
   selector: ExtensionAPI.browser.ElementSelector,
@@ -23,14 +24,16 @@ onExtensionIPCEvent('browser.activeTab.get', () => {
 onExtensionIPCEvent('browser.activeTab.reload', async () => {
   const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
 
-  const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck(
+  const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
     browserId,
-    'tabs:reload',
-    {
-      windowId,
-      tabId: id,
-    },
-  );
+    name: 'tabs:reload',
+    args: [
+      {
+        windowId,
+        tabId: id,
+      },
+    ],
+  });
   if (isWSAckError(result)) {
     throw new ExtensionError(result.errorMessage);
   }
@@ -105,16 +108,18 @@ onExtensionIPCEvent(
   async (_, selector, multiple) => {
     const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
 
-    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck(
+    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
       browserId,
-      'tabs:element-exists',
-      {
-        windowId,
-        tabId: id,
-      },
-      { selector },
-      multiple ?? false,
-    );
+      name: 'tabs:element-exists',
+      args: [
+        {
+          windowId,
+          tabId: id,
+        },
+        { selector },
+        multiple ?? false,
+      ],
+    });
     if (isWSAckError(result)) {
       throw new ExtensionError(result.errorMessage);
     }
@@ -122,3 +127,28 @@ onExtensionIPCEvent(
     return result;
   },
 );
+
+onExtensionIPCEvent('browser.activeTab.selectElement', async (_, options) => {
+  const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
+  const selectedElement = await tempHideCommandWindow(async () => {
+    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
+      browserId,
+      timeout: 90_000, // 5 minutes
+      name: 'tabs:select-element',
+      args: [
+        {
+          windowId,
+          tabId: id,
+        },
+        options ?? {},
+      ],
+    });
+    if (isWSAckError(result)) {
+      throw new ExtensionError(result.errorMessage);
+    }
+
+    return result;
+  });
+
+  return selectedElement;
+});

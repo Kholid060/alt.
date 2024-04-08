@@ -212,6 +212,19 @@ declare namespace ExtensionAPI.browser.activeTab {
     title: string;
   }
 
+  interface SelectElementFilter {
+    selector?: string;
+  }
+  interface SelectElementOptions {
+    title?: string;
+    description?: string;
+    filter?: SelectElementFilter;
+  }
+
+  export function selectElement(
+    options?: SelectElementOptions,
+  ): Promise<{ selector: string; canceled: boolean }>;
+
   export function get(): Promise<ActiveTab | null>;
 
   export function reload(): Promise<void>;

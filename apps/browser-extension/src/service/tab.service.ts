@@ -158,6 +158,22 @@ class TabService {
       args: [selector, multiple],
     });
   }
+
+  static async selectElement(
+    { tabId }: TabTarget,
+    options?: ExtensionAPI.browser.activeTab.SelectElementOptions,
+  ) {
+    await injectContentHandlerScript(tabId);
+
+    // const currentWindow = await Browser.windows.getCurrent();
+    // await Browser.windows.update(currentWindow.id!, { focused: true });
+
+    return await RuntimeMessage.instance.sendMessageToTab({
+      tabId,
+      name: 'element:select-element',
+      args: [options],
+    });
+  }
 }
 
 export default TabService;

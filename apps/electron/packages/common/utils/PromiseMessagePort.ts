@@ -127,6 +127,17 @@ class PromiseMessagePort<MessagePortEvents> {
     });
   }
 
+  sendSyncMessage<K extends keyof MessagePortEvents>(
+    name: K,
+    ...args: ExtractParams<MessagePortEvents, K>
+  ) {
+    this.messagePort.postMessage({
+      name,
+      args,
+      ...this.additionalMessagePayload,
+    });
+  }
+
   destroy() {
     if ('addListener' in this.messagePort) {
       this.messagePort.removeListener('message', this._onMessage);

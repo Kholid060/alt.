@@ -1777,6 +1777,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@medv/finder@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "@medv/finder@npm:3.2.0"
+  checksum: 10c0/2215db8f105430b40fd5c0071cca834667e1f73e8245a6a69e7aee05e35d1ed7c0f24824fe6e4d93e73bb287ee954681e7c7aa036b621043a760a6cae3a696b5
+  languageName: node
+  linkType: hard
+
 "@microsoft/api-extractor-model@npm:7.28.3":
   version: 7.28.3
   resolution: "@microsoft/api-extractor-model@npm:7.28.3"
@@ -3673,13 +3680,6 @@ __metadata:
   version: 2.0.0
   resolution: "@tootallnate/once@npm:2.0.0"
   checksum: 10c0/073bfa548026b1ebaf1659eb8961e526be22fa77139b10d60e712f46d2f0f05f4e6c8bec62a087d41088ee9e29faa7f54838568e475ab2f776171003c3920858
-  languageName: node
-  linkType: hard
-
-"@tootallnate/quickjs-emscripten@npm:^0.23.0":
-  version: 0.23.0
-  resolution: "@tootallnate/quickjs-emscripten@npm:0.23.0"
-  checksum: 10c0/2a939b781826fb5fd3edd0f2ec3b321d259d760464cf20611c9877205aaca3ccc0b7304dea68416baa0d568e82cd86b17d29548d1e5139fa3155a4a86a2b4b49
   languageName: node
   linkType: hard
 
@@ -5857,13 +5857,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"better-sqlite3@https://github.com/neoxpert/better-sqlite3#fix_electron29_build":
-  version: 9.4.3
-  resolution: "better-sqlite3@https://github.com/neoxpert/better-sqlite3.git#commit=08e8e193b8d962f55f8809316bc5af91e75bfef4"
+"better-sqlite3@npm:^9.4.5":
+  version: 9.4.5
+  resolution: "better-sqlite3@npm:9.4.5"
   dependencies:
     bindings: "npm:^1.5.0"
+    node-gyp: "npm:latest"
     prebuild-install: "npm:^7.1.1"
-  checksum: 10c0/35e8afa52ed24a64d9dc2670970d4610583849d618cb1ce82647e9abc4ced9725bf46ddd0488ae43a01fb0451754ff5324ccc044fb75287e856746dded1d8ec8
+  checksum: 10c0/4aabb51d6bcdca71f9b489bb589071b62ab50a5cd5c4c8cbdc68d0771f7e1a0c269d178846a1a680b3b272a9693ca979f96ee1b32f5ab2cbb18fbeb05510a06e
   languageName: node
   linkType: hard
 
@@ -5967,6 +5968,7 @@ __metadata:
   dependencies:
     "@commitlint/cli": "npm:18.4.4"
     "@commitlint/config-conventional": "npm:18.1.0"
+    "@medv/finder": "npm:^3.2.0"
     "@repo/eslint-config": "workspace:*"
     "@repo/extension-core": "workspace:*"
     "@repo/shared": "workspace:*"
@@ -7695,7 +7697,6 @@ __metadata:
     "@repo/tailwind-config": "workspace:*"
     "@repo/typescript-config": "workspace:*"
     "@repo/ui": "workspace:*"
-    "@tootallnate/quickjs-emscripten": "npm:^0.23.0"
     "@types/better-sqlite3": "npm:^7.6.9"
     "@types/lodash-es": "npm:^4.17.12"
     "@types/node": "npm:20.11.17"
@@ -7706,7 +7707,7 @@ __metadata:
     "@typescript-eslint/parser": "npm:^7.2.0"
     "@vitejs/plugin-react": "npm:^4.2.1"
     autoprefixer: "npm:^10.4.17"
-    better-sqlite3: "https://github.com/neoxpert/better-sqlite3#fix_electron29_build"
+    better-sqlite3: "npm:^9.4.5"
     cross-env: "npm:7.0.3"
     dayjs: "npm:^1.11.10"
     dot-prop: "npm:^8.0.2"
@@ -7742,7 +7743,7 @@ __metadata:
     postcss: "npm:^8.4.35"
     postcss-import: "npm:^16.0.1"
     prettier: "npm:^3.2.5"
-    quickjs-emscripten: "npm:^0.29.0"
+    quickjs-emscripten: "npm:^0.29.1"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
     react-error-boundary: "npm:^4.0.13"
@@ -7763,6 +7764,7 @@ __metadata:
     vitest: "npm:1.2.2"
     which: "npm:^4.0.0"
     workerpool: "npm:^9.1.0"
+    ws: "npm:^8.16.0"
     zod: "npm:^3.22.4"
     zod-validation-error: "npm:^3.0.3"
     zustand: "npm:^4.5.1"
@@ -13034,7 +13036,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"quickjs-emscripten@npm:^0.29.0":
+"quickjs-emscripten@npm:^0.29.1":
   version: 0.29.1
   resolution: "quickjs-emscripten@npm:0.29.1"
   dependencies:

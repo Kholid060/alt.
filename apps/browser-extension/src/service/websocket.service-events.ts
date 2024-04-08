@@ -163,4 +163,17 @@ export function websocketEventsListener(
       callback(result);
     }),
   );
+
+  io.on(
+    'tabs:select-element',
+    wsAckHandler(async (tab, options, callback) => {
+      const result = await TabService.selectElement(
+        {
+          tabId: tab.tabId,
+        },
+        options,
+      );
+      callback(result);
+    }),
+  );
 }
