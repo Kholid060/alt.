@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { UseFormReturn, useForm } from 'react-hook-form';
 import { ExtensionConfig } from '@repo/extension-core';
-import { useCommandNavigate, useCommandRoute } from '../hooks/useCommandRoute';
+import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
 import {
   UiButton,
   UiForm,
@@ -15,10 +15,10 @@ import {
   UiSelect,
   UiSwitch,
 } from '@repo/ui';
-import preloadAPI from '../utils/preloadAPI';
-import { useCommandPanelStore } from '../stores/command-panel.store';
+import preloadAPI from '/@/utils/preloadAPI';
+import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { IPCEventError } from '#common/interface/ipc-events.interface';
-import { ExecuteCommandPayload, useCommand } from '../hooks/useCommand';
+import { ExecuteCommandPayload, useCommand } from '/@/hooks/useCommand';
 
 type ConfigComponent<
   T extends ExtensionConfig['type'] = ExtensionConfig['type'],

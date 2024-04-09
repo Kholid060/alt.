@@ -1,5 +1,5 @@
 import { UiList, UiListItemAction } from '@repo/ui';
-import { ListItemRenderDetail } from '/@/routes/CommandList';
+import { ListItemRenderDetail } from '../../apps/command/routes/CommandList';
 import { RotateCcwIcon, AlertTriangleIcon, BoltIcon } from 'lucide-react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandStore } from '/@/stores/command.store';

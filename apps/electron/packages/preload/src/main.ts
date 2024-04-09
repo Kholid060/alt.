@@ -4,7 +4,11 @@ import {
 } from '#common/utils/constant/constant';
 import { ipcRenderer } from 'electron';
 
-export { invokeIpcMessage, ipcMessage } from '../../common/utils/ipc-renderer';
+export {
+  invokeIpcMessage,
+  ipcMessage,
+  sendIpcMessage,
+} from '../../common/utils/ipc-renderer';
 
 export function createMainMessagePort(eventId: string) {
   ipcRenderer.send(IPC_ON_EVENT.createExtensionPort);

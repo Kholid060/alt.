@@ -26,6 +26,7 @@ export async function createCommandWindow() {
     frame: false,
     x: windowXPos,
     y: windowYPos,
+    type: 'toolbar',
     resizable: false,
     skipTaskbar: true,
     transparent: true,

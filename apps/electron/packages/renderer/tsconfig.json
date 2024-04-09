@@ -3,6 +3,7 @@
     "baseUrl": ".",
     "paths": {
       "/@/*": ["./src/*"],
+      "#packages/*": ["../*"],
       "#common/*": ["../common/*"]
     }
   },
@@ -13,6 +14,6 @@
     "src/**/*.tsx",
     "../preload/preload.d.ts",
     "../../types/**/*.d.ts"
-, "../main/src/utils/extension/importExtension.ts"  ],
+  ],
   "exclude": ["**/*.spec.ts", "**/*.test.ts"]
 }

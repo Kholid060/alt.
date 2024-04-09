@@ -22,7 +22,6 @@ const config = {
       '#common': join(PACKAGE_ROOT, '../common'),
     },
   },
-  base: '',
   server: {
     fs: {
       strict: true,
@@ -36,7 +35,8 @@ const config = {
     minify: process.env.MODE !== 'development',
     rollupOptions: {
       input: {
-        main: join(PACKAGE_ROOT, 'index.html'),
+        main: join(__dirname, 'command', 'index.html'),
+        dashboard: join(__dirname, 'dashboard', 'index.html'),
       },
       output: {
         assetFileNames: '[name].[ext]',
@@ -49,7 +49,24 @@ const config = {
   optimizeDeps: {
     include: ['react/jsx-runtime'],
   },
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: 'middleware',
+      apply: 'serve',
+      configureServer(viteDevServer) {
+        return () => {
+          viteDevServer.middlewares.use(async (req, _res, next) => {
+            if (req.originalUrl.startsWith('/dashboard')) {
+              req.url = '/dashboard.html';
+            }
+
+            next();
+          });
+        };
+      },
+    },
+  ],
 };
 
 export default config;

@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
-import { useCommandNavigate, useCommandRoute } from '../hooks/useCommandRoute';
-import { useCommandCtx } from '../hooks/useCommandCtx';
-import ExtensionWorker from '../utils/extension/ExtensionWorker';
-import { useCommandPanelStore } from '../stores/command-panel.store';
+import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
+import { useCommandCtx } from '/@/hooks/useCommandCtx';
+import ExtensionWorker from '/@/utils/extension/ExtensionWorker';
+import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { useShallow } from 'zustand/react/shallow';
-import { useCommandStore } from '../stores/command.store';
-import preloadAPI from '../utils/preloadAPI';
+import { useCommandStore } from '/@/stores/command.store';
+import preloadAPI from '/@/utils/preloadAPI';
 import { CommandJSONViews, CommandLaunchContext } from '@repo/extension';
-import CommandViewJSONText from '../components/command-view-json/CommandViewJSONText';
-import CommandViewJSONList from '../components/command-view-json/CommandViewJSONList';
-import { CommandViewJSONProvider } from '../context/command-view-json.context';
+import CommandViewJSONText from '/@/components/command-view-json/CommandViewJSONText';
+import CommandViewJSONList from '/@/components/command-view-json/CommandViewJSONList';
+import { CommandViewJSONProvider } from '/@/context/command-view-json.context';
 import { ExtensionDataValid } from '#common/interface/extension.interface';
 
 const componentsMap = {

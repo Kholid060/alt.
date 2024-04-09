@@ -1,5 +1,5 @@
 import { UiList, UiListItemAction } from '@repo/ui';
-import { ListItemRenderDetail } from '/@/routes/CommandList';
+import { ListItemRenderDetail } from '../../apps/command/routes/CommandList';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { APP_DEEP_LINK } from '#common/utils/constant/constant';

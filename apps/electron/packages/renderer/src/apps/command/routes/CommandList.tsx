@@ -13,13 +13,13 @@ import {
   CommandListItems,
 } from '/@/interface/command.interface';
 import preloadAPI from '/@/utils/preloadAPI';
-import { BlocksIcon } from 'lucide-react';
+import { BlocksIcon, SettingsIcon } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
-import ListItemCommand from '../components/list-item/ListItemCommand';
-import ListItemExtension from '../components/list-item/ListItemExtension';
-import UiExtensionIcon from '../components/ui/UiExtensionIcon';
-import { useCommandNavigate } from '../hooks/useCommandRoute';
+import ListItemCommand from '../../../components/list-item/ListItemCommand';
+import ListItemExtension from '../../../components/list-item/ListItemExtension';
+import UiExtensionIcon from '../../../components/ui/UiExtensionIcon';
+import { useCommandNavigate } from '../../../hooks/useCommandRoute';
 
 const QUERY_PREFIX = {
   EXT: 'ext:',
@@ -201,6 +201,19 @@ function CommandList() {
             description: 'Something went wrong',
           });
         }
+      },
+      metadata: {
+        type: 'builtin-command',
+      },
+    },
+    {
+      title: 'Settings',
+      value: 'settings',
+      group: 'Commands',
+      icon: <UiList.Icon icon={SettingsIcon} />,
+      async onSelected() {
+        await preloadAPI.main.invokeIpcMessage('app:close-command-window');
+        preloadAPI.main.sendIpcMessage('window:open-settings');
       },
       metadata: {
         type: 'builtin-command',

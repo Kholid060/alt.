@@ -2,10 +2,9 @@ import { app, BrowserWindow } from 'electron';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export async function createMainWindow() {
+export async function createDashboardWindow() {
   const browserWindow = new BrowserWindow({
     show: false, // Use the 'ready-to-show' event to show the instantiated BrowserWindow.
-    // type: 'toolbar',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -41,7 +40,8 @@ export async function createMainWindow() {
     /**
      * Load from the Vite dev server for development.
      */
-    await browserWindow.loadURL(import.meta.env.VITE_DEV_SERVER_URL);
+    const url = new URL('/dashboard', import.meta.env.VITE_DEV_SERVER_URL);
+    await browserWindow.loadURL(url.href);
   } else {
     /**
      * Load from the local file system for production and test.
@@ -54,27 +54,10 @@ export async function createMainWindow() {
      */
     await browserWindow.loadFile(
       fileURLToPath(
-        new URL('./../../renderer/dist/index.html', import.meta.url),
+        new URL('./../../renderer/dist/dashboard.html', import.meta.url),
       ),
     );
   }
 
   return browserWindow;
 }
-
-/**
- * Restore an existing BrowserWindow or Create a new BrowserWindow.
- */
-// export async function restoreOrCreateMainWindow() {
-//   let window = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed());
-
-//   if (window === undefined) {
-//     window = await createMainWindow();
-//   }
-
-//   if (window.isMinimized()) {
-//     window.restore();
-//   }
-
-//   window.focus();
-// }

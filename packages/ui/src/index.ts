@@ -47,6 +47,8 @@ export {
   useUiFormField,
   UiFormDescription,
 } from './components/ui/form';
+export { UiToggle, uiToggleVariants } from './components/ui/toggle';
+export { UiToggleGroup, UiToggleGroupItem } from './components/ui/toggle-group';
 
 export { useUiList } from './context/list.context';
 

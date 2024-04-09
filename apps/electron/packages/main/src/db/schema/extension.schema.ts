@@ -14,6 +14,9 @@ export const extensions = sqliteTable('extensions', {
   title: text('title').notNull(),
   version: text('version').notNull(),
   description: text('description').notNull(),
+  isDisabled: integer('is_disabled', { mode: 'boolean' })
+    .notNull()
+    .$default(() => false),
   isLocal: integer('is_local', { mode: 'boolean' })
     .notNull()
     .$default(() => false),

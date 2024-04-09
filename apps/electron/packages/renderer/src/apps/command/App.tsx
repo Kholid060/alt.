@@ -1,25 +1,25 @@
 import { useEffect } from 'react';
 import { UiTooltipProvider } from '@repo/ui';
-import CommandHeader from './components/command/CommandHeader';
-import CommandFooter from './components/command/CommandFooter';
-import CommandContent from './components/command/CommandContent';
-import { useCommandStore } from './stores/command.store';
-import preloadAPI from './utils/preloadAPI';
-import { CommandCtxProvider } from './context/command.context';
+import CommandHeader from '/@/components/command/CommandHeader';
+import CommandFooter from '/@/components/command/CommandFooter';
+import CommandContent from '/@/components/command/CommandContent';
+import { useCommandStore } from '/@/stores/command.store';
+import preloadAPI from '/@/utils/preloadAPI';
+import { CommandCtxProvider } from '/@/context/command.context';
 import { UiListProvider } from '@repo/ui/dist/context/list.context';
 import {
   CommandRouteProvider,
   createCommandRoutes,
-} from './context/command-route.context';
+} from '/@/context/command-route.context';
 import CommandView from './routes/CommandView';
 import CommandList from './routes/CommandList';
-import CommandEventListener from './components/command/CommandEventListener';
-import CommandErrorOverlay from './components/command/CommandErrorOverlay';
+import CommandEventListener from '/@/components/command/CommandEventListener';
+import CommandErrorOverlay from '/@/components/command/CommandErrorOverlay';
 import ConfigInput from './routes/ConfigInput';
 import CommandViewJSON from './routes/CommandViewJSON';
-import AppDevtools from './components/app/AppDevtools';
-import AppEventListener from './components/app/AppEventListener';
-import ExtensionWorker from './utils/extension/ExtensionWorker';
+import AppDevtools from '/@/components/app/AppDevtools';
+import AppEventListener from '/@/components/app/AppEventListener';
+import ExtensionWorker from '/@/utils/extension/ExtensionWorker';
 
 const routes = createCommandRoutes([
   {

@@ -3,7 +3,7 @@ import ExtensionLoader from './extension/ExtensionLoader';
 import './ipc-extension-messages';
 import { BrowserWindow, clipboard, dialog } from 'electron';
 import ExtensionCommandScriptRunner from './extension/ExtensionCommandScriptRunner';
-import { onIpcMessage } from './ipc-main';
+import { onIpcMessage, onIpcSendMessage } from './ipc-main';
 import extensionsDB from '../db/extension.db';
 import type { ExtensionConfigData } from '#packages/common/interface/extension.interface';
 import { configs } from '../db/schema/extension.schema';
@@ -179,4 +179,8 @@ onIpcMessage('app:close-command-window', () => {
   commandWindow.hide();
 
   return Promise.resolve();
+});
+
+onIpcSendMessage('window:open-settings', () => {
+  WindowsManager.instance.restoreOrCreateWindow('dashboard');
 });

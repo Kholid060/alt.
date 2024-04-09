@@ -1,4 +1,4 @@
-import { Menu, Notification, app } from 'electron';
+import { Menu, app } from 'electron';
 import './utils/security-restrictions';
 import './utils/ipc-messages-handler';
 import { platform } from 'node:process';
@@ -75,32 +75,11 @@ app.on('activate', () =>
 app
   .whenReady()
   .then(() => {
-    const notification = new Notification({
-      toastXml: `
-          <toast launch="myapp:action=navigate&amp;contentId=351" activationType="protocol">
-              <visual>
-                  <binding template="ToastGeneric">
-                      <text>Hello world</text>
-                  </binding>
-              </visual>
-              <actions>
-                  <action
-                      content="See more details"
-                      arguments="myapp:action=viewDetails&amp;contentId=351"
-                      activationType="protocol"/>
-
-                  <action
-                      content="Remind me later"
-                      arguments="myapp:action=remindlater&amp;contentId=351"
-                      activationType="protocol"/>
-              </actions>
-          </toast>`,
-    });
-    notification.show();
     registerGlobalShortcuts();
     registerCustomProtocols();
     initDefaultWebsocketServer();
     WindowsManager.instance.restoreOrCreateWindow('command');
+    WindowsManager.instance.restoreOrCreateWindow('dashboard');
   })
   .catch((e) => console.error('Failed create window:', e));
 

@@ -1,11 +1,11 @@
 import type { BrowserWindow } from 'electron';
 import { createCommandWindow } from './command-window';
-import { createMainWindow } from './main-window';
+import { createDashboardWindow } from './dashboard-window';
 import type { IPCSendEvents } from '#packages/common/interface/ipc-events.interface';
 
 const windows = {
-  main: createMainWindow,
   command: createCommandWindow,
+  dashboard: createDashboardWindow,
 };
 
 type Windows = typeof windows;

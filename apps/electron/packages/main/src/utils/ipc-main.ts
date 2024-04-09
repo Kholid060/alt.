@@ -6,6 +6,7 @@ import type {
   IPCEvents,
   IPCEventError,
   IPCSendEvents,
+  IPCSendEventRendererToMain,
 } from '#packages/common/interface/ipc-events.interface';
 import type { BrowserWindow } from 'electron';
 import { ipcMain } from 'electron';
@@ -42,4 +43,13 @@ export function sendIpcMessageToWindow(window: BrowserWindow) {
   ) => {
     window.webContents.send(name, ...args);
   };
+}
+
+export function onIpcSendMessage<T extends keyof IPCSendEventRendererToMain>(
+  name: T,
+  callback: (
+    ...args: [event: Electron.IpcMainEvent, ...IPCSendEventRendererToMain[T]]
+  ) => void,
+) {
+  ipcMain.on(name, callback);
 }

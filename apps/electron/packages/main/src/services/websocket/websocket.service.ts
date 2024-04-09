@@ -31,7 +31,7 @@ class WebsocketService {
 
     ExtensionWSNamespace.instance.init(this.io);
 
-    console.log(`Server starting on port ${port}`);
+    console.log(`Websocket server starting on port ${port}`);
   }
 }
 

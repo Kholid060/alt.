@@ -2,6 +2,7 @@ import { ipcRenderer } from 'electron';
 import type {
   IPCEventError,
   IPCEvents,
+  IPCSendEventRendererToMain,
   IPCSendEvents,
 } from '../interface/ipc-events.interface';
 
@@ -30,6 +31,13 @@ function ipcMessageListener(type: 'on' | 'off') {
 
     return null;
   };
+}
+
+export function sendIpcMessage<T extends keyof IPCSendEventRendererToMain>(
+  name: T,
+  ...args: IPCSendEventRendererToMain[T]
+) {
+  ipcRenderer.send(name, ...args);
 }
 
 export const ipcMessage = {

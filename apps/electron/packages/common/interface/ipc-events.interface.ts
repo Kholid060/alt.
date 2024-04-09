@@ -143,3 +143,7 @@ export interface IPCSendEvents {
   'window:visibility-change': [isHidden: boolean];
   'browser:tabs:active': [BrowserExtensionTab | null];
 }
+
+export interface IPCSendEventRendererToMain {
+  'window:open-settings': [];
+}
