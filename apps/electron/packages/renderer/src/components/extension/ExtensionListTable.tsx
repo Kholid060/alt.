@@ -1,8 +1,22 @@
 import { ExtensionData } from '#packages/common/interface/extension.interface';
-import { UiButton, UiList, UiSwitch, cn } from '@repo/ui';
+import {
+  UiButton,
+  UiList,
+  UiPopover,
+  UiPopoverContent,
+  UiPopoverTrigger,
+  UiSwitch,
+  UiTooltip,
+  cn,
+} from '@repo/ui';
 import UiExtensionIcon from '../ui/UiExtensionIcon';
 import { Fragment, useState } from 'react';
-import { ChevronRightIcon, ExternalLinkIcon } from 'lucide-react';
+import {
+  AlertTriangleIcon,
+  ChevronRightIcon,
+  RotateCcwIcon,
+} from 'lucide-react';
+import preloadAPI from '/@/utils/preloadAPI';
 
 interface ExtensionListTableProps
   extends React.TableHTMLAttributes<HTMLTableElement> {
@@ -15,6 +29,16 @@ function ExtensionListTable({
 }: ExtensionListTableProps) {
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
+  async function reloadExtension(extensionId: string) {
+    const result = await preloadAPI.main.invokeIpcMessage(
+      'extension:reload',
+      extensionId,
+    );
+    if (!result) return;
+
+    console.log(result);
+  }
+
   return (
     <table
       className={cn('table-auto w-full cursor-default', className)}
@@ -23,10 +47,10 @@ function ExtensionListTable({
       <thead className="text-sm border-b w-full">
         <tr>
           <th className="text-left h-12 w-8"></th>
-          <th className="text-left h-12 pr-4">Name</th>
-          <th className="text-left h-12 px-4">Type</th>
-          <th className="text-left h-12 px-4">Shortcut</th>
-          <th className="h-12 px-4 w-24"></th>
+          <th className="text-left h-12 pr-3">Name</th>
+          <th className="text-left h-12 px-3">Type</th>
+          <th className="text-left h-12 px-3">Shortcut</th>
+          <th className="h-12 px-3 w-32"></th>
         </tr>
       </thead>
       <tbody>
@@ -48,14 +72,14 @@ function ExtensionListTable({
                 });
               }}
             >
-              <td className="py-4 text-center">
+              <td className="py-3 text-center">
                 {!extension.isError && (
                   <ChevronRightIcon
                     className={`h-5 w-5 inline-block transition-transform ${expandedRows.has(extension.id) ? 'rotate-90' : ''}`}
                   />
                 )}
               </td>
-              <td className="pr-4">
+              <td className="py-3 pr-3">
                 <div className="flex items-center">
                   <div className="h-7 w-7">
                     {extension.isError ? (
@@ -77,13 +101,46 @@ function ExtensionListTable({
                   </p>
                 </div>
               </td>
-              <td className="p-4">Extension</td>
-              <td className="p-4 text-muted-foreground">━</td>
-              <td className="p-4 text-right" align="center">
-                <UiButton size="icon-sm" variant="ghost">
-                  <ExternalLinkIcon />
-                </UiButton>
-                <UiSwitch size="sm" className="align-middle" />
+              <td className="p-3">Extension</td>
+              <td className="p-3 text-muted-foreground">━</td>
+              <td className="p-3 text-right" align="center">
+                <div className="flex items-center">
+                  {extension.isError && (
+                    <UiPopover>
+                      <UiPopoverTrigger>
+                        <UiTooltip label="See error">
+                          <UiButton
+                            size="icon-sm"
+                            variant="ghost"
+                            className="mr-2 h-8 w-8"
+                            onClick={() => reloadExtension(extension.id)}
+                          >
+                            <AlertTriangleIcon className="h-5 w-5 text-destructive-text" />
+                          </UiButton>
+                        </UiTooltip>
+                      </UiPopoverTrigger>
+                      <UiPopoverContent>
+                        <p>Extension Error</p>
+                        <pre className="bg-background p-3 rounded-lg mt-2 text-sm whitespace-pre-wrap text-muted-foreground">
+                          {extension.errorMessage}
+                        </pre>
+                      </UiPopoverContent>
+                    </UiPopover>
+                  )}
+                  {extension.isLocal && (
+                    <UiTooltip label="Reload extension">
+                      <UiButton
+                        size="icon-sm"
+                        variant="ghost"
+                        className="mr-4 h-8 w-8"
+                        onClick={() => reloadExtension(extension.id)}
+                      >
+                        <RotateCcwIcon className="h-5 w-5" />
+                      </UiButton>
+                    </UiTooltip>
+                  )}
+                  <UiSwitch size="sm" className="align-middle" />
+                </div>
               </td>
             </tr>
             {expandedRows.has(extension.id) &&

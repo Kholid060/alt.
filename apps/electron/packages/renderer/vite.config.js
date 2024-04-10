@@ -35,8 +35,8 @@ const config = {
     minify: process.env.MODE !== 'development',
     rollupOptions: {
       input: {
-        main: join(__dirname, 'command', 'index.html'),
-        dashboard: join(__dirname, 'dashboard', 'index.html'),
+        main: join(__dirname, 'index.html'),
+        dashboard: join(__dirname, 'dashboard.html'),
       },
       output: {
         assetFileNames: '[name].[ext]',

@@ -69,6 +69,7 @@
     "@repo/extension-core": "workspace:*",
     "@repo/shared": "workspace:*",
     "@repo/ui": "workspace:*",
+    "active-win": "^8.2.1",
     "better-sqlite3": "^9.4.5",
     "dayjs": "^1.11.10",
     "dot-prop": "^8.0.2",
