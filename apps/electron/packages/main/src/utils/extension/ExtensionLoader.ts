@@ -1,7 +1,7 @@
 import path from 'path';
 import fs from 'fs-extra';
 import { nanoid } from 'nanoid';
-import type { ExtensionManifest } from '@repo/extension-core';
+import type { ExtensionCommand, ExtensionManifest } from '@repo/extension-core';
 import { ExtensionManifestSchema } from '@repo/extension-core';
 import validateSemver from 'semver/functions/valid';
 import { ErrorLogger, logger, loggerBuilder } from '/@/lib/log';
@@ -31,7 +31,18 @@ async function extractExtManifest(
     };
   }
 
-  const manifestJSON = await fs.readJSON(manifestPath);
+  const manifestJSON = await fs.readJSON(manifestPath, { throws: false });
+  if (!manifestJSON) {
+    const errorMessage =
+      "Couldn't parse the extension manifest file.\nPlease check the manifest file format. It needs to be a valid JSON";
+    validatorLogger('error', errorMessage);
+
+    return {
+      isError: true,
+      message: errorMessage,
+    };
+  }
+
   const manifest = await ExtensionManifestSchema.safeParseAsync(manifestJSON);
 
   const extDir = path.dirname(manifestPath);
@@ -134,10 +145,12 @@ class ExtensionLoader {
       columns: {
         id: true,
         name: true,
+        icon: true,
         path: true,
         title: true,
         version: true,
         isLocal: true,
+        isDisabled: true,
         description: true,
       },
     });
@@ -153,28 +166,16 @@ class ExtensionLoader {
     return [...this._extensions.values()];
   }
 
-  getCommand(extensionId: string, commandId: string) {
+  getCommand(extensionId: string, commandId: string): ExtensionCommand | null {
     const extension = this.getExtension(extensionId);
-    const commandFilePath = this.getPath(extensionId, 'base', commandId);
+    if (!extension || extension.isError) return null;
+
     const command =
-      extension &&
-      !extension.isError &&
-      extension.manifest.commands.find((command) => command.name === commandId);
+      extension.manifest.commands.find(
+        (command) => command.name === commandId,
+      ) ?? null;
 
-    if (
-      !command ||
-      !extension ||
-      extension.isError ||
-      !commandFilePath ||
-      !fs.existsSync(commandFilePath)
-    ) {
-      return null;
-    }
-
-    return {
-      ...command,
-      filePath: commandFilePath,
-    };
+    return command;
   }
 
   getPath(
@@ -234,10 +235,22 @@ class ExtensionLoader {
       description,
       isLocal: true,
       isError: false,
+      isDisabled: false,
+      icon: manifest.icon,
       path: normalizeManifestPath,
     };
 
-    await extensionsDB.insert(extensions).values(extensionData);
+    await extensionsDB.insert(extensions).values({
+      id,
+      name,
+      title,
+      version,
+      description,
+      isLocal: true,
+      isDisabled: false,
+      icon: manifest.icon,
+      path: normalizeManifestPath,
+    });
     this.addExtension(extensionData);
 
     const { path: _, ...extension } = extensionData;
@@ -249,11 +262,13 @@ class ExtensionLoader {
     const extension = await extensionsDB.query.extensions.findFirst({
       columns: {
         id: true,
+        icon: true,
         name: true,
         path: true,
         title: true,
         isLocal: true,
         version: true,
+        isDisabled: true,
         description: true,
       },
       where(fields, operators) {

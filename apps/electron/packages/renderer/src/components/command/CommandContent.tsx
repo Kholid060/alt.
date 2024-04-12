@@ -1,4 +1,4 @@
-import { cn } from '@repo/ui';
+import { UiScrollArea } from '@repo/ui';
 import { useEffect, useRef } from 'react';
 import { CommandRouteOutlet } from '../../context/command-route.context';
 
@@ -30,19 +30,19 @@ function CommandContent() {
 
   return (
     <>
-      <div className={cn('max-h-80 min-h-48 overflow-auto')}>
-        <div
-          ref={containerRef}
-          style={{
-            height: 'var(--ui-list-height)',
-            transition: 'height 250ms ease',
-          }}
-        >
-          <div ref={resizerContainerRef}>
-            <CommandRouteOutlet />
-          </div>
+      <UiScrollArea
+        ref={containerRef}
+        type="always"
+        className="max-h-80 min-h-48"
+        style={{
+          height: 'var(--ui-list-height)',
+          transition: 'height 250ms ease',
+        }}
+      >
+        <div ref={resizerContainerRef}>
+          <CommandRouteOutlet />
         </div>
-      </div>
+      </UiScrollArea>
     </>
   );
 }

@@ -1,9 +1,10 @@
 import path from 'node:path';
 import which from 'which';
+import fs from 'fs-extra';
 import ExtensionLoader from './ExtensionLoader';
 import { spawn } from 'node:child_process';
 import WindowsManager from '/@/window/WindowsManager';
-import { sendIpcMessageToWindow } from '../ipc-main';
+import { sendIpcMessageToWindow } from '../ipc/ipc-main';
 import { snakeCase } from 'lodash-es';
 import { logger } from '/@/lib/log';
 import { ExtensionError } from '#packages/common/errors/custom-errors';
@@ -53,6 +54,15 @@ class ExtensionCommandScriptRunner {
       throw new ExtensionError("Couldn't find command");
     }
 
+    const commandFilePath = ExtensionLoader.instance.getPath(
+      extensionId,
+      'base',
+      commandId,
+    );
+    if (!commandFilePath || !fs.existsSync(commandFilePath)) {
+      throw new ExtensionError("Couldn't find command");
+    }
+
     const fileExt = path.extname(commandId);
     const fileCommand = FILE_EXT_COMMAND_MAP[fileExt];
     if (!fileCommand) {
@@ -79,7 +89,7 @@ class ExtensionCommandScriptRunner {
     ) as Record<string, string>;
     env['__LAUNCH_BY'] = launchContext.launchBy;
 
-    const spawnArgs: string[] = [command.filePath];
+    const spawnArgs: string[] = [commandFilePath];
     if (fileCommand === 'sh') {
       spawnArgs.unshift('-e');
     }

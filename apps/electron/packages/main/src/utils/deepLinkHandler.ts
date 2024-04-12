@@ -8,7 +8,7 @@ import type {
   ExtensionConfig,
 } from '@repo/extension-core';
 import { parseJSON } from '@repo/shared';
-import { sendIpcMessageToWindow } from './ipc-main';
+import { sendIpcMessageToWindow } from './ipc/ipc-main';
 import ExtensionCommandScriptRunner from './extension/ExtensionCommandScriptRunner';
 import { store } from '../lib/store';
 import { CommandLaunchBy } from '@repo/extension';

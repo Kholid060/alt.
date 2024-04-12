@@ -9,6 +9,7 @@ import {
 
 export const extensions = sqliteTable('extensions', {
   id: text('id').primaryKey(),
+  icon: text('icon').notNull(),
   name: text('name').notNull(),
   path: text('path').notNull(),
   title: text('title').notNull(),

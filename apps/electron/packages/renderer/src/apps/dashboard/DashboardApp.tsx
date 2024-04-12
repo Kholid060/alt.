@@ -6,7 +6,7 @@ function DashboardApp() {
   return (
     <UiTooltipProvider>
       <DashboardSidebar />
-      <div className="pl-64">
+      <div className="pl-20 lg:pl-64">
         <Outlet />
       </div>
     </UiTooltipProvider>

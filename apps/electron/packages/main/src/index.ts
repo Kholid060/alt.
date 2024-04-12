@@ -1,6 +1,7 @@
 import { Menu, app } from 'electron';
 import './utils/security-restrictions';
-import './utils/ipc-messages-handler';
+import './utils/ipc/ipc-send-message-handler';
+import './utils/ipc/ipc-invoke-messages-handler';
 import { platform } from 'node:process';
 import updater from 'electron-updater';
 import {

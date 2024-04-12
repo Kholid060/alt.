@@ -56,6 +56,10 @@ export interface IPCExtensionEvents {
   'extension:reload': (extId: string) => ExtensionData | null;
   'extension:import': () => ExtensionData | null;
   'extension:init-message-port': () => MessagePort;
+  'extension:get-command': (
+    extensionId: string,
+    commandId: string,
+  ) => ExtensionCommand | null;
   'extension:get': (
     extensionId: string,
   ) => (ExtensionData & { $key: string }) | null;
@@ -111,7 +115,7 @@ export type IPCEvents = IPCShellEvents &
   IPCUserExtensionEvents &
   IPCExtensionConfigEvents;
 
-export interface IPCSendEvents {
+export interface IPCSendEventMainToRenderer {
   'command-script:message': [
     {
       message: string;
@@ -142,8 +146,27 @@ export interface IPCSendEvents {
   ];
   'window:visibility-change': [isHidden: boolean];
   'browser:tabs:active': [BrowserExtensionTab | null];
+  'app:update-route': [path: string, routeData?: unknown];
 }
 
 export interface IPCSendEventRendererToMain {
-  'window:open-settings': [];
+  'window:open-settings': [path?: string];
+  'window:open-command': [path?: string, routeData?: unknown];
 }
+
+export interface IPCSendEventRendererToRenderer {
+  'data:changes': [type: 'extension' | 'command'];
+  'command-window:input-config': [
+    detail: {
+      commandId: string;
+      extensionId: string;
+      type: 'extension' | 'command';
+    },
+  ];
+}
+
+export type IPCMainSendEvent = IPCSendEventRendererToRenderer &
+  IPCSendEventRendererToMain;
+
+export type IPCRendererSendEvent = IPCSendEventRendererToRenderer &
+  IPCSendEventMainToRenderer;

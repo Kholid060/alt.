@@ -7,9 +7,12 @@ import type {
 export interface ExtensionDataBase {
   id: string;
   name: string;
+  icon: string;
   title: string;
+  path?: string;
   version: string;
   isLocal?: boolean;
+  isDisabled: boolean;
   description: string;
 }
 

@@ -29,10 +29,10 @@ const navigationItems: { title: string; path: string; icon: LucideIcon }[] = [
 
 function DashboardSidebar() {
   return (
-    <div className="w-64 border-r h-screen py-8 px-4 flex flex-col gap-8 fixed left-0 top-0">
-      <div className="flex items-center gap-3">
+    <div className="w-20 lg:w-64 border-r h-screen py-8 px-4 flex flex-col gap-8 fixed left-0 top-0">
+      <div className="flex items-center justify-center lg:justify-start gap-3">
         <img src={AppLogo} alt="App logo" className="h-6 w-6" />
-        <h1 className="text-xl font-semibold">App Name</h1>
+        <h1 className="text-xl font-semibold hidden lg:block linc">App Name</h1>
       </div>
       <ul className="text-muted-foreground space-y-2">
         {navigationItems.map((item) => (
@@ -41,13 +41,13 @@ function DashboardSidebar() {
             key={item.path}
             className={({ isActive }) =>
               cn(
-                'p-3 gap-3 rounded-md flex items-center transition',
+                'p-3 gap-3 rounded-md flex items-center transition justify-center lg:justify-start overflow-hidden',
                 isActive ? 'bg-card text-foreground' : 'hover:bg-card/80',
               )
             }
           >
             <item.icon className="h-5 w-5" />
-            <p>{item.title}</p>
+            <p className="hidden lg:block">{item.title}</p>
           </NavLink>
         ))}
       </ul>

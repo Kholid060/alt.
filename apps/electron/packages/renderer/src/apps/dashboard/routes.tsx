@@ -1,5 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
-import RouteExtension, { extensionLoader } from './routes/RouteExtension';
+import RouteExtension from './routes/RouteExtension';
 import DashboardApp from './DashboardApp';
 
 const router = createBrowserRouter(
@@ -10,7 +10,6 @@ const router = createBrowserRouter(
       children: [
         {
           path: 'extensions',
-          loader: extensionLoader,
           element: <RouteExtension />,
         },
       ],

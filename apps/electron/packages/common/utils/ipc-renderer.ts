@@ -2,8 +2,8 @@ import { ipcRenderer } from 'electron';
 import type {
   IPCEventError,
   IPCEvents,
-  IPCSendEventRendererToMain,
-  IPCSendEvents,
+  IPCMainSendEvent,
+  IPCRendererSendEvent,
 } from '../interface/ipc-events.interface';
 
 export const invokeIpcMessage = <
@@ -16,11 +16,11 @@ export const invokeIpcMessage = <
   ipcRenderer.invoke(name, ...args) as Promise<ReturnType<K> | IPCEventError>;
 
 function ipcMessageListener(type: 'on' | 'off') {
-  return <T extends keyof IPCSendEvents>(
+  return <T extends keyof IPCRendererSendEvent>(
     name: T,
     listener: (
       event: Electron.IpcRendererEvent,
-      ...args: IPCSendEvents[T]
+      ...args: IPCRendererSendEvent[T]
     ) => void,
   ) => {
     ipcRenderer[type](name, listener as () => void);
@@ -33,9 +33,9 @@ function ipcMessageListener(type: 'on' | 'off') {
   };
 }
 
-export function sendIpcMessage<T extends keyof IPCSendEventRendererToMain>(
+export function sendIpcMessage<T extends keyof IPCMainSendEvent>(
   name: T,
-  ...args: IPCSendEventRendererToMain[T]
+  ...args: IPCMainSendEvent[T]
 ) {
   ipcRenderer.send(name, ...args);
 }

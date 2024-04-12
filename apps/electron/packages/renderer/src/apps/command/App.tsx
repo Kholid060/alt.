@@ -47,16 +47,21 @@ function App() {
   const setCommandStoreState = useCommandStore((state) => state.setState);
 
   useEffect(() => {
-    preloadAPI.main.invokeIpcMessage('extension:list').then((extensions) => {
-      if ('$isError' in extensions) return;
-      setCommandStoreState('extensions', extensions);
-    });
+    const fetchExtensions = () => {
+      preloadAPI.main.invokeIpcMessage('extension:list').then((extensions) => {
+        if ('$isError' in extensions) return;
+        setCommandStoreState('extensions', extensions);
+      });
+    };
+    fetchExtensions();
 
     const onVisibilityChange = () => {
       if (ExtensionWorker.instance.worker) return;
 
       if (document.visibilityState === 'hidden') {
         preloadAPI.main.invokeIpcMessage('app:close-command-window');
+      } else {
+        fetchExtensions();
       }
     };
     document.addEventListener('visibilitychange', onVisibilityChange);

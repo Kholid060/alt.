@@ -84,7 +84,7 @@
     "globby": "^14.0.1",
     "immer": "^10.0.4",
     "lodash-es": "^4.17.21",
-    "lucide-react": "^0.331.0",
+    "lucide-react": "^0.367.0",
     "mitt": "^3.0.1",
     "nanoid": "^5.0.6",
     "quickjs-emscripten": "^0.29.1",

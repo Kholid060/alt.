@@ -49,6 +49,23 @@ export {
 } from './components/ui/form';
 export { UiToggle, uiToggleVariants } from './components/ui/toggle';
 export { UiToggleGroup, UiToggleGroupItem } from './components/ui/toggle-group';
+export {
+  UiDropdownMenu,
+  UiDropdownMenuSub,
+  UiDropdownMenuItem,
+  UiDropdownMenuLabel,
+  UiDropdownMenuGroup,
+  UiDropdownMenuPortal,
+  UiDropdownMenuTrigger,
+  UiDropdownMenuContent,
+  UiDropdownMenuShortcut,
+  UiDropdownMenuRadioItem,
+  UiDropdownMenuSeparator,
+  UiDropdownMenuSubContent,
+  UiDropdownMenuSubTrigger,
+  UiDropdownMenuRadioGroup,
+  UiDropdownMenuCheckboxItem,
+} from './components/ui/dropdown-menu';
 
 export { useUiList } from './context/list.context';
 

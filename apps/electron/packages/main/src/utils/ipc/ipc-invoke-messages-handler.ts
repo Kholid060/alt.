@@ -1,18 +1,18 @@
-import InstalledApps from './InstalledApps';
-import ExtensionLoader from './extension/ExtensionLoader';
+import InstalledApps from '../InstalledApps';
+import ExtensionLoader from '../extension/ExtensionLoader';
 import './ipc-extension-messages';
-import { BrowserWindow, clipboard, dialog } from 'electron';
-import ExtensionCommandScriptRunner from './extension/ExtensionCommandScriptRunner';
-import { onIpcMessage, onIpcSendMessage } from './ipc-main';
-import extensionsDB from '../db/extension.db';
+import { BrowserWindow, clipboard, dialog, shell } from 'electron';
+import ExtensionCommandScriptRunner from '../extension/ExtensionCommandScriptRunner';
+import { onIpcMessage } from './ipc-main';
+import extensionsDB from '../../db/extension.db';
 import type { ExtensionConfigData } from '#packages/common/interface/extension.interface';
-import { configs } from '../db/schema/extension.schema';
+import { configs } from '../../db/schema/extension.schema';
 import { eq } from 'drizzle-orm';
 import { ExtensionError } from '#packages/common/errors/custom-errors';
-import { getExtensionConfigDefaultValue } from './helper';
-import ExtensionsDBController from '../db/controller/extensions-db.controller';
+import { getExtensionConfigDefaultValue } from '../helper';
+import ExtensionsDBController from '../../db/controller/extensions-db.controller';
 import type { IPCExtensionConfigEvents } from '#packages/common/interface/ipc-events.interface';
-import WindowsManager from '../window/WindowsManager';
+import WindowsManager from '../../window/WindowsManager';
 
 /** EXTENSION */
 onIpcMessage('extension:list', () =>
@@ -56,6 +56,9 @@ onIpcMessage('extension:run-script-command', async (_, detail) => {
     };
   }
 });
+onIpcMessage('extension:get-command', (_, extensionId, commandId) =>
+  Promise.resolve(ExtensionLoader.instance.getCommand(extensionId, commandId)),
+);
 
 /** APPS */
 onIpcMessage('apps:get-list', () => InstalledApps.instance.getList());
@@ -159,6 +162,7 @@ onIpcMessage(
   },
 );
 
+/** APP */
 onIpcMessage('app:open-devtools', ({ sender }) => {
   sender.openDevTools();
   return Promise.resolve();
@@ -181,6 +185,7 @@ onIpcMessage('app:close-command-window', () => {
   return Promise.resolve();
 });
 
-onIpcSendMessage('window:open-settings', () => {
-  WindowsManager.instance.restoreOrCreateWindow('dashboard');
+/** SHELL */
+onIpcMessage('shell:open-in-folder', async (_, filePath) => {
+  await shell.openPath(filePath);
 });

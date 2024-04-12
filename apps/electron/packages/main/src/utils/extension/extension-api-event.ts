@@ -14,7 +14,7 @@ import ExtensionMessagePortHandler from './ExtensionMessagePortHandler';
 import { logger } from '/@/lib/log';
 import WindowsManager from '/@/window/WindowsManager';
 import type { ExtensionDataValid } from '#packages/common/interface/extension.interface';
-import { onIpcMessage } from '../ipc-main';
+import { onIpcMessage } from '../ipc/ipc-main';
 
 export type ExtensionMessageHandler = <
   T extends keyof IPCUserExtensionEventsMap,

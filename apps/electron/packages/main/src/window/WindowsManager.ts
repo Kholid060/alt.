@@ -1,7 +1,7 @@
 import type { BrowserWindow } from 'electron';
 import { createCommandWindow } from './command-window';
 import { createDashboardWindow } from './dashboard-window';
-import type { IPCSendEvents } from '#packages/common/interface/ipc-events.interface';
+import type { IPCRendererSendEvent } from '#packages/common/interface/ipc-events.interface';
 
 const windows = {
   command: createCommandWindow,
@@ -36,6 +36,13 @@ class WindowsManager {
     window.focus();
 
     return window;
+  }
+
+  getAllWindows() {
+    return [...this.windows.entries()].map((name, window) => ({
+      name,
+      window,
+    }));
   }
 
   async createWindow(name: WindowNames) {
@@ -83,10 +90,40 @@ class WindowsManager {
     return window;
   }
 
-  sendMessageToWindow<T extends keyof IPCSendEvents>(
+  async getWindowWithAutoInit(name: WindowNames) {
+    let window = this.windows.get(name);
+    if (!window) {
+      window = await this.createWindow(name);
+    }
+
+    return window;
+  }
+
+  sendMessageToAllWindows<T extends keyof IPCRendererSendEvent>({
+    args,
+    name,
+    excludeWindow,
+  }: {
+    name: T;
+    args: IPCRendererSendEvent[T];
+    excludeWindow?: (WindowNames | number)[];
+  }) {
+    this.windows.forEach((browserWindow, key) => {
+      if (
+        excludeWindow &&
+        (excludeWindow.includes(browserWindow.webContents.id) ||
+          excludeWindow.includes(key))
+      )
+        return;
+
+      browserWindow.webContents.send(name, ...args);
+    });
+  }
+
+  sendMessageToWindow<T extends keyof IPCRendererSendEvent>(
     browserWindow: WindowNames | BrowserWindow,
     eventName: T,
-    ...args: IPCSendEvents[T]
+    ...args: IPCRendererSendEvent[T]
   ) {
     const window =
       typeof browserWindow === 'string'
