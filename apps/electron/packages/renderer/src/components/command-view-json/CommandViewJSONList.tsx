@@ -19,7 +19,7 @@ function CommandViewJSONList({ data }: { data: CommandJSONViewList }) {
             {
               addStatus,
               commandId,
-              extension: extension!,
+              extensionManifest: extension!,
             },
             action as never,
           );

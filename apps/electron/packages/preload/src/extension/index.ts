@@ -53,23 +53,25 @@ export class ExtensionAPI {
 
       this.commandId = commandId;
 
-      const extensionData = await invokeIpcMessage(
-        'extension:get',
+      const extensionManifest = await invokeIpcMessage(
+        'database:get-extension-manifest',
         extensionId,
       );
-      if (extensionData && '$isError' in extensionData)
-        throw new Error(extensionData.message);
-      if (!extensionData || extensionData.isError) return setExtView();
+      if (extensionManifest && '$isError' in extensionManifest)
+        throw new Error(extensionManifest.message);
+      if (!extensionManifest || extensionManifest.isError) return setExtView();
 
-      this.key = extensionData.$key;
+      this.key = extensionManifest.$key;
 
-      const extensionApi = await this.getExtensionAPI(extensionData.manifest);
+      const extensionApi = await this.getExtensionAPI(
+        extensionManifest.manifest,
+      );
       contextBridge.exposeInMainWorld(PRELOAD_API_KEY.extension, {
         ...extensionApi,
         $commandId: commandId,
       });
 
-      this.permissions = extensionData.manifest.permissions || [];
+      this.permissions = extensionManifest.manifest.permissions || [];
     } catch (error) {
       console.error(error);
       setExtView('error');

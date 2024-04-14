@@ -1,13 +1,10 @@
-import preloadAPI from '/@/utils/preloadAPI';
-import {
-  ExtensionData,
-  ExtensionDataValid,
-} from '#packages/common/interface/extension.interface';
 import { UiInput, UiToggleGroup, UiToggleGroupItem } from '@repo/ui';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { SearchIcon } from 'lucide-react';
 import ExtensionListTable from '/@/components/extension/ExtensionListTable';
 import ExtensionDetailCard from '/@/components/extension/ExtensionDetailCard';
+import { useDatabaseQuery } from '/@/hooks/useDatabase';
+import { DatabaseExtension } from '#packages/common/interface/database.interface';
 
 type FilterTypes = 'all' | 'commands' | 'extensions' | 'scripts';
 
@@ -20,70 +17,65 @@ const filterItems: { id: FilterTypes; name: string }[] = [
 
 function RouteExtension() {
   const [search, setSearch] = useState('');
-  const [extensions, setExtensions] = useState<ExtensionData[]>([]);
   const [activeFilter, setActiveFilter] = useState<FilterTypes>('all');
 
   const [selectedExtensionId, setSelectedExtensionId] = useState('');
 
-  const filteredExtensions = extensions.reduce<ExtensionData[]>(
-    (acc, extension) => {
-      const searchStr = search.toLowerCase();
-      const filteredCommands = extension.isError
-        ? []
-        : extension.manifest.commands.filter((command) => {
-            let isMatchFilter = false;
-            switch (activeFilter) {
-              case 'commands':
-                isMatchFilter = command.type !== 'script';
-                break;
-              case 'scripts':
-                isMatchFilter = command.type === 'script';
-                break;
-              case 'all':
-                isMatchFilter = true;
-                break;
-            }
+  const extensionQuery = useDatabaseQuery({
+    name: 'database:get-extension-list',
+    args: [],
+  });
 
-            return (
-              isMatchFilter && command.title.toLowerCase().includes(searchStr)
-            );
-          });
+  const filteredExtensions = (extensionQuery.data ?? []).reduce<
+    DatabaseExtension[]
+  >((acc, extension) => {
+    const searchStr = search.toLowerCase();
+    const filteredCommands = extension.isError
+      ? []
+      : extension.commands.filter((command) => {
+          let isMatchFilter = false;
+          switch (activeFilter) {
+            case 'commands':
+              isMatchFilter = command.type !== 'script';
+              break;
+            case 'scripts':
+              isMatchFilter = command.type === 'script';
+              break;
+            case 'all':
+              isMatchFilter = true;
+              break;
+          }
 
-      if (!extension.isError && filteredCommands.length > 0) {
-        acc.push({
-          ...extension,
-          manifest: { ...extension.manifest, commands: filteredCommands },
-        } as ExtensionDataValid);
-        return acc;
-      }
+          return (
+            isMatchFilter && command.title.toLowerCase().includes(searchStr)
+          );
+        });
 
-      const searchFilter = extension.title.toLowerCase().includes(searchStr);
-      const categoryFilter =
-        activeFilter === 'all' ? true : activeFilter === 'extensions';
-
-      if (searchFilter && categoryFilter) {
-        let extensionData = extension;
-        if (!extension.isError) {
-          extensionData = {
-            ...extension,
-            manifest: { ...extension.manifest, commands: filteredCommands },
-          };
-        }
-
-        acc.push(extensionData);
-      }
-
+    if (!extension.isError && filteredCommands.length > 0) {
+      acc.push({
+        ...extension,
+        commands: filteredCommands,
+      });
       return acc;
-    },
-    [],
-  );
+    }
 
-  useEffect(() => {
-    preloadAPI.main.invokeIpcMessage('extension:list').then((result) => {
-      if ('$isError' in result) return;
+    const searchFilter = extension.title.toLowerCase().includes(searchStr);
+    const categoryFilter =
+      activeFilter === 'all' ? true : activeFilter === 'extensions';
 
-      setExtensions(result);
-    });
+    if (searchFilter && categoryFilter) {
+      let extensionData = extension;
+      if (!extension.isError) {
+        extensionData = {
+          ...extension,
+          commands: filteredCommands,
+        };
+      }
+
+      acc.push(extensionData);
+    }
+
+    return acc;
   }, []);
 
   return (
@@ -120,13 +112,14 @@ function RouteExtension() {
           />
         </div>
         {selectedExtensionId && (
-          <ExtensionDetailCard
-            className="w-72 flex-shrink-0"
-            extensionId={selectedExtensionId}
-            onClose={() => setSelectedExtensionId('')}
-          >
-            <p>Extension detail</p>
-          </ExtensionDetailCard>
+          <div className="w-72 flex-shrink-0">
+            <ExtensionDetailCard
+              extensionId={selectedExtensionId}
+              onClose={() => setSelectedExtensionId('')}
+            >
+              <p>Extension detail</p>
+            </ExtensionDetailCard>
+          </div>
         )}
       </div>
     </div>

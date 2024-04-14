@@ -9,6 +9,7 @@ import type { ExtensionCommand, ExtensionConfig } from '@repo/extension-core';
 import type { CommandLaunchContext } from '@repo/extension';
 import type { PartialDeep } from 'type-fest';
 import type { BrowserExtensionTab } from '@repo/shared';
+import type { DatabaseQueriesEvent } from './database.interface';
 
 export interface IPCUserExtensionCustomEventsMap {
   'browser.activeTab.elementExists': (
@@ -52,17 +53,13 @@ export interface IPCExtensionEvents {
     extensionId: string;
     launchContext: CommandLaunchContext;
   }) => { success: boolean; errorMessage: string };
-  'extension:list': () => ExtensionData[];
-  'extension:reload': (extId: string) => ExtensionData | null;
+  'extension:reload': (extId: string) => void;
   'extension:import': () => ExtensionData | null;
   'extension:init-message-port': () => MessagePort;
   'extension:get-command': (
     extensionId: string,
     commandId: string,
   ) => ExtensionCommand | null;
-  'extension:get': (
-    extensionId: string,
-  ) => (ExtensionData & { $key: string }) | null;
 }
 
 export interface IPCExtensionConfigEvents {
@@ -112,6 +109,7 @@ export type IPCEvents = IPCShellEvents &
   IPCDialogEvents &
   IPCClipboardEvents &
   IPCExtensionEvents &
+  DatabaseQueriesEvent &
   IPCUserExtensionEvents &
   IPCExtensionConfigEvents;
 
@@ -156,6 +154,7 @@ export interface IPCSendEventRendererToMain {
 
 export interface IPCSendEventRendererToRenderer {
   'data:changes': [type: 'extension' | 'command'];
+  'database:changes': [type: keyof DatabaseQueriesEvent, ...args: unknown[]];
   'command-window:input-config': [
     detail: {
       commandId: string;

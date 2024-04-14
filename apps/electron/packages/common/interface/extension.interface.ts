@@ -1,6 +1,8 @@
 import type { CommandLaunchContext } from '@repo/extension';
 import type {
+  ExtensionCommand,
   EXTENSION_PERMISSIONS,
+  ExtensionConfig,
   ExtensionManifest,
 } from '@repo/extension-core';
 
@@ -18,7 +20,8 @@ export interface ExtensionDataBase {
 
 export interface ExtensionDataValid extends ExtensionDataBase {
   isError: false;
-  manifest: ExtensionManifest;
+  config?: ExtensionConfig[];
+  commands: ExtensionCommand[];
 }
 
 export interface ExtensionDataError extends ExtensionDataBase {
@@ -42,3 +45,19 @@ export interface ExtensionConfigData {
   extensionId: string;
   value: Record<string, unknown>;
 }
+
+export type ExtensionLoaderManifestData =
+  | {
+      id: string;
+      isError: true;
+      path: string;
+      errorMessage: string;
+      $key: string;
+    }
+  | {
+      id: string;
+      isError: false;
+      manifest: ExtensionManifest;
+      path: string;
+      $key: string;
+    };

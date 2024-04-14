@@ -1,4 +1,4 @@
-import { ExtensionDataValid } from '#common/interface/extension.interface';
+import { ExtensionLoaderManifestData } from '#common/interface/extension.interface';
 import { CommandActions } from '@repo/extension';
 import {
   CopyIcon,
@@ -11,7 +11,7 @@ import {
 import preloadAPI from './preloadAPI';
 import { IPCEventError } from '#common/interface/ipc-events.interface';
 import { CommandPanelStoreActions } from '../stores/command-panel.store';
-import { isIPCEventError } from '#common/utils/helper';
+import { isIPCEventError } from './helper';
 
 function resultHandler(
   {
@@ -43,7 +43,7 @@ const defaultCommandActions: {
     onAction(
       detail: {
         commandId: string;
-        extension: ExtensionDataValid & { $key: string };
+        extensionManifest: ExtensionLoaderManifestData;
         addStatus: CommandPanelStoreActions['addStatus'];
       },
       data: Extract<CommandActions, { type: T }>,
@@ -54,7 +54,7 @@ const defaultCommandActions: {
     id: 'copy',
     icon: CopyIcon,
     title: 'Copy to Clipboard',
-    onAction({ extension, commandId, addStatus }, data) {
+    onAction({ extensionManifest: extension, commandId, addStatus }, data) {
       preloadAPI.main
         .invokeIpcMessage('user-extension', {
           commandId,
@@ -76,7 +76,7 @@ const defaultCommandActions: {
     id: 'paste',
     icon: ClipboardPaste,
     title: 'Paste Content',
-    onAction({ extension, commandId, addStatus }, data) {
+    onAction({ extensionManifest: extension, commandId, addStatus }, data) {
       preloadAPI.main
         .invokeIpcMessage('user-extension', {
           commandId,
@@ -93,7 +93,7 @@ const defaultCommandActions: {
     id: 'open-url',
     icon: GlobeIcon,
     title: 'Open in Browser',
-    onAction({ extension, commandId, addStatus }, data) {
+    onAction({ extensionManifest: extension, commandId, addStatus }, data) {
       preloadAPI.main
         .invokeIpcMessage('user-extension', {
           commandId,
@@ -110,7 +110,7 @@ const defaultCommandActions: {
     icon: FolderOpenIcon,
     id: 'show-in-folder',
     title: 'Show in Folder',
-    onAction({ extension, commandId, addStatus }, data) {
+    onAction({ extensionManifest: extension, commandId, addStatus }, data) {
       preloadAPI.main
         .invokeIpcMessage('user-extension', {
           commandId,
@@ -127,7 +127,7 @@ const defaultCommandActions: {
     icon: Trash2Icon,
     id: 'move-to-trash',
     title: 'Show in Folder',
-    onAction({ extension, commandId, addStatus }, data) {
+    onAction({ extensionManifest: extension, commandId, addStatus }, data) {
       preloadAPI.main
         .invokeIpcMessage('user-extension', {
           commandId,

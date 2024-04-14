@@ -38,7 +38,7 @@ function CommandEventListener() {
       launchContext,
     }) => {
       const extensionData = await preloadAPI.main.invokeIpcMessage(
-        'extension:get',
+        'database:get-extension-manifest',
         extension.id,
       );
       if (
@@ -50,9 +50,9 @@ function CommandEventListener() {
 
       const isConfigInputted = await checkCommandConfig({
         command,
+        extension,
         commandIcon,
         launchContext,
-        extension: extensionData,
       });
       if (!isConfigInputted) return;
 

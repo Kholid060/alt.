@@ -1,7 +1,7 @@
 import type { EXTENSION_PERMISSIONS } from '@repo/extension-core';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import type { NestedKeyOf } from '../interface/utils.interface';
-import type { IPCUserExtensionCustomEventsMap } from 'interface/ipc-events.interface';
+import type { IPCUserExtensionCustomEventsMap } from '../interface/ipc-events.interface';
 
 export type ExtensionAPIPaths =
   | NestedKeyOf<Omit<typeof ExtensionAPI, 'manifest'>>

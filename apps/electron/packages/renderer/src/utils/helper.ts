@@ -1,4 +1,6 @@
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
+import { IPCEventError } from '#packages/common/interface/ipc-events.interface';
+import { isObject } from '@repo/shared';
 
 export function extPathParser(path: string) {
   const [_, ext, extId, commandId] = path.split('/');
@@ -37,4 +39,8 @@ export function getExtIconURL(icon: string, extensionId: string) {
   if (icon.startsWith('icon:')) return icon;
 
   return `${CUSTOM_SCHEME.extension}://${extensionId}/icon/${icon}`;
+}
+
+export function isIPCEventError(result: unknown): result is IPCEventError {
+  return Boolean(result) && isObject(result) && '$isError' in result;
 }

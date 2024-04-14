@@ -14,11 +14,8 @@ function ListItemExtension({
   itemRef,
   selected,
 }: ListItemRenderDetail<'extension'>) {
-  const [showExtensionErrorOverlay, updateExtension] = useCommandStore(
-    useShallow((state) => [
-      state.showExtensionErrorOverlay,
-      state.updateExtension,
-    ]),
+  const [showExtensionErrorOverlay] = useCommandStore(
+    useShallow((state) => [state.showExtensionErrorOverlay]),
   );
   const hasError = useCommandStore((state) =>
     Object.hasOwn(state.extensionErrors, item.metadata.extension.id),
@@ -50,8 +47,6 @@ function ListItemExtension({
             });
             return;
           }
-
-          updateExtension(extension.id, result);
         } catch (error) {
           console.error(error);
         }
@@ -83,20 +78,17 @@ function ListItemExtension({
       title: 'See errors',
       color: 'destructive',
     });
-  } else if (
-    extension.manifest.config &&
-    extension.manifest.config?.length > 0
-  ) {
+  } else if (extension.config && extension.config?.length > 0) {
     actions.push({
       icon: BoltIcon,
       onAction() {
         navigate(`/configs/${extension.id}`, {
           data: {
-            config: extension.manifest.config,
+            config: extension.config,
           },
           panelHeader: {
             title: extension.title,
-            icon: extension.manifest.icon,
+            icon: extension.icon,
           },
         });
       },

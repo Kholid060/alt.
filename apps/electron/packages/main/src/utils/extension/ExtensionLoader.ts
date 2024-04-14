@@ -9,6 +9,7 @@ import { EXTENSION_FOLDER } from '../constant';
 import type {
   ExtensionData,
   ExtensionDataBase,
+  ExtensionLoaderManifestData,
 } from '#common/interface/extension.interface';
 import {
   ExtensionError,
@@ -88,7 +89,7 @@ async function extractExtManifest(
 
 async function getExtensionDataManifest(
   extension: ExtensionDataBase & { path: string },
-): Promise<ExtensionDataWithPath> {
+): Promise<ExtensionLoaderManifestData> {
   const extensionManifest = await extractExtManifest(
     path.join(extension.path, 'manifest.json'),
   );
@@ -96,6 +97,7 @@ async function getExtensionDataManifest(
   if ('isError' in extensionManifest) {
     return {
       ...extension,
+      $key: '',
       isError: true,
       errorMessage: extensionManifest.message,
     };
@@ -103,19 +105,17 @@ async function getExtensionDataManifest(
 
   return {
     ...extension,
+    $key: '',
     isError: false,
     manifest: extensionManifest as ExtensionManifest,
   };
 }
 
-type ExtensionDataWithPath = ExtensionData & {
-  path: string;
-};
-
 class ExtensionLoader {
   static instance = new ExtensionLoader();
 
-  _extensions: Map<string, ExtensionDataWithPath>;
+  private extensionsManifest: Map<string, ExtensionLoaderManifestData> =
+    new Map();
 
   // for accessing API
   private keys = new Map<string, string>();
@@ -123,8 +123,6 @@ class ExtensionLoader {
 
   constructor() {
     this.keys = new Map();
-    this._extensions = new Map();
-
     this._init();
   }
 
@@ -139,7 +137,7 @@ class ExtensionLoader {
   @ErrorLogger('ExtensionLoader', 'loadExtensions')
   private async loadExtensions() {
     this.keys = new Map();
-    this._extensions = new Map();
+    this.extensionsManifest = new Map();
 
     const extensionsDbData = await extensionsDB.query.extensions.findMany({
       columns: {
@@ -157,17 +155,17 @@ class ExtensionLoader {
     await Promise.all(
       extensionsDbData.map(async (extension) => {
         const extensionData = await getExtensionDataManifest(extension);
-        this.addExtension(extensionData);
+        this.addExtensionManifest(extensionData);
       }),
     );
   }
 
-  get extensions(): ExtensionData[] {
-    return [...this._extensions.values()];
+  isLocal(extPath: string) {
+    return extPath.startsWith(EXTENSION_FOLDER);
   }
 
   getCommand(extensionId: string, commandId: string): ExtensionCommand | null {
-    const extension = this.getExtension(extensionId);
+    const extension = this.getManifest(extensionId);
     if (!extension || extension.isError) return null;
 
     const command =
@@ -183,7 +181,7 @@ class ExtensionLoader {
     type: 'base' | 'icon' | 'libs',
     ...paths: string[]
   ) {
-    const extension = this._extensions.get(extensionId);
+    const extension = this.extensionsManifest.get(extensionId);
     if (!extension) return null;
 
     let basePath = '';
@@ -203,14 +201,15 @@ class ExtensionLoader {
     return basePath + `${paths.length === 0 ? '' : `/${paths.join('/')}`}`;
   }
 
+  @ErrorLogger('ExtensionLoader', 'importExtension')
   async importExtension(manifestPath: string): Promise<ExtensionData | null> {
     const normalizeManifestPath = path.normalize(path.dirname(manifestPath));
 
     let isAlreadyAdded = false;
-    this._extensions.forEach((extension) => {
+    this.extensionsManifest.forEach((manifest) => {
       if (
         isAlreadyAdded ||
-        path.normalize(extension.path) !== normalizeManifestPath
+        path.normalize(manifest.path) !== normalizeManifestPath
       )
         return;
 
@@ -226,17 +225,11 @@ class ExtensionLoader {
 
     const id = nanoid();
     const { description, name, title, version } = manifest;
-    const extensionData: ExtensionDataWithPath = {
+    const extensionData: ExtensionLoaderManifestData = {
       id,
-      name,
-      title,
-      version,
       manifest,
-      description,
-      isLocal: true,
+      $key: '',
       isError: false,
-      isDisabled: false,
-      icon: manifest.icon,
       path: normalizeManifestPath,
     };
 
@@ -251,11 +244,21 @@ class ExtensionLoader {
       icon: manifest.icon,
       path: normalizeManifestPath,
     });
-    this.addExtension(extensionData);
+    this.addExtensionManifest(extensionData);
 
-    const { path: _, ...extension } = extensionData;
-
-    return extension;
+    return {
+      id,
+      name,
+      title,
+      version,
+      description,
+      isLocal: true,
+      isError: false,
+      isDisabled: false,
+      icon: manifest.icon,
+      commands: manifest.commands,
+      path: normalizeManifestPath,
+    };
   }
 
   async reloadExtension(extId: string) {
@@ -281,36 +284,36 @@ class ExtensionLoader {
     if (!extension) throw new ExtensionError("Couldn't find extension");
 
     const extensionData = await getExtensionDataManifest(extension);
-    this._extensions.set(extId, extensionData);
+    this.extensionsManifest.set(extId, extensionData);
 
     return extensionData;
   }
 
-  addExtension(extensionData: ExtensionDataWithPath) {
+  addExtensionManifest(manifestData: ExtensionLoaderManifestData) {
     const extKey = nanoid(5);
 
-    this.keys.set(extKey, extensionData.id);
-    this.keysMap.set(extensionData.id, extKey);
-    this._extensions.set(extensionData.id, extensionData);
+    this.keys.set(extKey, manifestData.id);
+    this.keysMap.set(manifestData.id, extKey);
+    this.extensionsManifest.set(manifestData.id, {
+      ...manifestData,
+      $key: extKey,
+    });
   }
 
-  getExtensionByKey(key: string) {
+  getManifestByKey(key: string) {
     const extId = this.keys.get(key);
     if (!extId) return null;
 
-    return this._extensions.get(extId);
+    return this.extensionsManifest.get(extId);
   }
 
-  getExtension(extensionId: string) {
-    const extension = this._extensions.get(extensionId) ?? null;
-    if (!extension) return null;
+  getManifest(
+    extensionId: string,
+  ): (ExtensionLoaderManifestData & { $key: string }) | null {
+    const manifest = this.extensionsManifest.get(extensionId) ?? null;
+    if (!manifest) return null;
 
-    return { ...extension, $key: this.keysMap.get(extensionId)! };
-  }
-
-  async reloadExtensions() {
-    await this.loadExtensions();
-    return this._extensions;
+    return { ...manifest, $key: this.keysMap.get(extensionId)! };
   }
 }
 

@@ -2,6 +2,8 @@ import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
 import { BrowserWindow, app, screen } from 'electron';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import WindowsManager from './WindowsManager';
+import { centerWindow } from '../utils/helper';
 
 export const COMMNAND_WINDOW_BOUND = {
   width: 650,
@@ -9,6 +11,34 @@ export const COMMNAND_WINDOW_BOUND = {
   minHeight: 400,
   maxHeight: 600,
 } as const;
+
+export function toggleCommandWindow(showWindow?: boolean) {
+  const commandWindow = WindowsManager.instance.getWindow('command', {
+    noThrow: true,
+  });
+  if (!commandWindow) return;
+
+  const isHidden = WindowsManager.instance.isWindowHidden('command');
+  if (!isHidden || (typeof showWindow === 'boolean' && showWindow === false)) {
+    commandWindow.minimize();
+    commandWindow.hide();
+    return;
+  }
+
+  const cursorPosition = screen.getCursorScreenPoint();
+  const display = screen.getDisplayNearestPoint(cursorPosition);
+
+  centerWindow(commandWindow, display, {
+    width: COMMNAND_WINDOW_BOUND.width,
+    height: COMMNAND_WINDOW_BOUND.maxHeight,
+  });
+
+  if (isHidden || showWindow) {
+    commandWindow.moveTop();
+    commandWindow.show();
+    commandWindow.setBounds({ width: COMMNAND_WINDOW_BOUND.width });
+  }
+}
 
 export async function createCommandWindow() {
   const cursorPos = screen.getCursorScreenPoint();
@@ -69,6 +99,10 @@ export async function createCommandWindow() {
 
     event.preventDefault();
   });
+
+  // browserWindow.on('ready-to-show', () => {
+  //   browserWindow.webContents.openDevTools({ mode: 'undocked' });
+  // });
 
   /**
    * Load the main page of the main window.

@@ -1,6 +1,6 @@
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import type { EventMapEmit } from '@repo/shared';
-import type { IPCUserExtensionEventsMap } from 'interface/ipc-events.interface';
+import type { IPCUserExtensionEventsMap } from '../../interface/ipc-events.interface';
 
 export function extensionElementHandleFactory(
   sendMessage: CreateExtensionElementHandleDetail['sendMessage'],

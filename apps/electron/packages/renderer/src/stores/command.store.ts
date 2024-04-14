@@ -1,4 +1,3 @@
-import { ExtensionData } from '#common/interface/extension.interface';
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import createStoreSelectors from '../utils/createStoreSelector';
@@ -12,7 +11,6 @@ interface ExtensionCommandArgs {
 interface CommandStoreState {
   query: string;
   isWindowHidden: boolean;
-  extensions: ExtensionData[];
   commandArgs: ExtensionCommandArgs;
   activeBrowserTab: BrowserExtensionTab | null;
   extensionErrors: Record<string, CommandErrorOverlayData[]>;
@@ -30,9 +28,7 @@ interface CommandStoreActions {
     data: Partial<ExtensionCommandArgs>,
     replace?: boolean,
   ) => void;
-  addExtension: (data: ExtensionData) => void;
   addExtensionError: (extId: string, error: CommandErrorOverlayData) => void;
-  updateExtension: (id: string, data: Partial<ExtensionData>) => void;
   setState: <T extends keyof CommandStoreState>(
     name: T,
     value: CommandStoreState[T],
@@ -48,7 +44,6 @@ const MAX_EXTENSION_ERROR_ITEMS = 20;
 
 const initialState: CommandStoreState = {
   query: '',
-  extensions: [],
   errorOverlay: null,
   extensionErrors: {},
   isWindowHidden: false,
@@ -105,26 +100,6 @@ const commandStore = create<CommandStore>()(
           ...data,
           args: { ...currentVal.args, ...(data?.args ?? {}) },
         },
-      });
-    },
-    addExtension(data) {
-      set((state) => {
-        state.extensions.push(data);
-      });
-    },
-    updateExtension(extId, data) {
-      set((state) => {
-        const index = state.extensions.findIndex(
-          (extension) => extension.id === extId,
-        );
-        if (index === -1) return;
-
-        delete data.id;
-
-        state.extensions[index] = {
-          ...state.extensions[index],
-          ...data,
-        } as ExtensionData;
       });
     },
     setState(name, value) {

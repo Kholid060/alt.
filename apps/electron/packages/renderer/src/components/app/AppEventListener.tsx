@@ -6,7 +6,7 @@ import {
 } from '/@/hooks/useCommandRoute';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { useCommandStore } from '/@/stores/command.store';
-import { getExtIconURL } from '/@/utils/helper';
+import { getExtIconURL, isIPCEventError } from '/@/utils/helper';
 import { requireInputConfig } from '#packages/common/utils/helper';
 
 function AppEventListener() {
@@ -38,10 +38,11 @@ function AppEventListener() {
       'command-window:input-config',
       async (_, { commandId, extensionId, type }) => {
         const extension = await preloadAPI.main.invokeIpcMessage(
-          'extension:get',
+          'database:get-extension-manifest',
           extensionId,
         );
-        if (!extension || '$isError' in extension || extension.isError) return;
+        if (!extension || isIPCEventError(extension) || extension.isError)
+          return;
 
         if (type === 'extension') {
           if (!requireInputConfig(extension.manifest.config)) return;
@@ -51,8 +52,8 @@ function AppEventListener() {
               config: extension.manifest.config,
             },
             panelHeader: {
-              title: extension.title,
               icon: extension.manifest.icon,
+              title: extension.manifest.title,
             },
           });
           return;
@@ -69,8 +70,11 @@ function AppEventListener() {
           },
           panelHeader: {
             title: command.title,
-            subtitle: extension.title,
-            icon: getExtIconURL(command.icon || extension.icon, extension.id),
+            subtitle: extension.manifest.title,
+            icon: getExtIconURL(
+              command.icon || extension.manifest.icon,
+              extension.id,
+            ),
           },
         });
       },

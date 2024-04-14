@@ -17,7 +17,7 @@ import {
   RotateCcwIcon,
 } from 'lucide-react';
 import preloadAPI from '/@/utils/preloadAPI';
-import { isIPCEventError } from '#packages/common/utils/helper';
+import { isIPCEventError } from '/@/utils/helper';
 
 interface ExtensionListTableProps
   extends React.TableHTMLAttributes<HTMLTableElement> {
@@ -46,13 +46,13 @@ function ExtensionListTable({
 
   return (
     <table
-      className={cn('table-auto w-full cursor-default', className)}
+      className={cn('table-fixed w-full cursor-default', className)}
       {...props}
     >
       <thead className="text-sm border-b h-12 w-full">
         <tr className="text-left">
           <th className="h-12 w-8"></th>
-          <th className="h-12 pr-3">Name</th>
+          <th className="h-12 pr-3 w-4/12">Name</th>
           <th className="h-12 px-3">Type</th>
           <th className="h-12 px-3">Shortcut</th>
           <th className="h-12 px-3 w-32"></th>
@@ -73,7 +73,7 @@ function ExtensionListTable({
             <UiExtensionIcon
               alt={`${extension.title} icon`}
               id={extension.id}
-              icon={extension.manifest.icon}
+              icon={extension.icon}
               iconWrapper={(icon) => <UiList.Icon icon={icon} />}
             />
           );
@@ -84,8 +84,6 @@ function ExtensionListTable({
               <tr
                 className={`hover:bg-card border-b border-border/50 last:border-b-0 ${isExpanded ? 'bg-card' : ''}`}
                 onClick={() => {
-                  onExtensionSelected?.(extension.id);
-
                   if (extension.isError) return;
 
                   setExpandedRows((prevVal) => {
@@ -106,7 +104,12 @@ function ExtensionListTable({
                     />
                   )}
                 </td>
-                <td className="py-3 pr-3">
+                <td
+                  className="py-3 pr-3 cursor-pointer"
+                  onClick={() => {
+                    onExtensionSelected?.(extension.id);
+                  }}
+                >
                   <div className="flex items-center">
                     <div className="h-7 w-7 flex-shrink-0">{extensionIcon}</div>
                     <p className="ml-2">
@@ -167,7 +170,7 @@ function ExtensionListTable({
               </tr>
               {isExpanded &&
                 !extension.isError &&
-                extension.manifest.commands.map((command) => (
+                extension.commands.map((command) => (
                   <tr
                     key={extension.id + command.name}
                     className="border-b border-border/50 hover:bg-card"

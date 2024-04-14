@@ -10,7 +10,7 @@ import { CommandJSONViews, CommandLaunchContext } from '@repo/extension';
 import CommandViewJSONText from '/@/components/command-view-json/CommandViewJSONText';
 import CommandViewJSONList from '/@/components/command-view-json/CommandViewJSONList';
 import { CommandViewJSONProvider } from '/@/context/command-view-json.context';
-import { ExtensionDataValid } from '#common/interface/extension.interface';
+import { ExtensionLoaderManifestData } from '#common/interface/extension.interface';
 
 const componentsMap = {
   text: CommandViewJSONText,
@@ -31,9 +31,8 @@ function CommandViewJSON() {
   const worker = useRef<Worker | null>(null);
 
   const [viewData, setViewData] = useState<CommandJSONViews | null>(null);
-  const [extension, setExtension] = useState<
-    (ExtensionDataValid & { $key: string }) | null
-  >(null);
+  const [extension, setExtension] =
+    useState<ExtensionLoaderManifestData | null>(null);
 
   useEffect(() => {
     let messagePorts: MessagePort[] = [];
@@ -54,18 +53,22 @@ function CommandViewJSON() {
         commandId: string;
         extensionId: string;
       };
-      const extension = await preloadAPI.main.invokeIpcMessage(
-        'extension:get',
+      const extensionManifest = await preloadAPI.main.invokeIpcMessage(
+        'database:get-extension-manifest',
         extensionId,
       );
-      if (!extension || '$isError' in extension || extension.isError) {
+      if (
+        !extensionManifest ||
+        '$isError' in extensionManifest ||
+        extensionManifest.isError
+      ) {
         returnToMainPage();
         return;
       }
 
-      setExtension(extension);
+      setExtension(extensionManifest);
 
-      const command = extension.manifest.commands.find(
+      const command = extensionManifest.manifest.commands.find(
         (command) => command.name === commandId,
       );
       if (!command) {
@@ -96,9 +99,9 @@ function CommandViewJSON() {
       worker.current = await ExtensionWorker.instance.createWorker({
         command,
         messagePort: port1,
-        key: extension.$key,
-        extensionId: extension.id,
-        manifest: extension.manifest,
+        key: extensionManifest.$key,
+        extensionId: extensionManifest.id,
+        manifest: extensionManifest.manifest,
         launchContext: activeRoute.data as CommandLaunchContext,
         events: {
           onError: (worker, event) => {
@@ -118,7 +121,7 @@ function CommandViewJSON() {
                 clearPanel();
               },
             });
-            addExtensionError(extension.id, {
+            addExtensionError(extensionManifest.id, {
               content: event.message,
               title: `Error in "${command.title}" command`,
             });

@@ -13,14 +13,9 @@ import { getExtensionConfigDefaultValue } from '../helper';
 import ExtensionsDBController from '../../db/controller/extensions-db.controller';
 import type { IPCExtensionConfigEvents } from '#packages/common/interface/ipc-events.interface';
 import WindowsManager from '../../window/WindowsManager';
+import DatabaseService from '/@/services/database.service';
 
 /** EXTENSION */
-onIpcMessage('extension:list', () =>
-  Promise.resolve(ExtensionLoader.instance.extensions),
-);
-onIpcMessage('extension:get', (_, extId) =>
-  Promise.resolve(ExtensionLoader.instance.getExtension(extId)),
-);
 onIpcMessage('extension:import', async () => {
   const {
     canceled,
@@ -38,9 +33,13 @@ onIpcMessage('extension:import', async () => {
 
   return extensionData;
 });
-onIpcMessage('extension:reload', (_, extId) =>
-  ExtensionLoader.instance.reloadExtension(extId),
-);
+onIpcMessage('extension:reload', async (_, extId) => {
+  await ExtensionLoader.instance.reloadExtension(extId);
+  DatabaseService.emitDBChanges({
+    'database:get-extension': [extId],
+    'database:get-extension-list': [],
+  });
+});
 onIpcMessage('extension:run-script-command', async (_, detail) => {
   try {
     await ExtensionCommandScriptRunner.instance.runScript(detail);
@@ -115,28 +114,28 @@ onIpcMessage(
       return { requireInput: false } as ReturnValue;
     }
 
-    const extension = ExtensionLoader.instance.getExtension(extensionId);
-    if (!extension || extension.isError) {
+    const extensionManifest = ExtensionLoader.instance.getManifest(extensionId);
+    if (!extensionManifest || extensionManifest.isError) {
       throw new ExtensionError('Extension not found');
     }
 
     const extensionConfig = getExtensionConfigDefaultValue(
-      extension.manifest.config ?? [],
+      extensionManifest.manifest.config ?? [],
     );
     if (extensionConfig.requireInput) {
       const extensionConfigExists = await ExtensionsDBController.configExists(
-        extension.id,
+        extensionManifest.id,
       );
       if (!extensionConfigExists) {
         return {
           requireInput: true,
           type: 'extension',
-          config: extension.manifest.config,
+          config: extensionManifest.manifest.config,
         } as ReturnValue;
       }
     }
 
-    const command = extension.manifest.commands.find(
+    const command = extensionManifest.manifest.commands.find(
       (command) => command.name === commandId,
     );
     if (!command) throw new ExtensionError('Command not found');
@@ -183,6 +182,17 @@ onIpcMessage('app:close-command-window', () => {
   commandWindow.hide();
 
   return Promise.resolve();
+});
+
+/** DATABASE */
+onIpcMessage('database:get-extension', (_, extensionId) => {
+  return DatabaseService.getExtension(extensionId);
+});
+onIpcMessage('database:get-extension-list', () => {
+  return DatabaseService.getExtensions();
+});
+onIpcMessage('database:get-extension-manifest', (_, extensionId) => {
+  return Promise.resolve(ExtensionLoader.instance.getManifest(extensionId));
 });
 
 /** SHELL */

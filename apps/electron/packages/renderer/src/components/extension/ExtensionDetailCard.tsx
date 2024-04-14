@@ -1,10 +1,10 @@
-import { ExtensionData } from '#packages/common/interface/extension.interface';
-import { useEffect, useState } from 'react';
+import React from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { XIcon } from 'lucide-react';
 import UiExtensionIcon from '../ui/UiExtensionIcon';
 import { UiList } from '@repo/ui';
 import { ExtensionManifest } from '@repo/extension-core';
+import { useDatabaseQuery } from '/@/hooks/useDatabase';
 
 function getPermissionsDescription(manifest: ExtensionManifest) {
   const descriptions = new Set<string>();
@@ -49,37 +49,39 @@ function getPermissionsDescription(manifest: ExtensionManifest) {
   return [...descriptions];
 }
 
-interface ExtensoinDetailCardProps
-  extends React.HTMLAttributes<HTMLDivElement> {
+interface ExtensionDetailCardProps {
   extensionId: string;
   onClose?: () => void;
+  children?: React.ReactNode;
 }
 
 function ExtensionDetailCard({
   onClose,
   extensionId,
-  ...props
-}: ExtensoinDetailCardProps) {
-  const [extension, setExtension] = useState<ExtensionData | null>(null);
+}: ExtensionDetailCardProps) {
+  const extension = useDatabaseQuery({
+    name: 'database:get-extension',
+    args: [extensionId],
+  });
+  const extensionManifest = useDatabaseQuery({
+    name: 'database:get-extension-manifest',
+    args: [extensionId],
+  });
 
-  useEffect(() => {
-    preloadAPI.main
-      .invokeIpcMessage('extension:get', extensionId)
-      .then((extensionData) => {
-        if (!extensionData || '$isError' in extensionData) return;
+  if (
+    extensionManifest.state !== 'idle' ||
+    extension.state !== 'idle' ||
+    !extensionManifest.data ||
+    !extension.data
+  )
+    return null;
 
-        setExtension(extensionData);
-      });
-  }, [extensionId]);
-
-  if (!extension) return null;
-
-  const permissions = extension.isError
+  const permissions = extensionManifest.data.isError
     ? []
-    : getPermissionsDescription(extension.manifest);
+    : getPermissionsDescription(extensionManifest.data.manifest);
 
   return (
-    <div {...props}>
+    <>
       <div className="flex items-center h-[49px] px-4 border-b">
         <button
           className="text-muted-foreground hover:text-foreground transition"
@@ -88,27 +90,27 @@ function ExtensionDetailCard({
           <XIcon className="h-5 w-5" />
         </button>
         <div className="h-8 w-8 ml-4">
-          {extension.isError ? (
-            <UiList.Icon icon={extension.title[0].toUpperCase()} />
+          {extensionManifest.data.isError ? (
+            <UiList.Icon icon={extension.data.title[0].toUpperCase()} />
           ) : (
             <UiExtensionIcon
-              alt={`${extension.title} icon`}
-              id={extension.id}
-              icon={extension.manifest.icon}
+              alt={`${extension.data.title} icon`}
+              id={extension.data.id}
+              icon={extension.data.icon}
               iconWrapper={(icon) => <UiList.Icon icon={icon} />}
             />
           )}
         </div>
-        <p className="ml-2 line-clamp-1">{extension.title}</p>
+        <p className="ml-2 line-clamp-1">{extension.data.title}</p>
       </div>
       <div className="p-4 text-sm space-y-4 text-muted-foreground">
         <div>
           <p className="text-foreground">Description</p>
-          <p>{extension.description}</p>
+          <p>{extension.data.description}</p>
         </div>
         <div>
           <p className="text-foreground">Version</p>
-          <p>{extension.version}</p>
+          <p>{extension.data.version}</p>
         </div>
         <div>
           <p className="text-foreground">Permissions</p>
@@ -120,20 +122,20 @@ function ExtensionDetailCard({
         </div>
         <div>
           <p className="text-foreground">Source</p>
-          {extension.isLocal ? (
+          {extension.data.isLocal ? (
             <p>
               Loaded from:{' '}
               <button
                 className="underline text-left leading-tight"
                 onClick={() =>
-                  extension.path &&
+                  extension.data!.path &&
                   preloadAPI.main.invokeIpcMessage(
                     'shell:open-in-folder',
-                    extension.path,
+                    extension.data?.path as string,
                   )
                 }
               >
-                {extension.path}
+                {extension.data.path}
               </button>
             </p>
           ) : (
@@ -141,7 +143,7 @@ function ExtensionDetailCard({
           )}
         </div>
       </div>
-    </div>
+    </>
   );
 }
 

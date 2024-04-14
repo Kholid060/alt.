@@ -29,6 +29,7 @@ export const extensions = sqliteTable('extensions', {
     .default(sql`CURRENT_TIMESTAMP`),
 });
 export type NewExtension = typeof extensions.$inferInsert;
+export type SelectExtension = typeof extensions.$inferSelect;
 
 export const extensionsRelations = relations(extensions, ({ many }) => ({
   configs: many(configs),

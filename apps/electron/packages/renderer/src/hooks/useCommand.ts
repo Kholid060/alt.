@@ -26,7 +26,9 @@ export function useCommand() {
     extension,
     commandIcon,
     launchContext,
-  }: ExecuteCommandPayload) {
+  }: Omit<ExecuteCommandPayload, 'extension'> & {
+    extension: Pick<ExtensionDataBase, 'id' | 'name' | 'title'>;
+  }) {
     if (!command.config || command.config.length === 0) return true;
 
     const configState = await preloadAPI.main.invokeIpcMessage(

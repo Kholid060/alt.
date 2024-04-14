@@ -13,6 +13,8 @@ import ExtensionCommandScriptRunner from './extension/ExtensionCommandScriptRunn
 import { store } from '../lib/store';
 import { CommandLaunchBy } from '@repo/extension';
 import extensionsDB from '../db/extension.db';
+import DatabaseService from '../services/database.service';
+import { toggleCommandWindow } from '../window/command-window';
 
 function convertArgValue(argument: ExtensionCommandArgument, value: string) {
   let convertedValue: unknown = value;
@@ -35,10 +37,14 @@ async function deepLinkHandler(deepLink: string) {
     if (hostname !== 'extensions') return;
 
     const [_, extensionId, commandName] = pathname.split('/');
-    const extension = ExtensionLoader.instance.getExtension(extensionId);
-    if (!extension || extension.isError) return;
 
-    const command = extension.manifest.commands.find(
+    const extensionData = await DatabaseService.getExtension(extensionId);
+    if (!extensionData || extensionData.isDisabled) return;
+
+    const extensionManifest = ExtensionLoader.instance.getManifest(extensionId);
+    if (!extensionManifest || extensionManifest.isError) return;
+
+    const command = extensionManifest.manifest.commands.find(
       (item) => item.name === commandName,
     );
     if (!command) return;
@@ -123,7 +129,7 @@ async function deepLinkHandler(deepLink: string) {
       launchBy: CommandLaunchBy.DEEP_LINK,
     };
 
-    const configId = `${extension.id}:${command.name}`;
+    const configId = `${extensionManifest.id}:${command.name}`;
     const isHasConfig =
       command.config && command.config.length > 0
         ? Boolean(
@@ -141,9 +147,9 @@ async function deepLinkHandler(deepLink: string) {
         launchContext,
         runCommand: true,
         commandTitle: command.title,
-        extensionName: extension.manifest.title,
+        extensionName: extensionManifest.manifest.title,
         config: command.config as ExtensionConfig[],
-        commandIcon: command.icon ?? extension.manifest.icon,
+        commandIcon: command.icon ?? extensionManifest.manifest.icon,
       });
       return;
     }
@@ -157,12 +163,13 @@ async function deepLinkHandler(deepLink: string) {
       return;
     }
 
-    const { manifest: __, ...extensionPayload } = extension;
+    toggleCommandWindow(true);
+
     sendMesageToCommandWindow('command:execute', {
       command,
       launchContext,
-      extension: extensionPayload,
-      commandIcon: command.icon ?? extension.manifest.icon,
+      extension: extensionData,
+      commandIcon: command.icon ?? extensionManifest.manifest.icon,
     });
   } catch (error) {
     logger('error', ['deepLinkHandler'], (error as Error).message);

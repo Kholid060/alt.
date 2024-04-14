@@ -96,7 +96,7 @@ export class ExtensionIPCEvent {
     Awaited<ReturnType<IPCUserExtensionEventsMap[T]>> | IPCEventError
   > {
     try {
-      const extension = ExtensionLoader.instance.getExtensionByKey(key);
+      const extension = ExtensionLoader.instance.getManifestByKey(key);
       if (
         !extension ||
         extension.isError ||

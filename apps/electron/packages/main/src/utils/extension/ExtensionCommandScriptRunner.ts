@@ -48,7 +48,7 @@ class ExtensionCommandScriptRunner {
     extensionId: string;
     launchContext: CommandLaunchContext;
   }) {
-    const extension = ExtensionLoader.instance.getExtension(extensionId);
+    const extension = ExtensionLoader.instance.getManifest(extensionId);
     const command = ExtensionLoader.instance.getCommand(extensionId, commandId);
     if (!command || !extension) {
       throw new ExtensionError("Couldn't find command");
@@ -80,6 +80,7 @@ class ExtensionCommandScriptRunner {
 
     const scriptId = `${extensionId}::${commandId}`;
     const controller = new AbortController();
+    const isLocal = ExtensionLoader.instance.isLocal(extension.path);
 
     const env = Object.fromEntries(
       Object.entries(launchContext.args).map(([key, value]) => [
@@ -159,7 +160,7 @@ class ExtensionCommandScriptRunner {
       });
     });
     ls.stderr.addListener('data', (chunk) => {
-      if (!extension.isLocal || !this.runningScripts[scriptId]) return;
+      if (!isLocal || !this.runningScripts[scriptId]) return;
 
       this.runningScripts[scriptId].errorMessage += `${chunk.toString()}\n`;
       sencIpcMessage('command-script:message', {

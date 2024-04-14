@@ -14,12 +14,12 @@ import {
 } from '/@/interface/command.interface';
 import preloadAPI from '/@/utils/preloadAPI';
 import { BlocksIcon, SettingsIcon } from 'lucide-react';
-import { useShallow } from 'zustand/react/shallow';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
-import ListItemCommand from '../../../components/list-item/ListItemCommand';
-import ListItemExtension from '../../../components/list-item/ListItemExtension';
-import UiExtensionIcon from '../../../components/ui/UiExtensionIcon';
-import { useCommandNavigate } from '../../../hooks/useCommandRoute';
+import ListItemCommand from '/@/components/list-item/ListItemCommand';
+import ListItemExtension from '/@/components/list-item/ListItemExtension';
+import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
+import { useCommandNavigate } from '/@/hooks/useCommandRoute';
+import { useDatabaseQuery } from '/@/hooks/useDatabase';
 
 const QUERY_PREFIX = {
   EXT: 'ext:',
@@ -33,9 +33,10 @@ export interface ListItemRenderDetail<
 }
 
 function CommandList() {
-  const [extensions, addExtension] = useCommandStore(
-    useShallow((state) => [state.extensions, state.addExtension]),
-  );
+  const extensionQuery = useDatabaseQuery({
+    args: [],
+    name: 'database:get-extension-list',
+  });
   const activeBrowserTab = useCommandStore.use.activeBrowserTab();
 
   const addPanelStatus = useCommandPanelStore.use.addStatus();
@@ -72,14 +73,14 @@ function CommandList() {
     const commandItems: Item[] = [];
     const suggestionItems: Item[] = [];
 
-    extensions.forEach((extension) => {
+    extensionQuery.data?.forEach((extension) => {
       const extensionIcon = extension.isError ? (
         <UiList.Icon icon={extension.title[0].toUpperCase()} />
       ) : (
         <UiExtensionIcon
           alt={`${extension.title} icon`}
           id={extension.id}
-          icon={extension.manifest.icon}
+          icon={extension.icon}
           iconWrapper={(icon) => <UiList.Icon icon={icon} />}
         />
       );
@@ -98,9 +99,7 @@ function CommandList() {
 
       if (extension.isError) return;
 
-      const { manifest: _, ...extensionPayload } = extension;
-
-      extension.manifest.commands.forEach((command) => {
+      extension.commands.forEach((command) => {
         let isInSuggestion = false;
         const showCommands = command.context
           ? command.context.some((context) => {
@@ -129,9 +128,9 @@ function CommandList() {
         const commandItem: Item = {
           metadata: {
             command,
+            extension,
             type: 'command',
-            extension: extensionPayload,
-            commandIcon: command.icon ?? extension.manifest.icon,
+            commandIcon: command.icon ?? extension.icon,
           },
           value: `command:${extension.id}:${command.name}`,
           subtitle: command.subtitle || extension.title,
@@ -156,7 +155,7 @@ function CommandList() {
     });
 
     return { extItems, suggestionItems, commandItems };
-  }, [extensions, activeBrowserTab]);
+  }, [extensionQuery, activeBrowserTab]);
   const builtInCommands: CommandListItemCommandBuiltIn[] = [
     {
       group: 'Commands',
@@ -177,19 +176,18 @@ function CommandList() {
             return;
           }
 
-          addExtension(result);
+          preloadAPI.main.sendIpcMessage('data:changes', 'extension');
 
           const inputExtensionConfig =
-            !result.isError &&
-            result.manifest.config?.some((item) => item.required);
+            !result.isError && result.config?.some((item) => item.required);
           if (inputExtensionConfig) {
             navigate(`/configs/${result.id}`, {
               data: {
-                config: result.manifest.config,
+                config: result.config,
               },
               panelHeader: {
                 title: result.title,
-                icon: result.manifest.icon,
+                icon: result.icon,
               },
             });
           }

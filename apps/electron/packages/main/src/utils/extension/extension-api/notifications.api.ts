@@ -16,7 +16,7 @@ onExtensionIPCEvent(
         ExtensionLoader.instance.getPath(
           extension.id,
           'icon',
-          extension.manifest.icon,
+          extension.icon,
         ) ?? '',
     });
     notification.show();

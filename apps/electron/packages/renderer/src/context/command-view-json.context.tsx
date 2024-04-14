@@ -1,9 +1,9 @@
-import { ExtensionDataValid } from '#common/interface/extension.interface';
+import { ExtensionLoaderManifestData } from '#common/interface/extension.interface';
 import { createContext, useContext } from 'react';
 
 interface CommandViewJSONState {
   commandId: string;
-  extension: (ExtensionDataValid & { $key: string }) | null;
+  extension: ExtensionLoaderManifestData | null;
 }
 
 export const CommandViewJSONContext = createContext<CommandViewJSONState>({
