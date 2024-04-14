@@ -194,6 +194,9 @@ onIpcMessage('database:get-extension-list', () => {
 onIpcMessage('database:get-extension-manifest', (_, extensionId) => {
   return Promise.resolve(ExtensionLoader.instance.getManifest(extensionId));
 });
+onIpcMessage('database:update-extension', async (_, extensionId, data) => {
+  await DatabaseService.updateExtension(extensionId, data);
+});
 
 /** SHELL */
 onIpcMessage('shell:open-in-folder', async (_, filePath) => {

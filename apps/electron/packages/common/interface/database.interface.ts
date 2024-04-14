@@ -12,7 +12,15 @@ export type DatabaseExtension =
         $key: string;
       });
 
+export interface DatabaseUpdateExtensionPayload {
+  isDisabled?: boolean;
+}
+
 export interface DatabaseQueriesEvent {
+  'database:update-extension': (
+    extensionId: string,
+    data: Partial<DatabaseUpdateExtensionPayload>,
+  ) => void;
   'database:get-extension-list': () => DatabaseExtension[];
   'database:get-extension': (extensionId: string) => DatabaseExtension | null;
   'database:get-extension-manifest': (

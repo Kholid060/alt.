@@ -39,8 +39,12 @@ export function useDatabaseQuery<T extends keyof DatabaseQueriesEvent>(query: {
   const databaseCtx = useDatabaseCtx();
 
   function updateState(
-    data: ReturnValue | ((prevState: ReturnValue | null) => ReturnValue),
+    data: ReturnValue | ((prevState: ReturnValue) => ReturnValue),
   ) {
+    if (state.state !== 'idle') {
+      throw new Error('DB data can only updated when the state is "idle"');
+    }
+
     const stateData = typeof data === 'function' ? data(state.data) : data;
 
     setState({
@@ -74,7 +78,7 @@ export function useDatabaseQuery<T extends keyof DatabaseQueriesEvent>(query: {
     startQuery();
 
     const onDataChange = (...args: unknown[]) => {
-      if (shallowEqualArrays(query.args, args)) return;
+      if (!shallowEqualArrays(query.args, args)) return;
 
       startQuery();
     };

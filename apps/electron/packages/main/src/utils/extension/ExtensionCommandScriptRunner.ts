@@ -9,6 +9,7 @@ import { snakeCase } from 'lodash-es';
 import { logger } from '/@/lib/log';
 import { ExtensionError } from '#packages/common/errors/custom-errors';
 import type { CommandLaunchContext } from '@repo/extension';
+import DatabaseService from '/@/services/database.service';
 
 const FILE_EXT_COMMAND_MAP: Record<string, string> = {
   '.sh': 'sh',
@@ -48,9 +49,12 @@ class ExtensionCommandScriptRunner {
     extensionId: string;
     launchContext: CommandLaunchContext;
   }) {
-    const extension = ExtensionLoader.instance.getManifest(extensionId);
+    const extension = await DatabaseService.getExtensionBaseData(extensionId);
+    if (!extension || extension.isDisabled) return;
+
+    const extensionManifest = ExtensionLoader.instance.getManifest(extensionId);
     const command = ExtensionLoader.instance.getCommand(extensionId, commandId);
-    if (!command || !extension) {
+    if (!command || !extensionManifest) {
       throw new ExtensionError("Couldn't find command");
     }
 
@@ -80,7 +84,7 @@ class ExtensionCommandScriptRunner {
 
     const scriptId = `${extensionId}::${commandId}`;
     const controller = new AbortController();
-    const isLocal = ExtensionLoader.instance.isLocal(extension.path);
+    const isLocal = ExtensionLoader.instance.isLocal(extensionManifest.path);
 
     const env = Object.fromEntries(
       Object.entries(launchContext.args).map(([key, value]) => [

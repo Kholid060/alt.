@@ -1,4 +1,4 @@
-import { ExtensionData } from '#packages/common/interface/extension.interface';
+import type { ExtensionData } from '#packages/common/interface/extension.interface';
 import {
   UiButton,
   UiList,
@@ -18,17 +18,23 @@ import {
 } from 'lucide-react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '/@/utils/helper';
+import { DatabaseUpdateExtensionPayload } from '#packages/common/interface/database.interface';
 
 interface ExtensionListTableProps
   extends React.TableHTMLAttributes<HTMLTableElement> {
   extensions: ExtensionData[];
   onExtensionSelected?: (extensionId: string) => void;
   onReloadExtension?: (extension: ExtensionData) => void;
+  onUpdateExtension?: (
+    extensionId: string,
+    data: DatabaseUpdateExtensionPayload,
+  ) => void;
 }
 function ExtensionListTable({
   className,
   extensions,
   onReloadExtension,
+  onUpdateExtension,
   onExtensionSelected,
   ...props
 }: ExtensionListTableProps) {
@@ -82,7 +88,11 @@ function ExtensionListTable({
           return (
             <Fragment key={extension.id}>
               <tr
-                className={`hover:bg-card border-b border-border/50 last:border-b-0 ${isExpanded ? 'bg-card' : ''}`}
+                className={cn(
+                  'hover:bg-card border-b border-border/50 last:border-b-0',
+                  isExpanded && 'bg-card',
+                  extension.isDisabled && 'opacity-60',
+                )}
                 onClick={() => {
                   if (extension.isError) return;
 
@@ -164,6 +174,11 @@ function ExtensionListTable({
                       checked={!extension.isDisabled}
                       size="sm"
                       className="align-middle"
+                      onCheckedChange={(value) =>
+                        onUpdateExtension?.(extension.id, {
+                          isDisabled: !value,
+                        })
+                      }
                     />
                   </div>
                 </td>
@@ -173,7 +188,10 @@ function ExtensionListTable({
                 extension.commands.map((command) => (
                   <tr
                     key={extension.id + command.name}
-                    className="border-b border-border/50 hover:bg-card"
+                    className={cn(
+                      'border-b border-border/50 hover:bg-card',
+                      extension.isDisabled && 'opacity-60',
+                    )}
                   >
                     <td className="relative">
                       {/* <span className="absolute w-4/12 left-1/2 h-px bg-border" /> */}

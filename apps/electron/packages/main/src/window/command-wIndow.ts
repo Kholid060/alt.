@@ -59,6 +59,7 @@ export async function createCommandWindow() {
     type: 'toolbar',
     resizable: false,
     skipTaskbar: true,
+    alwaysOnTop: true,
     transparent: true,
     minimizable: false,
     maximizable: false,

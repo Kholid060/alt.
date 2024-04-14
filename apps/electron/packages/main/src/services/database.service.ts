@@ -1,12 +1,15 @@
 import type {
   DatabaseExtension,
   DatabaseQueriesEvent,
+  DatabaseUpdateExtensionPayload,
 } from '#packages/common/interface/database.interface';
 import type {
   ExtensionDataBase,
   ExtensionLoaderManifestData,
 } from '#packages/common/interface/extension.interface';
+import { eq } from 'drizzle-orm';
 import extensionsDB from '../db/extension.db';
+import { extensions } from '../db/schema/extension.schema';
 import ExtensionLoader from '../utils/extension/ExtensionLoader';
 import WindowsManager from '../window/WindowsManager';
 
@@ -58,7 +61,7 @@ class DatabaseService {
     return extensions;
   }
 
-  static async getExtension(extensionId: string) {
+  static async getExtensionBaseData(extensionId: string) {
     const extensionsDbData = await extensionsDB.query.extensions.findFirst({
       columns: {
         id: true,
@@ -75,12 +78,33 @@ class DatabaseService {
         return operators.eq(fields.id, extensionId);
       },
     });
+
+    return extensionsDbData;
+  }
+
+  static async getExtension(extensionId: string) {
+    const extensionsDbData = await this.getExtensionBaseData(extensionId);
     if (!extensionsDbData) return null;
 
     const manifest = ExtensionLoader.instance.getManifest(extensionId);
     if (!manifest) return null;
 
     return convertToDbExtension(extensionsDbData, manifest);
+  }
+
+  static async updateExtension(
+    extensionId: string,
+    { isDisabled }: DatabaseUpdateExtensionPayload,
+  ) {
+    await extensionsDB
+      .update(extensions)
+      .set({ isDisabled, updatedAt: new Date().toISOString() })
+      .where(eq(extensions.id, extensionId));
+
+    this.emitDBChanges({
+      'database:get-extension-list': [],
+      'database:get-extension': [extensionId],
+    });
   }
 
   static emitDBChanges(

@@ -97,7 +97,7 @@ function CommandList() {
       };
       extItems.push(item);
 
-      if (extension.isError) return;
+      if (extension.isError || extension.isDisabled) return;
 
       extension.commands.forEach((command) => {
         let isInSuggestion = false;

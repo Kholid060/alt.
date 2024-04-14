@@ -1,10 +1,14 @@
-import { UiInput, UiToggleGroup, UiToggleGroupItem } from '@repo/ui';
+import { UiInput, UiToggleGroup, UiToggleGroupItem, useToast } from '@repo/ui';
 import { useState } from 'react';
 import { SearchIcon } from 'lucide-react';
 import ExtensionListTable from '/@/components/extension/ExtensionListTable';
 import ExtensionDetailCard from '/@/components/extension/ExtensionDetailCard';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
-import { DatabaseExtension } from '#packages/common/interface/database.interface';
+import type {
+  DatabaseExtension,
+  DatabaseUpdateExtensionPayload,
+} from '#packages/common/interface/database.interface';
+import preloadAPI from '/@/utils/preloadAPI';
 
 type FilterTypes = 'all' | 'commands' | 'extensions' | 'scripts';
 
@@ -16,6 +20,8 @@ const filterItems: { id: FilterTypes; name: string }[] = [
 ];
 
 function RouteExtension() {
+  const { toast } = useToast();
+
   const [search, setSearch] = useState('');
   const [activeFilter, setActiveFilter] = useState<FilterTypes>('all');
 
@@ -25,6 +31,26 @@ function RouteExtension() {
     name: 'database:get-extension-list',
     args: [],
   });
+
+  async function updateExtension(
+    extensionId: string,
+    data: DatabaseUpdateExtensionPayload,
+  ) {
+    try {
+      await preloadAPI.main.invokeIpcMessage(
+        'database:update-extension',
+        extensionId,
+        data,
+      );
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error when updating extension',
+        description: (error as Error).message,
+        className: 'text-foreground!',
+      });
+    }
+  }
 
   const filteredExtensions = (extensionQuery.data ?? []).reduce<
     DatabaseExtension[]
@@ -107,8 +133,9 @@ function RouteExtension() {
       <div className="text-sm border mt-4 rounded-lg overflow-hidden flex">
         <div className={`flex-grow ${selectedExtensionId ? 'border-r' : ''}`}>
           <ExtensionListTable
-            onExtensionSelected={setSelectedExtensionId}
             extensions={filteredExtensions}
+            onUpdateExtension={updateExtension}
+            onExtensionSelected={setSelectedExtensionId}
           />
         </div>
         {selectedExtensionId && (

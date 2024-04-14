@@ -72,6 +72,8 @@ export function useCommand() {
     commandIcon,
     launchContext,
   }: ExecuteCommandPayload) {
+    if (extension.isDisabled) return;
+
     const isConfigInputted = await checkCommandConfig({
       command,
       extension,

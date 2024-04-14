@@ -61,6 +61,7 @@ export async function tempHideCommandWindow<
     if (isWindowFocus) {
       commandWindow?.minimize();
       commandWindow?.hide();
+      commandWindow?.setAlwaysOnTop(false);
     }
 
     const result = await callback();
@@ -71,6 +72,7 @@ export async function tempHideCommandWindow<
       commandWindow?.moveTop();
       commandWindow?.show();
       commandWindow?.focus();
+      commandWindow?.setAlwaysOnTop(true);
 
       await sleep(250);
     }
