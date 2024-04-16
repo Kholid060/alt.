@@ -1,4 +1,3 @@
-import type { ExtensionData } from '#packages/common/interface/extension.interface';
 import {
   UiButton,
   UiList,
@@ -18,16 +17,19 @@ import {
 } from 'lucide-react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '/@/utils/helper';
-import { DatabaseUpdateExtensionPayload } from '#packages/common/interface/database.interface';
+import {
+  DatabaseExtensionListItem,
+  DatabaseExtensionUpdatePayload,
+} from '#packages/main/src/interface/database.interface';
 
 interface ExtensionListTableProps
   extends React.TableHTMLAttributes<HTMLTableElement> {
-  extensions: ExtensionData[];
+  extensions: DatabaseExtensionListItem[];
   onExtensionSelected?: (extensionId: string) => void;
-  onReloadExtension?: (extension: ExtensionData) => void;
+  onReloadExtension?: (extension: DatabaseExtensionListItem) => void;
   onUpdateExtension?: (
     extensionId: string,
-    data: DatabaseUpdateExtensionPayload,
+    data: DatabaseExtensionUpdatePayload,
   ) => void;
 }
 function ExtensionListTable({
@@ -59,8 +61,8 @@ function ExtensionListTable({
         <tr className="text-left">
           <th className="h-12 w-8"></th>
           <th className="h-12 pr-3 w-4/12">Name</th>
-          <th className="h-12 px-3">Type</th>
-          <th className="h-12 px-3">Shortcut</th>
+          <th className="h-12 px-3 w-3/12">Type</th>
+          <th className="h-12 px-3 w-3/12">Shortcut</th>
           <th className="h-12 px-3 w-32"></th>
         </tr>
       </thead>

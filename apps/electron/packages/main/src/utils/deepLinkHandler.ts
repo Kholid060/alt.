@@ -38,13 +38,10 @@ async function deepLinkHandler(deepLink: string) {
 
     const [_, extensionId, commandName] = pathname.split('/');
 
-    const extensionData = await DatabaseService.getExtension(extensionId);
-    if (!extensionData || extensionData.isDisabled) return;
+    const extension = await DatabaseService.getExtension(extensionId);
+    if (!extension || extension.isDisabled || extension.isError) return;
 
-    const extensionManifest = ExtensionLoader.instance.getManifest(extensionId);
-    if (!extensionManifest || extensionManifest.isError) return;
-
-    const command = extensionManifest.manifest.commands.find(
+    const command = extension.commands.find(
       (item) => item.name === commandName,
     );
     if (!command) return;
@@ -129,7 +126,7 @@ async function deepLinkHandler(deepLink: string) {
       launchBy: CommandLaunchBy.DEEP_LINK,
     };
 
-    const configId = `${extensionManifest.id}:${command.name}`;
+    const configId = `${extension.id}:${command.name}`;
     const isHasConfig =
       command.config && command.config.length > 0
         ? Boolean(
@@ -147,9 +144,9 @@ async function deepLinkHandler(deepLink: string) {
         launchContext,
         runCommand: true,
         commandTitle: command.title,
-        extensionName: extensionManifest.manifest.title,
+        extensionName: extension.title,
         config: command.config as ExtensionConfig[],
-        commandIcon: command.icon ?? extensionManifest.manifest.icon,
+        commandIcon: command.icon ?? extension.icon,
       });
       return;
     }
@@ -166,10 +163,9 @@ async function deepLinkHandler(deepLink: string) {
     toggleCommandWindow(true);
 
     sendMesageToCommandWindow('command:execute', {
-      command,
       launchContext,
-      extension: extensionData,
-      commandIcon: command.icon ?? extensionManifest.manifest.icon,
+      commandId: command.id,
+      extensionId: extension.id,
     });
   } catch (error) {
     logger('error', ['deepLinkHandler'], (error as Error).message);

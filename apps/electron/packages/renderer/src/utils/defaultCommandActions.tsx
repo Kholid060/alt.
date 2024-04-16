@@ -1,4 +1,3 @@
-import { ExtensionLoaderManifestData } from '#common/interface/extension.interface';
 import { CommandActions } from '@repo/extension';
 import {
   CopyIcon,
@@ -12,6 +11,8 @@ import preloadAPI from './preloadAPI';
 import { IPCEventError } from '#common/interface/ipc-events.interface';
 import { CommandPanelStoreActions } from '../stores/command-panel.store';
 import { isIPCEventError } from './helper';
+import { ExtensionManifest } from '@repo/extension-core';
+import { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
 
 function resultHandler(
   {
@@ -42,8 +43,8 @@ const defaultCommandActions: {
     icon: LucideIcon;
     onAction(
       detail: {
-        commandId: string;
-        extensionManifest: ExtensionLoaderManifestData;
+        extensionManifest: ExtensionManifest;
+        executePayload: ExtensionCommandExecutePayload;
         addStatus: CommandPanelStoreActions['addStatus'];
       },
       data: Extract<CommandActions, { type: T }>,
@@ -54,11 +55,11 @@ const defaultCommandActions: {
     id: 'copy',
     icon: CopyIcon,
     title: 'Copy to Clipboard',
-    onAction({ extensionManifest: extension, commandId, addStatus }, data) {
+    onAction({ executePayload, addStatus }, data) {
       preloadAPI.main
         .invokeIpcMessage('user-extension', {
-          commandId,
-          key: extension.$key,
+          commandId: executePayload.commandId,
+          key: executePayload.extensionId,
           name: 'clipboard.write',
           args: ['text', data.content],
         })
@@ -76,11 +77,11 @@ const defaultCommandActions: {
     id: 'paste',
     icon: ClipboardPaste,
     title: 'Paste Content',
-    onAction({ extensionManifest: extension, commandId, addStatus }, data) {
+    onAction({ executePayload, addStatus }, data) {
       preloadAPI.main
         .invokeIpcMessage('user-extension', {
-          commandId,
-          key: extension.$key,
+          commandId: executePayload.commandId,
+          key: executePayload.extensionId,
           name: 'clipboard.paste',
           args: [data.content],
         })
@@ -93,11 +94,11 @@ const defaultCommandActions: {
     id: 'open-url',
     icon: GlobeIcon,
     title: 'Open in Browser',
-    onAction({ extensionManifest: extension, commandId, addStatus }, data) {
+    onAction({ executePayload, addStatus }, data) {
       preloadAPI.main
         .invokeIpcMessage('user-extension', {
-          commandId,
-          key: extension.$key,
+          commandId: executePayload.commandId,
+          key: executePayload.extensionId,
           name: 'shell.openURL',
           args: [data.url],
         })
@@ -110,11 +111,11 @@ const defaultCommandActions: {
     icon: FolderOpenIcon,
     id: 'show-in-folder',
     title: 'Show in Folder',
-    onAction({ extensionManifest: extension, commandId, addStatus }, data) {
+    onAction({ executePayload, addStatus }, data) {
       preloadAPI.main
         .invokeIpcMessage('user-extension', {
-          commandId,
-          key: extension.$key,
+          commandId: executePayload.commandId,
+          key: executePayload.extensionId,
           name: 'shell.showItemInFolder',
           args: [data.path],
         })
@@ -127,11 +128,11 @@ const defaultCommandActions: {
     icon: Trash2Icon,
     id: 'move-to-trash',
     title: 'Show in Folder',
-    onAction({ extensionManifest: extension, commandId, addStatus }, data) {
+    onAction({ executePayload, addStatus }, data) {
       preloadAPI.main
         .invokeIpcMessage('user-extension', {
-          commandId,
-          key: extension.$key,
+          commandId: executePayload.commandId,
+          key: executePayload.extensionId,
           name: 'shell.moveToTrash',
           args: [data.path],
         })

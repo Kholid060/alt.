@@ -1,10 +1,7 @@
 import { onExtensionIPCEvent } from '../extension-api-event';
-import WindowsManager from '/@/window/WindowsManager';
+import { toggleCommandWindow } from '/@/window/command-window';
 
 onExtensionIPCEvent('mainWindow.close', () => {
-  const commandWindow = WindowsManager.instance.getWindow('command');
-  commandWindow.blur();
-  commandWindow.hide();
-
+  toggleCommandWindow(false);
   return Promise.resolve();
 });

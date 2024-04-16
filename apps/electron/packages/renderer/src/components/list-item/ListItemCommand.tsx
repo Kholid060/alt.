@@ -5,10 +5,10 @@ import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { APP_DEEP_LINK } from '#common/utils/constant/constant';
 import { BoltIcon, LinkIcon } from 'lucide-react';
 import { useCommandStore } from '/@/stores/command.store';
-import { useCommand } from '/@/hooks/useCommand';
 import { CommandLaunchBy } from '@repo/extension';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import { getExtIconURL } from '/@/utils/helper';
+import { useCommandCtx } from '/@/hooks/useCommandCtx';
 
 function ListItemCommand({
   item,
@@ -19,7 +19,7 @@ function ListItemCommand({
   const addPanelStatus = useCommandPanelStore.use.addStatus();
 
   const navigate = useCommandNavigate();
-  const { executeCommand } = useCommand();
+  const { executeCommand } = useCommandCtx();
 
   const { command, commandIcon, extension } = item.metadata;
 
@@ -65,9 +65,8 @@ function ListItemCommand({
     }
 
     executeCommand({
-      command,
-      extension,
-      commandIcon,
+      commandId: command.name,
+      extensionId: command.extensionId,
       launchContext: {
         args,
         launchBy: CommandLaunchBy.USER,

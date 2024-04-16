@@ -1,15 +1,14 @@
-import { ExtensionLoaderManifestData } from '#common/interface/extension.interface';
+import { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
+import { ExtensionManifest } from '@repo/extension-core';
 import { createContext, useContext } from 'react';
 
 interface CommandViewJSONState {
-  commandId: string;
-  extension: ExtensionLoaderManifestData | null;
+  extensionManifest: ExtensionManifest;
+  payload: ExtensionCommandExecutePayload;
 }
 
-export const CommandViewJSONContext = createContext<CommandViewJSONState>({
-  commandId: '',
-  extension: null,
-});
+// @ts-expect-error ...
+export const CommandViewJSONContext = createContext<CommandViewJSONState>();
 
 export function useCommandViewJSON() {
   const data = useContext(CommandViewJSONContext);
@@ -19,15 +18,12 @@ export function useCommandViewJSON() {
 
 export function CommandViewJSONProvider({
   children,
-  extension,
-  commandId,
+  ...data
 }: {
   children?: React.ReactNode;
-  extension: CommandViewJSONState['extension'];
-  commandId: CommandViewJSONState['commandId'];
-}) {
+} & CommandViewJSONState) {
   return (
-    <CommandViewJSONContext.Provider value={{ extension, commandId }}>
+    <CommandViewJSONContext.Provider value={data}>
       {children}
     </CommandViewJSONContext.Provider>
   );

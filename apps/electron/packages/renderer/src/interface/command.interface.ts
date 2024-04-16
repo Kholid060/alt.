@@ -1,8 +1,8 @@
+import { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
 import {
-  ExtensionData,
-  ExtensionDataBase,
-} from '#common/interface/extension.interface';
-import { CommandLaunchContext } from '@repo/extension';
+  DatabaseExtensionCommand,
+  DatabaseExtensionListItem,
+} from '#packages/main/src/interface/database.interface';
 import { ExtensionCommand, ExtensionManifest } from '@repo/extension-core';
 import { UiListItem } from '@repo/ui';
 
@@ -16,15 +16,15 @@ export interface CommandListItemCommand extends UiListItem {
   metadata: {
     type: 'command';
     commandIcon: string;
-    command: ExtensionCommand;
-    extension: ExtensionDataBase;
+    command: DatabaseExtensionCommand;
+    extension: DatabaseExtensionListItem;
   };
 }
 
 export interface CommandListItemExtension extends UiListItem {
   metadata: {
     type: 'extension';
-    extension: ExtensionData;
+    extension: DatabaseExtensionListItem;
   };
 }
 
@@ -34,10 +34,9 @@ export type CommandListItems =
   | CommandListItemCommandBuiltIn;
 
 export interface CommandWorkerInitMessage {
-  key: string;
   type: 'init';
   workerId: string;
+  command: ExtensionCommand;
   manifest: ExtensionManifest;
-  launchContext: CommandLaunchContext;
-  commandType: ExtensionCommand['type'];
+  payload: ExtensionCommandExecutePayload;
 }

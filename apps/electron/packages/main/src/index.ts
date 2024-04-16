@@ -14,6 +14,7 @@ import path from 'node:path';
 import deepLinkHandler from './utils/deepLinkHandler';
 import { initDefaultWebsocketServer } from './services/websocket/websocket.service';
 import { registerGlobalShortcuts } from './utils/global-shortcuts';
+import ExtensionLoader from './utils/extension/ExtensionLoader';
 
 app.commandLine.appendSwitch('wm-window-animations-disabled');
 
@@ -75,10 +76,13 @@ app.on('activate', () =>
  */
 app
   .whenReady()
-  .then(() => {
+  .then(async () => {
     registerGlobalShortcuts();
     registerCustomProtocols();
     initDefaultWebsocketServer();
+
+    await ExtensionLoader.instance.loadExtensions();
+
     WindowsManager.instance.restoreOrCreateWindow('command');
     WindowsManager.instance.restoreOrCreateWindow('dashboard');
   })

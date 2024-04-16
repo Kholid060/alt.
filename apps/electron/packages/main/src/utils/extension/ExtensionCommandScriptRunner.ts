@@ -49,12 +49,11 @@ class ExtensionCommandScriptRunner {
     extensionId: string;
     launchContext: CommandLaunchContext;
   }) {
-    const extension = await DatabaseService.getExtensionBaseData(extensionId);
+    const extension = await DatabaseService.getExtension(extensionId);
     if (!extension || extension.isDisabled) return;
 
-    const extensionManifest = ExtensionLoader.instance.getManifest(extensionId);
-    const command = ExtensionLoader.instance.getCommand(extensionId, commandId);
-    if (!command || !extensionManifest) {
+    const command = extension.commands.find((item) => item.name === commandId);
+    if (!command || !extension) {
       throw new ExtensionError("Couldn't find command");
     }
 
@@ -84,7 +83,6 @@ class ExtensionCommandScriptRunner {
 
     const scriptId = `${extensionId}::${commandId}`;
     const controller = new AbortController();
-    const isLocal = ExtensionLoader.instance.isLocal(extensionManifest.path);
 
     const env = Object.fromEntries(
       Object.entries(launchContext.args).map(([key, value]) => [
@@ -164,7 +162,7 @@ class ExtensionCommandScriptRunner {
       });
     });
     ls.stderr.addListener('data', (chunk) => {
-      if (!isLocal || !this.runningScripts[scriptId]) return;
+      if (!extension.isLocal || !this.runningScripts[scriptId]) return;
 
       this.runningScripts[scriptId].errorMessage += `${chunk.toString()}\n`;
       sencIpcMessage('command-script:message', {

@@ -10,7 +10,6 @@ import {
 } from '/@/context/command-route.context';
 import CommandView from './routes/CommandView';
 import CommandList from './routes/CommandList';
-import CommandEventListener from '/@/components/command/CommandEventListener';
 import CommandErrorOverlay from '/@/components/command/CommandErrorOverlay';
 import ConfigInput from './routes/ConfigInput';
 import CommandViewJSON from './routes/CommandViewJSON';
@@ -43,9 +42,9 @@ const routes = createCommandRoutes([
 function App() {
   return (
     <UiTooltipProvider>
-      <CommandCtxProvider>
-        <DatabaseProvider>
-          <CommandRouteProvider routes={routes}>
+      <DatabaseProvider>
+        <CommandRouteProvider routes={routes}>
+          <CommandCtxProvider>
             <AppEventListener />
             <div className="p-0.5">
               <UiListProvider>
@@ -58,10 +57,9 @@ function App() {
               </UiListProvider>
               <CommandFooter />
             </div>
-            <CommandEventListener />
-          </CommandRouteProvider>
-        </DatabaseProvider>
-      </CommandCtxProvider>
+          </CommandCtxProvider>
+        </CommandRouteProvider>
+      </DatabaseProvider>
     </UiTooltipProvider>
   );
 }

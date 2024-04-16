@@ -3,14 +3,17 @@ import preloadAPI from '/@/utils/preloadAPI';
 import { XIcon } from 'lucide-react';
 import UiExtensionIcon from '../ui/UiExtensionIcon';
 import { UiList } from '@repo/ui';
-import { ExtensionManifest } from '@repo/extension-core';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
+import { ExtensionPermissions } from '#packages/common/interface/extension.interface';
+import { DatabaseExtensionCommand } from '#packages/main/src/interface/database.interface';
 
-function getPermissionsDescription(manifest: ExtensionManifest) {
+function getPermissionsDescription(
+  permissions: ExtensionPermissions[],
+  commands: DatabaseExtensionCommand[],
+) {
   const descriptions = new Set<string>();
-  const permissions = manifest.permissions ?? [];
 
-  const hasScriptCommand = manifest.commands.some(
+  const hasScriptCommand = commands.some(
     (command) => command.type === 'script',
   );
   if (hasScriptCommand) {
@@ -63,22 +66,21 @@ function ExtensionDetailCard({
     name: 'database:get-extension',
     args: [extensionId],
   });
-  const extensionManifest = useDatabaseQuery({
-    name: 'database:get-extension-manifest',
-    args: [extensionId],
-  });
 
   if (
-    extensionManifest.state !== 'idle' ||
     extension.state !== 'idle' ||
-    !extensionManifest.data ||
+    extension.state !== 'idle' ||
+    !extension.data ||
     !extension.data
   )
     return null;
 
-  const permissions = extensionManifest.data.isError
+  const permissions = extension.data.isError
     ? []
-    : getPermissionsDescription(extensionManifest.data.manifest);
+    : getPermissionsDescription(
+        extension.data.permissions ?? [],
+        extension.data.commands,
+      );
 
   return (
     <>
@@ -90,7 +92,7 @@ function ExtensionDetailCard({
           <XIcon className="h-5 w-5" />
         </button>
         <div className="h-8 w-8 ml-4">
-          {extensionManifest.data.isError ? (
+          {extension.data.isError ? (
             <UiList.Icon icon={extension.data.title[0].toUpperCase()} />
           ) : (
             <UiExtensionIcon

@@ -41,40 +41,36 @@ function AppEventListener() {
           'database:get-extension-manifest',
           extensionId,
         );
-        if (!extension || isIPCEventError(extension) || extension.isError)
-          return;
+        if (!extension || isIPCEventError(extension)) return;
 
         if (type === 'extension') {
-          if (!requireInputConfig(extension.manifest.config)) return;
+          if (!requireInputConfig(extension.config)) return;
 
-          navigate(`/configs/${extension.id}`, {
+          navigate(`/configs/${extensionId}`, {
             data: {
-              config: extension.manifest.config,
+              config: extension.config,
             },
             panelHeader: {
-              icon: extension.manifest.icon,
-              title: extension.manifest.title,
+              icon: extension.icon,
+              title: extension.title,
             },
           });
           return;
         }
 
-        const command = extension.manifest.commands.find(
+        const command = extension.commands.find(
           (command) => command.name === commandId,
         );
         if (!command || !requireInputConfig(command.config)) return;
 
-        navigate(`/configs/${extension.id}:${command.name}`, {
+        navigate(`/configs/${extensionId}:${command.name}`, {
           data: {
             config: command.config,
           },
           panelHeader: {
             title: command.title,
-            subtitle: extension.manifest.title,
-            icon: getExtIconURL(
-              command.icon || extension.manifest.icon,
-              extension.id,
-            ),
+            subtitle: extension.title,
+            icon: getExtIconURL(command.icon || extension.icon, extensionId),
           },
         });
       },

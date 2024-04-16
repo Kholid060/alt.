@@ -1,35 +1,5 @@
 import type { CommandLaunchContext } from '@repo/extension';
-import type {
-  ExtensionCommand,
-  EXTENSION_PERMISSIONS,
-  ExtensionConfig,
-  ExtensionManifest,
-} from '@repo/extension-core';
-
-export interface ExtensionDataBase {
-  id: string;
-  name: string;
-  icon: string;
-  title: string;
-  path?: string;
-  version: string;
-  isLocal?: boolean;
-  isDisabled: boolean;
-  description: string;
-}
-
-export interface ExtensionDataValid extends ExtensionDataBase {
-  isError: false;
-  config?: ExtensionConfig[];
-  commands: ExtensionCommand[];
-}
-
-export interface ExtensionDataError extends ExtensionDataBase {
-  isError: true;
-  errorMessage?: string;
-}
-
-export type ExtensionData = ExtensionDataValid | ExtensionDataError;
+import type { EXTENSION_PERMISSIONS } from '@repo/extension-core';
 
 export type ExtensionPermissions = (typeof EXTENSION_PERMISSIONS)[number];
 
@@ -46,18 +16,8 @@ export interface ExtensionConfigData {
   value: Record<string, unknown>;
 }
 
-export type ExtensionLoaderManifestData =
-  | {
-      id: string;
-      isError: true;
-      path: string;
-      errorMessage: string;
-      $key: string;
-    }
-  | {
-      id: string;
-      isError: false;
-      manifest: ExtensionManifest;
-      path: string;
-      $key: string;
-    };
+export interface ExtensionCommandExecutePayload {
+  commandId: string;
+  extensionId: string;
+  launchContext: CommandLaunchContext;
+}

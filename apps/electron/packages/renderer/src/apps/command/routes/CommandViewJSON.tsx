@@ -1,16 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
-import ExtensionWorker from '/@/utils/extension/ExtensionWorker';
-import { useCommandPanelStore } from '/@/stores/command-panel.store';
-import { useShallow } from 'zustand/react/shallow';
-import { useCommandStore } from '/@/stores/command.store';
 import preloadAPI from '/@/utils/preloadAPI';
-import { CommandJSONViews, CommandLaunchContext } from '@repo/extension';
+import { CommandJSONViews } from '@repo/extension';
 import CommandViewJSONText from '/@/components/command-view-json/CommandViewJSONText';
 import CommandViewJSONList from '/@/components/command-view-json/CommandViewJSONList';
 import { CommandViewJSONProvider } from '/@/context/command-view-json.context';
-import { ExtensionLoaderManifestData } from '#common/interface/extension.interface';
+import { ExtensionCommandExecutePayload } from '#common/interface/extension.interface';
+import { isIPCEventError } from '/@/utils/helper';
+import { ExtensionManifest } from '@repo/extension-core';
+import ExtensionCommandActionRunner from '/@/utils/extension/ExtensionCommandActionRunner';
 
 const componentsMap = {
   text: CommandViewJSONText,
@@ -19,20 +18,19 @@ const componentsMap = {
 
 function CommandViewJSON() {
   const activeRoute = useCommandRoute((state) => state.currentRoute);
-  const addExtensionError = useCommandStore.use.addExtensionError();
-  const [addStatus, clearPanel] = useCommandPanelStore(
-    useShallow((state) => [state.addStatus, state.clearAll]),
-  );
 
   const navigate = useCommandNavigate();
   const { setExtMessagePort } = useCommandCtx();
 
+  const workerId = useRef('');
   const isExecuting = useRef(false);
-  const worker = useRef<Worker | null>(null);
 
   const [viewData, setViewData] = useState<CommandJSONViews | null>(null);
-  const [extension, setExtension] =
-    useState<ExtensionLoaderManifestData | null>(null);
+  const [extensionManifest, setExtensionManifest] =
+    useState<ExtensionManifest | null>(null);
+
+  const commandExecutePayload =
+    activeRoute?.data as ExtensionCommandExecutePayload;
 
   useEffect(() => {
     let messagePorts: MessagePort[] = [];
@@ -41,7 +39,7 @@ function CommandViewJSON() {
       navigate('', { panelHeader: null });
     };
     const executeCommand = async () => {
-      if (!activeRoute) {
+      if (!commandExecutePayload) {
         returnToMainPage();
         return;
       }
@@ -49,32 +47,24 @@ function CommandViewJSON() {
       if (isExecuting.current) return;
       isExecuting.current = true;
 
-      const { commandId, extensionId } = activeRoute.params as {
-        commandId: string;
-        extensionId: string;
-      };
       const extensionManifest = await preloadAPI.main.invokeIpcMessage(
         'database:get-extension-manifest',
-        extensionId,
+        commandExecutePayload.extensionId,
       );
-      if (
-        !extensionManifest ||
-        '$isError' in extensionManifest ||
-        extensionManifest.isError
-      ) {
+      if (!extensionManifest || isIPCEventError(extensionManifest)) {
         returnToMainPage();
         return;
       }
 
-      setExtension(extensionManifest);
-
-      const command = extensionManifest.manifest.commands.find(
-        (command) => command.name === commandId,
+      const command = extensionManifest.commands.find(
+        (command) => command.name === commandExecutePayload.commandId,
       );
       if (!command) {
         returnToMainPage();
         return;
       }
+
+      setExtensionManifest(extensionManifest);
 
       const { port1, port2 } = new MessageChannel();
       setExtMessagePort(port2);
@@ -96,60 +86,38 @@ function CommandViewJSON() {
       );
       port2.start();
 
-      worker.current = await ExtensionWorker.instance.createWorker({
-        command,
+      const workerData = await ExtensionCommandActionRunner.instance.execute({
         messagePort: port1,
-        key: extensionManifest.$key,
-        extensionId: extensionManifest.id,
-        manifest: extensionManifest.manifest,
-        launchContext: activeRoute.data as CommandLaunchContext,
-        events: {
-          onError: (worker, event) => {
-            worker.terminate();
-            preloadAPI.main.deleteMainMessagePort();
-
-            if (!event.message) {
-              clearPanel();
-              return;
-            }
-
-            addStatus({
-              type: 'error',
-              title: 'Error!',
-              description: event.message,
-              onClose() {
-                clearPanel();
-              },
-            });
-            addExtensionError(extensionManifest.id, {
-              content: event.message,
-              title: `Error in "${command.title}" command`,
-            });
-          },
-        },
+        manifest: extensionManifest,
+        payload: commandExecutePayload,
       });
+      if (!workerData) {
+        returnToMainPage();
+        return;
+      }
+
+      workerId.current = workerData.id;
     };
     executeCommand();
 
     return () => {
       messagePorts.forEach((port) => port.close());
     };
-  }, [activeRoute]);
+  }, [commandExecutePayload]);
   useEffect(() => {
     return () => {
-      worker.current?.terminate();
-      preloadAPI.main.deleteMainMessagePort();
+      ExtensionCommandActionRunner.instance.stopExecution(workerId.current);
     };
   }, []);
 
-  if (!viewData) return null;
+  if (!viewData || !extensionManifest) return null;
 
   const Component = componentsMap[viewData.type];
 
   return (
     <CommandViewJSONProvider
-      extension={extension}
-      commandId={activeRoute?.params.commandId as string}
+      payload={commandExecutePayload}
+      extensionManifest={extensionManifest}
     >
       <Component data={viewData as never} />
     </CommandViewJSONProvider>

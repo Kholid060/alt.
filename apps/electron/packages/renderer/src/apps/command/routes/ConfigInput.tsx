@@ -18,7 +18,8 @@ import {
 import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { IPCEventError } from '#common/interface/ipc-events.interface';
-import { ExecuteCommandPayload, useCommand } from '/@/hooks/useCommand';
+import { useCommandCtx } from '/@/hooks/useCommandCtx';
+import { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
 
 type ConfigComponent<
   T extends ExtensionConfig['type'] = ExtensionConfig['type'],
@@ -264,7 +265,7 @@ function ConfigInput() {
   const currentRoute = useCommandRoute((state) => state.currentRoute!);
 
   const navigate = useCommandNavigate();
-  const { executeCommand } = useCommand();
+  const { executeCommand } = useCommandCtx();
 
   const alreadHasValue = useRef(false);
 
@@ -272,7 +273,7 @@ function ConfigInput() {
   const { config, executeCommand: executeCommandPayload } =
     currentRoute.data as {
       config: ExtensionConfig[];
-      executeCommand?: ExecuteCommandPayload;
+      executeCommand?: ExtensionCommandExecutePayload;
     };
 
   const form = useForm<Record<string, unknown>>({

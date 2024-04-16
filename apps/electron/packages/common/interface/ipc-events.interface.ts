@@ -1,15 +1,17 @@
 import type { FlatActionExtensionAPI } from '@repo/extension-core/dist/flat-extension-api';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import type {
+  ExtensionCommandExecutePayload,
   ExtensionConfigData,
-  ExtensionData,
-  ExtensionDataBase,
 } from './extension.interface';
 import type { ExtensionCommand, ExtensionConfig } from '@repo/extension-core';
 import type { CommandLaunchContext } from '@repo/extension';
 import type { PartialDeep } from 'type-fest';
 import type { BrowserExtensionTab } from '@repo/shared';
-import type { DatabaseQueriesEvent } from './database.interface';
+import type {
+  DatabaseExtension,
+  DatabaseQueriesEvent,
+} from '../../main/src/interface/database.interface';
 
 export interface IPCUserExtensionCustomEventsMap {
   'browser.activeTab.elementExists': (
@@ -54,7 +56,7 @@ export interface IPCExtensionEvents {
     launchContext: CommandLaunchContext;
   }) => { success: boolean; errorMessage: string };
   'extension:reload': (extId: string) => void;
-  'extension:import': () => ExtensionData | null;
+  'extension:import': () => DatabaseExtension | null;
   'extension:init-message-port': () => MessagePort;
   'extension:get-command': (
     extensionId: string,
@@ -123,14 +125,7 @@ export interface IPCSendEventMainToRenderer {
       type: 'error' | 'message' | 'start' | 'finish' | 'stderr';
     },
   ];
-  'command:execute': [
-    {
-      commandIcon: string;
-      command: ExtensionCommand;
-      extension: ExtensionDataBase;
-      launchContext: CommandLaunchContext;
-    },
-  ];
+  'command:execute': [payload: ExtensionCommandExecutePayload];
   'extension-config:open': [
     {
       configId: string;

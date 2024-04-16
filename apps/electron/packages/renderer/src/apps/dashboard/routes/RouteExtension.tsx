@@ -5,9 +5,9 @@ import ExtensionListTable from '/@/components/extension/ExtensionListTable';
 import ExtensionDetailCard from '/@/components/extension/ExtensionDetailCard';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import type {
-  DatabaseExtension,
-  DatabaseUpdateExtensionPayload,
-} from '#packages/common/interface/database.interface';
+  DatabaseExtensionListItem,
+  DatabaseExtensionUpdatePayload,
+} from '#packages/main/src/interface/database.interface';
 import preloadAPI from '/@/utils/preloadAPI';
 
 type FilterTypes = 'all' | 'commands' | 'extensions' | 'scripts';
@@ -34,7 +34,7 @@ function RouteExtension() {
 
   async function updateExtension(
     extensionId: string,
-    data: DatabaseUpdateExtensionPayload,
+    data: DatabaseExtensionUpdatePayload,
   ) {
     try {
       await preloadAPI.main.invokeIpcMessage(
@@ -53,7 +53,7 @@ function RouteExtension() {
   }
 
   const filteredExtensions = (extensionQuery.data ?? []).reduce<
-    DatabaseExtension[]
+    DatabaseExtensionListItem[]
   >((acc, extension) => {
     const searchStr = search.toLowerCase();
     const filteredCommands = extension.isError

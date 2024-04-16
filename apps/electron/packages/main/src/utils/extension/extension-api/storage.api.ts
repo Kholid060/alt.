@@ -5,7 +5,7 @@ import { storages } from '/@/db/schema/extension.schema';
 import { parseJSON } from '@repo/shared';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import { and, eq, inArray } from 'drizzle-orm';
-import ExtensionsDBController from '/@/db/controller/extensions-db.controller';
+import DatabaseService from '/@/services/database.service';
 
 const decryptStorageValue = (value: Buffer) => {
   const decryptedValue = safeStorage.decryptString(value);
@@ -20,18 +20,15 @@ const decryptStorageValue = (value: Buffer) => {
 
 type ResultType = Record<string, ExtensionAPI.storage.Values>;
 
-onExtensionIPCEvent('storage.get', async ({ extension }, keys) => {
+onExtensionIPCEvent('storage.get', async ({ extensionId }, keys) => {
   if (typeof keys === 'string') {
-    const result = await ExtensionsDBController.getStorage(keys, extension.id);
+    const result = await DatabaseService.getStorage(keys, extensionId);
     if (!result) return {};
 
     return { [keys]: decryptStorageValue(result.value) };
   }
 
-  const queryResult = await ExtensionsDBController.getStorage(
-    keys,
-    extension.id,
-  );
+  const queryResult = await DatabaseService.getStorage(keys, extensionId);
   const result = queryResult.reduce<ResultType>((acc, { key, value }) => {
     acc[key] = decryptStorageValue(value);
 
@@ -41,7 +38,7 @@ onExtensionIPCEvent('storage.get', async ({ extension }, keys) => {
   return result;
 });
 
-onExtensionIPCEvent('storage.set', async ({ extension }, key, value) => {
+onExtensionIPCEvent('storage.set', async ({ extensionId }, key, value) => {
   const encryptedValue = safeStorage.encryptString(
     typeof value === 'string' ? value : JSON.stringify(value),
   );
@@ -49,25 +46,23 @@ onExtensionIPCEvent('storage.set', async ({ extension }, key, value) => {
   await extensionsDB.insert(storages).values({
     key,
     value: encryptedValue,
-    extensionId: extension.id,
+    extensionId: extensionId,
   });
 });
 
-onExtensionIPCEvent('storage.remove', async ({ extension }, key) => {
+onExtensionIPCEvent('storage.remove', async ({ extensionId }, key) => {
   await extensionsDB
     .delete(storages)
     .where(
       and(
-        eq(storages.extensionId, extension.id),
+        eq(storages.extensionId, extensionId),
         Array.isArray(key) ? inArray(storages.key, key) : eq(storages.key, key),
       ),
     );
 });
 
-onExtensionIPCEvent('storage.getAll', async ({ extension }) => {
-  const queryResult = await ExtensionsDBController.getAllExtensionStorage(
-    extension.id,
-  );
+onExtensionIPCEvent('storage.getAll', async ({ extensionId }) => {
+  const queryResult = await DatabaseService.getAllExtensionStorage(extensionId);
   const result = queryResult.reduce<ResultType>((acc, { key, value }) => {
     acc[key] = decryptStorageValue(value);
 
@@ -77,8 +72,8 @@ onExtensionIPCEvent('storage.getAll', async ({ extension }) => {
   return result;
 });
 
-onExtensionIPCEvent('storage.clear', async ({ extension }) => {
+onExtensionIPCEvent('storage.clear', async ({ extensionId }) => {
   await extensionsDB
     .delete(storages)
-    .where(eq(storages.extensionId, extension.id));
+    .where(eq(storages.extensionId, extensionId));
 });

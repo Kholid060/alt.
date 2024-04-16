@@ -191,7 +191,8 @@ function CommandList() {
               },
             });
           }
-        } catch (_error) {
+        } catch (error) {
+          console.error(error);
           addPanelStatus({
             type: 'error',
             title: 'Error!',

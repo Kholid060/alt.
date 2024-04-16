@@ -1,7 +1,7 @@
 import { createContext, useEffect, useRef } from 'react';
 import EventEmitter from 'eventemitter3';
-import { DatabaseQueriesEvent } from '#common/interface/database.interface';
 import preloadAPI from '../utils/preloadAPI';
+import { DatabaseQueriesEvent } from '#packages/main/src/interface/database.interface';
 
 interface DatabaseContextState {
   emitter: EventEmitter<DatabaseQueriesEvent>;

@@ -109,7 +109,6 @@ export const ExtensionCommandSchema = z.object({
   title: z.string().min(1).max(48),
   icon: z.string().min(1).optional(),
   type: z.enum(EXTENSION_COMMAND_TYPE),
-  alias: z.string().min(3).max(9).optional(),
   config: ExtensionConfigSchema.array().optional(),
   arguments: ExtensionCommandArgumentSchema.array().optional(),
   context: z

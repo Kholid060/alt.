@@ -59,19 +59,17 @@ export class ExtensionAPI {
       );
       if (extensionManifest && '$isError' in extensionManifest)
         throw new Error(extensionManifest.message);
-      if (!extensionManifest || extensionManifest.isError) return setExtView();
+      if (!extensionManifest) return setExtView();
 
-      this.key = extensionManifest.$key;
+      this.key = extensionId;
 
-      const extensionApi = await this.getExtensionAPI(
-        extensionManifest.manifest,
-      );
+      const extensionApi = await this.getExtensionAPI(extensionManifest);
       contextBridge.exposeInMainWorld(PRELOAD_API_KEY.extension, {
         ...extensionApi,
         $commandId: commandId,
       });
 
-      this.permissions = extensionManifest.manifest.permissions || [];
+      this.permissions = extensionManifest.permissions || [];
     } catch (error) {
       console.error(error);
       setExtView('error');

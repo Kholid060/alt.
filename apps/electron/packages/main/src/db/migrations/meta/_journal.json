@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1711263645880,
-      "tag": "0000_modern_madripoor",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1712884563767,
-      "tag": "0001_sour_night_nurse",
+      "when": 1713253589972,
+      "tag": "0000_cooing_black_panther",
       "breakpoints": true
     }
   ]

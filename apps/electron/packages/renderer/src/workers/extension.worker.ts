@@ -5,7 +5,6 @@ import {
   PRELOAD_API_KEY,
 } from '#common/utils/constant/constant';
 import { ExtensionManifest } from '@repo/extension-core';
-import { CommandWorkerInitMessage } from '../interface/command.interface';
 import {
   CommandJSONViews,
   CommandLaunchContext,
@@ -20,6 +19,8 @@ import {
   extensionAPISearchPanelEvent,
   extensionAPIUiToast,
 } from '#common/utils/extension/extension-api-value';
+import { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
+import { CommandWorkerInitMessage } from '../interface/command.interface';
 
 type ExtensionCommand = (
   payload: CommandLaunchContext | CommandViewJSONLaunchContext,
@@ -118,12 +119,9 @@ async function getCommandExecution({
   return executeCommand;
 }
 
-interface CommnadRunnerData {
-  commandId: string;
+interface CommandRunnerData extends ExtensionCommandExecutePayload {
   workerId: string;
-  extensionId: string;
   manifest: ExtensionManifest;
-  launchContext: CommandLaunchContext;
   apiData: Omit<InitExtensionAPIData, 'manifest' | 'commandId'>;
 }
 
@@ -133,7 +131,7 @@ async function commandViewJSONRunner({
   commandId,
   extensionId,
   launchContext,
-}: CommnadRunnerData) {
+}: CommandRunnerData) {
   const executeCommand = await getCommandExecution({
     manifest,
     commandId,
@@ -166,7 +164,7 @@ async function commandActionRunner({
   commandId,
   extensionId,
   launchContext,
-}: CommnadRunnerData) {
+}: CommandRunnerData) {
   try {
     const executeCommand = await getCommandExecution({
       manifest,
@@ -192,31 +190,28 @@ self.onmessage = async ({
   data,
 }: MessageEvent<CommandWorkerInitMessage>) => {
   try {
-    if (!ports.length || data?.type !== 'init' || !data.key || !data.manifest) {
+    if (!ports.length || data?.type !== 'init' || !data.manifest) {
       self.close();
       return;
     }
 
-    const [extensionId, commandId] = self.name.split(':');
     self.name = '';
     self.onmessage = null;
 
-    const commandRunnerPayload: CommnadRunnerData = {
-      commandId,
-      extensionId,
+    const commandRunnerPayload: CommandRunnerData = {
+      ...data.payload,
       manifest: data.manifest,
       workerId: data.workerId,
-      launchContext: data.launchContext,
       apiData: {
-        key: data.key,
         messagePort: ports[1],
         mainMessagePort: ports[0],
+        key: data.payload.extensionId,
       },
     };
 
-    if (data.commandType === 'action') {
+    if (data.command.type === 'action') {
       await commandActionRunner(commandRunnerPayload);
-    } else if (data.commandType === 'view:json') {
+    } else if (data.command.type === 'view:json') {
       await commandViewJSONRunner(commandRunnerPayload);
     }
   } catch (error) {

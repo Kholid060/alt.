@@ -1,3 +1,19 @@
+CREATE TABLE `commands` (
+	`id` text PRIMARY KEY NOT NULL,
+	`shortcut` text,
+	`icon` text,
+	`type` text NOT NULL,
+	`subtitle` text,
+	`description` text,
+	`title` text NOT NULL,
+	`name` text NOT NULL,
+	`context` text,
+	`config` text,
+	`arguments` text,
+	`is_disabled` integer NOT NULL,
+	`extension_id` text NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE `configs` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`extension_id` text NOT NULL,
@@ -7,11 +23,18 @@ CREATE TABLE `configs` (
 --> statement-breakpoint
 CREATE TABLE `extensions` (
 	`id` text PRIMARY KEY NOT NULL,
+	`icon` text NOT NULL,
 	`name` text NOT NULL,
 	`path` text NOT NULL,
 	`title` text NOT NULL,
+	`author` text NOT NULL,
 	`version` text NOT NULL,
+	`error_message` text,
 	`description` text NOT NULL,
+	`permissions` text,
+	`config` text,
+	`is_error` integer NOT NULL,
+	`is_disabled` integer NOT NULL,
 	`is_local` integer NOT NULL,
 	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	`updated_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL
@@ -26,5 +49,6 @@ CREATE TABLE `storages` (
 	`value` blob NOT NULL
 );
 --> statement-breakpoint
+CREATE UNIQUE INDEX `commands_shortcut_unique` ON `commands` (`shortcut`);--> statement-breakpoint
 CREATE UNIQUE INDEX `configs_config_id_unique` ON `configs` (`config_id`);--> statement-breakpoint
 CREATE UNIQUE INDEX `config_id_idx` ON `configs` (`config_id`);

@@ -9,12 +9,12 @@ import {
   IPC_POST_MESSAGE_EVENT,
 } from '#packages/common/utils/constant/constant';
 import { ipcMain } from 'electron';
-import ExtensionLoader from './ExtensionLoader';
 import ExtensionMessagePortHandler from './ExtensionMessagePortHandler';
 import { logger } from '/@/lib/log';
 import WindowsManager from '/@/window/WindowsManager';
-import type { ExtensionDataValid } from '#packages/common/interface/extension.interface';
 import { onIpcMessage } from '../ipc/ipc-main';
+import type { ExtensionManifest } from '@repo/extension-core';
+import DatabaseService from '/@/services/database.service';
 
 export type ExtensionMessageHandler = <
   T extends keyof IPCUserExtensionEventsMap,
@@ -34,13 +34,15 @@ export type ExtensionIPCEventCallback<
   ...args: [
     detail: {
       commandId: string;
-      extensionKey: string;
-      extension: ExtensionDataValid;
+      extensionId: string;
+      extension: ExtensionManifest;
       sender: Electron.IpcMainInvokeEvent;
     },
     ...Parameters<IPCUserExtensionEventsMap[T]>,
   ]
 ) => ReturnType<IPCUserExtensionEventsMap[T]>;
+
+const CACHE_MAX_AGE_MS = 300_000; // 5 minutes
 
 export class ExtensionIPCEvent {
   static instance = new ExtensionIPCEvent();
@@ -49,6 +51,10 @@ export class ExtensionIPCEvent {
   private handlers: Map<string, (...args: any[]) => any> = new Map();
 
   private extensionMessagePort: ExtensionMessagePortHandler;
+  private extensionCache: Map<
+    string,
+    { data: ExtensionManifest; retrievedAt: number }
+  > = new Map();
 
   constructor() {
     this._onExtensionMessage = this._onExtensionMessage.bind(this);
@@ -80,6 +86,24 @@ export class ExtensionIPCEvent {
     });
   }
 
+  private async getExtensionManifest(extensionId: string) {
+    const cacheData = this.extensionCache.get(extensionId);
+    if (cacheData && Date.now() - cacheData.retrievedAt < CACHE_MAX_AGE_MS) {
+      return cacheData.data;
+    }
+
+    const extensionManifest =
+      await DatabaseService.getExtensionManifest(extensionId);
+    if (!extensionManifest) return null;
+
+    this.extensionCache.set(extensionId, {
+      data: extensionManifest,
+      retrievedAt: Date.now(),
+    });
+
+    return extensionManifest;
+  }
+
   private async _onExtensionMessage<T extends keyof IPCUserExtensionEventsMap>({
     args,
     key,
@@ -96,11 +120,10 @@ export class ExtensionIPCEvent {
     Awaited<ReturnType<IPCUserExtensionEventsMap[T]>> | IPCEventError
   > {
     try {
-      const extension = ExtensionLoader.instance.getManifestByKey(key);
+      const extensionManifest = await this.getExtensionManifest(key);
       if (
-        !extension ||
-        extension.isError ||
-        !isExtHasApiPermission(name, extension.manifest.permissions || [])
+        !extensionManifest ||
+        !isExtHasApiPermission(name, extensionManifest.permissions || [])
       ) {
         throw new ExtensionError(
           `Doesn't have permission to access the "${name}" API`,
@@ -111,7 +134,7 @@ export class ExtensionIPCEvent {
       if (!handler) throw new Error(`"${name}" doesn't have handler`);
 
       const result = await handler(
-        { sender, extension, commandId, extensionKey: key },
+        { sender, extension: extensionManifest, commandId, extensionId: key },
         ...args,
       );
 

@@ -1,9 +1,9 @@
-import { DatabaseQueriesEvent } from '#packages/common/interface/database.interface';
 import { useContext, useEffect, useState } from 'react';
 import { shallowEqualArrays } from 'shallow-equal';
 import preloadAPI from '../utils/preloadAPI';
 import { isIPCEventError } from '../utils/helper';
 import { DatabaseContext } from '../context/database.context';
+import type { DatabaseQueriesEvent } from '#packages/main/src/interface/database.interface';
 
 type QueryDBIdleState<T> = { state: 'idle'; error: null; data: T };
 type QueryDBErrorState = { state: 'error'; error: string; data: null };
