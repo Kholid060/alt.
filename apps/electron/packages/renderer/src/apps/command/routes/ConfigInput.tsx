@@ -267,7 +267,7 @@ function ConfigInput() {
   const navigate = useCommandNavigate();
   const { executeCommand } = useCommandCtx();
 
-  const alreadHasValue = useRef(false);
+  const alreadyHasValue = useRef(false);
 
   const { configId } = currentRoute.params;
   const { config, executeCommand: executeCommandPayload } =
@@ -293,7 +293,7 @@ function ConfigInput() {
       );
       if (configValues && !('$isError' in configValues)) {
         defaultValues = { ...defaultValues, ...configValues.value };
-        alreadHasValue.current = true;
+        alreadyHasValue.current = true;
       }
 
       return defaultValues;
@@ -311,7 +311,7 @@ function ConfigInput() {
 
       let result: IPCEventError | void;
 
-      if (alreadHasValue.current) {
+      if (alreadyHasValue.current) {
         result = await preloadAPI.main.invokeIpcMessage(
           'extension-config:update',
           configId,

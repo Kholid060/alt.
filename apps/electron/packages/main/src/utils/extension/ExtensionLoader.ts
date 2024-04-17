@@ -278,7 +278,8 @@ class ExtensionLoader {
     });
     if (!extension) throw new ExtensionError("Couldn't find extension");
 
-    const extensionManifest = await extractExtManifest(extension.path);
+    const manifestFilePath = path.join(extension.path, 'manifest.json');
+    const extensionManifest = await extractExtManifest(manifestFilePath);
 
     let updateExtensionPayload: Partial<NewExtension> = {
       isError: extensionManifest.isError,
@@ -288,7 +289,7 @@ class ExtensionLoader {
     };
 
     const lastUpdatedDb = new Date(extension.updatedAt);
-    const manifestFileStats = fs.statSync(extension.path);
+    const manifestFileStats = fs.statSync(manifestFilePath);
     if (
       !extensionManifest.isError &&
       (manifestFileStats.mtime > lastUpdatedDb ||

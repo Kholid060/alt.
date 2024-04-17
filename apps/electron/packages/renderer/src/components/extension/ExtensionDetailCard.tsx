@@ -62,18 +62,9 @@ function ExtensionDetailCard({
   onClose,
   extensionId,
 }: ExtensionDetailCardProps) {
-  const extension = useDatabaseQuery({
-    name: 'database:get-extension',
-    args: [extensionId],
-  });
+  const extension = useDatabaseQuery('database:get-extension', [extensionId]);
 
-  if (
-    extension.state !== 'idle' ||
-    extension.state !== 'idle' ||
-    !extension.data ||
-    !extension.data
-  )
-    return null;
+  if (extension.state !== 'idle' || !extension.data) return null;
 
   const permissions = extension.data.isError
     ? []

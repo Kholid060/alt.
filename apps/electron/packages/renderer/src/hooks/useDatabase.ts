@@ -24,10 +24,10 @@ function useDatabaseCtx() {
   return databaseCtx;
 }
 
-export function useDatabaseQuery<T extends keyof DatabaseQueriesEvent>(query: {
-  name: T;
-  args: Parameters<DatabaseQueriesEvent[T]>;
-}) {
+export function useDatabaseQuery<T extends keyof DatabaseQueriesEvent>(
+  name: T,
+  args: Parameters<DatabaseQueriesEvent[T]>,
+) {
   type ReturnValue = ReturnType<DatabaseQueriesEvent[T]>;
 
   const [state, setState] = useState<QueryDBState<ReturnValue>>({
@@ -56,38 +56,36 @@ export function useDatabaseQuery<T extends keyof DatabaseQueriesEvent>(query: {
 
   useEffect(() => {
     const startQuery = () => {
-      preloadAPI.main
-        .invokeIpcMessage(query.name, ...query.args)
-        .then((result) => {
-          if (isIPCEventError(result)) {
-            setState({
-              data: null,
-              state: 'error',
-              error: result.message,
-            });
-            return;
-          }
-
+      preloadAPI.main.invokeIpcMessage(name, ...args).then((result) => {
+        if (isIPCEventError(result)) {
           setState({
-            error: null,
-            state: 'idle',
-            data: result as ReturnType<DatabaseQueriesEvent[T]>,
+            data: null,
+            state: 'error',
+            error: result.message,
           });
+          return;
+        }
+
+        setState({
+          error: null,
+          state: 'idle',
+          data: result as ReturnType<DatabaseQueriesEvent[T]>,
         });
+      });
     };
     startQuery();
 
     const onDataChange = (...args: unknown[]) => {
-      if (!shallowEqualArrays(query.args, args)) return;
+      if (!shallowEqualArrays(args, args)) return;
 
       startQuery();
     };
-    databaseCtx.emitter.on(query.name, onDataChange);
+    databaseCtx.emitter.on(name, onDataChange);
 
     return () => {
-      databaseCtx.emitter.off(query.name, onDataChange);
+      databaseCtx.emitter.off(name, onDataChange);
     };
-  }, [query.name, databaseCtx.emitter]);
+  }, [name, databaseCtx.emitter]);
 
   return { ...state, updateState };
 }

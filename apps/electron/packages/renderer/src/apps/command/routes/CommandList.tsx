@@ -33,10 +33,7 @@ export interface ListItemRenderDetail<
 }
 
 function CommandList() {
-  const extensionQuery = useDatabaseQuery({
-    args: [],
-    name: 'database:get-extension-list',
-  });
+  const extensionQuery = useDatabaseQuery('database:get-extension-list', []);
   const activeBrowserTab = useCommandStore.use.activeBrowserTab();
 
   const addPanelStatus = useCommandPanelStore.use.addStatus();

@@ -13,24 +13,35 @@ import { getExtensionConfigDefaultValue } from '../helper';
 import type { IPCExtensionConfigEvents } from '#packages/common/interface/ipc-events.interface';
 import WindowsManager from '../../window/WindowsManager';
 import DatabaseService from '/@/services/database.service';
+import { toggleExtensionCommandShortcut } from '../global-shortcuts';
 
 /** EXTENSION */
-onIpcMessage('extension:import', async () => {
-  const {
-    canceled,
-    filePaths: [manifestPath],
-  } = await dialog.showOpenDialog({
-    buttonLabel: 'Import',
-    properties: ['openFile'],
-    title: 'Import Extension',
-    filters: [{ extensions: ['json'], name: 'Extension manifest' }],
-  });
-  if (canceled || !manifestPath) return null;
+onIpcMessage('extension:import', async ({ sender }) => {
+  const window = BrowserWindow.fromWebContents(sender);
+  const isAlwaysOnTop = window && window.isAlwaysOnTop();
+  if (isAlwaysOnTop) {
+    window.setAlwaysOnTop(false);
+  }
 
-  const extensionData =
-    await ExtensionLoader.instance.importExtension(manifestPath);
+  try {
+    const {
+      canceled,
+      filePaths: [manifestPath],
+    } = await dialog.showOpenDialog({
+      buttonLabel: 'Import',
+      properties: ['openFile'],
+      title: 'Import Extension',
+      filters: [{ extensions: ['json'], name: 'Extension manifest' }],
+    });
+    if (canceled || !manifestPath) return null;
 
-  return extensionData;
+    const extensionData =
+      await ExtensionLoader.instance.importExtension(manifestPath);
+
+    return extensionData;
+  } finally {
+    if (isAlwaysOnTop) window.setAlwaysOnTop(true);
+  }
 });
 onIpcMessage('extension:reload', async (_, extId) => {
   await ExtensionLoader.instance.reloadExtension(extId);
@@ -59,8 +70,14 @@ onIpcMessage('extension:run-script-command', async (_, detail) => {
 onIpcMessage('apps:get-list', () => InstalledApps.instance.getList());
 
 /** DIALOG */
-onIpcMessage('dialog:open', (_, options) => {
-  return dialog.showOpenDialog(options);
+onIpcMessage('dialog:open', ({ sender }, options) => {
+  const window = BrowserWindow.fromWebContents(sender);
+  const isAlwaysOnTop = window && window.isAlwaysOnTop();
+  if (isAlwaysOnTop) window.setAlwaysOnTop(false);
+
+  return dialog.showOpenDialog(options).finally(() => {
+    if (isAlwaysOnTop) window.setAlwaysOnTop(true);
+  });
 });
 onIpcMessage('dialog:message-box', (_, options) => {
   return dialog.showMessageBox(options);
@@ -196,6 +213,20 @@ onIpcMessage('database:update-extension', async (_, extensionId, data) => {
 onIpcMessage('database:get-command', (_, query) => {
   return DatabaseService.getExtensionCommand(query);
 });
+onIpcMessage(
+  'database:update-extension-command',
+  async (_, extensionId, commandId, value) => {
+    await DatabaseService.updateExtensionCommand(extensionId, commandId, value);
+
+    if (Object.hasOwn(value, 'shortcut')) {
+      toggleExtensionCommandShortcut(
+        extensionId,
+        commandId,
+        value.shortcut ?? null,
+      );
+    }
+  },
+);
 
 /** SHELL */
 onIpcMessage('shell:open-in-folder', async (_, filePath) => {

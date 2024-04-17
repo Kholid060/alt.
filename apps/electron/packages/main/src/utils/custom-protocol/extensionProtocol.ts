@@ -73,7 +73,6 @@ const appIconProtocol: CustomProtocol = {
           'icon',
           `${paths[0]}.png`,
         );
-        console.log(iconPath);
         if (!iconPath) {
           return createErrorResponse({
             status: 404,

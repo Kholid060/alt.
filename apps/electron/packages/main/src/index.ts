@@ -77,11 +77,13 @@ app.on('activate', () =>
 app
   .whenReady()
   .then(async () => {
-    registerGlobalShortcuts();
     registerCustomProtocols();
     initDefaultWebsocketServer();
 
-    await ExtensionLoader.instance.loadExtensions();
+    await Promise.all([
+      await registerGlobalShortcuts(),
+      await ExtensionLoader.instance.loadExtensions(),
+    ]);
 
     WindowsManager.instance.restoreOrCreateWindow('command');
     WindowsManager.instance.restoreOrCreateWindow('dashboard');

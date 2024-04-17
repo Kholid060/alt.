@@ -37,6 +37,10 @@ export type DatabaseExtensionUpdatePayload = Partial<
   Pick<DatabaseExtension, 'isDisabled'>
 >;
 
+export type DatabaseExtensionCommandUpdatePayload = Partial<
+  Pick<DatabaseExtensionCommand, 'shortcut' | 'subtitle'>
+>;
+
 export interface DatabaseQueriesEvent {
   'database:get-command': (
     commandId: string | { commandId: string; extensionId: string },
@@ -48,6 +52,11 @@ export interface DatabaseQueriesEvent {
   'database:update-extension': (
     extensionId: string,
     data: DatabaseExtensionUpdatePayload,
+  ) => void;
+  'database:update-extension-command': (
+    extensionId: string,
+    commandId: string,
+    data: DatabaseExtensionCommandUpdatePayload,
   ) => void;
   'database:get-extension-list': () => DatabaseExtensionListItem[];
   'database:get-extension': (extensionId: string) => DatabaseExtension | null;

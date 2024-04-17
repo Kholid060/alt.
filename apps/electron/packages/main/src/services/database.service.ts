@@ -9,6 +9,7 @@ import type {
 import {
   extensions,
   commands as commandsSchema,
+  commands,
 } from '../db/schema/extension.schema';
 import WindowsManager from '../window/WindowsManager';
 import type { ExtensionCommand, ExtensionManifest } from '@repo/extension-core';
@@ -21,6 +22,7 @@ import type {
   DatabaseExtensionCommandWithExtension,
   DatabaseExtensionListItem,
   DatabaseExtensionUpdatePayload,
+  DatabaseExtensionCommandUpdatePayload,
   DatabaseQueriesEvent,
 } from '../interface/database.interface';
 
@@ -291,6 +293,23 @@ class DatabaseService {
     });
 
     return result;
+  }
+
+  static async updateExtensionCommand(
+    extensionId: string,
+    commandId: string,
+    value: DatabaseExtensionCommandUpdatePayload,
+  ) {
+    await extensionsDB
+      .update(commands)
+      .set(value)
+      .where(eq(commands.id, `${extensionId}:${commandId}`));
+
+    this.emitDBChanges({
+      'database:get-extension-list': [],
+      'database:get-extension': [extensionId],
+      'database:get-command': [{ commandId, extensionId }],
+    });
   }
 
   static async addExtension(

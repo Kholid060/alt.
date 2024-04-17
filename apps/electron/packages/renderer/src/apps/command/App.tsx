@@ -8,36 +8,13 @@ import {
   CommandRouteProvider,
   createCommandRoutes,
 } from '/@/context/command-route.context';
-import CommandView from './routes/CommandView';
-import CommandList from './routes/CommandList';
 import CommandErrorOverlay from '/@/components/command/CommandErrorOverlay';
-import ConfigInput from './routes/ConfigInput';
-import CommandViewJSON from './routes/CommandViewJSON';
 import AppDevtools from '/@/components/app/AppDevtools';
 import AppEventListener from '/@/components/app/AppEventListener';
 import { DatabaseProvider } from '/@/context/database.context';
+import { commandAppRoutes } from './routes';
 
-const routes = createCommandRoutes([
-  {
-    path: '',
-    name: 'home',
-    element: CommandList,
-  },
-  {
-    name: 'extension-command-view',
-    path: '/extensions/:extensionId/:commandId/view',
-    element: CommandView,
-  },
-  {
-    name: 'extension-command-view-json',
-    path: '/extensions/:extensionId/:commandId/view-json',
-    element: CommandViewJSON,
-  },
-  {
-    element: ConfigInput,
-    path: '/configs/:configId',
-  },
-]);
+const routes = createCommandRoutes(commandAppRoutes);
 
 function App() {
   return (

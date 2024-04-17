@@ -7,20 +7,217 @@ import {
   UiSwitch,
   UiTooltip,
   cn,
+  useToast,
 } from '@repo/ui';
 import UiExtensionIcon from '../ui/UiExtensionIcon';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import {
   AlertTriangleIcon,
   ChevronRightIcon,
   RotateCcwIcon,
+  StopCircleIcon,
+  XIcon,
 } from 'lucide-react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '/@/utils/helper';
 import {
+  DatabaseExtensionCommand,
   DatabaseExtensionListItem,
   DatabaseExtensionUpdatePayload,
 } from '#packages/main/src/interface/database.interface';
+import CommandShortcut from '../command/CommandShortcut';
+
+const VALID_SHORTCUT_KEYS_REGEX = /[0-9A-Za-z!-/~`{[\]|;:,.?=+<>\\()*$%^&,@_#]/;
+
+function ExtensionCommandList({
+  commands,
+  extensionId,
+  extensionIcon,
+  extensionDisabled,
+}: {
+  extensionId: string;
+  extensionDisabled: boolean;
+  extensionIcon: React.ReactNode;
+  commands: DatabaseExtensionCommand[];
+}) {
+  const { toast } = useToast();
+
+  const [recordingData, setRecordingData] = useState<null | {
+    keys: string[];
+    isDirty: boolean;
+    commandId: string;
+  }>(null);
+
+  async function toggleRecording(commandId: string) {
+    try {
+      if (!recordingData || recordingData.commandId !== commandId) {
+        setRecordingData({ keys: [], commandId, isDirty: false });
+        return;
+      } else if (!recordingData.isDirty) {
+        setRecordingData(null);
+        return;
+      }
+
+      await preloadAPI.main.invokeIpcMessage(
+        'database:update-extension-command',
+        extensionId,
+        recordingData.commandId,
+        { shortcut: recordingData.keys.join('+') },
+      );
+
+      setRecordingData(null);
+    } catch (error) {
+      console.error(error);
+
+      if (!(error instanceof Error)) return;
+
+      toast({
+        title: 'Error!',
+        variant: 'destructive',
+        description: error.message.includes('UNIQUE constraint')
+          ? 'This shortcut is already been used'
+          : 'Something went wrong',
+      });
+    }
+  }
+  async function removeShortcut(commandId: string) {
+    try {
+      await preloadAPI.main.invokeIpcMessage(
+        'database:update-extension-command',
+        extensionId,
+        commandId,
+        { shortcut: null },
+      );
+    } catch (error) {
+      console.error(error);
+
+      if (!(error instanceof Error)) return;
+
+      toast({
+        title: 'Error!',
+        variant: 'destructive',
+        description: 'Something went wrong',
+      });
+    }
+  }
+
+  useEffect(() => {
+    const onKeyboardEvent = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setRecordingData(null);
+        return;
+      }
+
+      if (
+        event.repeat ||
+        event.key.length > 1 ||
+        !VALID_SHORTCUT_KEYS_REGEX.test(event.key)
+      )
+        return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      const keys: string[] = [];
+
+      if (event.ctrlKey || event.metaKey) keys.push('CmdOrCtrl');
+      if (event.shiftKey) keys.push('Shift');
+      if (event.altKey) keys.push('Alt');
+
+      if (keys.length === 0) return;
+
+      keys.push(event.key.toUpperCase());
+
+      setRecordingData((prevValue) =>
+        prevValue ? { ...prevValue, isDirty: true, keys } : prevValue,
+      );
+    };
+
+    if (recordingData) {
+      window.addEventListener('keydown', onKeyboardEvent);
+    }
+
+    return () => {
+      window.removeEventListener('keydown', onKeyboardEvent);
+    };
+  }, [recordingData]);
+
+  return (
+    <>
+      {commands.map((command) => (
+        <tr
+          key={extensionId + command.name}
+          className={cn(
+            'border-b border-border/50 hover:bg-card',
+            extensionDisabled && 'opacity-60',
+          )}
+        >
+          <td className="relative">
+            {/* <span className="absolute w-4/12 left-1/2 h-px bg-border" /> */}
+          </td>
+          <td className="pr-3 py-3">
+            <div className="flex items-center">
+              <div className="h-7 w-7 flex-shrink-0">
+                {command.icon ? (
+                  <UiExtensionIcon
+                    id={extensionId}
+                    alt={command.name + ' icon'}
+                    icon={command.icon}
+                    iconWrapper={(icon) => <UiList.Icon icon={icon} />}
+                  />
+                ) : (
+                  extensionIcon
+                )}
+              </div>
+              <span className="ml-2">{command.title}</span>
+            </div>
+          </td>
+          <td className="p-3">
+            {command.type === 'script' ? 'Script' : 'Command'}
+          </td>
+          <td
+            className="p-3 cursor-pointer text-muted-foreground text-sm hover:text-foreground transition-colors group/shortcut"
+            onClick={() => toggleRecording(command.name)}
+            title="Record shortcut"
+          >
+            {recordingData?.commandId === command.name ? (
+              <div className="flex items-center">
+                <span className="relative flex h-6 w-6 mr-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/90 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-6 w-6 bg-primary/90 items-center justify-center">
+                    <StopCircleIcon className="h-4 w-4 text-foreground" />
+                  </span>
+                </span>
+                <span className="text-foreground">
+                  {recordingData.keys.length
+                    ? recordingData.keys.join('+')
+                    : 'Stop recording'}
+                </span>
+              </div>
+            ) : command.shortcut ? (
+              <div className="flex items-center">
+                <CommandShortcut shortcut={command.shortcut} />
+                <button
+                  className="invisible group-hover/shortcut:visible ml-3"
+                  title="Remove shortcut"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    removeShortcut(command.name);
+                  }}
+                >
+                  <XIcon className="h-5 w-5" />
+                </button>
+              </div>
+            ) : (
+              'Record Shortcut'
+            )}
+          </td>
+          <td></td>
+        </tr>
+      ))}
+    </>
+  );
+}
 
 interface ExtensionListTableProps
   extends React.TableHTMLAttributes<HTMLTableElement> {
@@ -185,47 +382,14 @@ function ExtensionListTable({
                   </div>
                 </td>
               </tr>
-              {isExpanded &&
-                !extension.isError &&
-                extension.commands.map((command) => (
-                  <tr
-                    key={extension.id + command.name}
-                    className={cn(
-                      'border-b border-border/50 hover:bg-card',
-                      extension.isDisabled && 'opacity-60',
-                    )}
-                  >
-                    <td className="relative">
-                      {/* <span className="absolute w-4/12 left-1/2 h-px bg-border" /> */}
-                    </td>
-                    <td className="pr-3 py-3">
-                      <div className="flex items-center">
-                        <div className="h-7 w-7 flex-shrink-0">
-                          {command.icon ? (
-                            <UiExtensionIcon
-                              id={extension.id}
-                              alt={command.name + ' icon'}
-                              icon={command.icon}
-                              iconWrapper={(icon) => (
-                                <UiList.Icon icon={icon} />
-                              )}
-                            />
-                          ) : (
-                            extensionIcon
-                          )}
-                        </div>
-                        <span className="ml-2">{command.title}</span>
-                      </div>
-                    </td>
-                    <td className="p-3">
-                      {command.type === 'script' ? 'Script' : 'Command'}
-                    </td>
-                    <td className="p-3 cursor-pointer text-muted-foreground text-sm">
-                      Record Shortcut
-                    </td>
-                    <td></td>
-                  </tr>
-                ))}
+              {isExpanded && !extension.isError && (
+                <ExtensionCommandList
+                  extensionId={extension.id}
+                  commands={extension.commands}
+                  extensionIcon={extensionIcon}
+                  extensionDisabled={extension.isDisabled}
+                />
+              )}
             </Fragment>
           );
         })}

@@ -1,20 +1,13 @@
 import type { NativeImage } from 'electron';
 import { dialog, nativeImage } from 'electron';
-import WindowsManager from '../window/WindowsManager';
 import ExtensionLoader from './extension/ExtensionLoader';
 import { logger } from '../lib/log';
-import type {
-  ExtensionCommandArgument,
-  ExtensionConfig,
-} from '@repo/extension-core';
+import type { ExtensionCommandArgument } from '@repo/extension-core';
 import { parseJSON } from '@repo/shared';
-import { sendIpcMessageToWindow } from './ipc/ipc-main';
-import ExtensionCommandScriptRunner from './extension/ExtensionCommandScriptRunner';
 import { store } from '../lib/store';
 import { CommandLaunchBy } from '@repo/extension';
-import extensionsDB from '../db/extension.db';
 import DatabaseService from '../services/database.service';
-import { toggleCommandWindow } from '../window/command-window';
+import extensionCommandRunner from './extension/extensionCommandRunner';
 
 function convertArgValue(argument: ExtensionCommandArgument, value: string) {
   let convertedValue: unknown = value;
@@ -117,55 +110,15 @@ async function deepLinkHandler(deepLink: string) {
       return;
     }
 
-    const commandWindow =
-      await WindowsManager.instance.restoreOrCreateWindow('command');
-    const sendMesageToCommandWindow = sendIpcMessageToWindow(commandWindow);
-
     const launchContext = {
       args: commandArgs,
       launchBy: CommandLaunchBy.DEEP_LINK,
     };
 
-    const configId = `${extension.id}:${command.name}`;
-    const isHasConfig =
-      command.config && command.config.length > 0
-        ? Boolean(
-            await extensionsDB.query.configs.findFirst({
-              columns: { configId: true },
-              where(fields, operators) {
-                return operators.eq(fields.configId, configId);
-              },
-            }),
-          )
-        : true;
-    if (!isHasConfig) {
-      sendMesageToCommandWindow('extension-config:open', {
-        configId,
-        launchContext,
-        runCommand: true,
-        commandTitle: command.title,
-        extensionName: extension.title,
-        config: command.config as ExtensionConfig[],
-        commandIcon: command.icon ?? extension.icon,
-      });
-      return;
-    }
-
-    if (command.type === 'script') {
-      await ExtensionCommandScriptRunner.instance.runScript({
-        extensionId,
-        launchContext,
-        commandId: commandName,
-      });
-      return;
-    }
-
-    toggleCommandWindow(true);
-
-    sendMesageToCommandWindow('command:execute', {
+    await extensionCommandRunner({
+      command,
+      extension,
       launchContext,
-      commandId: command.id,
-      extensionId: extension.id,
     });
   } catch (error) {
     logger('error', ['deepLinkHandler'], (error as Error).message);

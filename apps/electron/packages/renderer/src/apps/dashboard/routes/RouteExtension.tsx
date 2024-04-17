@@ -27,10 +27,7 @@ function RouteExtension() {
 
   const [selectedExtensionId, setSelectedExtensionId] = useState('');
 
-  const extensionQuery = useDatabaseQuery({
-    name: 'database:get-extension-list',
-    args: [],
-  });
+  const extensionQuery = useDatabaseQuery('database:get-extension-list', []);
 
   async function updateExtension(
     extensionId: string,
