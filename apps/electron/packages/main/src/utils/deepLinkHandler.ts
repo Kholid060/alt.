@@ -1,6 +1,4 @@
-import type { NativeImage } from 'electron';
-import { dialog, nativeImage } from 'electron';
-import ExtensionLoader from './extension/ExtensionLoader';
+import { dialog } from 'electron';
 import { logger } from '../lib/log';
 import type { ExtensionCommandArgument } from '@repo/extension-core';
 import { parseJSON } from '@repo/shared';
@@ -29,32 +27,22 @@ async function deepLinkHandler(deepLink: string) {
     const { hostname, pathname, searchParams } = new URL(deepLink);
     if (hostname !== 'extensions') return;
 
-    const [_, extensionId, commandName] = pathname.split('/');
+    const [_, extensionId, commandId] = pathname.split('/');
 
-    const extension = await DatabaseService.getExtension(extensionId);
-    if (!extension || extension.isDisabled || extension.isError) return;
-
-    const command = extension.commands.find(
-      (item) => item.name === commandName,
-    );
+    const command = await DatabaseService.getExtensionCommand({
+      commandId,
+      extensionId,
+    });
     if (!command) return;
 
-    let commandIcon: NativeImage | undefined;
-    if (command.icon && !command.icon.startsWith('icon:')) {
-      commandIcon = nativeImage.createFromPath(
-        ExtensionLoader.instance.getPath(extensionId, 'icon', command.icon)!,
-      );
-    }
-
     const bypassCommands = store.get('bypassCommands') ?? [];
-    const bypassCommandId = `${extensionId}:${commandName}`;
+    const bypassCommandId = `${extensionId}:${commandId}`;
 
     const hideAlertDialog = bypassCommands.includes(bypassCommandId);
 
     if (!hideAlertDialog) {
       const { response } = await dialog.showMessageBox({
         type: 'question',
-        icon: commandIcon,
         message: `Run ${command.title} command?`,
         detail:
           'This command was initiated from outside of the app. If you didn\'t initiate this, click the "Cancel" button.',
@@ -116,8 +104,8 @@ async function deepLinkHandler(deepLink: string) {
     };
 
     await extensionCommandRunner({
-      command,
-      extension,
+      commandId,
+      extensionId,
       launchContext,
     });
   } catch (error) {

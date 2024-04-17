@@ -1,10 +1,6 @@
 import { memo } from 'react';
-import { IS_MAC_OS } from '/@/utils/constant';
 import { UiKbd } from '@repo/ui';
-
-const COMMAND_MOD_NAME_MAP: Record<string, string> = {
-  CmdOrCtrl: IS_MAC_OS ? '⌘' : 'Ctrl',
-};
+import { COMMAND_MOD_NAME_MAP } from '/@/utils/constant';
 
 function CommandShortcut({ shortcut }: { shortcut: string }) {
   const keys = shortcut.split('+');

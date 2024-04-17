@@ -12,14 +12,14 @@ export const COMMNAND_WINDOW_BOUND = {
   maxHeight: 600,
 } as const;
 
-export function toggleCommandWindow(showWindow?: boolean) {
+export function toggleCommandWindow(showWindow: boolean = false) {
   const commandWindow = WindowsManager.instance.getWindow('command', {
     noThrow: true,
   });
   if (!commandWindow) return;
 
   const isHidden = WindowsManager.instance.isWindowHidden('command');
-  if (!isHidden || (typeof showWindow === 'boolean' && showWindow === false)) {
+  if (!isHidden && typeof showWindow === 'boolean' && showWindow === false) {
     commandWindow.minimize();
     commandWindow.hide();
     return;
@@ -33,7 +33,7 @@ export function toggleCommandWindow(showWindow?: boolean) {
     height: COMMNAND_WINDOW_BOUND.maxHeight,
   });
 
-  if (isHidden || showWindow) {
+  if (showWindow || isHidden) {
     commandWindow.moveTop();
     commandWindow.show();
     commandWindow.setBounds({ width: COMMNAND_WINDOW_BOUND.width });

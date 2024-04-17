@@ -11,9 +11,9 @@ import { eq } from 'drizzle-orm';
 import { ExtensionError } from '#packages/common/errors/custom-errors';
 import { getExtensionConfigDefaultValue } from '../helper';
 import type { IPCExtensionConfigEvents } from '#packages/common/interface/ipc-events.interface';
-import WindowsManager from '../../window/WindowsManager';
 import DatabaseService from '/@/services/database.service';
 import { toggleExtensionCommandShortcut } from '../global-shortcuts';
+import { toggleCommandWindow } from '/@/window/command-window';
 
 /** EXTENSION */
 onIpcMessage('extension:import', async ({ sender }) => {
@@ -190,9 +190,12 @@ onIpcMessage('app:toggle-lock-window', ({ sender }) => {
   return Promise.resolve();
 });
 onIpcMessage('app:close-command-window', () => {
-  const commandWindow = WindowsManager.instance.getWindow('command');
-  commandWindow.minimize();
-  commandWindow.hide();
+  toggleCommandWindow(false);
+
+  return Promise.resolve();
+});
+onIpcMessage('app:show-command-window', () => {
+  toggleCommandWindow(true);
 
   return Promise.resolve();
 });

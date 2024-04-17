@@ -147,7 +147,10 @@ export function CommandCtxProvider({
     }
 
     const isConfigInputted = await checkCommandConfig(payload, command);
-    if (!isConfigInputted) return;
+    if (!isConfigInputted) {
+      await preloadAPI.main.invokeIpcMessage('app:show-command-window');
+      return;
+    }
 
     const updatePanelHeader = () => {
       setPanelHeader({
@@ -160,6 +163,10 @@ export function CommandCtxProvider({
       });
       removePanelStatus('command-missing-args');
     };
+
+    if (command.type !== 'script') {
+      await preloadAPI.main.invokeIpcMessage('app:show-command-window');
+    }
 
     switch (command.type) {
       case 'action':

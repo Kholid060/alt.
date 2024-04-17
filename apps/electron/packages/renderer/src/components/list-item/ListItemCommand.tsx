@@ -9,6 +9,7 @@ import { CommandLaunchBy } from '@repo/extension';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import { getExtIconURL } from '/@/utils/helper';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
+import CommandShortcut from '../command/CommandShortcut';
 
 function ListItemCommand({
   item,
@@ -123,9 +124,18 @@ function ListItemCommand({
       {...{ ...props, ...item, selected }}
       actions={actions}
       suffix={
-        command.type === 'script' ? (
-          <span className="text-xs text-muted-foreground">Command Script</span>
-        ) : undefined
+        <div className="space-x-3">
+          {command.shortcut && (
+            <span>
+              <CommandShortcut shortcut={command.shortcut} />
+            </span>
+          )}
+          {command.type === 'script' && (
+            <span className="text-xs text-muted-foreground">
+              Command Script
+            </span>
+          )}
+        </div>
       }
       onSelected={startExecuteCommand}
     />

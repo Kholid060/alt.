@@ -31,6 +31,7 @@ export interface IPCEventError {
 export interface IPCAppEvents {
   'app:open-devtools': () => void;
   'app:toggle-lock-window': () => void;
+  'app:show-command-window': () => void;
   'app:close-command-window': () => void;
 }
 

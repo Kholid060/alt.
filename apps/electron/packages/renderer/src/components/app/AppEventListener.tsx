@@ -4,13 +4,11 @@ import {
   CommandNavigateOptions,
   useCommandNavigate,
 } from '/@/hooks/useCommandRoute';
-import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { useCommandStore } from '/@/stores/command.store';
 import { getExtIconURL, isIPCEventError } from '/@/utils/helper';
 import { requireInputConfig } from '#packages/common/utils/helper';
 
 function AppEventListener() {
-  const clearPanel = useCommandPanelStore.use.clearAll();
   const setCommandStoreState = useCommandStore((state) => state.setState);
 
   const navigate = useCommandNavigate();
@@ -20,9 +18,11 @@ function AppEventListener() {
       'window:visibility-change',
       (_, isHidden) => {
         if (!isHidden) {
-          document.getElementById('input-query')?.focus();
-          navigate('');
-          clearPanel();
+          const inputEl = document.getElementById(
+            'input-query',
+          ) as HTMLInputElement;
+          inputEl?.focus();
+          inputEl?.select();
         }
 
         setCommandStoreState('isWindowHidden', isHidden);

@@ -1,7 +1,6 @@
 import { globalShortcut } from 'electron';
 import { GLOBAL_SHORTCUTS } from './constant';
 import { toggleCommandWindow } from '../window/command-window';
-import DatabaseService from '../services/database.service';
 import { logger } from '../lib/log';
 import extensionCommandRunner from './extension/extensionCommandRunner';
 import { CommandLaunchBy } from '@repo/extension';
@@ -72,17 +71,9 @@ export function toggleExtensionCommandShortcut(
     keys,
     async () => {
       try {
-        const extension = await DatabaseService.getExtension(extensionId);
-        if (!extension) return;
-
-        const command = extension.commands.find(
-          (item) => item.name === commandId,
-        );
-        if (!command) return;
-
         await extensionCommandRunner({
-          command,
-          extension,
+          commandId,
+          extensionId,
           launchContext: {
             args: {},
             launchBy: CommandLaunchBy.USER,

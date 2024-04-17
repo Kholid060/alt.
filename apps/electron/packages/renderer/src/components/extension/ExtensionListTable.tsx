@@ -1,5 +1,6 @@
 import {
   UiButton,
+  UiKbd,
   UiList,
   UiPopover,
   UiPopoverContent,
@@ -26,6 +27,7 @@ import {
   DatabaseExtensionUpdatePayload,
 } from '#packages/main/src/interface/database.interface';
 import CommandShortcut from '../command/CommandShortcut';
+import { COMMAND_MOD_NAME_MAP } from '/@/utils/constant';
 
 const VALID_SHORTCUT_KEYS_REGEX = /[0-9A-Za-z!-/~`{[\]|;:,.?=+<>\\()*$%^&,@_#]/;
 
@@ -176,9 +178,13 @@ function ExtensionCommandList({
             {command.type === 'script' ? 'Script' : 'Command'}
           </td>
           <td
-            className="p-3 cursor-pointer text-muted-foreground text-sm hover:text-foreground transition-colors group/shortcut"
+            className="p-3 text-muted-foreground text-sm transition-colors hover:text-foreground group/shortcut cursor-pointer"
             onClick={() => toggleRecording(command.name)}
-            title="Record shortcut"
+            title={
+              recordingData?.commandId === command.name
+                ? 'Stop recording'
+                : 'Record shortcut'
+            }
           >
             {recordingData?.commandId === command.name ? (
               <div className="flex items-center">
@@ -189,23 +195,31 @@ function ExtensionCommandList({
                   </span>
                 </span>
                 <span className="text-foreground">
-                  {recordingData.keys.length
-                    ? recordingData.keys.join('+')
-                    : 'Stop recording'}
+                  {recordingData.keys.length ? (
+                    <>
+                      {recordingData.keys.map((key) => (
+                        <UiKbd key={key}>
+                          {COMMAND_MOD_NAME_MAP[key] || key}
+                        </UiKbd>
+                      ))}
+                    </>
+                  ) : (
+                    'Stop recording'
+                  )}
                 </span>
               </div>
             ) : command.shortcut ? (
               <div className="flex items-center">
                 <CommandShortcut shortcut={command.shortcut} />
                 <button
-                  className="invisible group-hover/shortcut:visible ml-3"
+                  className="invisible group-hover/shortcut:visible ml-2 text-muted-foreground hover:text-foreground"
                   title="Remove shortcut"
                   onClick={(event) => {
                     event.stopPropagation();
                     removeShortcut(command.name);
                   }}
                 >
-                  <XIcon className="h-5 w-5" />
+                  <XIcon className="h-4 w-4" />
                 </button>
               </div>
             ) : (
@@ -258,8 +272,8 @@ function ExtensionListTable({
         <tr className="text-left">
           <th className="h-12 w-8"></th>
           <th className="h-12 pr-3 w-4/12">Name</th>
-          <th className="h-12 px-3 w-3/12">Type</th>
-          <th className="h-12 px-3 w-3/12">Shortcut</th>
+          <th className="h-12 px-3 w-2/12">Type</th>
+          <th className="h-12 px-3 w-4/12">Shortcut</th>
           <th className="h-12 px-3 w-32"></th>
         </tr>
       </thead>
