@@ -74,6 +74,8 @@ declare namespace ExtensionAPI.shell.installedApps {
       | RegExp,
   ): Promise<Extension.InstalledAppDetail[]>;
 
+  export function showInFolder(appId: string): Promise<void>;
+
   export function launch(appId: string): Promise<boolean>;
 
   // @ext-api-value

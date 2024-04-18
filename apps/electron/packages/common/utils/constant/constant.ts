@@ -1,9 +1,9 @@
-export const APP_TEMP_DIR_NAME = {
-  appIcon: 'app-icon',
-} as const;
+export const APP_TEMP_DIR_NAME = {} as const;
+
+export const APP_ICON_DIR_PREFIX = '$app';
 
 export const CUSTOM_SCHEME = {
-  appIcon: 'app-icon',
+  fileIcon: 'file-icon',
   extIcon: 'ext-icon',
   extension: 'extension',
 } as const;

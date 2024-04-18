@@ -6,7 +6,7 @@ import { shell } from 'electron';
 import { ExtensionError } from '#packages/common/errors/custom-errors';
 
 onExtensionIPCEvent('shell.installedApps.query', async (_, query) => {
-  const apps = await InstalledApps.instance.getList();
+  const apps = await InstalledApps.instance.getApps();
 
   if (query instanceof RegExp) {
     return apps.filter((app) => query.test(app.name));
@@ -29,15 +29,26 @@ onExtensionIPCEvent('shell.installedApps.launch', async (_, appId) => {
 
     return true;
   } catch (error) {
-    const appTarget = InstalledApps.instance.getAppTarget(appId);
+    const appTarget = InstalledApps.instance.getAppPath(appId);
     logger(
       'error',
       ['installedApps.launch'],
-      `Failed to launch "${path.basename(appTarget || '')}" (${(error as Error).message})`,
+      `Failed to launch "${path.basename(appTarget?.target || '')}" (${(error as Error).message})`,
     );
 
     return false;
   }
+});
+
+onExtensionIPCEvent('shell.installedApps.showInFolder', async (_, appId) => {
+  const appPath = InstalledApps.instance.getAppPath(appId);
+  if (!appPath) {
+    throw new ExtensionError(`Couldn't find installed with "${appId}" appId`);
+  }
+
+  shell.showItemInFolder(
+    appPath.isUrlShortcut ? appPath.shortcutPath : appPath.target,
+  );
 });
 
 onExtensionIPCEvent('shell.moveToTrash', async (_, itemPath) => {

@@ -3,7 +3,7 @@ import type { ExtensionMessagePortEvent } from '@repo/extension';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import type { AMessagePort } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
-import { CUSTOM_SCHEME } from '../constant/constant';
+import { APP_ICON_DIR_PREFIX, CUSTOM_SCHEME } from '../constant/constant';
 import type { ExtensionAPIValues } from '@repo/extension-core/dist/extensionApiBuilder';
 
 export const extensionAPIGetIconURL = (): Pick<
@@ -11,7 +11,7 @@ export const extensionAPIGetIconURL = (): Pick<
   'shell.installedApps.getIconURL'
 > => ({
   'shell.installedApps.getIconURL': (appId) =>
-    `${CUSTOM_SCHEME.appIcon}://${appId}.png`,
+    `${CUSTOM_SCHEME.fileIcon}://${APP_ICON_DIR_PREFIX}/${appId}`,
 });
 
 export function extensionAPISearchPanelEvent(

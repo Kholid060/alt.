@@ -65,7 +65,15 @@ function CommandMain() {
         onAction() {
           _extension.clipboard.paste(app.name);
         },
-      }
+      },
+      {
+        icon: UiExtIcon.FolderOpen,
+        title: 'Open file location',
+        value: 'open-file',
+        onAction() {
+          _extension.shell.installedApps.showInFolder(app.appId);
+        },
+      },
     ],
     icon: <UiImage src={_extension.shell.installedApps.getIconURL(app.appId)} style={{ height: '100%', width: '100%' }} />
   }));

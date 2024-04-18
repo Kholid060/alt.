@@ -67,7 +67,7 @@ onIpcMessage('extension:run-script-command', async (_, detail) => {
 });
 
 /** APPS */
-onIpcMessage('apps:get-list', () => InstalledApps.instance.getList());
+onIpcMessage('apps:get-list', () => InstalledApps.instance.getApps());
 
 /** DIALOG */
 onIpcMessage('dialog:open', ({ sender }, options) => {

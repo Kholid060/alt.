@@ -1,16 +1,19 @@
-import type { InstalledAppDetail } from '#common/interface/installed-apps.interface';
 import type { NativeImage } from 'electron';
-import { shell, app } from 'electron';
+import { shell, app, nativeImage } from 'electron';
 import fs from 'fs-extra';
 import { globby } from 'globby';
 import path from 'path';
 import { nanoid } from 'nanoid/non-secure';
-import { APP_ICON_DIR } from './constant';
-import { store } from '../lib/store';
-import dayjs from 'dayjs';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 
-const MAX_CACHE_AGE_DAY = 7;
+interface InstalledAppDetail
+  extends Pick<
+    Electron.ShortcutDetails,
+    'description' | 'target' | 'icon' | 'iconIndex'
+  > {
+  name: string;
+  isUrlShortcut: boolean;
+}
 
 const programShortcutDirs = [
   '%APPDATA%/Microsoft/Windows/Start Menu/Programs',
@@ -40,9 +43,9 @@ async function readURLShortcut(path: string) {
     if (props.length === 0) return null;
 
     const shortcutDetail: Omit<InstalledAppDetail, 'name'> = {
-      icon: '',
       target: '',
       description: '',
+      isUrlShortcut: false,
     };
 
     for (const keyValueStr of props) {
@@ -56,7 +59,7 @@ async function readURLShortcut(path: string) {
           shortcutDetail.target = value;
           break;
         case 'IconFile':
-          shortcutDetail.icon = value;
+          shortcutDetail.icon = resolveEnvDir(value)?.trim() ?? undefined;
           break;
       }
     }
@@ -77,6 +80,7 @@ async function extractShortcutDetail(shortcut: string) {
   try {
     let appDetail: InstalledAppDetail = {
       target: '',
+      isUrlShortcut: false,
       name: filename,
     };
 
@@ -86,6 +90,7 @@ async function extractShortcutDetail(shortcut: string) {
         appDetail = {
           ...appDetail,
           ...urlShortcutDetail,
+          isUrlShortcut: true,
         };
       }
     } else {
@@ -108,72 +113,24 @@ async function extractShortcutDetail(shortcut: string) {
   return null;
 }
 
-async function getAppIcon({
-  icon,
-  appId,
-  appPath,
-}: {
-  icon: string;
-  appId: string;
-  appPath: string;
-}) {
-  try {
-    let appIcon: NativeImage | null = null;
-
-    const iconExt = path.extname(icon);
-    if (iconExt == '.ico') {
-      const iconPath = resolveEnvDir(icon);
-
-      if (!iconPath) {
-        appIcon = await app.getFileIcon(appPath, { size: 'normal' });
-      } else {
-        await fs.copyFile(iconPath, path.join(APP_ICON_DIR, `${appId}.png`));
-        return `${appId}.png`;
-      }
-    } else {
-      appIcon = await app.getFileIcon(appPath, { size: 'normal' });
-    }
-
-    await fs.writeFile(
-      path.join(APP_ICON_DIR, `${appId}.png`),
-      appIcon.toPNG(),
-    );
-
-    return `${appId}.png`;
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
-}
-
 class InstalledApps {
-  private appTarget: Map<string, string> = new Map();
-
   static instance = new InstalledApps();
+
+  private isAppsFetched: boolean = false;
+  private apps: ExtensionAPI.shell.installedApps.AppDetail[] = [];
+  private appPaths: Map<
+    string,
+    {
+      target: string;
+      iconPath?: string;
+      shortcutPath: string;
+      isUrlShortcut: boolean;
+    }
+  > = new Map();
 
   constructor() {}
 
-  async getList() {
-    const storedData = store.get('installedApps');
-
-    const useCache =
-      storedData.fetchedAt &&
-      dayjs().diff(storedData.fetchedAt, 'day') <= MAX_CACHE_AGE_DAY;
-    if (useCache && storedData.list.length > 0) {
-      if (this.appTarget.size === 0) {
-        this.appTarget = new Map(
-          storedData.list.map((app) => [
-            app.appId,
-            storedData.appsTarget[app.appId],
-          ]),
-        );
-      }
-
-      return storedData.list;
-    }
-
-    await fs.emptyDir(APP_ICON_DIR);
-
+  private async fetchApps() {
     const shortcutDirs = programShortcutDirs.reduce<string[]>((acc, str) => {
       const dir = resolveEnvDir(str);
       if (dir)
@@ -183,7 +140,6 @@ class InstalledApps {
     }, []);
 
     const seenApps = new Set<string>();
-    const appsTarget: Record<string, string> = {};
 
     const shortcuts = await globby(shortcutDirs);
     const appPromise = await Promise.allSettled<
@@ -194,27 +150,30 @@ class InstalledApps {
         if (!appDetail?.target || seenApps.has(appDetail.target)) return null;
 
         const appId = nanoid(5);
-        this.appTarget.set(appId, appDetail.target);
-
         seenApps.add(appDetail.target);
 
-        const appIcon = await getAppIcon({
-          appId,
-          appPath: appDetail.target,
-          icon: appDetail.icon ?? '',
+        let iconPath: string | undefined;
+
+        if (appDetail.icon?.endsWith('.ico')) {
+          iconPath = appDetail.icon;
+        }
+
+        this.appPaths.set(appId, {
+          iconPath,
+          shortcutPath: shortcut,
+          target: appDetail.target,
+          isUrlShortcut: appDetail.isUrlShortcut,
         });
-        appsTarget[appId] = appDetail.target;
 
         return {
           appId,
           name: appDetail.name,
-          icon: appIcon ?? undefined,
           description: appDetail.description,
         };
       }),
     );
 
-    const apps = appPromise
+    this.apps = appPromise
       .reduce<ExtensionAPI.shell.installedApps.AppDetail[]>((acc, curr) => {
         if (curr.status === 'fulfilled' && curr.value) {
           acc.push(curr.value);
@@ -223,25 +182,39 @@ class InstalledApps {
         return acc;
       }, [])
       .sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1));
-
-    store.set('installedApps', {
-      list: apps,
-      appsTarget,
-      fetchedAt: new Date().toISOString(),
-    });
-
-    return apps;
+    this.isAppsFetched = true;
   }
 
-  getAppTarget(appId: string) {
-    return this.appTarget.get(appId);
+  async getApps() {
+    if (this.isAppsFetched) return this.apps;
+
+    await this.fetchApps();
+
+    return this.apps;
+  }
+
+  getAppPath(appId: string) {
+    return this.appPaths.get(appId);
+  }
+
+  async getAppIcon(appId: string): Promise<null | NativeImage> {
+    const appPath = this.appPaths.get(appId);
+    if (!appPath) return null;
+
+    if (appPath.iconPath) {
+      return nativeImage.createFromPath(appPath.iconPath);
+    }
+
+    return await app.getFileIcon(
+      appPath.isUrlShortcut ? appPath.shortcutPath : appPath.target,
+    );
   }
 
   launchApp(appId: string) {
-    const target = this.appTarget.get(appId);
-    if (!target) throw new Error("Can't find app");
+    const appPath = this.appPaths.get(appId);
+    if (!appPath) throw new Error("Can't find app");
 
-    return shell.openExternal(target, {
+    return shell.openExternal(appPath.target, {
       workingDirectory: app.getPath('desktop'),
     });
   }
