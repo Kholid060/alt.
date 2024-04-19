@@ -1,7 +1,7 @@
-import { onExtensionIPCEvent } from '../extension-api-event';
+import ExtensionIPCEvent from '../ExtensionIPCEvent';
 import DatabaseService from '/@/services/database.service';
 
-onExtensionIPCEvent(
+ExtensionIPCEvent.instance.on(
   'runtime.config.getValues',
   async ({ commandId, extensionId }, type = 'command') => {
     const configId =

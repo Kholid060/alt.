@@ -1,7 +1,7 @@
 import { Notification } from 'electron';
-import { onExtensionIPCEvent } from '../extension-api-event';
+import ExtensionIPCEvent from '../ExtensionIPCEvent';
 
-onExtensionIPCEvent(
+ExtensionIPCEvent.instance.on(
   'notifications.create',
   (_, { title, body, subtitle, silent }) => {
     if (!Notification.isSupported()) return Promise.resolve(false);

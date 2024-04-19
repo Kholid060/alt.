@@ -1,11 +1,11 @@
 import path from 'path';
 import InstalledApps from '../../InstalledApps';
-import { onExtensionIPCEvent } from '../extension-api-event';
 import { logger } from '/@/lib/log';
 import { shell } from 'electron';
 import { ExtensionError } from '#packages/common/errors/custom-errors';
+import ExtensionIPCEvent from '../ExtensionIPCEvent';
 
-onExtensionIPCEvent('shell.installedApps.query', async (_, query) => {
+ExtensionIPCEvent.instance.on('shell.installedApps.query', async (_, query) => {
   const apps = await InstalledApps.instance.getApps();
 
   if (query instanceof RegExp) {
@@ -23,46 +23,52 @@ onExtensionIPCEvent('shell.installedApps.query', async (_, query) => {
   return apps.filter((app) => app.name.includes(query));
 });
 
-onExtensionIPCEvent('shell.installedApps.launch', async (_, appId) => {
-  try {
-    await InstalledApps.instance.launchApp(appId);
+ExtensionIPCEvent.instance.on(
+  'shell.installedApps.launch',
+  async (_, appId) => {
+    try {
+      await InstalledApps.instance.launchApp(appId);
 
-    return true;
-  } catch (error) {
-    const appTarget = InstalledApps.instance.getAppPath(appId);
-    logger(
-      'error',
-      ['installedApps.launch'],
-      `Failed to launch "${path.basename(appTarget?.target || '')}" (${(error as Error).message})`,
+      return true;
+    } catch (error) {
+      const appTarget = InstalledApps.instance.getAppPath(appId);
+      logger(
+        'error',
+        ['installedApps.launch'],
+        `Failed to launch "${path.basename(appTarget?.target || '')}" (${(error as Error).message})`,
+      );
+
+      return false;
+    }
+  },
+);
+
+ExtensionIPCEvent.instance.on(
+  'shell.installedApps.showInFolder',
+  async (_, appId) => {
+    const appPath = InstalledApps.instance.getAppPath(appId);
+    if (!appPath) {
+      throw new ExtensionError(`Couldn't find installed with "${appId}" appId`);
+    }
+
+    shell.showItemInFolder(
+      appPath.isUrlShortcut ? appPath.shortcutPath : appPath.target,
     );
+  },
+);
 
-    return false;
-  }
-});
-
-onExtensionIPCEvent('shell.installedApps.showInFolder', async (_, appId) => {
-  const appPath = InstalledApps.instance.getAppPath(appId);
-  if (!appPath) {
-    throw new ExtensionError(`Couldn't find installed with "${appId}" appId`);
-  }
-
-  shell.showItemInFolder(
-    appPath.isUrlShortcut ? appPath.shortcutPath : appPath.target,
-  );
-});
-
-onExtensionIPCEvent('shell.moveToTrash', async (_, itemPath) => {
+ExtensionIPCEvent.instance.on('shell.moveToTrash', async (_, itemPath) => {
   const itemPaths = Array.isArray(itemPath) ? itemPath : [itemPath];
   await Promise.all(itemPaths.map((item) => shell.trashItem(item)));
 });
 
-onExtensionIPCEvent('shell.showItemInFolder', (_, itemPath) => {
+ExtensionIPCEvent.instance.on('shell.showItemInFolder', (_, itemPath) => {
   shell.showItemInFolder(itemPath);
 
   return Promise.resolve();
 });
 
-onExtensionIPCEvent('shell.openURL', (_, url) => {
+ExtensionIPCEvent.instance.on('shell.openURL', (_, url) => {
   if (!url.startsWith('http')) {
     throw new ExtensionError('Invalid URL');
   }

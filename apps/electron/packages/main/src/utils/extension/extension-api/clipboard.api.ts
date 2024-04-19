@@ -3,10 +3,10 @@ import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import type { NativeImage } from 'electron';
 import { clipboard, nativeImage } from 'electron';
 import { keyboard, Key } from '@nut-tree/nut-js';
-import { onExtensionIPCEvent } from '../extension-api-event';
 import { tempHideCommandWindow } from '../../helper';
+import ExtensionIPCEvent from '../ExtensionIPCEvent';
 
-onExtensionIPCEvent('clipboard.read', async (_, format) => {
+ExtensionIPCEvent.instance.on('clipboard.read', async (_, format) => {
   switch (format) {
     case 'html':
       return clipboard.readHTML();
@@ -27,7 +27,7 @@ const EXT_CLIPBOARD_FORMATS: ExtensionAPI.clipboard.ClipboardContentType[] = [
   'rtf',
   'text',
 ];
-onExtensionIPCEvent('clipboard.write', async (_, format, value) => {
+ExtensionIPCEvent.instance.on('clipboard.write', async (_, format, value) => {
   if (!EXT_CLIPBOARD_FORMATS.includes(format)) {
     throw new ExtensionError(`"${format}" is an invalid clipboard format`);
   }
@@ -40,7 +40,7 @@ onExtensionIPCEvent('clipboard.write', async (_, format, value) => {
   });
 });
 
-onExtensionIPCEvent('clipboard.paste', async (_, value) => {
+ExtensionIPCEvent.instance.on('clipboard.paste', async (_, value) => {
   const content = typeof value === 'string' ? value : JSON.stringify(value);
   clipboard.writeText(content);
 

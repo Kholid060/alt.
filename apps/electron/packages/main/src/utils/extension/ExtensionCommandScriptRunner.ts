@@ -4,12 +4,12 @@ import fs from 'fs-extra';
 import ExtensionLoader from './ExtensionLoader';
 import { spawn } from 'node:child_process';
 import WindowsManager from '/@/window/WindowsManager';
-import { sendIpcMessageToWindow } from '../ipc/ipc-main';
 import { snakeCase } from 'lodash-es';
 import { logger } from '/@/lib/log';
 import { ExtensionError } from '#packages/common/errors/custom-errors';
 import type { CommandLaunchContext } from '@repo/extension';
 import DatabaseService from '/@/services/database.service';
+import IPCMain from '../ipc/IPCMain';
 
 const FILE_EXT_COMMAND_MAP: Record<string, string> = {
   '.sh': 'sh',
@@ -79,7 +79,6 @@ class ExtensionCommandScriptRunner {
     }
 
     const commandWindow = WindowsManager.instance.getWindow('command');
-    const sencIpcMessage = sendIpcMessageToWindow(commandWindow);
 
     const scriptId = `${extensionId}::${commandId}`;
     const controller = new AbortController();
@@ -107,7 +106,7 @@ class ExtensionCommandScriptRunner {
         lastMessage: '',
         errorMessage: '',
       };
-      sencIpcMessage('command-script:message', {
+      IPCMain.sendToWindow(commandWindow, 'command-script:message', {
         commandId,
         extensionId,
         message: '',
@@ -117,7 +116,7 @@ class ExtensionCommandScriptRunner {
     });
     ls.addListener('error', (error) => {
       console.error(error);
-      sencIpcMessage('command-script:message', {
+      IPCMain.sendToWindow(commandWindow, 'command-script:message', {
         commandId,
         extensionId,
         type: 'error',
@@ -136,7 +135,7 @@ class ExtensionCommandScriptRunner {
       const isSuccess = code === 0;
       const { lastMessage, errorMessage } = this.runningScripts[scriptId] ?? {};
 
-      sencIpcMessage('command-script:message', {
+      IPCMain.sendToWindow(commandWindow, 'command-script:message', {
         commandId,
         extensionId,
         commandTitle: command.title,
@@ -153,7 +152,7 @@ class ExtensionCommandScriptRunner {
 
       const message = data.toString();
       this.runningScripts[scriptId].lastMessage = message;
-      sencIpcMessage('command-script:message', {
+      IPCMain.sendToWindow(commandWindow, 'command-script:message', {
         message,
         commandId,
         extensionId,
@@ -165,7 +164,7 @@ class ExtensionCommandScriptRunner {
       if (!extension.isLocal || !this.runningScripts[scriptId]) return;
 
       this.runningScripts[scriptId].errorMessage += `${chunk.toString()}\n`;
-      sencIpcMessage('command-script:message', {
+      IPCMain.sendToWindow(commandWindow, 'command-script:message', {
         commandId,
         extensionId,
         type: 'stderr',

@@ -1,6 +1,6 @@
 import { MessageChannelMain } from 'electron';
 import { isObject } from '@repo/shared';
-import type { ExtensionMessageHandler } from './extension-api-event';
+import type { ExtensionMessageHandler } from './ExtensionIPCEvent';
 import type { IPCUserExtensionEventsMap } from '#packages/common/interface/ipc-events.interface';
 
 class ExtensionMessagePortHandler {

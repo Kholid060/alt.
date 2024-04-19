@@ -11,9 +11,9 @@ import {
 import WindowsManager from './window/WindowsManager';
 import { APP_DEEP_LINK } from '#packages/common/utils/constant/constant';
 import path from 'node:path';
-import deepLinkHandler from './utils/deepLinkHandler';
+import DeepLink from './utils/DeepLink';
 import { initDefaultWebsocketServer } from './services/websocket/websocket.service';
-import { registerGlobalShortcuts } from './utils/global-shortcuts';
+import { registerGlobalShortcuts } from './utils/GlobalShortcuts';
 import ExtensionLoader from './utils/extension/ExtensionLoader';
 
 app.commandLine.appendSwitch('wm-window-animations-disabled');
@@ -47,7 +47,7 @@ app.on('second-instance', (_event, commandLine) => {
     return;
   }
 
-  deepLinkHandler(deepLink);
+  DeepLink.handler(deepLink);
 });
 
 /**

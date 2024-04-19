@@ -51,64 +51,66 @@ class GlobalShortcut {
   }
 }
 
-export function toggleExtensionCommandShortcut(
-  extensionId: string,
-  commandId: string,
-  keys: string | null,
-) {
-  const metadata = `${extensionId}:${commandId}`;
+export class GlobalShortcutExtension {
+  static toggleShortcut(
+    extensionId: string,
+    commandId: string,
+    keys: string | null,
+  ) {
+    const metadata = `${extensionId}:${commandId}`;
 
-  const registeredShorcut = GlobalShortcut.instance.shortcuts.find(
-    (shortcut) => shortcut.metadata === metadata,
-  );
-  if (registeredShorcut) {
-    GlobalShortcut.instance.unregister(registeredShorcut.keys);
+    const registeredShorcut = GlobalShortcut.instance.shortcuts.find(
+      (shortcut) => shortcut.metadata === metadata,
+    );
+    if (registeredShorcut) {
+      GlobalShortcut.instance.unregister(registeredShorcut.keys);
+    }
+
+    if (!keys) return;
+
+    GlobalShortcut.instance.register(
+      keys,
+      async () => {
+        try {
+          await extensionCommandRunner({
+            commandId,
+            extensionId,
+            launchContext: {
+              args: {},
+              launchBy: CommandLaunchBy.USER,
+            },
+          });
+        } catch (error) {
+          logger(
+            'error',
+            ['globalShorcut', 'extension-command-shortcut'],
+            error,
+          );
+        }
+      },
+      metadata,
+    );
   }
 
-  if (!keys) return;
+  static async registerAllShortcuts() {
+    const commands = await extensionsDB.query.commands.findMany({
+      columns: {
+        name: true,
+        shortcut: true,
+      },
+      with: {
+        extension: { columns: { id: true } },
+      },
+      where(fields, operators) {
+        return operators.isNotNull(fields.shortcut);
+      },
+    });
+    commands.map((command) => {
+      if (!command.extension) return;
 
-  GlobalShortcut.instance.register(
-    keys,
-    async () => {
-      try {
-        await extensionCommandRunner({
-          commandId,
-          extensionId,
-          launchContext: {
-            args: {},
-            launchBy: CommandLaunchBy.USER,
-          },
-        });
-      } catch (error) {
-        logger('error', ['globalShorcut', 'extension-command-shortcut'], error);
-      }
-    },
-    metadata,
-  );
-}
-
-async function registerAllExtensionCommandShortcuts() {
-  const commands = await extensionsDB.query.commands.findMany({
-    columns: {
-      name: true,
-      shortcut: true,
-    },
-    with: {
-      extension: { columns: { id: true } },
-    },
-    where(fields, operators) {
-      return operators.isNotNull(fields.shortcut);
-    },
-  });
-  commands.map((command) => {
-    if (!command.extension) return;
-
-    toggleExtensionCommandShortcut(
-      command.extension.id,
-      command.name,
-      command.shortcut,
-    );
-  });
+      this.toggleShortcut(command.extension.id, command.name, command.shortcut);
+    });
+  }
 }
 
 export async function registerGlobalShortcuts() {
@@ -119,7 +121,7 @@ export async function registerGlobalShortcuts() {
         toggleCommandWindow();
       },
     );
-    await registerAllExtensionCommandShortcuts();
+    await GlobalShortcutExtension.registerAllShortcuts();
   } catch (error) {
     logger('error', ['globalShorcut', 'registerGlobalShortcuts'], error);
   }

@@ -10,7 +10,7 @@ import InstalledApps from '../InstalledApps';
 const appIconProtocol: CustomProtocol = {
   scheme: CUSTOM_SCHEME.fileIcon,
   async handler(req) {
-    let filePath = req.url.slice(`${CUSTOM_SCHEME.fileIcon}://`.length);
+    const filePath = req.url.slice(`${CUSTOM_SCHEME.fileIcon}://`.length);
 
     if (filePath.startsWith(APP_ICON_DIR_PREFIX)) {
       const appId = filePath.slice(APP_ICON_DIR_PREFIX.length + 1);

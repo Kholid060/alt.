@@ -20,6 +20,7 @@ import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { IPCEventError } from '#common/interface/ipc-events.interface';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
 import { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
+import { isIPCEventError } from '/@/utils/helper';
 
 type ConfigComponent<
   T extends ExtensionConfig['type'] = ExtensionConfig['type'],
@@ -329,7 +330,8 @@ function ConfigInput() {
           },
         );
       }
-      if (result && '$isError' in result) {
+      console.log({ result });
+      if (isIPCEventError(result)) {
         addPanelStatus({
           type: 'error',
           title: result.message,

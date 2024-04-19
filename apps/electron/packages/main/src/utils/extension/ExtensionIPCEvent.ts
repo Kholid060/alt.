@@ -12,9 +12,9 @@ import { ipcMain } from 'electron';
 import ExtensionMessagePortHandler from './ExtensionMessagePortHandler';
 import { logger } from '/@/lib/log';
 import WindowsManager from '/@/window/WindowsManager';
-import { onIpcMessage } from '../ipc/ipc-main';
 import type { ExtensionManifest } from '@repo/extension-core';
 import DatabaseService from '/@/services/database.service';
+import IPCMain from '../ipc/IPCMain';
 
 export type ExtensionMessageHandler = <
   T extends keyof IPCUserExtensionEventsMap,
@@ -44,7 +44,7 @@ export type ExtensionIPCEventCallback<
 
 const CACHE_MAX_AGE_MS = 300_000; // 5 minutes
 
-export class ExtensionIPCEvent {
+class ExtensionIPCEvent {
   static instance = new ExtensionIPCEvent();
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -67,7 +67,7 @@ export class ExtensionIPCEvent {
   }
 
   private _initMessageListener() {
-    onIpcMessage('user-extension', (sender, payload) =>
+    IPCMain.handle('user-extension', (sender, payload) =>
       this._onExtensionMessage({ ...payload, sender }),
     );
 
@@ -164,6 +164,4 @@ export class ExtensionIPCEvent {
   }
 }
 
-export const onExtensionIPCEvent = ExtensionIPCEvent.instance.on.bind(
-  ExtensionIPCEvent.instance,
-);
+export default ExtensionIPCEvent;

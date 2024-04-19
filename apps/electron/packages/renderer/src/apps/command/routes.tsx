@@ -22,10 +22,6 @@ export const commandAppRoutes = [
   },
   {
     element: ConfigInput,
-    path: '/configs/:extensionId',
-  },
-  {
-    element: ConfigInput,
-    path: '/configs/:extensionId/:commandId',
+    path: '/configs/:configId',
   },
 ] as const satisfies CommandRoute[];

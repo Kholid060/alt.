@@ -8,8 +8,8 @@ const windows = {
   dashboard: createDashboardWindow,
 };
 
-type Windows = typeof windows;
-type WindowNames = keyof Windows;
+export type WindowManagerWindows = typeof windows;
+export type WindowManagerWindowNames = keyof WindowManagerWindows;
 
 class WindowsManager {
   private static _instance: WindowsManager | null = null;
@@ -21,12 +21,13 @@ class WindowsManager {
     return this._instance;
   }
 
-  private windows: Map<WindowNames, BrowserWindow> = new Map();
-  private windowsHiddenState: Map<WindowNames, boolean> = new Map();
+  private windows: Map<WindowManagerWindowNames, BrowserWindow> = new Map();
+  private windowsHiddenState: Map<WindowManagerWindowNames, boolean> =
+    new Map();
 
   constructor() {}
 
-  async restoreOrCreateWindow(name: WindowNames) {
+  async restoreOrCreateWindow(name: WindowManagerWindowNames) {
     const window = await this.createWindow(name);
 
     if (window.isMinimized()) {
@@ -45,7 +46,7 @@ class WindowsManager {
     }));
   }
 
-  async createWindow(name: WindowNames) {
+  async createWindow(name: WindowManagerWindowNames) {
     let window = this.windows.get(name);
     if (window && !window.isDestroyed()) return window;
 
@@ -67,17 +68,20 @@ class WindowsManager {
     return window;
   }
 
-  isWindowHidden(name: WindowNames) {
+  isWindowHidden(name: WindowManagerWindowNames) {
     return this.windowsHiddenState.get(name) ?? true;
   }
 
-  getWindow(name: WindowNames, options?: { noThrow: false }): BrowserWindow;
   getWindow(
-    name: WindowNames,
+    name: WindowManagerWindowNames,
+    options?: { noThrow: false },
+  ): BrowserWindow;
+  getWindow(
+    name: WindowManagerWindowNames,
     options?: { noThrow: true },
   ): BrowserWindow | null;
   getWindow(
-    name: WindowNames,
+    name: WindowManagerWindowNames,
     options?: { noThrow: boolean },
   ): BrowserWindow | null {
     const window = this.windows.get(name);
@@ -90,15 +94,6 @@ class WindowsManager {
     return window;
   }
 
-  async getWindowWithAutoInit(name: WindowNames) {
-    let window = this.windows.get(name);
-    if (!window) {
-      window = await this.createWindow(name);
-    }
-
-    return window;
-  }
-
   sendMessageToAllWindows<T extends keyof IPCRendererSendEvent>({
     args,
     name,
@@ -106,7 +101,7 @@ class WindowsManager {
   }: {
     name: T;
     args: IPCRendererSendEvent[T];
-    excludeWindow?: (WindowNames | number)[];
+    excludeWindow?: (WindowManagerWindowNames | number)[];
   }) {
     this.windows.forEach((browserWindow, key) => {
       if (
@@ -121,7 +116,7 @@ class WindowsManager {
   }
 
   sendMessageToWindow<T extends keyof IPCRendererSendEvent>(
-    browserWindow: WindowNames | BrowserWindow,
+    browserWindow: WindowManagerWindowNames | BrowserWindow,
     eventName: T,
     ...args: IPCRendererSendEvent[T]
   ) {

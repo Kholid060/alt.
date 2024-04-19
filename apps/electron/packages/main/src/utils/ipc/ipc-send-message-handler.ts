@@ -1,7 +1,7 @@
-import { onIpcSendMessage } from './ipc-main';
+import IPCMain from './IPCMain';
 import WindowsManager from '/@/window/WindowsManager';
 
-onIpcSendMessage('window:open-settings', (_, routePath) => {
+IPCMain.on('window:open-settings', (_, routePath) => {
   WindowsManager.instance.restoreOrCreateWindow('dashboard').then((window) => {
     if (!routePath) return;
 
@@ -13,7 +13,7 @@ onIpcSendMessage('window:open-settings', (_, routePath) => {
   });
 });
 
-onIpcSendMessage('window:open-command', (_, routePath) => {
+IPCMain.on('window:open-command', (_, routePath) => {
   WindowsManager.instance.restoreOrCreateWindow('command').then((window) => {
     if (!routePath) return;
 
@@ -25,7 +25,7 @@ onIpcSendMessage('window:open-command', (_, routePath) => {
   });
 });
 
-onIpcSendMessage('data:changes', ({ sender }, ...args) => {
+IPCMain.on('data:changes', ({ sender }, ...args) => {
   WindowsManager.instance.sendMessageToAllWindows({
     args,
     name: 'data:changes',
@@ -33,7 +33,7 @@ onIpcSendMessage('data:changes', ({ sender }, ...args) => {
   });
 });
 
-onIpcSendMessage('command-window:input-config', (_, detail) => {
+IPCMain.on('command-window:input-config', (_, detail) => {
   const commandWindow = WindowsManager.instance.getWindow('command');
   commandWindow.focus();
 

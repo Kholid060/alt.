@@ -3,7 +3,7 @@ import ExtensionLoader from '../extension/ExtensionLoader';
 import './ipc-extension-messages';
 import { BrowserWindow, clipboard, dialog, shell } from 'electron';
 import ExtensionCommandScriptRunner from '../extension/ExtensionCommandScriptRunner';
-import { onIpcMessage } from './ipc-main';
+import IPCMain from './IPCMain';
 import extensionsDB from '../../db/extension.db';
 import type { ExtensionConfigData } from '#packages/common/interface/extension.interface';
 import { configs } from '../../db/schema/extension.schema';
@@ -12,11 +12,11 @@ import { ExtensionError } from '#packages/common/errors/custom-errors';
 import { getExtensionConfigDefaultValue } from '../helper';
 import type { IPCExtensionConfigEvents } from '#packages/common/interface/ipc-events.interface';
 import DatabaseService from '/@/services/database.service';
-import { toggleExtensionCommandShortcut } from '../global-shortcuts';
+import { GlobalShortcutExtension } from '../GlobalShortcuts';
 import { toggleCommandWindow } from '/@/window/command-window';
 
 /** EXTENSION */
-onIpcMessage('extension:import', async ({ sender }) => {
+IPCMain.handle('extension:import', async ({ sender }) => {
   const window = BrowserWindow.fromWebContents(sender);
   const isAlwaysOnTop = window && window.isAlwaysOnTop();
   if (isAlwaysOnTop) {
@@ -43,14 +43,14 @@ onIpcMessage('extension:import', async ({ sender }) => {
     if (isAlwaysOnTop) window.setAlwaysOnTop(true);
   }
 });
-onIpcMessage('extension:reload', async (_, extId) => {
+IPCMain.handle('extension:reload', async (_, extId) => {
   await ExtensionLoader.instance.reloadExtension(extId);
   DatabaseService.emitDBChanges({
     'database:get-extension': [extId],
     'database:get-extension-list': [],
   });
 });
-onIpcMessage('extension:run-script-command', async (_, detail) => {
+IPCMain.handle('extension:run-script-command', async (_, detail) => {
   try {
     await ExtensionCommandScriptRunner.instance.runScript(detail);
 
@@ -67,10 +67,10 @@ onIpcMessage('extension:run-script-command', async (_, detail) => {
 });
 
 /** APPS */
-onIpcMessage('apps:get-list', () => InstalledApps.instance.getApps());
+IPCMain.handle('apps:get-list', () => InstalledApps.instance.getApps());
 
 /** DIALOG */
-onIpcMessage('dialog:open', ({ sender }, options) => {
+IPCMain.handle('dialog:open', ({ sender }, options) => {
   const window = BrowserWindow.fromWebContents(sender);
   const isAlwaysOnTop = window && window.isAlwaysOnTop();
   if (isAlwaysOnTop) window.setAlwaysOnTop(false);
@@ -79,43 +79,43 @@ onIpcMessage('dialog:open', ({ sender }, options) => {
     if (isAlwaysOnTop) window.setAlwaysOnTop(true);
   });
 });
-onIpcMessage('dialog:message-box', (_, options) => {
+IPCMain.handle('dialog:message-box', (_, options) => {
   return dialog.showMessageBox(options);
 });
 
 /** CLIPBOARD */
-onIpcMessage('clipboard:copy', (_, content) => {
+IPCMain.handle('clipboard:copy', (_, content) => {
   clipboard.writeText(content);
 
   return Promise.resolve();
 });
 
 /** EXTENSION CONFIG */
-onIpcMessage('extension-config:get', async (_, configId) => {
+IPCMain.handle('extension-config:get', async (_, configId) => {
   const result = (await extensionsDB.query.configs.findFirst({
     where: (fields, { eq }) => eq(fields.configId, configId),
   })) as ExtensionConfigData;
 
   return result ?? null;
 });
-onIpcMessage('extension-config:set', async (_, configId, data) => {
+IPCMain.handle('extension-config:set', async (_, configId, data) => {
   await extensionsDB.insert(configs).values({
     ...data,
     configId,
   });
 });
-onIpcMessage('extension-config:update', async (_, configId, data) => {
+IPCMain.handle('extension-config:update', async (_, configId, data) => {
   await extensionsDB
     .update(configs)
     .set(data)
     .where(eq(configs.configId, configId));
 });
-onIpcMessage('extension-config:exists', (_, configId) => {
+IPCMain.handle('extension-config:exists', (_, configId) => {
   return DatabaseService.configExists(configId);
 });
 
 const extensionConfigNeedInputCache = new Set<string>();
-onIpcMessage(
+IPCMain.handle(
   'extension-config:need-input',
   async (_, extensionId, commandId) => {
     type ReturnValue = ReturnType<
@@ -175,11 +175,11 @@ onIpcMessage(
 );
 
 /** APP */
-onIpcMessage('app:open-devtools', ({ sender }) => {
+IPCMain.handle('app:open-devtools', ({ sender }) => {
   sender.openDevTools();
   return Promise.resolve();
 });
-onIpcMessage('app:toggle-lock-window', ({ sender }) => {
+IPCMain.handle('app:toggle-lock-window', ({ sender }) => {
   const browserWindow = BrowserWindow.fromWebContents(sender);
   if (!browserWindow) return Promise.resolve();
 
@@ -189,40 +189,40 @@ onIpcMessage('app:toggle-lock-window', ({ sender }) => {
 
   return Promise.resolve();
 });
-onIpcMessage('app:close-command-window', () => {
+IPCMain.handle('app:close-command-window', () => {
   toggleCommandWindow(false);
 
   return Promise.resolve();
 });
-onIpcMessage('app:show-command-window', () => {
+IPCMain.handle('app:show-command-window', () => {
   toggleCommandWindow(true);
 
   return Promise.resolve();
 });
 
 /** DATABASE */
-onIpcMessage('database:get-extension', (_, extensionId) => {
+IPCMain.handle('database:get-extension', (_, extensionId) => {
   return DatabaseService.getExtension(extensionId);
 });
-onIpcMessage('database:get-extension-list', () => {
+IPCMain.handle('database:get-extension-list', () => {
   return DatabaseService.getExtensions();
 });
-onIpcMessage('database:get-extension-manifest', (_, extensionId) => {
+IPCMain.handle('database:get-extension-manifest', (_, extensionId) => {
   return DatabaseService.getExtensionManifest(extensionId);
 });
-onIpcMessage('database:update-extension', async (_, extensionId, data) => {
+IPCMain.handle('database:update-extension', async (_, extensionId, data) => {
   await DatabaseService.updateExtension(extensionId, data);
 });
-onIpcMessage('database:get-command', (_, query) => {
+IPCMain.handle('database:get-command', (_, query) => {
   return DatabaseService.getExtensionCommand(query);
 });
-onIpcMessage(
+IPCMain.handle(
   'database:update-extension-command',
   async (_, extensionId, commandId, value) => {
     await DatabaseService.updateExtensionCommand(extensionId, commandId, value);
 
     if (Object.hasOwn(value, 'shortcut')) {
-      toggleExtensionCommandShortcut(
+      GlobalShortcutExtension.toggleShortcut(
         extensionId,
         commandId,
         value.shortcut ?? null,
@@ -232,6 +232,6 @@ onIpcMessage(
 );
 
 /** SHELL */
-onIpcMessage('shell:open-in-folder', async (_, filePath) => {
+IPCMain.handle('shell:open-in-folder', async (_, filePath) => {
   await shell.openPath(filePath);
 });
