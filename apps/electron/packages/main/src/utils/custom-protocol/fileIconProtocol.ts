@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import { createErrorResponse, type CustomProtocol } from './index';
+import { createErrorResponse, type CustomProtocolHandler } from './CustomProtocol';
 import {
   APP_ICON_DIR_PREFIX,
   CUSTOM_SCHEME,
@@ -7,7 +7,7 @@ import {
 import { app } from 'electron';
 import InstalledApps from '../InstalledApps';
 
-const appIconProtocol: CustomProtocol = {
+const appIconProtocol: CustomProtocolHandler = {
   scheme: CUSTOM_SCHEME.fileIcon,
   async handler(req) {
     const filePath = req.url.slice(`${CUSTOM_SCHEME.fileIcon}://`.length);

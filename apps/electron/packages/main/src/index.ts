@@ -4,10 +4,7 @@ import './utils/ipc/ipc-send-message-handler';
 import './utils/ipc/ipc-invoke-messages-handler';
 import { platform } from 'node:process';
 import updater from 'electron-updater';
-import {
-  registerCustomProtocols,
-  registerCustomProtocolsPrivileged,
-} from './utils/custom-protocol';
+import CustomProtocol from './utils/custom-protocol/CustomProtocol';
 import WindowsManager from './window/WindowsManager';
 import { APP_DEEP_LINK } from '#packages/common/utils/constant/constant';
 import path from 'node:path';
@@ -19,7 +16,7 @@ import ExtensionLoader from './utils/extension/ExtensionLoader';
 app.commandLine.appendSwitch('wm-window-animations-disabled');
 
 Menu.setApplicationMenu(null);
-registerCustomProtocolsPrivileged();
+CustomProtocol.registerPrivileged();
 
 /**
  * Prevent electron from running multiple instances.
@@ -77,7 +74,7 @@ app.on('activate', () =>
 app
   .whenReady()
   .then(async () => {
-    registerCustomProtocols();
+    CustomProtocol.registerProtocols();
     initDefaultWebsocketServer();
 
     await Promise.all([

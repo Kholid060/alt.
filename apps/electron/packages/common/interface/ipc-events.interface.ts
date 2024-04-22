@@ -35,6 +35,13 @@ export interface IPCAppEvents {
   'app:close-command-window': () => void;
 }
 
+export interface IPCScreenEvents {
+  'screen:get-cursor-position': (relativeToWindow?: boolean) => {
+    x: number;
+    y: number;
+  };
+}
+
 export interface IPCShellEvents {
   'shell:open-url': (url: string) => void;
   'shell:open-in-folder': (path: string) => void;
@@ -110,6 +117,7 @@ export type IPCEvents = IPCShellEvents &
   IPCAppEvents &
   IPCAppsEvents &
   IPCDialogEvents &
+  IPCScreenEvents &
   IPCClipboardEvents &
   IPCExtensionEvents &
   DatabaseQueriesEvent &

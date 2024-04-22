@@ -6,6 +6,7 @@ import {
   LucideIcon,
   SettingsIcon,
   UserCog2Icon,
+  WorkflowIcon,
 } from 'lucide-react';
 import AppLogo from '#packages/renderer/assets/logo.svg';
 
@@ -19,6 +20,11 @@ const navigationItems: { title: string; path: string; icon: LucideIcon }[] = [
     icon: UserCog2Icon,
     path: '/accounts',
     title: 'Accounts',
+  },
+  {
+    icon: WorkflowIcon,
+    path: '/workflows/workflowId',
+    title: 'Workflows',
   },
   {
     path: '/settings',

@@ -98,7 +98,7 @@ function CommandList() {
 
       extension.commands.forEach((command) => {
         let isInSuggestion = false;
-        const showCommands = command.context
+        const showCommand = command.context
           ? command.context.some((context) => {
               if (context.startsWith('host')) {
                 if (!activeBrowserTab) return false;
@@ -120,7 +120,7 @@ function CommandList() {
             })
           : true;
 
-        if (!showCommands) return;
+        if (!showCommand) return;
 
         const commandItem: Item = {
           metadata: {

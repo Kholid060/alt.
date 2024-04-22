@@ -26,7 +26,7 @@ import {
   DatabaseExtensionListItem,
   DatabaseExtensionUpdatePayload,
 } from '#packages/main/src/interface/database.interface';
-import CommandShortcut from '../command/CommandShortcut';
+import CommandShortcut from '../ui/UiShortcut';
 import { COMMAND_MOD_NAME_MAP } from '/@/utils/constant';
 
 const VALID_SHORTCUT_KEYS_REGEX = /[0-9A-Za-z!-/~`{[\]|;:,.?=+<>\\()*$%^&,@_#]/;

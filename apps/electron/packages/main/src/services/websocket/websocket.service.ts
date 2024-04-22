@@ -16,7 +16,7 @@ class WebsocketService {
 
   private io: Server | null = null;
 
-  initServer(port: number, options: Partial<ServerOptions> = {}) {
+  startServer(port: number, options: Partial<ServerOptions> = {}) {
     this.io = new Server(port, {
       cors: {
         origin: '*',
@@ -38,7 +38,7 @@ class WebsocketService {
 export function initDefaultWebsocketServer() {
   const PORT = 4567;
 
-  return WebsocketService.instance.initServer(PORT);
+  return WebsocketService.instance.startServer(PORT);
 }
 
 export default WebsocketService;

@@ -28,4 +28,10 @@ export const IPC_POST_MESSAGE_EVENT = {
   extensionPortCreated: 'extension-port-created',
 } as const;
 
+export enum WORKFLOW_NODE_TYPE {
+  COMMAND = 'node-command',
+}
+
+export const DATABASE_CHANGES_ALL_ARGS = '$database-all-args$' as const;
+
 export const APP_DEEP_LINK = 'app-app';

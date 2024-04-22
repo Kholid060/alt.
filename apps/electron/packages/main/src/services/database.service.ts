@@ -25,9 +25,12 @@ import type {
   DatabaseExtensionCommandUpdatePayload,
   DatabaseQueriesEvent,
 } from '../interface/database.interface';
+import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 
 class DatabaseService {
-  static async getExtensions(): Promise<DatabaseExtensionListItem[]> {
+  static async getExtensions(
+    activeExtOnly: boolean = false,
+  ): Promise<DatabaseExtensionListItem[]> {
     const extensionsDbData = await extensionsDB.query.extensions.findMany({
       columns: {
         id: true,
@@ -39,12 +42,19 @@ class DatabaseService {
         isLocal: true,
         isDisabled: true,
         description: true,
-
         errorMessage: true,
       },
       with: {
         commands: {},
       },
+      where: activeExtOnly
+        ? (fields, operators) => {
+            return operators.and(
+              operators.eq(fields.isDisabled, false),
+              operators.eq(fields.isError, false),
+            );
+          }
+        : undefined,
     });
 
     return extensionsDbData;
@@ -137,25 +147,27 @@ class DatabaseService {
       .where(eq(extensions.id, extensionId));
 
     this.emitDBChanges({
-      'database:get-extension-list': [],
       'database:get-extension': [extensionId],
+      'database:get-extension-list': DATABASE_CHANGES_ALL_ARGS,
     });
   }
 
   static emitDBChanges(
     changes: {
-      [T in keyof Partial<DatabaseQueriesEvent>]: Parameters<
-        DatabaseQueriesEvent[T]
-      >;
+      [T in keyof Partial<DatabaseQueriesEvent>]:
+        | typeof DATABASE_CHANGES_ALL_ARGS
+        | Parameters<DatabaseQueriesEvent[T]>;
     },
     excludeWindow?: number[],
   ) {
     for (const _key in changes) {
       const key = _key as keyof DatabaseQueriesEvent;
+      const params = changes[key];
+
       WindowsManager.instance.sendMessageToAllWindows({
         name: 'database:changes',
         excludeWindow,
-        args: [key, ...(changes[key] ?? [])],
+        args: [key, ...(Array.isArray(params) ? params : [params])],
       });
     }
   }
@@ -306,9 +318,9 @@ class DatabaseService {
       .where(eq(commands.id, `${extensionId}:${commandId}`));
 
     this.emitDBChanges({
-      'database:get-extension-list': [],
       'database:get-extension': [extensionId],
       'database:get-command': [{ commandId, extensionId }],
+      'database:get-extension-list': DATABASE_CHANGES_ALL_ARGS,
     });
   }
 
@@ -320,7 +332,7 @@ class DatabaseService {
     await extensionsDB.insert(commandsSchema).values(commandsData).returning();
 
     this.emitDBChanges({
-      'database:get-extension-list': [],
+      'database:get-extension-list': DATABASE_CHANGES_ALL_ARGS,
     });
 
     const extension = await this.getExtension(extensionData.id);

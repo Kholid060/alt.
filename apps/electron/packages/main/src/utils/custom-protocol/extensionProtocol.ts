@@ -1,4 +1,4 @@
-import { createErrorResponse, type CustomProtocol } from './index';
+import { createErrorResponse, type CustomProtocolHandler } from './CustomProtocol';
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
 import { net } from 'electron';
 import { fileURLToPath } from 'url';
@@ -59,7 +59,7 @@ function handleCommandPath(extId: string, ...paths: string[]) {
   return net.fetch(path);
 }
 
-const appIconProtocol: CustomProtocol = {
+const appIconProtocol: CustomProtocolHandler = {
   scheme: CUSTOM_SCHEME.extension,
   async handler(req) {
     const [extId, type, ...paths] = req.url

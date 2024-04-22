@@ -58,7 +58,9 @@ export interface DatabaseQueriesEvent {
     commandId: string,
     data: DatabaseExtensionCommandUpdatePayload,
   ) => void;
-  'database:get-extension-list': () => DatabaseExtensionListItem[];
+  'database:get-extension-list': (
+    activeExtOnly?: boolean,
+  ) => DatabaseExtensionListItem[];
   'database:get-extension': (extensionId: string) => DatabaseExtension | null;
   'database:get-extension-manifest': (
     extensionId: string,

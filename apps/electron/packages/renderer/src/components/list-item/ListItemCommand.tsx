@@ -9,7 +9,7 @@ import { CommandLaunchBy } from '@repo/extension';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import { getExtIconURL } from '/@/utils/helper';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
-import CommandShortcut from '../command/CommandShortcut';
+import CommandShortcut from '../ui/UiShortcut';
 
 function ListItemCommand({
   item,

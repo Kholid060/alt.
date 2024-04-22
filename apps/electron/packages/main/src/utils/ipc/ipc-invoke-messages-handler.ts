@@ -1,7 +1,7 @@
 import InstalledApps from '../InstalledApps';
 import ExtensionLoader from '../extension/ExtensionLoader';
 import './ipc-extension-messages';
-import { BrowserWindow, clipboard, dialog, shell } from 'electron';
+import { BrowserWindow, clipboard, dialog, screen, shell } from 'electron';
 import ExtensionCommandScriptRunner from '../extension/ExtensionCommandScriptRunner';
 import IPCMain from './IPCMain';
 import extensionsDB from '../../db/extension.db';
@@ -204,8 +204,8 @@ IPCMain.handle('app:show-command-window', () => {
 IPCMain.handle('database:get-extension', (_, extensionId) => {
   return DatabaseService.getExtension(extensionId);
 });
-IPCMain.handle('database:get-extension-list', () => {
-  return DatabaseService.getExtensions();
+IPCMain.handle('database:get-extension-list', (_, activeExtOnly) => {
+  return DatabaseService.getExtensions(activeExtOnly);
 });
 IPCMain.handle('database:get-extension-manifest', (_, extensionId) => {
   return DatabaseService.getExtensionManifest(extensionId);
@@ -235,3 +235,30 @@ IPCMain.handle(
 IPCMain.handle('shell:open-in-folder', async (_, filePath) => {
   await shell.openPath(filePath);
 });
+
+/** SCREEN */
+IPCMain.handle(
+  'screen:get-cursor-position',
+  async ({ sender }, relativeToWindow) => {
+    const point = screen.getCursorScreenPoint();
+    if (!relativeToWindow) return Promise.resolve(point);
+
+    const browserWindow = BrowserWindow.fromWebContents(sender);
+    if (!browserWindow) return Promise.resolve({ x: 0, y: 0 });
+
+    const windowBound = browserWindow.getBounds();
+    if (
+      point.x > windowBound.x + windowBound.width ||
+      point.x < windowBound.x ||
+      point.y > windowBound.y + windowBound.height ||
+      point.y < windowBound.y
+    ) {
+      return Promise.resolve({ x: 0, y: 0 });
+    }
+
+    return Promise.resolve({
+      x: point.x - windowBound.x,
+      y: point.y - windowBound.y,
+    });
+  },
+);

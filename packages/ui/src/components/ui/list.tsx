@@ -666,7 +666,7 @@ const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
               </span>
             )}
             <div className="flex-1">
-              <p className="leading-tight">
+              <p className="leading-tight line-clamp-1">
                 {title}
                 <span className="text-muted-foreground leading-tight ml-2 text-xs">
                   {subtitle}
@@ -702,9 +702,35 @@ const UiListIcon = forwardRef<HTMLSpanElement, { icon: LucideIcon | string }>(
 );
 UiListIcon.displayName = 'ExtCommandListIcon';
 
+const UiListInput = forwardRef<
+  HTMLInputElement,
+  React.InputHTMLAttributes<HTMLInputElement>
+>(({ onKeyDown, onChange, ...props }, ref) => {
+  const listStore = useUiListStore();
+  const query = useUiList((state) => state.search);
+
+  return (
+    <input
+      ref={ref}
+      {...props}
+      value={query}
+      onKeyDown={(event) => {
+        onKeyDown?.(event);
+        listStore.listControllerKeyBind(event.nativeEvent);
+      }}
+      onChange={(event) => {
+        onChange?.(event);
+        listStore.setState('search', event.target.value);
+      }}
+    />
+  );
+});
+UiListInput.displayName = 'ExtCommandListIcon';
+
 const UiList = Object.assign(UiListRoot, {
   Icon: UiListIcon,
   Item: UiListItem,
+  Input: UiListInput,
   GroupHeading: UiListGroupHeading,
 });
 

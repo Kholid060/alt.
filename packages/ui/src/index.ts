@@ -48,6 +48,24 @@ export {
   UiFormDescription,
 } from './components/ui/form';
 export { UiToggle, uiToggleVariants } from './components/ui/toggle';
+export {
+  UiContextMenu,
+  UiContextMenuSub,
+  UiContextMenuItem,
+  UiContextMenuLabel,
+  UiContextMenuGroup,
+  UiContextMenuPortal,
+  UiContextMenuTrigger,
+  UiContextMenuContent,
+  UiContextMenuShortcut,
+  UiContextMenuRadioItem,
+  UiContextMenuSeparator,
+  UiContextMenuSubContent,
+  UiContextMenuSubTrigger,
+  UiContextMenuRadioGroup,
+  UiContextMenuCheckboxItem,
+  UiContextMenuItemIndicator,
+} from './components/ui/context-menu';
 export { UiToggleGroup, UiToggleGroupItem } from './components/ui/toggle-group';
 export {
   UiDropdownMenu,

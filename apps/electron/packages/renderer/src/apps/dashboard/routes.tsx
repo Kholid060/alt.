@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import RouteExtension from './routes/RouteExtension';
 import DashboardApp from './DashboardApp';
+import RouteWorkflow from './routes/RouteWorkflow';
 
 const router = createBrowserRouter(
   [
@@ -13,6 +14,10 @@ const router = createBrowserRouter(
           element: <RouteExtension />,
         },
       ],
+    },
+    {
+      path: '/workflows/:workflowId',
+      element: <RouteWorkflow />,
     },
   ],
   { basename: '/dashboard' },

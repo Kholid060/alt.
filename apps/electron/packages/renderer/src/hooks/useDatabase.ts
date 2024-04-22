@@ -4,6 +4,7 @@ import preloadAPI from '../utils/preloadAPI';
 import { isIPCEventError } from '../utils/helper';
 import { DatabaseContext } from '../context/database.context';
 import type { DatabaseQueriesEvent } from '#packages/main/src/interface/database.interface';
+import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 
 type QueryDBIdleState<T> = { state: 'idle'; error: null; data: T };
 type QueryDBErrorState = { state: 'error'; error: string; data: null };
@@ -76,7 +77,11 @@ export function useDatabaseQuery<T extends keyof DatabaseQueriesEvent>(
     startQuery();
 
     const onDataChange = (...args: unknown[]) => {
-      if (!shallowEqualArrays(args, args)) return;
+      if (
+        args[0] !== DATABASE_CHANGES_ALL_ARGS &&
+        !shallowEqualArrays(args, args)
+      )
+        return;
 
       startQuery();
     };
