@@ -89,6 +89,19 @@ IPCMain.handle('clipboard:copy', (_, content) => {
 
   return Promise.resolve();
 });
+IPCMain.handle('clipboard:copy-buffer', (_, contentType, content) => {
+  const buffer = Buffer.from(content);
+  clipboard.writeBuffer(contentType, buffer);
+
+  return Promise.resolve();
+});
+IPCMain.handle('clipboard:read-buffer', (_, contentType) => {
+  const buffer = clipboard.readBuffer(contentType);
+  return Promise.resolve(buffer.toString());
+});
+IPCMain.handle('clipboard:has-buffer', (_, contentType) => {
+  return Promise.resolve(clipboard.has(contentType));
+});
 
 /** EXTENSION CONFIG */
 IPCMain.handle('extension-config:get', async (_, configId) => {
@@ -246,19 +259,19 @@ IPCMain.handle(
     const browserWindow = BrowserWindow.fromWebContents(sender);
     if (!browserWindow) return Promise.resolve({ x: 0, y: 0 });
 
-    const windowBound = browserWindow.getBounds();
+    const contentBound = browserWindow.getContentBounds();
     if (
-      point.x > windowBound.x + windowBound.width ||
-      point.x < windowBound.x ||
-      point.y > windowBound.y + windowBound.height ||
-      point.y < windowBound.y
+      point.x > contentBound.x + contentBound.width ||
+      point.x < contentBound.x ||
+      point.y > contentBound.y + contentBound.height ||
+      point.y < contentBound.y
     ) {
       return Promise.resolve({ x: 0, y: 0 });
     }
 
     return Promise.resolve({
-      x: point.x - windowBound.x,
-      y: point.y - windowBound.y,
+      x: point.x - contentBound.x,
+      y: point.y - contentBound.y,
     });
   },
 );

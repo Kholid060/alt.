@@ -1,7 +1,13 @@
+import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
+import { UiListItem } from '@repo/ui';
+import { WorkflowNodeCommand } from './workflow.interface';
+import { SetRequired } from 'type-fest';
+
 export enum WorkflowEditorContextMenuType {
   PANE,
   NODE,
   EDGE,
+  SELECTION,
 }
 
 export interface XYPosition {
@@ -12,15 +18,29 @@ export interface XYPosition {
 export type WorkflowEditorContextMenuEventPayload =
   | { type: WorkflowEditorContextMenuType.PANE; position: XYPosition }
   | {
-      type: WorkflowEditorContextMenuType.NODE;
-      position: XYPosition;
       nodeId: string;
+      position: XYPosition;
+      type: WorkflowEditorContextMenuType.NODE;
     }
   | {
-      type: WorkflowEditorContextMenuType.EDGE;
-      position: XYPosition;
       edgeId: string;
+      position: XYPosition;
+      type: WorkflowEditorContextMenuType.EDGE;
+    }
+  | {
+      nodeIds: string[];
+      position: XYPosition;
+      type: WorkflowEditorContextMenuType.SELECTION;
     };
+
+export type WorkflowEditorNodeListCommandItem = SetRequired<
+  UiListItem<
+    { type: WORKFLOW_NODE_TYPE.COMMAND } & WorkflowNodeCommand['data']
+  >,
+  'metadata'
+>;
+
+export type WorkflowEditorNodeListItem = WorkflowEditorNodeListCommandItem;
 
 // hmm....
 export interface WorkflowEditorOpenNodeListModalPayload {

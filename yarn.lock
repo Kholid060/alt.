@@ -7866,6 +7866,7 @@ __metadata:
     active-win: "npm:^8.2.1"
     autoprefixer: "npm:^10.4.17"
     better-sqlite3: "npm:^9.4.5"
+    clsx: "npm:^2.1.0"
     cross-env: "npm:7.0.3"
     dayjs: "npm:^1.11.10"
     dot-prop: "npm:^8.0.2"

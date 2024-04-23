@@ -1,21 +1,21 @@
 import { useCallback, useRef } from 'react';
 import ReactFlow, {
-  Background,
-  BackgroundVariant,
   Edge,
   Node,
+  Panel,
   NodeProps,
   OnConnect,
+  Background,
   OnConnectEnd,
   OnConnectStart,
-  Panel,
+  OnEdgeUpdateFunc,
+  BackgroundVariant,
   ReactFlowProvider,
 } from 'reactflow';
-
-import 'reactflow/dist/style.css';
+import '/@/assets/css/workflow-editor-style.css';
 import WorkflowEditorHeader from '/@/components/workflow/editor/WorkflowEditorHeader';
 import WorkflowEditorControls from '/@/components/workflow/editor/WorkflowEditorControls';
-import WorkflowNodeBase from '/@/components/workflow/node/WorkflowNodeBase';
+import WorkflowNodeCommand from '../../../components/workflow/node/WorkflowNodeCommand';
 import { WorkflowEditorNodeListModal } from '/@/components/workflow/editor/WorkflowEditorNodeLIst';
 import {
   WorkflowEditorStore,
@@ -27,17 +27,24 @@ import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 import { WorkflowEditorContextMenuType } from '/@/interface/workflow-editor.interface';
 import WorkflowEditorContextMenu from '/@/components/workflow/editor/WorkflowEditorContextMenu';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
+import WorkflowEdgeDefault from '/@/components/workflow/edge/WorkflowEdgeDefault';
 
 const nodeTypes: Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>> = {
-  [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeBase,
+  [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeCommand,
+};
+const edgeTypes = {
+  default: WorkflowEdgeDefault,
 };
 
 const selector = (state: WorkflowEditorStore) => ({
   nodes: state.nodes,
   edges: state.edges,
   onConnect: state.onConnect,
+  deleteEdge: state.deleteEdge,
+  updateEdge: state.updateEdge,
   onNodesChange: state.onNodesChange,
   onEdgesChange: state.onEdgesChange,
+  onSelectionChange: state.onSelectionChange,
 });
 
 function WorkflowEditor() {
@@ -47,9 +54,18 @@ function WorkflowEditor() {
     nodeId: string;
     handleId: string;
   } | null>(null);
+  const edgeUpdateSuccessful = useRef(true);
 
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect } =
-    useWorkflowStore(useShallow(selector));
+  const {
+    nodes,
+    edges,
+    onConnect,
+    updateEdge,
+    deleteEdge,
+    onNodesChange,
+    onEdgesChange,
+    onSelectionChange,
+  } = useWorkflowStore(useShallow(selector));
 
   const onConnectEnd: OnConnectEnd = useCallback(
     (event) => {
@@ -88,6 +104,7 @@ function WorkflowEditor() {
     },
     [onConnect],
   );
+
   const onPaneContextMenu = useCallback(
     (event: React.MouseEvent) =>
       workflowEditorEvent.emit('context-menu:open', {
@@ -114,6 +131,36 @@ function WorkflowEditor() {
       }),
     [workflowEditorEvent],
   );
+  const onSelectionContextMenu = useCallback(
+    (event: React.MouseEvent, nodes: Node[]) =>
+      workflowEditorEvent.emit('context-menu:open', {
+        nodeIds: nodes.map((node) => node.id),
+        type: WorkflowEditorContextMenuType.SELECTION,
+        position: { x: event.clientX, y: event.clientY },
+      }),
+    [workflowEditorEvent],
+  );
+
+  const onEdgeUpdateStart = useCallback(() => {
+    edgeUpdateSuccessful.current = false;
+  }, []);
+  const onEdgeUpdate: OnEdgeUpdateFunc = useCallback(
+    (oldEdge, newConnection) => {
+      edgeUpdateSuccessful.current = true;
+      updateEdge(oldEdge, newConnection);
+    },
+    [updateEdge],
+  );
+  const onEdgeUpdateEnd = useCallback(
+    (_: MouseEvent | TouchEvent, edge: Edge) => {
+      if (!edgeUpdateSuccessful.current) {
+        deleteEdge(edge.id);
+      }
+
+      edgeUpdateSuccessful.current = true;
+    },
+    [deleteEdge],
+  );
 
   return (
     <div className="relative w-full h-screen flex flex-col">
@@ -121,18 +168,24 @@ function WorkflowEditor() {
       <div className="flex-grow flex relative">
         <WorkflowEditorNodeListModal />
         <ReactFlow
-          className="flex-grow"
-          nodeTypes={nodeTypes}
           nodes={nodes}
           edges={edges}
+          className="flex-grow"
+          nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           onConnect={onEditorConnect}
           onConnectEnd={onConnectEnd}
+          onEdgeUpdate={onEdgeUpdate}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnectStart={onConnectStart}
+          onEdgeUpdateEnd={onEdgeUpdateEnd}
+          onEdgeUpdateStart={onEdgeUpdateStart}
           onPaneContextMenu={onPaneContextMenu}
+          onSelectionChange={onSelectionChange}
           onNodeContextMenu={onNodeContextMenu}
           onEdgeContextMenu={onEdgeContextMenu}
+          onSelectionContextMenu={onSelectionContextMenu}
         >
           <Panel position="bottom-left">
             <WorkflowEditorControls />

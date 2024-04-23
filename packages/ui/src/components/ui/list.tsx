@@ -688,18 +688,25 @@ const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
 );
 UiListItem.displayName = 'UiListItem';
 
-const UiListIcon = forwardRef<HTMLSpanElement, { icon: LucideIcon | string }>(
-  ({ icon: Icon }, ref) => {
-    return (
-      <span
-        ref={ref}
-        className="group-aria-selected/item:text-foreground text-muted-foreground inline-flex justify-center items-center bg-card rounded-sm border border-border/40 h-full w-full"
-      >
-        {typeof Icon === 'string' ? Icon : <Icon className="h-4 w-4" />}
-      </span>
-    );
-  },
-);
+const UiListIcon = forwardRef<
+  HTMLSpanElement,
+  Omit<React.HTMLAttributes<HTMLSpanElement>, 'children'> & {
+    icon: LucideIcon | string;
+  }
+>(({ icon: Icon, className, ...props }, ref) => {
+  return (
+    <span
+      ref={ref}
+      className={cn(
+        'group-aria-selected/item:text-foreground text-muted-foreground inline-flex justify-center items-center bg-card rounded-sm border border-border/40 h-full w-full',
+        className,
+      )}
+      {...props}
+    >
+      {typeof Icon === 'string' ? Icon : <Icon className="h-4 w-4" />}
+    </span>
+  );
+});
 UiListIcon.displayName = 'ExtCommandListIcon';
 
 const UiListInput = forwardRef<

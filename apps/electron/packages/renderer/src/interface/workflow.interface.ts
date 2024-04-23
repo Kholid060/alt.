@@ -1,5 +1,5 @@
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
-import { Node } from 'reactflow';
+import { Edge, Node } from 'reactflow';
 import { SetOptional } from 'type-fest';
 
 interface WorkflowNodeBaseData {
@@ -12,6 +12,7 @@ export type WorkflowNodeCommand = Node<
     title: string;
     commandId: string;
     extensionId: string;
+    extensionTitle: string;
   } & WorkflowNodeBaseData,
   WORKFLOW_NODE_TYPE.COMMAND
 >;
@@ -24,3 +25,8 @@ export type WorkflowGetNode<T extends WORKFLOW_NODE_TYPE> = Extract<
 >;
 
 export type WorkflowNewNode = SetOptional<WorkflowNodes, 'id'>;
+
+export interface WorkflowClipboardData {
+  edges: Edge[];
+  nodes: WorkflowNodes[];
+}

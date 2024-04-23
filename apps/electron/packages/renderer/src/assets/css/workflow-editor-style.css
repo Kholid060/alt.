@@ -1,0 +1,41 @@
+@import 'reactflow/dist/style.css';
+
+.react-flow__handle {
+  width: theme(spacing.3);
+  height: theme(spacing.3);
+
+  &-left {
+    left: -6px;
+    border: none;
+    height: theme(spacing.8);
+    border-radius: theme(borderRadius.sm);
+    background-color: theme(colors.primary.DEFAULT);
+  }
+  &-right {
+    right: -7px;
+    width: theme(spacing.4);
+    height: theme(spacing.4);
+    border-radius: theme(borderRadius.sm);
+    background-color: theme(colors.background);
+    border: theme(borderWidth.2) solid theme(borderColor.primary.DEFAULT);
+  }
+}
+
+.react-flow__node {
+  &.selected > div {
+    @apply border-primary/60;
+  }
+}
+
+.react-flow__edge {
+  &-path {
+    stroke-width: theme(spacing[0.5]);
+    stroke: theme(borderColor.border);
+  }
+
+  &.selected, &:hover {
+    .react-flow__edge-path {
+      stroke: theme(colors.primary.DEFAULT);
+    }
+  }
+}

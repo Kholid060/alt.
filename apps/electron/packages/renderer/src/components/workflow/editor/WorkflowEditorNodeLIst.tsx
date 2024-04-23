@@ -1,6 +1,5 @@
 import {
   UiList,
-  UiListItem,
   UiPopover,
   UiPopoverContent,
   UiPopoverTrigger,
@@ -19,7 +18,10 @@ import { Connection, useReactFlow } from 'reactflow';
 import { useWorkflowStore } from '/@/stores/workflow-editor.store';
 import { WorkflowNewNode } from '/@/interface/workflow.interface';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
-import { WorkflowEditorOpenNodeListModalPayload } from '/@/interface/workflow-editor.interface';
+import {
+  WorkflowEditorNodeListCommandItem,
+  WorkflowEditorOpenNodeListModalPayload,
+} from '/@/interface/workflow-editor.interface';
 import { nanoid } from 'nanoid/non-secure';
 
 type NodeType = 'all' | 'triggers' | 'commands' | 'scripts';
@@ -45,7 +47,7 @@ export function WorkflowEditorNodeList({
   const [nodeType, setNodeType] = useState<NodeType>('all');
 
   const items = useMemo(() => {
-    const allItems: UiListItem[] = [];
+    const allItems: WorkflowEditorNodeListCommandItem[] = [];
 
     extensionsQuery.data?.forEach((extension) => {
       const extIcon = (
@@ -71,9 +73,16 @@ export function WorkflowEditorNodeList({
               ? 'Scripts'
               : 'Commands'
             : undefined;
-
-        allItems.push({
+        const item: WorkflowEditorNodeListCommandItem = {
           group,
+          metadata: {
+            title: command.title,
+            commandId: command.name,
+            extensionId: extension.id,
+            extensionTitle: extension.title,
+            type: WORKFLOW_NODE_TYPE.COMMAND,
+            icon: command.icon || extension.icon,
+          },
           subtitle: extension.title,
           icon: command.icon ? (
             <UiExtensionIcon
@@ -87,25 +96,25 @@ export function WorkflowEditorNodeList({
           ),
           title: command.title,
           value: extension.id + command.name,
-        });
+        };
+
+        allItems.push(item);
       });
     });
 
     return allItems;
   }, [extensionsQuery, nodeType]);
 
-  function onItemSelected() {
-    const newNode: WorkflowNewNode = {
-      data: {
-        icon: '',
-        title: '',
-        commandId: '',
-        extensionId: '',
-      },
-      type: WORKFLOW_NODE_TYPE.COMMAND,
+  function onItemSelected(value: string) {
+    const selectedItem = items.find((item) => item.value === value);
+    if (!selectedItem) return;
+
+    const { type, ...data } = selectedItem.metadata;
+    onSelectItem?.({
+      data,
+      type,
       position: { x: 0, y: 0 },
-    };
-    onSelectItem?.(newNode);
+    });
   }
 
   return (

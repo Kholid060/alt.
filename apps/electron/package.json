@@ -71,6 +71,7 @@
     "@repo/ui": "workspace:*",
     "active-win": "^8.2.1",
     "better-sqlite3": "^9.4.5",
+    "clsx": "^2.1.0",
     "dayjs": "^1.11.10",
     "dot-prop": "^8.0.2",
     "drizzle-orm": "^0.30.8",
