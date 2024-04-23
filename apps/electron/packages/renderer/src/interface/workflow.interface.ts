@@ -17,7 +17,16 @@ export type WorkflowNodeCommand = Node<
   WORKFLOW_NODE_TYPE.COMMAND
 >;
 
-export type WorkflowNodes = WorkflowNodeCommand;
+export interface WorkflowNodeTriggerManual {
+  type: 'manual';
+}
+
+export type WorkflowNodeTrigger = Node<
+  WorkflowNodeTriggerManual,
+  WORKFLOW_NODE_TYPE.TRIGGER
+>;
+
+export type WorkflowNodes = WorkflowNodeCommand | WorkflowNodeTrigger;
 
 export type WorkflowGetNode<T extends WORKFLOW_NODE_TYPE> = Extract<
   WorkflowNodeCommand,

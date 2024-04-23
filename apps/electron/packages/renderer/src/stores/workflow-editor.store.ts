@@ -11,6 +11,7 @@ import {
   applyNodeChanges,
   updateEdge,
   OnSelectionChangeFunc,
+  Node,
 } from 'reactflow';
 import { create } from 'zustand';
 import createStoreSelectors from '../utils/createStoreSelector';
@@ -77,14 +78,12 @@ const workflowStore = create<WorkflowEditorStore>((set, get) => ({
 
     const newNodeIdsMap: Record<string, string> = {};
 
-    const nodes: WorkflowNewNode[] = elements.nodes.map(
-      ({ data, position, type, id }) => {
-        const nodeId = nanoid();
-        newNodeIdsMap[id] = nodeId;
+    const nodes = elements.nodes.map(({ data, position, type, id }) => {
+      const nodeId = nanoid();
+      newNodeIdsMap[id] = nodeId;
 
-        return { id: nodeId, type, data, position };
-      },
-    );
+      return { id: nodeId, type, data, position };
+    }) as WorkflowNewNode[];
     const edges: Connection[] = elements.edges.map(
       ({ source, sourceHandle, target, targetHandle }) => ({
         source: newNodeIdsMap[source] || source,
@@ -129,7 +128,10 @@ const workflowStore = create<WorkflowEditorStore>((set, get) => ({
   },
   onNodesChange: (changes: NodeChange[]) => {
     set({
-      nodes: applyNodeChanges(changes, get().nodes) as WorkflowNodes[],
+      nodes: applyNodeChanges(
+        changes,
+        get().nodes as Node[],
+      ) as WorkflowNodes[],
     });
   },
   onEdgesChange: (changes: EdgeChange[]) => {

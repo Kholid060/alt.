@@ -110,7 +110,7 @@ function ContextMenuItemDelete({
       onClick={deleteWorkflowElements}
     >
       <p className="text-destructive-text">
-        Delete {selectedElsCount ? `(${selectedElsCount})` : ''}
+        Delete {selectedElsCount > 1 ? `(${selectedElsCount})` : ''}
       </p>
       <UiContextMenuShortcut>
         <UiShortcut shortcut="Backspace" />

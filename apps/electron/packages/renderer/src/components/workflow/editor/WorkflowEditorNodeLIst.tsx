@@ -20,6 +20,8 @@ import { WorkflowNewNode } from '/@/interface/workflow.interface';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import {
   WorkflowEditorNodeListCommandItem,
+  WorkflowEditorNodeListItem,
+  WorkflowEditorNodeListTriggerItem,
   WorkflowEditorOpenNodeListModalPayload,
 } from '/@/interface/workflow-editor.interface';
 import { nanoid } from 'nanoid/non-secure';
@@ -31,6 +33,16 @@ const nodeTypes: { id: NodeType; title: string }[] = [
   { id: 'triggers', title: 'Triggers' },
   { id: 'commands', title: 'Commands' },
   { id: 'scripts', title: 'Scripts' },
+];
+
+const triggersNode: WorkflowEditorNodeListTriggerItem[] = [
+  {
+    icon: 'huh',
+    title: 'Manual',
+    group: 'Triggers',
+    value: 'trigger-manual',
+    metadata: { nodeType: WORKFLOW_NODE_TYPE.TRIGGER, type: 'manual' },
+  },
 ];
 
 export function WorkflowEditorNodeList({
@@ -47,7 +59,7 @@ export function WorkflowEditorNodeList({
   const [nodeType, setNodeType] = useState<NodeType>('all');
 
   const items = useMemo(() => {
-    const allItems: WorkflowEditorNodeListCommandItem[] = [];
+    const allItems: WorkflowEditorNodeListItem[] = [];
 
     extensionsQuery.data?.forEach((extension) => {
       const extIcon = (
@@ -62,25 +74,21 @@ export function WorkflowEditorNodeList({
       extension.commands.forEach((command) => {
         if (
           nodeType === 'triggers' ||
+          command.type === 'view' ||
+          command.type === 'view:json' ||
           (nodeType === 'scripts' && command.type !== 'script') ||
           (nodeType === 'commands' && command.type === 'script')
         )
           return;
 
-        const group =
-          nodeType === 'all'
-            ? command.type === 'script'
-              ? 'Scripts'
-              : 'Commands'
-            : undefined;
         const item: WorkflowEditorNodeListCommandItem = {
-          group,
+          group: command.type === 'script' ? 'Scripts' : 'Commands',
           metadata: {
             title: command.title,
             commandId: command.name,
             extensionId: extension.id,
             extensionTitle: extension.title,
-            type: WORKFLOW_NODE_TYPE.COMMAND,
+            nodeType: WORKFLOW_NODE_TYPE.COMMAND,
             icon: command.icon || extension.icon,
           },
           subtitle: extension.title,
@@ -102,6 +110,10 @@ export function WorkflowEditorNodeList({
       });
     });
 
+    if (nodeType === 'all' || nodeType === 'triggers') {
+      allItems.unshift(...triggersNode);
+    }
+
     return allItems;
   }, [extensionsQuery, nodeType]);
 
@@ -109,12 +121,12 @@ export function WorkflowEditorNodeList({
     const selectedItem = items.find((item) => item.value === value);
     if (!selectedItem) return;
 
-    const { type, ...data } = selectedItem.metadata;
+    const { nodeType, ...data } = selectedItem.metadata;
     onSelectItem?.({
       data,
-      type,
+      type: nodeType,
       position: { x: 0, y: 0 },
-    });
+    } as WorkflowNewNode);
   }
 
   return (

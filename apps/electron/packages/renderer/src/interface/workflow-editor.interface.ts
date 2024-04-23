@@ -1,6 +1,6 @@
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import { UiListItem } from '@repo/ui';
-import { WorkflowNodeCommand } from './workflow.interface';
+import { WorkflowNodeCommand, WorkflowNodeTrigger } from './workflow.interface';
 import { SetRequired } from 'type-fest';
 
 export enum WorkflowEditorContextMenuType {
@@ -35,12 +35,21 @@ export type WorkflowEditorContextMenuEventPayload =
 
 export type WorkflowEditorNodeListCommandItem = SetRequired<
   UiListItem<
-    { type: WORKFLOW_NODE_TYPE.COMMAND } & WorkflowNodeCommand['data']
+    { nodeType: WORKFLOW_NODE_TYPE.COMMAND } & WorkflowNodeCommand['data']
   >,
   'metadata'
 >;
 
-export type WorkflowEditorNodeListItem = WorkflowEditorNodeListCommandItem;
+export type WorkflowEditorNodeListTriggerItem = SetRequired<
+  UiListItem<
+    { nodeType: WORKFLOW_NODE_TYPE.TRIGGER } & WorkflowNodeTrigger['data']
+  >,
+  'metadata'
+>;
+
+export type WorkflowEditorNodeListItem =
+  | WorkflowEditorNodeListCommandItem
+  | WorkflowEditorNodeListTriggerItem;
 
 // hmm....
 export interface WorkflowEditorOpenNodeListModalPayload {

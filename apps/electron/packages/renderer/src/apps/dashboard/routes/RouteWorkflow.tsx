@@ -15,7 +15,6 @@ import ReactFlow, {
 import '/@/assets/css/workflow-editor-style.css';
 import WorkflowEditorHeader from '/@/components/workflow/editor/WorkflowEditorHeader';
 import WorkflowEditorControls from '/@/components/workflow/editor/WorkflowEditorControls';
-import WorkflowNodeCommand from '../../../components/workflow/node/WorkflowNodeCommand';
 import { WorkflowEditorNodeListModal } from '/@/components/workflow/editor/WorkflowEditorNodeLIst';
 import {
   WorkflowEditorStore,
@@ -28,9 +27,14 @@ import { WorkflowEditorContextMenuType } from '/@/interface/workflow-editor.inte
 import WorkflowEditorContextMenu from '/@/components/workflow/editor/WorkflowEditorContextMenu';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import WorkflowEdgeDefault from '/@/components/workflow/edge/WorkflowEdgeDefault';
+import {
+  WorkflowNodeCommand,
+  WorkflowNodeTrigger,
+} from '/@/components/workflow/WorkflowNodes';
 
 const nodeTypes: Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>> = {
   [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeCommand,
+  [WORKFLOW_NODE_TYPE.TRIGGER]: WorkflowNodeTrigger,
 };
 const edgeTypes = {
   default: WorkflowEdgeDefault,
