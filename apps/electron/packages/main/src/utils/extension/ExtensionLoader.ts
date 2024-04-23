@@ -11,7 +11,6 @@ import {
   ExtensionError,
   ValidationError,
 } from '#packages/common/errors/custom-errors';
-import extensionsDB from '/@/db/extension.db';
 import { fromZodError } from 'zod-validation-error';
 import type {
   NewExtension,
@@ -19,8 +18,8 @@ import type {
 } from '/@/db/schema/extension.schema';
 import { extensions as extensionsSchema } from '/@/db/schema/extension.schema';
 import { mapManifestToDB } from '../database-utils';
-import DatabaseService from '/@/services/database.service';
 import type { DatabaseExtension } from '/@/interface/database.interface';
+import DBService from '/@/services/database/database.service';
 
 const validatorLogger = loggerBuilder(['ExtensionLoader', 'manifestValidator']);
 
@@ -129,8 +128,8 @@ class ExtensionLoader {
 
   @ErrorLogger('ExtensionLoader', 'loadExtensions')
   async loadExtensions() {
-    await extensionsDB.transaction(async (tx) => {
-      const extensions = await extensionsDB.query.extensions.findMany({
+    await DBService.instance.db.transaction(async (tx) => {
+      const extensions = await DBService.instance.db.query.extensions.findMany({
         columns: {
           id: true,
           path: true,
@@ -173,7 +172,7 @@ class ExtensionLoader {
                 ...mapManifestToDB.extension(extensionManifest.data),
               };
 
-              await DatabaseService.upsertExtensionCommands(
+              await DBService.instance.extension.upsertExtensionCommands(
                 extension.id,
                 extensionManifest.data.commands,
                 tx,
@@ -246,7 +245,7 @@ class ExtensionLoader {
         ...mapManifestToDB.command(command),
       }),
     );
-    const extension = await DatabaseService.addExtension(
+    const extension = await DBService.instance.extension.addExtension(
       {
         id,
         isLocal: true,
@@ -262,7 +261,7 @@ class ExtensionLoader {
   }
 
   async reloadExtension(extId: string): Promise<boolean> {
-    const extension = await extensionsDB.query.extensions.findFirst({
+    const extension = await DBService.instance.db.query.extensions.findFirst({
       columns: {
         id: true,
         path: true,
@@ -300,14 +299,16 @@ class ExtensionLoader {
         ...mapManifestToDB.extension(extensionManifest.data),
       };
 
-      await DatabaseService.upsertExtensionCommands(
+      await DBService.instance.extension.upsertExtensionCommands(
         extension.id,
         extensionManifest.data.commands,
       );
       this.extensionsManifestPath.set(extension.id, extension.path);
     }
 
-    await extensionsDB.update(extensionsSchema).set(updateExtensionPayload);
+    await DBService.instance.db
+      .update(extensionsSchema)
+      .set(updateExtensionPayload);
 
     return true;
   }

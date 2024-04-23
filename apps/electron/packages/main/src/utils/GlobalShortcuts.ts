@@ -4,7 +4,7 @@ import { toggleCommandWindow } from '../window/command-window';
 import { logger } from '../lib/log';
 import extensionCommandRunner from './extension/extensionCommandRunner';
 import { CommandLaunchBy } from '@repo/extension';
-import extensionsDB from '../db/extension.db';
+import DBService from '../services/database/database.service';
 
 class GlobalShortcut {
   private static _instance: GlobalShortcut | null = null;
@@ -93,7 +93,7 @@ export class GlobalShortcutExtension {
   }
 
   static async registerAllShortcuts() {
-    const commands = await extensionsDB.query.commands.findMany({
+    const commands = await DBService.instance.db.query.commands.findMany({
       columns: {
         name: true,
         shortcut: true,

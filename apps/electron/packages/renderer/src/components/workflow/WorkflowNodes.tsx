@@ -3,7 +3,7 @@ import { Handle, NodeProps, Position } from 'reactflow';
 import {
   WorkflowNodeCommand as WorkflowNodeCommandData,
   WorkflowNodeTrigger as WorkflowNodeTriggerData,
-} from '/@/interface/workflow.interface';
+} from '#common/interface/workflow.interface';
 import { UiList } from '@repo/ui';
 import UiExtensionIcon from '../ui/UiExtensionIcon';
 import { PlugZapIcon } from 'lucide-react';
@@ -46,7 +46,7 @@ export const WorkflowNodeTrigger: React.FC<
           <UiList.Icon icon={PlugZapIcon} />
         </div>
         <div className="flex-grow ml-2">
-          <p className="line-clamp-1">Manual trigger</p>
+          <p className="line-clamp-1">Manual Trigger</p>
           <p className="line-clamp-1 text-xs text-muted-foreground">Trigger</p>
         </div>
       </div>

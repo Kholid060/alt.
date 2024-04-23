@@ -1,4 +1,7 @@
-import { createErrorResponse, type CustomProtocolHandler } from './CustomProtocol';
+import {
+  createErrorResponse,
+  type CustomProtocolHandler,
+} from './CustomProtocol';
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
 import { net } from 'electron';
 import { fileURLToPath } from 'url';

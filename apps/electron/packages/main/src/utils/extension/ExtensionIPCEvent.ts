@@ -13,8 +13,8 @@ import ExtensionMessagePortHandler from './ExtensionMessagePortHandler';
 import { logger } from '/@/lib/log';
 import WindowsManager from '/@/window/WindowsManager';
 import type { ExtensionManifest } from '@repo/extension-core';
-import DatabaseService from '/@/services/database.service';
 import IPCMain from '../ipc/IPCMain';
+import DBService from '/@/services/database/database.service';
 
 export type ExtensionMessageHandler = <
   T extends keyof IPCUserExtensionEventsMap,
@@ -93,7 +93,7 @@ class ExtensionIPCEvent {
     }
 
     const extensionManifest =
-      await DatabaseService.getExtensionManifest(extensionId);
+      await DBService.instance.extension.getExtensionManifest(extensionId);
     if (!extensionManifest) return null;
 
     this.extensionCache.set(extensionId, {

@@ -49,6 +49,18 @@ CREATE TABLE `storages` (
 	`value` blob NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE `workflows` (
+	`id` text PRIMARY KEY NOT NULL,
+	`name` text NOT NULL,
+	`icon` text,
+	`description` text,
+	`nodes` text DEFAULT (json_array()) NOT NULL,
+	`viewport` text,
+	`edges` text DEFAULT (json_array()) NOT NULL,
+	`triggers` text DEFAULT (json_array()) NOT NULL,
+	`settings` text
+);
+--> statement-breakpoint
 CREATE UNIQUE INDEX `commands_shortcut_unique` ON `commands` (`shortcut`);--> statement-breakpoint
 CREATE UNIQUE INDEX `configs_config_id_unique` ON `configs` (`config_id`);--> statement-breakpoint
 CREATE UNIQUE INDEX `config_id_idx` ON `configs` (`config_id`);

@@ -20,8 +20,11 @@ import {
   WorkflowClipboardData,
   WorkflowNewNode,
   WorkflowNodes,
-} from '../interface/workflow.interface';
-import { APP_WORKFLOW_ELS_FORMAT } from '#packages/common/utils/constant/constant';
+} from '../../../common/interface/workflow.interface';
+import {
+  APP_WORKFLOW_ELS_FORMAT,
+  WORKFLOW_NODE_TYPE,
+} from '#packages/common/utils/constant/constant';
 import preloadAPI from '../utils/preloadAPI';
 import { parseJSON } from '@repo/shared';
 import { isIPCEventError } from '../utils/helper';
@@ -166,13 +169,35 @@ const workflowStore = create<WorkflowEditorStore>((set, get) => ({
     return true;
   },
   addNodes(nodes) {
-    const newNodes: WorkflowNodes[] = nodes.map((node) => ({
-      ...node,
-      id: node.id || nanoid(),
-    }));
+    const { nodes: oldNodes } = get();
+    let isHasManualTrigger = false;
+
+    const newNodes = nodes.reduce<WorkflowNodes[]>((acc, node) => {
+      if (
+        node.type === WORKFLOW_NODE_TYPE.TRIGGER &&
+        node.data.type === 'manual' &&
+        !isHasManualTrigger
+      ) {
+        isHasManualTrigger = oldNodes.some(
+          (oldNode) =>
+            oldNode.type === WORKFLOW_NODE_TYPE.TRIGGER &&
+            oldNode.data.type === 'manual',
+        );
+        if (isHasManualTrigger) return acc;
+      }
+
+      acc.push({
+        ...node,
+        id: node.id || nanoid(),
+      });
+
+      return acc;
+    }, []);
+
+    if (newNodes.length === 0) return;
 
     set({
-      nodes: [...get().nodes, ...newNodes],
+      nodes: [...oldNodes, ...newNodes],
     });
   },
   addEdges(connections) {

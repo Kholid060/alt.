@@ -1,22 +1,21 @@
 import { and, eq, notInArray } from 'drizzle-orm';
-import extensionsDB from '../db/extension.db';
 import type {
   NewExtension,
   NewExtensionCommand,
   SelectExtensionConfig,
   SelectExtensionStorage,
-} from '../db/schema/extension.schema';
+} from '/@/db/schema/extension.schema';
 import {
   extensions,
   commands as commandsSchema,
   commands,
-} from '../db/schema/extension.schema';
-import WindowsManager from '../window/WindowsManager';
+} from '/@/db/schema/extension.schema';
+import WindowsManager from '/@/window/WindowsManager';
 import type { ExtensionCommand, ExtensionManifest } from '@repo/extension-core';
 import {
   buildConflictUpdateColumns,
   mapManifestToDB,
-} from '../utils/database-utils';
+} from '/@/utils/database-utils';
 import type {
   DatabaseExtension,
   DatabaseExtensionCommandWithExtension,
@@ -24,14 +23,17 @@ import type {
   DatabaseExtensionUpdatePayload,
   DatabaseExtensionCommandUpdatePayload,
   DatabaseQueriesEvent,
-} from '../interface/database.interface';
+} from '/@/interface/database.interface';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
+import type { SQLiteDatabase } from './database.service';
 
-class DatabaseService {
-  static async getExtensions(
+class DBExtensionService {
+  constructor(private database: SQLiteDatabase) {}
+
+  async getExtensions(
     activeExtOnly: boolean = false,
   ): Promise<DatabaseExtensionListItem[]> {
-    const extensionsDbData = await extensionsDB.query.extensions.findMany({
+    const extensionsDbData = await this.database.query.extensions.findMany({
       columns: {
         id: true,
         icon: true,
@@ -60,10 +62,8 @@ class DatabaseService {
     return extensionsDbData;
   }
 
-  static async getExtension(
-    extensionId: string,
-  ): Promise<DatabaseExtension | null> {
-    const extension = await extensionsDB.query.extensions.findFirst({
+  async getExtension(extensionId: string): Promise<DatabaseExtension | null> {
+    const extension = await this.database.query.extensions.findFirst({
       with: { commands: {} },
       where(fields, operators) {
         return operators.eq(fields.id, extensionId);
@@ -73,8 +73,8 @@ class DatabaseService {
     return extension ?? null;
   }
 
-  static getCommands() {
-    return extensionsDB.query.commands.findMany({
+  getCommands() {
+    return this.database.query.commands.findMany({
       with: {
         extension: {
           columns: { isError: true, isDisabled: true },
@@ -83,10 +83,10 @@ class DatabaseService {
     });
   }
 
-  static async getExtensionManifest(
+  async getExtensionManifest(
     extensionId: string,
   ): Promise<ExtensionManifest | null> {
-    const extension = await extensionsDB.query.extensions.findFirst({
+    const extension = await this.database.query.extensions.findFirst({
       where(fields, operators) {
         return operators.and(
           operators.eq(fields.isError, false),
@@ -102,14 +102,14 @@ class DatabaseService {
     return extension as ExtensionManifest;
   }
 
-  static async getExtensionCommand(
+  async getExtensionCommand(
     query: string | { commandId: string; extensionId: string },
   ): Promise<DatabaseExtensionCommandWithExtension | null> {
     const commandId =
       typeof query === 'string'
         ? query
         : `${query.extensionId}:${query.commandId}`;
-    const result = await extensionsDB.query.commands.findFirst({
+    const result = await this.database.query.commands.findFirst({
       with: {
         extension: {
           columns: {
@@ -129,19 +129,19 @@ class DatabaseService {
     return result as DatabaseExtensionCommandWithExtension | null;
   }
 
-  static getCommandsByExtensionId(extensionId: string) {
-    return extensionsDB.query.commands.findMany({
+  getCommandsByExtensionId(extensionId: string) {
+    return this.database.query.commands.findMany({
       where(fields, operators) {
         return operators.eq(fields.extensionId, extensionId);
       },
     });
   }
 
-  static async updateExtension(
+  async updateExtension(
     extensionId: string,
     { isDisabled }: DatabaseExtensionUpdatePayload,
   ) {
-    await extensionsDB
+    await this.database
       .update(extensions)
       .set({ isDisabled, updatedAt: new Date().toISOString() })
       .where(eq(extensions.id, extensionId));
@@ -152,7 +152,7 @@ class DatabaseService {
     });
   }
 
-  static emitDBChanges(
+  emitDBChanges(
     changes: {
       [T in keyof Partial<DatabaseQueriesEvent>]:
         | typeof DATABASE_CHANGES_ALL_ARGS
@@ -172,12 +172,12 @@ class DatabaseService {
     }
   }
 
-  static async upsertExtensionCommands(
+  async upsertExtensionCommands(
     extensionId: string,
     commands: ExtensionCommand[],
-    tx?: Parameters<Parameters<typeof extensionsDB.transaction>[0]>[0],
+    tx?: Parameters<Parameters<typeof this.database.transaction>[0]>[0],
   ) {
-    const db = tx || extensionsDB;
+    const db = tx || this.database;
 
     const insertCommandsPayload: NewExtensionCommand[] = commands.map(
       (command) => ({
@@ -211,9 +211,9 @@ class DatabaseService {
     );
   }
 
-  static async configExists(configId: string) {
+  async configExists(configId: string) {
     return Boolean(
-      await extensionsDB.query.configs.findFirst({
+      await this.database.query.configs.findFirst({
         columns: {
           configId: true,
         },
@@ -224,13 +224,13 @@ class DatabaseService {
     );
   }
 
-  static async getConfigs(
+  async getConfigs(
     configId: string,
   ): Promise<SelectExtensionConfig | undefined>;
-  static async getConfigs(configId: string[]): Promise<SelectExtensionConfig[]>;
-  static async getConfigs(configIds: string | string[]): Promise<unknown> {
+  async getConfigs(configId: string[]): Promise<SelectExtensionConfig[]>;
+  async getConfigs(configIds: string | string[]): Promise<unknown> {
     if (Array.isArray(configIds)) {
-      return await extensionsDB.query.configs.findMany({
+      return await this.database.query.configs.findMany({
         columns: {
           id: true,
           value: true,
@@ -243,7 +243,7 @@ class DatabaseService {
       });
     }
 
-    return await extensionsDB.query.configs.findFirst({
+    return await this.database.query.configs.findFirst({
       columns: {
         id: true,
         value: true,
@@ -256,20 +256,20 @@ class DatabaseService {
     });
   }
 
-  static async getStorage(
+  async getStorage(
     keys: string[],
     extensionId: string,
   ): Promise<Pick<SelectExtensionStorage, 'key' | 'value'>[]>;
-  static async getStorage(
+  async getStorage(
     keys: string,
     extensionId: string,
   ): Promise<Pick<SelectExtensionStorage, 'key' | 'value'> | undefined>;
-  static async getStorage(
+  async getStorage(
     keys: string | string[],
     extensionId: string,
   ): Promise<unknown> {
     if (typeof keys === 'string') {
-      const result = await extensionsDB.query.storages.findFirst({
+      const result = await this.database.query.storages.findFirst({
         columns: {
           key: true,
           value: true,
@@ -281,7 +281,7 @@ class DatabaseService {
       return result;
     }
 
-    const result = await extensionsDB.query.storages.findMany({
+    const result = await this.database.query.storages.findMany({
       columns: {
         key: true,
         value: true,
@@ -293,8 +293,8 @@ class DatabaseService {
     return result;
   }
 
-  static async getAllExtensionStorage(extensionId: string) {
-    const result = await extensionsDB.query.storages.findMany({
+  async getAllExtensionStorage(extensionId: string) {
+    const result = await this.database.query.storages.findMany({
       columns: {
         key: true,
         value: true,
@@ -307,12 +307,12 @@ class DatabaseService {
     return result;
   }
 
-  static async updateExtensionCommand(
+  async updateExtensionCommand(
     extensionId: string,
     commandId: string,
     value: DatabaseExtensionCommandUpdatePayload,
   ) {
-    await extensionsDB
+    await this.database
       .update(commands)
       .set(value)
       .where(eq(commands.id, `${extensionId}:${commandId}`));
@@ -324,12 +324,12 @@ class DatabaseService {
     });
   }
 
-  static async addExtension(
+  async addExtension(
     extensionData: NewExtension,
     commandsData: NewExtensionCommand[],
   ): Promise<DatabaseExtension> {
-    await extensionsDB.insert(extensions).values(extensionData);
-    await extensionsDB.insert(commandsSchema).values(commandsData).returning();
+    await this.database.insert(extensions).values(extensionData);
+    await this.database.insert(commandsSchema).values(commandsData).returning();
 
     this.emitDBChanges({
       'database:get-extension-list': DATABASE_CHANGES_ALL_ARGS,
@@ -341,4 +341,4 @@ class DatabaseService {
   }
 }
 
-export default DatabaseService;
+export default DBExtensionService;

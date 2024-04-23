@@ -4,7 +4,7 @@ import type { ExtensionCommandArgument } from '@repo/extension-core';
 import { parseJSON } from '@repo/shared';
 import { store } from '../lib/store';
 import { CommandLaunchBy } from '@repo/extension';
-import DatabaseService from '../services/database.service';
+import DBExtensionService from '../services/database/database-extension.service';
 import extensionCommandRunner from './extension/extensionCommandRunner';
 import { APP_DEEP_LINK } from '#packages/common/utils/constant/constant';
 
@@ -34,7 +34,7 @@ class DeepLink {
     try {
       const [_, extensionId, commandId] = pathname.split('/');
 
-      const command = await DatabaseService.getExtensionCommand({
+      const command = await DBExtensionService.getExtensionCommand({
         commandId,
         extensionId,
       });

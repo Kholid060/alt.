@@ -8,7 +8,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { SearchIcon } from 'lucide-react';
+import { PlugZapIcon, SearchIcon } from 'lucide-react';
 import { UiListProvider } from '@repo/ui/dist/context/list.context';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import UiExtensionIcon from '../../ui/UiExtensionIcon';
@@ -16,7 +16,6 @@ import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '/@/utils/helper';
 import { Connection, useReactFlow } from 'reactflow';
 import { useWorkflowStore } from '/@/stores/workflow-editor.store';
-import { WorkflowNewNode } from '/@/interface/workflow.interface';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import {
   WorkflowEditorNodeListCommandItem,
@@ -25,6 +24,7 @@ import {
   WorkflowEditorOpenNodeListModalPayload,
 } from '/@/interface/workflow-editor.interface';
 import { nanoid } from 'nanoid/non-secure';
+import { WorkflowNewNode } from '#packages/common/interface/workflow.interface';
 
 type NodeType = 'all' | 'triggers' | 'commands' | 'scripts';
 
@@ -37,8 +37,8 @@ const nodeTypes: { id: NodeType; title: string }[] = [
 
 const triggersNode: WorkflowEditorNodeListTriggerItem[] = [
   {
-    icon: 'huh',
-    title: 'Manual',
+    icon: <UiList.Icon icon={PlugZapIcon} />,
+    title: 'Manual Trigger',
     group: 'Triggers',
     value: 'trigger-manual',
     metadata: { nodeType: WORKFLOW_NODE_TYPE.TRIGGER, type: 'manual' },

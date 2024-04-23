@@ -1,6 +1,9 @@
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import { UiListItem } from '@repo/ui';
-import { WorkflowNodeCommand, WorkflowNodeTrigger } from './workflow.interface';
+import {
+  WorkflowNodeCommand,
+  WorkflowNodeTrigger,
+} from '../../../common/interface/workflow.interface';
 import { SetRequired } from 'type-fest';
 
 export enum WorkflowEditorContextMenuType {

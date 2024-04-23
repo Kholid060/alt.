@@ -4,16 +4,15 @@ import './ipc-extension-messages';
 import { BrowserWindow, clipboard, dialog, screen, shell } from 'electron';
 import ExtensionCommandScriptRunner from '../extension/ExtensionCommandScriptRunner';
 import IPCMain from './IPCMain';
-import extensionsDB from '../../db/extension.db';
 import type { ExtensionConfigData } from '#packages/common/interface/extension.interface';
 import { configs } from '../../db/schema/extension.schema';
 import { eq } from 'drizzle-orm';
 import { ExtensionError } from '#packages/common/errors/custom-errors';
 import { getExtensionConfigDefaultValue } from '../helper';
 import type { IPCExtensionConfigEvents } from '#packages/common/interface/ipc-events.interface';
-import DatabaseService from '/@/services/database.service';
 import { GlobalShortcutExtension } from '../GlobalShortcuts';
 import { toggleCommandWindow } from '/@/window/command-window';
+import DBService from '/@/services/database/database.service';
 
 /** EXTENSION */
 IPCMain.handle('extension:import', async ({ sender }) => {
@@ -45,7 +44,7 @@ IPCMain.handle('extension:import', async ({ sender }) => {
 });
 IPCMain.handle('extension:reload', async (_, extId) => {
   await ExtensionLoader.instance.reloadExtension(extId);
-  DatabaseService.emitDBChanges({
+  DBService.instance.extension.emitDBChanges({
     'database:get-extension': [extId],
     'database:get-extension-list': [],
   });
@@ -105,26 +104,26 @@ IPCMain.handle('clipboard:has-buffer', (_, contentType) => {
 
 /** EXTENSION CONFIG */
 IPCMain.handle('extension-config:get', async (_, configId) => {
-  const result = (await extensionsDB.query.configs.findFirst({
+  const result = (await DBService.instance.db.query.configs.findFirst({
     where: (fields, { eq }) => eq(fields.configId, configId),
   })) as ExtensionConfigData;
 
   return result ?? null;
 });
 IPCMain.handle('extension-config:set', async (_, configId, data) => {
-  await extensionsDB.insert(configs).values({
+  await DBService.instance.db.insert(configs).values({
     ...data,
     configId,
   });
 });
 IPCMain.handle('extension-config:update', async (_, configId, data) => {
-  await extensionsDB
+  await DBService.instance.db
     .update(configs)
     .set(data)
     .where(eq(configs.configId, configId));
 });
 IPCMain.handle('extension-config:exists', (_, configId) => {
-  return DatabaseService.configExists(configId);
+  return DBService.instance.extension.configExists(configId);
 });
 
 const extensionConfigNeedInputCache = new Set<string>();
@@ -140,7 +139,8 @@ IPCMain.handle(
       return { requireInput: false } as ReturnValue;
     }
 
-    const extension = await DatabaseService.getExtension(extensionId);
+    const extension =
+      await DBService.instance.extension.getExtension(extensionId);
     if (!extension || extension.isError) {
       throw new ExtensionError('Extension not found');
     }
@@ -149,9 +149,8 @@ IPCMain.handle(
       extension.config ?? [],
     );
     if (extensionConfig.requireInput) {
-      const extensionConfigExists = await DatabaseService.configExists(
-        extension.id,
-      );
+      const extensionConfigExists =
+        await DBService.instance.extension.configExists(extension.id);
       if (!extensionConfigExists) {
         return {
           requireInput: true,
@@ -169,7 +168,7 @@ IPCMain.handle(
     const commandConfig = getExtensionConfigDefaultValue(command.config ?? []);
     if (commandConfig.requireInput) {
       const commandConfigExists =
-        await DatabaseService.configExists(commandConfigId);
+        await DBService.instance.extension.configExists(commandConfigId);
       if (!commandConfigExists) {
         return {
           type: 'command',
@@ -215,24 +214,28 @@ IPCMain.handle('app:show-command-window', () => {
 
 /** DATABASE */
 IPCMain.handle('database:get-extension', (_, extensionId) => {
-  return DatabaseService.getExtension(extensionId);
+  return DBService.instance.extension.getExtension(extensionId);
 });
 IPCMain.handle('database:get-extension-list', (_, activeExtOnly) => {
-  return DatabaseService.getExtensions(activeExtOnly);
+  return DBService.instance.extension.getExtensions(activeExtOnly);
 });
 IPCMain.handle('database:get-extension-manifest', (_, extensionId) => {
-  return DatabaseService.getExtensionManifest(extensionId);
+  return DBService.instance.extension.getExtensionManifest(extensionId);
 });
 IPCMain.handle('database:update-extension', async (_, extensionId, data) => {
-  await DatabaseService.updateExtension(extensionId, data);
+  await DBService.instance.extension.updateExtension(extensionId, data);
 });
 IPCMain.handle('database:get-command', (_, query) => {
-  return DatabaseService.getExtensionCommand(query);
+  return DBService.instance.extension.getExtensionCommand(query);
 });
 IPCMain.handle(
   'database:update-extension-command',
   async (_, extensionId, commandId, value) => {
-    await DatabaseService.updateExtensionCommand(extensionId, commandId, value);
+    await DBService.instance.extension.updateExtensionCommand(
+      extensionId,
+      commandId,
+      value,
+    );
 
     if (Object.hasOwn(value, 'shortcut')) {
       GlobalShortcutExtension.toggleShortcut(

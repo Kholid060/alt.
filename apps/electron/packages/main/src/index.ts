@@ -12,6 +12,7 @@ import DeepLink from './utils/DeepLink';
 import { initDefaultWebsocketServer } from './services/websocket/websocket.service';
 import { registerGlobalShortcuts } from './utils/GlobalShortcuts';
 import ExtensionLoader from './utils/extension/ExtensionLoader';
+import DBService from './services/database/database.service';
 
 app.commandLine.appendSwitch('wm-window-animations-disabled');
 
@@ -74,6 +75,8 @@ app.on('activate', () =>
 app
   .whenReady()
   .then(async () => {
+    await DBService.instance.initDB();
+
     CustomProtocol.registerProtocols();
     initDefaultWebsocketServer();
 

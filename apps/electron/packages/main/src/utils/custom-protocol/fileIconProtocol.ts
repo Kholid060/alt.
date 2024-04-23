@@ -1,5 +1,8 @@
 import fs from 'fs-extra';
-import { createErrorResponse, type CustomProtocolHandler } from './CustomProtocol';
+import {
+  createErrorResponse,
+  type CustomProtocolHandler,
+} from './CustomProtocol';
 import {
   APP_ICON_DIR_PREFIX,
   CUSTOM_SCHEME,
