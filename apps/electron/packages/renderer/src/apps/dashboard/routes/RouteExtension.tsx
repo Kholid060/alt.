@@ -102,7 +102,7 @@ function RouteExtension() {
   }, []);
 
   return (
-    <div className="p-8">
+    <div className="p-8 container">
       <h2 className="text-2xl font-semibold leading-tight -mt-0.5">
         Extensions
       </h2>
@@ -123,7 +123,7 @@ function RouteExtension() {
           value={search}
           prefixIcon={<SearchIcon className="h-5 w-5" />}
           className="w-64"
-          placeholder="Search.."
+          placeholder="Search..."
           onValueChange={setSearch}
         />
       </div>

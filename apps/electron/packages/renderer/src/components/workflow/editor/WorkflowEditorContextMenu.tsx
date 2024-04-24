@@ -157,6 +157,7 @@ function ContextMenuNode() {
     <>
       <ContextMenuItemCopy nodeId={contextMenu.nodeId} />
       <ContextMenuItemPaste />
+      <UiContextMenuItem>Settings</UiContextMenuItem>
       <UiContextMenuSeparator />
       <ContextMenuItemDelete nodeId={contextMenu.nodeId} />
     </>

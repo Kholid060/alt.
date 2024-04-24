@@ -17,14 +17,14 @@ const navigationItems: { title: string; path: string; icon: LucideIcon }[] = [
     title: 'Extensions',
   },
   {
+    icon: WorkflowIcon,
+    path: '/workflows',
+    title: 'Workflows',
+  },
+  {
     icon: UserCog2Icon,
     path: '/accounts',
     title: 'Accounts',
-  },
-  {
-    icon: WorkflowIcon,
-    path: '/workflows/workflowId',
-    title: 'Workflows',
   },
   {
     path: '/settings',

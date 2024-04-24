@@ -9,6 +9,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { DATABASE_FOLDER } from '/@/utils/constant';
 import { ErrorLogger } from '/@/lib/log';
+import DBWorkflowService from './database-workflow.service';
 
 const dbPath = path.join(DATABASE_FOLDER, 'extensions.db');
 
@@ -27,6 +28,8 @@ class DBService {
 
   intialized: boolean;
   db!: SQLiteDatabase;
+
+  workflow!: DBWorkflowService;
   extension!: DBExtensionService;
 
   private sqlite!: BS3Database;
@@ -49,6 +52,7 @@ class DBService {
       },
     });
 
+    this.workflow = new DBWorkflowService(this.db);
     this.extension = new DBExtensionService(this.db);
 
     migrate(this.db, {

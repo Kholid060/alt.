@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import ReactFlow, {
   Edge,
   Node,
@@ -31,6 +31,8 @@ import {
   WorkflowNodeCommand,
   WorkflowNodeTrigger,
 } from '/@/components/workflow/WorkflowNodes';
+import { useDatabaseQuery } from '/@/hooks/useDatabase';
+import { useParams } from 'react-router-dom';
 
 const nodeTypes: Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>> = {
   [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeCommand,

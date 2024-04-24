@@ -63,6 +63,7 @@
   },
   "dependencies": {
     "@floating-ui/react": "^0.26.12",
+    "@hookform/resolvers": "^3.3.4",
     "@nut-tree/nut-js": "^3.1.2",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@repo/extension": "workspace:*",

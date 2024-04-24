@@ -157,9 +157,33 @@ const UiSelectSeparator = React.forwardRef<
 ));
 UiSelectSeparator.displayName = SelectPrimitive.Separator.displayName;
 
+const UiSelectNative = React.forwardRef<
+  HTMLSelectElement,
+  React.SelectHTMLAttributes<HTMLSelectElement> & {
+    placeholder?: string;
+  } & VariantProps<typeof uiSelectVariants>
+>(({ className, variant, size, placeholder, children, ...props }, ref) => {
+  return (
+    <select
+      ref={ref}
+      className={cn(uiSelectVariants({ variant, size, className }))}
+      {...props}
+    >
+      {placeholder && (
+        <option disabled value="">
+          {placeholder}
+        </option>
+      )}
+      {children}
+    </select>
+  );
+});
+UiSelectNative.displayName = 'UiSelectNative';
+
 export const UiSelect = Object.assign(UiSelectRoot, {
   Group: UiSelectGroup,
   Label: UiSelectLabel,
+  Native: UiSelectNative,
   Option: UiSelectOption,
   Separator: UiSelectSeparator,
 });

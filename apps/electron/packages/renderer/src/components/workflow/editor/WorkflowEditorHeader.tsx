@@ -6,12 +6,20 @@ import {
   SettingsIcon,
   UndoIcon,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 function WorkflowEditorHeader() {
   return (
     <header className="h-20 border-b flex items-center px-4">
-      <UiButton variant="outline" size="icon-sm">
-        <ChevronLeftIcon className="h-5 w-5" />
+      <UiButton
+        variant="outline"
+        size="icon-sm"
+        className="flex-shrink-0"
+        asChild
+      >
+        <Link to="/workflows">
+          <ChevronLeftIcon className="h-5 w-5" />
+        </Link>
       </UiButton>
       <hr className="h-2/6 bg-border/50 w-px mx-4" />
       <div className="inline-flex items-center justify-center h-10 w-10 bg-card rounded-md">

@@ -10,10 +10,10 @@ import {
   commands as commandsSchema,
   commands,
 } from '/@/db/schema/extension.schema';
-import WindowsManager from '/@/window/WindowsManager';
 import type { ExtensionCommand, ExtensionManifest } from '@repo/extension-core';
 import {
   buildConflictUpdateColumns,
+  emitDBChanges,
   mapManifestToDB,
 } from '/@/utils/database-utils';
 import type {
@@ -22,7 +22,6 @@ import type {
   DatabaseExtensionListItem,
   DatabaseExtensionUpdatePayload,
   DatabaseExtensionCommandUpdatePayload,
-  DatabaseQueriesEvent,
 } from '/@/interface/database.interface';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import type { SQLiteDatabase } from './database.service';
@@ -146,30 +145,10 @@ class DBExtensionService {
       .set({ isDisabled, updatedAt: new Date().toISOString() })
       .where(eq(extensions.id, extensionId));
 
-    this.emitDBChanges({
+    emitDBChanges({
       'database:get-extension': [extensionId],
       'database:get-extension-list': DATABASE_CHANGES_ALL_ARGS,
     });
-  }
-
-  emitDBChanges(
-    changes: {
-      [T in keyof Partial<DatabaseQueriesEvent>]:
-        | typeof DATABASE_CHANGES_ALL_ARGS
-        | Parameters<DatabaseQueriesEvent[T]>;
-    },
-    excludeWindow?: number[],
-  ) {
-    for (const _key in changes) {
-      const key = _key as keyof DatabaseQueriesEvent;
-      const params = changes[key];
-
-      WindowsManager.instance.sendMessageToAllWindows({
-        name: 'database:changes',
-        excludeWindow,
-        args: [key, ...(Array.isArray(params) ? params : [params])],
-      });
-    }
   }
 
   async upsertExtensionCommands(
@@ -317,7 +296,7 @@ class DBExtensionService {
       .set(value)
       .where(eq(commands.id, `${extensionId}:${commandId}`));
 
-    this.emitDBChanges({
+    emitDBChanges({
       'database:get-extension': [extensionId],
       'database:get-command': [{ commandId, extensionId }],
       'database:get-extension-list': DATABASE_CHANGES_ALL_ARGS,
@@ -331,7 +310,7 @@ class DBExtensionService {
     await this.database.insert(extensions).values(extensionData);
     await this.database.insert(commandsSchema).values(commandsData).returning();
 
-    this.emitDBChanges({
+    emitDBChanges({
       'database:get-extension-list': DATABASE_CHANGES_ALL_ARGS,
     });
 

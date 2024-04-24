@@ -4,6 +4,18 @@
   width: theme(spacing.3);
   height: theme(spacing.3);
 
+  &.custom {
+    width: auto;
+    height: theme(spacing.5);
+
+    & > .dot {
+      flex-shrink: 0;
+      width: theme(spacing.3);
+      height: theme(spacing.3);
+      border-radius: theme('borderRadius.full');
+    }
+  }
+
   &-left {
     left: -6px;
     border: none;
@@ -15,7 +27,7 @@
     right: -7px;
     width: theme(spacing.4);
     height: theme(spacing.4);
-    border-radius: theme(borderRadius.sm);
+    border-radius: theme(borderRadius.full);
     background-color: theme(colors.background);
     border: theme(borderWidth.2) solid theme(borderColor.primary.DEFAULT);
   }

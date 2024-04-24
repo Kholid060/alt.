@@ -15,6 +15,7 @@ import { Fragment, useEffect, useState } from 'react';
 import {
   AlertTriangleIcon,
   ChevronRightIcon,
+  FileIcon,
   RotateCcwIcon,
   StopCircleIcon,
   XIcon,
@@ -282,16 +283,13 @@ function ExtensionListTable({
   }
 
   return (
-    <table
-      className={cn('table-fixed w-full cursor-default', className)}
-      {...props}
-    >
+    <table className={cn('w-full cursor-default', className)} {...props}>
       <thead className="text-sm border-b h-12 w-full">
         <tr className="text-left">
           <th className="h-12 w-8"></th>
-          <th className="h-12 pr-3 w-4/12">Name</th>
-          <th className="h-12 px-3 w-2/12">Type</th>
-          <th className="h-12 px-3 w-4/12">Shortcut</th>
+          <th className="h-12 pr-3">Name</th>
+          <th className="h-12 px-3">Type</th>
+          <th className="h-12 px-3">Shortcut</th>
           <th className="h-12 px-3 w-32"></th>
         </tr>
       </thead>
@@ -345,12 +343,7 @@ function ExtensionListTable({
                     />
                   )}
                 </td>
-                <td
-                  className="py-3 pr-3 cursor-pointer"
-                  onClick={() => {
-                    onExtensionSelected?.(extension.id);
-                  }}
-                >
+                <td className="py-3 pr-3">
                   <div className="flex items-center">
                     <div className="h-7 w-7 flex-shrink-0">{extensionIcon}</div>
                     <p className="ml-2">
@@ -389,6 +382,16 @@ function ExtensionListTable({
                         </UiPopoverContent>
                       </UiPopover>
                     )}
+                    <UiTooltip label="Extension detail">
+                      <UiButton
+                        size="icon-sm"
+                        variant="ghost"
+                        className="mr-4 h-8 w-8"
+                        onClick={() => onExtensionSelected?.(extension.id)}
+                      >
+                        <FileIcon className="h-5 w-5" />
+                      </UiButton>
+                    </UiTooltip>
                     {extension.isLocal && (
                       <UiTooltip label="Reload extension">
                         <UiButton

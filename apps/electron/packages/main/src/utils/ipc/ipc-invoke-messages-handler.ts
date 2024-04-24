@@ -13,6 +13,7 @@ import type { IPCExtensionConfigEvents } from '#packages/common/interface/ipc-ev
 import { GlobalShortcutExtension } from '../GlobalShortcuts';
 import { toggleCommandWindow } from '/@/window/command-window';
 import DBService from '/@/services/database/database.service';
+import { emitDBChanges } from '../database-utils';
 
 /** EXTENSION */
 IPCMain.handle('extension:import', async ({ sender }) => {
@@ -44,7 +45,7 @@ IPCMain.handle('extension:import', async ({ sender }) => {
 });
 IPCMain.handle('extension:reload', async (_, extId) => {
   await ExtensionLoader.instance.reloadExtension(extId);
-  DBService.instance.extension.emitDBChanges({
+  emitDBChanges({
     'database:get-extension': [extId],
     'database:get-extension-list': [],
   });
@@ -213,6 +214,22 @@ IPCMain.handle('app:show-command-window', () => {
 });
 
 /** DATABASE */
+IPCMain.handle('database:get-workflow-list', () => {
+  return DBService.instance.workflow.list();
+});
+IPCMain.handle('database:get-workflow', (_, workflowId) => {
+  return DBService.instance.workflow.get(workflowId);
+});
+IPCMain.handle('database:update-workflow', (_, ...args) => {
+  return DBService.instance.workflow.update(...args);
+});
+IPCMain.handle('database:delete-workflow', (_, workflowId) => {
+  return DBService.instance.workflow.delete(workflowId);
+});
+IPCMain.handle('database:insert-workflow', (_, data) => {
+  return DBService.instance.workflow.insert(data);
+});
+
 IPCMain.handle('database:get-extension', (_, extensionId) => {
   return DBService.instance.extension.getExtension(extensionId);
 });

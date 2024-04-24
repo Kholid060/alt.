@@ -6,6 +6,9 @@ import type {
   NewExtension,
   NewExtensionCommand,
 } from '../db/schema/extension.schema';
+import type { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
+import type { DatabaseQueriesEvent } from '../interface/database.interface';
+import WindowsManager from '../window/WindowsManager';
 
 export function buildConflictUpdateColumns<
   T extends SQLiteTable,
@@ -68,3 +71,23 @@ export const mapManifestToDB = {
     };
   },
 };
+
+export function emitDBChanges(
+  changes: {
+    [T in keyof Partial<DatabaseQueriesEvent>]:
+      | typeof DATABASE_CHANGES_ALL_ARGS
+      | Parameters<DatabaseQueriesEvent[T]>;
+  },
+  excludeWindow?: number[],
+) {
+  for (const _key in changes) {
+    const key = _key as keyof DatabaseQueriesEvent;
+    const params = changes[key];
+
+    WindowsManager.instance.sendMessageToAllWindows({
+      name: 'database:changes',
+      excludeWindow,
+      args: [key, ...(Array.isArray(params) ? params : [params])],
+    });
+  }
+}

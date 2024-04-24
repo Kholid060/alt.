@@ -10,6 +10,8 @@ const UiDialogTrigger = DialogPrimitive.Trigger;
 
 const UiDialogPortal = DialogPrimitive.Portal;
 
+const UiDialogClose = DialogPrimitive.Close;
+
 const UiDialogOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
@@ -105,12 +107,13 @@ const UiDialogDescription = React.forwardRef<
 UiDialogDescription.displayName = DialogPrimitive.Description.displayName;
 
 export const UiDialog = Object.assign(UiDialogRoot, {
+  Close: UiDialogClose,
+  Title: UiDialogTitle,
   Portal: UiDialogPortal,
+  Header: UiDialogHeader,
+  Footer: UiDialogFooter,
   Overlay: UiDialogOverlay,
   Trigger: UiDialogTrigger,
   Content: UiDialogContent,
-  Header: UiDialogHeader,
-  Footer: UiDialogFooter,
-  Title: UiDialogTitle,
   Description: UiDialogDescription,
 });

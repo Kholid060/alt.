@@ -31,6 +31,19 @@ export const WorkflowNodeCommand: React.FC<
         </div>
       </div>
       <Handle type="source" position={Position.Right} id={`${id}--handle`} />
+      {/* <Handle
+        type="source"
+        position={Position.Right}
+        id={`${id}--handle-2`}
+        className="text-xs inline-flex justify-center items-center px-1 custom gap-1 text-muted-foreground"
+        style={{
+          top: '100%',
+          borderColor: 'rgb(var(--destructive))',
+        }}
+      >
+        <p>on error</p>
+        <div className="dot bg-destructive"></div>
+      </Handle> */}
     </div>
   );
 });

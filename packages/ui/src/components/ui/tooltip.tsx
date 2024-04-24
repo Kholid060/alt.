@@ -21,11 +21,11 @@ export const UiTooltip = React.forwardRef<
       open,
       children,
       className,
-      sideOffset,
       label = '',
       defaultOpen,
       renderLabel,
       onOpenChange,
+      sideOffset = 5,
       delayDuration = 500,
       disableHoverableContent,
       ...props

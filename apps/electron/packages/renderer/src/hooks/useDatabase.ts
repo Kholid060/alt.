@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import { shallowEqualArrays } from 'shallow-equal';
 import preloadAPI from '../utils/preloadAPI';
 import { isIPCEventError } from '../utils/helper';
@@ -55,26 +55,27 @@ export function useDatabaseQuery<T extends keyof DatabaseQueriesEvent>(
     });
   }
 
-  useEffect(() => {
-    const startQuery = () => {
-      preloadAPI.main.invokeIpcMessage(name, ...args).then((result) => {
-        if (isIPCEventError(result)) {
-          setState({
-            data: null,
-            state: 'error',
-            error: result.message,
-          });
-          return;
-        }
-
+  const fetchQuery = useCallback(() => {
+    preloadAPI.main.invokeIpcMessage(name, ...args).then((result) => {
+      if (isIPCEventError(result)) {
         setState({
-          error: null,
-          state: 'idle',
-          data: result as ReturnType<DatabaseQueriesEvent[T]>,
+          data: null,
+          state: 'error',
+          error: result.message,
         });
+        return;
+      }
+
+      setState({
+        error: null,
+        state: 'idle',
+        data: result as ReturnType<DatabaseQueriesEvent[T]>,
       });
-    };
-    startQuery();
+    });
+  }, [name]);
+
+  useEffect(() => {
+    fetchQuery();
 
     const onDataChange = (...args: unknown[]) => {
       if (
@@ -83,14 +84,14 @@ export function useDatabaseQuery<T extends keyof DatabaseQueriesEvent>(
       )
         return;
 
-      startQuery();
+      fetchQuery();
     };
     databaseCtx.emitter.on(name, onDataChange);
 
     return () => {
       databaseCtx.emitter.off(name, onDataChange);
     };
-  }, [name, databaseCtx.emitter]);
+  }, [fetchQuery, databaseCtx.emitter]);
 
-  return { ...state, updateState };
+  return { ...state, updateState, refresh: fetchQuery };
 }
