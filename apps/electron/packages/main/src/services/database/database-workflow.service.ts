@@ -63,7 +63,10 @@ class DBWorkflowService {
       isDisabled,
       description,
     }: DatabaseWorkflowUpdatePayload,
-    ignoreModified = false,
+    {
+      excludeEmit,
+      ignoreModified = false,
+    }: Partial<{ ignoreModified: boolean; excludeEmit?: number[] }>,
   ) {
     const payload: Partial<SelectWorkflow> = {
       icon,
@@ -83,10 +86,13 @@ class DBWorkflowService {
       .set(payload)
       .where(eq(workflows.id, workflowId));
 
-    emitDBChanges({
-      'database:get-workflow': [workflowId],
-      'database:get-workflow-list': DATABASE_CHANGES_ALL_ARGS,
-    });
+    emitDBChanges(
+      {
+        'database:get-workflow': [workflowId],
+        'database:get-workflow-list': DATABASE_CHANGES_ALL_ARGS,
+      },
+      excludeEmit,
+    );
   }
 
   async delete(id: string) {

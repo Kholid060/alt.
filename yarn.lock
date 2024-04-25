@@ -7926,6 +7926,7 @@ __metadata:
     ws: "npm:^8.16.0"
     zod: "npm:^3.22.4"
     zod-validation-error: "npm:^3.0.3"
+    zundo: "npm:^2.1.0"
     zustand: "npm:^4.5.1"
   languageName: unknown
   linkType: soft
@@ -16885,6 +16886,18 @@ __metadata:
   version: 3.22.4
   resolution: "zod@npm:3.22.4"
   checksum: 10c0/7578ab283dac0eee66a0ad0fc4a7f28c43e6745aadb3a529f59a4b851aa10872b3890398b3160f257f4b6817b4ce643debdda4fb21a2c040adda7862cab0a587
+  languageName: node
+  linkType: hard
+
+"zundo@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "zundo@npm:2.1.0"
+  peerDependencies:
+    zustand: ^4.3.0
+  peerDependenciesMeta:
+    zustand:
+      optional: false
+  checksum: 10c0/d4c74d4cb92e97d7c60469bb35580a620d7e62758d45f8dfd2e5d35350f8240037250b8d471956273e388b8ed32969a1c079f3c27717f98b284fb4f90471b5bf
   languageName: node
   linkType: hard
 

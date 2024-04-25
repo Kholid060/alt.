@@ -15,7 +15,7 @@ import UiExtensionIcon from '../../ui/UiExtensionIcon';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '/@/utils/helper';
 import { Connection, useReactFlow } from 'reactflow';
-import { useWorkflowStore } from '/@/stores/workflow-editor.store';
+import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import {
   WorkflowEditorNodeListCommandItem,
@@ -175,8 +175,8 @@ export function WorkflowEditorNodeList({
 }
 
 export function WorkflowEditorNodeListModal() {
-  const addNodes = useWorkflowStore.use.addNodes();
-  const addEdges = useWorkflowStore.use.addEdges();
+  const addNodes = useWorkflowEditorStore.use.addNodes();
+  const addEdges = useWorkflowEditorStore.use.addEdges();
 
   const workflowEditor = useWorkflowEditor();
   const { screenToFlowPosition } = useReactFlow();

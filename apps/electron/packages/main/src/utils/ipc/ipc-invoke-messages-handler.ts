@@ -220,9 +220,20 @@ IPCMain.handle('database:get-workflow-list', () => {
 IPCMain.handle('database:get-workflow', (_, workflowId) => {
   return DBService.instance.workflow.get(workflowId);
 });
-IPCMain.handle('database:update-workflow', (_, ...args) => {
-  return DBService.instance.workflow.update(...args);
-});
+IPCMain.handle(
+  'database:update-workflow',
+  (
+    { sender },
+    workflowId,
+    data,
+    options = { ignoreModified: false, omitDBChanges: false },
+  ) => {
+    return DBService.instance.workflow.update(workflowId, data, {
+      ignoreModified: options.ignoreModified,
+      excludeEmit: options.omitDBChanges ? [sender.id] : undefined,
+    });
+  },
+);
 IPCMain.handle('database:delete-workflow', (_, workflowId) => {
   return DBService.instance.workflow.delete(workflowId);
 });

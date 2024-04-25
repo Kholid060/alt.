@@ -3,7 +3,7 @@ import EventEmitter from 'eventemitter3';
 import preloadAPI from '../utils/preloadAPI';
 import { DatabaseQueriesEvent } from '#packages/main/src/interface/database.interface';
 
-interface DatabaseContextState {
+export interface DatabaseContextState {
   emitter: EventEmitter<DatabaseQueriesEvent>;
 }
 

@@ -3,50 +3,51 @@ import {
   type OnConnect,
   type OnEdgesChange,
   type OnNodesChange,
-  Connection,
-  EdgeChange,
-  NodeChange,
+  Node,
   addEdge,
+  Connection,
+  updateEdge,
   applyEdgeChanges,
   applyNodeChanges,
-  updateEdge,
   OnSelectionChangeFunc,
-  Node,
 } from 'reactflow';
 import { create } from 'zustand';
+import { subscribeWithSelector } from 'zustand/middleware';
 import createStoreSelectors from '../utils/createStoreSelector';
 import { nanoid } from 'nanoid/non-secure';
 import {
-  WorkflowClipboardData,
   WorkflowNewNode,
   WorkflowNodes,
-} from '../../../common/interface/workflow.interface';
+} from '#common/interface/workflow.interface';
+import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import {
-  APP_WORKFLOW_ELS_FORMAT,
-  WORKFLOW_NODE_TYPE,
-} from '#packages/common/utils/constant/constant';
-import preloadAPI from '../utils/preloadAPI';
-import { parseJSON } from '@repo/shared';
-import { isIPCEventError } from '../utils/helper';
+  DatabaseWorkflowDetail,
+  DatabaseWorkflowUpdatePayload,
+} from '#packages/main/src/interface/database.interface';
 
 export interface WorkflowEditorStoreState {
-  nodes: WorkflowNodes[];
-  edges: Edge[];
+  workflowLastSavedAt: null | string;
+  workflow: DatabaseWorkflowDetail | null;
   selection: { nodes: WorkflowNodes[]; edges: Edge[] };
+  workflowChanges: Set<keyof DatabaseWorkflowUpdatePayload>;
 }
 
 export interface WorkflowEditorStoreActions {
+  $reset: () => void;
   onConnect: OnConnect;
   onNodesChange: OnNodesChange;
   onEdgesChange: OnEdgesChange;
+  clearWorkflowChanges: () => void;
   onSelectionChange: OnSelectionChangeFunc;
-  setEdges: (edges: Edge[]) => void;
-  setNodes: (nodes: WorkflowNodes[]) => void;
   addNodes: (nodes: WorkflowNewNode[]) => void;
   addEdges: (connections: Connection[]) => void;
   deleteEdge: (edgeId: string | string[]) => void;
-  pasteElements: () => Promise<WorkflowClipboardData | null>;
-  copyElements: (element?: { nodeId?: string; edgeId?: string }) => void;
+  setWorkflow: (workflow: DatabaseWorkflowDetail) => void;
+  updateWorkflow: (
+    data:
+      | DatabaseWorkflowUpdatePayload
+      | ((workflow: DatabaseWorkflowDetail) => DatabaseWorkflowUpdatePayload),
+  ) => void;
   updateEdge: (edgeId: string | Edge, connection: Connection) => boolean;
 }
 
@@ -54,174 +55,141 @@ export type WorkflowEditorStore = WorkflowEditorStoreState &
   WorkflowEditorStoreActions;
 
 const initialState: WorkflowEditorStoreState = {
-  edges: [],
-  nodes: [],
+  workflow: null,
+  workflowLastSavedAt: null,
+  workflowChanges: new Set(),
   selection: { edges: [], nodes: [] },
 };
 
-const workflowStore = create<WorkflowEditorStore>((set, get) => ({
-  ...initialState,
-  async pasteElements() {
-    const copiedElements = await preloadAPI.main.invokeIpcMessage(
-      'clipboard:read-buffer',
-      APP_WORKFLOW_ELS_FORMAT,
-    );
-    if (isIPCEventError(copiedElements)) return null;
+const workflowEditorStore = create(
+  subscribeWithSelector<WorkflowEditorStore>((set, get) => ({
+    ...initialState,
+    clearWorkflowChanges() {
+      set({ workflowChanges: new Set() });
+    },
+    updateWorkflow(data) {
+      const state = get();
+      const currentWorkflow = state.workflow;
+      if (!currentWorkflow) throw new Error("Workflow hasn't been initialized");
 
-    const elements: WorkflowClipboardData | null = parseJSON(
-      copiedElements,
-      null,
-    );
-    if (
-      !elements ||
-      !Array.isArray(elements.nodes) ||
-      !Array.isArray(elements.edges)
-    )
-      return null;
+      const newData = typeof data === 'function' ? data(currentWorkflow) : data;
+      const keys = Object.keys(
+        newData,
+      ) as (keyof DatabaseWorkflowUpdatePayload)[];
 
-    const newNodeIdsMap: Record<string, string> = {};
+      if (keys.length === 0) return;
 
-    const nodes = elements.nodes.map(({ data, position, type, id }) => {
-      const nodeId = nanoid();
-      newNodeIdsMap[id] = nodeId;
+      set({
+        workflowLastSavedAt: new Date().toString(),
+        workflowChanges: new Set([...state.workflowChanges, ...keys]),
+        workflow: {
+          ...currentWorkflow,
+          ...newData,
+        },
+      });
+    },
+    onNodesChange(changes) {
+      get().updateWorkflow((workflow) => ({
+        nodes: applyNodeChanges(
+          changes,
+          workflow.nodes as Node[],
+        ) as WorkflowNodes[],
+      }));
+    },
+    onEdgesChange(changes) {
+      get().updateWorkflow((workflow) => ({
+        edges: applyEdgeChanges(changes, workflow.edges),
+      }));
+    },
+    onConnect(connection: Connection) {
+      get().updateWorkflow((workflow) => ({
+        edges: addEdge(connection, workflow.edges),
+      }));
+    },
+    onSelectionChange({ edges, nodes }) {
+      set({
+        selection: {
+          edges,
+          nodes: nodes as WorkflowNodes[],
+        },
+      });
+    },
+    updateEdge(edgeId, connection) {
+      get().updateWorkflow((workflow) => {
+        const oldEdge =
+          typeof edgeId === 'string'
+            ? workflow.edges.find((edge) => edge.id === edgeId)
+            : edgeId;
+        if (!oldEdge) return {};
 
-      return { id: nodeId, type, data, position };
-    }) as WorkflowNewNode[];
-    const edges: Connection[] = elements.edges.map(
-      ({ source, sourceHandle, target, targetHandle }) => ({
-        source: newNodeIdsMap[source] || source,
-        target: newNodeIdsMap[target] || target,
-        sourceHandle: sourceHandle || '',
-        targetHandle: targetHandle || '',
-      }),
-    );
-
-    if (nodes.length > 0) get().addNodes(nodes);
-    if (edges.length > 0) get().addEdges(edges);
-
-    return null;
-  },
-  copyElements(element) {
-    const state = get();
-
-    const { edges, nodes } = state.selection;
-    let workflowClipboardData: WorkflowClipboardData | null = null;
-
-    if (edges.length > 0 || nodes.length > 0) {
-      workflowClipboardData = { edges, nodes };
-    } else if (element?.nodeId) {
-      const node = state.nodes.find((item) => item.id === element.nodeId);
-      if (!node) return;
-
-      workflowClipboardData = { edges: [], nodes: [node] };
-    } else if (element?.edgeId) {
-      const edge = state.edges.find((item) => item.id === element.edgeId);
-      if (!edge) return;
-
-      workflowClipboardData = { edges: [edge], nodes: [] };
-    }
-
-    if (!workflowClipboardData) return;
-
-    preloadAPI.main.invokeIpcMessage(
-      'clipboard:copy-buffer',
-      APP_WORKFLOW_ELS_FORMAT,
-      JSON.stringify(workflowClipboardData),
-    );
-  },
-  onNodesChange: (changes: NodeChange[]) => {
-    set({
-      nodes: applyNodeChanges(
-        changes,
-        get().nodes as Node[],
-      ) as WorkflowNodes[],
-    });
-  },
-  onEdgesChange: (changes: EdgeChange[]) => {
-    set({
-      edges: applyEdgeChanges(changes, get().edges),
-    });
-  },
-  onConnect: (connection: Connection) => {
-    set({
-      edges: addEdge(connection, get().edges),
-    });
-  },
-  onSelectionChange({ edges, nodes }) {
-    set({
-      selection: {
-        edges,
-        nodes: nodes as WorkflowNodes[],
-      },
-    });
-  },
-  updateEdge(edgeId, connection) {
-    const state = get();
-
-    const oldEdge =
-      typeof edgeId === 'string'
-        ? state.edges.find((edge) => edge.id === edgeId)
-        : edgeId;
-    if (!oldEdge) return false;
-
-    set({ edges: updateEdge(oldEdge, connection, state.edges) });
-
-    return true;
-  },
-  addNodes(nodes) {
-    const { nodes: oldNodes } = get();
-    let isHasManualTrigger = false;
-
-    const newNodes = nodes.reduce<WorkflowNodes[]>((acc, node) => {
-      if (
-        node.type === WORKFLOW_NODE_TYPE.TRIGGER &&
-        node.data.type === 'manual' &&
-        !isHasManualTrigger
-      ) {
-        isHasManualTrigger = oldNodes.some(
-          (oldNode) =>
-            oldNode.type === WORKFLOW_NODE_TYPE.TRIGGER &&
-            oldNode.data.type === 'manual',
-        );
-        if (isHasManualTrigger) return acc;
-      }
-
-      acc.push({
-        ...node,
-        id: node.id || nanoid(),
+        return {
+          edges: updateEdge(oldEdge, connection, workflow.edges),
+        };
       });
 
-      return acc;
-    }, []);
+      return true;
+    },
+    addNodes(nodes) {
+      get().updateWorkflow((workflow) => {
+        const oldNodes = workflow.nodes;
+        let isHasManualTrigger = false;
 
-    if (newNodes.length === 0) return;
+        const newNodes = nodes.reduce<WorkflowNodes[]>((acc, node) => {
+          if (
+            node.type === WORKFLOW_NODE_TYPE.TRIGGER &&
+            node.data.type === 'manual' &&
+            !isHasManualTrigger
+          ) {
+            isHasManualTrigger = oldNodes.some(
+              (oldNode) =>
+                oldNode.type === WORKFLOW_NODE_TYPE.TRIGGER &&
+                oldNode.data.type === 'manual',
+            );
+            if (isHasManualTrigger) return acc;
+          }
 
-    set({
-      nodes: [...oldNodes, ...newNodes],
-    });
-  },
-  addEdges(connections) {
-    const state = get();
-    const newEdges = connections.flatMap((connection) =>
-      addEdge(connection, state.edges),
-    );
+          acc.push({
+            ...node,
+            id: node.id || nanoid(),
+          });
 
-    set({
-      edges: newEdges,
-    });
-  },
-  deleteEdge(edgeId) {
-    const edgeIds = new Set(Array.isArray(edgeId) ? edgeId : [edgeId]);
-    set({
-      edges: get().edges.filter((edge) => !edgeIds.has(edge.id)),
-    });
-  },
-  setNodes: (nodes) => {
-    set({ nodes });
-  },
-  setEdges: (edges) => {
-    set({ edges });
-  },
-}));
+          return acc;
+        }, []);
 
-export const useWorkflowStore = createStoreSelectors(workflowStore);
+        if (newNodes.length === 0) return {};
+
+        return {
+          nodes: [...oldNodes, ...newNodes],
+        };
+      });
+    },
+    addEdges(connections) {
+      get().updateWorkflow((workflow) => {
+        const newEdges = connections.flatMap((connection) =>
+          addEdge(connection, workflow.edges ?? []),
+        );
+
+        return {
+          edges: newEdges,
+        };
+      });
+    },
+    deleteEdge(edgeId) {
+      get().updateWorkflow((workflow) => {
+        const edgeIds = new Set(Array.isArray(edgeId) ? edgeId : [edgeId]);
+
+        return {
+          edges: workflow.edges.filter((edge) => !edgeIds.has(edge.id)),
+        };
+      });
+    },
+    setWorkflow(workflow) {
+      set({ workflow });
+    },
+    $reset() {
+      set(initialState);
+    },
+  })),
+);
+
+export const useWorkflowEditorStore = createStoreSelectors(workflowEditorStore);

@@ -14,7 +14,7 @@ type QueryDBState<T> =
   | QueryDBErrorState
   | QueryDBLoadingState;
 
-function useDatabaseCtx() {
+export function useDatabase() {
   const databaseCtx = useContext(DatabaseContext);
   if (!databaseCtx) {
     throw new Error(
@@ -22,7 +22,56 @@ function useDatabaseCtx() {
     );
   }
 
-  return databaseCtx;
+  const queryDatabase = useCallback(
+    <T extends keyof DatabaseQueriesEvent>({
+      args,
+      name,
+      onData,
+      onError,
+      onChange,
+      refreshOnChange = true,
+    }: {
+      name: T;
+      refreshOnChange?: boolean;
+      onError?: (message: string) => void;
+      args: Parameters<DatabaseQueriesEvent[T]>;
+      onChange?: (detail: { refresh: () => void }) => void;
+      onData?: (data: ReturnType<DatabaseQueriesEvent[T]>) => void;
+    }): (() => void) => {
+      const fetchData = () => {
+        preloadAPI.main
+          .invokeIpcMessage(name, ...args)
+          .then((data) => {
+            if (isIPCEventError(data)) {
+              onError?.(data.message);
+              return;
+            }
+
+            onData?.(data);
+          })
+          .catch((error) => {
+            onError?.(error.message);
+          });
+      };
+      const changeListener = onChange
+        ? () => {
+            if (refreshOnChange) fetchData();
+            onChange({ refresh: fetchData });
+          }
+        : null;
+
+      fetchData();
+
+      if (changeListener) databaseCtx.emitter.on(name, changeListener);
+
+      return () => {
+        if (changeListener) databaseCtx.emitter.off(name, changeListener);
+      };
+    },
+    [databaseCtx.emitter],
+  );
+
+  return { ...databaseCtx, queryDatabase };
 }
 
 export function useDatabaseQuery<T extends keyof DatabaseQueriesEvent>(
@@ -37,7 +86,7 @@ export function useDatabaseQuery<T extends keyof DatabaseQueriesEvent>(
     state: 'loading',
   });
 
-  const databaseCtx = useDatabaseCtx();
+  const databaseCtx = useDatabase();
 
   function updateState(
     data: ReturnValue | ((prevState: ReturnValue) => ReturnValue),

@@ -128,7 +128,7 @@ function WorkflowCards({ workflows }: { workflows: DatabaseWorkflow[] }) {
                   {
                     isDisabled: !workflow.isDisabled,
                   },
-                  true,
+                  { ignoreModified: true },
                 )
               }
             />

@@ -91,7 +91,10 @@ export interface DatabaseQueriesEvent {
   'database:update-workflow': (
     workflowId: string,
     data: DatabaseWorkflowUpdatePayload,
-    ignoreModified?: boolean,
+    options?: Partial<{
+      omitDBChanges: boolean;
+      ignoreModified: boolean;
+    }>,
   ) => void;
   'database:insert-workflow': (workflow: DatabaseWorkflowInsertPayload) => void;
   'database:delete-workflow': (workflowId: string) => void;

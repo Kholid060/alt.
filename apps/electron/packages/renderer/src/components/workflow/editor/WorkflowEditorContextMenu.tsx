@@ -15,7 +15,7 @@ import {
 } from '/@/interface/workflow-editor.interface';
 import UiShortcut from '../../ui/UiShortcut';
 import { useStore, useReactFlow } from 'reactflow';
-import { useWorkflowStore } from '/@/stores/workflow-editor.store';
+import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
 import preloadAPI from '/@/utils/preloadAPI';
 import { APP_WORKFLOW_ELS_FORMAT } from '#packages/common/utils/constant/constant';
 import { isIPCEventError } from '/@/utils/helper';
@@ -34,7 +34,7 @@ const useContextMenu = <
   );
 
 function ContextMenuItemPaste() {
-  const pasteElements = useWorkflowStore.use.pasteElements();
+  const { pasteElements } = useWorkflowEditor();
 
   const [show, setShow] = useState(false);
 
@@ -64,7 +64,7 @@ function ContextMenuItemCopy({
   nodeId?: string;
   edgeId?: string;
 }) {
-  const copyElements = useWorkflowStore.use.copyElements();
+  const { copyElements } = useWorkflowEditor();
 
   return (
     <UiContextMenuItem onClick={() => copyElements({ edgeId, nodeId })}>
@@ -81,7 +81,7 @@ function ContextMenuItemDelete({
   edgeId?: string;
 }) {
   const { deleteElements } = useReactFlow();
-  const selection = useWorkflowStore.use.selection();
+  const selection = useWorkflowEditorStore.use.selection();
 
   const selectedElsCount = selection.edges.length + selection.nodes.length;
 
@@ -202,7 +202,7 @@ function WorkflowEditorContextMenu() {
 
   useEffect(() => {
     const clearSelection = (ctxData: WorkflowEditorContextMenuEventPayload) => {
-      const { selection } = useWorkflowStore.getState();
+      const { selection } = useWorkflowEditorStore.getState();
       let clearSelection =
         selection.edges.length > 0 || selection.nodes.length > 0;
 

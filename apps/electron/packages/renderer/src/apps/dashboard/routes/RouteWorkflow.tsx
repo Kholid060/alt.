@@ -11,6 +11,7 @@ import ReactFlow, {
   OnEdgeUpdateFunc,
   BackgroundVariant,
   ReactFlowProvider,
+  useOnViewportChange,
 } from 'reactflow';
 import '/@/assets/css/workflow-editor-style.css';
 import WorkflowEditorHeader from '/@/components/workflow/editor/WorkflowEditorHeader';
@@ -18,7 +19,7 @@ import WorkflowEditorControls from '/@/components/workflow/editor/WorkflowEditor
 import { WorkflowEditorNodeListModal } from '/@/components/workflow/editor/WorkflowEditorNodeLIst';
 import {
   WorkflowEditorStore,
-  useWorkflowStore,
+  useWorkflowEditorStore,
 } from '/@/stores/workflow-editor.store';
 import { useShallow } from 'zustand/react/shallow';
 import { WorkflowEditorProvider } from '/@/context/workflow-editor.context';
@@ -31,8 +32,11 @@ import {
   WorkflowNodeCommand,
   WorkflowNodeTrigger,
 } from '/@/components/workflow/WorkflowNodes';
-import { useDatabaseQuery } from '/@/hooks/useDatabase';
-import { useParams } from 'react-router-dom';
+import { useDatabase } from '/@/hooks/useDatabase';
+import { useNavigate, useParams } from 'react-router-dom';
+import { debounce } from '@repo/shared';
+import preloadAPI from '/@/utils/preloadAPI';
+import { DatabaseWorkflowUpdatePayload } from '#packages/main/src/interface/database.interface';
 
 const nodeTypes: Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>> = {
   [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeCommand,
@@ -43,13 +47,14 @@ const edgeTypes = {
 };
 
 const selector = (state: WorkflowEditorStore) => ({
-  nodes: state.nodes,
-  edges: state.edges,
+  workflow: state.workflow,
   onConnect: state.onConnect,
   deleteEdge: state.deleteEdge,
   updateEdge: state.updateEdge,
+  setWorkflow: state.setWorkflow,
   onNodesChange: state.onNodesChange,
   onEdgesChange: state.onEdgesChange,
+  updateWorkflow: state.updateWorkflow,
   onSelectionChange: state.onSelectionChange,
 });
 
@@ -63,15 +68,14 @@ function WorkflowEditor() {
   const edgeUpdateSuccessful = useRef(true);
 
   const {
-    nodes,
-    edges,
+    workflow,
     onConnect,
     updateEdge,
     deleteEdge,
     onNodesChange,
     onEdgesChange,
     onSelectionChange,
-  } = useWorkflowStore(useShallow(selector));
+  } = useWorkflowEditorStore(useShallow(selector));
 
   const onConnectEnd: OnConnectEnd = useCallback(
     (event) => {
@@ -168,14 +172,16 @@ function WorkflowEditor() {
     [deleteEdge],
   );
 
+  if (!workflow) return null;
+
   return (
     <div className="relative w-full h-screen flex flex-col">
       <WorkflowEditorHeader />
       <div className="flex-grow flex relative">
         <WorkflowEditorNodeListModal />
         <ReactFlow
-          nodes={nodes}
-          edges={edges}
+          nodes={workflow.nodes}
+          edges={workflow.edges}
           className="flex-grow"
           nodeTypes={nodeTypes}
           edgeTypes={edgeTypes}
@@ -192,6 +198,7 @@ function WorkflowEditor() {
           onNodeContextMenu={onNodeContextMenu}
           onEdgeContextMenu={onEdgeContextMenu}
           onSelectionContextMenu={onSelectionContextMenu}
+          defaultViewport={workflow.viewport ?? undefined}
         >
           <Panel position="bottom-left">
             <WorkflowEditorControls />
@@ -208,13 +215,94 @@ function WorkflowEditor() {
     </div>
   );
 }
+function WokflowViewportChangesListener() {
+  const updateWorkflow = useWorkflowEditorStore.use.updateWorkflow();
+  useOnViewportChange({
+    onEnd: (viewport) => {
+      updateWorkflow({ viewport });
+    },
+  });
 
+  return null;
+}
+
+const WORKFLOW_CHANGES_DEBOUNCE_MS = 2000;
 function RouteWorkflow() {
+  const setWorkflow = useWorkflowEditorStore.use.setWorkflow();
+
+  const navigate = useNavigate();
+  const { workflowId } = useParams();
+  const { queryDatabase } = useDatabase();
+
+  const dataFetched = useRef(false);
+
+  useEffect(() => {
+    const offQueryListener = queryDatabase({
+      name: 'database:get-workflow',
+      args: [workflowId!],
+      onData(data) {
+        if (!data) {
+          navigate('/workflows');
+          return;
+        }
+
+        setWorkflow(data);
+        setTimeout(() => {
+          dataFetched.current = true;
+        }, WORKFLOW_CHANGES_DEBOUNCE_MS + 100);
+      },
+      onError(message) {
+        console.log('Error: ', message);
+      },
+    });
+
+    return () => {
+      offQueryListener();
+      useWorkflowEditorStore.getState().$reset();
+    };
+  }, [workflowId, navigate]);
+  useEffect(
+    () =>
+      useWorkflowEditorStore.subscribe(
+        (state) => state.workflow,
+        debounce(async (workflow) => {
+          if (!dataFetched.current || !workflow) return;
+
+          try {
+            const { workflowChanges: changes, clearWorkflowChanges } =
+              useWorkflowEditorStore.getState();
+            if (changes.size === 0) return;
+
+            const payload: DatabaseWorkflowUpdatePayload = {};
+            changes.forEach((key) => {
+              //@ts-expect-error ...
+              payload[key] = workflow[key];
+            });
+
+            await preloadAPI.main.invokeIpcMessage(
+              'database:update-workflow',
+              workflow.id,
+              payload,
+            );
+            clearWorkflowChanges();
+
+            if (import.meta.env.DEV) {
+              console.log('Save workflow', changes);
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        }, WORKFLOW_CHANGES_DEBOUNCE_MS),
+      ),
+    [],
+  );
+
   return (
     <WorkflowEditorProvider>
       <ReactFlowProvider>
         <WorkflowEditorContextMenu />
         <WorkflowEditor />
+        <WokflowViewportChangesListener />
       </ReactFlowProvider>
     </WorkflowEditorProvider>
   );
