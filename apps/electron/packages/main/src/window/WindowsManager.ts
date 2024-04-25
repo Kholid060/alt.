@@ -1,11 +1,11 @@
 import type { BrowserWindow } from 'electron';
-import { createCommandWindow } from './command-window';
-import { createDashboardWindow } from './dashboard-window';
 import type { IPCRendererSendEvent } from '#packages/common/interface/ipc-events.interface';
+import WindowCommand from './command-window';
+import WindowDashboard from './dashboard-window';
 
 const windows = {
-  command: createCommandWindow,
-  dashboard: createDashboardWindow,
+  command: WindowCommand.instance,
+  dashboard: WindowDashboard.instance,
 };
 
 export type WindowManagerWindows = typeof windows;
@@ -50,7 +50,7 @@ class WindowsManager {
     let window = this.windows.get(name);
     if (window && !window.isDestroyed()) return window;
 
-    window = await windows[name]();
+    window = await windows[name].createWindow();
     if (!window) throw new Error('Invalid window name');
 
     this.windows.set(name, window);

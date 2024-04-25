@@ -11,9 +11,10 @@ import { ExtensionError } from '#packages/common/errors/custom-errors';
 import { getExtensionConfigDefaultValue } from '../helper';
 import type { IPCExtensionConfigEvents } from '#packages/common/interface/ipc-events.interface';
 import { GlobalShortcutExtension } from '../GlobalShortcuts';
-import { toggleCommandWindow } from '/@/window/command-window';
 import DBService from '/@/services/database/database.service';
 import { emitDBChanges } from '../database-utils';
+import WorkflowRunnerService from '../../services/workflow-runner.service';
+import WindowCommand from '/@/window/command-window';
 
 /** EXTENSION */
 IPCMain.handle('extension:import', async ({ sender }) => {
@@ -203,13 +204,11 @@ IPCMain.handle('app:toggle-lock-window', ({ sender }) => {
   return Promise.resolve();
 });
 IPCMain.handle('app:close-command-window', () => {
-  toggleCommandWindow(false);
-
+  WindowCommand.instance.toggleWindow(false);
   return Promise.resolve();
 });
 IPCMain.handle('app:show-command-window', () => {
-  toggleCommandWindow(true);
-
+  WindowCommand.instance.toggleWindow(true);
   return Promise.resolve();
 });
 
@@ -306,3 +305,8 @@ IPCMain.handle(
     });
   },
 );
+
+/** WORKFLOW */
+IPCMain.handle('workflow:run', (_, payload) => {
+  return WorkflowRunnerService.instance.run(payload);
+});

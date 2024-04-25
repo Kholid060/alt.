@@ -12,6 +12,7 @@ import type {
   DatabaseExtension,
   DatabaseQueriesEvent,
 } from '../../main/src/interface/database.interface';
+import type { WorkflowRunPayload } from './workflow.interface';
 
 export interface IPCUserExtensionCustomEventsMap {
   'browser.activeTab.elementExists': (
@@ -98,6 +99,10 @@ export interface IPCExtensionConfigEvents {
   ) => void;
 }
 
+export interface IPCWorkflowEvents {
+  'workflow:run': (payload: WorkflowRunPayload) => string;
+}
+
 export interface IPCUserExtensionEvents {
   'user-extension': <T extends keyof IPCUserExtensionEventsMap>(detail: {
     key: string;
@@ -121,6 +126,7 @@ export type IPCEvents = IPCShellEvents &
   IPCAppsEvents &
   IPCDialogEvents &
   IPCScreenEvents &
+  IPCWorkflowEvents &
   IPCClipboardEvents &
   IPCExtensionEvents &
   DatabaseQueriesEvent &

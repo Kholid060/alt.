@@ -1,5 +1,6 @@
 import path from 'path';
 import { app } from 'electron';
+import { fileURLToPath } from 'url';
 
 export const EXTENSION_FOLDER = path.join(
   app.getPath('userData'),
@@ -14,3 +15,7 @@ export const GLOBAL_SHORTCUTS = {
   toggleCommandWindow: 'Alt+.',
   closeCommandWindow: 'Escape',
 } as const;
+
+export const __FILENAME = fileURLToPath(import.meta.url);
+
+export const __DIRNAME = path.dirname(__FILENAME);

@@ -30,6 +30,7 @@ const config = {
     lib: {
       entry: {
         index: 'src/index.ts',
+        'workflow-runner': 'src/workflow-runner/WorkflowRunnerManager.ts',
       },
       formats: ['es'],
     },

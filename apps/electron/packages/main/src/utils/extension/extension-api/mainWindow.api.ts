@@ -1,7 +1,7 @@
 import ExtensionIPCEvent from '../ExtensionIPCEvent';
-import { toggleCommandWindow } from '/@/window/command-window';
+import WindowCommand from '/@/window/command-window';
 
 ExtensionIPCEvent.instance.on('mainWindow.close', () => {
-  toggleCommandWindow(false);
+  WindowCommand.instance.toggleWindow(false);
   return Promise.resolve();
 });

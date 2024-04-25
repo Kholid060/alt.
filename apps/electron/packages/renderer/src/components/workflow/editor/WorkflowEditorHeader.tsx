@@ -1,15 +1,12 @@
-import { UiButton } from '@repo/ui';
-import {
-  ChevronLeftIcon,
-  RedoIcon,
-  SettingsIcon,
-  UndoIcon,
-} from 'lucide-react';
+import { UiButton, useToast } from '@repo/ui';
+import { ChevronLeftIcon, PlayIcon, RedoIcon, UndoIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
 import { UiExtIcon } from '@repo/extension';
 import dayjs from 'dayjs';
 import { useEffect, useRef, useState } from 'react';
+import preloadAPI from '/@/utils/preloadAPI';
+import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 
 function SavedTimeText() {
   const intervalRef = useRef<NodeJS.Timeout>();
@@ -36,6 +33,39 @@ function SavedTimeText() {
 
 function WorkflowEditorHeader() {
   const workflow = useWorkflowEditorStore.use.workflow()!;
+
+  const { toast } = useToast();
+
+  function runWorkflow() {
+    const manualTriggerNode = workflow.nodes.find(
+      (node) =>
+        node.type === WORKFLOW_NODE_TYPE.TRIGGER && node.data.type === 'manual',
+    );
+    if (!manualTriggerNode) {
+      toast({
+        variant: 'destructive',
+        title: "Couldn't find a Manual Trigger node",
+        description: 'Add a Manual Trigger node to run the workflow manually',
+      });
+      return;
+    }
+
+    preloadAPI.main
+      .invokeIpcMessage('workflow:run', {
+        id: workflow.id,
+        startNodeId: manualTriggerNode.id,
+      })
+      .catch((error) => {
+        console.error(error);
+        toast({
+          variant: 'destructive',
+          title: 'Something went wrong!',
+          description: (
+            <p className="line-clamp-2">{`Something went wrong when running the "${workflow.name}" workfow`}</p>
+          ),
+        });
+      });
+  }
 
   const WorkflowIcon =
     UiExtIcon[workflow.icon as keyof typeof UiExtIcon] ?? UiExtIcon.Command;
@@ -70,8 +100,9 @@ function WorkflowEditorHeader() {
       </UiButton>
       <SavedTimeText />
       <hr className="h-2/6 bg-border/50 w-px mx-4" />
-      <UiButton size="icon" variant="secondary">
-        <SettingsIcon className="h-5 w-5" />
+      <UiButton variant="secondary" onClick={runWorkflow}>
+        <PlayIcon className="h-4 w-4 mr-2 -ml-0.5" />
+        <p>Run</p>
       </UiButton>
       <UiButton className="ml-2">Publish</UiButton>
     </header>

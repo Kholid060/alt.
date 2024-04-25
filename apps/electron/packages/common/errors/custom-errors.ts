@@ -11,3 +11,11 @@ export class ValidationError extends Error {
     this.name = 'ValidationError';
   }
 }
+
+// hmm...
+export class CustomError extends Error {
+  constructor(message?: string) {
+    super(message);
+    this.name = 'ValidationError';
+  }
+}

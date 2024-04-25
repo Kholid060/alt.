@@ -1,10 +1,10 @@
 import { globalShortcut } from 'electron';
 import { GLOBAL_SHORTCUTS } from './constant';
-import { toggleCommandWindow } from '../window/command-window';
 import { logger } from '../lib/log';
 import extensionCommandRunner from './extension/extensionCommandRunner';
 import { CommandLaunchBy } from '@repo/extension';
 import DBService from '../services/database/database.service';
+import WindowCommand from '../window/command-window';
 
 class GlobalShortcut {
   private static _instance: GlobalShortcut | null = null;
@@ -118,7 +118,7 @@ export async function registerGlobalShortcuts() {
     GlobalShortcut.instance.register(
       GLOBAL_SHORTCUTS.toggleCommandWindow,
       () => {
-        toggleCommandWindow();
+        WindowCommand.instance.toggleWindow();
       },
     );
     await GlobalShortcutExtension.registerAllShortcuts();

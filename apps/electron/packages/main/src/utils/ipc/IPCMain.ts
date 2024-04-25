@@ -1,4 +1,5 @@
 import {
+  CustomError,
   ExtensionError,
   ValidationError,
 } from '#packages/common/errors/custom-errors';
@@ -25,6 +26,7 @@ class IPCMain {
         return await callback(event, ...(args as P));
       } catch (error) {
         if (
+          error instanceof CustomError ||
           error instanceof ExtensionError ||
           error instanceof ValidationError
         ) {

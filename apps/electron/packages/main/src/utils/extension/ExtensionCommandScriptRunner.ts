@@ -8,8 +8,8 @@ import { snakeCase } from 'lodash-es';
 import { logger } from '/@/lib/log';
 import { ExtensionError } from '#packages/common/errors/custom-errors';
 import type { CommandLaunchContext } from '@repo/extension';
-import DBExtensionService from '../../services/database/database-extension.service';
 import IPCMain from '../ipc/IPCMain';
+import DBService from '/@/services/database/database.service';
 
 const FILE_EXT_COMMAND_MAP: Record<string, string> = {
   '.sh': 'sh',
@@ -49,7 +49,8 @@ class ExtensionCommandScriptRunner {
     extensionId: string;
     launchContext: CommandLaunchContext;
   }) {
-    const extension = await DBExtensionService.getExtension(extensionId);
+    const extension =
+      await DBService.instance.extension.getExtension(extensionId);
     if (!extension || extension.isDisabled) return;
 
     const command = extension.commands.find((item) => item.name === commandId);

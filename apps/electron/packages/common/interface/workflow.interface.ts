@@ -1,4 +1,7 @@
-import type { WORKFLOW_NODE_TYPE } from '../utils/constant/constant';
+import type {
+  WORKFLOW_MANUAL_TRIGGER_ID,
+  WORKFLOW_NODE_TYPE,
+} from '../utils/constant/constant';
 import type { Edge, Node } from 'reactflow';
 import type { SetOptional } from 'type-fest';
 
@@ -40,6 +43,11 @@ export type WorkflowNewNode = SetOptional<WorkflowNodes, 'id'>;
 export interface WorkflowClipboardData {
   edges: Edge[];
   nodes: WorkflowNodes[];
+}
+
+export interface WorkflowRunPayload {
+  id: string;
+  startNodeId: typeof WORKFLOW_MANUAL_TRIGGER_ID | string;
 }
 
 export interface WorkflowSettings {}

@@ -4,9 +4,9 @@ import type { ExtensionCommandArgument } from '@repo/extension-core';
 import { parseJSON } from '@repo/shared';
 import { store } from '../lib/store';
 import { CommandLaunchBy } from '@repo/extension';
-import DBExtensionService from '../services/database/database-extension.service';
 import extensionCommandRunner from './extension/extensionCommandRunner';
 import { APP_DEEP_LINK } from '#packages/common/utils/constant/constant';
+import DBService from '../services/database/database.service';
 
 function convertArgValue(argument: ExtensionCommandArgument, value: string) {
   let convertedValue: unknown = value;
@@ -34,7 +34,7 @@ class DeepLink {
     try {
       const [_, extensionId, commandId] = pathname.split('/');
 
-      const command = await DBExtensionService.getExtensionCommand({
+      const command = await DBService.instance.extension.getExtensionCommand({
         commandId,
         extensionId,
       });
@@ -74,22 +74,20 @@ class DeepLink {
       });
 
       const requiredArgs: { name: string; index: number }[] = [];
-      const commandArgs =
-        command.arguments?.reduce<Record<string, unknown>>(
-          (acc, argument, index) => {
-            if (Object.hasOwn(args, index)) {
-              acc[argument.name] = convertArgValue(argument, args[index]);
-            } else if (argument.required) {
-              requiredArgs.push({
-                index,
-                name: argument.placeholder ?? argument.name,
-              });
-            }
+      const commandArgs = (command.arguments ?? []).reduce<
+        Record<string, unknown>
+      >((acc, argument, index) => {
+        if (Object.hasOwn(args, index)) {
+          acc[argument.name] = convertArgValue(argument, args[index]);
+        } else if (argument.required) {
+          requiredArgs.push({
+            index,
+            name: argument.placeholder ?? argument.name,
+          });
+        }
 
-            return acc;
-          },
-          {},
-        ) ?? {};
+        return acc;
+      }, {});
 
       if (requiredArgs.length > 0) {
         const requiredArgsStr = requiredArgs

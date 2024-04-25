@@ -38,3 +38,5 @@ export const DATABASE_CHANGES_ALL_ARGS = '$database-all-args$' as const;
 export const APP_DEEP_LINK = 'app-app';
 
 export const APP_WORKFLOW_ELS_FORMAT = 'APP_NAME/workflow-elements' as const;
+
+export const WORKFLOW_MANUAL_TRIGGER_ID = '$manual$' as const;
