@@ -1,17 +1,27 @@
 import { nanoid } from 'nanoid';
 import EventEmitter from 'eventemitter3';
-import type { DatabaseWorkflowDetail } from '/@/interface/database.interface';
 import type { WorkflowRunnerRunPayload } from '#packages/common/interface/workflow-runner.interace';
-import type { Node } from 'reactflow';
-import { getOutgoers } from 'reactflow';
 import {
   WORKFLOW_MANUAL_TRIGGER_ID,
   WORKFLOW_NODE_TYPE,
 } from '#packages/common/utils/constant/constant';
+import type {
+  WorkflowEdge,
+  WorkflowNodes,
+} from '#packages/common/interface/workflow.interface';
+import type { WorkflowNodeHandler } from './node-handler/WorkflowNodeHandler';
 
-export interface WorkflowRunnerOptions extends WorkflowRunnerRunPayload {}
+type NodeHandlers = Record<
+  WORKFLOW_NODE_TYPE,
+  WorkflowNodeHandler<WORKFLOW_NODE_TYPE>
+>;
+
+export interface WorkflowRunnerOptions extends WorkflowRunnerRunPayload {
+  nodeHandlers: NodeHandlers;
+}
 
 export interface WorkflowRunnerEvents {
+  done: () => void;
   error: (message: string) => void;
 }
 
@@ -22,27 +32,75 @@ export enum WorkflowRunnerState {
   Running = 'running',
 }
 
-class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
-  private startNodeId: string;
-  private workflow: DatabaseWorkflowDetail;
+interface NodeConnectionMap {
+  source: string[];
+  target: string[];
+}
 
-  id: string;
-  state: WorkflowRunnerState;
+function getNodeConnectionsMap(nodes: WorkflowNodes[], edges: WorkflowEdge[]) {
+  const connectionMap: Record<string, NodeConnectionMap> = {};
+  const nodePositions = new Map(nodes.map((node) => [node.id, node.position]));
 
-  constructor({ startNodeId, workflow }: WorkflowRunnerOptions) {
-    super();
+  edges.forEach((edge) => {
+    if (!nodePositions.has(edge.source) || !nodePositions.has(edge.target))
+      return;
 
-    this.workflow = workflow;
-    this.startNodeId = startNodeId;
+    if (!connectionMap[edge.source]) {
+      connectionMap[edge.source] = {
+        source: [],
+        target: [],
+      };
+    }
+    if (!connectionMap[edge.target]) {
+      connectionMap[edge.target] = {
+        source: [],
+        target: [],
+      };
+    }
 
-    this.id = nanoid();
-    this.state = WorkflowRunnerState.Running;
+    connectionMap[edge.target].source.push(edge.source);
+    connectionMap[edge.source].target.push(edge.target);
+  });
 
-    this.start();
+  // sort connection by the node Y position
+  const connectionSorter = (a: string, z: string) =>
+    nodePositions.get(a)!.y - nodePositions.get(z)!.y;
+  for (const key in connectionMap) {
+    const connection = connectionMap[key];
+    connection.source.sort(connectionSorter);
+    connection.target.sort(connectionSorter);
   }
 
-  start() {
-    const startNode = this.workflow.nodes.find((node) => {
+  return connectionMap;
+}
+
+class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
+  private startNodeId: string;
+  private nodeHandlers: NodeHandlers;
+  private nodeExecutionQueue: string[] = [];
+
+  id: string;
+  workflowId: string;
+  state: WorkflowRunnerState;
+  nodes: Map<string, WorkflowNodes>;
+  connectionsMap: Record<string, NodeConnectionMap> = {};
+
+  constructor({ startNodeId, workflow, nodeHandlers }: WorkflowRunnerOptions) {
+    super();
+
+    this.startNodeId = startNodeId;
+    this.nodeHandlers = nodeHandlers;
+
+    this.id = nanoid();
+    this.workflowId = workflow.id;
+    this.state = WorkflowRunnerState.Running;
+    this.nodes = new Map(workflow.nodes.map((node) => [node.id, node]));
+
+    this.start(workflow.nodes, workflow.edges);
+  }
+
+  private start(nodes: WorkflowNodes[], edges: WorkflowEdge[]) {
+    const startNode = nodes.find((node) => {
       if (this.startNodeId === WORKFLOW_MANUAL_TRIGGER_ID) {
         return (
           node.type === WORKFLOW_NODE_TYPE.TRIGGER &&
@@ -58,14 +116,47 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
       return;
     }
 
-    console.log({
-      startNode,
-      outers: getOutgoers(
-        startNode as Node,
-        this.workflow.nodes as Node[],
-        this.workflow.edges,
-      ),
-    });
+    this.connectionsMap = getNodeConnectionsMap(nodes, edges);
+
+    this.executeNode(startNode);
+  }
+
+  private async executeNode(node: WorkflowNodes, previousNode?: WorkflowNodes) {
+    const nodeHandler = this.nodeHandlers[node.type];
+    if (!nodeHandler) {
+      throw new Error(`Node with "${node.type}" doesn't have handler`);
+    }
+
+    const result = await nodeHandler.call(this, node);
+    console.log(result);
+
+    const connection = this.connectionsMap[result.nextNodeId || node.id];
+    if (!connection || connection.target.length === 0) {
+      const lastNodeIdQueue = this.nodeExecutionQueue.pop();
+      if (!lastNodeIdQueue || !this.nodes.has(lastNodeIdQueue)) {
+        this.state = WorkflowRunnerState.Done;
+        this.emit('done');
+        return;
+      }
+
+      const nextNode = this.nodes.get(lastNodeIdQueue)!;
+      this.executeNode(nextNode, previousNode);
+
+      return;
+    }
+
+    const [nextNodeId, ...queueNodeIds] = connection.target;
+    this.nodeExecutionQueue.push(...queueNodeIds.toReversed());
+
+    console.log('Next Node => ', nextNodeId, 'queue => ', queueNodeIds);
+
+    const nextNode = this.nodes.get(nextNodeId);
+    if (!nextNode) {
+      this.emit('error', `Couldn't find node with "${nextNodeId}" id`);
+      return;
+    }
+
+    this.executeNode(nextNode);
   }
 }
 

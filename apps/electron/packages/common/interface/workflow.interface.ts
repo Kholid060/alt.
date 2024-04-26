@@ -3,13 +3,18 @@ import type {
   WORKFLOW_NODE_TYPE,
 } from '../utils/constant/constant';
 import type { Edge, Node } from 'reactflow';
-import type { SetOptional } from 'type-fest';
+import type { SetOptional, SetRequired } from 'type-fest';
 
 interface WorkflowNodeBaseData {
   description?: string;
 }
 
-export type WorkflowNodeCommand = Node<
+export type WorkflowNodeBase<
+  T = unknown,
+  P extends string = string,
+> = SetRequired<Node<T, P>, 'type'>;
+
+export type WorkflowNodeCommand = WorkflowNodeBase<
   {
     icon: string;
     title: string;
@@ -24,7 +29,7 @@ export interface WorkflowNodeTriggerManual {
   type: 'manual';
 }
 
-export type WorkflowNodeTrigger = Node<
+export type WorkflowNodeTrigger = WorkflowNodeBase<
   WorkflowNodeTriggerManual,
   WORKFLOW_NODE_TYPE.TRIGGER
 >;

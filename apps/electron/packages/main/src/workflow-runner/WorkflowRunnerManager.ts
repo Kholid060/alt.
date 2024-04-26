@@ -3,7 +3,27 @@ import type {
   WorkflowRunnerRunPayload,
 } from '#packages/common/interface/workflow-runner.interace';
 import BetterMessagePort from '#packages/common/utils/BetterMessagePort';
+import type { WorkflowRunnerOptions } from './WorkflowRunner';
 import WorkflowRunner from './WorkflowRunner';
+import * as builtNodeHandlers from './node-handler/workflow-node-handlers';
+
+const nodeHandlers = (() => {
+  // const files = import.meta.glob('./node-handler/*.ts', {
+  //   eager: true,
+  // }) as Record<
+  //   string,
+  //   {
+  //     default: WorkflowNodeHandler;
+  //   }
+  // >;
+  const handlers: Record<string, unknown> = {};
+
+  Object.values(builtNodeHandlers).forEach((handler) => {
+    handlers[handler.type] = handler;
+  });
+
+  return handlers as WorkflowRunnerOptions['nodeHandlers'];
+})();
 
 class WorkflowRunnerManager {
   private static _instance: WorkflowRunnerManager | null = null;
@@ -17,10 +37,8 @@ class WorkflowRunnerManager {
   constructor() {}
 
   runWorkflow(payload: WorkflowRunnerRunPayload) {
-    const workflowRunner = new WorkflowRunner(payload);
+    const workflowRunner = new WorkflowRunner({ ...payload, nodeHandlers });
     this.workflowRunners.set(workflowRunner.id, workflowRunner);
-
-    workflowRunner.start();
 
     return workflowRunner.id;
   }

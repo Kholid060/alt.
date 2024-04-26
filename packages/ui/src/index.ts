@@ -94,6 +94,11 @@ export {
 } from './components/ui/card';
 export { UiSkeleton } from './components/ui/skeleton';
 export { UiTextarea } from './components/ui/textarea';
+export {
+  UiAvatar,
+  UiAvatarImage,
+  UiAvatarFallback,
+} from './components/ui/avatar';
 
 export { useUiList } from './context/list.context';
 

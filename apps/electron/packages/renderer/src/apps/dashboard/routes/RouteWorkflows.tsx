@@ -104,7 +104,7 @@ function WorkflowCards({ workflows }: { workflows: DatabaseWorkflow[] }) {
             </div>
             <div className="flex-grow"></div>
           </UiCardHeader>
-          <UiCardContent className="p-4 pt-0 flex-grow">
+          <UiCardContent className="px-4 pt-0 flex-grow">
             <Link
               to={`/workflows/${workflow.id}`}
               className="h-full w-full block"

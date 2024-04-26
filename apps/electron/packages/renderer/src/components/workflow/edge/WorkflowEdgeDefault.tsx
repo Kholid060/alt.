@@ -11,6 +11,7 @@ function WorkflowEdgeDefault({
   targetPosition = Position.Top,
   sourcePosition = Position.Bottom,
 }: EdgeProps) {
+  // if target === "loop" then use getSmoothStepPath
   const [edgePath] = getBezierPath({
     sourceX,
     sourceY,

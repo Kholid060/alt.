@@ -12,6 +12,7 @@ import ReactFlow, {
   BackgroundVariant,
   ReactFlowProvider,
   useOnViewportChange,
+  EdgeMouseHandler,
 } from 'reactflow';
 import '/@/assets/css/workflow-editor-style.css';
 import WorkflowEditorHeader from '/@/components/workflow/editor/WorkflowEditorHeader';
@@ -51,10 +52,8 @@ const selector = (state: WorkflowEditorStore) => ({
   onConnect: state.onConnect,
   deleteEdge: state.deleteEdge,
   updateEdge: state.updateEdge,
-  setWorkflow: state.setWorkflow,
   onNodesChange: state.onNodesChange,
   onEdgesChange: state.onEdgesChange,
-  updateWorkflow: state.updateWorkflow,
   onSelectionChange: state.onSelectionChange,
 });
 
@@ -65,7 +64,6 @@ function WorkflowEditor() {
     nodeId: string;
     handleId: string;
   } | null>(null);
-  const edgeUpdateSuccessful = useRef(true);
 
   const {
     workflow,
@@ -151,23 +149,15 @@ function WorkflowEditor() {
     [workflowEditorEvent],
   );
 
-  const onEdgeUpdateStart = useCallback(() => {
-    edgeUpdateSuccessful.current = false;
-  }, []);
   const onEdgeUpdate: OnEdgeUpdateFunc = useCallback(
     (oldEdge, newConnection) => {
-      edgeUpdateSuccessful.current = true;
       updateEdge(oldEdge, newConnection);
     },
     [updateEdge],
   );
-  const onEdgeUpdateEnd = useCallback(
-    (_: MouseEvent | TouchEvent, edge: Edge) => {
-      if (!edgeUpdateSuccessful.current) {
-        deleteEdge(edge.id);
-      }
-
-      edgeUpdateSuccessful.current = true;
+  const onEdgeDoubleClick: EdgeMouseHandler = useCallback(
+    (_, edge) => {
+      deleteEdge(edge.id);
     },
     [deleteEdge],
   );
@@ -191,11 +181,10 @@ function WorkflowEditor() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnectStart={onConnectStart}
-          onEdgeUpdateEnd={onEdgeUpdateEnd}
-          onEdgeUpdateStart={onEdgeUpdateStart}
           onPaneContextMenu={onPaneContextMenu}
           onSelectionChange={onSelectionChange}
           onNodeContextMenu={onNodeContextMenu}
+          onEdgeDoubleClick={onEdgeDoubleClick}
           onEdgeContextMenu={onEdgeContextMenu}
           onSelectionContextMenu={onSelectionContextMenu}
           defaultViewport={workflow.viewport ?? undefined}
