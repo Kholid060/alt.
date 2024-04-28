@@ -2,10 +2,12 @@ import type { BrowserWindow } from 'electron';
 import type { IPCRendererSendEvent } from '#packages/common/interface/ipc-events.interface';
 import WindowCommand from './command-window';
 import WindowDashboard from './dashboard-window';
+import WindowSharedProcess from './shared-process-window';
 
 const windows = {
   command: WindowCommand.instance,
   dashboard: WindowDashboard.instance,
+  'shared-process': WindowSharedProcess.instance,
 };
 
 export type WindowManagerWindows = typeof windows;

@@ -86,7 +86,7 @@ app
     ]);
 
     WindowsManager.instance.restoreOrCreateWindow('command');
-    WindowsManager.instance.restoreOrCreateWindow('dashboard');
+    WindowsManager.instance.restoreOrCreateWindow('shared-process');
   })
   .catch((e) => console.error('Failed create window:', e));
 

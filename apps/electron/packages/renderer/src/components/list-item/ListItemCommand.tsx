@@ -78,8 +78,8 @@ function ListItemCommand({
   const actions: UiListItemAction[] = [
     {
       onAction() {
-        preloadAPI.main
-          .invokeIpcMessage(
+        preloadAPI.main.ipc
+          .invoke(
             'clipboard:copy',
             `${APP_DEEP_LINK}://extensions/${extension.id}/${command.name}`,
           )

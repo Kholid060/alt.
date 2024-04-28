@@ -39,8 +39,8 @@ function ContextMenuItemPaste() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
-    preloadAPI.main
-      .invokeIpcMessage('clipboard:has-buffer', APP_WORKFLOW_ELS_FORMAT)
+    preloadAPI.main.ipc
+      .invoke('clipboard:has-buffer', APP_WORKFLOW_ELS_FORMAT)
       .then((hasValue) => {
         if (isIPCEventError(hasValue) || !hasValue) return;
 

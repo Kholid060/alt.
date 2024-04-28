@@ -14,6 +14,6 @@
     },
     "baseUrl": "."
   },
-  "include": ["src/**/*.ts", "./preload.d.ts", "../../types/**/*.d.ts"],
+  "include": ["src/**/*.ts", "./preload.d.ts", "../../types/**/*.d.ts", "../common/utils/IPCRenderer.ts"],
   "exclude": ["**/*.spec.ts", "**/*.test.ts"]
 }

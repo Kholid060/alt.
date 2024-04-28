@@ -161,19 +161,18 @@ function CommandList() {
       icon: <UiList.Icon icon={BlocksIcon} />,
       async onSelected() {
         try {
-          const result =
-            await preloadAPI.main.invokeIpcMessage('extension:import');
+          const result = await preloadAPI.main.ipc.invoke('extension:import');
           if (!result) return;
 
           if ('$isError' in result) {
-            await preloadAPI.main.invokeIpcMessage('dialog:message-box', {
+            await preloadAPI.main.ipc.invoke('dialog:message-box', {
               type: 'error',
               message: `Error when trying to import extension:\n\n${result.message}`,
             });
             return;
           }
 
-          preloadAPI.main.sendIpcMessage('data:changes', 'extension');
+          preloadAPI.main.ipc.send('data:changes', 'extension');
 
           const inputExtensionConfig =
             !result.isError && result.config?.some((item) => item.required);
@@ -207,8 +206,8 @@ function CommandList() {
       group: 'Commands',
       icon: <UiList.Icon icon={SettingsIcon} />,
       async onSelected() {
-        await preloadAPI.main.invokeIpcMessage('app:close-command-window');
-        preloadAPI.main.sendIpcMessage('window:open-settings');
+        await preloadAPI.main.ipc.invoke('app:close-command-window');
+        preloadAPI.main.ipc.send('window:open-settings');
       },
       metadata: {
         type: 'builtin-command',

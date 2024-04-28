@@ -7,6 +7,8 @@ import {
 import { useCommandStore } from '/@/stores/command.store';
 import { getExtIconURL, isIPCEventError } from '/@/utils/helper';
 import { requireInputConfig } from '#packages/common/utils/helper';
+import MessagePortListener from '../../utils/message-port';
+import { MESSAGE_PORT_CHANNEL_IDS } from '#packages/common/utils/constant/constant';
 
 function AppEventListener() {
   const setCommandStoreState = useCommandStore((state) => state.setState);
@@ -14,7 +16,7 @@ function AppEventListener() {
   const navigate = useCommandNavigate();
 
   useEffect(() => {
-    const offWindowVisibility = preloadAPI.main.ipcMessage.on(
+    const offWindowVisibility = preloadAPI.main.ipc.on(
       'window:visibility-change',
       (_, isHidden) => {
         if (!isHidden) {
@@ -28,16 +30,16 @@ function AppEventListener() {
         setCommandStoreState('isWindowHidden', isHidden);
       },
     );
-    const offAppUpdateRoute = preloadAPI.main.ipcMessage.on(
+    const offAppUpdateRoute = preloadAPI.main.ipc.on(
       'app:update-route',
       (_, path, routeData) => {
         navigate(path, routeData as CommandNavigateOptions);
       },
     );
-    const offInputConfig = preloadAPI.main.ipcMessage.on(
+    const offInputConfig = preloadAPI.main.ipc.on(
       'command-window:input-config',
       async (_, { commandId, extensionId, type }) => {
-        const extension = await preloadAPI.main.invokeIpcMessage(
+        const extension = await preloadAPI.main.ipc.invoke(
           'database:get-extension-manifest',
           extensionId,
         );
@@ -77,9 +79,9 @@ function AppEventListener() {
     );
 
     return () => {
-      offInputConfig?.();
-      offAppUpdateRoute?.();
-      offWindowVisibility?.();
+      offInputConfig();
+      offAppUpdateRoute();
+      offWindowVisibility();
     };
   }, []);
 

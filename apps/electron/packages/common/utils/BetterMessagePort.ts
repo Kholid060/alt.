@@ -24,7 +24,7 @@ export interface BetterMessagePortSend {
   messageId?: string;
 }
 
-export type PromiseMessagePayload =
+export type BetterMessagePayload =
   | BetterMessagePortSend
   | BetterMessagePortResult;
 
@@ -40,7 +40,7 @@ type ExtractReturnType<T, K extends keyof T> = T[K] extends FuncType
   ? ReturnType<T[K]>
   : void;
 
-function normalizeMessagePort(messagePort: MessagePortType) {
+export function normalizeMessagePort(messagePort: MessagePortType) {
   const isMain = 'addEventListener' in messagePort;
 
   return {
@@ -57,19 +57,18 @@ function normalizeMessagePort(messagePort: MessagePortType) {
 }
 type NormalizeMessagePort = ReturnType<typeof normalizeMessagePort>;
 
-class AsyncMessagePort<MessagePortEvents> {
+type PostMessageFunc = (data: unknown) => void;
+
+export class BetterMessagePortAsync<MessagePortEvents> {
   private messages: Map<
     PropertyKey,
     { resolve(value: any): void; reject(reason?: any): void }
   > = new Map();
   private listeners: Map<PropertyKey, (...args: any) => any> = new Map();
 
-  constructor(private messagePort: NormalizeMessagePort) {
-    this._onMessage = this._onMessage.bind(this);
-    this.messagePort.onMessage(this._onMessage);
-  }
+  constructor(private postMessage: PostMessageFunc) {}
 
-  private async _onMessage({ data }: { data: PromiseMessagePayload }) {
+  async messageHandler(data: BetterMessagePayload) {
     if (
       !isObject(data) ||
       (data.type !== 'result' && data.type !== 'send') ||
@@ -105,7 +104,7 @@ class AsyncMessagePort<MessagePortEvents> {
       payload.result = await messageListener(...data.args);
     }
 
-    this.messagePort.postMessage(payload);
+    this.postMessage(payload);
   }
 
   on<K extends keyof MessagePortEvents>(
@@ -144,7 +143,7 @@ class AsyncMessagePort<MessagePortEvents> {
         },
       });
 
-      this.messagePort.postMessage({
+      this.postMessage({
         name,
         args,
         messageId,
@@ -154,22 +153,18 @@ class AsyncMessagePort<MessagePortEvents> {
   }
 
   destroy() {
-    this.messagePort.offMessage(this._onMessage);
     this.messages.forEach((message) => {
-      message.reject(new Error('DESTROYED'));
+      message.reject(new Error('CLOSED'));
     });
   }
 }
 
-class SyncMessagePort<MessagePortEvents> {
+export class BetterMessagePortSync<MessagePortEvents> {
   private listeners: Record<PropertyKey, ((...args: any) => any)[]> = {};
 
-  constructor(private messagePort: NormalizeMessagePort) {
-    this._onMessage = this._onMessage.bind(this);
-    this.messagePort.onMessage(this._onMessage);
-  }
+  constructor(private postMessage: PostMessageFunc) {}
 
-  private _onMessage({ data }: { data: PromiseMessagePayload }) {
+  messageHandler(data: BetterMessagePayload) {
     if (!isObject(data) || data.type === 'result' || !data.isSync) return;
 
     const listeners = this.listeners[data.name];
@@ -203,7 +198,7 @@ class SyncMessagePort<MessagePortEvents> {
     name: K,
     ...args: ExtractParams<MessagePortEvents, K>
   ): void {
-    this.messagePort.postMessage({
+    this.postMessage({
       name,
       args,
       type: 'send',
@@ -213,24 +208,42 @@ class SyncMessagePort<MessagePortEvents> {
 
   destroy() {
     this.listeners = {};
-    this.messagePort.offMessage(this._onMessage);
   }
 }
 
-class BetterMessagePort<MessagePortEvents> {
-  sync: SyncMessagePort<MessagePortEvents>;
-  async: AsyncMessagePort<MessagePortEvents>;
+class BetterMessagePort<AsyncEvents = unknown, SyncEvents = unknown> {
+  sync: BetterMessagePortSync<SyncEvents>;
+  async: BetterMessagePortAsync<AsyncEvents>;
+
+  private nomalizedMessagePort: NormalizeMessagePort;
 
   constructor(private messagePort: MessagePortType) {
-    const nomalizedMessagePort = normalizeMessagePort(messagePort);
+    this.nomalizedMessagePort = normalizeMessagePort(messagePort);
+
+    this.sync = new BetterMessagePortSync(
+      this.nomalizedMessagePort.postMessage,
+    );
+    this.async = new BetterMessagePortAsync(
+      this.nomalizedMessagePort.postMessage,
+    );
+
+    this.onMessage = this.onMessage.bind(this);
+    this.nomalizedMessagePort.onMessage(this.onMessage);
 
     messagePort.start();
+  }
 
-    this.sync = new SyncMessagePort(nomalizedMessagePort);
-    this.async = new AsyncMessagePort(nomalizedMessagePort);
+  private onMessage({ data }: { data: BetterMessagePayload }) {
+    if (data?.type === 'send' && data.isSync) {
+      this.sync.messageHandler(data);
+    } else {
+      this.async.messageHandler(data);
+    }
   }
 
   destroy() {
+    this.nomalizedMessagePort.offMessage(this.onMessage);
+
     this.messagePort.close();
 
     this.sync.destroy();

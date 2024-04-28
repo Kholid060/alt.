@@ -15,7 +15,7 @@ export const extensionAPIGetIconURL = (): Pick<
 });
 
 export function extensionAPISearchPanelEvent(
-  messagePort: AMessagePort<ExtensionMessagePortEvent>,
+  messagePort?: AMessagePort<ExtensionMessagePortEvent>,
 ): Pick<
   ExtensionAPIValues,
   'ui.searchPanel.onChanged' | 'ui.searchPanel.onKeydown'
@@ -38,7 +38,7 @@ export function extensionAPISearchPanelEvent(
 }
 
 export function extensionAPIUiToast(
-  messagePort: AMessagePort<ExtensionMessagePortEvent>,
+  messagePort?: AMessagePort<ExtensionMessagePortEvent>,
 ): Pick<ExtensionAPIValues, 'ui.createToast'> {
   return {
     'ui.createToast': (options) => {

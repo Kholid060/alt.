@@ -34,7 +34,7 @@ function RouteExtension() {
     data: DatabaseExtensionUpdatePayload,
   ) {
     try {
-      await preloadAPI.main.invokeIpcMessage(
+      await preloadAPI.main.ipc.invoke(
         'database:update-extension',
         extensionId,
         data,

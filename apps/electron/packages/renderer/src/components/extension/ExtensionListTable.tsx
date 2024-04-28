@@ -188,7 +188,7 @@ function ExtensionListTable({
         return;
       }
 
-      await preloadAPI.main.invokeIpcMessage(
+      await preloadAPI.main.ipc.invoke(
         'database:update-extension-command',
         extensionId,
         recordingData.commandId,
@@ -212,7 +212,7 @@ function ExtensionListTable({
   }
   async function removeShortcut(extensionId: string, commandId: string) {
     try {
-      await preloadAPI.main.invokeIpcMessage(
+      await preloadAPI.main.ipc.invoke(
         'database:update-extension-command',
         extensionId,
         commandId,
@@ -273,7 +273,7 @@ function ExtensionListTable({
   }, [recordingData]);
 
   async function reloadExtension(extensionId: string) {
-    const result = await preloadAPI.main.invokeIpcMessage(
+    const result = await preloadAPI.main.ipc.invoke(
       'extension:reload',
       extensionId,
     );

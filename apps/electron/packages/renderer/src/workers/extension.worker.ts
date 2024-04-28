@@ -210,7 +210,8 @@ self.onmessage = async ({
     };
 
     if (data.command.type === 'action') {
-      await commandActionRunner(commandRunnerPayload);
+      const result = await commandActionRunner(commandRunnerPayload);
+      self.postMessage({ type: 'finish', message: result });
     } else if (data.command.type === 'view:json') {
       await commandViewJSONRunner(commandRunnerPayload);
     }

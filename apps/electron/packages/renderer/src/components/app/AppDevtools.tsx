@@ -20,7 +20,7 @@ function AppDevtools() {
           size="icon"
           variant="secondary"
           onClick={() => {
-            preloadAPI.main.invokeIpcMessage('app:open-devtools');
+            preloadAPI.main.ipc.invoke('app:open-devtools');
           }}
         >
           <AppWindowIcon className="h-5 w-5" />
@@ -31,7 +31,7 @@ function AppDevtools() {
           size="icon"
           variant="secondary"
           onClick={() => {
-            preloadAPI.main.invokeIpcMessage('app:toggle-lock-window');
+            preloadAPI.main.ipc.invoke('app:toggle-lock-window');
           }}
         >
           <LockIcon className="h-5 w-5" />

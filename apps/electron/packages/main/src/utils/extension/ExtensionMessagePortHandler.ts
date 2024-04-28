@@ -1,32 +1,33 @@
-import { MessageChannelMain } from 'electron';
 import { isObject } from '@repo/shared';
 import type { ExtensionMessageHandler } from './ExtensionIPCEvent';
 import type { IPCUserExtensionEventsMap } from '#packages/common/interface/ipc-events.interface';
 
 class ExtensionMessagePortHandler {
-  private messageChannel: MessageChannelMain | null = null;
+  private ports: Map<string, Electron.MessagePortMain> = new Map();
 
-  portMessageHandler: ExtensionMessageHandler;
+  constructor(private portMessageHandler: ExtensionMessageHandler) {}
 
-  constructor({
-    portMessageHandler,
-  }: {
-    portMessageHandler: ExtensionMessageHandler;
-  }) {
-    this.portMessageHandler = portMessageHandler;
-    this.onPortMessage = this.onPortMessage.bind(this);
+  initMessagePort(port: Electron.MessagePortMain, extPortId: string) {
+    this.ports.set(extPortId, port);
+    port.addListener('message', this.onMessagePortMessage.bind(this, port));
+
+    port.start();
   }
 
-  createMessagePort() {
-    this.messageChannel = new MessageChannelMain();
+  deleteMessagePort(extPortId: string) {
+    const port = this.ports.get(extPortId);
+    if (!port) return;
 
-    this.messageChannel.port2.start();
-    this.messageChannel.port2.on('message', this.onPortMessage);
+    port.close();
+    port.removeAllListeners();
 
-    return this.messageChannel.port1;
+    this.ports.delete(extPortId);
   }
 
-  private async onPortMessage({ data }: Electron.MessageEvent) {
+  private async onMessagePortMessage(
+    currentPort: Electron.MessagePortMain,
+    { data }: Electron.MessageEvent,
+  ) {
     if (
       !isObject(data) ||
       typeof data.key !== 'string' ||
@@ -35,9 +36,6 @@ class ExtensionMessagePortHandler {
       !Array.isArray(data.args)
     ) {
       throw new Error('Invalid message payload');
-    }
-    if (!this.messageChannel) {
-      throw new Error("Message channel hasn't been initialized");
     }
 
     const result = await this.portMessageHandler({
@@ -50,21 +48,15 @@ class ExtensionMessagePortHandler {
       >,
     });
 
-    this.messageChannel.port2.postMessage({
+    currentPort.postMessage({
       result,
       messageId: data.messageId,
     });
   }
 
   destroy() {
-    if (this.messageChannel) {
-      this.messageChannel.port2.removeAllListeners();
-
-      this.messageChannel.port1.close();
-      this.messageChannel.port2.close();
-
-      this.messageChannel = null;
-    }
+    this.ports.forEach((port) => port.close());
+    this.ports.clear();
   }
 }
 

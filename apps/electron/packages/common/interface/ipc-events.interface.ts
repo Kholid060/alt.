@@ -13,6 +13,27 @@ import type {
   DatabaseQueriesEvent,
 } from '../../main/src/interface/database.interface';
 import type { WorkflowRunPayload } from './workflow.interface';
+import type Electron from 'electron';
+import { MessagePortChannelIds } from './message-port-events.interface';
+
+export interface IPCRendererInvokeEventPayload {
+  name: string;
+  args: unknown[];
+  messageId: string;
+}
+export interface IPCRendererInvokeEventSuccess<T = unknown> {
+  result: T;
+  type: 'success';
+  messageId: string;
+}
+export interface IPCRendererInvokeEventError {
+  type: 'error';
+  messageId: string;
+  errorMessage: string;
+}
+export type IPCRendererInvokeEventType<T = unknown> =
+  | IPCRendererInvokeEventSuccess<T>
+  | IPCRendererInvokeEventError;
 
 export interface IPCUserExtensionCustomEventsMap {
   'browser.activeTab.elementExists': (
@@ -163,6 +184,7 @@ export interface IPCSendEventMainToRenderer {
 export interface IPCSendEventRendererToMain {
   'window:open-settings': [path?: string];
   'window:open-command': [path?: string, routeData?: unknown];
+  'command:execute': [payload: ExtensionCommandExecutePayload];
 }
 
 export interface IPCSendEventRendererToRenderer {
@@ -177,8 +199,27 @@ export interface IPCSendEventRendererToRenderer {
   ];
 }
 
+export interface IPCPostEventRendererToMain {
+  'message-port:shared-extension<=>main': [{ extPortId: string }];
+  'message-port:delete:shared-extension<=>main': [{ extPortId: string }];
+  'message-port:port-bridge': [channelId: MessagePortChannelIds];
+}
+
+export interface IPCPostMessageEventMainToRenderer {
+  'message-port:created': [{ channelId: MessagePortChannelIds }];
+}
+
+interface IPCInvokeEventMainToRenderer {
+  'command:execute-action': (
+    payload: ExtensionCommandExecutePayload,
+  ) => unknown;
+}
+
 export type IPCMainSendEvent = IPCSendEventRendererToRenderer &
-  IPCSendEventRendererToMain;
+  IPCSendEventRendererToMain & IPCPostEventRendererToMain;
 
 export type IPCRendererSendEvent = IPCSendEventRendererToRenderer &
-  IPCSendEventMainToRenderer;
+  IPCSendEventMainToRenderer &
+  IPCPostMessageEventMainToRenderer;
+
+export type IPCRendererInvokeEvent = IPCInvokeEventMainToRenderer;

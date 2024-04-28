@@ -4,14 +4,8 @@ import type {
   IPCUserExtensionEventsMap,
 } from '#packages/common/interface/ipc-events.interface';
 import { isExtHasApiPermission } from '#packages/common/utils/check-ext-permission';
-import {
-  IPC_ON_EVENT,
-  IPC_POST_MESSAGE_EVENT,
-} from '#packages/common/utils/constant/constant';
-import { ipcMain } from 'electron';
 import ExtensionMessagePortHandler from './ExtensionMessagePortHandler';
 import { logger } from '/@/lib/log';
-import WindowsManager from '/@/window/WindowsManager';
 import type { ExtensionManifest } from '@repo/extension-core';
 import IPCMain from '../ipc/IPCMain';
 import DBService from '/@/services/database/database.service';
@@ -59,9 +53,9 @@ class ExtensionIPCEvent {
   constructor() {
     this._onExtensionMessage = this._onExtensionMessage.bind(this);
 
-    this.extensionMessagePort = new ExtensionMessagePortHandler({
-      portMessageHandler: this._onExtensionMessage,
-    });
+    this.extensionMessagePort = new ExtensionMessagePortHandler(
+      this._onExtensionMessage,
+    );
 
     this._initMessageListener();
   }
@@ -70,20 +64,20 @@ class ExtensionIPCEvent {
     IPCMain.handle('user-extension', (sender, payload) =>
       this._onExtensionMessage({ ...payload, sender }),
     );
+    IPCMain.on(
+      'message-port:delete:shared-extension<=>main',
+      (_, { extPortId }) => {
+        this.extensionMessagePort.deleteMessagePort(extPortId);
+      },
+    );
+    IPCMain.on(
+      'message-port:shared-extension<=>main',
+      ({ ports: [port] }, { extPortId }) => {
+        if (!port) return;
 
-    ipcMain.on(IPC_ON_EVENT.createExtensionPort, () => {
-      const extensionPort = this.extensionMessagePort.createMessagePort();
-      const commandWindow = WindowsManager.instance.getWindow('command');
-
-      commandWindow.webContents.postMessage(
-        IPC_POST_MESSAGE_EVENT.extensionPortCreated,
-        null,
-        [extensionPort],
-      );
-    });
-    ipcMain.on(IPC_ON_EVENT.deleteExtensionPort, () => {
-      this.extensionMessagePort.destroy();
-    });
+        this.extensionMessagePort.initMessagePort(port, extPortId);
+      },
+    );
   }
 
   private async getExtensionManifest(extensionId: string) {
@@ -105,8 +99,8 @@ class ExtensionIPCEvent {
   }
 
   private async _onExtensionMessage<T extends keyof IPCUserExtensionEventsMap>({
-    args,
     key,
+    args,
     name,
     sender,
     commandId,

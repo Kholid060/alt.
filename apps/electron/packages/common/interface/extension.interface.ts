@@ -17,6 +17,7 @@ export interface ExtensionConfigData {
 }
 
 export interface ExtensionCommandExecutePayload {
+  timeoutMs?: number;
   commandId: string;
   extensionId: string;
   launchContext: CommandLaunchContext;

@@ -122,7 +122,7 @@ function ExtensionDetailCard({
                 className="underline text-left leading-tight"
                 onClick={() =>
                   extension.data!.path &&
-                  preloadAPI.main.invokeIpcMessage(
+                  preloadAPI.main.ipc.invoke(
                     'shell:open-in-folder',
                     extension.data?.path as string,
                   )

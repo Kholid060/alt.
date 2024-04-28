@@ -207,7 +207,7 @@ export function WorkflowEditorNodeListModal() {
       };
 
       if (!position) {
-        const cursorPosition = await preloadAPI.main.invokeIpcMessage(
+        const cursorPosition = await preloadAPI.main.ipc.invoke(
           'screen:get-cursor-position',
           true,
         );

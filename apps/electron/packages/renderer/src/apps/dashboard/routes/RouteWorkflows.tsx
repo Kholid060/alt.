@@ -61,7 +61,7 @@ function WorkflowCards({ workflows }: { workflows: DatabaseWorkflow[] }) {
   const updateWorkflow: DatabaseQueriesEvent['database:update-workflow'] =
     async (...args) => {
       try {
-        const result = await preloadAPI.main.invokeIpcMessage(
+        const result = await preloadAPI.main.ipc.invoke(
           'database:update-workflow',
           ...args,
         );
@@ -170,7 +170,7 @@ function WorkflowCreateForm({
 
   async function onSubmit(values: NewWorkflowSchema) {
     try {
-      const result = await preloadAPI.main.invokeIpcMessage(
+      const result = await preloadAPI.main.ipc.invoke(
         'database:insert-workflow',
         values,
       );

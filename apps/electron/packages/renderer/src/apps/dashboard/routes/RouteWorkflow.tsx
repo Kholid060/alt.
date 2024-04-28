@@ -268,7 +268,7 @@ function RouteWorkflow() {
               payload[key] = workflow[key];
             });
 
-            await preloadAPI.main.invokeIpcMessage(
+            await preloadAPI.main.ipc.invoke(
               'database:update-workflow',
               workflow.id,
               payload,

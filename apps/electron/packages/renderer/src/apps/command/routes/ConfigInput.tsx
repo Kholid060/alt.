@@ -34,7 +34,7 @@ const ConfigInputDirectory: ConfigComponent = ({ config, form }) => {
 
   async function selectDirectory() {
     try {
-      const result = await preloadAPI.main.invokeIpcMessage('dialog:open', {
+      const result = await preloadAPI.main.ipc.invoke('dialog:open', {
         properties: ['openDirectory'],
       });
       if ('$isError' in result) {
@@ -93,7 +93,7 @@ const ConfigInputFile: ConfigComponent<'input:file'> = ({ config, form }) => {
 
   async function selectFile() {
     try {
-      const result = await preloadAPI.main.invokeIpcMessage('dialog:open', {
+      const result = await preloadAPI.main.ipc.invoke('dialog:open', {
         properties: ['openFile'],
         filters: config.fileFilter,
       });
@@ -288,7 +288,7 @@ function ConfigInput() {
         defaultValues[item.name] = item.defaultValue ?? '';
       });
 
-      const configValues = await preloadAPI.main.invokeIpcMessage(
+      const configValues = await preloadAPI.main.ipc.invoke(
         'extension-config:get',
         configId,
       );
@@ -313,7 +313,7 @@ function ConfigInput() {
       let result: IPCEventError | void;
 
       if (alreadyHasValue.current) {
-        result = await preloadAPI.main.invokeIpcMessage(
+        result = await preloadAPI.main.ipc.invoke(
           'extension-config:update',
           configId,
           {
@@ -321,7 +321,7 @@ function ConfigInput() {
           },
         );
       } else {
-        result = await preloadAPI.main.invokeIpcMessage(
+        result = await preloadAPI.main.ipc.invoke(
           'extension-config:set',
           configId,
           {

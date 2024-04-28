@@ -279,7 +279,7 @@ function CommandInput() {
     if (commandRouteCtx) {
       const currentRoute = commandRouteCtx.getState().currentRoute;
       if (!currentRoute?.path) {
-        preloadAPI.main.invokeIpcMessage('app:close-command-window');
+        preloadAPI.main.ipc.invoke('app:close-command-window');
         return;
       }
     }
@@ -297,10 +297,10 @@ function CommandInput() {
       return;
     }
 
-    const messagePort = commandCtx.extMessagePort.current;
+    const messagePort = commandCtx.runnerMessagePort.current;
     if (messagePort && commandKeys.has(event.key)) {
       const { key, ctrlKey, altKey, metaKey, shiftKey } = event;
-      messagePort.sendMessage('extension:keydown-event', {
+      messagePort.event.sendMessage('extension:keydown-event', {
         key,
         altKey,
         ctrlKey,
@@ -326,9 +326,9 @@ function CommandInput() {
   function onInputValueChange(value: string) {
     moveArgumentContainer(value);
 
-    const messagePort = commandCtx.extMessagePort.current;
+    const messagePort = commandCtx.runnerMessagePort.current;
     if (messagePort) {
-      messagePort.sendMessage('extension:query-change', value);
+      messagePort.event.sendMessage('extension:query-change', value);
     }
 
     uiListStore.setState('search', value);

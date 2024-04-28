@@ -1,7 +1,7 @@
 import path from 'path';
 import BetterMessagePort from '#common/utils/BetterMessagePort';
 import { MessageChannelMain, utilityProcess } from 'electron';
-import type { WorkflowRunnerMessagePortEvents } from '#common/interface/workflow-runner.interace';
+import type { WorkflowRunnerMessagePortAsyncEvents } from '#common/interface/workflow-runner.interace';
 import type { WorkflowRunPayload } from '#packages/common/interface/workflow.interface';
 import DBService from './database/database.service';
 import { CustomError } from '#packages/common/errors/custom-errors';
@@ -18,7 +18,7 @@ class WorkflowRunnerService {
 
   private runnerProcess: Electron.UtilityProcess | null = null;
   private messageChannel: MessageChannelMain = new MessageChannelMain();
-  private messagePort: BetterMessagePort<WorkflowRunnerMessagePortEvents>;
+  private messagePort: BetterMessagePort<WorkflowRunnerMessagePortAsyncEvents>;
 
   constructor() {
     this.messagePort = new BetterMessagePort(this.messageChannel.port1);

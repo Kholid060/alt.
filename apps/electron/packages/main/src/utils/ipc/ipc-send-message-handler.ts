@@ -1,3 +1,4 @@
+import { MESSAGE_PORT_CHANNEL_IDS } from '#packages/common/utils/constant/constant';
 import IPCMain from './IPCMain';
 import WindowsManager from '/@/window/WindowsManager';
 
@@ -42,4 +43,22 @@ IPCMain.on('command-window:input-config', (_, detail) => {
     'command-window:input-config',
     detail,
   );
+});
+
+IPCMain.on('message-port:port-bridge', ({ ports }, channelId) => {
+  if (ports.length === 0) return;
+
+  switch (channelId) {
+    case MESSAGE_PORT_CHANNEL_IDS.sharedWithCommand:
+      IPCMain.postMessageToWindow('command', {
+        ports: ports,
+        data: { channelId },
+        name: 'message-port:created',
+      });
+      break;
+  }
+});
+
+IPCMain.on('command:execute', (_, payload) => {
+  IPCMain.sendToWindow('shared-process', 'command:execute', payload);
 });

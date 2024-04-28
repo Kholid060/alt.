@@ -47,7 +47,7 @@ function CommandViewJSON() {
       if (isExecuting.current) return;
       isExecuting.current = true;
 
-      const extensionManifest = await preloadAPI.main.invokeIpcMessage(
+      const extensionManifest = await preloadAPI.main.ipc.invoke(
         'database:get-extension-manifest',
         commandExecutePayload.extensionId,
       );

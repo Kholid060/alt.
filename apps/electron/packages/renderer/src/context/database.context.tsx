@@ -14,7 +14,7 @@ export function DatabaseProvider({ children }: { children?: React.ReactNode }) {
   const emitter = useRef(new EventEmitter<DatabaseQueriesEvent>());
 
   useEffect(() => {
-    const offDbChanges = preloadAPI.main.ipcMessage.on(
+    const offDbChanges = preloadAPI.main.ipc.on(
       'database:changes',
       (_, type, ...args) => {
         // @ts-expect-error something

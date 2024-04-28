@@ -6,7 +6,6 @@ import {
   CUSTOM_SCHEME,
   PRELOAD_API_KEY,
 } from '#common/utils/constant/constant';
-import { invokeIpcMessage } from '#common/utils/ipc-renderer';
 import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
 import { contextBridge } from 'electron';
 import { isExtHasApiPermission } from '#common/utils/check-ext-permission';
@@ -20,6 +19,7 @@ import {
   extensionAPISearchPanelEvent,
   extensionAPIUiToast,
 } from '#common/utils/extension/extension-api-value';
+import IPCRenderer from '../../../common/utils/IPCRenderer';
 
 function setExtView(type: 'empty' | 'error' = 'empty') {
   contextBridge.exposeInMainWorld(PRELOAD_API_KEY.extension, {
@@ -27,7 +27,20 @@ function setExtView(type: 'empty' | 'error' = 'empty') {
   });
 }
 
-export class ExtensionAPI {
+class ExtensionAPI {
+  static init() {
+    window.addEventListener(
+      'message',
+      ({ ports }) => {
+        const [port] = ports;
+        if (!port) throw new Error('PORT IS EMPTY');
+
+        new ExtensionAPI(port).loadAPI();
+      },
+      { once: true },
+    );
+  }
+
   private key: string = '';
   private commandId: string = '';
   private permissions: SetRequired<
@@ -53,7 +66,7 @@ export class ExtensionAPI {
 
       this.commandId = commandId;
 
-      const extensionManifest = await invokeIpcMessage(
+      const extensionManifest = await IPCRenderer.invoke(
         'database:get-extension-manifest',
         extensionId,
       );
@@ -122,7 +135,7 @@ export class ExtensionAPI {
       );
     }
 
-    const result = (await invokeIpcMessage('user-extension', {
+    const result = (await IPCRenderer.invoke('user-extension', {
       name,
       args,
       key: this.key,
@@ -135,3 +148,5 @@ export class ExtensionAPI {
     return result;
   }
 }
+
+export default ExtensionAPI;

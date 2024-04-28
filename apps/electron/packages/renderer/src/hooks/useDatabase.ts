@@ -39,8 +39,8 @@ export function useDatabase() {
       onData?: (data: ReturnType<DatabaseQueriesEvent[T]>) => void;
     }): (() => void) => {
       const fetchData = () => {
-        preloadAPI.main
-          .invokeIpcMessage(name, ...args)
+        preloadAPI.main.ipc
+          .invoke(name, ...args)
           .then((data) => {
             if (isIPCEventError(data)) {
               onError?.(data.message);
@@ -105,7 +105,7 @@ export function useDatabaseQuery<T extends keyof DatabaseQueriesEvent>(
   }
 
   const fetchQuery = useCallback(() => {
-    preloadAPI.main.invokeIpcMessage(name, ...args).then((result) => {
+    preloadAPI.main.ipc.invoke(name, ...args).then((result) => {
       if (isIPCEventError(result)) {
         setState({
           data: null,

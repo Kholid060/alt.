@@ -56,8 +56,8 @@ const defaultCommandActions: {
     icon: CopyIcon,
     title: 'Copy to Clipboard',
     onAction({ executePayload, addStatus }, data) {
-      preloadAPI.main
-        .invokeIpcMessage('user-extension', {
+      preloadAPI.main.ipc
+        .invoke('user-extension', {
           commandId: executePayload.commandId,
           key: executePayload.extensionId,
           name: 'clipboard.write',
@@ -78,8 +78,8 @@ const defaultCommandActions: {
     icon: ClipboardPaste,
     title: 'Paste Content',
     onAction({ executePayload, addStatus }, data) {
-      preloadAPI.main
-        .invokeIpcMessage('user-extension', {
+      preloadAPI.main.ipc
+        .invoke('user-extension', {
           commandId: executePayload.commandId,
           key: executePayload.extensionId,
           name: 'clipboard.paste',
@@ -95,8 +95,8 @@ const defaultCommandActions: {
     icon: GlobeIcon,
     title: 'Open in Browser',
     onAction({ executePayload, addStatus }, data) {
-      preloadAPI.main
-        .invokeIpcMessage('user-extension', {
+      preloadAPI.main.ipc
+        .invoke('user-extension', {
           commandId: executePayload.commandId,
           key: executePayload.extensionId,
           name: 'shell.openURL',
@@ -112,8 +112,8 @@ const defaultCommandActions: {
     id: 'show-in-folder',
     title: 'Show in Folder',
     onAction({ executePayload, addStatus }, data) {
-      preloadAPI.main
-        .invokeIpcMessage('user-extension', {
+      preloadAPI.main.ipc
+        .invoke('user-extension', {
           commandId: executePayload.commandId,
           key: executePayload.extensionId,
           name: 'shell.showItemInFolder',
@@ -129,8 +129,8 @@ const defaultCommandActions: {
     id: 'move-to-trash',
     title: 'Show in Folder',
     onAction({ executePayload, addStatus }, data) {
-      preloadAPI.main
-        .invokeIpcMessage('user-extension', {
+      preloadAPI.main.ipc
+        .invoke('user-extension', {
           commandId: executePayload.commandId,
           key: executePayload.extensionId,
           name: 'shell.moveToTrash',

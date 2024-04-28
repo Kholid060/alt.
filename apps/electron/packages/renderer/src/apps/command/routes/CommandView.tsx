@@ -18,7 +18,7 @@ function CommandView() {
 
   function initPortListener(port: MessagePort) {
     commandCtx.setExtMessagePort(port);
-    const messagePort = commandCtx.extMessagePort.current!;
+    const messagePort = commandCtx.runnerMessagePort.current!;
 
     messagePort.addListener('extension:reload', () => {
       setIframeKey((prevVal) => prevVal + 1);

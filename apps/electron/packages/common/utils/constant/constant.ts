@@ -20,8 +20,9 @@ export const PRELOAD_API_KEY = {
 } as const;
 
 export const IPC_ON_EVENT = {
-  deleteExtensionPort: 'delete-extension-port',
-  createExtensionPort: 'create-extension-port',
+  rendererInvoke: 'renderer-invoke',
+  deleteMessagePortMain: 'delete-message-port',
+  createMessagePortMain: 'create-message-port',
 } as const;
 
 export const IPC_POST_MESSAGE_EVENT = {
@@ -40,3 +41,7 @@ export const APP_DEEP_LINK = 'app-app';
 export const APP_WORKFLOW_ELS_FORMAT = 'APP_NAME/workflow-elements' as const;
 
 export const WORKFLOW_MANUAL_TRIGGER_ID = '$manual$' as const;
+
+export const MESSAGE_PORT_CHANNEL_IDS = {
+  sharedWithCommand: 'shared-with-command',
+} as const;

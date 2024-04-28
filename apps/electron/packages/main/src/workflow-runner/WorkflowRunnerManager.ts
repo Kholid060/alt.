@@ -1,5 +1,5 @@
 import type {
-  WorkflowRunnerMessagePortEvents,
+  WorkflowRunnerMessagePortAsyncEvents,
   WorkflowRunnerRunPayload,
 } from '#packages/common/interface/workflow-runner.interace';
 import BetterMessagePort from '#packages/common/utils/BetterMessagePort';
@@ -26,15 +26,12 @@ const nodeHandlers = (() => {
 })();
 
 class WorkflowRunnerManager {
-  private static _instance: WorkflowRunnerManager | null = null;
-
-  static get instance() {
-    return this._instance || (this._instance = new WorkflowRunnerManager());
-  }
-
   private workflowRunners: Map<string, WorkflowRunner> = new Map();
 
-  constructor() {}
+  messagePort: BetterMessagePort<WorkflowRunnerMessagePortAsyncEvents>;
+
+  constructor(private _messagePort: Electron.MessagePortMain) {
+  }
 
   runWorkflow(payload: WorkflowRunnerRunPayload) {
     const workflowRunner = new WorkflowRunner({ ...payload, nodeHandlers });
@@ -49,9 +46,8 @@ function onMessage({ data, ports }: Electron.MessageEvent) {
 
   process.parentPort.removeListener('message', onMessage);
 
-  const messagePort = new BetterMessagePort<WorkflowRunnerMessagePortEvents>(
-    ports[0],
-  );
+  const messagePort =
+    new BetterMessagePort<WorkflowRunnerMessagePortAsyncEvents>(ports[0]);
 
   messagePort.async.on('workflow:run', (payload) => {
     return WorkflowRunnerManager.instance.runWorkflow(payload);

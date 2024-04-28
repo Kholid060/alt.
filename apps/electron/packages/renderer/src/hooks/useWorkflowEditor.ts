@@ -23,7 +23,7 @@ export function useWorkflowEditor() {
   );
 
   async function pasteElements() {
-    const copiedElements = await preloadAPI.main.invokeIpcMessage(
+    const copiedElements = await preloadAPI.main.ipc.invoke(
       'clipboard:read-buffer',
       APP_WORKFLOW_ELS_FORMAT,
     );
@@ -90,7 +90,7 @@ export function useWorkflowEditor() {
 
     if (!workflowClipboardData) return;
 
-    preloadAPI.main.invokeIpcMessage(
+    preloadAPI.main.ipc.invoke(
       'clipboard:copy-buffer',
       APP_WORKFLOW_ELS_FORMAT,
       JSON.stringify(workflowClipboardData),

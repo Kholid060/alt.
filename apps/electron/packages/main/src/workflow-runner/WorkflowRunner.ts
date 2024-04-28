@@ -1,6 +1,9 @@
 import { nanoid } from 'nanoid';
 import EventEmitter from 'eventemitter3';
-import type { WorkflowRunnerRunPayload } from '#packages/common/interface/workflow-runner.interace';
+import type {
+  WorkflowRunnerMessagePortAsyncEvents,
+  WorkflowRunnerRunPayload,
+} from '#packages/common/interface/workflow-runner.interace';
 import {
   WORKFLOW_MANUAL_TRIGGER_ID,
   WORKFLOW_NODE_TYPE,
@@ -10,6 +13,7 @@ import type {
   WorkflowNodes,
 } from '#packages/common/interface/workflow.interface';
 import type { WorkflowNodeHandler } from './node-handler/WorkflowNodeHandler';
+import type BetterMessagePort from '#packages/common/utils/BetterMessagePort';
 
 type NodeHandlers = Record<
   WORKFLOW_NODE_TYPE,
@@ -18,6 +22,7 @@ type NodeHandlers = Record<
 
 export interface WorkflowRunnerOptions extends WorkflowRunnerRunPayload {
   nodeHandlers: NodeHandlers;
+  messagePort: BetterMessagePort<WorkflowRunnerMessagePortAsyncEvents>;
 }
 
 export interface WorkflowRunnerEvents {
@@ -79,17 +84,26 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   private nodeHandlers: NodeHandlers;
   private nodeExecutionQueue: string[] = [];
 
+  private messagePort: WorkflowRunnerOptions['messagePort'];
+
   id: string;
   workflowId: string;
   state: WorkflowRunnerState;
   nodes: Map<string, WorkflowNodes>;
   connectionsMap: Record<string, NodeConnectionMap> = {};
 
-  constructor({ startNodeId, workflow, nodeHandlers }: WorkflowRunnerOptions) {
+  constructor({
+    workflow,
+    startNodeId,
+    messagePort,
+    nodeHandlers,
+  }: WorkflowRunnerOptions) {
     super();
 
     this.startNodeId = startNodeId;
     this.nodeHandlers = nodeHandlers;
+
+    this.messagePort = messagePort;
 
     this.id = nanoid();
     this.workflowId = workflow.id;

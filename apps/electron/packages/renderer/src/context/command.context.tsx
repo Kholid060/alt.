@@ -11,17 +11,23 @@ import ExtensionCommandActionRunner, {
 } from '../utils/extension/ExtensionCommandActionRunner';
 import { useCommandStore } from '../stores/command.store';
 import { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
+import { MESSAGE_PORT_CHANNEL_IDS } from '#packages/common/utils/constant/constant';
+import {
+  MessagePortListener,
+  MessagePortRenderer,
+} from '../utils/message-port';
+import { MessagePortSharedCommandWindowEvents } from '#packages/common/interface/message-port-events.interface';
 
 export interface CommandContextState {
-  setExtMessagePort(port: MessagePort | null): void;
   executeCommand(payload: ExtensionCommandExecutePayload): void;
-  extMessagePort: RefObject<AMessagePort<ExtensionMessagePortEvent> | null>;
+  runnerMessagePort: RefObject<
+    MessagePortRenderer<MessagePortSharedCommandWindowEvents>
+  >;
 }
 
 export const CommandContext = createContext<CommandContextState>({
   executeCommand() {},
-  setExtMessagePort() {},
-  extMessagePort: { current: null },
+  runnerMessagePort: { current: null },
 });
 
 export function CommandCtxProvider({
@@ -39,19 +45,19 @@ export function CommandCtxProvider({
 
   const navigate = useCommandNavigate();
 
-  const extMessagePort = useRef<AMessagePort<ExtensionMessagePortEvent> | null>(
-    null,
-  );
+  const runnerMessagePort = useRef<
+    MessagePortRenderer<MessagePortSharedCommandWindowEvents>
+  >(new MessagePortRenderer());
 
   function setExtMessagePort(port: MessagePort | null) {
-    if (!port && extMessagePort.current) {
-      extMessagePort.current.destroy();
+    if (!port && runnerMessagePort.current) {
+      runnerMessagePort.current.destroy();
     }
 
-    extMessagePort.current = port ? new AMessagePort(port) : port;
-    if (!extMessagePort.current) return;
+    runnerMessagePort.current = port ? new AMessagePort(port) : port;
+    if (!runnerMessagePort.current) return;
 
-    extMessagePort.current.addListener(
+    runnerMessagePort.current.addListener(
       'extension:show-toast',
       (toastId, options) => {
         addPanelStatus({
@@ -60,7 +66,7 @@ export function CommandCtxProvider({
         });
       },
     );
-    extMessagePort.current.addListener('extension:hide-toast', (toastId) => {
+    runnerMessagePort.current.addListener('extension:hide-toast', (toastId) => {
       removePanelStatus(toastId);
     });
   }
@@ -70,7 +76,7 @@ export function CommandCtxProvider({
   ) {
     if (!command.config || command.config.length === 0) return true;
 
-    const configState = await preloadAPI.main.invokeIpcMessage(
+    const configState = await preloadAPI.main.ipc.invoke(
       'extension-config:need-input',
       payload.extensionId,
       command.name,
@@ -112,7 +118,7 @@ export function CommandCtxProvider({
     payload: ExtensionCommandExecutePayload,
     _command: DatabaseExtensionCommandWithExtension,
   ) {
-    const manifest = await preloadAPI.main.invokeIpcMessage(
+    const manifest = await preloadAPI.main.ipc.invoke(
       'database:get-extension-manifest',
       payload.extensionId,
     );
@@ -134,7 +140,9 @@ export function CommandCtxProvider({
     });
   }
   async function executeCommand(payload: ExtensionCommandExecutePayload) {
-    const command = await preloadAPI.main.invokeIpcMessage(
+    preloadAPI.main.ipc.send('command:execute', payload);
+    return;
+    const command = await preloadAPI.main.ipc.invoke(
       'database:get-command',
       payload,
     );
@@ -148,7 +156,7 @@ export function CommandCtxProvider({
 
     const isConfigInputted = await checkCommandConfig(payload, command);
     if (!isConfigInputted) {
-      await preloadAPI.main.invokeIpcMessage('app:show-command-window');
+      await preloadAPI.main.ipc.invoke('app:show-command-window');
       return;
     }
 
@@ -165,7 +173,7 @@ export function CommandCtxProvider({
     };
 
     if (command.type !== 'script') {
-      await preloadAPI.main.invokeIpcMessage('app:show-command-window');
+      await preloadAPI.main.ipc.invoke('app:show-command-window');
     }
 
     switch (command.type) {
@@ -173,7 +181,7 @@ export function CommandCtxProvider({
         executeActionCommand(payload, command);
         break;
       case 'script': {
-        const result = await preloadAPI.main.invokeIpcMessage(
+        const result = await preloadAPI.main.ipc.invoke(
           'extension:run-script-command',
           payload,
         );
@@ -226,6 +234,7 @@ export function CommandCtxProvider({
           clearAllPanel();
         },
       });
+
       addExtensionError(worker.payload.extensionId, {
         content: errorMessage,
         title: `Error in "${worker.command.title}" command`,
@@ -243,7 +252,7 @@ export function CommandCtxProvider({
     };
   }, [clearAllPanel]);
   useEffect(() => {
-    const offCommandScriptMessageEvent = preloadAPI.main.ipcMessage.on(
+    const offCommandScriptMessageEvent = preloadAPI.main.ipc.on(
       'command-script:message',
       (_, detail) => {
         switch (detail.type) {
@@ -274,13 +283,13 @@ export function CommandCtxProvider({
         }
       },
     );
-    const offCommandExecute = preloadAPI.main.ipcMessage.on(
+    const offCommandExecute = preloadAPI.main.ipc.on(
       'command:execute',
       (_, payload) => {
         executeCommand(payload);
       },
     );
-    const offOpenExtConfig = preloadAPI.main.ipcMessage.on(
+    const offOpenExtConfig = preloadAPI.main.ipc.on(
       'extension-config:open',
       (_, payload) => {
         navigate(`/configs/${payload.configId}`, {
@@ -293,18 +302,32 @@ export function CommandCtxProvider({
         });
       },
     );
-    const offBrowserTabsActive = preloadAPI.main.ipcMessage.on(
+    const offBrowserTabsActive = preloadAPI.main.ipc.on(
       'browser:tabs:active',
       (_, browserTab) => {
         setCommandStore('activeBrowserTab', browserTab);
       },
     );
 
+    preloadAPI.main.ipc.handle('command:execute-action', (payload) => {
+      return executeCommand(payload);
+    });
+
+    const offSharedMessagePortListener = MessagePortListener.on(
+      MESSAGE_PORT_CHANNEL_IDS.sharedWithCommand,
+      ({ ports: [port] }) => {
+        if (!port) return;
+
+        runnerMessagePort.current.changePort(port);
+      },
+    );
+
     return () => {
-      offOpenExtConfig?.();
-      offCommandExecute?.();
-      offBrowserTabsActive?.();
-      offCommandScriptMessageEvent?.();
+      offOpenExtConfig();
+      offCommandExecute();
+      offBrowserTabsActive();
+      offSharedMessagePortListener();
+      offCommandScriptMessageEvent();
     };
   }, []);
 
@@ -312,8 +335,7 @@ export function CommandCtxProvider({
     <CommandContext.Provider
       value={{
         executeCommand,
-        extMessagePort,
-        setExtMessagePort,
+        runnerMessagePort,
       }}
     >
       {children}

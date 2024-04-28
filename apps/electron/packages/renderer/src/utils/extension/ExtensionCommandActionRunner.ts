@@ -34,15 +34,18 @@ function createMessagePort() {
 }
 
 export enum CommandActionRunnerFinishReason {
-  done = 'done',
-  timeout = 'timeout',
-  terminate = 'terminate',
+  Done = 'done',
+  Timeout = 'timeout',
+  Terminate = 'terminate',
 }
 
 export interface CommandActionRunnerEvents {
   error: [workerId: string, errorMessage: string];
   message: [workerId: string, event: MessageEvent];
-  finish: [workerId: string, reason: CommandActionRunnerFinishReason];
+  finish: [
+    workerId: string,
+    detail: { result: unknown; reason: CommandActionRunnerFinishReason },
+  ];
 }
 
 export type CommandActionRunnerListener<
@@ -111,11 +114,10 @@ class ExtensionCommandActionRunner extends EventEmitter<CommandActionRunnerEvent
       if (workerTimeout !== 0) {
         workerTimeout = setTimeout(() => {
           this.terminateWorker(workerId);
-          this.emit(
-            'finish',
-            workerId,
-            CommandActionRunnerFinishReason.timeout,
-          );
+          this.emit('finish', workerId, {
+            reason: CommandActionRunnerFinishReason.Timeout,
+            result: null,
+          });
         }, timeout);
       }
 
@@ -146,7 +148,10 @@ class ExtensionCommandActionRunner extends EventEmitter<CommandActionRunnerEvent
             this.terminateWorker(workerId);
             break;
           case 'finish':
-            this.emit('finish', workerId, CommandActionRunnerFinishReason.done);
+            this.emit('finish', workerId, {
+              result: message,
+              reason: CommandActionRunnerFinishReason.Done,
+            });
             break;
         }
       };
@@ -180,7 +185,10 @@ class ExtensionCommandActionRunner extends EventEmitter<CommandActionRunnerEvent
     const isWorkerTerminated = this.terminateWorker(workerId);
     if (!isWorkerTerminated) return;
 
-    this.emit('finish', workerId, CommandActionRunnerFinishReason.terminate);
+    this.emit('finish', workerId, {
+      result: null,
+      reason: CommandActionRunnerFinishReason.Terminate,
+    });
   }
 
   private terminateWorker(workerId: string) {

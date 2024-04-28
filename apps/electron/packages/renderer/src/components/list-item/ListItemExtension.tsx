@@ -33,7 +33,7 @@ function ListItemExtension({
       icon: RotateCcwIcon,
       async onAction() {
         try {
-          const result = await preloadAPI.main.invokeIpcMessage(
+          const result = await preloadAPI.main.ipc.invoke(
             'extension:reload',
             extension.id,
           );
