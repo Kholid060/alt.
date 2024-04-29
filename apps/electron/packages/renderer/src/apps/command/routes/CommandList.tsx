@@ -177,15 +177,7 @@ function CommandList() {
           const inputExtensionConfig =
             !result.isError && result.config?.some((item) => item.required);
           if (inputExtensionConfig) {
-            navigate(`/configs/${result.id}`, {
-              data: {
-                config: result.config,
-              },
-              panelHeader: {
-                title: result.title,
-                icon: result.icon,
-              },
-            });
+            navigate(`/configs/${result.id}`);
           }
         } catch (error) {
           console.error(error);

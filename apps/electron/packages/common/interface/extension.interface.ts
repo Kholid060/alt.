@@ -1,5 +1,6 @@
 import type { CommandLaunchContext } from '@repo/extension';
 import type { EXTENSION_PERMISSIONS } from '@repo/extension-core';
+import type { DatabaseExtensionCommandWithExtension } from '../../main/src/interface/database.interface';
 
 export type ExtensionPermissions = (typeof EXTENSION_PERMISSIONS)[number];
 
@@ -22,3 +23,22 @@ export interface ExtensionCommandExecutePayload {
   extensionId: string;
   launchContext: CommandLaunchContext;
 }
+
+export interface ExtensionJSONViewData extends ExtensionCommandExecutePayload {
+  title: string;
+  icon: string;
+  subtitle: string;
+  processId: string;
+}
+
+export interface ExtensionCommandExecutePayloadWithData
+  extends ExtensionCommandExecutePayload {
+  command: DatabaseExtensionCommandWithExtension;
+}
+
+export type ExtensionCommandConfigValuePayload =
+  | { requireInput: false }
+  | {
+      requireInput: true;
+      type: 'extension' | 'command';
+    };

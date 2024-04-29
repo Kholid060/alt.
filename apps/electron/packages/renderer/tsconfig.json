@@ -14,6 +14,6 @@
     "src/**/*.tsx",
     "../preload/preload.d.ts",
     "../../types/**/*.d.ts"
-, "../common/interface/workflow.interface.ts"  ],
+, "../common/interface/workflow.interface.ts", "../common/utils/message-port-renderer.ts"  ],
   "exclude": ["**/*.spec.ts", "**/*.test.ts"]
 }

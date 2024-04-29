@@ -172,7 +172,7 @@ class ExtensionLoader {
                 ...mapManifestToDB.extension(extensionManifest.data),
               };
 
-              await DBService.instance.extension.upsertExtensionCommands(
+              await DBService.instance.extension.upsertCommands(
                 extension.id,
                 extensionManifest.data.commands,
                 tx,
@@ -245,7 +245,7 @@ class ExtensionLoader {
         ...mapManifestToDB.command(command),
       }),
     );
-    const extension = await DBService.instance.extension.addExtension(
+    const extension = await DBService.instance.extension.insert(
       {
         id,
         isLocal: true,
@@ -299,7 +299,7 @@ class ExtensionLoader {
         ...mapManifestToDB.extension(extensionManifest.data),
       };
 
-      await DBService.instance.extension.upsertExtensionCommands(
+      await DBService.instance.extension.upsertCommands(
         extension.id,
         extensionManifest.data.commands,
       );

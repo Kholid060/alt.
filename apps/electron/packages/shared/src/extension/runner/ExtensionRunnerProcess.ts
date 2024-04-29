@@ -2,9 +2,11 @@ import type { ExtensionCommandExecutePayload } from '#common/interface/extension
 import type { DatabaseExtensionCommandWithExtension } from '#packages/main/src/interface/database.interface';
 import { EventEmitter } from 'eventemitter3';
 import type ExtensionCommandRunner from '../ExtensionCommandRunner';
+import type { BetterMessagePayload } from '#packages/common/utils/BetterMessagePort';
 
 export enum ExtensionRunnerProcessFinishReason {
   Done = 'done',
+  Stop = 'stopped',
   Timeout = 'timeout',
   Terminate = 'terminate',
 }
@@ -45,7 +47,7 @@ abstract class ExtensionRunnerProcess extends EventEmitter<ExtensionRunnerProces
 
   abstract stop(): void;
 
-  abstract destroy(): void;
+  abstract onCommandWindowEvents?(data: BetterMessagePayload): void;
 }
 
 export default ExtensionRunnerProcess;

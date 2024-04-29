@@ -1,5 +1,6 @@
 import { MESSAGE_PORT_CHANNEL_IDS } from '#packages/common/utils/constant/constant';
 import IPCMain from './IPCMain';
+import SharedProcessService from '/@/services/shared-process.service';
 import WindowsManager from '/@/window/WindowsManager';
 
 IPCMain.on('window:open-settings', (_, routePath) => {
@@ -34,17 +35,6 @@ IPCMain.on('data:changes', ({ sender }, ...args) => {
   });
 });
 
-IPCMain.on('command-window:input-config', (_, detail) => {
-  const commandWindow = WindowsManager.instance.getWindow('command');
-  commandWindow.focus();
-
-  WindowsManager.instance.sendMessageToWindow(
-    commandWindow,
-    'command-window:input-config',
-    detail,
-  );
-});
-
 IPCMain.on('message-port:port-bridge', ({ ports }, channelId) => {
   if (ports.length === 0) return;
 
@@ -59,6 +49,7 @@ IPCMain.on('message-port:port-bridge', ({ ports }, channelId) => {
   }
 });
 
-IPCMain.on('command:execute', (_, payload) => {
-  IPCMain.sendToWindow('shared-process', 'command:execute', payload);
+IPCMain.on('extension:stop-execute-command', (_, processId) => {
+  SharedProcessService.stopExecuteExtensionCommand(processId);
+  return Promise.resolve();
 });

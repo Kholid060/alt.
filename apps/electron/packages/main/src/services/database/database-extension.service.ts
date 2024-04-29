@@ -2,13 +2,14 @@ import { and, eq, notInArray } from 'drizzle-orm';
 import type {
   NewExtension,
   NewExtensionCommand,
-  SelectExtensionConfig,
+  NewExtensionConfig,
   SelectExtensionStorage,
 } from '/@/db/schema/extension.schema';
 import {
   extensions,
   commands as commandsSchema,
   commands,
+  configs,
 } from '/@/db/schema/extension.schema';
 import type { ExtensionCommand, ExtensionManifest } from '@repo/extension-core';
 import {
@@ -22,14 +23,24 @@ import type {
   DatabaseExtensionListItem,
   DatabaseExtensionUpdatePayload,
   DatabaseExtensionCommandUpdatePayload,
+  DatabaseExtensionConfig,
+  DatabaseExtensionConfigWithSchema,
+  DatabaseGetExtensionConfig,
+  DatabaseExtensionConfigUpdatePayload,
 } from '/@/interface/database.interface';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import type { SQLiteDatabase } from './database.service';
+import { MemoryCache } from '@repo/shared';
+import { ExtensionError } from '#packages/common/errors/custom-errors';
+import { getExtensionConfigDefaultValue } from '/@/utils/helper';
+import type { ExtensionCommandConfigValuePayload } from '#packages/common/interface/extension.interface';
 
 class DBExtensionService {
+  private cache: MemoryCache = new MemoryCache();
+
   constructor(private database: SQLiteDatabase) {}
 
-  async getExtensions(
+  async list(
     activeExtOnly: boolean = false,
   ): Promise<DatabaseExtensionListItem[]> {
     const extensionsDbData = await this.database.query.extensions.findMany({
@@ -61,7 +72,7 @@ class DBExtensionService {
     return extensionsDbData;
   }
 
-  async getExtension(extensionId: string): Promise<DatabaseExtension | null> {
+  async get(extensionId: string): Promise<DatabaseExtension | null> {
     const extension = await this.database.query.extensions.findFirst({
       with: { commands: {} },
       where(fields, operators) {
@@ -82,9 +93,7 @@ class DBExtensionService {
     });
   }
 
-  async getExtensionManifest(
-    extensionId: string,
-  ): Promise<ExtensionManifest | null> {
+  async getManifest(extensionId: string): Promise<ExtensionManifest | null> {
     const extension = await this.database.query.extensions.findFirst({
       where(fields, operators) {
         return operators.and(
@@ -101,7 +110,7 @@ class DBExtensionService {
     return extension as ExtensionManifest;
   }
 
-  async getExtensionCommand(
+  async getCommand(
     query: string | { commandId: string; extensionId: string },
   ): Promise<DatabaseExtensionCommandWithExtension | null> {
     const commandId =
@@ -136,7 +145,7 @@ class DBExtensionService {
     });
   }
 
-  async updateExtension(
+  async update(
     extensionId: string,
     { isDisabled }: DatabaseExtensionUpdatePayload,
   ) {
@@ -151,7 +160,7 @@ class DBExtensionService {
     });
   }
 
-  async upsertExtensionCommands(
+  async upsertCommands(
     extensionId: string,
     commands: ExtensionCommand[],
     tx?: Parameters<Parameters<typeof this.database.transaction>[0]>[0],
@@ -203,11 +212,56 @@ class DBExtensionService {
     );
   }
 
-  async getConfigs(
+  async getConfig({
+    configId,
+    extensionId,
+    commandId,
+  }: DatabaseGetExtensionConfig): Promise<DatabaseExtensionConfigWithSchema | null> {
+    let configData: DatabaseExtensionConfigWithSchema = {
+      configId,
+      value: {},
+      config: [],
+      extensionId,
+      commandIcon: '',
+      commandTitle: '',
+      extensionIcon: '',
+      extensionTitle: '',
+    };
+
+    if (commandId) {
+      const command = await this.getCommand({ commandId, extensionId });
+      if (!command || !command.config) return null;
+
+      configData = {
+        ...configData,
+        config: command.config,
+        commandTitle: command.title,
+        commandIcon: command.icon ?? '',
+        extensionIcon: command.extension.icon,
+        extensionTitle: command.extension.title,
+      };
+    } else {
+      const extension = await this.get(extensionId);
+      if (!extension || !extension.config) return null;
+
+      configData = {
+        ...configData,
+        config: extension.config,
+        extensionIcon: extension.icon,
+        extensionTitle: extension.title,
+      };
+    }
+
+    configData.value = (await this.getConfigValue(configId)) ?? {};
+
+    return configData;
+  }
+
+  async getConfigValue(
     configId: string,
-  ): Promise<SelectExtensionConfig | undefined>;
-  async getConfigs(configId: string[]): Promise<SelectExtensionConfig[]>;
-  async getConfigs(configIds: string | string[]): Promise<unknown> {
+  ): Promise<DatabaseExtensionConfig | undefined>;
+  async getConfigValue(configId: string[]): Promise<DatabaseExtensionConfig[]>;
+  async getConfigValue(configIds: string | string[]): Promise<unknown> {
     if (Array.isArray(configIds)) {
       return await this.database.query.configs.findMany({
         columns: {
@@ -272,7 +326,7 @@ class DBExtensionService {
     return result;
   }
 
-  async getAllExtensionStorage(extensionId: string) {
+  async storageList(extensionId: string) {
     const result = await this.database.query.storages.findMany({
       columns: {
         key: true,
@@ -286,7 +340,7 @@ class DBExtensionService {
     return result;
   }
 
-  async updateExtensionCommand(
+  async updateCommand(
     extensionId: string,
     commandId: string,
     value: DatabaseExtensionCommandUpdatePayload,
@@ -303,7 +357,7 @@ class DBExtensionService {
     });
   }
 
-  async addExtension(
+  async insert(
     extensionData: NewExtension,
     commandsData: NewExtensionCommand[],
   ): Promise<DatabaseExtension> {
@@ -314,9 +368,80 @@ class DBExtensionService {
       'database:get-extension-list': DATABASE_CHANGES_ALL_ARGS,
     });
 
-    const extension = await this.getExtension(extensionData.id);
+    const extension = await this.get(extensionData.id);
 
     return extension!;
+  }
+
+  async isCommandConfigInputted(
+    extensionId: string,
+    commandId: string,
+  ): Promise<ExtensionCommandConfigValuePayload> {
+    const configId = `${extensionId}:${commandId}`;
+    const commandConfigCacheId = `config-inputted:${configId}`;
+    if (this.cache.has(commandConfigCacheId)) {
+      return { requireInput: false };
+    }
+
+    const extension = await this.get(extensionId);
+    if (!extension || extension.isError) {
+      throw new ExtensionError('Extension not found');
+    }
+
+    const extensionConfig = extension.config
+      ? getExtensionConfigDefaultValue(extension.config)
+      : null;
+    if (extensionConfig?.requireInput) {
+      const extensionConfigExists = await this.configExists(extension.id);
+      if (!extensionConfigExists) {
+        return {
+          requireInput: true,
+          type: 'extension',
+        };
+      }
+    }
+
+    const command = extension.commands.find(
+      (command) => command.name === commandId,
+    );
+    if (!command) throw new ExtensionError('Command not found');
+
+    const commandConfig = getExtensionConfigDefaultValue(command.config ?? []);
+    if (commandConfig.requireInput) {
+      const commandConfigExists = await this.configExists(configId);
+      if (!commandConfigExists) {
+        return {
+          type: 'command',
+          requireInput: true,
+        };
+      }
+    }
+
+    this.cache.add(commandConfigCacheId, true);
+
+    return {
+      requireInput: false,
+    };
+  }
+
+  async insertConfig({ configId, extensionId, value }: NewExtensionConfig) {
+    await this.database.insert(configs).values({
+      value,
+      configId,
+      extensionId,
+    });
+  }
+
+  async updateConfig(
+    configId: string,
+    { value }: DatabaseExtensionConfigUpdatePayload,
+  ) {
+    await this.database
+      .update(configs)
+      .set({
+        value,
+      })
+      .where(eq(configs.configId, configId));
   }
 }
 

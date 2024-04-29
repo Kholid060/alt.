@@ -7,7 +7,7 @@ ExtensionIPCEvent.instance.on(
     const configId =
       type === 'command' ? `${extensionId}:${commandId}` : extensionId;
     const configValues =
-      await DBService.instance.extension.getConfigs(configId);
+      await DBService.instance.extension.getConfigValue(configId);
 
     return configValues?.value ?? {};
   },

@@ -7,7 +7,6 @@ import { BoltIcon, LinkIcon } from 'lucide-react';
 import { useCommandStore } from '/@/stores/command.store';
 import { CommandLaunchBy } from '@repo/extension';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
-import { getExtIconURL } from '/@/utils/helper';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
 import CommandShortcut from '../ui/UiShortcut';
 
@@ -22,7 +21,7 @@ function ListItemCommand({
   const navigate = useCommandNavigate();
   const { executeCommand } = useCommandCtx();
 
-  const { command, commandIcon, extension } = item.metadata;
+  const { command, extension } = item.metadata;
 
   function startExecuteCommand() {
     const args: Record<string, unknown> = {};
@@ -101,16 +100,7 @@ function ListItemCommand({
     actions.push({
       icon: BoltIcon,
       onAction() {
-        navigate(`/configs/${extension.id}:${command.name}`, {
-          data: {
-            config: command.config,
-          },
-          panelHeader: {
-            title: command.title,
-            subtitle: extension.title,
-            icon: getExtIconURL(commandIcon, extension.id),
-          },
-        });
+        navigate(`/configs/${extension.id}:${command.name}`);
       },
       title: 'Config',
       value: 'config',

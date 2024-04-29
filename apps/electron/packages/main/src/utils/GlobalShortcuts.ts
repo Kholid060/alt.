@@ -1,10 +1,10 @@
 import { globalShortcut } from 'electron';
 import { GLOBAL_SHORTCUTS } from './constant';
 import { logger } from '../lib/log';
-import extensionCommandRunner from './extension/extensionCommandRunner';
 import { CommandLaunchBy } from '@repo/extension';
 import DBService from '../services/database/database.service';
 import WindowCommand from '../window/command-window';
+import SharedProcessService from '../services/shared-process.service';
 
 class GlobalShortcut {
   private static _instance: GlobalShortcut | null = null;
@@ -72,7 +72,7 @@ export class GlobalShortcutExtension {
       keys,
       async () => {
         try {
-          await extensionCommandRunner({
+          await SharedProcessService.executeExtensionCommand({
             commandId,
             extensionId,
             launchContext: {

@@ -5,10 +5,6 @@ import {
   useCommandNavigate,
 } from '/@/hooks/useCommandRoute';
 import { useCommandStore } from '/@/stores/command.store';
-import { getExtIconURL, isIPCEventError } from '/@/utils/helper';
-import { requireInputConfig } from '#packages/common/utils/helper';
-import MessagePortListener from '../../utils/message-port';
-import { MESSAGE_PORT_CHANNEL_IDS } from '#packages/common/utils/constant/constant';
 
 function AppEventListener() {
   const setCommandStoreState = useCommandStore((state) => state.setState);
@@ -38,42 +34,18 @@ function AppEventListener() {
     );
     const offInputConfig = preloadAPI.main.ipc.on(
       'command-window:input-config',
-      async (_, { commandId, extensionId, type }) => {
-        const extension = await preloadAPI.main.ipc.invoke(
-          'database:get-extension-manifest',
-          extensionId,
-        );
-        if (!extension || isIPCEventError(extension)) return;
-
-        if (type === 'extension') {
-          if (!requireInputConfig(extension.config)) return;
-
-          navigate(`/configs/${extensionId}`, {
-            data: {
-              config: extension.config,
-            },
-            panelHeader: {
-              icon: extension.icon,
-              title: extension.title,
-            },
-          });
-          return;
-        }
-
-        const command = extension.commands.find(
-          (command) => command.name === commandId,
-        );
-        if (!command || !requireInputConfig(command.config)) return;
-
-        navigate(`/configs/${extensionId}:${command.name}`, {
-          data: {
-            config: command.config,
-          },
-          panelHeader: {
-            title: command.title,
-            subtitle: extension.title,
-            icon: getExtIconURL(command.icon || extension.icon, extensionId),
-          },
+      async (_, { commandId, extensionId, type, executeCommandPayload }) => {
+        const configId =
+          type === 'extension' ? extensionId : `${extensionId}:${commandId}`;
+        navigate(`/configs/${configId}`, { data: { executeCommandPayload } });
+      },
+    );
+    const offOpenJSONViewPage = preloadAPI.main.ipc.on(
+      'command-window:open-json-view',
+      (_, payload) => {
+        const { extensionId, commandId } = payload;
+        navigate(`/extensions/${extensionId}/${commandId}/view-json`, {
+          data: payload,
         });
       },
     );
@@ -82,6 +54,7 @@ function AppEventListener() {
       offInputConfig();
       offAppUpdateRoute();
       offWindowVisibility();
+      offOpenJSONViewPage();
     };
   }, []);
 

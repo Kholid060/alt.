@@ -3,10 +3,12 @@ import type { ExtensionRunnerProcessConstructor } from './ExtensionRunnerProcess
 import ExtensionRunnerProcess, {
   ExtensionRunnerProcessFinishReason,
 } from './ExtensionRunnerProcess';
-import { isObject } from '@repo/shared';
+import type { BetterMessagePayload } from '@repo/shared';
+import { BetterMessagePort, isObject } from '@repo/shared';
 import IPCRenderer from '#packages/common/utils/IPCRenderer';
 import { isIPCEventError } from '/@/utils/helper';
 import type { ExtensionCommandWorkerInitMessage } from '/@/inteface/extension.interface';
+import type { MessagePortSharedCommandWindowEvents } from '#packages/common/interface/message-port-events.interface';
 
 class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
   private worker: Worker | null = null;
@@ -19,12 +21,21 @@ class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
 
   constructor({ id, ...options }: ExtensionRunnerProcessConstructor) {
     super(options);
+
     this.id = id;
+    this.onCommandWindowEvents = this.onCommandWindowEvents.bind(this);
   }
 
   private initWorkerMessagePort() {
-    this.messageChannel.port2.addEventListener('message', (event) => {
-      console.log('extension', event);
+    const messagePort =
+      BetterMessagePort.createStandalone<MessagePortSharedCommandWindowEvents>(
+        'sync',
+        this.messageChannel.port2,
+      );
+
+    messagePort.on('command-json:update-ui', (data) => {
+      // forward to command window
+      this.runner.messagePort.event.sendMessage('command-json:update-ui', data);
     });
   }
 
@@ -52,8 +63,7 @@ class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
   }
 
   async start() {
-    const { commandId, extensionId, timeoutMs } = this.payload;
-    const workerId = `${extensionId}:${commandId}`;
+    const { extensionId, timeoutMs } = this.payload;
 
     const manifest = await IPCRenderer.invoke(
       'database:get-extension-manifest',
@@ -71,9 +81,7 @@ class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
     );
 
     try {
-      this.worker = new ExtensionWorkerScript({
-        name: workerId,
-      });
+      this.worker = new ExtensionWorkerScript();
 
       if (typeof timeoutMs === 'number' && timeoutMs !== 0) {
         this.timeout = setTimeout(() => {
@@ -89,9 +97,9 @@ class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
 
       this.worker.postMessage(
         {
-          workerId,
           manifest,
           type: 'init',
+          processId: this.id,
           payload: this.payload,
           command: this.command,
         } as ExtensionCommandWorkerInitMessage,
@@ -106,13 +114,22 @@ class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
     }
   }
 
-  stop(): void {
-    throw new Error('Method not implemented.');
+  onCommandWindowEvents(data: BetterMessagePayload) {
+    this.messageChannel.port2.postMessage(data);
   }
 
-  destroy() {
+  stop(): void {
+    this.destroy();
+    this.emit('finish', ExtensionRunnerProcessFinishReason.Stop, null);
+  }
+
+  private destroy() {
     this.worker?.terminate();
     this.worker = null;
+
+    IPCRenderer.postMessage('message-port:delete:shared-extension<=>main', {
+      extPortId: this.id,
+    });
 
     clearTimeout(this.timeout);
   }

@@ -4,17 +4,12 @@ import './ipc-extension-messages';
 import { BrowserWindow, clipboard, dialog, screen, shell } from 'electron';
 import ExtensionCommandScriptRunner from '../extension/ExtensionCommandScriptRunner';
 import IPCMain from './IPCMain';
-import type { ExtensionConfigData } from '#packages/common/interface/extension.interface';
-import { configs } from '../../db/schema/extension.schema';
-import { eq } from 'drizzle-orm';
-import { ExtensionError } from '#packages/common/errors/custom-errors';
-import { getExtensionConfigDefaultValue } from '../helper';
-import type { IPCExtensionConfigEvents } from '#packages/common/interface/ipc-events.interface';
 import { GlobalShortcutExtension } from '../GlobalShortcuts';
 import DBService from '/@/services/database/database.service';
 import { emitDBChanges } from '../database-utils';
 import WorkflowRunnerService from '../../services/workflow-runner.service';
 import WindowCommand from '/@/window/command-window';
+import SharedProcessService from '/@/services/shared-process.service';
 
 /** EXTENSION */
 IPCMain.handle('extension:import', async ({ sender }) => {
@@ -50,6 +45,9 @@ IPCMain.handle('extension:reload', async (_, extId) => {
     'database:get-extension': [extId],
     'database:get-extension-list': [],
   });
+});
+IPCMain.handle('extension:execute-command', (_, payload) => {
+  return SharedProcessService.executeExtensionCommand(payload);
 });
 IPCMain.handle('extension:run-script-command', async (_, detail) => {
   try {
@@ -104,90 +102,6 @@ IPCMain.handle('clipboard:has-buffer', (_, contentType) => {
   return Promise.resolve(clipboard.has(contentType));
 });
 
-/** EXTENSION CONFIG */
-IPCMain.handle('extension-config:get', async (_, configId) => {
-  const result = (await DBService.instance.db.query.configs.findFirst({
-    where: (fields, { eq }) => eq(fields.configId, configId),
-  })) as ExtensionConfigData;
-
-  return result ?? null;
-});
-IPCMain.handle('extension-config:set', async (_, configId, data) => {
-  await DBService.instance.db.insert(configs).values({
-    ...data,
-    configId,
-  });
-});
-IPCMain.handle('extension-config:update', async (_, configId, data) => {
-  await DBService.instance.db
-    .update(configs)
-    .set(data)
-    .where(eq(configs.configId, configId));
-});
-IPCMain.handle('extension-config:exists', (_, configId) => {
-  return DBService.instance.extension.configExists(configId);
-});
-
-const extensionConfigNeedInputCache = new Set<string>();
-IPCMain.handle(
-  'extension-config:need-input',
-  async (_, extensionId, commandId) => {
-    type ReturnValue = ReturnType<
-      IPCExtensionConfigEvents['extension-config:need-input']
-    >;
-
-    const commandConfigId = `${extensionId}:${commandId}`;
-    if (extensionConfigNeedInputCache.has(commandConfigId)) {
-      return { requireInput: false } as ReturnValue;
-    }
-
-    const extension =
-      await DBService.instance.extension.getExtension(extensionId);
-    if (!extension || extension.isError) {
-      throw new ExtensionError('Extension not found');
-    }
-
-    const extensionConfig = getExtensionConfigDefaultValue(
-      extension.config ?? [],
-    );
-    if (extensionConfig.requireInput) {
-      const extensionConfigExists =
-        await DBService.instance.extension.configExists(extension.id);
-      if (!extensionConfigExists) {
-        return {
-          requireInput: true,
-          type: 'extension',
-          config: extension.config,
-        } as ReturnValue;
-      }
-    }
-
-    const command = extension.commands.find(
-      (command) => command.name === commandId,
-    );
-    if (!command) throw new ExtensionError('Command not found');
-
-    const commandConfig = getExtensionConfigDefaultValue(command.config ?? []);
-    if (commandConfig.requireInput) {
-      const commandConfigExists =
-        await DBService.instance.extension.configExists(commandConfigId);
-      if (!commandConfigExists) {
-        return {
-          type: 'command',
-          requireInput: true,
-          config: command.config,
-        } as ReturnValue;
-      }
-    }
-
-    extensionConfigNeedInputCache.add(commandConfigId);
-
-    return {
-      requireInput: false,
-    } as ReturnValue;
-  },
-);
-
 /** APP */
 IPCMain.handle('app:open-devtools', ({ sender }) => {
   sender.openDevTools();
@@ -241,24 +155,27 @@ IPCMain.handle('database:insert-workflow', (_, data) => {
 });
 
 IPCMain.handle('database:get-extension', (_, extensionId) => {
-  return DBService.instance.extension.getExtension(extensionId);
+  return DBService.instance.extension.get(extensionId);
 });
 IPCMain.handle('database:get-extension-list', (_, activeExtOnly) => {
-  return DBService.instance.extension.getExtensions(activeExtOnly);
+  return DBService.instance.extension.list(activeExtOnly);
 });
 IPCMain.handle('database:get-extension-manifest', (_, extensionId) => {
-  return DBService.instance.extension.getExtensionManifest(extensionId);
+  return DBService.instance.extension.getManifest(extensionId);
 });
 IPCMain.handle('database:update-extension', async (_, extensionId, data) => {
-  await DBService.instance.extension.updateExtension(extensionId, data);
+  await DBService.instance.extension.update(extensionId, data);
 });
 IPCMain.handle('database:get-command', (_, query) => {
-  return DBService.instance.extension.getExtensionCommand(query);
+  return DBService.instance.extension.getCommand(query);
+});
+IPCMain.handle('database:get-extension-config', (_, configId) => {
+  return DBService.instance.extension.getConfig(configId);
 });
 IPCMain.handle(
   'database:update-extension-command',
   async (_, extensionId, commandId, value) => {
-    await DBService.instance.extension.updateExtensionCommand(
+    await DBService.instance.extension.updateCommand(
       extensionId,
       commandId,
       value,
@@ -273,6 +190,12 @@ IPCMain.handle(
     }
   },
 );
+IPCMain.handle('database:insert-extension-config', (_, config) => {
+  return DBService.instance.extension.insertConfig(config);
+});
+IPCMain.handle('database:update-extension-config', (_, configId, data) => {
+  return DBService.instance.extension.updateConfig(configId, data);
+});
 
 /** SHELL */
 IPCMain.handle('shell:open-in-folder', async (_, filePath) => {

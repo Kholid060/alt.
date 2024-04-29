@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ExtensionMessagePortEvent } from '@repo/extension';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
-import type { AMessagePort } from '@repo/shared';
+import type { BetterMessagePortSync } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { APP_ICON_DIR_PREFIX, CUSTOM_SCHEME } from '../constant/constant';
 import type { ExtensionAPIValues } from '@repo/extension-core/dist/extensionApiBuilder';
@@ -15,7 +15,7 @@ export const extensionAPIGetIconURL = (): Pick<
 });
 
 export function extensionAPISearchPanelEvent(
-  messagePort?: AMessagePort<ExtensionMessagePortEvent>,
+  messagePort?: BetterMessagePortSync<ExtensionMessagePortEvent>,
 ): Pick<
   ExtensionAPIValues,
   'ui.searchPanel.onChanged' | 'ui.searchPanel.onKeydown'
@@ -24,10 +24,10 @@ export function extensionAPISearchPanelEvent(
     key: 'extension:query-change' | 'extension:keydown-event',
   ) => ({
     addListener: (callback: (...args: any[]) => void) => {
-      messagePort?.addListener(key, callback);
+      messagePort?.on(key, callback);
     },
     removeListener: (callback: (...args: any[]) => void) => {
-      messagePort?.removeListener(key, callback);
+      messagePort?.off(key, callback);
     },
   });
 
@@ -36,9 +36,8 @@ export function extensionAPISearchPanelEvent(
     'ui.searchPanel.onKeydown': createEventListener('extension:keydown-event'),
   };
 }
-
 export function extensionAPIUiToast(
-  messagePort?: AMessagePort<ExtensionMessagePortEvent>,
+  messagePort?: BetterMessagePortSync<ExtensionMessagePortEvent>,
 ): Pick<ExtensionAPIValues, 'ui.createToast'> {
   return {
     'ui.createToast': (options) => {

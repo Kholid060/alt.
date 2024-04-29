@@ -11,7 +11,6 @@ import preloadAPI from './preloadAPI';
 import { IPCEventError } from '#common/interface/ipc-events.interface';
 import { CommandPanelStoreActions } from '../stores/command-panel.store';
 import { isIPCEventError } from './helper';
-import { ExtensionManifest } from '@repo/extension-core';
 import { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
 
 function resultHandler(
@@ -43,7 +42,6 @@ const defaultCommandActions: {
     icon: LucideIcon;
     onAction(
       detail: {
-        extensionManifest: ExtensionManifest;
         executePayload: ExtensionCommandExecutePayload;
         addStatus: CommandPanelStoreActions['addStatus'];
       },

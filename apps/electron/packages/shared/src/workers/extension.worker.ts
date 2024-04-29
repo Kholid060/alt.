@@ -8,10 +8,9 @@ import type {
   CommandJSONViews,
   CommandLaunchContext,
   CommandViewJSONLaunchContext,
-  ExtensionMessagePortEvent,
 } from '@repo/extension';
-import type { EventMapEmit } from '@repo/shared';
-import { AMessagePort } from '@repo/shared';
+import type { BetterMessagePortSync, EventMapEmit } from '@repo/shared';
+import { BetterMessagePort } from '@repo/shared';
 import { createExtensionElementHandle } from '#common/utils/extension/extension-element-handle';
 import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
 import {
@@ -22,6 +21,7 @@ import {
 import type { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
 import ExtensionWorkerMessagePort from '../extension/ExtensionWorkerMessagePort';
 import type { ExtensionCommandWorkerInitMessage } from '../inteface/extension.interface';
+import type { MessagePortSharedCommandWindowEvents } from '#packages/common/interface/message-port-events.interface';
 
 type ExtensionCommand = (
   payload: CommandLaunchContext | CommandViewJSONLaunchContext,
@@ -41,9 +41,9 @@ async function loadExtensionCommand(extensionId: string, commandId: string) {
 interface InitExtensionAPIData {
   key: string;
   commandId: string;
-  messagePort: MessagePort;
-  mainMessagePort: MessagePort;
   manifest: ExtensionManifest;
+  mainMessagePort: MessagePort;
+  messagePort: BetterMessagePortSync<MessagePortSharedCommandWindowEvents>;
 }
 function initExtensionAPI({
   key,
@@ -58,15 +58,13 @@ function initExtensionAPI({
     messagePort: mainMessagePort,
   });
 
-  const aMessagePort = new AMessagePort<ExtensionMessagePortEvent>(messagePort);
-
   const extensionAPI = Object.freeze(
     extensionApiBuilder({
       values: {
         manifest,
         ...extensionAPIGetIconURL(),
-        ...extensionAPIUiToast(aMessagePort),
-        ...extensionAPISearchPanelEvent(aMessagePort),
+        ...extensionAPIUiToast(messagePort),
+        ...extensionAPISearchPanelEvent(messagePort),
         'browser.activeTab.findElement': (selector) => {
           return createExtensionElementHandle({
             selector,
@@ -121,7 +119,7 @@ async function getCommandExecution({
 }
 
 interface CommandRunnerData extends ExtensionCommandExecutePayload {
-  workerId: string;
+  processId: string;
   manifest: ExtensionManifest;
   apiData: Omit<InitExtensionAPIData, 'manifest' | 'commandId'>;
 }
@@ -129,6 +127,7 @@ interface CommandRunnerData extends ExtensionCommandExecutePayload {
 async function commandViewJSONRunner({
   apiData,
   manifest,
+  processId,
   commandId,
   extensionId,
   launchContext,
@@ -145,9 +144,11 @@ async function commandViewJSONRunner({
   });
 
   const updateView: CommandViewJSONLaunchContext['updateView'] = (viewData) => {
-    apiData.messagePort.postMessage({
-      type: 'view-data',
-      viewData: viewData,
+    apiData.messagePort.sendMessage('command-json:update-ui', {
+      viewData,
+      processId,
+      commandId,
+      extensionId,
     });
   };
 
@@ -200,11 +201,11 @@ self.onmessage = async ({
     const commandRunnerPayload: CommandRunnerData = {
       ...data.payload,
       manifest: data.manifest,
-      workerId: data.workerId,
+      processId: data.processId,
       apiData: {
-        messagePort: ports[1],
         mainMessagePort: ports[0],
         key: data.payload.extensionId,
+        messagePort: BetterMessagePort.createStandalone('sync', ports[1]),
       },
     };
 

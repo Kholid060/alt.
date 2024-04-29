@@ -76,7 +76,7 @@ ExtensionIPCEvent.instance.on(
 
 ExtensionIPCEvent.instance.on('storage.getAll', async ({ extensionId }) => {
   const queryResult =
-    await DBService.instance.extension.getAllExtensionStorage(extensionId);
+    await DBService.instance.extension.storageList(extensionId);
   const result = queryResult.reduce<ResultType>((acc, { key, value }) => {
     acc[key] = decryptStorageValue(value);
 

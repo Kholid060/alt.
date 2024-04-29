@@ -12,8 +12,8 @@ import { isExtHasApiPermission } from '#common/utils/check-ext-permission';
 import type { SetRequired } from 'type-fest';
 import { ExtensionError } from '#common/errors/custom-errors';
 import { createExtensionElementHandle } from '#common/utils/extension/extension-element-handle';
-import type { EventMapEmit } from '@repo/shared';
-import { AMessagePort } from '@repo/shared';
+import type { BetterMessagePortSync, EventMapEmit } from '@repo/shared';
+import { BetterMessagePort } from '@repo/shared';
 import {
   extensionAPIGetIconURL,
   extensionAPISearchPanelEvent,
@@ -48,10 +48,10 @@ class ExtensionAPI {
     'permissions'
   >['permissions'] = [];
 
-  aMessagePort: AMessagePort<ExtensionMessagePortEvent>;
+  messagePort: BetterMessagePortSync<ExtensionMessagePortEvent>;
 
   constructor(messagePort: MessagePort) {
-    this.aMessagePort = new AMessagePort(messagePort);
+    this.messagePort = BetterMessagePort.createStandalone('sync', messagePort);
   }
 
   async loadAPI() {
@@ -98,8 +98,8 @@ class ExtensionAPI {
       values: {
         manifest,
         ...extensionAPIGetIconURL(),
-        ...extensionAPIUiToast(this.aMessagePort),
-        ...extensionAPISearchPanelEvent(this.aMessagePort),
+        ...extensionAPIUiToast(this.messagePort),
+        ...extensionAPISearchPanelEvent(this.messagePort),
         'browser.activeTab.findElement': (selector) => {
           return createExtensionElementHandle({
             selector,

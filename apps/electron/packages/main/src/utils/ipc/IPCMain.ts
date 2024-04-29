@@ -21,6 +21,11 @@ import { IPC_ON_EVENT } from '#packages/common/utils/constant/constant';
 import { isObject } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 
+interface PromiseResolver<T = unknown> {
+  resolve(value: T): void;
+  reject(reason: unknown): void;
+}
+
 class IPCMain {
   private static _instance: IPCMain;
 
@@ -28,7 +33,7 @@ class IPCMain {
     return this._instance || (this._instance = new IPCMain());
   }
 
-  private asyncMessages = new Map<string, PromiseWithResolvers<unknown>>();
+  private asyncMessages = new Map<string, PromiseResolver>();
 
   constructor() {
     this.onInvokeMessage = this.onInvokeMessage.bind(this);
@@ -41,7 +46,7 @@ class IPCMain {
   ) {
     if (
       !isObject(message) ||
-      Object.hasOwn(message, 'type') ||
+      !Object.hasOwn(message, 'type') ||
       !this.asyncMessages.has(message.messageId)
     )
       return;
@@ -62,26 +67,20 @@ class IPCMain {
     name: T,
     ...args: Parameters<IPCRendererInvokeEvent[T]>
   ): Promise<ReturnType<IPCRendererInvokeEvent[T]>> {
-    const messageId = nanoid();
-    const resolver =
-      Promise.withResolvers<ReturnType<IPCRendererInvokeEvent[T]>>();
+    return new Promise((resolve, reject) => {
+      const messageId = nanoid();
+      this.asyncMessages.set(messageId, { reject, resolve });
 
-    this.asyncMessages.set(
-      messageId,
-      resolver as PromiseWithResolvers<unknown>,
-    );
-
-    const browserWindow =
-      typeof window === 'string'
-        ? WindowsManager.instance.getWindow(window)
-        : window;
-    browserWindow.webContents.send(IPC_ON_EVENT.rendererInvoke, {
-      args,
-      name,
-      messageId,
-    } as IPCRendererInvokeEventPayload);
-
-    return resolver.promise;
+      const browserWindow =
+        typeof window === 'string'
+          ? WindowsManager.instance.getWindow(window)
+          : window;
+      browserWindow.webContents.send(IPC_ON_EVENT.rendererInvoke, {
+        args,
+        name,
+        messageId,
+      } as IPCRendererInvokeEventPayload);
+    });
   }
 
   static handle<T extends keyof IPCEvents, P extends Parameters<IPCEvents[T]>>(

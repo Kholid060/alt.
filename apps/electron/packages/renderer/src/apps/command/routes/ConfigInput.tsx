@@ -20,7 +20,9 @@ import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { IPCEventError } from '#common/interface/ipc-events.interface';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
 import { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
-import { isIPCEventError } from '/@/utils/helper';
+import { getExtIconURL, isIPCEventError } from '/@/utils/helper';
+import { useDatabaseQuery } from '/@/hooks/useDatabase';
+import { DatabaseExtensionConfigWithSchema } from '#packages/main/src/interface/database.interface';
 
 type ConfigComponent<
   T extends ExtensionConfig['type'] = ExtensionConfig['type'],
@@ -261,41 +263,35 @@ const configComponentMap: Record<ExtensionConfig['type'], ConfigComponent> = {
   'input:file': ConfigInputFile as ConfigComponent,
 };
 
-function ConfigInput() {
+function ConfigInput({
+  data,
+  configId,
+  executeCommandPayload,
+}: {
+  configId: string;
+  data: DatabaseExtensionConfigWithSchema;
+  executeCommandPayload?: ExtensionCommandExecutePayload;
+}) {
   const addPanelStatus = useCommandPanelStore.use.addStatus();
-  const currentRoute = useCommandRoute((state) => state.currentRoute!);
+  const setPanelHeader = useCommandPanelStore.use.setHeader();
 
   const navigate = useCommandNavigate();
   const { executeCommand } = useCommandCtx();
 
   const alreadyHasValue = useRef(false);
 
-  const { configId } = currentRoute.params;
-  const { config, executeCommand: executeCommandPayload } =
-    currentRoute.data as {
-      config: ExtensionConfig[];
-      executeCommand?: ExtensionCommandExecutePayload;
-    };
-
   const form = useForm<Record<string, unknown>>({
     async defaultValues() {
-      if (!configId || !Array.isArray(config)) return {};
+      if (!Array.isArray(data.config)) return {};
 
-      let defaultValues: Record<string, unknown> = {};
-      config.forEach((item) => {
-        if (!Object.hasOwn(item, 'defaultValue')) return;
-
-        defaultValues[item.name] = item.defaultValue ?? '';
+      const defaultValues: Record<string, unknown> = {};
+      data.config.forEach((item) => {
+        if (Object.hasOwn(item, 'defaultValue')) {
+          defaultValues[item.name] = item.defaultValue ?? '';
+        } else if (Object.hasOwn(data.value, item.name)) {
+          defaultValues[item.name] = data.value[item.name];
+        }
       });
-
-      const configValues = await preloadAPI.main.ipc.invoke(
-        'extension-config:get',
-        configId,
-      );
-      if (configValues && !('$isError' in configValues)) {
-        defaultValues = { ...defaultValues, ...configValues.value };
-        alreadyHasValue.current = true;
-      }
 
       return defaultValues;
     },
@@ -314,7 +310,7 @@ function ConfigInput() {
 
       if (alreadyHasValue.current) {
         result = await preloadAPI.main.ipc.invoke(
-          'extension-config:update',
+          'database:update-extension-config',
           configId,
           {
             value: values,
@@ -322,15 +318,15 @@ function ConfigInput() {
         );
       } else {
         result = await preloadAPI.main.ipc.invoke(
-          'extension-config:set',
-          configId,
+          'database:insert-extension-config',
           {
+            configId,
             extensionId,
             value: values,
           },
         );
       }
-      console.log({ result });
+
       if (isIPCEventError(result)) {
         addPanelStatus({
           type: 'error',
@@ -354,12 +350,17 @@ function ConfigInput() {
   }
 
   useEffect(() => {
-    if (!config || config.length === 0) {
-      navigate('', { panelHeader: null });
-    }
-  }, [config, navigate]);
+    setPanelHeader({
+      title: data.commandTitle || data.extensionTitle,
+      subtitle: data.commandTitle ? data.extensionTitle : '',
+      icon: getExtIconURL(
+        data.commandIcon || data.extensionIcon,
+        data.extensionId,
+      ),
+    });
+  }, [data, setPanelHeader]);
 
-  if (!Array.isArray(config)) return null;
+  if (!Array.isArray(data.config)) return null;
 
   return (
     <div className="py-4 px-6">
@@ -374,7 +375,7 @@ function ConfigInput() {
           className="flex flex-col mt-4 gap-4"
           onSubmit={form.handleSubmit(onSubmit)}
         >
-          {config.map((item) => {
+          {data.config.map((item) => {
             const ConfigComponent = configComponentMap[item.type];
 
             return (
@@ -400,4 +401,33 @@ function ConfigInput() {
   );
 }
 
-export default ConfigInput;
+function ConfigInputRoute() {
+  const navigate = useCommandNavigate();
+  const currentRoute = useCommandRoute((state) => state.currentRoute!);
+
+  const executeCommandPayload = currentRoute.data?.executeCommandPayload as
+    | ExtensionCommandExecutePayload
+    | undefined;
+
+  const { configId } = currentRoute.params as { configId: string };
+  const [extensionId, commandId] = configId.split(':');
+
+  const query = useDatabaseQuery('database:get-extension-config', [
+    { configId, extensionId, commandId },
+  ]);
+
+  if (!query.data || query.data.config.length === 0) {
+    if (query.state === 'idle') navigate('');
+    return null;
+  }
+
+  return (
+    <ConfigInput
+      data={query.data}
+      configId={configId}
+      executeCommandPayload={executeCommandPayload}
+    />
+  );
+}
+
+export default ConfigInputRoute;

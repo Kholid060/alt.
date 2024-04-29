@@ -1,5 +1,5 @@
-import { BetterMessagePortSync } from '#common/utils/BetterMessagePort';
-import { MessagePortChannelIds } from '#common/interface/message-port-events.interface';
+import { BetterMessagePortSync } from './BetterMessagePort';
+import type { MessagePortChannelIds } from '../interface/message-port-events.interface';
 
 export class MessagePortListener {
   static on(
@@ -29,6 +29,10 @@ export class MessagePortRenderer<T> {
   constructor() {
     this.onMessage = this.onMessage.bind(this);
     this.event = new BetterMessagePortSync(this.postMessage.bind(this));
+  }
+
+  get hasPort() {
+    return Boolean(this.port);
   }
 
   private postMessage(data: unknown) {

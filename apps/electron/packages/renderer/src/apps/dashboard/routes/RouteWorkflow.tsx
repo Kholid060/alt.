@@ -38,6 +38,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { debounce } from '@repo/shared';
 import preloadAPI from '/@/utils/preloadAPI';
 import { DatabaseWorkflowUpdatePayload } from '#packages/main/src/interface/database.interface';
+import { debugLog } from '#packages/common/utils/helper';
 
 const nodeTypes: Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>> = {
   [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeCommand,
@@ -241,7 +242,7 @@ function RouteWorkflow() {
         }, WORKFLOW_CHANGES_DEBOUNCE_MS + 100);
       },
       onError(message) {
-        console.log('Error: ', message);
+        debugLog('Error: ', message);
       },
     });
 
@@ -275,9 +276,7 @@ function RouteWorkflow() {
             );
             clearWorkflowChanges();
 
-            if (import.meta.env.DEV) {
-              console.log('Save workflow', changes);
-            }
+            debugLog('Save workflow', changes);
           } catch (error) {
             console.error(error);
           }

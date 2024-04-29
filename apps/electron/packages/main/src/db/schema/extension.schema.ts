@@ -111,7 +111,9 @@ export const configs = sqliteTable(
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
     extensionId: text('extension_id').notNull(),
     configId: text('config_id').unique().notNull(),
-    value: text('value', { mode: 'json' }).notNull(),
+    value: text('value', { mode: 'json' })
+      .notNull()
+      .$type<Record<string, unknown>>(),
   },
   (table) => ({
     configIdIdx: uniqueIndex('config_id_idx').on(table.configId),

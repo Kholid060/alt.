@@ -2,6 +2,7 @@ import type { ServerOptions } from 'socket.io';
 import { Server } from 'socket.io';
 import ExtensionWSNamespace from './ws-namespaces/extensions.ws-namespace';
 import { WebSocketServer } from 'ws';
+import { debuglog } from 'util';
 
 class WebsocketService {
   private static _instance: WebsocketService | null = null;
@@ -31,7 +32,7 @@ class WebsocketService {
 
     ExtensionWSNamespace.instance.init(this.io);
 
-    console.log(`Websocket server starting on port ${port}`);
+    debuglog(`Websocket server starting on port ${port}`);
   }
 }
 

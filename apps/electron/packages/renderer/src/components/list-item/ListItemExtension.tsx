@@ -82,15 +82,7 @@ function ListItemExtension({
     actions.push({
       icon: BoltIcon,
       onAction() {
-        navigate(`/configs/${extension.id}`, {
-          data: {
-            config: extension.config,
-          },
-          panelHeader: {
-            title: extension.title,
-            icon: extension.icon,
-          },
-        });
+        navigate(`/configs/${extension.id}`);
       },
       title: 'Config',
       value: 'config',

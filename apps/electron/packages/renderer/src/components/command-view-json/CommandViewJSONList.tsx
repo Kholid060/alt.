@@ -6,7 +6,7 @@ import { useCommandViewJSON } from '/@/context/command-view-json.context';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 
 function CommandViewJSONList({ data }: { data: CommandJSONViewList }) {
-  const { extensionManifest, payload } = useCommandViewJSON();
+  const { payload } = useCommandViewJSON();
   const addStatus = useCommandPanelStore.use.addStatus();
 
   const items: UiListItem[] = data.items.map((item) => {
@@ -19,7 +19,6 @@ function CommandViewJSONList({ data }: { data: CommandJSONViewList }) {
             {
               addStatus,
               executePayload: payload,
-              extensionManifest: extensionManifest!,
             },
             action as never,
           );
@@ -38,16 +37,15 @@ function CommandViewJSONList({ data }: { data: CommandJSONViewList }) {
       },
     );
 
-    const icon =
-      item.icon && extensionManifest ? (
-        <UiExtensionIcon
-          icon={item.icon}
-          extensionIcon={false}
-          id={payload.extensionId}
-          alt={`${item.title} icon`}
-          iconWrapper={(icon) => <UiList.Icon icon={icon} />}
-        />
-      ) : undefined;
+    const icon = item.icon ? (
+      <UiExtensionIcon
+        icon={item.icon}
+        extensionIcon={false}
+        id={payload.extensionId}
+        alt={`${item.title} icon`}
+        iconWrapper={(icon) => <UiList.Icon icon={icon} />}
+      />
+    ) : undefined;
 
     return {
       icon,

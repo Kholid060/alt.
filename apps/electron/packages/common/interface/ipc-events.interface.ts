@@ -2,19 +2,19 @@ import type { FlatActionExtensionAPI } from '@repo/extension-core/dist/flat-exte
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import type {
   ExtensionCommandExecutePayload,
-  ExtensionConfigData,
+  ExtensionCommandExecutePayloadWithData,
+  ExtensionJSONViewData,
 } from './extension.interface';
-import type { ExtensionCommand, ExtensionConfig } from '@repo/extension-core';
+import type { ExtensionCommand } from '@repo/extension-core';
 import type { CommandLaunchContext } from '@repo/extension';
-import type { PartialDeep } from 'type-fest';
 import type { BrowserExtensionTab } from '@repo/shared';
 import type {
+  DatabaseEvents,
   DatabaseExtension,
-  DatabaseQueriesEvent,
 } from '../../main/src/interface/database.interface';
 import type { WorkflowRunPayload } from './workflow.interface';
 import type Electron from 'electron';
-import { MessagePortChannelIds } from './message-port-events.interface';
+import type { MessagePortChannelIds } from './message-port-events.interface';
 
 export interface IPCRendererInvokeEventPayload {
   name: string;
@@ -95,29 +95,9 @@ export interface IPCExtensionEvents {
     extensionId: string,
     commandId: string,
   ) => ExtensionCommand | null;
-}
-
-export interface IPCExtensionConfigEvents {
-  'extension-config:exists': (configId: string) => boolean;
-  'extension-config:get': (configId: string) => ExtensionConfigData | null;
-  'extension-config:need-input': (
-    extensionId: string,
-    commandId: string,
-  ) =>
-    | { requireInput: false }
-    | {
-        requireInput: true;
-        config: ExtensionConfig[];
-        type: 'extension' | 'command';
-      };
-  'extension-config:update': (
-    configId: string,
-    data: PartialDeep<Pick<ExtensionConfigData, 'value'>>,
-  ) => void;
-  'extension-config:set': (
-    configId: string,
-    data: Omit<ExtensionConfigData, 'configId' | 'id'>,
-  ) => void;
+  'extension:execute-command': (
+    payload: ExtensionCommandExecutePayload,
+  ) => string | null;
 }
 
 export interface IPCWorkflowEvents {
@@ -145,16 +125,16 @@ export interface IPCDialogEvents {
 export type IPCEvents = IPCShellEvents &
   IPCAppEvents &
   IPCAppsEvents &
+  DatabaseEvents &
   IPCDialogEvents &
   IPCScreenEvents &
   IPCWorkflowEvents &
   IPCClipboardEvents &
   IPCExtensionEvents &
-  DatabaseQueriesEvent &
-  IPCUserExtensionEvents &
-  IPCExtensionConfigEvents;
+  IPCUserExtensionEvents;
 
 export interface IPCSendEventMainToRenderer {
+  'shared-window:stop-execute-command': [processId: string];
   'command-script:message': [
     {
       message: string;
@@ -164,39 +144,31 @@ export interface IPCSendEventMainToRenderer {
       type: 'error' | 'message' | 'start' | 'finish' | 'stderr';
     },
   ];
-  'command:execute': [payload: ExtensionCommandExecutePayload];
-  'extension-config:open': [
-    {
-      configId: string;
-      runCommand: boolean;
-      commandIcon: string;
-      commandTitle: string;
-      extensionName: string;
-      config: ExtensionConfig[];
-      launchContext: CommandLaunchContext;
-    },
-  ];
   'window:visibility-change': [isHidden: boolean];
   'browser:tabs:active': [BrowserExtensionTab | null];
   'app:update-route': [path: string, routeData?: unknown];
-}
-
-export interface IPCSendEventRendererToMain {
-  'window:open-settings': [path?: string];
-  'window:open-command': [path?: string, routeData?: unknown];
-  'command:execute': [payload: ExtensionCommandExecutePayload];
-}
-
-export interface IPCSendEventRendererToRenderer {
-  'data:changes': [type: 'extension' | 'command'];
-  'database:changes': [type: keyof DatabaseQueriesEvent, ...args: unknown[]];
   'command-window:input-config': [
     detail: {
       commandId: string;
       extensionId: string;
       type: 'extension' | 'command';
+      executeCommandPayload?: ExtensionCommandExecutePayload;
     },
   ];
+  'command-window:open-json-view': [
+    executeCommandPayload: ExtensionJSONViewData,
+  ];
+}
+
+export interface IPCSendEventRendererToMain {
+  'window:open-settings': [path?: string];
+  'extension:stop-execute-command': [processId: string];
+  'window:open-command': [path?: string, routeData?: unknown];
+}
+
+export interface IPCSendEventRendererToRenderer {
+  'data:changes': [type: 'extension' | 'command'];
+  'database:changes': [type: keyof DatabaseEvents, ...args: unknown[]];
 }
 
 export interface IPCPostEventRendererToMain {
@@ -210,13 +182,14 @@ export interface IPCPostMessageEventMainToRenderer {
 }
 
 interface IPCInvokeEventMainToRenderer {
-  'command:execute-action': (
-    payload: ExtensionCommandExecutePayload,
-  ) => unknown;
+  'shared-window:execute-command': (
+    payload: ExtensionCommandExecutePayloadWithData,
+  ) => Promise<string>;
 }
 
 export type IPCMainSendEvent = IPCSendEventRendererToRenderer &
-  IPCSendEventRendererToMain & IPCPostEventRendererToMain;
+  IPCSendEventRendererToMain &
+  IPCPostEventRendererToMain;
 
 export type IPCRendererSendEvent = IPCSendEventRendererToRenderer &
   IPCSendEventMainToRenderer &

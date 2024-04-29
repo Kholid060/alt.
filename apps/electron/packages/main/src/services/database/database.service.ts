@@ -10,6 +10,7 @@ import { fileURLToPath } from 'url';
 import { DATABASE_FOLDER } from '/@/utils/constant';
 import { ErrorLogger } from '/@/lib/log';
 import DBWorkflowService from './database-workflow.service';
+import { debuglog } from 'util';
 
 const dbPath = path.join(DATABASE_FOLDER, 'extensions.db');
 
@@ -42,7 +43,7 @@ class DBService {
   async initDB() {
     if (this.intialized) return;
 
-    if (import.meta.env) console.log('Init Sqlite DB...');
+    debuglog('Init Sqlite DB...');
 
     this.sqlite = new Database(dbPath);
     this.db = drizzle(this.sqlite, {

@@ -36,3 +36,9 @@ export function arrayObjSorter<T extends Record<any, any>[]>({
     return order === 'desc' ? comparison * -1 : comparison;
   }) as T;
 }
+
+export function debugLog(...args: unknown[]) {
+  if (!import.meta.env.DEV) return;
+
+  console.log('DEBUG:', ...args);
+}

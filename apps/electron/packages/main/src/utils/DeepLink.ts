@@ -4,9 +4,9 @@ import type { ExtensionCommandArgument } from '@repo/extension-core';
 import { parseJSON } from '@repo/shared';
 import { store } from '../lib/store';
 import { CommandLaunchBy } from '@repo/extension';
-import extensionCommandRunner from './extension/extensionCommandRunner';
 import { APP_DEEP_LINK } from '#packages/common/utils/constant/constant';
 import DBService from '../services/database/database.service';
+import SharedProcessService from '../services/shared-process.service';
 
 function convertArgValue(argument: ExtensionCommandArgument, value: string) {
   let convertedValue: unknown = value;
@@ -34,7 +34,7 @@ class DeepLink {
     try {
       const [_, extensionId, commandId] = pathname.split('/');
 
-      const command = await DBService.instance.extension.getExtensionCommand({
+      const command = await DBService.instance.extension.getCommand({
         commandId,
         extensionId,
       });
@@ -106,7 +106,7 @@ class DeepLink {
         launchBy: CommandLaunchBy.DEEP_LINK,
       };
 
-      await extensionCommandRunner({
+      await SharedProcessService.executeExtensionCommand({
         commandId,
         extensionId,
         launchContext,

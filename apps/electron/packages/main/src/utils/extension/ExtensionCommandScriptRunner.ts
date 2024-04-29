@@ -50,7 +50,7 @@ class ExtensionCommandScriptRunner {
     launchContext: CommandLaunchContext;
   }) {
     const extension =
-      await DBService.instance.extension.getExtension(extensionId);
+      await DBService.instance.extension.get(extensionId);
     if (!extension || extension.isDisabled) return;
 
     const command = extension.commands.find((item) => item.name === commandId);

@@ -21,6 +21,12 @@ const CommandMain: CommandViewJSONRenderer = ({ updateView }) => {
         ],
       });
     } catch (error) {
+      updateView({
+        type: 'text',
+        color: 'destructive',
+        textStyle: 'heading-4',
+        text: `Error:\n${error.message}`,
+      });
       console.error(error);
     }
   });

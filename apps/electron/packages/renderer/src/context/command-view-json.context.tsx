@@ -1,9 +1,7 @@
 import { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
-import { ExtensionManifest } from '@repo/extension-core';
 import { createContext, useContext } from 'react';
 
 interface CommandViewJSONState {
-  extensionManifest: ExtensionManifest;
   payload: ExtensionCommandExecutePayload;
 }
 

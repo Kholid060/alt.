@@ -87,7 +87,7 @@ class ExtensionIPCEvent {
     }
 
     const extensionManifest =
-      await DBService.instance.extension.getExtensionManifest(extensionId);
+      await DBService.instance.extension.getManifest(extensionId);
     if (!extensionManifest) return null;
 
     this.extensionCache.set(extensionId, {

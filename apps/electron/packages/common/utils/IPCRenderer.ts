@@ -13,6 +13,63 @@ import { isObject } from '@repo/shared';
 import { ipcRenderer } from 'electron';
 
 class IPCRenderer {
+  private static _instance: IPCRenderer;
+
+  static get instance() {
+    return this._instance || (this._instance = new IPCRenderer());
+  }
+
+  private invokeHandlers = new Map<
+    string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (...args: any[]) => unknown | Promise<unknown>
+  >();
+
+  constructor() {
+    this.onInvokeEvent = this.onInvokeEvent.bind(this);
+    ipcRenderer.on(IPC_ON_EVENT.rendererInvoke, this.onInvokeEvent);
+  }
+
+  private async onInvokeEvent(
+    _event: Electron.IpcRendererEvent,
+    message: IPCRendererInvokeEventPayload,
+  ) {
+    if (
+      !isObject(message) ||
+      !Object.hasOwn(message, 'name') ||
+      !Object.hasOwn(message, 'messageId')
+    )
+      return;
+
+    let payload: IPCRendererInvokeEventType;
+
+    const handler = this.invokeHandlers.get(message.name);
+    if (!handler) {
+      payload = {
+        type: 'error',
+        messageId: message.messageId,
+        errorMessage: `"${message.name}" doesn't have handler`,
+      };
+    } else {
+      payload = {
+        type: 'success',
+        messageId: message.messageId,
+        result: await handler(...message.args),
+      };
+    }
+
+    ipcRenderer.send(IPC_ON_EVENT.rendererInvoke, payload);
+  }
+
+  handle<T extends keyof IPCRendererInvokeEvent>(
+    name: T,
+    callback: (
+      ...args: Parameters<IPCRendererInvokeEvent[T]>
+    ) => ReturnType<IPCRendererInvokeEvent[T]>,
+  ) {
+    this.invokeHandlers.set(name, callback);
+  }
+
   static invoke<
     T extends keyof IPCEvents,
     K extends IPCEvents[T] = IPCEvents[T],
@@ -51,54 +108,6 @@ class IPCRenderer {
     ...args: IPCMainSendEvent[T]
   ) {
     ipcRenderer.send(name, ...args);
-  }
-
-  static createInvokeHandler() {
-    const handlers = new Map<
-      string,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (...args: any[]) => unknown | Promise<unknown>
-    >();
-
-    ipcRenderer.on(
-      IPC_ON_EVENT.rendererInvoke,
-      async (_, message: IPCRendererInvokeEventPayload) => {
-        if (
-          !isObject(message) ||
-          Object.hasOwn(message, 'type') ||
-          Object.hasOwn(message, 'messageId')
-        )
-          return;
-
-        let payload: IPCRendererInvokeEventType;
-
-        const handler = handlers.get(message.name);
-        if (!handler) {
-          payload = {
-            type: 'error',
-            messageId: message.messageId,
-            errorMessage: `"${message.name}" doesn't have handler`,
-          };
-        } else {
-          payload = {
-            type: 'success',
-            messageId: message.messageId,
-            result: await handler(...message.args),
-          };
-        }
-
-        ipcRenderer.send(IPC_ON_EVENT.rendererInvoke, payload);
-      },
-    );
-
-    return <T extends keyof IPCRendererInvokeEvent>(
-      name: T,
-      callback: (
-        ...args: Parameters<IPCRendererInvokeEvent[T]>
-      ) => ReturnType<IPCRendererInvokeEvent[T]>,
-    ) => {
-      handlers.set(name, callback);
-    };
   }
 
   static postMessage<T extends keyof IPCPostEventRendererToMain>(

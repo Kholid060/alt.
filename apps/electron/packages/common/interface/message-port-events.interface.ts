@@ -1,11 +1,23 @@
-import type { ExtensionMessagePortEvent } from '@repo/extension';
+import type {
+  CommandJSONViews,
+  ExtensionMessagePortEvent,
+} from '@repo/extension';
 import type { MESSAGE_PORT_CHANNEL_IDS } from '../utils/constant/constant';
 
 export type MessagePortChannelIds =
   (typeof MESSAGE_PORT_CHANNEL_IDS)[keyof typeof MESSAGE_PORT_CHANNEL_IDS];
 
+export interface MessagePortCommandJSONUpdateUI {
+  commandId: string;
+  processId: string;
+  extensionId: string;
+  viewData: CommandJSONViews;
+}
+
 export interface MessagePortSharedCommandWindowEvents
-  extends ExtensionMessagePortEvent {}
+  extends ExtensionMessagePortEvent {
+  'command-json:update-ui': (data: MessagePortCommandJSONUpdateUI) => void;
+}
 
 export interface MessagePortChannelEventsMap {
   [MESSAGE_PORT_CHANNEL_IDS.sharedWithCommand]: MessagePortSharedCommandWindowEvents;
