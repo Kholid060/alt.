@@ -36,7 +36,7 @@ export type ExtensionIPCEventCallback<
   ]
 ) => ReturnType<IPCUserExtensionEventsMap[T]>;
 
-const CACHE_MAX_AGE_MS = 300_000; // 5 minutes
+const CACHE_MAX_AGE_MS = 120_000; // 2 minutes
 
 class ExtensionIPCEvent {
   static instance = new ExtensionIPCEvent();
@@ -67,7 +67,7 @@ class ExtensionIPCEvent {
     IPCMain.on(
       'message-port:delete:shared-extension<=>main',
       (_, { extPortId }) => {
-        this.extensionMessagePort.deleteMessagePort(extPortId);
+        this.extensionMessagePort.deletePort(extPortId);
       },
     );
     IPCMain.on(
@@ -75,7 +75,7 @@ class ExtensionIPCEvent {
       ({ ports: [port] }, { extPortId }) => {
         if (!port) return;
 
-        this.extensionMessagePort.initMessagePort(port, extPortId);
+        this.extensionMessagePort.addPort(port, extPortId);
       },
     );
   }

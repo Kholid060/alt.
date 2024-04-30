@@ -21,6 +21,7 @@ export const EXTENSION_COMMAND_TYPE = [
   'script',
   'view:json',
 ] as const;
+export type ExtensionCommandType = (typeof EXTENSION_COMMAND_TYPE)[number];
 
 export const EXTENSION_COMMAND_CONTEXT = ['all'] as const;
 
@@ -31,6 +32,8 @@ export const EXTENSION_COMMAND_ARGUMENT_TYPE = [
   'input:number',
   'input:password',
 ] as const;
+export type ExtensionCommandArgumentType =
+  (typeof EXTENSION_COMMAND_ARGUMENT_TYPE)[number];
 
 export const EXTENSION_CONFIG_TYPE = [
   'select',
@@ -40,6 +43,7 @@ export const EXTENSION_CONFIG_TYPE = [
   'input:number',
   'input:directory',
 ] as const;
+export type ExtensionConfigType = (typeof EXTENSION_CONFIG_TYPE)[number];
 
 const ExtensionCommandArgumentBaseSchema = z.object({
   name: z.string().min(1).max(32),

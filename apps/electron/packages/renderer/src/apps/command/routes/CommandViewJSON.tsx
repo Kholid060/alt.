@@ -5,7 +5,7 @@ import { CommandJSONViews } from '@repo/extension';
 import CommandViewJSONText from '/@/components/command-view-json/CommandViewJSONText';
 import CommandViewJSONList from '/@/components/command-view-json/CommandViewJSONList';
 import { CommandViewJSONProvider } from '/@/context/command-view-json.context';
-import { ExtensionJSONViewData } from '#common/interface/extension.interface';
+import { ExtensionCommandJSONViewData } from '#common/interface/extension.interface';
 import { MessagePortCommandJSONUpdateUI } from '#packages/common/interface/message-port-events.interface';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
@@ -23,7 +23,7 @@ function CommandViewJSON() {
   const processId = useRef('');
   const [viewData, setViewData] = useState<CommandJSONViews | null>(null);
 
-  const commandExecutePayload = activeRoute?.data as ExtensionJSONViewData;
+  const commandExecutePayload = activeRoute?.data as ExtensionCommandJSONViewData;
 
   useEffect(() => {
     const { commandId, extensionId, icon, subtitle, title } =

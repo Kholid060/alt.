@@ -3,10 +3,10 @@ import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import type {
   ExtensionCommandExecutePayload,
   ExtensionCommandExecutePayloadWithData,
-  ExtensionJSONViewData,
+  ExtensionCommandJSONViewData,
+  ExtensionCommandViewData,
 } from './extension.interface';
 import type { ExtensionCommand } from '@repo/extension-core';
-import type { CommandLaunchContext } from '@repo/extension';
 import type { BrowserExtensionTab } from '@repo/shared';
 import type {
   DatabaseEvents,
@@ -83,11 +83,6 @@ export interface IPCClipboardEvents {
 }
 
 export interface IPCExtensionEvents {
-  'extension:run-script-command': (detail: {
-    commandId: string;
-    extensionId: string;
-    launchContext: CommandLaunchContext;
-  }) => { success: boolean; errorMessage: string };
   'extension:reload': (extId: string) => void;
   'extension:import': () => DatabaseExtension | null;
   'extension:init-message-port': () => MessagePort;
@@ -135,15 +130,6 @@ export type IPCEvents = IPCShellEvents &
 
 export interface IPCSendEventMainToRenderer {
   'shared-window:stop-execute-command': [processId: string];
-  'command-script:message': [
-    {
-      message: string;
-      commandId: string;
-      extensionId: string;
-      commandTitle: string;
-      type: 'error' | 'message' | 'start' | 'finish' | 'stderr';
-    },
-  ];
   'window:visibility-change': [isHidden: boolean];
   'browser:tabs:active': [BrowserExtensionTab | null];
   'app:update-route': [path: string, routeData?: unknown];
@@ -155,8 +141,11 @@ export interface IPCSendEventMainToRenderer {
       executeCommandPayload?: ExtensionCommandExecutePayload;
     },
   ];
-  'command-window:open-json-view': [
-    executeCommandPayload: ExtensionJSONViewData,
+  'command-window:open-command-json-view': [
+    executeCommandPayload: ExtensionCommandJSONViewData,
+  ];
+  'command-window:open-command-view': [
+    executeCommandPayload: ExtensionCommandViewData,
   ];
 }
 

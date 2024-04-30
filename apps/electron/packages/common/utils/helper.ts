@@ -40,5 +40,5 @@ export function arrayObjSorter<T extends Record<any, any>[]>({
 export function debugLog(...args: unknown[]) {
   if (!import.meta.env.DEV) return;
 
-  console.log('DEBUG:', ...args);
+  console.log('[DEBUG]', ...args);
 }

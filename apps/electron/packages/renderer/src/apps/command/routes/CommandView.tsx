@@ -4,6 +4,7 @@ import { useCommandCtx } from '/@/hooks/useCommandCtx';
 import { CommandLaunchContext } from '@repo/extension';
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
 import { ExtensionCommandViewInitMessage } from '#common/interface/extension.interface';
+import { BetterMessagePort } from '@repo/shared';
 
 function CommandView() {
   const navigate = useCommandNavigate();
@@ -17,10 +18,12 @@ function CommandView() {
   const [iframeKey, setIframeKey] = useState(0);
 
   function initPortListener(port: MessagePort) {
-    commandCtx.setExtMessagePort(port);
-    const messagePort = commandCtx.runnerMessagePort.current!;
+    commandCtx.setCommandViewMessagePort(
+      BetterMessagePort.createStandalone('sync', port),
+    );
+    const messagePort = commandCtx.commandViewMessagePort.current!;
 
-    messagePort.addListener('extension:reload', () => {
+    messagePort.on('extension:reload', () => {
       setIframeKey((prevVal) => prevVal + 1);
     });
   }
@@ -58,7 +61,7 @@ function CommandView() {
       messageChannelRef.current?.port1.close();
       messageChannelRef.current?.port2.close();
 
-      commandCtx.setExtMessagePort(null);
+      commandCtx.setCommandViewMessagePort(null);
     };
   }, [commandCtx]);
   useEffect(() => {

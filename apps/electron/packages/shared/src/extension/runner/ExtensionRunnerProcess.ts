@@ -19,12 +19,14 @@ export interface ExtensionRunnerProcessEvents {
 
 export interface ExtensionRunnerProcessConstructor {
   id: string;
+  commandFilePath: string;
   runner: ExtensionCommandRunner;
   payload: ExtensionCommandExecutePayload;
   command: DatabaseExtensionCommandWithExtension;
 }
 
 abstract class ExtensionRunnerProcess extends EventEmitter<ExtensionRunnerProcessEvents> {
+  commandFilePath: string;
   runner: ExtensionCommandRunner;
   payload: ExtensionCommandExecutePayload;
   command: DatabaseExtensionCommandWithExtension;
@@ -35,12 +37,14 @@ abstract class ExtensionRunnerProcess extends EventEmitter<ExtensionRunnerProces
     runner,
     command,
     payload,
+    commandFilePath,
   }: Omit<ExtensionRunnerProcessConstructor, 'id'>) {
     super();
 
     this.runner = runner;
     this.payload = payload;
     this.command = command;
+    this.commandFilePath = commandFilePath;
   }
 
   abstract start(): Promise<void> | void;

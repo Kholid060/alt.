@@ -40,7 +40,10 @@ const config = {
       output: {
         entryFileNames: '[name].js',
       },
-      external: [...builtinModules, 'electron'],
+      external: [...builtinModules, 'electron'].flatMap((item) => [
+        item,
+        `node:${item}`,
+      ]),
     },
     emptyOutDir: true,
   },

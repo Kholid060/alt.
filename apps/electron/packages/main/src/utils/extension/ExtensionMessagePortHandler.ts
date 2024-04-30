@@ -1,25 +1,31 @@
 import { isObject } from '@repo/shared';
+import { debugLog } from '#common/utils/helper';
 import type { ExtensionMessageHandler } from './ExtensionIPCEvent';
-import type { IPCUserExtensionEventsMap } from '#packages/common/interface/ipc-events.interface';
+import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
 
 class ExtensionMessagePortHandler {
   private ports: Map<string, Electron.MessagePortMain> = new Map();
 
   constructor(private portMessageHandler: ExtensionMessageHandler) {}
 
-  initMessagePort(port: Electron.MessagePortMain, extPortId: string) {
+  addPort(port: Electron.MessagePortMain, extPortId: string) {
+    debugLog('Add extension MessagePort', extPortId);
+
     this.ports.set(extPortId, port);
+    port.addListener('close', this.deletePort.bind(this, extPortId));
     port.addListener('message', this.onMessagePortMessage.bind(this, port));
 
     port.start();
   }
 
-  deleteMessagePort(extPortId: string) {
+  deletePort(extPortId: string) {
     const port = this.ports.get(extPortId);
     if (!port) return;
 
-    port.close();
+    debugLog('Delete extension MessagePort', extPortId);
+
     port.removeAllListeners();
+    port.close();
 
     this.ports.delete(extPortId);
   }

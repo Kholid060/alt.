@@ -17,6 +17,16 @@ export interface MessagePortCommandJSONUpdateUI {
 export interface MessagePortSharedCommandWindowEvents
   extends ExtensionMessagePortEvent {
   'command-json:update-ui': (data: MessagePortCommandJSONUpdateUI) => void;
+  'command-script:message': [
+    {
+      message: string;
+      commandId: string;
+      processId: string;
+      extensionId: string;
+      commandTitle: string;
+      type: 'error' | 'message' | 'start' | 'finish' | 'stderr';
+    },
+  ];
 }
 
 export interface MessagePortChannelEventsMap {

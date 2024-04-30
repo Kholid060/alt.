@@ -1,11 +1,11 @@
 import path from 'path';
-import BetterMessagePort from '#common/utils/BetterMessagePort';
 import { MessageChannelMain, utilityProcess } from 'electron';
 import type { WorkflowRunnerMessagePortAsyncEvents } from '#common/interface/workflow-runner.interace';
 import type { WorkflowRunPayload } from '#packages/common/interface/workflow.interface';
 import DBService from './database/database.service';
 import { CustomError } from '#packages/common/errors/custom-errors';
 import { __DIRNAME } from '/@/utils/constant';
+import { BetterMessagePort } from '@repo/shared';
 
 const workflowRunnerFilePath = path.join(__DIRNAME, './workflow-runner.js');
 

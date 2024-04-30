@@ -8,6 +8,8 @@ import { debugLog } from '#packages/common/utils/helper';
 import { MessagePortRenderer } from '#common/utils/message-port-renderer';
 import type { MessagePortSharedCommandWindowEvents } from '#packages/common/interface/message-port-events.interface';
 import type { SetRequired } from 'type-fest';
+import type { ExtensionRunnerProcessConstructor } from './runner/ExtensionRunnerProcess';
+import ExtensionRunnerCommandScript from './runner/ExtensionRunnerCommandScript';
 
 class ExtensionCommandRunner {
   private static _instance: ExtensionCommandRunner;
@@ -57,6 +59,7 @@ class ExtensionCommandRunner {
 
   async execute({
     command,
+    commandFilePath,
     ...payload
   }: ExtensionCommandExecutePayloadWithData) {
     const runnerId = nanoid(5);
@@ -65,15 +68,25 @@ class ExtensionCommandRunner {
       this.createCommandWindowMessagePort();
 
       let commandRunner: ExtensionRunnerProcess | null = null;
+      const commandRunnerPayload: ExtensionRunnerProcessConstructor = {
+        command,
+        payload,
+        runner: this,
+        id: runnerId,
+        commandFilePath,
+      };
+
       switch (command.type) {
         case 'action':
         case 'view:json':
-          commandRunner = new ExtensionRunnerCommandAction({
-            command,
-            payload,
-            runner: this,
-            id: runnerId,
-          });
+          commandRunner = new ExtensionRunnerCommandAction(
+            commandRunnerPayload,
+          );
+          break;
+        case 'script':
+          commandRunner = new ExtensionRunnerCommandScript(
+            commandRunnerPayload,
+          );
           break;
       }
       if (!commandRunner) {

@@ -1,6 +1,6 @@
 import {
-  DatabaseQueriesEvent,
   DatabaseWorkflow,
+  DatabaseUpdateEvents,
 } from '#packages/main/src/interface/database.interface';
 import {
   ArrowDownAzIcon,
@@ -58,7 +58,7 @@ function WorkflowIcon({ icon, ...props }: { icon: string } & LucideProps) {
 function WorkflowCards({ workflows }: { workflows: DatabaseWorkflow[] }) {
   const { toast } = useToast();
 
-  const updateWorkflow: DatabaseQueriesEvent['database:update-workflow'] =
+  const updateWorkflow: DatabaseUpdateEvents['database:update-workflow'] =
     async (...args) => {
       try {
         const result = await preloadAPI.main.ipc.invoke(

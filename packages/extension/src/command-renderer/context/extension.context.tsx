@@ -1,5 +1,5 @@
 import { useUiListStore } from '@repo/ui/dist/context/list.context';
-import { AMessagePort } from '@repo/shared';
+import { BetterMessagePortSync } from '@repo/shared';
 import { createContext, useEffect, useState } from 'react';
 import {
   ExtensionMessagePortCallback,
@@ -21,7 +21,7 @@ export function ExtensionProvider({
 }: {
   children: React.ReactNode;
   value?: string;
-  messagePort: AMessagePort<ExtensionMessagePortEvent>;
+  messagePort: BetterMessagePortSync<ExtensionMessagePortEvent>;
 }) {
   const listStore = useUiListStore();
 
@@ -42,12 +42,12 @@ export function ExtensionProvider({
       );
     };
 
-    messagePort?.addListener('extension:query-change', onQueryChange);
-    messagePort?.addListener('extension:keydown-event', onParentKeydown);
+    messagePort.on('extension:query-change', onQueryChange);
+    messagePort.on('extension:keydown-event', onParentKeydown);
 
     return () => {
-      messagePort?.removeListener('extension:query-change', onQueryChange);
-      messagePort?.removeListener('extension:keydown-event', onParentKeydown);
+      messagePort.on('extension:query-change', onQueryChange);
+      messagePort.on('extension:keydown-event', onParentKeydown);
     };
   }, [messagePort]);
 

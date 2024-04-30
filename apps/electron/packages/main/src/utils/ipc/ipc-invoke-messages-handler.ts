@@ -2,7 +2,6 @@ import InstalledApps from '../InstalledApps';
 import ExtensionLoader from '../extension/ExtensionLoader';
 import './ipc-extension-messages';
 import { BrowserWindow, clipboard, dialog, screen, shell } from 'electron';
-import ExtensionCommandScriptRunner from '../extension/ExtensionCommandScriptRunner';
 import IPCMain from './IPCMain';
 import { GlobalShortcutExtension } from '../GlobalShortcuts';
 import DBService from '/@/services/database/database.service';
@@ -48,21 +47,6 @@ IPCMain.handle('extension:reload', async (_, extId) => {
 });
 IPCMain.handle('extension:execute-command', (_, payload) => {
   return SharedProcessService.executeExtensionCommand(payload);
-});
-IPCMain.handle('extension:run-script-command', async (_, detail) => {
-  try {
-    await ExtensionCommandScriptRunner.instance.runScript(detail);
-
-    return {
-      success: true,
-      errorMessage: '',
-    };
-  } catch (error) {
-    return {
-      $isError: true,
-      message: (error as Error).message,
-    };
-  }
 });
 
 /** APPS */

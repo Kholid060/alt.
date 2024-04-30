@@ -1,4 +1,4 @@
-import { BetterMessagePortSync } from './BetterMessagePort';
+import { BetterMessagePortSync } from '@repo/shared';
 import type { MessagePortChannelIds } from '../interface/message-port-events.interface';
 
 export class MessagePortListener {

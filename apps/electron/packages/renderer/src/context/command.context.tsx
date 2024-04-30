@@ -10,17 +10,25 @@ import {
 } from '#common/utils/message-port-renderer';
 import { MessagePortSharedCommandWindowEvents } from '#packages/common/interface/message-port-events.interface';
 import { debugLog } from '#packages/common/utils/helper';
+import { BetterMessagePortSync } from '@repo/shared';
+import { ExtensionMessagePortEvent } from '@repo/extension';
+
+type CommandViewMessagePort = BetterMessagePortSync<ExtensionMessagePortEvent>;
 
 export interface CommandContextState {
   executeCommand(payload: ExtensionCommandExecutePayload): void;
+  setCommandViewMessagePort(port: CommandViewMessagePort | null): void;
   runnerMessagePort: RefObject<
     MessagePortRenderer<MessagePortSharedCommandWindowEvents>
   >;
+  commandViewMessagePort: RefObject<CommandViewMessagePort | null>;
 }
 
 export const CommandContext = createContext<CommandContextState>({
   executeCommand() {},
+  setCommandViewMessagePort() {},
   runnerMessagePort: { current: null },
+  commandViewMessagePort: { current: null },
 });
 
 export function CommandCtxProvider({
@@ -37,17 +45,25 @@ export function CommandCtxProvider({
   const runnerMessagePort = useRef<
     MessagePortRenderer<MessagePortSharedCommandWindowEvents>
   >(new MessagePortRenderer());
+  const commandViewMessagePort = useRef<CommandViewMessagePort | null>(null);
 
   async function executeCommand(payload: ExtensionCommandExecutePayload) {
     preloadAPI.main.ipc
       .invoke('extension:execute-command', payload)
       .catch(console.error);
   }
+  function setCommandViewMessagePort(port: CommandViewMessagePort | null) {
+    if (commandViewMessagePort.current) {
+      commandViewMessagePort.current.destroy();
+    }
+
+    commandViewMessagePort.current = port;
+  }
 
   useEffect(() => {
-    const offCommandScriptMessageEvent = preloadAPI.main.ipc.on(
+    const offCommandScriptMessageEvent = runnerMessagePort.current.event.on(
       'command-script:message',
-      (_, detail) => {
+      (detail) => {
         switch (detail.type) {
           case 'finish':
           case 'error': {
@@ -105,6 +121,8 @@ export function CommandCtxProvider({
       value={{
         executeCommand,
         runnerMessagePort,
+        commandViewMessagePort,
+        setCommandViewMessagePort,
       }}
     >
       {children}

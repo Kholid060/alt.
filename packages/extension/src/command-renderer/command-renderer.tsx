@@ -1,6 +1,6 @@
 import React from 'react';
+import { BetterMessagePortSync } from '@repo/shared';
 import { ExtensionProvider } from './context/extension.context';
-import { AMessagePort } from '@repo/shared';
 import { ExtensionMessagePortEvent } from '@/interfaces/message-events';
 import { UiListProvider } from '@repo/ui/dist/context/list.context';
 import { CommandLaunchContext } from '@/interfaces/command.interface';
@@ -10,7 +10,7 @@ export type ExtensionCommandView = (
   props: CommandLaunchContext,
 ) => React.ReactNode;
 export type ExtensionCommandRenderer = (detail: {
-  messagePort: AMessagePort<ExtensionMessagePortEvent>;
+  messagePort: BetterMessagePortSync<ExtensionMessagePortEvent>;
   context: CommandLaunchContext;
 }) => React.ReactNode;
 

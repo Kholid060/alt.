@@ -13,7 +13,13 @@ export interface DatabaseExtensionCommandWithExtension
   extends DatabaseExtensionCommand {
   extension: Pick<
     SelectExtension,
-    'isDisabled' | 'errorMessage' | 'icon' | 'id' | 'title' | 'isError'
+    | 'id'
+    | 'icon'
+    | 'title'
+    | 'isError'
+    | 'isLocal'
+    | 'isDisabled'
+    | 'errorMessage'
   >;
 }
 

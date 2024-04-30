@@ -40,11 +40,20 @@ function AppEventListener() {
         navigate(`/configs/${configId}`, { data: { executeCommandPayload } });
       },
     );
-    const offOpenJSONViewPage = preloadAPI.main.ipc.on(
-      'command-window:open-json-view',
+    const offOpenCommandJSONViewPage = preloadAPI.main.ipc.on(
+      'command-window:open-command-json-view',
       (_, payload) => {
         const { extensionId, commandId } = payload;
         navigate(`/extensions/${extensionId}/${commandId}/view-json`, {
+          data: payload,
+        });
+      },
+    );
+    const offOpenCommandViewPage = preloadAPI.main.ipc.on(
+      'command-window:open-command-view',
+      (_, payload) => {
+        const { extensionId, commandId } = payload;
+        navigate(`/extensions/${extensionId}/${commandId}/view`, {
           data: payload,
         });
       },
@@ -54,7 +63,8 @@ function AppEventListener() {
       offInputConfig();
       offAppUpdateRoute();
       offWindowVisibility();
-      offOpenJSONViewPage();
+      offOpenCommandViewPage();
+      offOpenCommandJSONViewPage();
     };
   }, []);
 

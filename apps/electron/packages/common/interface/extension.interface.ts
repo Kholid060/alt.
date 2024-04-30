@@ -24,15 +24,20 @@ export interface ExtensionCommandExecutePayload {
   launchContext: CommandLaunchContext;
 }
 
-export interface ExtensionJSONViewData extends ExtensionCommandExecutePayload {
+export interface ExtensionCommandViewData
+  extends ExtensionCommandExecutePayload {
   title: string;
   icon: string;
   subtitle: string;
+}
+
+export interface ExtensionCommandJSONViewData extends ExtensionCommandViewData {
   processId: string;
 }
 
 export interface ExtensionCommandExecutePayloadWithData
   extends ExtensionCommandExecutePayload {
+  commandFilePath: string;
   command: DatabaseExtensionCommandWithExtension;
 }
 

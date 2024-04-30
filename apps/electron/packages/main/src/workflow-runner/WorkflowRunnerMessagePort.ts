@@ -1,5 +1,5 @@
 import type { WorkflowRunnerMessagePortAsyncEvents } from '#packages/common/interface/workflow-runner.interace';
-import BetterMessagePort from '#packages/common/utils/BetterMessagePort';
+import { BetterMessagePort } from '@repo/shared';
 
 class WorkflowRunnerMessagePort {
   private static _instance: WorkflowRunnerMessagePort;

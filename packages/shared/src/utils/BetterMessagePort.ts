@@ -103,6 +103,8 @@ export class BetterMessagePortAsync<MessagePortEvents> {
     ) => ExtractReturnType<MessagePortEvents, K>,
   ) {
     this.listeners.set(name, callback);
+
+    return () => this.listeners.delete(name);
   }
 
   off<K extends keyof MessagePortEvents>(name: K) {
@@ -169,6 +171,8 @@ export class BetterMessagePortSync<MessagePortEvents> {
     if (!this.listeners[name]) this.listeners[name] = [];
 
     this.listeners[name].push(callback);
+
+    return () => this.off(name, callback);
   }
 
   off<K extends keyof MessagePortEvents>(

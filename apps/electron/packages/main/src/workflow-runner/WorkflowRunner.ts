@@ -13,7 +13,7 @@ import type {
   WorkflowNodes,
 } from '#packages/common/interface/workflow.interface';
 import type { WorkflowNodeHandler } from './node-handler/WorkflowNodeHandler';
-import type BetterMessagePort from '#packages/common/utils/BetterMessagePort';
+import type { BetterMessagePort } from '@repo/shared';
 
 type NodeHandlers = Record<
   WORKFLOW_NODE_TYPE,

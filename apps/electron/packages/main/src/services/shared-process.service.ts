@@ -1,11 +1,13 @@
 import type { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
+import ExtensionLoader from '../utils/extension/ExtensionLoader';
 import IPCMain from '../utils/ipc/IPCMain';
+import WindowCommand from '../window/command-window';
 import DBService from './database/database.service';
 
 class SharedProcessService {
   static async executeExtensionCommand(
     payload: ExtensionCommandExecutePayload,
-  ) {
+  ): Promise<string | null> {
     const { commandId, extensionId } = payload;
 
     const command = await DBService.instance.extension.getCommand({
@@ -13,6 +15,14 @@ class SharedProcessService {
       extensionId,
     });
     if (!command) throw new Error("Coudln't find command");
+    if (command.extension.isDisabled) return null;
+
+    const commandFilePath = ExtensionLoader.instance.getPath(
+      extensionId,
+      'base',
+      commandId,
+    );
+    if (!commandFilePath) throw new Error("Coudln't find command file");
 
     const commandConfig =
       await DBService.instance.extension.isCommandConfigInputted(
@@ -32,6 +42,7 @@ class SharedProcessService {
     const executeCommandPayload = {
       ...payload,
       command,
+      commandFilePath,
     };
 
     switch (command.type) {
@@ -43,25 +54,40 @@ class SharedProcessService {
         );
 
         // check if command window is closed
-        IPCMain.sendToWindow('command', 'command-window:open-json-view', {
-          ...payload,
-          processId,
-          title: command.title,
-          subtitle: command.extension.title,
-          icon: command.icon || command.extension.icon,
-        });
+        WindowCommand.instance.toggleWindow(true);
+        IPCMain.sendToWindow(
+          'command',
+          'command-window:open-command-json-view',
+          {
+            ...payload,
+            processId,
+            title: command.title,
+            subtitle: command.extension.title,
+            icon: command.icon || command.extension.icon,
+          },
+        );
 
         return processId;
       }
+      case 'script':
       case 'action':
         return IPCMain.instance.invoke(
           'shared-process',
           'shared-window:execute-command',
           executeCommandPayload,
         );
+      case 'view':
+        WindowCommand.instance.toggleWindow(true);
+        IPCMain.sendToWindow('command', 'command-window:open-command-view', {
+          ...payload,
+          title: command.title,
+          subtitle: command.extension.title,
+          icon: command.icon || command.extension.icon,
+        });
+        return null;
       default:
         throw new Error(
-          `Commnad with "${command.type}" type doesn't have handler`,
+          `Command with "${command.type}" type doesn't have handler`,
         );
     }
 

@@ -125,7 +125,9 @@ class DBExtensionService {
             icon: true,
             title: true,
             isError: true,
+            isLocal: true,
             isDisabled: true,
+            errorMessage: true,
           },
         },
       },
@@ -134,7 +136,7 @@ class DBExtensionService {
       },
     });
 
-    return result as DatabaseExtensionCommandWithExtension | null;
+    return result ?? null;
   }
 
   getCommandsByExtensionId(extensionId: string) {
