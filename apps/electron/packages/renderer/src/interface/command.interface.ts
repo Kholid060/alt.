@@ -12,6 +12,13 @@ export interface CommandListItemCommandBuiltIn extends UiListItem {
   };
 }
 
+export interface CommandListItemWorkflow extends UiListItem {
+  metadata: {
+    type: 'workflow';
+    workflowId: string;
+  };
+}
+
 export interface CommandListItemCommand extends UiListItem {
   metadata: {
     type: 'command';
@@ -30,6 +37,7 @@ export interface CommandListItemExtension extends UiListItem {
 
 export type CommandListItems =
   | CommandListItemCommand
+  | CommandListItemWorkflow
   | CommandListItemExtension
   | CommandListItemCommandBuiltIn;
 

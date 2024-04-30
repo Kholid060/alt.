@@ -58,6 +58,10 @@ CREATE TABLE `workflows` (
 	`viewport` text,
 	`edges` text DEFAULT (json_array()) NOT NULL,
 	`triggers` text DEFAULT (json_array()) NOT NULL,
+	`is_disabled` integer NOT NULL,
+	`created_at` text NOT NULL,
+	`updated_at` text NOT NULL,
+	`execute_count` integer DEFAULT 0 NOT NULL,
 	`settings` text
 );
 --> statement-breakpoint

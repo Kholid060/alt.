@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { asc, desc, eq, sql } from 'drizzle-orm';
 import type { SQLiteDatabase } from './database.service';
 import type { SelectWorkflow } from '/@/db/schema/workflow.schema';
 import { workflows } from '/@/db/schema/workflow.schema';
@@ -7,6 +7,7 @@ import type {
   DatabaseWorkflowDetail,
   DatabaseWorkflowInsertPayload,
   DatabaseWorkflowUpdatePayload,
+  DatabaseWorkfowListQueryOptions,
 } from '/@/interface/database.interface';
 import { nanoid } from 'nanoid';
 import { emitDBChanges } from '/@/utils/database-utils';
@@ -15,18 +16,27 @@ import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/const
 class DBWorkflowService {
   constructor(private database: SQLiteDatabase) {}
 
-  list(): Promise<DatabaseWorkflow[]> {
-    return this.database.query.workflows.findMany({
-      columns: {
-        id: true,
-        icon: true,
-        name: true,
-        createdAt: true,
-        updatedAt: true,
-        isDisabled: true,
-        description: true,
-      },
-    });
+  list(option: DatabaseWorkfowListQueryOptions): Promise<DatabaseWorkflow[]> {
+    let query = this.database
+      .select({
+        id: workflows.id,
+        icon: workflows.icon,
+        name: workflows.name,
+        createdAt: workflows.createdAt,
+        updatedAt: workflows.updatedAt,
+        isDisabled: workflows.isDisabled,
+        description: workflows.description,
+      })
+      .from(workflows)
+      .$dynamic();
+
+    if (option === 'commands') {
+      query = query
+        .orderBy(desc(workflows.executeCount), asc(workflows.updatedAt))
+        .limit(10);
+    }
+
+    return query.execute();
   }
 
   async get(workflowId: string): Promise<DatabaseWorkflowDetail | null> {
@@ -102,6 +112,15 @@ class DBWorkflowService {
       'database:get-workflow': [id],
       'database:get-workflow-list': DATABASE_CHANGES_ALL_ARGS,
     });
+  }
+
+  async incExecuteCount(workflowId: string) {
+    this.database
+      .update(workflows)
+      .set({
+        executeCount: sql`${workflows.executeCount} + 1`,
+      })
+      .where(eq(workflows.id, workflowId));
   }
 }
 

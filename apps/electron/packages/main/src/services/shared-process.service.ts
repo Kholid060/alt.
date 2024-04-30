@@ -104,6 +104,8 @@ class SharedProcessService {
     const workflow = await DBService.instance.workflow.get(payload.id);
     if (!workflow) throw new Error("Couldn't find workflow");
 
+    await DBService.instance.workflow.incExecuteCount(payload.id);
+
     return IPCMain.instance.invoke(
       'shared-process',
       'shared-window:execute-workflow',

@@ -39,6 +39,7 @@ import { debounce } from '@repo/shared';
 import preloadAPI from '/@/utils/preloadAPI';
 import { DatabaseWorkflowUpdatePayload } from '#packages/main/src/interface/database.interface';
 import { debugLog } from '#packages/common/utils/helper';
+import { useDashboardStore } from '/@/stores/dashboard.store';
 
 const nodeTypes: Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>> = {
   [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeCommand,
@@ -218,6 +219,7 @@ function WokflowViewportChangesListener() {
 
 const WORKFLOW_CHANGES_DEBOUNCE_MS = 2000;
 function RouteWorkflow() {
+  const hideSidebar = useDashboardStore.use.setHideSidebar();
   const setWorkflow = useWorkflowEditorStore.use.setWorkflow();
 
   const navigate = useNavigate();
@@ -245,9 +247,11 @@ function RouteWorkflow() {
         debugLog('Error: ', message);
       },
     });
+    hideSidebar(true);
 
     return () => {
       offQueryListener();
+      hideSidebar(false);
       useWorkflowEditorStore.getState().$reset();
     };
   }, [workflowId, navigate]);

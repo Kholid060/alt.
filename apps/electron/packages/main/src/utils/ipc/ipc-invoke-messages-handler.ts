@@ -111,11 +111,11 @@ IPCMain.handle('app:toggle-lock-window', ({ sender }) => {
 
   return Promise.resolve();
 });
-IPCMain.handle('app:close-command-window', () => {
+IPCMain.handle('command-window:close', () => {
   WindowCommand.instance.toggleWindow(false);
   return Promise.resolve();
 });
-IPCMain.handle('app:show-command-window', () => {
+IPCMain.handle('command-window:show', () => {
   WindowCommand.instance.toggleWindow(true);
   return Promise.resolve();
 });

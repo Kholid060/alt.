@@ -95,6 +95,8 @@ export interface DatabaseGetExtensionConfig {
   extensionId: string;
 }
 
+export type DatabaseWorkfowListQueryOptions = 'commands';
+
 export interface DatabaseQueriesEvent {
   'database:get-command': (
     commandId: string | { commandId: string; extensionId: string },
@@ -105,7 +107,9 @@ export interface DatabaseQueriesEvent {
   'database:get-extension-list': (
     activeExtOnly?: boolean,
   ) => DatabaseExtensionListItem[];
-  'database:get-workflow-list': () => DatabaseWorkflow[];
+  'database:get-workflow-list': (
+    options?: DatabaseWorkfowListQueryOptions,
+  ) => DatabaseWorkflow[];
   'database:get-workflow': (
     workflowId: string,
   ) => DatabaseWorkflowDetail | null;

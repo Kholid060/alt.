@@ -223,7 +223,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
         return;
       }
 
-      // check if node has error handler;
+      // TO_DO: check if node has error handler;
 
       // emit event if no error handler
       this.emitError((<Error>error).message);

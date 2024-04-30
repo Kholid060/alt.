@@ -9,6 +9,8 @@ import {
   WorkflowIcon,
 } from 'lucide-react';
 import AppLogo from '#packages/renderer/assets/logo.svg';
+import { useDashboardStore } from '/@/stores/dashboard.store';
+import { useEffect } from 'react';
 
 const navigationItems: { title: string; path: string; icon: LucideIcon }[] = [
   {
@@ -33,7 +35,19 @@ const navigationItems: { title: string; path: string; icon: LucideIcon }[] = [
   },
 ];
 
-function DashboardSidebar() {
+function DashboardSidebar({
+  onVisibilityChange,
+}: {
+  onVisibilityChange: (hide: boolean) => void;
+}) {
+  const hideSidebar = useDashboardStore.use.hideSidebar();
+
+  useEffect(() => {
+    onVisibilityChange(hideSidebar);
+  }, [hideSidebar, onVisibilityChange]);
+
+  if (hideSidebar) return null;
+
   return (
     <div className="w-20 lg:w-64 border-r h-screen py-8 px-4 flex flex-col gap-8 fixed left-0 top-0">
       <div className="flex items-center justify-center lg:justify-start gap-3">

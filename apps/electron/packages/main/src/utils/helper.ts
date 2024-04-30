@@ -57,6 +57,8 @@ export async function tempHideCommandWindow<
   const hiddenState = WindowsManager.instance.isWindowHidden('command');
   const isWindowFocus = commandWindow?.isFocused();
 
+  console.log({ hiddenState, isWindowFocus });
+
   try {
     if (isWindowFocus) {
       commandWindow?.minimize();

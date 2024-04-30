@@ -279,7 +279,7 @@ function CommandInput() {
     if (commandRouteCtx) {
       const currentRoute = commandRouteCtx.getState().currentRoute;
       if (!currentRoute?.path) {
-        preloadAPI.main.ipc.invoke('app:close-command-window');
+        preloadAPI.main.ipc.invoke('command-window:close');
         return;
       }
     }

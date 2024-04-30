@@ -3,14 +3,12 @@ import IPCMain from './IPCMain';
 import SharedProcessService from '/@/services/shared-process.service';
 import WindowsManager from '/@/window/WindowsManager';
 
-IPCMain.on('window:open-settings', (_, routePath) => {
+IPCMain.on('dashboard-window:open', (_, path) => {
   WindowsManager.instance.restoreOrCreateWindow('dashboard').then((window) => {
-    if (!routePath) return;
-
     WindowsManager.instance.sendMessageToWindow(
       window,
-      'app:update-route',
-      routePath,
+      'dashboard-window:open',
+      path,
     );
   });
 });

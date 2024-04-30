@@ -10,16 +10,22 @@ import {
   CommandListItemCommand,
   CommandListItemCommandBuiltIn,
   CommandListItemExtension,
+  CommandListItemWorkflow,
   CommandListItems,
 } from '/@/interface/command.interface';
 import preloadAPI from '/@/utils/preloadAPI';
-import { BlocksIcon, SettingsIcon } from 'lucide-react';
+import {
+  BlocksIcon,
+  LayoutDashboardIcon,
+  SettingsIcon,
+  WorkflowIcon,
+} from 'lucide-react';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import ListItemCommand from '/@/components/list-item/ListItemCommand';
-import ListItemExtension from '/@/components/list-item/ListItemExtension';
 import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
+import ListItemWorkflow from '/@/components/list-item/ListItemWorkflow';
 
 const QUERY_PREFIX = {
   EXT: 'ext:',
@@ -32,10 +38,35 @@ export interface ListItemRenderDetail<
   item: Extract<CommandListItems, { metadata: { type: T } }>;
 }
 
+const dashboardPageCommands: CommandListItemCommandBuiltIn[] = (
+  [
+    { title: 'Dashboard Page', icon: LayoutDashboardIcon, path: 'dashboard' },
+    { title: 'Workflows Page', icon: WorkflowIcon, path: 'workflows' },
+    { title: 'Extensions Page', icon: BlocksIcon, path: 'extensions' },
+    { title: 'Settings Page', icon: SettingsIcon, path: 'settings' },
+  ] as const
+).map((page) => ({
+  title: page.title,
+  group: 'Commands',
+  subtitle: 'Dashboard',
+  value: `dashboard:${page.path || ''}`,
+  icon: <UiList.Icon icon={page.icon} />,
+  async onSelected() {
+    await preloadAPI.main.ipc.invoke('command-window:close');
+    preloadAPI.main.ipc.send('dashboard-window:open', page.path);
+  },
+  metadata: {
+    type: 'builtin-command',
+  },
+}));
+
 function CommandList() {
   const extensionQuery = useDatabaseQuery('database:get-extension-list', []);
-  const activeBrowserTab = useCommandStore.use.activeBrowserTab();
+  const workflowQuery = useDatabaseQuery('database:get-workflow-list', [
+    'commands',
+  ]);
 
+  const activeBrowserTab = useCommandStore.use.activeBrowserTab();
   const addPanelStatus = useCommandPanelStore.use.addStatus();
   const navigate = useCommandNavigate();
 
@@ -63,10 +94,26 @@ function CommandList() {
       .map((item) => ({ ...item, group: 'Search results' }));
   }, []);
 
+  const workflowCommands = useMemo<CommandListItemWorkflow[]>(() => {
+    if (workflowQuery.state !== 'idle') return [];
+
+    return workflowQuery.data.map((workflow) => {
+      return {
+        group: 'Workflows',
+        icon: workflow.icon,
+        title: workflow.name,
+        subtitle: 'Workflow',
+        value: `workflow:${workflow.id}`,
+        metadata: {
+          type: 'workflow',
+          workflowId: workflow.id,
+        },
+      };
+    });
+  }, [workflowQuery]);
   const extensionCommands = useMemo(() => {
     type Item = CommandListItemCommand | CommandListItemExtension;
 
-    const extItems: Item[] = [];
     const commandItems: Item[] = [];
     const suggestionItems: Item[] = [];
 
@@ -81,19 +128,6 @@ function CommandList() {
           iconWrapper={(icon) => <UiList.Icon icon={icon} />}
         />
       );
-
-      const item: CommandListItemExtension = {
-        value: extension.id,
-        group: 'Extensions',
-        icon: extensionIcon,
-        title: extension.title,
-        metadata: {
-          extension,
-          type: 'extension',
-        },
-      };
-      extItems.push(item);
-
       if (extension.isError || extension.isDisabled) return;
 
       extension.commands.forEach((command) => {
@@ -151,13 +185,14 @@ function CommandList() {
       });
     });
 
-    return { extItems, suggestionItems, commandItems };
+    return { suggestionItems, commandItems };
   }, [extensionQuery, activeBrowserTab]);
   const builtInCommands: CommandListItemCommandBuiltIn[] = [
     {
       group: 'Commands',
       title: 'Import Extension',
       value: 'import-extension',
+      subtitle: 'Utils',
       icon: <UiList.Icon icon={BlocksIcon} />,
       async onSelected() {
         try {
@@ -192,19 +227,7 @@ function CommandList() {
         type: 'builtin-command',
       },
     },
-    {
-      title: 'Settings',
-      value: 'settings',
-      group: 'Commands',
-      icon: <UiList.Icon icon={SettingsIcon} />,
-      async onSelected() {
-        await preloadAPI.main.ipc.invoke('app:close-command-window');
-        preloadAPI.main.ipc.send('window:open-settings');
-      },
-      metadata: {
-        type: 'builtin-command',
-      },
-    },
+    ...dashboardPageCommands,
   ];
 
   return (
@@ -214,7 +237,7 @@ function CommandList() {
         items={[
           ...extensionCommands.suggestionItems,
           ...extensionCommands.commandItems,
-          ...extensionCommands.extItems,
+          ...workflowCommands,
           ...builtInCommands,
         ]}
         customFilter={customListFilter}
@@ -237,11 +260,11 @@ function CommandList() {
                   {...{ ...detail }}
                 />
               );
-            case 'extension':
+            case 'workflow':
               return (
-                <ListItemExtension
+                <ListItemWorkflow
                   itemRef={ref}
-                  item={commandItem as CommandListItemExtension}
+                  item={commandItem as CommandListItemWorkflow}
                   {...{ ...detail }}
                 />
               );

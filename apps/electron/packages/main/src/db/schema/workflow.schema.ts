@@ -38,6 +38,7 @@ export const workflows = sqliteTable('workflows', {
   updatedAt: text('updated_at')
     .notNull()
     .$defaultFn(() => new Date().toISOString()),
+  executeCount: integer('execute_count').notNull().default(0),
   settings: text('settings', { mode: 'json' }).$type<WorkflowSettings>(),
 });
 export type NewWorkflow = typeof workflows.$inferInsert;

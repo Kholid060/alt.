@@ -16,6 +16,7 @@ import type { WorkflowRunPayload } from './workflow.interface';
 import type Electron from 'electron';
 import type { MessagePortChannelIds } from './message-port-events.interface';
 import type { WorkflowRunnerRunPayload } from './workflow-runner.interace';
+import type { WindowDashboardPages } from './window.interface';
 
 export interface IPCRendererInvokeEventPayload {
   name: string;
@@ -54,8 +55,11 @@ export interface IPCEventError {
 export interface IPCAppEvents {
   'app:open-devtools': () => void;
   'app:toggle-lock-window': () => void;
-  'app:show-command-window': () => void;
-  'app:close-command-window': () => void;
+}
+
+export interface IPCWindowEvents {
+  'command-window:show': () => void;
+  'command-window:close': () => void;
 }
 
 export interface IPCScreenEvents {
@@ -127,6 +131,7 @@ export type IPCEvents = IPCShellEvents &
   IPCAppsEvents &
   DatabaseEvents &
   IPCDialogEvents &
+  IPCWindowEvents &
   IPCScreenEvents &
   IPCWorkflowEvents &
   IPCClipboardEvents &
@@ -155,13 +160,13 @@ export interface IPCSendEventMainToRenderer {
 }
 
 export interface IPCSendEventRendererToMain {
-  'window:open-settings': [path?: string];
   'extension:stop-execute-command': [runnerId: string];
   'window:open-command': [path?: string, routeData?: unknown];
 }
 
 export interface IPCSendEventRendererToRenderer {
   'data:changes': [type: 'extension' | 'command'];
+  'dashboard-window:open': [path: WindowDashboardPages];
   'database:changes': [type: keyof DatabaseEvents, ...args: unknown[]];
 }
 

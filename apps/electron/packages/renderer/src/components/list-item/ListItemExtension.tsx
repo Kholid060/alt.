@@ -1,6 +1,11 @@
 import { UiList, UiListItemAction } from '@repo/ui';
 import { ListItemRenderDetail } from '../../apps/command/routes/CommandList';
-import { RotateCcwIcon, AlertTriangleIcon, BoltIcon } from 'lucide-react';
+import {
+  RotateCcwIcon,
+  AlertTriangleIcon,
+  BoltIcon,
+  ToggleRight,
+} from 'lucide-react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandStore } from '/@/stores/command.store';
 import { useShallow } from 'zustand/react/shallow';
@@ -28,7 +33,19 @@ function ListItemExtension({
   const { extension } = item.metadata;
 
   const actions: UiListItemAction[] = [];
-  if (extension.isLocal) {
+  if (extension.isDisabled) {
+    actions.push({
+      title: 'Enable',
+      value: 'enable',
+      icon: ToggleRight,
+      onAction() {
+        preloadAPI.main.ipc.invoke('database:update-extension', extension.id, {
+          isDisabled: false,
+        });
+      },
+    });
+  }
+  if (extension.isLocal && !extension.isDisabled) {
     actions.push({
       icon: RotateCcwIcon,
       async onAction() {
@@ -56,7 +73,7 @@ function ListItemExtension({
       shortcut: { key: 'r', mod1: 'mod', mod2: 'shiftKey' },
     });
   }
-  if (extension.isError || hasError) {
+  if ((extension.isError || hasError) && !extension.isDisabled) {
     actions.push({
       icon: AlertTriangleIcon,
       onAction() {
@@ -78,7 +95,11 @@ function ListItemExtension({
       title: 'See errors',
       color: 'destructive',
     });
-  } else if (extension.config && extension.config?.length > 0) {
+  } else if (
+    extension.config &&
+    extension.config?.length > 0 &&
+    !extension.isDisabled
+  ) {
     actions.push({
       icon: BoltIcon,
       onAction() {
@@ -94,6 +115,7 @@ function ListItemExtension({
     <UiList.Item
       ref={itemRef}
       {...{ ...props, ...item, selected, actions }}
+      className={item.metadata.extension.isDisabled ? 'opacity-60' : ''}
       onSelected={() => uiListStore.setState('search', `ext:${extension.id}`)}
       suffix={
         extension.isLocal && (

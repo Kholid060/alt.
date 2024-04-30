@@ -18,11 +18,11 @@ const router = createBrowserRouter(
           path: '/workflows',
           element: <RouteWorkflows />,
         },
+        {
+          path: '/workflows/:workflowId',
+          element: <RouteWorkflow />,
+        },
       ],
-    },
-    {
-      path: '/workflows/:workflowId',
-      element: <RouteWorkflow />,
     },
   ],
   { basename: '/dashboard' },

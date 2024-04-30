@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1713873625324,
-      "tag": "0000_brainy_rhino",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1713936271041,
-      "tag": "0001_nervous_jack_power",
+      "when": 1714470658527,
+      "tag": "0000_sticky_longshot",
       "breakpoints": true
     }
   ]
