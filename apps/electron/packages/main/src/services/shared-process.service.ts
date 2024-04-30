@@ -1,4 +1,5 @@
 import type { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
+import type { WorkflowRunPayload } from '#packages/common/interface/workflow.interface';
 import ExtensionLoader from '../utils/extension/ExtensionLoader';
 import IPCMain from '../utils/ipc/IPCMain';
 import WindowCommand from '../window/command-window';
@@ -24,11 +25,10 @@ class SharedProcessService {
     );
     if (!commandFilePath) throw new Error("Coudln't find command file");
 
-    const commandConfig =
-      await DBService.instance.extension.isCommandConfigInputted(
-        extensionId,
-        commandId,
-      );
+    const commandConfig = await DBService.instance.extension.isConfigInputted(
+      extensionId,
+      commandId,
+    );
     if (commandConfig.requireInput) {
       IPCMain.sendToWindow('command', 'command-window:input-config', {
         commandId,
@@ -47,7 +47,7 @@ class SharedProcessService {
 
     switch (command.type) {
       case 'view:json': {
-        const processId = await IPCMain.instance.invoke(
+        const runnerId = await IPCMain.instance.invoke(
           'shared-process',
           'shared-window:execute-command',
           executeCommandPayload,
@@ -60,14 +60,14 @@ class SharedProcessService {
           'command-window:open-command-json-view',
           {
             ...payload,
-            processId,
+            runnerId,
             title: command.title,
             subtitle: command.extension.title,
             icon: command.icon || command.extension.icon,
           },
         );
 
-        return processId;
+        return runnerId;
       }
       case 'script':
       case 'action':
@@ -90,15 +90,27 @@ class SharedProcessService {
           `Command with "${command.type}" type doesn't have handler`,
         );
     }
-
-    return null;
   }
 
-  static stopExecuteExtensionCommand(processId: string) {
+  static stopExecuteExtensionCommand(runnerId: string) {
     IPCMain.sendToWindow(
       'shared-process',
       'shared-window:stop-execute-command',
-      processId,
+      runnerId,
+    );
+  }
+
+  static async executeWorkflow(payload: WorkflowRunPayload) {
+    const workflow = await DBService.instance.workflow.get(payload.id);
+    if (!workflow) throw new Error("Couldn't find workflow");
+
+    return IPCMain.instance.invoke(
+      'shared-process',
+      'shared-window:execute-workflow',
+      {
+        ...payload,
+        workflow,
+      },
     );
   }
 }

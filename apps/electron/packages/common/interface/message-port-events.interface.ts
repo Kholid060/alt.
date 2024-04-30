@@ -9,7 +9,7 @@ export type MessagePortChannelIds =
 
 export interface MessagePortCommandJSONUpdateUI {
   commandId: string;
-  processId: string;
+  runnerId: string;
   extensionId: string;
   viewData: CommandJSONViews;
 }
@@ -21,7 +21,7 @@ export interface MessagePortSharedCommandWindowEvents
     {
       message: string;
       commandId: string;
-      processId: string;
+      runnerId: string;
       extensionId: string;
       commandTitle: string;
       type: 'error' | 'message' | 'start' | 'finish' | 'stderr';

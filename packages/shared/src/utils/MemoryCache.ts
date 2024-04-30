@@ -1,6 +1,7 @@
 interface CacheContent<K, T> {
   id: K;
   value: T;
+  addedAt: number;
 }
 
 class MemoryCache<K = string, T = unknown> {
@@ -11,11 +12,11 @@ class MemoryCache<K = string, T = unknown> {
   }
 
   add(id: K, value: T) {
-    this.caches.set(id, { id, value });
+    this.caches.set(id, { id, value, addedAt: Date.now() });
   }
 
-  get(id: K) {
-    return this.caches.get(id);
+  get<R = T>(id: K) {
+    return (this.caches.get(id) ?? null) as CacheContent<K, R> | null;
   }
 
   has(id: K) {

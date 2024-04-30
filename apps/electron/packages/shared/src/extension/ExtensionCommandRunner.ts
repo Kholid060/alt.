@@ -18,7 +18,7 @@ class ExtensionCommandRunner {
     return this._instance || (this._instance = new ExtensionCommandRunner());
   }
 
-  private runningCommands: Map<string, ExtensionRunnerProcess> = new Map();
+  private runners: Map<string, ExtensionRunnerProcess> = new Map();
   private commandWindowEventListeners: Map<
     string,
     SetRequired<
@@ -93,17 +93,13 @@ class ExtensionCommandRunner {
         throw new Error(`"${command.type}" doesn't have runner`);
       }
 
-      commandRunner.on('error', (message) => {
+      commandRunner.once('error', (message) => {
         this.destroyRunningCommand(runnerId);
-        debugLog('Command error: ', message, this.runningCommands.size);
+        debugLog('Command error: ', message, this.runners.size);
       });
-      commandRunner.on('finish', (reason, data) => {
+      commandRunner.once('finish', (reason, data) => {
         this.destroyRunningCommand(runnerId);
-        debugLog(
-          'Command finish: ',
-          { reason, data },
-          this.runningCommands.size,
-        );
+        debugLog('Command finish: ', { reason, data }, this.runners.size);
       });
 
       if (commandRunner.onCommandWindowEvents) {
@@ -113,26 +109,26 @@ class ExtensionCommandRunner {
         );
       }
 
-      this.runningCommands.set(runnerId, commandRunner);
+      this.runners.set(runnerId, commandRunner);
 
       await commandRunner.start();
 
-      return runnerId;
+      return { id: runnerId, runner: commandRunner };
     } catch (error) {
       this.destroyRunningCommand(runnerId);
       throw error;
     }
   }
 
-  stop(processId: string) {
-    const runningCommand = this.runningCommands.get(processId);
+  stop(runnerId: string) {
+    const runningCommand = this.runners.get(runnerId);
     if (!runningCommand) return;
 
     runningCommand.stop();
   }
 
   private destroyRunningCommand(runnerId: string) {
-    this.runningCommands.delete(runnerId);
+    this.runners.delete(runnerId);
     this.commandWindowEventListeners.delete(runnerId);
   }
 }

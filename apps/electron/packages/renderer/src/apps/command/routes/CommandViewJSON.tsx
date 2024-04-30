@@ -20,7 +20,7 @@ function CommandViewJSON() {
   const setPanelHeader = useCommandPanelStore.use.setHeader();
   const activeRoute = useCommandRoute((state) => state.currentRoute);
 
-  const processId = useRef('');
+  const runnerId = useRef('');
   const [viewData, setViewData] = useState<CommandJSONViews | null>(null);
 
   const commandExecutePayload = activeRoute?.data as ExtensionCommandJSONViewData;
@@ -30,7 +30,7 @@ function CommandViewJSON() {
       commandExecutePayload;
 
     setPanelHeader({ title, subtitle, icon });
-    // processId.current = commandExecutePayload.processId;
+    // runnerId.current = commandExecutePayload.runnerId;
 
     const messagePort = runnerMessagePort.current;
     const onUpdateUI = (data: MessagePortCommandJSONUpdateUI) => {
@@ -38,7 +38,7 @@ function CommandViewJSON() {
         return;
       }
 
-      processId.current = data.processId;
+      runnerId.current = data.runnerId;
       setViewData(data.viewData);
     };
     messagePort?.event.on('command-json:update-ui', onUpdateUI);
@@ -47,7 +47,7 @@ function CommandViewJSON() {
       messagePort?.event.off('command-json:update-ui', onUpdateUI);
       preloadAPI.main.ipc.send(
         'extension:stop-execute-command',
-        processId.current,
+        runnerId.current,
       );
     };
   }, [commandExecutePayload, setPanelHeader]);

@@ -119,7 +119,7 @@ async function getCommandExecution({
 }
 
 interface CommandRunnerData extends ExtensionCommandExecutePayload {
-  processId: string;
+  runnerId: string;
   manifest: ExtensionManifest;
   apiData: Omit<InitExtensionAPIData, 'manifest' | 'commandId'>;
 }
@@ -127,7 +127,7 @@ interface CommandRunnerData extends ExtensionCommandExecutePayload {
 async function commandViewJSONRunner({
   apiData,
   manifest,
-  processId,
+  runnerId,
   commandId,
   extensionId,
   launchContext,
@@ -146,7 +146,7 @@ async function commandViewJSONRunner({
   const updateView: CommandViewJSONLaunchContext['updateView'] = (viewData) => {
     apiData.messagePort.sendMessage('command-json:update-ui', {
       viewData,
-      processId,
+      runnerId,
       commandId,
       extensionId,
     });
@@ -201,7 +201,7 @@ self.onmessage = async ({
     const commandRunnerPayload: CommandRunnerData = {
       ...data.payload,
       manifest: data.manifest,
-      processId: data.processId,
+      runnerId: data.runnerId,
       apiData: {
         mainMessagePort: ports[0],
         key: data.payload.extensionId,

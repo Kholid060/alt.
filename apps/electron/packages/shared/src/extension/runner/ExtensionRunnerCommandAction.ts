@@ -6,9 +6,9 @@ import ExtensionRunnerProcess, {
 import type { BetterMessagePayload } from '@repo/shared';
 import { BetterMessagePort, isObject } from '@repo/shared';
 import IPCRenderer from '#packages/common/utils/IPCRenderer';
-import { isIPCEventError } from '/@/utils/helper';
 import type { ExtensionCommandWorkerInitMessage } from '/@/inteface/extension.interface';
 import type { MessagePortSharedCommandWindowEvents } from '#packages/common/interface/message-port-events.interface';
+import { isIPCEventError } from '#packages/common/utils/helper';
 
 class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
   private worker: Worker | null = null;
@@ -99,7 +99,7 @@ class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
         {
           manifest,
           type: 'init',
-          processId: this.id,
+          runnerId: this.id,
           payload: this.payload,
           command: this.command,
         } as ExtensionCommandWorkerInitMessage,

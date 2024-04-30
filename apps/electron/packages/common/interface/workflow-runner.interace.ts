@@ -6,5 +6,5 @@ export type WorkflowRunnerRunPayload = Omit<WorkflowRunPayload, 'id'> & {
 };
 
 export interface WorkflowRunnerMessagePortAsyncEvents {
-  'workflow:run': (payload: WorkflowRunnerRunPayload) => string;
+  'workflow:execute': (payload: WorkflowRunnerRunPayload) => string;
 }

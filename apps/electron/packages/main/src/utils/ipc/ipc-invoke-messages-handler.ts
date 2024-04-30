@@ -6,7 +6,6 @@ import IPCMain from './IPCMain';
 import { GlobalShortcutExtension } from '../GlobalShortcuts';
 import DBService from '/@/services/database/database.service';
 import { emitDBChanges } from '../database-utils';
-import WorkflowRunnerService from '../../services/workflow-runner.service';
 import WindowCommand from '/@/window/command-window';
 import SharedProcessService from '/@/services/shared-process.service';
 
@@ -48,6 +47,17 @@ IPCMain.handle('extension:reload', async (_, extId) => {
 IPCMain.handle('extension:execute-command', (_, payload) => {
   return SharedProcessService.executeExtensionCommand(payload);
 });
+IPCMain.handle('extension:is-config-inputted', (_, extensionId, commandId) => {
+  return DBService.instance.extension.isConfigInputted(extensionId, commandId);
+});
+IPCMain.handle(
+  'extension:get-command-file-path',
+  (_, extensionId, commandId) => {
+    return Promise.resolve(
+      ExtensionLoader.instance.getPath(extensionId, 'base', commandId),
+    );
+  },
+);
 
 /** APPS */
 IPCMain.handle('apps:get-list', () => InstalledApps.instance.getApps());
@@ -214,6 +224,6 @@ IPCMain.handle(
 );
 
 /** WORKFLOW */
-IPCMain.handle('workflow:run', (_, payload) => {
-  return WorkflowRunnerService.instance.run(payload);
+IPCMain.handle('workflow:execute', (_, payload) => {
+  return SharedProcessService.executeWorkflow(payload);
 });

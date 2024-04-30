@@ -69,7 +69,7 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
         extensionId,
         message: '',
         type: 'start',
-        processId: this.id,
+        runnerId: this.id,
         commandTitle: this.command.title,
       });
     });
@@ -79,7 +79,7 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
         commandId,
         extensionId,
         type: 'error',
-        processId: this.id,
+        runnerId: this.id,
         message: error.message,
         commandTitle: this.command.title,
       });
@@ -94,7 +94,7 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
         message,
         commandId,
         extensionId,
-        processId: this.id,
+        runnerId: this.id,
         commandTitle: this.command.title,
         type: isSuccess ? 'finish' : 'error',
       });
@@ -112,7 +112,7 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
         commandId,
         extensionId,
         type: 'message',
-        processId: this.id,
+        runnerId: this.id,
         message: this.lastMessage,
         commandTitle: this.command.title,
       });
@@ -124,7 +124,7 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
         commandId,
         extensionId,
         type: 'stderr',
-        processId: this.id,
+        runnerId: this.id,
         message: chunk.toString(),
         commandTitle: this.command.title,
       });

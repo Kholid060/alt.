@@ -51,7 +51,7 @@ function WorkflowEditorHeader() {
     }
 
     preloadAPI.main.ipc
-      .invoke('workflow:run', {
+      .invoke('workflow:execute', {
         id: workflow.id,
         startNodeId: manualTriggerNode.id,
       })

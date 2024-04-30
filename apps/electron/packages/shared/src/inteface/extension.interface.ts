@@ -3,7 +3,7 @@ import type { ExtensionCommand, ExtensionManifest } from '@repo/extension-core';
 
 export interface ExtensionCommandWorkerInitMessage {
   type: 'init';
-  processId: string;
+  runnerId: string;
   command: ExtensionCommand;
   manifest: ExtensionManifest;
   payload: ExtensionCommandExecutePayload;

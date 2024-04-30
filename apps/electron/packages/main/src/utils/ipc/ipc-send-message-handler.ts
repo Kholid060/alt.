@@ -49,7 +49,7 @@ IPCMain.on('message-port:port-bridge', ({ ports }, channelId) => {
   }
 });
 
-IPCMain.on('extension:stop-execute-command', (_, processId) => {
-  SharedProcessService.stopExecuteExtensionCommand(processId);
+IPCMain.on('extension:stop-execute-command', (_, runnerId) => {
+  SharedProcessService.stopExecuteExtensionCommand(runnerId);
   return Promise.resolve();
 });

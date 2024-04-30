@@ -21,6 +21,7 @@ export type WorkflowNodeCommand = WorkflowNodeBase<
     commandId: string;
     extensionId: string;
     extensionTitle: string;
+    commandData: Record<string, unknown>;
   } & WorkflowNodeBaseData,
   WORKFLOW_NODE_TYPE.COMMAND
 >;

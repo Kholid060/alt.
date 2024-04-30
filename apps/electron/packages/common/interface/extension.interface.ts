@@ -32,7 +32,7 @@ export interface ExtensionCommandViewData
 }
 
 export interface ExtensionCommandJSONViewData extends ExtensionCommandViewData {
-  processId: string;
+  runnerId: string;
 }
 
 export interface ExtensionCommandExecutePayloadWithData

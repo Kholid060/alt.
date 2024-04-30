@@ -375,11 +375,11 @@ class DBExtensionService {
     return extension!;
   }
 
-  async isCommandConfigInputted(
+  async isConfigInputted(
     extensionId: string,
-    commandId: string,
+    commandId?: string,
   ): Promise<ExtensionCommandConfigValuePayload> {
-    const configId = `${extensionId}:${commandId}`;
+    const configId = commandId ? `${extensionId}:${commandId}` : extensionId;
     const commandConfigCacheId = `config-inputted:${configId}`;
     if (this.cache.has(commandConfigCacheId)) {
       return { requireInput: false };
@@ -401,6 +401,8 @@ class DBExtensionService {
           type: 'extension',
         };
       }
+    } else if (!commandId) {
+      return { requireInput: false };
     }
 
     const command = extension.commands.find(

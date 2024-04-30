@@ -1,12 +1,12 @@
 import type { FlatActionExtensionAPI } from '@repo/extension-core/dist/flat-extension-api';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import type {
+  ExtensionCommandConfigValuePayload,
   ExtensionCommandExecutePayload,
   ExtensionCommandExecutePayloadWithData,
   ExtensionCommandJSONViewData,
   ExtensionCommandViewData,
 } from './extension.interface';
-import type { ExtensionCommand } from '@repo/extension-core';
 import type { BrowserExtensionTab } from '@repo/shared';
 import type {
   DatabaseEvents,
@@ -15,6 +15,7 @@ import type {
 import type { WorkflowRunPayload } from './workflow.interface';
 import type Electron from 'electron';
 import type { MessagePortChannelIds } from './message-port-events.interface';
+import type { WorkflowRunnerRunPayload } from './workflow-runner.interace';
 
 export interface IPCRendererInvokeEventPayload {
   name: string;
@@ -83,20 +84,24 @@ export interface IPCClipboardEvents {
 }
 
 export interface IPCExtensionEvents {
+  'extension:is-config-inputted': (
+    extensionId: string,
+    commandId?: string,
+  ) => ExtensionCommandConfigValuePayload;
   'extension:reload': (extId: string) => void;
   'extension:import': () => DatabaseExtension | null;
   'extension:init-message-port': () => MessagePort;
-  'extension:get-command': (
+  'extension:get-command-file-path': (
     extensionId: string,
     commandId: string,
-  ) => ExtensionCommand | null;
+  ) => string | null;
   'extension:execute-command': (
     payload: ExtensionCommandExecutePayload,
   ) => string | null;
 }
 
 export interface IPCWorkflowEvents {
-  'workflow:run': (payload: WorkflowRunPayload) => string;
+  'workflow:execute': (payload: WorkflowRunPayload) => string;
 }
 
 export interface IPCUserExtensionEvents {
@@ -129,7 +134,7 @@ export type IPCEvents = IPCShellEvents &
   IPCUserExtensionEvents;
 
 export interface IPCSendEventMainToRenderer {
-  'shared-window:stop-execute-command': [processId: string];
+  'shared-window:stop-execute-command': [runnerId: string];
   'window:visibility-change': [isHidden: boolean];
   'browser:tabs:active': [BrowserExtensionTab | null];
   'app:update-route': [path: string, routeData?: unknown];
@@ -151,7 +156,7 @@ export interface IPCSendEventMainToRenderer {
 
 export interface IPCSendEventRendererToMain {
   'window:open-settings': [path?: string];
-  'extension:stop-execute-command': [processId: string];
+  'extension:stop-execute-command': [runnerId: string];
   'window:open-command': [path?: string, routeData?: unknown];
 }
 
@@ -173,6 +178,9 @@ export interface IPCPostMessageEventMainToRenderer {
 interface IPCInvokeEventMainToRenderer {
   'shared-window:execute-command': (
     payload: ExtensionCommandExecutePayloadWithData,
+  ) => Promise<string>;
+  'shared-window:execute-workflow': (
+    payload: WorkflowRunnerRunPayload,
   ) => Promise<string>;
 }
 

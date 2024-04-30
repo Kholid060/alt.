@@ -1,7 +1,7 @@
 import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
+import { isIPCEventError } from '#packages/common/utils/helper';
 import { isObject } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
-import { isIPCEventError } from '/@/utils/helper';
 
 const EVENT_TIMEOUT_MS = 10000; // 10 seconds;
 
