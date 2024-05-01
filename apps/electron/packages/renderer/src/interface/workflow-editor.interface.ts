@@ -13,6 +13,8 @@ export enum WorkflowEditorContextMenuType {
   SELECTION,
 }
 
+export type WorkflowEditorNodeGroup = 'Triggers' | 'Commands' | 'Scripts';
+
 export interface XYPosition {
   x: number;
   y: number;
@@ -36,18 +38,17 @@ export type WorkflowEditorContextMenuEventPayload =
       type: WorkflowEditorContextMenuType.SELECTION;
     };
 
-export type WorkflowEditorNodeListCommandItem = SetRequired<
-  UiListItem<
-    { nodeType: WORKFLOW_NODE_TYPE.COMMAND } & WorkflowNodeCommand['data']
-  >,
+type WorkflowEditorNodeItemBase<T> = SetRequired<
+  UiListItem<T> & { group: WorkflowEditorNodeGroup },
   'metadata'
 >;
 
-export type WorkflowEditorNodeListTriggerItem = SetRequired<
-  UiListItem<
-    { nodeType: WORKFLOW_NODE_TYPE.TRIGGER } & WorkflowNodeTrigger['data']
-  >,
-  'metadata'
+export type WorkflowEditorNodeListCommandItem = WorkflowEditorNodeItemBase<
+  { nodeType: WORKFLOW_NODE_TYPE.COMMAND } & WorkflowNodeCommand['data']
+>;
+
+export type WorkflowEditorNodeListTriggerItem = WorkflowEditorNodeItemBase<
+  { nodeType: WORKFLOW_NODE_TYPE.TRIGGER } & WorkflowNodeTrigger['data']
 >;
 
 export type WorkflowEditorNodeListItem =

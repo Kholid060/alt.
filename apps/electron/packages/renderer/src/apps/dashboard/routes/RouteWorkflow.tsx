@@ -13,11 +13,18 @@ import ReactFlow, {
   ReactFlowProvider,
   useOnViewportChange,
   EdgeMouseHandler,
+  OnSelectionChangeFunc,
+  OnEdgesChange,
+  OnNodesChange,
+  addEdge,
+  NodeMouseHandler,
+  Viewport,
+  OnNodesDelete,
 } from 'reactflow';
 import '/@/assets/css/workflow-editor-style.css';
 import WorkflowEditorHeader from '/@/components/workflow/editor/WorkflowEditorHeader';
 import WorkflowEditorControls from '/@/components/workflow/editor/WorkflowEditorControls';
-import { WorkflowEditorNodeListModal } from '/@/components/workflow/editor/WorkflowEditorNodeLIst';
+import { WorkflowEditorNodeListModal } from '../../../components/workflow/editor/WorkflowEditorNodeList';
 import {
   WorkflowEditorStore,
   useWorkflowEditorStore,
@@ -40,6 +47,8 @@ import preloadAPI from '/@/utils/preloadAPI';
 import { DatabaseWorkflowUpdatePayload } from '#packages/main/src/interface/database.interface';
 import { debugLog } from '#packages/common/utils/helper';
 import { useDashboardStore } from '/@/stores/dashboard.store';
+import WorkflowEditorEditNode from '/@/components/workflow/editor/WorkflowEditorEditNode';
+import { WorkflowNodes } from '#packages/common/interface/workflow.interface';
 
 const nodeTypes: Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>> = {
   [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeCommand,
@@ -50,13 +59,15 @@ const edgeTypes = {
 };
 
 const selector = (state: WorkflowEditorStore) => ({
-  workflow: state.workflow,
-  onConnect: state.onConnect,
+  edges: state.workflow?.edges,
+  nodes: state.workflow?.nodes,
   deleteEdge: state.deleteEdge,
   updateEdge: state.updateEdge,
-  onNodesChange: state.onNodesChange,
-  onEdgesChange: state.onEdgesChange,
-  onSelectionChange: state.onSelectionChange,
+  setEditNode: state.setEditNode,
+  setSelection: state.setSelection,
+  viewport: state.workflow?.viewport,
+  updateWorkflow: state.updateWorkflow,
+  applyElementChanges: state.applyElementChanges,
 });
 
 function WorkflowEditor() {
@@ -66,15 +77,18 @@ function WorkflowEditor() {
     nodeId: string;
     handleId: string;
   } | null>(null);
+  const applyChanges = useRef(false);
 
   const {
-    workflow,
-    onConnect,
+    edges,
+    nodes,
+    viewport,
     updateEdge,
     deleteEdge,
-    onNodesChange,
-    onEdgesChange,
-    onSelectionChange,
+    setEditNode,
+    setSelection,
+    updateWorkflow,
+    applyElementChanges,
   } = useWorkflowEditorStore(useShallow(selector));
 
   const onConnectEnd: OnConnectEnd = useCallback(
@@ -107,12 +121,14 @@ function WorkflowEditor() {
     },
     [],
   );
-  const onEditorConnect: OnConnect = useCallback(
-    (...args) => {
+  const onConnect: OnConnect = useCallback(
+    (connection) => {
       connectingNodeEdge.current = null;
-      onConnect(...args);
+      updateWorkflow((workflow) => ({
+        edges: addEdge(connection, workflow.edges),
+      }));
     },
-    [onConnect],
+    [updateWorkflow],
   );
 
   const onPaneContextMenu = useCallback(
@@ -163,55 +179,107 @@ function WorkflowEditor() {
     },
     [deleteEdge],
   );
+  const onEdgesChange: OnEdgesChange = useCallback(
+    (edges) => {
+      if (!applyChanges.current) return;
 
-  if (!workflow) return null;
+      applyElementChanges({ edges });
+    },
+    [applyElementChanges],
+  );
+  const onNodesChange: OnNodesChange = useCallback(
+    (nodes) => {
+      if (!applyChanges.current) return;
+
+      applyElementChanges({ nodes });
+    },
+    [applyElementChanges],
+  );
+  const onNodeDoubleClick: NodeMouseHandler = useCallback(
+    (_, node) => {
+      setEditNode(node as WorkflowNodes);
+    },
+    [setEditNode],
+  );
+  const onInit = useCallback(() => {
+    setTimeout(() => {
+      applyChanges.current = true;
+    }, 500);
+  }, []);
+  const onNodesDelete: OnNodesDelete = useCallback(
+    (nodes) => {
+      const { editNode } = useWorkflowEditorStore.getState();
+      const closeEditNodePanel =
+        editNode && nodes.some((node) => node.id === editNode.id);
+      if (!closeEditNodePanel) return;
+
+      setEditNode(null);
+    },
+    [setEditNode],
+  );
+
+  if (!nodes || !edges) return null;
 
   return (
-    <div className="relative w-full h-screen flex flex-col">
-      <WorkflowEditorHeader />
-      <div className="flex-grow flex relative">
-        <WorkflowEditorNodeListModal />
-        <ReactFlow
-          nodes={workflow.nodes}
-          edges={workflow.edges}
-          className="flex-grow"
-          nodeTypes={nodeTypes}
-          edgeTypes={edgeTypes}
-          onConnect={onEditorConnect}
-          onConnectEnd={onConnectEnd}
-          onEdgeUpdate={onEdgeUpdate}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnectStart={onConnectStart}
-          onPaneContextMenu={onPaneContextMenu}
-          onSelectionChange={onSelectionChange}
-          onNodeContextMenu={onNodeContextMenu}
-          onEdgeDoubleClick={onEdgeDoubleClick}
-          onEdgeContextMenu={onEdgeContextMenu}
-          onSelectionContextMenu={onSelectionContextMenu}
-          defaultViewport={workflow.viewport ?? undefined}
-        >
-          <Panel position="bottom-left">
-            <WorkflowEditorControls />
-          </Panel>
-          <Background
-            variant={BackgroundVariant.Dots}
-            gap={12}
-            size={1}
-            color="currentColor"
-            className="text-foreground/15"
-          />
-        </ReactFlow>
-      </div>
-    </div>
+    <ReactFlow
+      nodes={nodes}
+      edges={edges}
+      onInit={onInit}
+      className="flex-grow"
+      nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
+      onConnect={onConnect}
+      onConnectEnd={onConnectEnd}
+      onEdgeUpdate={onEdgeUpdate}
+      onNodesChange={onNodesChange}
+      onEdgesChange={onEdgesChange}
+      onNodesDelete={onNodesDelete}
+      onConnectStart={onConnectStart}
+      onPaneContextMenu={onPaneContextMenu}
+      onNodeContextMenu={onNodeContextMenu}
+      onEdgeDoubleClick={onEdgeDoubleClick}
+      onEdgeContextMenu={onEdgeContextMenu}
+      onNodeDoubleClick={onNodeDoubleClick}
+      defaultViewport={viewport ?? undefined}
+      onSelectionContextMenu={onSelectionContextMenu}
+      onSelectionChange={setSelection as OnSelectionChangeFunc}
+    >
+      <Panel position="bottom-left">
+        <WorkflowEditorControls />
+      </Panel>
+      <Background
+        variant={BackgroundVariant.Dots}
+        gap={12}
+        size={1}
+        color="currentColor"
+        className="text-foreground/15"
+      />
+    </ReactFlow>
   );
 }
 function WokflowViewportChangesListener() {
-  const updateWorkflow = useWorkflowEditorStore.use.updateWorkflow();
+  const { workflowId } = useParams();
+  const viewportData = useRef<Viewport | null>(null);
+
   useOnViewportChange({
     onEnd: (viewport) => {
-      updateWorkflow({ viewport });
+      viewportData.current = viewport;
     },
+  });
+
+  useEffect(() => {
+    return () => {
+      if (!workflowId || !viewportData.current) return;
+
+      preloadAPI.main.ipc.invoke(
+        'database:update-workflow',
+        workflowId,
+        {
+          viewport: viewportData.current,
+        },
+        { ignoreModified: true },
+      );
+    };
   });
 
   return null;
@@ -258,8 +326,9 @@ function RouteWorkflow() {
   useEffect(
     () =>
       useWorkflowEditorStore.subscribe(
-        (state) => state.workflow,
-        debounce(async (workflow) => {
+        (state) => state.workflowChangesId,
+        debounce(async () => {
+          const { workflow } = useWorkflowEditorStore.getState();
           if (!dataFetched.current || !workflow) return;
 
           try {
@@ -293,7 +362,14 @@ function RouteWorkflow() {
     <WorkflowEditorProvider>
       <ReactFlowProvider>
         <WorkflowEditorContextMenu />
-        <WorkflowEditor />
+        <div className="relative w-full h-screen flex flex-col">
+          <WorkflowEditorHeader />
+          <div className="flex-grow flex relative">
+            <WorkflowEditorNodeListModal />
+            <WorkflowEditor />
+            <WorkflowEditorEditNode />
+          </div>
+        </div>
         <WokflowViewportChangesListener />
       </ReactFlowProvider>
     </WorkflowEditorProvider>

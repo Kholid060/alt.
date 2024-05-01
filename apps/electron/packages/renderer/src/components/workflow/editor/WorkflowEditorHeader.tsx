@@ -19,12 +19,24 @@ function SavedTimeText() {
       if (!date) return;
 
       setText(dayjs(date).fromNow());
-    }, 30_000); // 30 seconds
+    }, 15_000); // 15 seconds
 
     return () => {
       clearInterval(intervalRef.current);
     };
   }, []);
+  useEffect(
+    () =>
+      useWorkflowEditorStore.subscribe(
+        (state) => state.workflowLastSavedAt,
+        (date) => {
+          if (!date) return;
+
+          setText(dayjs(date).fromNow());
+        },
+      ),
+    [],
+  );
 
   if (!text) return null;
 
@@ -32,11 +44,13 @@ function SavedTimeText() {
 }
 
 function WorkflowEditorHeader() {
-  const workflow = useWorkflowEditorStore.use.workflow()!;
+  const workflow = useWorkflowEditorStore.use.workflow();
 
   const { toast } = useToast();
 
   function runWorkflow() {
+    if (!workflow) return;
+
     const manualTriggerNode = workflow.nodes.find(
       (node) =>
         node.type === WORKFLOW_NODE_TYPE.TRIGGER && node.data.type === 'manual',
@@ -66,6 +80,8 @@ function WorkflowEditorHeader() {
         });
       });
   }
+
+  if (!workflow) return null;
 
   const WorkflowIcon =
     UiExtIcon[workflow.icon as keyof typeof UiExtIcon] ?? UiExtIcon.Command;

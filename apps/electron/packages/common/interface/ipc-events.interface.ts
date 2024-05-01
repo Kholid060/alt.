@@ -16,7 +16,6 @@ import type { WorkflowRunPayload } from './workflow.interface';
 import type Electron from 'electron';
 import type { MessagePortChannelIds } from './message-port-events.interface';
 import type { WorkflowRunnerRunPayload } from './workflow-runner.interace';
-import type { WindowDashboardPages } from './window.interface';
 
 export interface IPCRendererInvokeEventPayload {
   name: string;
@@ -165,8 +164,8 @@ export interface IPCSendEventRendererToMain {
 }
 
 export interface IPCSendEventRendererToRenderer {
+  'dashboard-window:open': [path?: string];
   'data:changes': [type: 'extension' | 'command'];
-  'dashboard-window:open': [path: WindowDashboardPages];
   'database:changes': [type: keyof DatabaseEvents, ...args: unknown[]];
 }
 

@@ -7,7 +7,7 @@ export default async function CommandMain(context: CommandLaunchContext) {
   // await new Promise((r) => setTimeout(r, 4000));
 
 
-  await _extension.mainWindow.close();
+  // await _extension.mainWindow.close();
 
   await _extension.clipboard.paste('Hello world');
 

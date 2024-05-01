@@ -9,20 +9,7 @@ function DashboardAppEventListener() {
     const offOpenWindowListener = preloadAPI.main.ipc.on(
       'dashboard-window:open',
       (_, path) => {
-        switch (path || 'dashboard') {
-          case 'dashboard':
-            navigate('/');
-            break;
-          case 'extensions':
-            navigate('/extensions');
-            break;
-          case 'settings':
-            navigate('/settings');
-            break;
-          case 'workflows':
-            navigate('/workflows');
-            break;
-        }
+        navigate(path || '/');
       },
     );
 

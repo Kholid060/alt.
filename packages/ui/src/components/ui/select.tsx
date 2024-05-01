@@ -1,29 +1,40 @@
 import * as React from 'react';
 import * as SelectPrimitive from '@radix-ui/react-select';
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
+import {
+  CheckIcon,
+  ChevronDown,
+  ChevronDownIcon,
+  ChevronUpIcon,
+} from 'lucide-react';
 
 import { cn } from '@/utils/cn';
 import { VariantProps, cva } from 'class-variance-authority';
 
 const UiSelectGroup = SelectPrimitive.Group;
 
+const selectVariantPadding = {
+  sm: 'px-3',
+  lg: 'px-8',
+  default: 'px-4',
+};
+
 export const uiSelectVariants = cva(
-  'flex h-10 w-full items-center justify-between relative rounded-md ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+  'flex w-full items-center justify-between relative rounded-md',
   {
     variants: {
       variant: {
         default:
           'border border-input hover:border-mauve-8 dark:hover:border-mauvedark-8 bg-transparent',
       },
-      size: {
-        default: 'h-10 px-4 py-2',
-        sm: 'h-9 rounded-md px-3',
-        lg: 'h-11 rounded-md px-8',
+      inputSize: {
+        sm: 'h-9',
+        lg: 'h-11',
+        default: 'h-10',
       },
     },
     defaultVariants: {
       variant: 'default',
-      size: 'default',
+      inputSize: 'default',
     },
   },
 );
@@ -49,7 +60,7 @@ export const UiSelectRoot = React.forwardRef<
       children,
       position = 'popper',
       variant,
-      size,
+      inputSize,
       className,
       placeholder,
       viewportClass,
@@ -63,7 +74,12 @@ export const UiSelectRoot = React.forwardRef<
       <SelectPrimitive.Root {...props}>
         <SelectPrimitive.Trigger
           ref={forwardedRef}
-          className={cn(uiSelectVariants({ variant, size, className }))}
+          className={cn(
+            'ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50' +
+              uiSelectVariants({ variant, inputSize, className }),
+            selectVariantPadding[inputSize ?? 'default'] ??
+              selectVariantPadding.default,
+          )}
         >
           {triggerLeft}
           <span className="truncate flex-1 text-left">
@@ -161,23 +177,51 @@ const UiSelectNative = React.forwardRef<
   HTMLSelectElement,
   React.SelectHTMLAttributes<HTMLSelectElement> & {
     placeholder?: string;
+    selectClass?: string;
   } & VariantProps<typeof uiSelectVariants>
->(({ className, variant, size, placeholder, children, ...props }, ref) => {
-  return (
-    <select
-      ref={ref}
-      className={cn(uiSelectVariants({ variant, size, className }))}
-      {...props}
-    >
-      {placeholder && (
-        <option disabled value="">
-          {placeholder}
-        </option>
-      )}
-      {children}
-    </select>
-  );
-});
+>(
+  (
+    {
+      variant,
+      children,
+      className,
+      inputSize,
+      placeholder,
+      selectClass,
+      ...props
+    },
+    ref,
+  ) => {
+    return (
+      <div
+        className={cn(
+          'overflow-hidden ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2' +
+            uiSelectVariants({ variant, className, inputSize }),
+        )}
+      >
+        <select
+          ref={ref}
+          className={cn(
+            'placeholder:text-muted-foreground appearance-none h-full w-full disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none',
+            selectVariantPadding[inputSize ?? 'default'] ??
+              selectVariantPadding.default,
+            selectClass,
+          )}
+          style={{ paddingRight: '40px' }}
+          {...props}
+        >
+          {placeholder && (
+            <option disabled value="">
+              {placeholder}
+            </option>
+          )}
+          {children}
+        </select>
+        <ChevronDown className="h-5 w-5 right-3 top-1/2 -translate-y-1/2 absolute pointer-events-none" />
+      </div>
+    );
+  },
+);
 UiSelectNative.displayName = 'UiSelectNative';
 
 export const UiSelect = Object.assign(UiSelectRoot, {

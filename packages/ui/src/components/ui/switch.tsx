@@ -40,7 +40,7 @@ const UiSwitch = React.forwardRef<
     VariantProps<typeof uiSwitchRootVariants>
 >(({ className, size, ...props }, ref) => (
   <SwitchPrimitives.Root
-    className={cn(cn(uiSwitchRootVariants({ size, className })))}
+    className={cn(uiSwitchRootVariants({ size, className }))}
     {...props}
     ref={ref}
   >

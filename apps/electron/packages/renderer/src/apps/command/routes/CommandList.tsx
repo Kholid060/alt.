@@ -40,10 +40,10 @@ export interface ListItemRenderDetail<
 
 const dashboardPageCommands: CommandListItemCommandBuiltIn[] = (
   [
-    { title: 'Dashboard Page', icon: LayoutDashboardIcon, path: 'dashboard' },
-    { title: 'Workflows Page', icon: WorkflowIcon, path: 'workflows' },
-    { title: 'Extensions Page', icon: BlocksIcon, path: 'extensions' },
-    { title: 'Settings Page', icon: SettingsIcon, path: 'settings' },
+    { title: 'Dashboard Page', icon: LayoutDashboardIcon, path: '/dashboard' },
+    { title: 'Workflows Page', icon: WorkflowIcon, path: '/workflows' },
+    { title: 'Extensions Page', icon: BlocksIcon, path: '/extensions' },
+    { title: 'Settings Page', icon: SettingsIcon, path: '/settings' },
   ] as const
 ).map((page) => ({
   title: page.title,

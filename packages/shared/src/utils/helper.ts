@@ -15,6 +15,20 @@ export function debounce<T extends unknown[]>(
   };
 }
 
+export function createDebounce() {
+  let timeout: number = -1;
+
+  return (callback: () => void, timeoutMs: number) => {
+    if (timeout > 0) {
+      clearTimeout(timeout);
+      timeout = setTimeout(callback, timeoutMs);
+      return;
+    }
+
+    timeout = setTimeout(callback, timeoutMs);
+  };
+}
+
 export type ThrottledFunction<T extends unknown[]> = (...args: T) => void;
 export function throttle<T extends unknown[]>(
   func: (...args: T) => void,
@@ -66,7 +80,7 @@ export function isObject(
 }
 
 export function sleep(ms = 1000) {
-  return new Promise((r) => setTimeout(r, ms));
+  return new Promise<void>((r) => setTimeout(r, ms));
 }
 
 export function getRandomArbitrary(min = 0, max = 10, remainder?: number) {

@@ -55,26 +55,21 @@ export async function tempHideCommandWindow<
     noThrow: true,
   });
   const hiddenState = WindowsManager.instance.isWindowHidden('command');
-  const isWindowFocus = commandWindow?.isFocused();
-
-  console.log({ hiddenState, isWindowFocus });
 
   try {
-    if (isWindowFocus) {
+    if (!hiddenState) {
       commandWindow?.minimize();
       commandWindow?.hide();
-      commandWindow?.setAlwaysOnTop(false);
     }
 
     const result = await callback();
 
     return result as ReturnType<T>;
   } finally {
-    if (isWindowFocus || (!hiddenState && !commandWindow?.isVisible())) {
+    if (!hiddenState) {
       commandWindow?.moveTop();
       commandWindow?.show();
       commandWindow?.focus();
-      commandWindow?.setAlwaysOnTop(true);
 
       await sleep(250);
     }

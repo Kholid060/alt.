@@ -10,32 +10,22 @@ import WindowCommand from '/@/window/command-window';
 import SharedProcessService from '/@/services/shared-process.service';
 
 /** EXTENSION */
-IPCMain.handle('extension:import', async ({ sender }) => {
-  const window = BrowserWindow.fromWebContents(sender);
-  const isAlwaysOnTop = window && window.isAlwaysOnTop();
-  if (isAlwaysOnTop) {
-    window.setAlwaysOnTop(false);
-  }
+IPCMain.handle('extension:import', async () => {
+  const {
+    canceled,
+    filePaths: [manifestPath],
+  } = await dialog.showOpenDialog({
+    buttonLabel: 'Import',
+    properties: ['openFile'],
+    title: 'Import Extension',
+    filters: [{ extensions: ['json'], name: 'Extension manifest' }],
+  });
+  if (canceled || !manifestPath) return null;
 
-  try {
-    const {
-      canceled,
-      filePaths: [manifestPath],
-    } = await dialog.showOpenDialog({
-      buttonLabel: 'Import',
-      properties: ['openFile'],
-      title: 'Import Extension',
-      filters: [{ extensions: ['json'], name: 'Extension manifest' }],
-    });
-    if (canceled || !manifestPath) return null;
+  const extensionData =
+    await ExtensionLoader.instance.importExtension(manifestPath);
 
-    const extensionData =
-      await ExtensionLoader.instance.importExtension(manifestPath);
-
-    return extensionData;
-  } finally {
-    if (isAlwaysOnTop) window.setAlwaysOnTop(true);
-  }
+  return extensionData;
 });
 IPCMain.handle('extension:reload', async (_, extId) => {
   await ExtensionLoader.instance.reloadExtension(extId);
@@ -63,14 +53,8 @@ IPCMain.handle(
 IPCMain.handle('apps:get-list', () => InstalledApps.instance.getApps());
 
 /** DIALOG */
-IPCMain.handle('dialog:open', ({ sender }, options) => {
-  const window = BrowserWindow.fromWebContents(sender);
-  const isAlwaysOnTop = window && window.isAlwaysOnTop();
-  if (isAlwaysOnTop) window.setAlwaysOnTop(false);
-
-  return dialog.showOpenDialog(options).finally(() => {
-    if (isAlwaysOnTop) window.setAlwaysOnTop(true);
-  });
+IPCMain.handle('dialog:open', (_, options) => {
+  return dialog.showOpenDialog(options);
 });
 IPCMain.handle('dialog:message-box', (_, options) => {
   return dialog.showMessageBox(options);
@@ -121,8 +105,8 @@ IPCMain.handle('command-window:show', () => {
 });
 
 /** DATABASE */
-IPCMain.handle('database:get-workflow-list', () => {
-  return DBService.instance.workflow.list();
+IPCMain.handle('database:get-workflow-list', (_, option) => {
+  return DBService.instance.workflow.list(option);
 });
 IPCMain.handle('database:get-workflow', (_, workflowId) => {
   return DBService.instance.workflow.get(workflowId);

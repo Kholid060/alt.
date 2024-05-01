@@ -368,7 +368,8 @@ function RouteWorkflows() {
           <hr className="h-6 w-px bg-border" />
           <UiSelect.Native
             value={sort.by}
-            className="border-0 px-2 bg-background"
+            className="border-0 bg-background"
+            selectClass="px-2"
             placeholder="Sort by"
             onChange={(event) =>
               setSort((prevValue) => ({

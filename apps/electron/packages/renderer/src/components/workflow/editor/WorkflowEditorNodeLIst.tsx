@@ -17,7 +17,8 @@ import { isIPCEventError } from '/@/utils/helper';
 import { Connection, useReactFlow } from 'reactflow';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
-import {
+import type {
+  WorkflowEditorNodeGroup,
   WorkflowEditorNodeListCommandItem,
   WorkflowEditorNodeListItem,
   WorkflowEditorNodeListTriggerItem,
@@ -26,13 +27,11 @@ import {
 import { nanoid } from 'nanoid/non-secure';
 import { WorkflowNewNode } from '#packages/common/interface/workflow.interface';
 
-type NodeType = 'all' | 'triggers' | 'commands' | 'scripts';
-
-const nodeTypes: { id: NodeType; title: string }[] = [
-  { id: 'all', title: 'All' },
-  { id: 'triggers', title: 'Triggers' },
-  { id: 'commands', title: 'Commands' },
-  { id: 'scripts', title: 'Scripts' },
+const nodeTypes: { id: WorkflowEditorNodeGroup | 'All'; title: string }[] = [
+  { id: 'All', title: 'All' },
+  { id: 'Triggers', title: 'Triggers' },
+  { id: 'Commands', title: 'Commands' },
+  { id: 'Scripts', title: 'Scripts' },
 ];
 
 const triggersNode: WorkflowEditorNodeListTriggerItem[] = [
@@ -56,12 +55,16 @@ export function WorkflowEditorNodeList({
     true,
   ]);
 
-  const [nodeType, setNodeType] = useState<NodeType>('all');
+  const [nodeType, setNodeType] = useState<WorkflowEditorNodeGroup | 'All'>(
+    'All',
+  );
 
-  const items = useMemo(() => {
-    const allItems: WorkflowEditorNodeListItem[] = [];
+  const commandItems = useMemo<WorkflowEditorNodeListCommandItem[]>(() => {
+    if (extensionsQuery.state !== 'idle') return [];
 
-    extensionsQuery.data?.forEach((extension) => {
+    const items: WorkflowEditorNodeListCommandItem[] = [];
+
+    extensionsQuery.data.forEach((extension) => {
       const extIcon = (
         <UiExtensionIcon
           alt={`${extension.title} icon`}
@@ -72,22 +75,21 @@ export function WorkflowEditorNodeList({
       );
 
       extension.commands.forEach((command) => {
-        if (
-          nodeType === 'triggers' ||
-          command.type === 'view' ||
-          command.type === 'view:json' ||
-          (nodeType === 'scripts' && command.type !== 'script') ||
-          (nodeType === 'commands' && command.type === 'script')
-        )
-          return;
+        if (command.type === 'view' || command.type === 'view:json') return;
 
         const item: WorkflowEditorNodeListCommandItem = {
           group: command.type === 'script' ? 'Scripts' : 'Commands',
           metadata: {
             title: command.title,
             commandId: command.name,
-            extensionId: extension.id,
-            extensionTitle: extension.title,
+            extension: {
+              id: extension.id,
+              title: extension.title,
+              version: extension.version,
+            },
+            $expData: {},
+            argsValue: {},
+            args: command.arguments ?? [],
             nodeType: WORKFLOW_NODE_TYPE.COMMAND,
             icon: command.icon || extension.icon,
           },
@@ -106,16 +108,21 @@ export function WorkflowEditorNodeList({
           value: extension.id + command.name,
         };
 
-        allItems.push(item);
+        items.push(item);
       });
     });
 
-    if (nodeType === 'all' || nodeType === 'triggers') {
-      allItems.unshift(...triggersNode);
-    }
+    return items;
+  }, [extensionsQuery]);
 
-    return allItems;
-  }, [extensionsQuery, nodeType]);
+  const items = ([] as WorkflowEditorNodeListItem[]).concat(
+    triggersNode,
+    commandItems,
+  );
+  const filteredItems =
+    nodeType === 'All'
+      ? items
+      : items.filter((item) => item.group === nodeType);
 
   function onItemSelected(value: string) {
     const selectedItem = items.find((item) => item.value === value);
@@ -158,7 +165,7 @@ export function WorkflowEditorNodeList({
           </div>
         </div>
         <UiList
-          items={items}
+          items={filteredItems}
           onItemSelected={onItemSelected}
           className="h-72 p-2 overflow-auto"
           renderItem={({ item, props, ref, selected }) => (

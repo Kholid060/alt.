@@ -1,3 +1,4 @@
+import type { ExtensionCommandArgument } from '@repo/extension-core';
 import type {
   WORKFLOW_MANUAL_TRIGGER_ID,
   WORKFLOW_NODE_TYPE,
@@ -5,8 +6,16 @@ import type {
 import type { Edge, Node } from 'reactflow';
 import type { SetOptional, SetRequired } from 'type-fest';
 
+export interface WorkflowFormExpression {
+  value: string;
+  active: boolean;
+}
+
+export type WorkflowFormExpressionData = Record<string, WorkflowFormExpression>;
+
 interface WorkflowNodeBaseData {
   description?: string;
+  $expData: WorkflowFormExpressionData;
 }
 
 export type WorkflowNodeBase<
@@ -19,9 +28,13 @@ export type WorkflowNodeCommand = WorkflowNodeBase<
     icon: string;
     title: string;
     commandId: string;
-    extensionId: string;
-    extensionTitle: string;
-    commandData: Record<string, unknown>;
+    extension: {
+      id: string;
+      title: string;
+      version: string;
+    };
+    args: ExtensionCommandArgument[];
+    argsValue: Record<string, unknown>;
   } & WorkflowNodeBaseData,
   WORKFLOW_NODE_TYPE.COMMAND
 >;

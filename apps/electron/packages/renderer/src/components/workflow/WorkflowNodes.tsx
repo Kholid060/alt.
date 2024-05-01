@@ -18,7 +18,7 @@ export const WorkflowNodeCommand: React.FC<
         <div className="h-8 w-8">
           <UiExtensionIcon
             alt={`${data.title} icon`}
-            id={data.extensionId}
+            id={data.extension.id}
             icon={data.icon}
             iconWrapper={(icon) => <UiList.Icon icon={icon} />}
           />
@@ -26,7 +26,7 @@ export const WorkflowNodeCommand: React.FC<
         <div className="flex-grow ml-2">
           <p className="line-clamp-1">{data.title}</p>
           <p className="line-clamp-1 text-xs text-muted-foreground">
-            {data.extensionTitle}
+            {data.extension.title}
           </p>
         </div>
       </div>

@@ -46,7 +46,6 @@ class WindowCommand extends WindowUtils implements WindowBase {
       type: 'toolbar',
       resizable: false,
       skipTaskbar: true,
-      alwaysOnTop: true,
       transparent: true,
       minimizable: false,
       maximizable: false,
@@ -125,11 +124,14 @@ class WindowCommand extends WindowUtils implements WindowBase {
     return browserWindow;
   }
 
-  toggleWindow(showWindow: boolean = false) {
+  toggleWindow(showWindow?: boolean) {
     if (!this.browserWindow) return;
 
     const isHidden = WindowsManager.instance.isWindowHidden('command');
-    if (!isHidden && typeof showWindow === 'boolean' && showWindow === false) {
+    if (
+      !isHidden ||
+      (typeof showWindow === 'boolean' && showWindow === false)
+    ) {
       this.browserWindow.minimize();
       this.browserWindow.hide();
       return;

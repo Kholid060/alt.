@@ -1,21 +1,20 @@
 import {
   type Edge,
-  type OnConnect,
-  type OnEdgesChange,
-  type OnNodesChange,
-  Node,
   addEdge,
   Connection,
   updateEdge,
+  NodeChange,
+  EdgeChange,
   applyEdgeChanges,
   applyNodeChanges,
-  OnSelectionChangeFunc,
+  Node,
 } from 'reactflow';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import createStoreSelectors from '../utils/createStoreSelector';
 import { nanoid } from 'nanoid/non-secure';
 import {
+  WorkflowEdge,
   WorkflowNewNode,
   WorkflowNodes,
 } from '#common/interface/workflow.interface';
@@ -24,31 +23,47 @@ import {
   DatabaseWorkflowDetail,
   DatabaseWorkflowUpdatePayload,
 } from '#packages/main/src/interface/database.interface';
+import { createDebounce } from '@repo/shared';
+
+interface WorkflowElement {
+  edges: WorkflowEdge[];
+  nodes: WorkflowNodes[];
+}
 
 export interface WorkflowEditorStoreState {
+  editNode: WorkflowNodes | null;
+  workflowChangesId: number;
   workflowLastSavedAt: null | string;
   workflow: DatabaseWorkflowDetail | null;
-  selection: { nodes: WorkflowNodes[]; edges: Edge[] };
+  selection: WorkflowElement;
   workflowChanges: Set<keyof DatabaseWorkflowUpdatePayload>;
 }
 
 export interface WorkflowEditorStoreActions {
   $reset: () => void;
-  onConnect: OnConnect;
-  onNodesChange: OnNodesChange;
-  onEdgesChange: OnEdgesChange;
   clearWorkflowChanges: () => void;
-  onSelectionChange: OnSelectionChangeFunc;
   addNodes: (nodes: WorkflowNewNode[]) => void;
   addEdges: (connections: Connection[]) => void;
+  setEditNode(node: WorkflowNodes | null): void;
+  setSelection(selection: WorkflowElement): void;
   deleteEdge: (edgeId: string | string[]) => void;
   setWorkflow: (workflow: DatabaseWorkflowDetail) => void;
+  updateEditNode(node: Partial<WorkflowNodes['data']>): void;
   updateWorkflow: (
     data:
       | DatabaseWorkflowUpdatePayload
       | ((workflow: DatabaseWorkflowDetail) => DatabaseWorkflowUpdatePayload),
+    saveChanges?: boolean,
   ) => void;
   updateEdge: (edgeId: string | Edge, connection: Connection) => boolean;
+  updateNodeData: (
+    nodeId: string,
+    data: Partial<WorkflowNodes['data']>,
+  ) => boolean;
+  applyElementChanges(changes: {
+    nodes?: NodeChange[];
+    edges?: EdgeChange[];
+  }): void;
 }
 
 export type WorkflowEditorStore = WorkflowEditorStoreState &
@@ -56,18 +71,107 @@ export type WorkflowEditorStore = WorkflowEditorStoreState &
 
 const initialState: WorkflowEditorStoreState = {
   workflow: null,
+  editNode: null,
+  workflowChangesId: 0,
   workflowLastSavedAt: null,
   workflowChanges: new Set(),
   selection: { edges: [], nodes: [] },
 };
 
+const updateWorkflowNodeDebounce = createDebounce();
+
 const workflowEditorStore = create(
   subscribeWithSelector<WorkflowEditorStore>((set, get) => ({
     ...initialState,
     clearWorkflowChanges() {
-      set({ workflowChanges: new Set() });
+      set({
+        workflowChanges: new Set(),
+        workflowLastSavedAt: new Date().toString(),
+      });
     },
-    updateWorkflow(data) {
+    updateNodeData(nodeId, data) {
+      let nodeFound = false;
+
+      get().updateWorkflow(({ nodes }) => {
+        const newNodes = nodes.map((node) => {
+          if (node.id !== nodeId) return node;
+
+          nodeFound = true;
+
+          return { ...node, data: { ...node.data, ...data } };
+        }) as WorkflowNodes[];
+
+        if (!nodeFound) return {};
+
+        return { nodes: newNodes };
+      });
+
+      return nodeFound;
+    },
+    setEditNode(node) {
+      if (get().editNode?.id === node?.id) return;
+
+      set({ editNode: structuredClone(node) });
+    },
+    setSelection(selection) {
+      set({ selection });
+    },
+    updateEditNode(nodeData) {
+      const currentNode = get().editNode;
+      if (!currentNode) return;
+
+      const node = {
+        ...currentNode,
+        data: { ...currentNode.data, ...nodeData },
+      } as WorkflowNodes;
+
+      set({
+        editNode: node,
+      });
+
+      updateWorkflowNodeDebounce(() => {
+        get().updateWorkflow(({ nodes }) => {
+          let nodeUpdated = false;
+
+          const newNodes = nodes.map((item) => {
+            if (node.id !== item.id) return item;
+
+            nodeUpdated = true;
+
+            return {
+              ...item,
+              data: {
+                ...item.data,
+                ...node.data,
+              },
+            };
+          }) as WorkflowNodes[];
+
+          if (!nodeUpdated) return {};
+
+          return { nodes: newNodes };
+        });
+      }, 250);
+    },
+    applyElementChanges({ edges, nodes }) {
+      const { workflow, workflowChangesId } = get();
+      if (!workflow) return;
+
+      const updatedElement: Partial<WorkflowElement> = {};
+      if (edges) updatedElement.edges = applyEdgeChanges(edges, workflow.edges);
+      if (nodes) {
+        updatedElement.nodes = applyNodeChanges(
+          nodes,
+          workflow.nodes as Node[],
+        ) as WorkflowNodes[];
+      }
+
+      set({
+        workflowChangesId: workflowChangesId + 1,
+        workflow: { ...workflow, ...updatedElement },
+      });
+    },
+    updateWorkflow(data, saveChanges = true) {
       const state = get();
       const currentWorkflow = state.workflow;
       if (!currentWorkflow) throw new Error("Workflow hasn't been initialized");
@@ -79,40 +183,18 @@ const workflowEditorStore = create(
 
       if (keys.length === 0) return;
 
-      set({
-        workflowLastSavedAt: new Date().toString(),
+      const updatePayload: Partial<WorkflowEditorStoreState> = {
         workflowChanges: new Set([...state.workflowChanges, ...keys]),
         workflow: {
           ...currentWorkflow,
           ...newData,
         },
-      });
-    },
-    onNodesChange(changes) {
-      get().updateWorkflow((workflow) => ({
-        nodes: applyNodeChanges(
-          changes,
-          workflow.nodes as Node[],
-        ) as WorkflowNodes[],
-      }));
-    },
-    onEdgesChange(changes) {
-      get().updateWorkflow((workflow) => ({
-        edges: applyEdgeChanges(changes, workflow.edges),
-      }));
-    },
-    onConnect(connection: Connection) {
-      get().updateWorkflow((workflow) => ({
-        edges: addEdge(connection, workflow.edges),
-      }));
-    },
-    onSelectionChange({ edges, nodes }) {
-      set({
-        selection: {
-          edges,
-          nodes: nodes as WorkflowNodes[],
-        },
-      });
+      };
+      if (saveChanges) {
+        updatePayload.workflowChangesId = state.workflowChangesId + 1;
+      }
+
+      set(updatePayload);
     },
     updateEdge(edgeId, connection) {
       get().updateWorkflow((workflow) => {

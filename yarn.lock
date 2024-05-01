@@ -2908,6 +2908,33 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@radix-ui/react-tabs@npm:^1.0.4":
+  version: 1.0.4
+  resolution: "@radix-ui/react-tabs@npm:1.0.4"
+  dependencies:
+    "@babel/runtime": "npm:^7.13.10"
+    "@radix-ui/primitive": "npm:1.0.1"
+    "@radix-ui/react-context": "npm:1.0.1"
+    "@radix-ui/react-direction": "npm:1.0.1"
+    "@radix-ui/react-id": "npm:1.0.1"
+    "@radix-ui/react-presence": "npm:1.0.1"
+    "@radix-ui/react-primitive": "npm:1.0.3"
+    "@radix-ui/react-roving-focus": "npm:1.0.4"
+    "@radix-ui/react-use-controllable-state": "npm:1.0.1"
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: ^16.8 || ^17.0 || ^18.0
+    react-dom: ^16.8 || ^17.0 || ^18.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+    "@types/react-dom":
+      optional: true
+  checksum: 10c0/79699a921f5c2e890e0e496a751d9c2a7c4017eff8e52f094389e993263332881353bdd27b8cc123c906b36743e803eec7f32fdbb4d413328cba0a37d6413339
+  languageName: node
+  linkType: hard
+
 "@radix-ui/react-toast@npm:^1.1.5":
   version: 1.1.5
   resolution: "@radix-ui/react-toast@npm:1.1.5"
@@ -3442,6 +3469,7 @@ __metadata:
     "@radix-ui/react-select": "npm:^2.0.0"
     "@radix-ui/react-slot": "npm:^1.0.2"
     "@radix-ui/react-switch": "npm:^1.0.3"
+    "@radix-ui/react-tabs": "npm:^1.0.4"
     "@radix-ui/react-toast": "npm:^1.1.5"
     "@radix-ui/react-toggle": "npm:^1.0.3"
     "@radix-ui/react-toggle-group": "npm:^1.0.4"
@@ -5576,6 +5604,19 @@ __metadata:
   checksum: 10c0/ac4f72adf727ee425e049bc9d8b31d4a57e1c90da8d28bcd23d60781b12fcd6fc3d68db5df16994c57b78b94eed7988f5a6b482fd376dc5b084125e20a0a622e
   languageName: node
   linkType: hard
+
+"alt.@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "alt.@workspace:."
+  dependencies:
+    "@repo/eslint-config": "workspace:*"
+    eslint: "npm:^8.56.0"
+    nano-staged: "npm:^0.8.0"
+    prettier: "npm:^3.1.1"
+    turbo: "npm:latest"
+    typescript: "npm:^5.4.5"
+  languageName: unknown
+  linkType: soft
 
 "ansi-escapes@npm:^6.2.0":
   version: 6.2.0
@@ -11387,19 +11428,6 @@ __metadata:
   checksum: 10c0/73075db44a692bf6c34a649f3b4b3aea4993b84f6b754cbf7a8577e7c7db44c0bad87752bd23b0ce533f49de2244ce2ce03b7b1b667a85ae170a94782cc50f9b
   languageName: node
   linkType: hard
-
-"komand@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "komand@workspace:."
-  dependencies:
-    "@repo/eslint-config": "workspace:*"
-    eslint: "npm:^8.56.0"
-    nano-staged: "npm:^0.8.0"
-    prettier: "npm:^3.1.1"
-    turbo: "npm:latest"
-    typescript: "npm:^5.4.5"
-  languageName: unknown
-  linkType: soft
 
 "language-subtag-registry@npm:^0.3.20":
   version: 0.3.22

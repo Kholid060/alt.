@@ -89,13 +89,13 @@ export class NodeHandlerCommand extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.C
   async execute({
     node,
   }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.COMMAND>): Promise<WorkflowNodeHandlerExecuteReturn> {
-    const { commandId, extensionId } = node.data;
+    const { commandId, extension } = node.data;
 
     const inputtedConfigCacheId = `command-confg:${node.id}`;
     if (!this.inputtedConfigCache.has(inputtedConfigCacheId)) {
       const commandConfig = await IPCRenderer.invoke(
         'extension:is-config-inputted',
-        extensionId,
+        extension.id,
         commandId,
       );
       if (isIPCEventError(commandConfig)) {
@@ -112,15 +112,15 @@ export class NodeHandlerCommand extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.C
 
     const command = await this.getCommandData({
       commandId,
-      extensionId,
       nodeId: node.id,
+      extensionId: extension.id,
     });
     const value = await executeCommandPromise({
       command,
       commandId,
-      extensionId,
+      extensionId: extension.id,
       launchContext: {
-        args: node.data.commandData ?? {},
+        args: node.data.argsValue ?? {},
         launchBy: CommandLaunchBy.WORKFLOW,
       },
       commandFilePath: command.filePath,

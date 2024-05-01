@@ -99,6 +99,12 @@ export {
   UiAvatarImage,
   UiAvatarFallback,
 } from './components/ui/avatar';
+export {
+  UiTabs,
+  UiTabsList,
+  UiTabsTrigger,
+  UiTabsContent,
+} from './components/ui/tabs';
 
 export { useUiList } from './context/list.context';
 

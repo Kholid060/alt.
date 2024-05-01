@@ -16,7 +16,7 @@ import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/const
 class DBWorkflowService {
   constructor(private database: SQLiteDatabase) {}
 
-  list(option: DatabaseWorkfowListQueryOptions): Promise<DatabaseWorkflow[]> {
+  list(option?: DatabaseWorkfowListQueryOptions): Promise<DatabaseWorkflow[]> {
     let query = this.database
       .select({
         id: workflows.id,

@@ -13,10 +13,27 @@ import AppDevtools from '/@/components/app/AppDevtools';
 import AppEventListener from '/@/components/app/AppEventListener';
 import { DatabaseProvider } from '/@/context/database.context';
 import { commandAppRoutes } from './routes';
+import { useCommandStore } from '/@/stores/command.store';
+import { useEffect } from 'react';
+import preloadAPI from '/@/utils/preloadAPI';
 
 const routes = createCommandRoutes(commandAppRoutes);
 
 function App() {
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      const { isWindowHidden } = useCommandStore.getState();
+      if (!isWindowHidden && document.visibilityState === 'hidden') {
+        preloadAPI.main.ipc.invoke('command-window:close');
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+  }, []);
+
   return (
     <UiTooltipProvider>
       <DatabaseProvider>

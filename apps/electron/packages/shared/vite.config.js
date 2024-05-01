@@ -45,7 +45,6 @@ const config = {
         `node:${item}`,
       ]),
     },
-    emptyOutDir: true,
   },
 };
 
