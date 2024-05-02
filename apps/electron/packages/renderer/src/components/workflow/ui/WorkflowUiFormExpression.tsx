@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
+import { UiLabel } from '@repo/ui';
 
 interface WorkflowFormExpressionProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
@@ -53,12 +54,9 @@ function WorkflowUiFormExpression({
       <div className="flex items-center justify-between mb-0.5">
         <div className="flex-grow">
           {label && (
-            <label
-              htmlFor={labelId}
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ml-1 line-clamp-1"
-            >
+            <UiLabel htmlFor={labelId} className="ml-1 line-clamp-1">
               {label}
-            </label>
+            </UiLabel>
           )}
         </div>
         <button
@@ -91,7 +89,7 @@ function WorkflowUiFormExpression({
             onChange={({ target }) =>
               updateExpressionData({ value: target.value })
             }
-            className="flex-grow h-full min-h-10 p-2 rounded-r-md focus:outline-none"
+            className="flex-grow h-full min-h-9 p-2 rounded-r-md focus:outline-none"
           ></textarea>
         </div>
       ) : (

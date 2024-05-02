@@ -29,11 +29,20 @@ export default {
       arguments: [
         {
           name: 'test',
+          title: 'Test',
           placeholder: 'Test',
           type: 'input:text'
         },
         {
+          name: 'test',
+          title: 'Test',
+          type: 'toggle',
+          placeholder: 'Test',
+        },
+        {
           name: 'select',
+          required: true,
+          title: 'Select!',
           placeholder: 'Select',
           type: 'select',
           options: [
@@ -69,13 +78,6 @@ export default {
       name: 'bash-script.sh',
       title: 'Bash script',
       type: 'script',
-      arguments: [
-        {
-          name: 'test',
-          placeholder: 'Test',
-          type: 'input:text'
-        }
-      ],
     },
     {
       icon: 'icon:Terminal',
@@ -85,6 +87,7 @@ export default {
       arguments: [
         {
           name: 'test',
+          title: 'テスト',
           placeholder: 'Test',
           type: 'input:text'
         }
@@ -98,6 +101,7 @@ export default {
       arguments: [
         {
           name: 'test',
+          title: 'Test',
           placeholder: 'Test',
           type: 'input:text'
         }
@@ -111,7 +115,8 @@ export default {
       arguments: [
         {
           name: 'test',
-          placeholder: 'Test',
+          title: 'Test',
+          placeholder: 'Placeholder!',
           type: 'input:text',
           required: true,
         }

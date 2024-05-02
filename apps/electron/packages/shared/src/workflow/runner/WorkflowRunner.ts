@@ -14,6 +14,8 @@ import { WorkflowRunnerNodeError } from './workflow-runner-errors';
 import ExtensionCommandRunner from '/@/extension/ExtensionCommandRunner';
 import SandboxService from '/@/services/sandbox.service';
 import { setProperty } from 'dot-prop';
+import { debugLog } from '#packages/common/utils/helper';
+import { sleep } from '@repo/shared';
 
 export type NodeHandlersObj = Record<
   WORKFLOW_NODE_TYPE,
@@ -42,39 +44,53 @@ export enum WorkflowRunnerFinishReason {
   Stop = 'stopped',
 }
 
+interface NodeConnectionMapItem {
+  nodeId: string;
+  targetHandle?: string | null;
+  sourceHandle?: string | null;
+}
 interface NodeConnectionMap {
-  source: string[];
-  target: string[];
+  source: NodeConnectionMapItem[];
+  target: NodeConnectionMapItem[];
 }
 
 function getNodeConnectionsMap(nodes: WorkflowNodes[], edges: WorkflowEdge[]) {
   const connectionMap: Record<string, NodeConnectionMap> = {};
   const nodePositions = new Map(nodes.map((node) => [node.id, node.position]));
 
-  edges.forEach((edge) => {
-    if (!nodePositions.has(edge.source) || !nodePositions.has(edge.target))
-      return;
+  edges.forEach(({ source, target, sourceHandle, targetHandle }) => {
+    if (!nodePositions.has(source) || !nodePositions.has(target)) return;
 
-    if (!connectionMap[edge.source]) {
-      connectionMap[edge.source] = {
+    if (!connectionMap[source]) {
+      connectionMap[source] = {
         source: [],
         target: [],
       };
     }
-    if (!connectionMap[edge.target]) {
-      connectionMap[edge.target] = {
+    if (!connectionMap[target]) {
+      connectionMap[target] = {
         source: [],
         target: [],
       };
     }
 
-    connectionMap[edge.target].source.push(edge.source);
-    connectionMap[edge.source].target.push(edge.target);
+    connectionMap[target].source.push({
+      sourceHandle,
+      targetHandle,
+      nodeId: source,
+    });
+    connectionMap[source].target.push({
+      targetHandle,
+      sourceHandle,
+      nodeId: target,
+    });
   });
 
   // sort connection by the node Y position
-  const connectionSorter = (a: string, z: string) =>
-    nodePositions.get(a)!.y - nodePositions.get(z)!.y;
+  const connectionSorter = (
+    a: NodeConnectionMapItem,
+    z: NodeConnectionMapItem,
+  ) => nodePositions.get(a.nodeId)!.y - nodePositions.get(z.nodeId)!.y;
   for (const key in connectionMap) {
     const connection = connectionMap[key];
     connection.source.sort(connectionSorter);
@@ -87,6 +103,8 @@ function getNodeConnectionsMap(nodes: WorkflowNodes[], edges: WorkflowEdge[]) {
 export interface WorkflowRunnerPrevNodeExecution {
   value: unknown;
   node: WorkflowNodes;
+  retryCount?: number;
+  isRetrying?: boolean;
 }
 
 class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
@@ -191,11 +209,80 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     return { ...node, data: copyNodeData } as WorkflowNodes;
   }
 
+  private findNextNode(
+    nodeId: string,
+    sourceHandle?: string,
+  ):
+    | {
+        node: null;
+        status: 'not-found' | 'finish';
+      }
+    | {
+        status: 'continue';
+        node: WorkflowNodes;
+      } {
+    const connection = this.connectionsMap[nodeId];
+    if (!connection || connection.target.length === 0) {
+      const lastNodeIdQueue = this.nodeExecutionQueue.pop();
+      const nextNode = lastNodeIdQueue ? this.getNode(lastNodeIdQueue) : null;
+
+      if (!nextNode) {
+        this.state = WorkflowRunnerState.Finish;
+        this.emit('finish', WorkflowRunnerFinishReason.Done);
+        this.destroy();
+
+        return {
+          node: null,
+          status: 'finish',
+        };
+      }
+
+      return {
+        node: nextNode,
+        status: 'continue',
+      };
+    }
+
+    const nextNodeId = sourceHandle
+      ? connection.target.find((target) =>
+          target.sourceHandle?.startsWith(sourceHandle),
+        )
+      : connection.target[0];
+    if (nextNodeId && connection.target.length > 1) {
+      this.nodeExecutionQueue.push(
+        ...connection.target
+          .slice(1)
+          .toReversed()
+          .map(({ nodeId }) => nodeId),
+      );
+    }
+
+    const nextNode = nextNodeId ? this.getNode(nextNodeId.nodeId) : null;
+    if (!nextNode) {
+      this.emitError("Couldn't find the next node");
+
+      return {
+        node: null,
+        status: 'not-found',
+      };
+    }
+
+    return {
+      node: nextNode,
+      status: 'continue',
+    };
+  }
+
   private async executeNode(
     node: WorkflowNodes,
-    prevExecution?: WorkflowRunnerPrevNodeExecution,
+    prevExec?: WorkflowRunnerPrevNodeExecution,
   ) {
     try {
+      if (node.id === prevExec?.node.id) {
+        this.emitError('Stopped to prevent infinite loop');
+        return;
+      }
+
       const nodeHandler = this.nodeHandlers[node.type];
       if (!nodeHandler) {
         throw new WorkflowRunnerNodeError(
@@ -206,43 +293,14 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
       const renderedNode = await this.evaluateNodeExpression(node);
       const result = await nodeHandler.execute({
         runner: this,
-        prevExecution,
+        prevExecution: prevExec,
         node: renderedNode,
       });
 
-      const connection = this.connectionsMap[result.nextNodeId || node.id];
-      if (!connection || connection.target.length === 0) {
-        const lastNodeIdQueue = this.nodeExecutionQueue.pop();
-        const nextNode = lastNodeIdQueue ? this.getNode(lastNodeIdQueue) : null;
+      const nextNode = this.findNextNode(node.id);
+      if (nextNode.status !== 'continue') return;
 
-        if (!nextNode) {
-          this.state = WorkflowRunnerState.Finish;
-          this.emit('finish', WorkflowRunnerFinishReason.Done);
-          this.destroy();
-        } else {
-          this.executeNode(nextNode, {
-            node,
-            value: result.value,
-          });
-        }
-
-        return;
-      }
-
-      const nextNodeId = connection.target[0];
-      if (connection.target.length > 1) {
-        this.nodeExecutionQueue.push(
-          ...connection.target.slice(1).toReversed(),
-        );
-      }
-
-      const nextNode = this.getNode(nextNodeId);
-      if (!nextNode) {
-        this.emitError(`Couldn't find node with "${nextNodeId}" id`);
-        return;
-      }
-
-      this.executeNode(nextNode, {
+      this.executeNode(nextNode.node, {
         node,
         value: result.value,
       });
@@ -252,9 +310,48 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
         return;
       }
 
-      // TO_DO: check if node has error handler;
+      if (!node.data.$errorHandler) {
+        this.emitError((<Error>error).message);
+        return;
+      }
 
-      // emit event if no error handler
+      const { action, retry, retryCount, retryIntervalMs } =
+        node.data.$errorHandler;
+
+      const retryExecution =
+        retry &&
+        (prevExec?.isRetrying && typeof prevExec?.retryCount === 'number'
+          ? prevExec.retryCount <= retryCount
+          : true);
+      if (retryExecution) {
+        debugLog(
+          `Retry execution {${prevExec?.retryCount ?? 0} => ${retryCount}}`,
+        );
+
+        await sleep(retryIntervalMs);
+
+        this.executeNode(node, {
+          ...(prevExec || { value: null, node }),
+          isRetrying: true,
+          retryCount: (prevExec?.retryCount ?? 0) + 1,
+        });
+        return;
+      }
+
+      if (action === 'continue' || action === 'fallback') {
+        const nextNode = this.findNextNode(
+          node.id,
+          action === 'fallback' ? 'error-fallback' : '',
+        );
+        if (nextNode.status !== 'continue') return;
+
+        this.executeNode(
+          nextNode.node,
+          prevExec ? { node: prevExec.node, value: prevExec.value } : undefined,
+        );
+        return;
+      }
+
       this.emitError((<Error>error).message);
     }
   }

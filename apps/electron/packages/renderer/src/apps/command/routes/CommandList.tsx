@@ -237,8 +237,8 @@ function CommandList() {
         items={[
           ...extensionCommands.suggestionItems,
           ...extensionCommands.commandItems,
-          ...workflowCommands,
           ...builtInCommands,
+          ...workflowCommands,
         ]}
         customFilter={customListFilter}
         renderItem={({ ref, item, ...detail }) => {

@@ -13,6 +13,7 @@ import UiExtensionIcon from '../../ui/UiExtensionIcon';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
 import { ChevronDown } from 'lucide-react';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
+import WorkflowNodeErrorHandler from './WorklflowNodeErrorHandler';
 
 function CommandArgs({ data }: { data: WorkflowNodeCommand['data'] }) {
   const updateEditNode = useWorkflowEditorStore.use.updateEditNode();
@@ -27,8 +28,8 @@ function CommandArgs({ data }: { data: WorkflowNodeCommand['data'] }) {
   }
 
   return (
-    <ul className="space-y-2">
-      {data.args.map((arg) => {
+    <ul className="space-y-3">
+      {data.args.map((arg, index) => {
         let argComponent: React.ReactNode = null;
 
         switch (arg.type) {
@@ -83,26 +84,23 @@ function CommandArgs({ data }: { data: WorkflowNodeCommand['data'] }) {
           }
           case 'toggle':
             argComponent = (
-              <div className="flex items-center gap-1">
-                <UiSwitch
-                  id={arg.name}
-                  size="sm"
-                  checked={Boolean(data.argsValue[arg.name])}
-                  onCheckedChange={(checked) => {
-                    updateArgValue(arg.name, checked);
-                  }}
-                  className="data-[state=unchecked]:bg-secondary-selected"
-                />
-                <span className="line-clamp-1 max-w-28">{arg.placeholder}</span>
-              </div>
+              <UiSwitch
+                id={arg.name}
+                size="sm"
+                checked={Boolean(data.argsValue[arg.name])}
+                onCheckedChange={(checked) => {
+                  updateArgValue(arg.name, checked);
+                }}
+                className="data-[state=unchecked]:bg-secondary-selected"
+              />
             );
             break;
         }
 
         return (
-          <li key={data.extension.id + arg.name}>
+          <li key={data.extension.id + arg.name + index}>
             <WorkflowUiFormExpression
-              label={arg.title || arg.name}
+              label={arg.title}
               labelId={arg.name}
               data={data.$expData ?? {}}
               path={`argsValue.${arg.name}`}
@@ -138,13 +136,16 @@ function WorkflowNodeEditCommand() {
           </p>
         </div>
       </div>
-      <UiTabs variant="line" defaultValue="arguments">
+      <UiTabs variant="line" defaultValue="parameters">
         <UiTabsList>
-          <UiTabsTrigger value="arguments">Arguments</UiTabsTrigger>
-          <UiTabsTrigger value="settings">Settings</UiTabsTrigger>
+          <UiTabsTrigger value="parameters">Parameters</UiTabsTrigger>
+          <UiTabsTrigger value="error">Error Handler</UiTabsTrigger>
         </UiTabsList>
-        <UiTabsContent value="arguments" className="p-4 mt-0">
+        <UiTabsContent value="parameters" className="p-4 mt-0">
           <CommandArgs data={data} />
+        </UiTabsContent>
+        <UiTabsContent value="error" className="p-4 mt-0">
+          <WorkflowNodeErrorHandler data={data.$errorHandler} />
         </UiTabsContent>
       </UiTabs>
     </>

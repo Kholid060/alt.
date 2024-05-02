@@ -6,16 +6,26 @@ import type {
 import type { Edge, Node } from 'reactflow';
 import type { SetOptional, SetRequired } from 'type-fest';
 
+export type WorkflowNodeErroHandlerAction = 'continue' | 'stop' | 'fallback';
+
+export interface WorkflowNodeErroHandler {
+  retry: boolean;
+  retryCount: number;
+  retryIntervalMs: number;
+  action: WorkflowNodeErroHandlerAction;
+}
+
 export interface WorkflowFormExpression {
   value: string;
   active: boolean;
 }
-
 export type WorkflowFormExpressionData = Record<string, WorkflowFormExpression>;
 
 interface WorkflowNodeBaseData {
+  isDisabled: boolean;
   description?: string;
   $expData: WorkflowFormExpressionData;
+  $errorHandler?: WorkflowNodeErroHandler;
 }
 
 export type WorkflowNodeBase<

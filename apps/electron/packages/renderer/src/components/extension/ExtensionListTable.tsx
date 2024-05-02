@@ -376,7 +376,7 @@ function ExtensionListTable({
                         </UiTooltip>
                         <UiPopoverContent>
                           <p>Extension Error</p>
-                          <pre className="bg-background p-3 rounded-lg mt-2 text-sm whitespace-pre-wrap text-muted-foreground">
+                          <pre className="bg-background overflow-auto p-3 rounded-lg mt-2 text-sm whitespace-pre-wrap text-muted-foreground">
                             {extension.errorMessage}
                           </pre>
                         </UiPopoverContent>

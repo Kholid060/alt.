@@ -105,6 +105,7 @@ export {
   UiTabsTrigger,
   UiTabsContent,
 } from './components/ui/tabs';
+export { UiLabel } from './components/ui/label';
 
 export { useUiList } from './context/list.context';
 

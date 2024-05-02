@@ -47,7 +47,13 @@ function validateCommandArgument(
   };
 
   for (const arg of args) {
-    if (!Object.hasOwn(argsValue, arg.name)) continue;
+    if (!Object.hasOwn(argsValue, arg.name)) {
+      if (arg.required) {
+        throw new Error(`"${arg.title}" argument is required`);
+      }
+
+      continue;
+    }
 
     switch (arg.type) {
       case 'input:text':
@@ -127,9 +133,7 @@ export class NodeHandlerCommand extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.C
   }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.COMMAND>): Promise<WorkflowNodeHandlerExecuteReturn> {
     const { commandId, extension } = node.data;
 
-    if (Object.keys(node.data.$expData).length > 0) {
-      validateCommandArgument(node.data.args, node.data.argsValue);
-    }
+    validateCommandArgument(node.data.args, node.data.argsValue);
 
     const inputtedConfigCacheId = `command-confg:${node.id}`;
     if (!this.inputtedConfigCache.has(inputtedConfigCacheId)) {
