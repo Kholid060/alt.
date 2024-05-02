@@ -21,7 +21,7 @@ interface WorkflowNodeBaseData {
 export type WorkflowNodeBase<
   T = unknown,
   P extends string = string,
-> = SetRequired<Node<T, P>, 'type'>;
+> = SetRequired<Node<T & WorkflowNodeBaseData, P>, 'type'>;
 
 export type WorkflowNodeCommand = WorkflowNodeBase<
   {
@@ -35,7 +35,7 @@ export type WorkflowNodeCommand = WorkflowNodeBase<
     };
     args: ExtensionCommandArgument[];
     argsValue: Record<string, unknown>;
-  } & WorkflowNodeBaseData,
+  },
   WORKFLOW_NODE_TYPE.COMMAND
 >;
 

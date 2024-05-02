@@ -8277,6 +8277,7 @@ __metadata:
     usehooks-ts: "npm:^3.1.0"
     vite: "npm:5.1.1"
     vite-plugin-node-polyfills: "npm:^0.21.0"
+    vite-plugin-singlefile: "npm:^2.0.1"
     vite-plugin-static-copy: "npm:^1.0.1"
     vitest: "npm:1.2.2"
     which: "npm:^4.0.0"
@@ -16892,6 +16893,18 @@ __metadata:
   peerDependencies:
     vite: ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0
   checksum: 10c0/09095c1244dea0b9e2c78b9c44591c75048b6c12b65dd85e78edb3c1b7dd8222670f72e1849f70bbdb5a2a0e0b2b1c4deec7779cbe52664ba1f0fda1c19115f5
+  languageName: node
+  linkType: hard
+
+"vite-plugin-singlefile@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "vite-plugin-singlefile@npm:2.0.1"
+  dependencies:
+    micromatch: "npm:^4.0.5"
+  peerDependencies:
+    rollup: ^4.12.0
+    vite: ^5.1.4
+  checksum: 10c0/a41249a803335ab2cb6c8340e9d6fdc2c67e703b96340f446d198a5933c7a6dbfa7997535ba9bd6b9060fc0838b8c06be94dd2e9027c85a6af5d640e5df312e9
   languageName: node
   linkType: hard
 

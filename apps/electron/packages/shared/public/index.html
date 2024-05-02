@@ -2,7 +2,7 @@
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
-  <meta content="script-src 'self' blob: extension:; worker-src extension: 'self'" http-equiv="Content-Security-Policy">
+  <meta content="script-src 'self' blob: sandbox: extension:; worker-src 'self'; frame-src sandbox: extension:" http-equiv="Content-Security-Policy">
   <title>Shared Process</title>
 </head>
 <body>

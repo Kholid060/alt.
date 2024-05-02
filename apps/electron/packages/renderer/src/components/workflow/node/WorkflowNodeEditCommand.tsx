@@ -27,7 +27,7 @@ function CommandArgs({ data }: { data: WorkflowNodeCommand['data'] }) {
   }
 
   return (
-    <ul className="space-y-3">
+    <ul className="space-y-2">
       {data.args.map((arg) => {
         let argComponent: React.ReactNode = null;
 
@@ -102,7 +102,7 @@ function CommandArgs({ data }: { data: WorkflowNodeCommand['data'] }) {
         return (
           <li key={data.extension.id + arg.name}>
             <WorkflowUiFormExpression
-              label={arg.name}
+              label={arg.title || arg.name}
               labelId={arg.name}
               data={data.$expData ?? {}}
               path={`argsValue.${arg.name}`}

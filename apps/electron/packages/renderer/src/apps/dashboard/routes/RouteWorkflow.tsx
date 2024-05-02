@@ -21,7 +21,6 @@ import ReactFlow, {
   Viewport,
   OnNodesDelete,
 } from 'reactflow';
-import '/@/assets/css/workflow-editor-style.css';
 import WorkflowEditorHeader from '/@/components/workflow/editor/WorkflowEditorHeader';
 import WorkflowEditorControls from '/@/components/workflow/editor/WorkflowEditorControls';
 import { WorkflowEditorNodeListModal } from '../../../components/workflow/editor/WorkflowEditorNodeList';

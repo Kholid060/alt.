@@ -40,7 +40,11 @@ const triggersNode: WorkflowEditorNodeListTriggerItem[] = [
     title: 'Manual Trigger',
     group: 'Triggers',
     value: 'trigger-manual',
-    metadata: { nodeType: WORKFLOW_NODE_TYPE.TRIGGER, type: 'manual' },
+    metadata: {
+      $expData: {},
+      type: 'manual',
+      nodeType: WORKFLOW_NODE_TYPE.TRIGGER,
+    },
   },
 ];
 

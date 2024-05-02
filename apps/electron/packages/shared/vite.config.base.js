@@ -31,21 +31,21 @@ const config = {
     assetsDir: '.',
     minify: process.env.MODE !== 'development',
     lib: {
-      entry: {
-        main: join(__dirname, '/src/main.ts'),
-      },
       formats: ['cjs'],
     },
     rollupOptions: {
       output: {
         entryFileNames: '[name].js',
+        chunkFileNames: '[name].[ext]',
       },
       external: [...builtinModules, 'electron'].flatMap((item) => [
         item,
         `node:${item}`,
       ]),
     },
+    emptyOutDir: false,
   },
+  plugins: [],
 };
 
 export default config;

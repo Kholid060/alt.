@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import '@repo/ui/dist/theme.css';
 import '/@/assets/css/style.css';
 import '/@/assets/css/fonts.css';
+import '/@/assets/css/workflow-editor-style.css';
 import { RouterProvider } from 'react-router-dom';
 import router from './routes';
 import { UiToaster, UiTooltipProvider } from '@repo/ui';

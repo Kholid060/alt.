@@ -69,7 +69,7 @@ export class BetterMessagePortAsync<MessagePortEvents> {
       const promise = this.messages.get(data.name);
       if (promise) {
         if (data.error) {
-          promise.reject(data.errorMessage);
+          promise.reject(new Error(data.errorMessage));
         } else {
           promise.resolve(data.result);
         }
@@ -89,8 +89,15 @@ export class BetterMessagePortAsync<MessagePortEvents> {
     if (!messageListener) {
       payload.error = true;
       payload.errorMessage = `"${data.name}" doesn't have handler`;
-    } else {
+      this.postMessage(payload);
+      return;
+    }
+
+    try {
       payload.result = await messageListener(...data.args);
+    } catch (error) {
+      payload.error = true;
+      payload.errorMessage = (error as Error).message;
     }
 
     this.postMessage(payload);

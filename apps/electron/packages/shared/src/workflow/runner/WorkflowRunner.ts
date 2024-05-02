@@ -12,6 +12,8 @@ import type WorkflowNodeHandler from '../node-handler/WorkflowNodeHandler';
 import type { DatabaseWorkflowDetail } from '#packages/main/src/interface/database.interface';
 import { WorkflowRunnerNodeError } from './workflow-runner-errors';
 import ExtensionCommandRunner from '/@/extension/ExtensionCommandRunner';
+import SandboxService from '/@/services/sandbox.service';
+import { setProperty } from 'dot-prop';
 
 export type NodeHandlersObj = Record<
   WORKFLOW_NODE_TYPE,
@@ -165,6 +167,30 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     return this.workflow.nodes[nodeIndex] ?? null;
   }
 
+  private async evaluateNodeExpression(node: WorkflowNodes) {
+    if (!Object.hasOwn(node.data, '$expData')) return node;
+
+    const evaluateExpressions: Record<string, string> = {};
+    for (const key in node.data.$expData) {
+      const expression = node.data.$expData[key];
+      if (!expression.active) continue;
+
+      evaluateExpressions[key] = expression.value;
+    }
+
+    const result = await SandboxService.instance.evaluateCode(
+      evaluateExpressions,
+      { halo: 'haha' },
+    );
+
+    const copyNodeData = structuredClone(node.data);
+    for (const key in result) {
+      setProperty(copyNodeData, key, result[key]);
+    }
+
+    return { ...node, data: copyNodeData } as WorkflowNodes;
+  }
+
   private async executeNode(
     node: WorkflowNodes,
     prevExecution?: WorkflowRunnerPrevNodeExecution,
@@ -172,13 +198,16 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     try {
       const nodeHandler = this.nodeHandlers[node.type];
       if (!nodeHandler) {
-        throw new Error(`Node with "${node.type}" doesn't have handler`);
+        throw new WorkflowRunnerNodeError(
+          `Node with "${node.type}" doesn't have handler`,
+        );
       }
 
+      const renderedNode = await this.evaluateNodeExpression(node);
       const result = await nodeHandler.execute({
-        node,
-        prevExecution,
         runner: this,
+        prevExecution,
+        node: renderedNode,
       });
 
       const connection = this.connectionsMap[result.nextNodeId || node.id];
