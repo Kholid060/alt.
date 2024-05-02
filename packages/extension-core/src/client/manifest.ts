@@ -48,7 +48,7 @@ export type ExtensionConfigType = (typeof EXTENSION_CONFIG_TYPE)[number];
 const ExtensionCommandArgumentBaseSchema = z.object({
   name: z.string().min(1).max(32),
   required: z.boolean().optional(),
-  title: z.string().optional(),
+  title: z.string().min(1).max(64),
   description: z.string().optional(),
   placeholder: z.string().optional(),
   type: z.enum(EXTENSION_COMMAND_ARGUMENT_TYPE).exclude(['select']),

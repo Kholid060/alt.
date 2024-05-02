@@ -11,6 +11,7 @@ import type {
 import ExtensionCommandRunner from '/@/extension/ExtensionCommandRunner';
 import { CommandLaunchBy } from '@repo/extension';
 import type { ExtensionCommandExecutePayloadWithData } from '#packages/common/interface/extension.interface';
+import type { ExtensionCommandArgument } from '@repo/extension-core';
 
 type CommandDataWithPath = DatabaseExtensionCommandWithExtension & {
   filePath: string;
@@ -28,6 +29,41 @@ function executeCommandPromise(
       })
       .catch(reject);
   });
+}
+function validateCommandArgument(
+  args: ExtensionCommandArgument[],
+  argsValue: Record<string, unknown>,
+) {
+  const expectedType = (
+    name: string,
+    value: unknown,
+    expected: 'number' | 'string' | 'boolean',
+  ) => {
+    if (typeof value === expected) return;
+
+    throw new Error(
+      `"${name}" argument expected "${expected}" as value but got "${typeof value}"`,
+    );
+  };
+
+  for (const arg of args) {
+    if (!Object.hasOwn(argsValue, arg.name)) continue;
+
+    switch (arg.type) {
+      case 'input:text':
+      case 'input:password':
+      case 'select': {
+        expectedType(arg.title, argsValue[arg.name], 'string');
+        break;
+      }
+      case 'input:number':
+        expectedType(arg.title, argsValue[arg.name], 'number');
+        break;
+      case 'toggle':
+        expectedType(arg.title, argsValue[arg.name], 'boolean');
+        break;
+    }
+  }
 }
 
 export class NodeHandlerCommand extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.COMMAND> {
@@ -91,6 +127,10 @@ export class NodeHandlerCommand extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.C
   }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.COMMAND>): Promise<WorkflowNodeHandlerExecuteReturn> {
     const { commandId, extension } = node.data;
 
+    if (Object.keys(node.data.$expData).length > 0) {
+      validateCommandArgument(node.data.args, node.data.argsValue);
+    }
+
     const inputtedConfigCacheId = `command-confg:${node.id}`;
     if (!this.inputtedConfigCache.has(inputtedConfigCacheId)) {
       const commandConfig = await IPCRenderer.invoke(
@@ -103,7 +143,7 @@ export class NodeHandlerCommand extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.C
       }
       if (commandConfig.requireInput) {
         throw new WorkflowRunnerNodeError(
-          'Missing config! Input the command config before using it.',
+          'Missing config! Input the command config before using this command.',
         );
       }
 

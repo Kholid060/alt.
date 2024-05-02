@@ -180,7 +180,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
 
     const result = await SandboxService.instance.evaluateCode(
       evaluateExpressions,
-      { halo: 'haha' },
+      {}, // TO_DO: Add context data to expression
     );
 
     const copyNodeData = structuredClone(node.data);
