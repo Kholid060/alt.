@@ -1,5 +1,11 @@
 import { memo } from 'react';
-import { BaseEdge, EdgeProps, Position, getBezierPath } from 'reactflow';
+import {
+  BaseEdge,
+  EdgeProps,
+  Position,
+  getBezierPath,
+  getSmoothStepPath,
+} from 'reactflow';
 
 function WorkflowEdgeDefault({
   style,
@@ -11,15 +17,26 @@ function WorkflowEdgeDefault({
   targetPosition = Position.Top,
   sourcePosition = Position.Bottom,
 }: EdgeProps) {
-  // if target === "loop" then use getSmoothStepPath
-  const [edgePath] = getBezierPath({
-    sourceX,
-    sourceY,
-    targetX,
-    targetY,
-    sourcePosition,
-    targetPosition,
-  });
+  let edgePath = '';
+
+  if (sourceX > targetX) {
+    [edgePath] = getSmoothStepPath({
+      sourceX,
+      sourceY,
+      targetX,
+      targetY,
+      borderRadius: 15,
+    });
+  } else {
+    [edgePath] = getBezierPath({
+      sourceX,
+      sourceY,
+      targetX,
+      targetY,
+      sourcePosition,
+      targetPosition,
+    });
+  }
 
   return (
     <>
