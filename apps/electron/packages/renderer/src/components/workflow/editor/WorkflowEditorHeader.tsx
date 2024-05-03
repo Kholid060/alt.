@@ -1,12 +1,11 @@
-import { UiButton, useToast } from '@repo/ui';
+import { UiButton } from '@repo/ui';
 import { ChevronLeftIcon, PlayIcon, RedoIcon, UndoIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
 import { UiExtIcon } from '@repo/extension';
 import dayjs from 'dayjs';
 import { useEffect, useRef, useState } from 'react';
-import preloadAPI from '/@/utils/preloadAPI';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
+import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 
 function SavedTimeText() {
   const intervalRef = useRef<NodeJS.Timeout>();
@@ -45,41 +44,7 @@ function SavedTimeText() {
 
 function WorkflowEditorHeader() {
   const workflow = useWorkflowEditorStore.use.workflow();
-
-  const { toast } = useToast();
-
-  function runWorkflow() {
-    if (!workflow) return;
-
-    const manualTriggerNode = workflow.nodes.find(
-      (node) =>
-        node.type === WORKFLOW_NODE_TYPE.TRIGGER && node.data.type === 'manual',
-    );
-    if (!manualTriggerNode) {
-      toast({
-        variant: 'destructive',
-        title: "Couldn't find a Manual Trigger node",
-        description: 'Add a Manual Trigger node to run the workflow manually',
-      });
-      return;
-    }
-
-    preloadAPI.main.ipc
-      .invoke('workflow:execute', {
-        id: workflow.id,
-        startNodeId: manualTriggerNode.id,
-      })
-      .catch((error) => {
-        console.error(error);
-        toast({
-          variant: 'destructive',
-          title: 'Something went wrong!',
-          description: (
-            <p className="line-clamp-2">{`Something went wrong when running the "${workflow.name}" workfow`}</p>
-          ),
-        });
-      });
-  }
+  const { runCurrentWorkflow } = useWorkflowEditor();
 
   if (!workflow) return null;
 
@@ -116,7 +81,7 @@ function WorkflowEditorHeader() {
       </UiButton>
       <SavedTimeText />
       <hr className="h-2/6 bg-border/50 w-px mx-4" />
-      <UiButton variant="secondary" onClick={runWorkflow}>
+      <UiButton variant="secondary" onClick={() => runCurrentWorkflow()}>
         <PlayIcon className="h-4 w-4 mr-2 -ml-0.5" />
         <p>Run</p>
       </UiButton>

@@ -14,6 +14,7 @@ import { debugLog } from '#packages/common/utils/helper';
 import { sleep } from '@repo/shared';
 import WorkflowRunnerData from './WorkflowRunnerData';
 import type { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
+import type { WorkflowNodeHandlerExecuteReturn } from '../node-handler/WorkflowNodeHandler';
 
 export type NodeHandlersObj = Record<
   WORKFLOW_NODE_TYPE,
@@ -312,12 +313,16 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
         );
       }
 
-      const renderedNode = await this.evaluateNodeExpression(node);
-      const execResult = await nodeHandler.execute({
-        runner: this,
-        node: renderedNode,
-        prevExecution: prevExec,
-      });
+      const renderedNode = node.data.isDisabled
+        ? node
+        : await this.evaluateNodeExpression(node);
+      const execResult: WorkflowNodeHandlerExecuteReturn = node.data.isDisabled
+        ? { value: prevExec?.value }
+        : await nodeHandler.execute({
+            runner: this,
+            node: renderedNode,
+            prevExecution: prevExec,
+          });
 
       const nextNode = this.findNextNode(
         execResult.nextNodeId ?? node.id,

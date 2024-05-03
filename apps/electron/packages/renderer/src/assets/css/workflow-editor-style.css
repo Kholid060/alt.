@@ -27,6 +27,8 @@
 }
 
 .react-flow__node {
+  min-height: 64px;
+
   &.selected > div {
     @apply border-primary/60;
   }

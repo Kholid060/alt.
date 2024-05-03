@@ -4,24 +4,37 @@ import {
   WorkflowClipboardData,
   WorkflowNewNode,
 } from '#packages/common/interface/workflow.interface';
-import { APP_WORKFLOW_ELS_FORMAT } from '#packages/common/utils/constant/constant';
+import {
+  APP_WORKFLOW_ELS_FORMAT,
+  WORKFLOW_NODE_TYPE,
+} from '#packages/common/utils/constant/constant';
 import { parseJSON } from '@repo/shared';
 import { nanoid } from 'nanoid';
-import { Connection } from 'reactflow';
+import { Connection, useStore, useStoreApi } from 'reactflow';
 import { isIPCEventError } from '../utils/helper';
 import preloadAPI from '../utils/preloadAPI';
 import { useWorkflowEditorStore } from '../stores/workflow-editor.store';
 import { useShallow } from 'zustand/react/shallow';
+import { useToast } from '@repo/ui';
 
 export function useWorkflowEditor() {
+  const storeApi = useStoreApi();
   const context = useContext(WorkflowEditorContext);
+
   const { addEdges, addNodes } = useWorkflowEditorStore(
     useShallow((state) => ({
       addNodes: state.addNodes,
       addEdges: state.addEdges,
     })),
   );
+  const unselectAll = useStore((state) => state.unselectNodesAndEdges);
 
+  const { toast } = useToast();
+
+  function selectAllNodes() {
+    const nodes = storeApi.getState().getNodes();
+    storeApi.getState().addSelectedNodes(nodes.map((node) => node.id));
+  }
   async function pasteElements() {
     const copiedElements = await preloadAPI.main.ipc.invoke(
       'clipboard:read-buffer',
@@ -62,7 +75,6 @@ export function useWorkflowEditor() {
 
     return null;
   }
-
   function copyElements(element: { nodeId?: string; edgeId?: string }) {
     const state = useWorkflowEditorStore.getState();
     if (!state.workflow) return;
@@ -96,6 +108,47 @@ export function useWorkflowEditor() {
       JSON.stringify(workflowClipboardData),
     );
   }
+  function runCurrentWorkflow(startNodeId?: string) {
+    const { workflow } = useWorkflowEditorStore.getState();
+    if (!workflow) return;
 
-  return { ...context, pasteElements, copyElements };
+    const manualTriggerNode =
+      !startNodeId &&
+      workflow.nodes.find(
+        (node) =>
+          node.type === WORKFLOW_NODE_TYPE.TRIGGER &&
+          node.data.type === 'manual',
+      );
+    if (!startNodeId && !manualTriggerNode) {
+      toast({
+        variant: 'destructive',
+        title: "Couldn't find a Manual Trigger node",
+        description: 'Add a Manual Trigger node to run the workflow manually',
+      });
+      return;
+    }
+
+    preloadAPI.main.ipc
+      .invoke('workflow:execute', {
+        id: workflow.id,
+        startNodeId: startNodeId || manualTriggerNode.id,
+      })
+      .catch((error) => {
+        console.error(error);
+        toast({
+          variant: 'destructive',
+          title: 'Something went wrong!',
+          description: `Something went wrong when running the "${workflow.name}" workfow`,
+        });
+      });
+  }
+
+  return {
+    ...context,
+    unselectAll,
+    copyElements,
+    pasteElements,
+    selectAllNodes,
+    runCurrentWorkflow,
+  };
 }

@@ -14,7 +14,7 @@ import {
   WorkflowEditorContextMenuType,
 } from '/@/interface/workflow-editor.interface';
 import UiShortcut from '../../ui/UiShortcut';
-import { useStore, useReactFlow } from 'reactflow';
+import { useReactFlow } from 'reactflow';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
 import preloadAPI from '/@/utils/preloadAPI';
 import { APP_WORKFLOW_ELS_FORMAT } from '#packages/common/utils/constant/constant';
@@ -119,6 +119,25 @@ function ContextMenuItemDelete({
   );
 }
 
+function ContextMenuItemSelection() {
+  const { unselectAll, selectAllNodes } = useWorkflowEditor();
+
+  return (
+    <>
+      <UiContextMenuSeparator />
+      <UiContextMenuItem onClick={() => selectAllNodes()}>
+        <p>Select all</p>
+        <UiContextMenuShortcut>
+          <UiShortcut shortcut="CmdOrCtrl+A" />
+        </UiContextMenuShortcut>
+      </UiContextMenuItem>
+      <UiContextMenuItem onClick={() => unselectAll()}>
+        Clear selection
+      </UiContextMenuItem>
+    </>
+  );
+}
+
 function ContextMenuItemAddNode() {
   const contextMenu = useContextMenu();
   const { event: workflowEditorEvent } = useWorkflowEditor();
@@ -146,18 +165,36 @@ function ContextMenuPane() {
     <>
       <ContextMenuItemAddNode />
       <ContextMenuItemPaste />
+      <ContextMenuItemSelection />
     </>
   );
 }
 
 function ContextMenuNode() {
+  const { runCurrentWorkflow } = useWorkflowEditor();
+  const setEditNode = useWorkflowEditorStore.use.setEditNode();
+
   const contextMenu = useContextMenu<WorkflowEditorContextMenuType.NODE>();
+
+  function editCurrentNode() {
+    const { workflow } = useWorkflowEditorStore.getState();
+    if (!workflow) return;
+
+    const node = workflow.nodes.find((item) => item.id === contextMenu.nodeId);
+    if (!node) return;
+
+    setEditNode(node);
+  }
 
   return (
     <>
+      <UiContextMenuItem onClick={editCurrentNode}>Edit</UiContextMenuItem>
+      <UiContextMenuItem onClick={() => runCurrentWorkflow(contextMenu.nodeId)}>
+        Run workflow from here
+      </UiContextMenuItem>
       <ContextMenuItemCopy nodeId={contextMenu.nodeId} />
       <ContextMenuItemPaste />
-      <UiContextMenuItem>Settings</UiContextMenuItem>
+      <ContextMenuItemSelection />
       <UiContextMenuSeparator />
       <ContextMenuItemDelete nodeId={contextMenu.nodeId} />
     </>
@@ -172,6 +209,7 @@ function ContextMenuEdge() {
       <ContextMenuItemAddNode />
       <ContextMenuItemPaste />
       <UiContextMenuSeparator />
+      <ContextMenuItemSelection />
       <ContextMenuItemDelete edgeId={contextMenu.edgeId} />
     </>
   );
@@ -183,6 +221,7 @@ function ContextMenuSelection() {
       <ContextMenuItemAddNode />
       <ContextMenuItemCopy />
       <ContextMenuItemPaste />
+      <ContextMenuItemSelection />
       <UiContextMenuSeparator />
       <ContextMenuItemDelete />
     </>
@@ -190,10 +229,7 @@ function ContextMenuSelection() {
 }
 
 function WorkflowEditorContextMenu() {
-  const { event: workflowEditorEvent } = useWorkflowEditor();
-  const unselectNodesAndEdges = useStore(
-    (state) => state.unselectNodesAndEdges,
-  );
+  const { event: workflowEditorEvent, unselectAll } = useWorkflowEditor();
 
   const triggerRef = useRef<HTMLButtonElement>(null);
 
@@ -224,7 +260,7 @@ function WorkflowEditorContextMenu() {
           break;
       }
 
-      if (clearSelection) unselectNodesAndEdges();
+      if (clearSelection) unselectAll();
     };
 
     const onCloseContextMenu = () => {

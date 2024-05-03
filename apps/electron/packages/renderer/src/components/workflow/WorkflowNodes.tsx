@@ -1,5 +1,12 @@
 import { memo, useEffect, useRef } from 'react';
-import { Handle, NodeProps, Position, useUpdateNodeInternals } from 'reactflow';
+import {
+  Handle,
+  NodeProps,
+  NodeToolbar,
+  Position,
+  useReactFlow,
+  useUpdateNodeInternals,
+} from 'reactflow';
 import { WorkflowNodeErroHandlerAction } from '#common/interface/workflow.interface';
 import { UiList } from '@repo/ui';
 import UiExtensionIcon from '../ui/UiExtensionIcon';
@@ -7,6 +14,17 @@ import type * as NodesType from '#packages/common/interface/workflow-nodes.inter
 import { WORKFLOW_NODES } from '/@/utils/constant/workflow-nodes';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import clsx from 'clsx';
+import {
+  BanIcon,
+  EllipsisIcon,
+  PlayIcon,
+  ToggleLeftIcon,
+  ToggleRightIcon,
+  TrashIcon,
+} from 'lucide-react';
+import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
+import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
+import { WorkflowEditorContextMenuType } from '/@/interface/workflow-editor.interface';
 
 function NodeHandleWithLabel({
   label,
@@ -46,6 +64,24 @@ function NodeHandleWithLabel({
   );
 }
 
+function NodeToolbarButton({
+  className,
+  children,
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement>) {
+  return (
+    <button
+      className={clsx(
+        'h-9 w-9 rounded-md hover:bg-secondary text-muted-foreground hover:text-foreground transition-colors inline-flex justify-center items-center',
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+}
+
 function NodeErrorHandlerHandle({
   nodeId,
   errorHandlerAction,
@@ -78,16 +114,76 @@ function NodeErrorHandlerHandle({
     />
   );
 }
+function NodeToolbarMenu({
+  nodeId,
+  nodeData,
+}: {
+  nodeId: string;
+  nodeData: NodesType.WorkflowNodes['data'];
+}) {
+  const updateNodeData = useWorkflowEditorStore.use.updateNodeData();
+
+  const { deleteElements } = useReactFlow();
+  const { runCurrentWorkflow, event: workflowEditorEvent } =
+    useWorkflowEditor();
+
+  function deleteNode() {
+    deleteElements({ nodes: [{ id: nodeId }] });
+  }
+  function toggleDisabled() {
+    updateNodeData(nodeId, { isDisabled: !nodeData.isDisabled });
+  }
+  function openContextMenu({ clientX, clientY }: React.MouseEvent) {
+    workflowEditorEvent.emit('context-menu:open', {
+      nodeId,
+      position: { x: clientX, y: clientY },
+      type: WorkflowEditorContextMenuType.NODE,
+    });
+  }
+
+  return (
+    <NodeToolbar
+      align="start"
+      className="bg-background rounded-lg border p-1 flex items-center gap-0.5"
+    >
+      <NodeToolbarButton
+        title={nodeData.isDisabled ? 'Enable' : 'Disable'}
+        onClick={toggleDisabled}
+      >
+        {nodeData.isDisabled ? (
+          <ToggleLeftIcon className="h-6 w-6" />
+        ) : (
+          <ToggleRightIcon className="h-6 w-6 fill-primary stroke-foreground" />
+        )}
+      </NodeToolbarButton>
+      <NodeToolbarButton
+        title="Run workflow from here"
+        onClick={() => runCurrentWorkflow(nodeId)}
+      >
+        <PlayIcon size="18px" />
+      </NodeToolbarButton>
+      <hr className="h-6 block bg-border border-0 w-px mx-1" />
+      <NodeToolbarButton title="Delete node" onClick={deleteNode}>
+        <TrashIcon className="h-5 w-5" />
+      </NodeToolbarButton>
+      <NodeToolbarButton title="Open menu" onClick={openContextMenu}>
+        <EllipsisIcon className="h-5 w-5" />
+      </NodeToolbarButton>
+    </NodeToolbar>
+  );
+}
 function NodeCard({
   icon,
   title,
   subtitle,
   children,
   handleSlot,
+  isDisabled,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & {
   title: string;
   subtitle?: string;
+  isDisabled: boolean;
   icon: React.ReactNode;
   handleSlot?: React.ReactNode;
 }) {
@@ -97,11 +193,25 @@ function NodeCard({
       {...props}
     >
       <div className="p-3 flex items-center relative">
-        <div className="h-8 w-8">{icon}</div>
+        <div className="h-8 w-8 relative">
+          {isDisabled && (
+            <div className="h-full w-full absolute inline-flex items-center justify-center bg-background opacity-40">
+              <BanIcon className="text-destructive" />
+            </div>
+          )}
+          {icon}
+        </div>
         <div className="flex-grow ml-2">
-          <p className="line-clamp-1">{title}</p>
+          <p
+            className={clsx(
+              'line-clamp-1',
+              isDisabled && 'text-muted-foreground',
+            )}
+          >
+            {title}
+          </p>
           <p className="line-clamp-1 text-xs text-muted-foreground">
-            {subtitle}
+            {subtitle} {isDisabled && '(disabled)'}
           </p>
         </div>
         {handleSlot}
@@ -115,25 +225,29 @@ export const WorkflowNodeCommand: React.FC<
   NodeProps<NodesType.WorkflowNodeCommand['data']>
 > = memo(({ id, data }) => {
   return (
-    <NodeCard
-      title={data.title}
-      subtitle={data.extension.title}
-      icon={
-        <UiExtensionIcon
-          alt={`${data.title} icon`}
-          id={data.extension.id}
-          icon={data.icon}
-          iconWrapper={(icon) => <UiList.Icon icon={icon} />}
+    <>
+      <NodeToolbarMenu nodeId={id} nodeData={data} />
+      <NodeCard
+        title={data.title}
+        isDisabled={data.isDisabled}
+        subtitle={data.extension.title}
+        icon={
+          <UiExtensionIcon
+            alt={`${data.title} icon`}
+            id={data.extension.id}
+            icon={data.icon}
+            iconWrapper={(icon) => <UiList.Icon icon={icon} />}
+          />
+        }
+      >
+        <Handle type="target" position={Position.Left} />
+        <Handle type="source" position={Position.Right} id={`default:${id}`} />
+        <NodeErrorHandlerHandle
+          nodeId={id}
+          errorHandlerAction={data.$errorHandler?.action}
         />
-      }
-    >
-      <Handle type="target" position={Position.Left} />
-      <Handle type="source" position={Position.Right} id={`default:${id}`} />
-      <NodeErrorHandlerHandle
-        nodeId={id}
-        errorHandlerAction={data.$errorHandler?.action}
-      />
-    </NodeCard>
+      </NodeCard>
+    </>
   );
 });
 WorkflowNodeCommand.displayName = 'WorkflowNodeCommand';
@@ -144,36 +258,40 @@ export const WorkflowNodeLoop: React.FC<
   const nodeData = WORKFLOW_NODES[WORKFLOW_NODE_TYPE.LOOP];
 
   return (
-    <NodeCard
-      title={nodeData.title}
-      subtitle={nodeData.subtitle}
-      icon={<UiList.Icon icon={nodeData.icon} />}
-      handleSlot={
-        <>
-          <Handle
-            type="source"
-            position={Position.Right}
-            id={`start-loop:${id}`}
-            style={{ right: -9 }}
+    <>
+      <NodeToolbarMenu nodeId={id} nodeData={data} />
+      <NodeCard
+        title={nodeData.title}
+        isDisabled={data.isDisabled}
+        subtitle={nodeData.subtitle}
+        icon={<UiList.Icon icon={nodeData.icon} />}
+        handleSlot={
+          <>
+            <Handle
+              type="source"
+              position={Position.Right}
+              id={`start-loop:${id}`}
+              style={{ right: -9 }}
+            />
+          </>
+        }
+      >
+        <Handle type="target" position={Position.Left} />
+        <div className="text-right h-6">
+          <NodeHandleWithLabel
+            label="loop end"
+            handleId={`default:${id}`}
+            style={{ position: 'relative', bottom: 10, right: -9 }}
+            className="text-orange-500"
           />
-        </>
-      }
-    >
-      <Handle type="target" position={Position.Left} />
-      <div className="text-right h-6">
-        <NodeHandleWithLabel
-          label="loop end"
-          handleId={`default:${id}`}
-          style={{ position: 'relative', bottom: 10, right: -9 }}
-          className="text-orange-500"
+        </div>
+        <NodeErrorHandlerHandle
+          nodeId={id}
+          style={{ right: -7 }}
+          errorHandlerAction={data.$errorHandler?.action}
         />
-      </div>
-      <NodeErrorHandlerHandle
-        nodeId={id}
-        style={{ right: -7 }}
-        errorHandlerAction={data.$errorHandler?.action}
-      />
-    </NodeCard>
+      </NodeCard>
+    </>
   );
 });
 WorkflowNodeLoop.displayName = 'WorkflowNodeLoop';
@@ -184,31 +302,35 @@ export const WorkflowNodeBasic: React.FC<
   const nodeData = WORKFLOW_NODES[type as WORKFLOW_NODE_TYPE];
 
   return (
-    <NodeCard
-      icon={<UiList.Icon icon={nodeData.icon} />}
-      title={nodeData.title}
-      subtitle={nodeData.subtitle}
-    >
-      {nodeData.handleTarget.map((type, index) => (
-        <Handle key={type + index} type="target" position={Position.Left} />
-      ))}
-      {nodeData.handleSource.map((type, index) =>
-        type === 'error-fallback' ? (
-          <NodeErrorHandlerHandle
-            nodeId={id}
-            key={type + index}
-            errorHandlerAction={data.$errorHandler?.action}
-          />
-        ) : (
-          <Handle
-            key={type + index}
-            type="source"
-            position={Position.Right}
-            id={`default:${id}`}
-          />
-        ),
-      )}
-    </NodeCard>
+    <>
+      <NodeToolbarMenu nodeId={id} nodeData={data} />
+      <NodeCard
+        title={nodeData.title}
+        isDisabled={data.isDisabled}
+        subtitle={nodeData.subtitle}
+        icon={<UiList.Icon icon={nodeData.icon} />}
+      >
+        {nodeData.handleTarget.map((type, index) => (
+          <Handle key={type + index} type="target" position={Position.Left} />
+        ))}
+        {nodeData.handleSource.map((type, index) =>
+          type === 'error-fallback' ? (
+            <NodeErrorHandlerHandle
+              nodeId={id}
+              key={type + index}
+              errorHandlerAction={data.$errorHandler?.action}
+            />
+          ) : (
+            <Handle
+              key={type + index}
+              type="source"
+              position={Position.Right}
+              id={`default:${id}`}
+            />
+          ),
+        )}
+      </NodeCard>
+    </>
   );
 });
 WorkflowNodeBasic.displayName = 'WorkflowNodeBasic';
