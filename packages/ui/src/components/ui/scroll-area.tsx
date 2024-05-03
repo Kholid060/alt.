@@ -5,8 +5,10 @@ import { cn } from '@/utils/cn';
 
 const UiScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> & {
+    orientation?: 'horizontal' | 'vertical' | 'both';
+  }
+>(({ className, children, orientation, ...props }, ref) => (
   <ScrollAreaPrimitive.Root
     ref={ref}
     className={cn('relative overflow-hidden', className)}
@@ -15,7 +17,14 @@ const UiScrollArea = React.forwardRef<
     <ScrollAreaPrimitive.Viewport className="h-full w-full rounded-[inherit]">
       {children}
     </ScrollAreaPrimitive.Viewport>
-    <UiScrollBar />
+    {orientation === 'both' ? (
+      <>
+        <UiScrollBar orientation="horizontal" />
+        <UiScrollBar orientation="vertical" />
+      </>
+    ) : (
+      <UiScrollBar orientation={orientation} />
+    )}
     <ScrollAreaPrimitive.Corner />
   </ScrollAreaPrimitive.Root>
 ));

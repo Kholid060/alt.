@@ -120,7 +120,9 @@ export interface DatabaseQueriesEvent {
 }
 
 export interface DatabaseInsertEvents {
-  'database:insert-workflow': (workflow: DatabaseWorkflowInsertPayload) => void;
+  'database:insert-workflow': (
+    workflow: DatabaseWorkflowInsertPayload,
+  ) => string;
   'database:insert-extension-config': (
     cofig: DatabaseExtensionConfigInsertPayload,
   ) => void;

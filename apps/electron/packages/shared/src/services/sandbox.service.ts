@@ -48,19 +48,19 @@ class SandboxService {
 
   async evaluateCode(
     code: Record<string, string>,
-    context?: Record<PropertyKey, unknown>,
+    data?: Record<PropertyKey, unknown>,
   ): Promise<Record<string, unknown>>;
   async evaluateCode(
     code: string,
-    context?: Record<PropertyKey, unknown>,
+    data?: Record<PropertyKey, unknown>,
   ): Promise<unknown>;
   async evaluateCode(
     code: string | Record<string, string>,
-    context?: Record<PropertyKey, unknown>,
+    data?: Record<PropertyKey, unknown>,
   ): Promise<unknown> {
     await this.ensureSandboxEl();
 
-    return this.messagePort.sendMessage('evaluate-code', code, context);
+    return this.messagePort.sendMessage('evaluate-code', code, data);
   }
 }
 

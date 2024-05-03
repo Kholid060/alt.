@@ -4,6 +4,11 @@
   width: theme(spacing.3);
   height: theme(spacing.3);
 
+  &.is-relative {
+    position: relative;
+    transform: translate(0, 0);
+  }
+
   &-left {
     left: -6px;
     border: none;

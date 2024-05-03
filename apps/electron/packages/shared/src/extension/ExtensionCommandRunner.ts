@@ -95,11 +95,19 @@ class ExtensionCommandRunner {
 
       commandRunner.once('error', (message) => {
         this.destroyRunningCommand(runnerId);
-        debugLog('Command error: ', message, this.runners.size);
+        debugLog(
+          `"${command.title}" command error:`,
+          message,
+          this.runners.size,
+        );
       });
       commandRunner.once('finish', (reason, data) => {
         this.destroyRunningCommand(runnerId);
-        debugLog('Command finish: ', { reason, data }, this.runners.size);
+        debugLog(
+          `"${command.title}" command finish:`,
+          { reason, data },
+          this.runners.size,
+        );
       });
 
       if (commandRunner.onCommandWindowEvents) {

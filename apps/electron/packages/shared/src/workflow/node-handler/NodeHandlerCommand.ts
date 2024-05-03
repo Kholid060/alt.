@@ -17,19 +17,6 @@ type CommandDataWithPath = DatabaseExtensionCommandWithExtension & {
   filePath: string;
 };
 
-function executeCommandPromise(
-  executePayload: ExtensionCommandExecutePayloadWithData,
-) {
-  return new Promise((resolve, reject) => {
-    ExtensionCommandRunner.instance
-      .execute(executePayload)
-      .then(({ runner }) => {
-        runner.once('finish', (_, value) => resolve(value));
-        runner.once('error', (message) => reject(new Error(message)));
-      })
-      .catch(reject);
-  });
-}
 function validateCommandArgument(
   args: ExtensionCommandArgument[],
   argsValue: Record<string, unknown>,
@@ -76,8 +63,31 @@ export class NodeHandlerCommand extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.C
   private inputtedConfigCache: Set<string> = new Set();
   private commandDataCache: Record<string, CommandDataWithPath> = {};
 
+  private commandRunnerIds: Set<string> = new Set();
+
   constructor() {
     super(WORKFLOW_NODE_TYPE.COMMAND);
+  }
+
+  private executeCommandPromise(
+    executePayload: ExtensionCommandExecutePayloadWithData,
+  ) {
+    return new Promise((resolve, reject) => {
+      ExtensionCommandRunner.instance
+        .execute(executePayload)
+        .then(({ runner }) => {
+          this.commandRunnerIds.add(runner.id);
+          runner.once('finish', (_, value) => {
+            this.commandRunnerIds.delete(runner.id);
+            resolve(value);
+          });
+          runner.once('error', (message) => {
+            this.commandRunnerIds.delete(runner.id);
+            reject(new Error(message));
+          });
+        })
+        .catch(reject);
+    });
   }
 
   private async getCommandData({
@@ -159,7 +169,7 @@ export class NodeHandlerCommand extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.C
       nodeId: node.id,
       extensionId: extension.id,
     });
-    const value = await executeCommandPromise({
+    const value = await this.executeCommandPromise({
       command,
       commandId,
       extensionId: extension.id,
@@ -176,6 +186,11 @@ export class NodeHandlerCommand extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.C
   destroy(): void {
     this.commandDataCache = {};
     this.inputtedConfigCache.clear();
+
+    this.commandRunnerIds.forEach((runnerId) => {
+      ExtensionCommandRunner.instance.stop(runnerId);
+    });
+    this.commandRunnerIds.clear();
   }
 }
 

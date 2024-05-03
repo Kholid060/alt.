@@ -42,11 +42,11 @@ import { useEffect, useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '/@/utils/helper';
 import { arrayObjSorter } from '#packages/common/utils/helper';
-import { LOCALSTORAGE_KEYS } from '/@/utils/constant';
+import { LOCALSTORAGE_KEYS } from '../../../utils/constant/constant';
 import { parseJSON } from '@repo/shared';
 import dayjs from '/@/lib/dayjs';
 import clsx from 'clsx';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 type IconsName = keyof typeof UiExtIcon;
 
@@ -155,7 +155,7 @@ function WorkflowCreateForm({
   children,
   onInserted,
 }: {
-  onInserted?: () => void;
+  onInserted?: (workflowId: string) => void;
   children?: React.ReactNode;
 }) {
   const { toast } = useToast();
@@ -183,7 +183,7 @@ function WorkflowCreateForm({
         return;
       }
 
-      onInserted?.();
+      onInserted?.(result);
     } catch (error) {
       console.error(error);
     }
@@ -257,6 +257,7 @@ function WorkflowCreateForm({
   );
 }
 function WorkflowCreateDialog() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
   return (
@@ -272,7 +273,12 @@ function WorkflowCreateDialog() {
           <UiDialog.Title>New workflow</UiDialog.Title>
           <UiDialog.Description>Create a new workflow</UiDialog.Description>
         </UiDialog.Header>
-        <WorkflowCreateForm onInserted={() => setOpen(false)}>
+        <WorkflowCreateForm
+          onInserted={(workflowId) => {
+            setOpen(false);
+            navigate(`/workflows/${workflowId}`);
+          }}
+        >
           <UiDialog.Footer className="mt-10 gap-2">
             <UiButton
               type="button"

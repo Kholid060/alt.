@@ -16,7 +16,6 @@ import { nanoid } from 'nanoid/non-secure';
 import {
   WorkflowEdge,
   WorkflowNewNode,
-  WorkflowNodes,
 } from '#common/interface/workflow.interface';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import {
@@ -24,6 +23,7 @@ import {
   DatabaseWorkflowUpdatePayload,
 } from '#packages/main/src/interface/database.interface';
 import { createDebounce } from '@repo/shared';
+import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
 
 interface WorkflowElement {
   edges: WorkflowEdge[];
@@ -212,6 +212,8 @@ const workflowEditorStore = create(
       return true;
     },
     addNodes(nodes) {
+      if (nodes.length <= 0) return;
+
       get().updateWorkflow((workflow) => {
         const oldNodes = workflow.nodes;
         let isHasManualTrigger = false;
@@ -246,9 +248,12 @@ const workflowEditorStore = create(
       });
     },
     addEdges(connections) {
+      if (connections.length <= 0) return;
+
       get().updateWorkflow((workflow) => {
-        const newEdges = connections.flatMap((connection) =>
-          addEdge(connection, workflow.edges ?? []),
+        const newEdges = connections.reduce<Edge[]>(
+          (acc, connection) => addEdge(connection, acc),
+          workflow.edges ?? [],
         );
 
         return {

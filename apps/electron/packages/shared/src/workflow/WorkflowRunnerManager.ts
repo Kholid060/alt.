@@ -36,10 +36,12 @@ class WorkflowRunnerManager {
     });
     runner.once('error', (message) => {
       debugLog(`Error on "${workflow.name}" workflow: ${message}`);
+      runner.destroy();
       this.runners.delete(runnerId);
     });
     runner.once('finish', (reason) => {
       debugLog(`Finish "${workflow.name}" execution: ${reason}`);
+      runner.destroy();
       this.runners.delete(runnerId);
     });
 

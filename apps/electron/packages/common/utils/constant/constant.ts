@@ -30,8 +30,10 @@ export const IPC_POST_MESSAGE_EVENT = {
 } as const;
 
 export enum WORKFLOW_NODE_TYPE {
+  LOOP = 'node-loop',
   COMMAND = 'node-command',
   TRIGGER = 'node-trigger',
+  DO_NOTHING = 'node-do-nothing',
 }
 
 export const DATABASE_CHANGES_ALL_ARGS = '$database-all-args$' as const;

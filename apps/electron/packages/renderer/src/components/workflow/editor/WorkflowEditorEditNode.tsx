@@ -1,12 +1,15 @@
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import { useShallow } from 'zustand/react/shallow';
-import WorkflowNodeEditCommand from '../node/WorkflowNodeEditCommand';
+import WorkflowNodeEditCommand from '../node-edit/WorkflowNodeEditCommand';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
 import { memo } from 'react';
 import { XIcon } from 'lucide-react';
+import WorkflowNodeEditLoop from '../node-edit/WorkflowNodeEditLoop';
 
 const editNodeComponentMap: Record<WORKFLOW_NODE_TYPE, React.FC | null> = {
   [WORKFLOW_NODE_TYPE.TRIGGER]: null,
+  [WORKFLOW_NODE_TYPE.DO_NOTHING]: null,
+  [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeEditLoop,
   [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeEditCommand,
 };
 

@@ -1,4 +1,4 @@
-import { WorkflowNodeCommand } from '#packages/common/interface/workflow.interface';
+import { WorkflowNodeCommand } from '#packages/common/interface/workflow-nodes.interface';
 import {
   UiInput,
   UiList,
@@ -104,7 +104,6 @@ function CommandArgs({ data }: { data: WorkflowNodeCommand['data'] }) {
               labelId={arg.name}
               data={data.$expData ?? {}}
               path={`argsValue.${arg.name}`}
-              value={data.argsValue[arg.name]}
             >
               {argComponent}
             </WorkflowUiFormExpression>

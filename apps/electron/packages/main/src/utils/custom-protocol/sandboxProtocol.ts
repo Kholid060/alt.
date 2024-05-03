@@ -15,8 +15,6 @@ const sandboxProtocol: CustomProtocolHandler = {
     const paths = req.url.slice(`${CUSTOM_SCHEME.sandbox}://`.length);
     const [host, path] = paths.split('/');
 
-    console.log({ host, path }, req.url, req.method);
-
     if (host === 'sandbox') {
       if (!path) {
         return new Response(await fs.readFile(join(basePath, '/sandbox.html')));

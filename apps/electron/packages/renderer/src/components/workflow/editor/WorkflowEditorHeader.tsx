@@ -120,7 +120,7 @@ function WorkflowEditorHeader() {
         <PlayIcon className="h-4 w-4 mr-2 -ml-0.5" />
         <p>Run</p>
       </UiButton>
-      <UiButton className="ml-2">Publish</UiButton>
+      <UiButton className="ml-2">Save</UiButton>
     </header>
   );
 }

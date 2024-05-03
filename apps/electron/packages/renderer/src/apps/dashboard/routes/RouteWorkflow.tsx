@@ -20,6 +20,7 @@ import ReactFlow, {
   NodeMouseHandler,
   Viewport,
   OnNodesDelete,
+  IsValidConnection,
 } from 'reactflow';
 import WorkflowEditorHeader from '/@/components/workflow/editor/WorkflowEditorHeader';
 import WorkflowEditorControls from '/@/components/workflow/editor/WorkflowEditorControls';
@@ -36,8 +37,9 @@ import WorkflowEditorContextMenu from '/@/components/workflow/editor/WorkflowEdi
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import WorkflowEdgeDefault from '/@/components/workflow/edge/WorkflowEdgeDefault';
 import {
+  WorkflowNodeBasic,
   WorkflowNodeCommand,
-  WorkflowNodeTrigger,
+  WorkflowNodeLoop,
 } from '/@/components/workflow/WorkflowNodes';
 import { useDatabase } from '/@/hooks/useDatabase';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -47,11 +49,13 @@ import { DatabaseWorkflowUpdatePayload } from '#packages/main/src/interface/data
 import { debugLog } from '#packages/common/utils/helper';
 import { useDashboardStore } from '/@/stores/dashboard.store';
 import WorkflowEditorEditNode from '/@/components/workflow/editor/WorkflowEditorEditNode';
-import { WorkflowNodes } from '#packages/common/interface/workflow.interface';
+import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
 
 const nodeTypes: Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>> = {
+  [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoop,
+  [WORKFLOW_NODE_TYPE.TRIGGER]: WorkflowNodeBasic,
   [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeCommand,
-  [WORKFLOW_NODE_TYPE.TRIGGER]: WorkflowNodeTrigger,
+  [WORKFLOW_NODE_TYPE.DO_NOTHING]: WorkflowNodeBasic,
 };
 const edgeTypes = {
   default: WorkflowEdgeDefault,
@@ -68,6 +72,9 @@ const selector = (state: WorkflowEditorStore) => ({
   updateWorkflow: state.updateWorkflow,
   applyElementChanges: state.applyElementChanges,
 });
+const nodeConnectionValidator: IsValidConnection = (edge) => {
+  return edge.source !== edge.target;
+};
 
 function WorkflowEditor() {
   const { event: workflowEditorEvent } = useWorkflowEditor();
@@ -240,6 +247,7 @@ function WorkflowEditor() {
       onEdgeContextMenu={onEdgeContextMenu}
       onNodeDoubleClick={onNodeDoubleClick}
       defaultViewport={viewport ?? undefined}
+      isValidConnection={nodeConnectionValidator}
       onSelectionContextMenu={onSelectionContextMenu}
       onSelectionChange={setSelection as OnSelectionChangeFunc}
     >

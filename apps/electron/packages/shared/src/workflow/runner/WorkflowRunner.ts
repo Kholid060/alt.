@@ -4,18 +4,16 @@ import {
   WORKFLOW_MANUAL_TRIGGER_ID,
   WORKFLOW_NODE_TYPE,
 } from '#packages/common/utils/constant/constant';
-import type {
-  WorkflowEdge,
-  WorkflowNodes,
-} from '#packages/common/interface/workflow.interface';
+import type { WorkflowEdge } from '#packages/common/interface/workflow.interface';
 import type WorkflowNodeHandler from '../node-handler/WorkflowNodeHandler';
 import type { DatabaseWorkflowDetail } from '#packages/main/src/interface/database.interface';
 import { WorkflowRunnerNodeError } from './workflow-runner-errors';
-import ExtensionCommandRunner from '/@/extension/ExtensionCommandRunner';
 import SandboxService from '/@/services/sandbox.service';
 import { setProperty } from 'dot-prop';
 import { debugLog } from '#packages/common/utils/helper';
 import { sleep } from '@repo/shared';
+import WorkflowRunnerData from './WorkflowRunnerData';
+import type { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
 
 export type NodeHandlersObj = Record<
   WORKFLOW_NODE_TYPE,
@@ -50,10 +48,16 @@ interface NodeConnectionMapItem {
   sourceHandle?: string | null;
 }
 interface NodeConnectionMap {
-  source: NodeConnectionMapItem[];
-  target: NodeConnectionMapItem[];
+  source: Record<string, NodeConnectionMapItem[]>;
+  target: Record<string, NodeConnectionMapItem[]>;
 }
 
+function extractHandleType(handle: string) {
+  const handles = handle.split(':');
+  if (handles.length <= 1) return 'default';
+
+  return handles[0];
+}
 function getNodeConnectionsMap(nodes: WorkflowNodes[], edges: WorkflowEdge[]) {
   const connectionMap: Record<string, NodeConnectionMap> = {};
   const nodePositions = new Map(nodes.map((node) => [node.id, node.position]));
@@ -63,23 +67,28 @@ function getNodeConnectionsMap(nodes: WorkflowNodes[], edges: WorkflowEdge[]) {
 
     if (!connectionMap[source]) {
       connectionMap[source] = {
-        source: [],
-        target: [],
+        source: { default: [] },
+        target: { default: [] },
       };
     }
     if (!connectionMap[target]) {
       connectionMap[target] = {
-        source: [],
-        target: [],
+        source: { default: [] },
+        target: { default: [] },
       };
     }
 
-    connectionMap[target].source.push({
+    connectionMap[target].source.default.push({
       sourceHandle,
       targetHandle,
       nodeId: source,
     });
-    connectionMap[source].target.push({
+
+    const sourceHandleType = extractHandleType(sourceHandle ?? '');
+    if (!connectionMap[source].target[sourceHandleType]) {
+      connectionMap[source].target[sourceHandleType] = [];
+    }
+    connectionMap[source].target[sourceHandleType].push({
       targetHandle,
       sourceHandle,
       nodeId: target,
@@ -93,8 +102,13 @@ function getNodeConnectionsMap(nodes: WorkflowNodes[], edges: WorkflowEdge[]) {
   ) => nodePositions.get(a.nodeId)!.y - nodePositions.get(z.nodeId)!.y;
   for (const key in connectionMap) {
     const connection = connectionMap[key];
-    connection.source.sort(connectionSorter);
-    connection.target.sort(connectionSorter);
+
+    for (const handle in connection.source) {
+      connection.source[handle].sort(connectionSorter);
+    }
+    for (const handle in connection.target) {
+      connection.target[handle].sort(connectionSorter);
+    }
   }
 
   return connectionMap;
@@ -116,10 +130,9 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   id: string;
   state: WorkflowRunnerState;
   workflow: DatabaseWorkflowDetail;
-
   connectionsMap: Record<string, NodeConnectionMap> = {};
 
-  commandRunnerIds: string[];
+  dataStorage: WorkflowRunnerData;
 
   constructor({
     id,
@@ -130,16 +143,16 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     super();
 
     this.id = id;
+    this.workflow = workflow;
     this.startNodeId = startNodeId;
     this.nodeHandlers = nodeHandlers;
     this.state = WorkflowRunnerState.Running;
 
-    this.workflow = workflow;
+    this.dataStorage = new WorkflowRunnerData();
+
     this.nodesIdxMap = new Map(
       workflow.nodes.map((node, index) => [node.id, index]),
     );
-
-    this.commandRunnerIds = [];
   }
 
   start() {
@@ -155,7 +168,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     });
     if (!startNode) {
       this.state = WorkflowRunnerState.Error;
-      this.emitError("Couldn't find the starting node");
+      this.emit('error', "Couldn't find the starting node");
       return;
     }
 
@@ -168,13 +181,15 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   }
 
   stop() {
+    this.state = WorkflowRunnerState.Stop;
     this.emit('finish', WorkflowRunnerFinishReason.Stop);
-    this.destroy();
   }
 
-  private emitError(message: string) {
-    this.emit('error', message);
-    this.destroy();
+  evaluateCode<T extends Record<string, string>>(code: T) {
+    return SandboxService.instance.evaluateCode(
+      code,
+      {}, // TO_DO: Add context data to expression
+    ) as Promise<Record<keyof T, unknown>>;
   }
 
   private getNode(nodeId: string): WorkflowNodes | null {
@@ -196,10 +211,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
       evaluateExpressions[key] = expression.value;
     }
 
-    const result = await SandboxService.instance.evaluateCode(
-      evaluateExpressions,
-      {}, // TO_DO: Add context data to expression
-    );
+    const result = await this.evaluateCode(evaluateExpressions);
 
     const copyNodeData = structuredClone(node.data);
     for (const key in result) {
@@ -211,7 +223,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
 
   private findNextNode(
     nodeId: string,
-    sourceHandle?: string,
+    sourceHandle: string = 'default',
   ):
     | {
         node: null;
@@ -221,15 +233,24 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
         status: 'continue';
         node: WorkflowNodes;
       } {
-    const connection = this.connectionsMap[nodeId];
-    if (!connection || connection.target.length === 0) {
+    if (!this.nodesIdxMap.has(nodeId)) {
+      this.state = WorkflowRunnerState.Error;
+      this.emit('error', `Couldn't find node with "${nodeId}" id`);
+
+      return {
+        node: null,
+        status: 'not-found',
+      };
+    }
+
+    const connection = this.connectionsMap[nodeId]?.target[sourceHandle];
+    if (!connection || connection.length === 0) {
       const lastNodeIdQueue = this.nodeExecutionQueue.pop();
       const nextNode = lastNodeIdQueue ? this.getNode(lastNodeIdQueue) : null;
 
       if (!nextNode) {
         this.state = WorkflowRunnerState.Finish;
         this.emit('finish', WorkflowRunnerFinishReason.Done);
-        this.destroy();
 
         return {
           node: null,
@@ -242,24 +263,24 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
         status: 'continue',
       };
     }
-
-    const nextNodeId = sourceHandle
-      ? connection.target.find((target) =>
+    const nodeConnection = sourceHandle
+      ? connection.find((target) =>
           target.sourceHandle?.startsWith(sourceHandle),
         )
-      : connection.target[0];
-    if (nextNodeId && connection.target.length > 1) {
+      : connection[0];
+    if (nodeConnection && connection.length > 1) {
       this.nodeExecutionQueue.push(
-        ...connection.target
+        ...connection
           .slice(1)
           .toReversed()
           .map(({ nodeId }) => nodeId),
       );
     }
 
-    const nextNode = nextNodeId ? this.getNode(nextNodeId.nodeId) : null;
+    const nextNode = nodeConnection && this.getNode(nodeConnection.nodeId);
     if (!nextNode) {
-      this.emitError("Couldn't find the next node");
+      this.state = WorkflowRunnerState.Error;
+      this.emit('error', "Couldn't find the next node");
 
       return {
         node: null,
@@ -279,7 +300,8 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   ) {
     try {
       if (node.id === prevExec?.node.id) {
-        this.emitError('Stopped to prevent infinite loop');
+        this.state = WorkflowRunnerState.Error;
+        this.emit('error', 'Stopped to prevent infinite loop');
         return;
       }
 
@@ -291,27 +313,34 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
       }
 
       const renderedNode = await this.evaluateNodeExpression(node);
-      const result = await nodeHandler.execute({
+      const execResult = await nodeHandler.execute({
         runner: this,
-        prevExecution: prevExec,
         node: renderedNode,
+        prevExecution: prevExec,
       });
 
-      const nextNode = this.findNextNode(node.id);
+      const nextNode = this.findNextNode(
+        execResult.nextNodeId ?? node.id,
+        execResult.nextNodeHandle,
+      );
       if (nextNode.status !== 'continue') return;
 
       this.executeNode(nextNode.node, {
         node,
-        value: result.value,
+        value: execResult.value,
       });
     } catch (error) {
+      if (import.meta.env.DEV) console.error(error);
+
       if (error instanceof WorkflowRunnerNodeError) {
-        this.emitError(error.message);
+        this.state = WorkflowRunnerState.Error;
+        this.emit('error', error.message);
         return;
       }
 
       if (!node.data.$errorHandler) {
-        this.emitError((<Error>error).message);
+        this.state = WorkflowRunnerState.Error;
+        this.emit('error', (<Error>error).message);
         return;
       }
 
@@ -352,20 +381,19 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
         return;
       }
 
-      this.emitError((<Error>error).message);
+      this.state = WorkflowRunnerState.Error;
+      this.emit('error', (<Error>error).message);
     }
   }
 
-  private destroy() {
-    this.nodesIdxMap.clear();
-    this.removeAllListeners();
-
-    this.commandRunnerIds.forEach((id) => {
-      ExtensionCommandRunner.instance.stop(id);
-    });
+  destroy() {
     Object.values(this.nodeHandlers).forEach((nodeHandler) => {
       nodeHandler.destroy();
     });
+
+    this.nodesIdxMap.clear();
+    this.dataStorage.destroy();
+    this.removeAllListeners();
   }
 }
 

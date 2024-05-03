@@ -50,14 +50,17 @@ class DBWorkflowService {
   }
 
   async insert(workflow: DatabaseWorkflowInsertPayload) {
+    const workflowId = nanoid();
     await this.database.insert(workflows).values({
       ...workflow,
-      id: nanoid(),
+      id: workflowId,
     });
 
     emitDBChanges({
       'database:get-workflow-list': DATABASE_CHANGES_ALL_ARGS,
     });
+
+    return workflowId;
   }
 
   async update(

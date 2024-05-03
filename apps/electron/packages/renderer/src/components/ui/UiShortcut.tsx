@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { UiKbd } from '@repo/ui';
-import { COMMAND_MOD_NAME_MAP } from '/@/utils/constant';
+import { COMMAND_MOD_NAME_MAP } from '../../utils/constant/constant';
 
 function CommandShortcut({ shortcut }: { shortcut: string }) {
   const keys = shortcut.split('+');

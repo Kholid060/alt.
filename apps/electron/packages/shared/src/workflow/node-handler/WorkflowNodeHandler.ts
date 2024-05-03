@@ -1,4 +1,4 @@
-import type { WorkflowNodes } from '#packages/common/interface/workflow.interface';
+import type { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
 import type { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import type WorkflowRunner from '../runner/WorkflowRunner';
 import type { WorkflowRunnerPrevNodeExecution } from '../runner/WorkflowRunner';
@@ -6,6 +6,7 @@ import type { WorkflowRunnerPrevNodeExecution } from '../runner/WorkflowRunner';
 export interface WorkflowNodeHandlerExecuteReturn {
   value: unknown;
   nextNodeId?: string;
+  nextNodeHandle?: string;
 }
 
 export interface WorkflowNodeHandlerExecute<

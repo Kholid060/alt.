@@ -1,9 +1,5 @@
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
+import { WorkflowNodesMap } from '#packages/common/interface/workflow-nodes.interface';
 import { UiListItem } from '@repo/ui';
-import {
-  WorkflowNodeCommand,
-  WorkflowNodeTrigger,
-} from '../../../common/interface/workflow.interface';
 import { SetRequired } from 'type-fest';
 
 export enum WorkflowEditorContextMenuType {
@@ -13,7 +9,11 @@ export enum WorkflowEditorContextMenuType {
   SELECTION,
 }
 
-export type WorkflowEditorNodeGroup = 'Triggers' | 'Commands' | 'Scripts';
+export type WorkflowEditorNodeGroup =
+  | 'Flow'
+  | 'Triggers'
+  | 'Commands'
+  | 'Scripts';
 
 export interface XYPosition {
   x: number;
@@ -43,17 +43,23 @@ type WorkflowEditorNodeItemBase<T> = SetRequired<
   'metadata'
 >;
 
-export type WorkflowEditorNodeListCommandItem = WorkflowEditorNodeItemBase<
-  { nodeType: WORKFLOW_NODE_TYPE.COMMAND } & WorkflowNodeCommand['data']
->;
+export type WorkflowEditorNodeListItemRecord = {
+  [T in keyof WorkflowNodesMap]: WorkflowEditorNodeItemBase<
+    {
+      nodeType: WorkflowNodesMap[T]['type'];
+    } & WorkflowNodesMap[T]['data']
+  >;
+};
 
-export type WorkflowEditorNodeListTriggerItem = WorkflowEditorNodeItemBase<
-  { nodeType: WORKFLOW_NODE_TYPE.TRIGGER } & WorkflowNodeTrigger['data']
->;
+export type WorkflowEditorNodeListItem<T extends keyof WorkflowNodesMap> =
+  WorkflowEditorNodeItemBase<
+    {
+      nodeType: T;
+    } & WorkflowNodesMap[T]['data']
+  >;
 
-export type WorkflowEditorNodeListItem =
-  | WorkflowEditorNodeListCommandItem
-  | WorkflowEditorNodeListTriggerItem;
+export type WorkflowEditorNodeListItems =
+  WorkflowEditorNodeListItemRecord[keyof WorkflowEditorNodeListItemRecord];
 
 // hmm....
 export interface WorkflowEditorOpenNodeListModalPayload {

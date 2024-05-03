@@ -3,12 +3,13 @@ import {
   UiPopover,
   UiPopoverContent,
   UiPopoverTrigger,
+  UiScrollArea,
   cn,
 } from '@repo/ui';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { PlugZapIcon, SearchIcon } from 'lucide-react';
+import { PlugZapIcon, RepeatIcon, SearchIcon } from 'lucide-react';
 import { UiListProvider } from '@repo/ui/dist/context/list.context';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import UiExtensionIcon from '../../ui/UiExtensionIcon';
@@ -19,31 +20,53 @@ import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import type {
   WorkflowEditorNodeGroup,
-  WorkflowEditorNodeListCommandItem,
   WorkflowEditorNodeListItem,
-  WorkflowEditorNodeListTriggerItem,
+  WorkflowEditorNodeListItems,
   WorkflowEditorOpenNodeListModalPayload,
 } from '/@/interface/workflow-editor.interface';
 import { nanoid } from 'nanoid/non-secure';
 import { WorkflowNewNode } from '#packages/common/interface/workflow.interface';
+import { WorkflowNodeBaseData } from '#packages/common/interface/workflow-nodes.interface';
 
-const nodeTypes: { id: WorkflowEditorNodeGroup | 'All'; title: string }[] = [
-  { id: 'All', title: 'All' },
-  { id: 'Triggers', title: 'Triggers' },
-  { id: 'Commands', title: 'Commands' },
-  { id: 'Scripts', title: 'Scripts' },
+type NodeCommandItem = WorkflowEditorNodeListItem<WORKFLOW_NODE_TYPE.COMMAND>;
+
+const nodeTypes: (WorkflowEditorNodeGroup | 'All')[] = [
+  'All',
+  'Triggers',
+  'Commands',
+  'Scripts',
+  'Flow',
 ];
+const defaultData: WorkflowNodeBaseData = {
+  $expData: {},
+  isDisabled: false,
+};
 
-const triggersNode: WorkflowEditorNodeListTriggerItem[] = [
+const triggerNodes: WorkflowEditorNodeListItems[] = [
   {
     icon: <UiList.Icon icon={PlugZapIcon} />,
     title: 'Manual Trigger',
     group: 'Triggers',
     value: 'trigger-manual',
     metadata: {
-      $expData: {},
       type: 'manual',
       nodeType: WORKFLOW_NODE_TYPE.TRIGGER,
+      ...defaultData,
+    },
+  },
+];
+const flowNodes: WorkflowEditorNodeListItems[] = [
+  {
+    group: 'Flow',
+    title: 'Loop',
+    value: 'loop-node',
+    icon: <UiList.Icon icon={RepeatIcon} />,
+    metadata: {
+      varName: '',
+      expression: '',
+      dataSource: 'prev-node',
+      nodeType: WORKFLOW_NODE_TYPE.LOOP,
+      ...defaultData,
     },
   },
 ];
@@ -63,10 +86,10 @@ export function WorkflowEditorNodeList({
     'All',
   );
 
-  const commandItems = useMemo<WorkflowEditorNodeListCommandItem[]>(() => {
+  const commandItems = useMemo(() => {
     if (extensionsQuery.state !== 'idle') return [];
 
-    const items: WorkflowEditorNodeListCommandItem[] = [];
+    const items: NodeCommandItem[] = [];
 
     extensionsQuery.data.forEach((extension) => {
       const extIcon = (
@@ -81,7 +104,7 @@ export function WorkflowEditorNodeList({
       extension.commands.forEach((command) => {
         if (command.type === 'view' || command.type === 'view:json') return;
 
-        const item: WorkflowEditorNodeListCommandItem = {
+        const item: NodeCommandItem = {
           group: command.type === 'script' ? 'Scripts' : 'Commands',
           metadata: {
             title: command.title,
@@ -93,6 +116,7 @@ export function WorkflowEditorNodeList({
             },
             $expData: {},
             argsValue: {},
+            isDisabled: false,
             args: command.arguments ?? [],
             nodeType: WORKFLOW_NODE_TYPE.COMMAND,
             icon: command.icon || extension.icon,
@@ -119,9 +143,10 @@ export function WorkflowEditorNodeList({
     return items;
   }, [extensionsQuery]);
 
-  const items = ([] as WorkflowEditorNodeListItem[]).concat(
-    triggersNode,
+  const items = ([] as WorkflowEditorNodeListItems[]).concat(
+    triggerNodes,
     commandItems,
+    flowNodes,
   );
   const filteredItems =
     nodeType === 'All'
@@ -139,34 +164,62 @@ export function WorkflowEditorNodeList({
       position: { x: 0, y: 0 },
     } as WorkflowNewNode);
   }
+  function onInputKeyDown({
+    key,
+    target: eventTarget,
+  }: React.KeyboardEvent<HTMLInputElement>) {
+    if (key !== 'ArrowLeft' && key !== 'ArrowRight') return;
+
+    const target = eventTarget as HTMLInputElement;
+    const currentTypeIdx = nodeTypes.indexOf(nodeType);
+
+    if (key === 'ArrowLeft' && target.selectionStart === 0) {
+      setNodeType(
+        nodeTypes.at(currentTypeIdx === 0 ? -1 : currentTypeIdx - 1)!,
+      );
+      return;
+    }
+
+    if (key === 'ArrowRight' && target.selectionEnd === 0) {
+      setNodeType(
+        nodeTypes.at(
+          currentTypeIdx === nodeTypes.length - 1 ? 0 : currentTypeIdx + 1,
+        )!,
+      );
+      return;
+    }
+  }
 
   return (
     <UiListProvider>
       <div className={cn('flex flex-col', className)} {...props}>
-        <div className="border-b px-3">
-          <div className="flex items-center gap-2">
+        <div className="border-b">
+          <div className="flex items-center gap-2 px-3">
             <SearchIcon className="h-5 w-5 text-muted-foreground flex-shrink-0" />
             <UiList.Input
               className="focus:outline-none h-11 bg-transparent flex-grow"
               placeholder="Search nodes..."
+              onKeyDown={onInputKeyDown}
             />
           </div>
-          <div className="flex text-muted-foreground text-sm justify-between">
-            {nodeTypes.map((item) => (
-              <button
-                key={item.id}
-                className={cn(
-                  'border-b-2 px-2 pb-2 hover:text-foreground transition-colors min-w-12',
-                  nodeType === item.id
-                    ? 'border-primary text-foreground'
-                    : 'border-transparent',
-                )}
-                onClick={() => setNodeType(item.id)}
-              >
-                {item.title}
-              </button>
-            ))}
-          </div>
+          <UiScrollArea orientation="horizontal">
+            <div className="flex w-max text-muted-foreground">
+              {nodeTypes.map((item) => (
+                <button
+                  key={item}
+                  className={cn(
+                    'border-b-2 px-2 pb-2 hover:text-foreground transition-colors min-w-12 shrink-0',
+                    nodeType === item
+                      ? 'border-primary text-foreground'
+                      : 'border-transparent',
+                  )}
+                  onClick={() => setNodeType(item)}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          </UiScrollArea>
         </div>
         <UiList
           items={filteredItems}
@@ -253,28 +306,56 @@ export function WorkflowEditorNodeListModal() {
     if (!newNodeData.current) return;
 
     const { position, sourceEdge } = newNodeData.current;
+    const newNode = {
+      ...node,
+      position,
+    };
 
-    let nodeId: string | undefined;
-    let newEdge: Connection | undefined;
+    const newEdges: Connection[] = [];
+    const newNodes: WorkflowNewNode[] = [];
 
     if (sourceEdge) {
-      nodeId = nanoid();
-      newEdge = {
-        target: nodeId,
+      newNode.id = nanoid();
+      newEdges.push({
         targetHandle: '',
+        target: newNode.id,
         source: sourceEdge.nodeId,
         sourceHandle: sourceEdge.handleId,
-      };
+      });
     }
 
-    addNodes([
-      {
-        ...node,
-        position,
+    if (node.type === WORKFLOW_NODE_TYPE.LOOP) {
+      if (!newNode.id) newNode.id = nanoid();
+
+      const nodeId = nanoid();
+
+      newNodes.push({
         id: nodeId,
-      },
-    ]);
-    if (newEdge) addEdges([newEdge]);
+        type: WORKFLOW_NODE_TYPE.DO_NOTHING,
+        position: {
+          x: position.x + 250,
+          y: position.y - 100,
+        },
+        data: { $expData: {}, isDisabled: false },
+      });
+      newEdges.push(
+        {
+          targetHandle: '',
+          target: nodeId,
+          source: newNode.id,
+          sourceHandle: `start-loop:${newNode.id}`,
+        },
+        {
+          targetHandle: '',
+          source: nodeId,
+          target: newNode.id,
+          sourceHandle: `default:${nodeId}`,
+        },
+      );
+    }
+
+    addNodes([newNode, ...newNodes]);
+    addEdges(newEdges);
 
     setShow(false);
   }
