@@ -300,6 +300,8 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     prevExec?: WorkflowRunnerPrevNodeExecution,
   ) {
     try {
+      if (this.state !== WorkflowRunnerState.Running) return;
+
       if (node.id === prevExec?.node.id) {
         this.state = WorkflowRunnerState.Error;
         this.emit('error', 'Stopped to prevent infinite loop');
@@ -313,16 +315,17 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
         );
       }
 
-      const renderedNode = node.data.isDisabled
-        ? node
-        : await this.evaluateNodeExpression(node);
-      const execResult: WorkflowNodeHandlerExecuteReturn = node.data.isDisabled
-        ? { value: prevExec?.value }
-        : await nodeHandler.execute({
-            runner: this,
-            node: renderedNode,
-            prevExecution: prevExec,
-          });
+      let execResult: WorkflowNodeHandlerExecuteReturn = {
+        value: prevExec?.value,
+      };
+      if (!node.data.isDisabled) {
+        const renderedNode = await this.evaluateNodeExpression(node);
+        execResult = await nodeHandler.execute({
+          runner: this,
+          node: renderedNode,
+          prevExecution: prevExec,
+        });
+      }
 
       const nextNode = this.findNextNode(
         execResult.nextNodeId ?? node.id,
@@ -335,7 +338,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
         value: execResult.value,
       });
     } catch (error) {
-      if (import.meta.env.DEV) console.error(error);
+      if (this.state !== WorkflowRunnerState.Running) return;
 
       if (error instanceof WorkflowRunnerNodeError) {
         this.state = WorkflowRunnerState.Error;

@@ -106,6 +106,19 @@ export {
   UiTabsContent,
 } from './components/ui/tabs';
 export { UiLabel } from './components/ui/label';
+export {
+  UiAlertDialog,
+  UiAlertDialogTitle,
+  UiAlertDialogPortal,
+  UiAlertDialogHeader,
+  UiAlertDialogFooter,
+  UiAlertDialogAction,
+  UiAlertDialogCancel,
+  UiAlertDialogOverlay,
+  UiAlertDialogTrigger,
+  UiAlertDialogContent,
+  UiAlertDialogDescription,
+} from './components/ui/alert-dialog';
 
 export { useUiList } from './context/list.context';
 

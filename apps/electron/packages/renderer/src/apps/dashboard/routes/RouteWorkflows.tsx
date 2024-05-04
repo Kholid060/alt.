@@ -5,6 +5,7 @@ import {
 import {
   ArrowDownAzIcon,
   ArrowUpAzIcon,
+  EllipsisVerticalIcon,
   LucideProps,
   PlusIcon,
   SearchIcon,
@@ -12,12 +13,24 @@ import {
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import UiStateView from '/@/components/ui/UiStateView';
 import {
+  UiAlertDialog,
+  UiAlertDialogAction,
+  UiAlertDialogCancel,
+  UiAlertDialogContent,
+  UiAlertDialogDescription,
+  UiAlertDialogFooter,
+  UiAlertDialogHeader,
+  UiAlertDialogTitle,
   UiButton,
   UiCard,
   UiCardContent,
   UiCardFooter,
-  UiCardHeader,
   UiDialog,
+  UiDropdownMenu,
+  UiDropdownMenuContent,
+  UiDropdownMenuItem,
+  UiDropdownMenuSeparator,
+  UiDropdownMenuTrigger,
   UiForm,
   UiFormControl,
   UiFormField,
@@ -57,6 +70,12 @@ function WorkflowIcon({ icon, ...props }: { icon: string } & LucideProps) {
 }
 function WorkflowCards({ workflows }: { workflows: DatabaseWorkflow[] }) {
   const { toast } = useToast();
+  const navigate = useNavigate();
+
+  const [deleteDialog, setDeleteDialog] = useState<null | {
+    id: string;
+    name: string;
+  }>(null);
 
   const updateWorkflow: DatabaseUpdateEvents['database:update-workflow'] =
     async (...args) => {
@@ -74,8 +93,33 @@ function WorkflowCards({ workflows }: { workflows: DatabaseWorkflow[] }) {
         }
       } catch (error) {
         console.error(error);
+        toast({
+          title: 'Something went wrong',
+        });
       }
     };
+  async function deleteWorkflow() {
+    try {
+      if (!deleteDialog) return;
+
+      const result = await preloadAPI.main.ipc.invoke(
+        'database:delete-workflow',
+        deleteDialog.id,
+      );
+      if (isIPCEventError(result)) {
+        toast({
+          title: 'error',
+          description: result.message,
+        });
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: 'Something went wrong',
+      });
+    }
+  }
 
   if (workflows.length === 0) {
     return (
@@ -89,7 +133,7 @@ function WorkflowCards({ workflows }: { workflows: DatabaseWorkflow[] }) {
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 mt-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6 xl:grid-cols-3">
       {workflows.map((workflow) => (
         <UiCard
           key={workflow.id}
@@ -98,24 +142,25 @@ function WorkflowCards({ workflows }: { workflows: DatabaseWorkflow[] }) {
             workflow.isDisabled && 'opacity-80 text-muted-foreground',
           )}
         >
-          <UiCardHeader className="p-4 flex-row items-center">
-            <div className="h-10 w-10 border border-border/50 rounded-md bg-background/50 inline-flex items-center justify-center">
-              <WorkflowIcon icon={workflow.icon ?? ''} className="h-5 w-5" />
-            </div>
-            <div className="flex-grow"></div>
-          </UiCardHeader>
-          <UiCardContent className="px-4 pt-0 flex-grow">
-            <Link
-              to={`/workflows/${workflow.id}`}
-              className="h-full w-full block"
+          <Link to={`/workflows/${workflow.id}`}>
+            <UiCardContent
+              className={clsx(
+                'px-4 pt-4 flex-grow flex items-start gap-2',
+                !workflow.description && 'items-center',
+              )}
             >
-              <p className="line-clamp-2">{workflow.name}</p>
-              <p className="line-clamp-2 text-muted-foreground text-sm leading-tight">
-                {workflow.description}
-              </p>
-            </Link>
-          </UiCardContent>
-          <UiCardFooter className="px-4 pb-4">
+              <div className="h-10 w-10 border border-border/50 rounded-md bg-background/50 inline-flex justify-center items-center">
+                <WorkflowIcon icon={workflow.icon ?? ''} className="h-5 w-5" />
+              </div>
+              <div className="flex-grow">
+                <p className="line-clamp-2">{workflow.name}</p>
+                <p className="line-clamp-2 text-muted-foreground text-sm leading-tight">
+                  {workflow.description}
+                </p>
+              </div>
+            </UiCardContent>
+          </Link>
+          <UiCardFooter className="px-4 pb-4 gap-2">
             <p className="text-sm text-muted-foreground flex-grow line-clamp-1">
               Updated {dayjs(new Date(workflow.updatedAt)).fromNow()}
             </p>
@@ -132,9 +177,55 @@ function WorkflowCards({ workflows }: { workflows: DatabaseWorkflow[] }) {
                 )
               }
             />
+            <UiDropdownMenu>
+              <UiDropdownMenuTrigger>
+                <EllipsisVerticalIcon className="h-5 w-5" />
+              </UiDropdownMenuTrigger>
+              <UiDropdownMenuContent>
+                <UiDropdownMenuItem
+                  onClick={() => navigate(`/workflows/${workflow.id}`)}
+                >
+                  Open
+                </UiDropdownMenuItem>
+                <UiDropdownMenuItem>Export</UiDropdownMenuItem>
+                <UiDropdownMenuSeparator />
+                <UiDropdownMenuItem
+                  onClick={() =>
+                    setDeleteDialog({ id: workflow.id, name: workflow.name })
+                  }
+                  className="text-destructive-text data-[highlighted]:text-destructive-text data-[highlighted]:bg-destructive/20"
+                >
+                  Delete
+                </UiDropdownMenuItem>
+              </UiDropdownMenuContent>
+            </UiDropdownMenu>
           </UiCardFooter>
         </UiCard>
       ))}
+      <UiAlertDialog
+        open={Boolean(deleteDialog)}
+        onOpenChange={(value) => !value && setDeleteDialog(null)}
+      >
+        <UiAlertDialogContent>
+          <UiAlertDialogHeader>
+            <UiAlertDialogTitle>Delete workflow?</UiAlertDialogTitle>
+            <UiAlertDialogDescription>
+              This action cannot be undone. Are you sure want to delete the
+              &ldquo;<b>{deleteDialog?.name}</b>
+              &ldquo; workflow?
+            </UiAlertDialogDescription>
+            <UiAlertDialogFooter>
+              <UiAlertDialogCancel>Cancel</UiAlertDialogCancel>
+              <UiAlertDialogAction
+                variant="destructive"
+                onClick={deleteWorkflow}
+              >
+                Delete
+              </UiAlertDialogAction>
+            </UiAlertDialogFooter>
+          </UiAlertDialogHeader>
+        </UiAlertDialogContent>
+      </UiAlertDialog>
     </div>
   );
 }

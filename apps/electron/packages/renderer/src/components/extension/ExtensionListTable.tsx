@@ -1,5 +1,9 @@
 import {
   UiButton,
+  UiDropdownMenu,
+  UiDropdownMenuContent,
+  UiDropdownMenuItem,
+  UiDropdownMenuTrigger,
   UiKbd,
   UiList,
   UiPopover,
@@ -15,6 +19,7 @@ import { Fragment, useEffect, useState } from 'react';
 import {
   AlertTriangleIcon,
   ChevronRightIcon,
+  EllipsisIcon,
   FileIcon,
   RotateCcwIcon,
   StopCircleIcon,
@@ -360,16 +365,12 @@ function ExtensionListTable({
                   className="p-3"
                   onClick={(event) => event.stopPropagation()}
                 >
-                  <div className="flex items-center justify-end">
+                  <div className="flex items-center justify-end gap-2">
                     {extension.isError && (
                       <UiPopover>
                         <UiTooltip label="See error">
                           <UiPopoverTrigger asChild>
-                            <UiButton
-                              size="icon-sm"
-                              variant="ghost"
-                              className="mr-2 h-8 w-8"
-                            >
+                            <UiButton size="icon-sm" variant="ghost">
                               <AlertTriangleIcon className="h-5 w-5 text-destructive-text" />
                             </UiButton>
                           </UiPopoverTrigger>
@@ -382,28 +383,6 @@ function ExtensionListTable({
                         </UiPopoverContent>
                       </UiPopover>
                     )}
-                    <UiTooltip label="Extension detail">
-                      <UiButton
-                        size="icon-sm"
-                        variant="ghost"
-                        className="mr-4 h-8 w-8"
-                        onClick={() => onExtensionSelected?.(extension.id)}
-                      >
-                        <FileIcon className="h-5 w-5" />
-                      </UiButton>
-                    </UiTooltip>
-                    {extension.isLocal && (
-                      <UiTooltip label="Reload extension">
-                        <UiButton
-                          size="icon-sm"
-                          variant="ghost"
-                          className="mr-4 h-8 w-8"
-                          onClick={() => reloadExtension(extension.id)}
-                        >
-                          <RotateCcwIcon className="h-5 w-5" />
-                        </UiButton>
-                      </UiTooltip>
-                    )}
                     <UiSwitch
                       checked={!extension.isDisabled}
                       size="sm"
@@ -414,6 +393,29 @@ function ExtensionListTable({
                         })
                       }
                     />
+                    <UiDropdownMenu>
+                      <UiDropdownMenuTrigger asChild>
+                        <UiButton variant="ghost" size="icon-sm">
+                          <EllipsisIcon className="h-5 w-5" />
+                        </UiButton>
+                      </UiDropdownMenuTrigger>
+                      <UiDropdownMenuContent align="end" className="min-w-32">
+                        <UiDropdownMenuItem
+                          onClick={() => onExtensionSelected?.(extension.id)}
+                        >
+                          <FileIcon className="h-4 w-4 mr-2" />
+                          <span>See details</span>
+                        </UiDropdownMenuItem>
+                        {extension.isLocal && (
+                          <UiDropdownMenuItem
+                            onClick={() => reloadExtension(extension.id)}
+                          >
+                            <RotateCcwIcon className="h-4 w-4 mr-2" />
+                            <span>Reload</span>
+                          </UiDropdownMenuItem>
+                        )}
+                      </UiDropdownMenuContent>
+                    </UiDropdownMenu>
                   </div>
                 </td>
               </tr>
