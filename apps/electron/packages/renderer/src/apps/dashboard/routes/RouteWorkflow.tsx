@@ -43,9 +43,7 @@ import {
 } from '/@/components/workflow/WorkflowNodes';
 import { useDatabase } from '/@/hooks/useDatabase';
 import { useNavigate, useParams } from 'react-router-dom';
-import { debounce } from '@repo/shared';
 import preloadAPI from '/@/utils/preloadAPI';
-import { DatabaseWorkflowUpdatePayload } from '#packages/main/src/interface/database.interface';
 import { debugLog } from '#packages/common/utils/helper';
 import { useDashboardStore } from '/@/stores/dashboard.store';
 import WorkflowEditorEditNode from '/@/components/workflow/editor/WorkflowEditorEditNode';
@@ -292,7 +290,6 @@ function WokflowViewportChangesListener() {
   return null;
 }
 
-const WORKFLOW_CHANGES_DEBOUNCE_MS = 2000;
 function RouteWorkflow() {
   const hideSidebar = useDashboardStore.use.setHideSidebar();
   const setWorkflow = useWorkflowEditorStore.use.setWorkflow();
@@ -300,8 +297,6 @@ function RouteWorkflow() {
   const navigate = useNavigate();
   const { workflowId } = useParams();
   const { queryDatabase } = useDatabase();
-
-  const dataFetched = useRef(false);
 
   useEffect(() => {
     const offQueryListener = queryDatabase({
@@ -314,9 +309,6 @@ function RouteWorkflow() {
         }
 
         setWorkflow(data);
-        setTimeout(() => {
-          dataFetched.current = true;
-        }, WORKFLOW_CHANGES_DEBOUNCE_MS + 100);
       },
       onError(message) {
         debugLog('Error: ', message);
@@ -330,40 +322,6 @@ function RouteWorkflow() {
       useWorkflowEditorStore.getState().$reset();
     };
   }, [workflowId, navigate]);
-  useEffect(
-    () =>
-      useWorkflowEditorStore.subscribe(
-        (state) => state.workflowChangesId,
-        debounce(async () => {
-          const { workflow } = useWorkflowEditorStore.getState();
-          if (!dataFetched.current || !workflow) return;
-
-          try {
-            const { workflowChanges: changes, clearWorkflowChanges } =
-              useWorkflowEditorStore.getState();
-            if (changes.size === 0) return;
-
-            const payload: DatabaseWorkflowUpdatePayload = {};
-            changes.forEach((key) => {
-              //@ts-expect-error ...
-              payload[key] = workflow[key];
-            });
-
-            await preloadAPI.main.ipc.invoke(
-              'database:update-workflow',
-              workflow.id,
-              payload,
-            );
-            clearWorkflowChanges();
-
-            debugLog('Save workflow', changes);
-          } catch (error) {
-            console.error(error);
-          }
-        }, WORKFLOW_CHANGES_DEBOUNCE_MS),
-      ),
-    [],
-  );
 
   return (
     <WorkflowEditorProvider>

@@ -31,11 +31,10 @@ interface WorkflowElement {
 }
 
 export interface WorkflowEditorStoreState {
-  editNode: WorkflowNodes | null;
-  workflowChangesId: number;
-  workflowLastSavedAt: null | string;
-  workflow: DatabaseWorkflowDetail | null;
   selection: WorkflowElement;
+  enableWorkflowSaveBtn: boolean;
+  editNode: WorkflowNodes | null;
+  workflow: DatabaseWorkflowDetail | null;
   workflowChanges: Set<keyof DatabaseWorkflowUpdatePayload>;
 }
 
@@ -47,6 +46,7 @@ export interface WorkflowEditorStoreActions {
   setEditNode(node: WorkflowNodes | null): void;
   setSelection(selection: WorkflowElement): void;
   deleteEdge: (edgeId: string | string[]) => void;
+  toggleSaveWorkflowBtn: (enable: boolean) => void;
   setWorkflow: (workflow: DatabaseWorkflowDetail) => void;
   updateEditNode(node: Partial<WorkflowNodes['data']>): void;
   updateWorkflow: (
@@ -72,9 +72,8 @@ export type WorkflowEditorStore = WorkflowEditorStoreState &
 const initialState: WorkflowEditorStoreState = {
   workflow: null,
   editNode: null,
-  workflowChangesId: 0,
-  workflowLastSavedAt: null,
   workflowChanges: new Set(),
+  enableWorkflowSaveBtn: false,
   selection: { edges: [], nodes: [] },
 };
 
@@ -86,8 +85,10 @@ const workflowEditorStore = create(
     clearWorkflowChanges() {
       set({
         workflowChanges: new Set(),
-        workflowLastSavedAt: new Date().toString(),
       });
+    },
+    toggleSaveWorkflowBtn(enable) {
+      set({ enableWorkflowSaveBtn: enable });
     },
     updateNodeData(nodeId, data) {
       let nodeFound = false;
@@ -154,7 +155,7 @@ const workflowEditorStore = create(
       }, 250);
     },
     applyElementChanges({ edges, nodes }) {
-      const { workflow, workflowChangesId } = get();
+      const { workflow } = get();
       if (!workflow) return;
 
       const updatedElement: Partial<WorkflowElement> = {};
@@ -167,7 +168,7 @@ const workflowEditorStore = create(
       }
 
       set({
-        workflowChangesId: workflowChangesId + 1,
+        enableWorkflowSaveBtn: true,
         workflow: { ...workflow, ...updatedElement },
       });
     },
@@ -191,7 +192,7 @@ const workflowEditorStore = create(
         },
       };
       if (saveChanges) {
-        updatePayload.workflowChangesId = state.workflowChangesId + 1;
+        updatePayload.enableWorkflowSaveBtn = true;
       }
 
       set(updatePayload);

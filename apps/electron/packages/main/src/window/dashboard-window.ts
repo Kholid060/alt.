@@ -1,8 +1,9 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, dialog } from 'electron';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type WindowBase from './WindowBase';
 import WindowUtils from './WindowUtils';
+import { parseJSON } from '@repo/shared';
 
 class WindowDashboard extends WindowUtils implements WindowBase {
   private static _instance: WindowDashboard | null = null;
@@ -43,6 +44,22 @@ class WindowDashboard extends WindowUtils implements WindowBase {
       if (import.meta.env.DEV) {
         browserWindow?.webContents.openDevTools();
       }
+    });
+    browserWindow.on('close', async (event) => {
+      const url = new URL(browserWindow.webContents.getURL());
+      const preventCloseWindow = parseJSON(
+        url.searchParams.get('preventCloseWindow') ?? '',
+        false,
+      );
+      if (!preventCloseWindow) return;
+
+      const choice = dialog.showMessageBoxSync(browserWindow, {
+        type: 'question',
+        buttons: ['Close', 'Cancel'],
+        title: 'Close window?',
+        message: 'Changes you made may not be saved.',
+      });
+      if (choice > 0) event.preventDefault();
     });
 
     /**
