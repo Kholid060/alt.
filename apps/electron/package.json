@@ -64,6 +64,7 @@
     "vitest": "1.2.2"
   },
   "dependencies": {
+    "@codemirror/lang-javascript": "^6.2.2",
     "@floating-ui/react": "^0.26.12",
     "@hookform/resolvers": "^3.3.4",
     "@n8n_io/riot-tmpl": "^4.0.1",
@@ -73,6 +74,8 @@
     "@repo/extension-core": "workspace:*",
     "@repo/shared": "workspace:*",
     "@repo/ui": "workspace:*",
+    "@uiw/codemirror-theme-tokyo-night": "^4.22.0",
+    "@uiw/react-codemirror": "^4.22.0",
     "active-win": "^8.2.1",
     "better-sqlite3": "^9.6.0",
     "clsx": "^2.1.0",

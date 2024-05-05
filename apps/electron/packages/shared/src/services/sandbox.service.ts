@@ -46,21 +46,23 @@ class SandboxService {
     });
   }
 
-  async evaluateCode(
+  async evaluateExpression(
     code: Record<string, string>,
     data?: Record<PropertyKey, unknown>,
   ): Promise<Record<string, unknown>>;
-  async evaluateCode(
+  async evaluateExpression(
     code: string,
     data?: Record<PropertyKey, unknown>,
   ): Promise<unknown>;
-  async evaluateCode(
+  async evaluateExpression(
     code: string | Record<string, string>,
     data?: Record<PropertyKey, unknown>,
   ): Promise<unknown> {
     await this.ensureSandboxEl();
-
-    return this.messagePort.sendMessage('evaluate-code', code, data);
+    const start = performance.now();
+    return this.messagePort
+      .sendMessage('evaluate-expression', code, data)
+      .finally(() => console.log('final', performance.now() - start, code));
   }
 }
 

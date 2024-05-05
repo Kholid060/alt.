@@ -8,13 +8,13 @@ import type { WorkflowEdge } from '#packages/common/interface/workflow.interface
 import type WorkflowNodeHandler from '../node-handler/WorkflowNodeHandler';
 import type { DatabaseWorkflowDetail } from '#packages/main/src/interface/database.interface';
 import { WorkflowRunnerNodeError } from './workflow-runner-errors';
-import SandboxService from '/@/services/sandbox.service';
 import { setProperty } from 'dot-prop';
 import { debugLog } from '#packages/common/utils/helper';
 import { sleep } from '@repo/shared';
 import WorkflowRunnerData from './WorkflowRunnerData';
 import type { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
 import type { WorkflowNodeHandlerExecuteReturn } from '../node-handler/WorkflowNodeHandler';
+import WorkflowRunnerSandbox from './WorkflowRunnerSandbox';
 
 export type NodeHandlersObj = Record<
   WORKFLOW_NODE_TYPE,
@@ -32,6 +32,7 @@ export interface WorkflowRunnerEvents {
 }
 
 export enum WorkflowRunnerState {
+  Idle = 'idle',
   Error = 'error',
   Stop = 'stopped',
   Finish = 'finish',
@@ -133,6 +134,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   workflow: DatabaseWorkflowDetail;
   connectionsMap: Record<string, NodeConnectionMap> = {};
 
+  sandbox: WorkflowRunnerSandbox;
   dataStorage: WorkflowRunnerData;
 
   constructor({
@@ -147,8 +149,9 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     this.workflow = workflow;
     this.startNodeId = startNodeId;
     this.nodeHandlers = nodeHandlers;
-    this.state = WorkflowRunnerState.Running;
+    this.state = WorkflowRunnerState.Idle;
 
+    this.sandbox = new WorkflowRunnerSandbox();
     this.dataStorage = new WorkflowRunnerData();
 
     this.nodesIdxMap = new Map(
@@ -157,6 +160,8 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   }
 
   start() {
+    if (this.state !== WorkflowRunnerState.Idle) return;
+
     const startNode = this.workflow.nodes.find((node) => {
       if (this.startNodeId === WORKFLOW_MANUAL_TRIGGER_ID) {
         return (
@@ -178,19 +183,14 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
       this.workflow.edges,
     );
 
+    this.state = WorkflowRunnerState.Running;
+
     this.executeNode(startNode);
   }
 
   stop() {
     this.state = WorkflowRunnerState.Stop;
     this.emit('finish', WorkflowRunnerFinishReason.Stop);
-  }
-
-  evaluateCode<T extends Record<string, string>>(code: T) {
-    return SandboxService.instance.evaluateCode(
-      code,
-      {}, // TO_DO: Add context data to expression
-    ) as Promise<Record<keyof T, unknown>>;
   }
 
   private getNode(nodeId: string): WorkflowNodes | null {
@@ -204,22 +204,23 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   private async evaluateNodeExpression(node: WorkflowNodes) {
     if (!Object.hasOwn(node.data, '$expData')) return node;
 
-    const evaluateExpressions: Record<string, string> = {};
-    for (const key in node.data.$expData) {
-      const expression = node.data.$expData[key];
-      if (!expression.active) continue;
+    let isEmpty = true;
+    const expression: Record<string, string> = {};
+    Object.entries(node.data.$expData!).forEach(([key, value]) => {
+      if (!value.active) return;
 
-      evaluateExpressions[key] = expression.value;
-    }
+      isEmpty = false;
+      expression[key] = value.value;
+    });
 
-    const result = await this.evaluateCode(evaluateExpressions);
+    if (isEmpty) return node;
 
-    const copyNodeData = structuredClone(node.data);
-    for (const key in result) {
-      setProperty(copyNodeData, key, result[key]);
-    }
+    const result = await this.sandbox.evaluateExpression(expression);
+    Object.entries(result).forEach(([key, value]) => {
+      setProperty(node.data, key, value);
+    });
 
-    return { ...node, data: copyNodeData } as WorkflowNodes;
+    return node;
   }
 
   private findNextNode(
@@ -399,6 +400,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
       nodeHandler.destroy();
     });
 
+    this.sandbox.destroy();
     this.nodesIdxMap.clear();
     this.dataStorage.destroy();
     this.removeAllListeners();

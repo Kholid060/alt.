@@ -107,4 +107,6 @@ function WorkflowNodeEditLoop() {
   );
 }
 
+export const nodeType = WORKFLOW_NODE_TYPE.LOOP;
+
 export default WorkflowNodeEditLoop;

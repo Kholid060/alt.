@@ -61,6 +61,13 @@ export type WorkflowNodeLoop = WorkflowNodeBase<
   WORKFLOW_NODE_TYPE.LOOP
 >;
 
+export type WorkflowNodeCode = WorkflowNodeBase<
+  {
+    jsCode: string;
+  },
+  WORKFLOW_NODE_TYPE.CODE
+>;
+
 export type WorkflowNodeDoNothing = WorkflowNodeBase<
   object,
   WORKFLOW_NODE_TYPE.DO_NOTHING
@@ -77,12 +84,10 @@ export type WorkflowNodeTrigger = WorkflowNodeBase<
 
 export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoop;
+  [WORKFLOW_NODE_TYPE.CODE]: WorkflowNodeCode;
   [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeCommand;
   [WORKFLOW_NODE_TYPE.TRIGGER]: WorkflowNodeTrigger;
+  [WORKFLOW_NODE_TYPE.DO_NOTHING]: WorkflowNodeDoNothing;
 }
 
-export type WorkflowNodes =
-  | WorkflowNodeLoop
-  | WorkflowNodeCommand
-  | WorkflowNodeTrigger
-  | WorkflowNodeDoNothing;
+export type WorkflowNodes = WorkflowNodesMap[keyof WorkflowNodesMap];

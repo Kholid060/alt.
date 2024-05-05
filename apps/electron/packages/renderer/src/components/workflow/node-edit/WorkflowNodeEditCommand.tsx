@@ -14,6 +14,7 @@ import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
 import { ChevronDown } from 'lucide-react';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeErrorHandler from './WorklflowNodeErrorHandler';
+import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 
 function CommandArgs({ data }: { data: WorkflowNodeCommand['data'] }) {
   const updateEditNode = useWorkflowEditorStore.use.updateEditNode();
@@ -150,5 +151,7 @@ function WorkflowNodeEditCommand() {
     </>
   );
 }
+
+export const nodeType = WORKFLOW_NODE_TYPE.COMMAND;
 
 export default WorkflowNodeEditCommand;

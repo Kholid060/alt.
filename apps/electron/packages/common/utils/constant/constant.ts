@@ -31,6 +31,7 @@ export const IPC_POST_MESSAGE_EVENT = {
 
 export enum WORKFLOW_NODE_TYPE {
   LOOP = 'node-loop',
+  CODE = 'node-code',
   COMMAND = 'node-command',
   TRIGGER = 'node-trigger',
   DO_NOTHING = 'node-do-nothing',

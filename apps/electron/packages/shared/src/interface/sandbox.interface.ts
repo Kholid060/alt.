@@ -1,6 +1,6 @@
 export interface SandboxEvents {
-  'evaluate-code': (
-    code: string | Record<string, string>,
+  'evaluate-expression': (
+    expression: string | Record<string, string>,
     context?: Record<PropertyKey, unknown>,
   ) => unknown | Record<string, string>;
 }

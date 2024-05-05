@@ -51,6 +51,7 @@ import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interfa
 
 const nodeTypes: Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>> = {
   [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoop,
+  [WORKFLOW_NODE_TYPE.CODE]: WorkflowNodeBasic,
   [WORKFLOW_NODE_TYPE.TRIGGER]: WorkflowNodeBasic,
   [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeCommand,
   [WORKFLOW_NODE_TYPE.DO_NOTHING]: WorkflowNodeBasic,

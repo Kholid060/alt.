@@ -1,17 +1,42 @@
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import { useShallow } from 'zustand/react/shallow';
-import WorkflowNodeEditCommand from '../node-edit/WorkflowNodeEditCommand';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
-import { memo } from 'react';
+import { Suspense, lazy, memo } from 'react';
 import { XIcon } from 'lucide-react';
-import WorkflowNodeEditLoop from '../node-edit/WorkflowNodeEditLoop';
+import { UiSkeleton } from '@repo/ui';
 
-const editNodeComponentMap: Record<WORKFLOW_NODE_TYPE, React.FC | null> = {
-  [WORKFLOW_NODE_TYPE.TRIGGER]: null,
-  [WORKFLOW_NODE_TYPE.DO_NOTHING]: null,
-  [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeEditLoop,
-  [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeEditCommand,
-};
+const editComponents = Object.fromEntries(
+  Object.entries(import.meta.glob('../node-edit/WorkflowNodeEdit*.tsx')).map(
+    ([key, value]) => {
+      const compName =
+        key
+          .split('/')
+          .at(-1)
+          ?.replaceAll(/WorkflowNodeEdit|.tsx/g, '') ?? '';
+
+      return [
+        `node-${compName.toLowerCase()}`,
+        lazy(value as () => Promise<{ default: React.FC }>),
+      ];
+    },
+  ),
+);
+
+function Loading() {
+  return (
+    <div className="p-4">
+      <div className="flex items-center gap-2">
+        <UiSkeleton className="h-10 w-10" />
+        <div className="flex-grow">
+          <UiSkeleton className="h-4 w-7/12" />
+          <UiSkeleton className="h-4 w-5/12 mt-1.5" />
+        </div>
+      </div>
+      <UiSkeleton className="h-9 w-full mt-6" />
+      <UiSkeleton className="h-9 w-full mt-4" />
+      <UiSkeleton className="h-9 w-full mt-4" />
+    </div>
+  );
+}
 
 function WorkflowEditorEditNode() {
   const editNode = useWorkflowEditorStore(
@@ -23,7 +48,7 @@ function WorkflowEditorEditNode() {
   );
   const setEditNode = useWorkflowEditorStore.use.setEditNode();
 
-  const EditComponent = editNode && editNodeComponentMap[editNode.type];
+  const EditComponent = editNode && editComponents[editNode.type];
   if (!EditComponent) return null;
 
   return (
@@ -34,7 +59,9 @@ function WorkflowEditorEditNode() {
       >
         <XIcon className="h-5 w-5" />
       </button>
-      <EditComponent />
+      <Suspense fallback={<Loading />}>
+        <EditComponent key={editNode.id} />
+      </Suspense>
     </div>
   );
 }

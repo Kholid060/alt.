@@ -11,6 +11,7 @@ export enum WorkflowEditorContextMenuType {
 
 export type WorkflowEditorNodeGroup =
   | 'Flow'
+  | 'Core'
   | 'Triggers'
   | 'Commands'
   | 'Scripts';

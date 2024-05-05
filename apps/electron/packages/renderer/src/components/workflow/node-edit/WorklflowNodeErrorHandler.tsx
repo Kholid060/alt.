@@ -1,16 +1,14 @@
-import {
-  WorkflowNodeErroHandler,
-  WorkflowNodeErroHandlerAction,
-} from '#packages/common/interface/workflow.interface';
+import { WorkflowNodeErroHandlerAction } from '#packages/common/interface/workflow.interface';
 import { UiInput, UiLabel, UiSelect, UiSwitch } from '@repo/ui';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
+import { WorkflowNodeErrorHandler as WorkflowNodeErrorHandlerType } from '#packages/common/interface/workflow-nodes.interface';
 
 const errorActions: { title: string; id: WorkflowNodeErroHandlerAction }[] = [
   { id: 'stop', title: 'Stop execution' },
   { id: 'continue', title: 'Continue execution' },
   { id: 'fallback', title: 'Execute fallback node' },
 ];
-const defaultErrorHandler: WorkflowNodeErroHandler = {
+const defaultErrorHandler: WorkflowNodeErrorHandlerType = {
   action: 'stop',
   retry: false,
   retryCount: 3,
@@ -20,13 +18,13 @@ const defaultErrorHandler: WorkflowNodeErroHandler = {
 function WorkflowNodeErrorHandler({
   data,
 }: {
-  data?: WorkflowNodeErroHandler;
+  data?: WorkflowNodeErrorHandlerType;
 }) {
   const updateEditNode = useWorkflowEditorStore.use.updateEditNode();
 
   const errorHandler = data || defaultErrorHandler;
 
-  function updateErrorHandler(data: Partial<WorkflowNodeErroHandler>) {
+  function updateErrorHandler(data: Partial<WorkflowNodeErrorHandlerType>) {
     updateEditNode({
       $errorHandler: { ...errorHandler, ...data },
     });

@@ -19,9 +19,8 @@ export class NodeHandlerLoop extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.LOOP
 
     switch (node.data.dataSource) {
       case 'expression':
-        ({ expression: data } = await runner.evaluateCode({
-          expression: node.data.expression,
-        }));
+        data = await runner.sandbox.evaluateExpression(node.data.expression);
+        console.log('data', data);
         break;
       case 'prev-node':
         data = prevExecution?.value;

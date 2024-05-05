@@ -49,3 +49,7 @@ interface URLPatternComponentResult {
     [key: string]: string | undefined;
   };
 }
+
+declare interface Element {
+  scrollIntoViewIfNeeded(centerIfNeeded?: boolean): void;
+}

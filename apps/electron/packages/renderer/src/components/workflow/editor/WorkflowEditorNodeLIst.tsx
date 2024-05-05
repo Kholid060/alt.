@@ -9,12 +9,10 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { PlugZapIcon, RepeatIcon, SearchIcon } from 'lucide-react';
+import { SearchIcon } from 'lucide-react';
 import { UiListProvider } from '@repo/ui/dist/context/list.context';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import UiExtensionIcon from '../../ui/UiExtensionIcon';
-import preloadAPI from '/@/utils/preloadAPI';
-import { isIPCEventError } from '/@/utils/helper';
 import { Connection, useReactFlow } from 'reactflow';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
@@ -26,50 +24,46 @@ import type {
 } from '/@/interface/workflow-editor.interface';
 import { nanoid } from 'nanoid/non-secure';
 import { WorkflowNewNode } from '#packages/common/interface/workflow.interface';
-import { WorkflowNodeBaseData } from '#packages/common/interface/workflow-nodes.interface';
+import { WORKFLOW_NODES } from '/@/utils/constant/workflow-nodes';
 
 type NodeCommandItem = WorkflowEditorNodeListItem<WORKFLOW_NODE_TYPE.COMMAND>;
 
 const nodeTypes: (WorkflowEditorNodeGroup | 'All')[] = [
   'All',
+  'Core',
   'Triggers',
   'Commands',
   'Scripts',
   'Flow',
 ];
-const defaultData: WorkflowNodeBaseData = {
-  $expData: {},
-  isDisabled: false,
+const defaultNodes: Record<
+  WorkflowEditorNodeGroup,
+  WorkflowEditorNodeListItems[]
+> = {
+  Core: [],
+  Flow: [],
+  Scripts: [],
+  Commands: [],
+  Triggers: [],
 };
+const allNodesItems = Object.values(WORKFLOW_NODES).reduce((acc, node) => {
+  if (node.invisible) return acc;
 
-const triggerNodes: WorkflowEditorNodeListItems[] = [
-  {
-    icon: <UiList.Icon icon={PlugZapIcon} />,
-    title: 'Manual Trigger',
-    group: 'Triggers',
-    value: 'trigger-manual',
+  if (!acc[node.group]) acc[node.group] = [];
+
+  acc[node.group].push({
+    value: node.type,
+    group: node.group,
+    title: node.title,
+    icon: <UiList.Icon icon={node.icon} />,
     metadata: {
-      type: 'manual',
-      nodeType: WORKFLOW_NODE_TYPE.TRIGGER,
-      ...defaultData,
+      ...node.defaultData,
+      nodeType: node.type,
     },
-  },
-];
-const flowNodes: WorkflowEditorNodeListItems[] = [
-  {
-    group: 'Flow',
-    title: 'Loop',
-    value: 'loop-node',
-    icon: <UiList.Icon icon={RepeatIcon} />,
-    metadata: {
-      varName: '',
-      expression: '',
-      dataSource: 'prev-node',
-      nodeType: WORKFLOW_NODE_TYPE.LOOP,
-      ...defaultData,
-    },
-  },
-];
+  } as WorkflowEditorNodeListItems);
+
+  return acc;
+}, defaultNodes);
 
 export function WorkflowEditorNodeList({
   className,
@@ -82,6 +76,7 @@ export function WorkflowEditorNodeList({
     true,
   ]);
 
+  const categoryContainerRef = useRef<HTMLDivElement>(null);
   const [nodeType, setNodeType] = useState<WorkflowEditorNodeGroup | 'All'>(
     'All',
   );
@@ -144,9 +139,10 @@ export function WorkflowEditorNodeList({
   }, [extensionsQuery]);
 
   const items = ([] as WorkflowEditorNodeListItems[]).concat(
-    triggerNodes,
+    allNodesItems.Triggers,
+    allNodesItems.Core,
+    allNodesItems.Flow,
     commandItems,
-    flowNodes,
   );
   const filteredItems =
     nodeType === 'All'
@@ -173,21 +169,25 @@ export function WorkflowEditorNodeList({
     const target = eventTarget as HTMLInputElement;
     const currentTypeIdx = nodeTypes.indexOf(nodeType);
 
+    let activeNodeType: (WorkflowEditorNodeGroup | 'All') | undefined;
+
     if (key === 'ArrowLeft' && target.selectionStart === 0) {
-      setNodeType(
-        nodeTypes.at(currentTypeIdx === 0 ? -1 : currentTypeIdx - 1)!,
+      activeNodeType = nodeTypes.at(
+        currentTypeIdx === 0 ? -1 : currentTypeIdx - 1,
       );
-      return;
+    } else if (key === 'ArrowRight' && target.selectionEnd === 0) {
+      activeNodeType = nodeTypes.at(
+        currentTypeIdx === nodeTypes.length - 1 ? 0 : currentTypeIdx + 1,
+      );
     }
 
-    if (key === 'ArrowRight' && target.selectionEnd === 0) {
-      setNodeType(
-        nodeTypes.at(
-          currentTypeIdx === nodeTypes.length - 1 ? 0 : currentTypeIdx + 1,
-        )!,
-      );
-      return;
-    }
+    if (!activeNodeType) return;
+
+    setNodeType(activeNodeType);
+
+    categoryContainerRef.current
+      ?.querySelector(`#${activeNodeType}`)
+      ?.scrollIntoView();
   }
 
   return (
@@ -203,9 +203,13 @@ export function WorkflowEditorNodeList({
             />
           </div>
           <UiScrollArea orientation="horizontal">
-            <div className="flex w-max text-muted-foreground">
+            <div
+              className="flex w-max text-muted-foreground"
+              ref={categoryContainerRef}
+            >
               {nodeTypes.map((item) => (
                 <button
+                  id={item}
                   key={item}
                   className={cn(
                     'border-b-2 px-2 pb-2 hover:text-foreground transition-colors min-w-12 shrink-0',
@@ -271,16 +275,12 @@ export function WorkflowEditorNodeListModal() {
       };
 
       if (!position) {
-        const cursorPosition = await preloadAPI.main.ipc.invoke(
-          'screen:get-cursor-position',
-          true,
-        );
-        if (isIPCEventError(cursorPosition)) return;
-
-        modalPosition = screenToFlowPosition(cursorPosition);
+        modalPosition = workflowEditor.lastMousePos.current;
         newNodeData.current.position = modalPosition;
       } else {
-        newNodeData.current.position = screenToFlowPosition(modalPosition);
+        newNodeData.current.position = screenToFlowPosition(
+          workflowEditor.lastMousePos.current,
+        );
       }
 
       triggerRef.current.style.top = modalPosition.y + 'px';
@@ -295,7 +295,7 @@ export function WorkflowEditorNodeListModal() {
 
       setShow(true);
     },
-    [screenToFlowPosition],
+    [screenToFlowPosition, workflowEditor.lastMousePos],
   );
 
   useHotkeys(['mod+shift+a'], () => {

@@ -61,7 +61,10 @@ function WorkflowEditorHeader() {
 
       const { workflowChanges: changes, clearWorkflowChanges } =
         useWorkflowEditorStore.getState();
-      if (changes.size === 0) return;
+      if (changes.size === 0) {
+        toggleSaveWorkflowBtn(false);
+        return;
+      }
 
       const payload: DatabaseWorkflowUpdatePayload = {};
       changes.forEach((key) => {
@@ -103,6 +106,10 @@ function WorkflowEditorHeader() {
     } else if (blocker.state === 'proceeding') {
       navigate(blocker.location.pathname.replace('/dashboard', ''));
     }
+
+    return () => {
+      blocker?.reset?.();
+    };
   }, [blocker, navigate]);
 
   useEffect(() => {
