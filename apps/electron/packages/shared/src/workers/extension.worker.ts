@@ -20,7 +20,7 @@ import {
 } from '#common/utils/extension/extension-api-value';
 import type { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
 import ExtensionWorkerMessagePort from '../extension/ExtensionWorkerMessagePort';
-import type { ExtensionCommandWorkerInitMessage } from '../inteface/extension.interface';
+import type { ExtensionCommandWorkerInitMessage } from '../interface/extension.interface';
 import type { MessagePortSharedCommandWindowEvents } from '#packages/common/interface/message-port-events.interface';
 
 type ExtensionCommand = (

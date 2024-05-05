@@ -108,32 +108,18 @@ function setupExtensionPackageWatcher({ resolvedUrls }) {
 function setupSharedPackageWatcher({ resolvedUrls }) {
   process.env.VITE_DEV_SERVER_URL = resolvedUrls.local[0];
 
-  return Promise.all([
-    build({
-      mode,
-      logLevel,
-      configFile: 'packages/shared/vite.config.main.js',
-      build: {
-        /**
-         * Set to {} to enable rollup watcher
-         * @see https://vitejs.dev/config/build-options.html#build-watch
-         */
-        watch: {},
-      },
-    }),
-    build({
-      mode,
-      logLevel,
-      configFile: 'packages/shared/vite.config.sandbox.js',
-      build: {
-        /**
-         * Set to {} to enable rollup watcher
-         * @see https://vitejs.dev/config/build-options.html#build-watch
-         */
-        watch: {},
-      },
-    }),
-  ]);
+  return build({
+    mode,
+    logLevel,
+    configFile: 'packages/shared/vite.config.main.js',
+    build: {
+      /**
+       * Set to {} to enable rollup watcher
+       * @see https://vitejs.dev/config/build-options.html#build-watch
+       */
+      watch: {},
+    },
+  });
 }
 
 /**

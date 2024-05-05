@@ -51,16 +51,16 @@ interface WorkflowFormExpressionProps
   labelId?: string;
   noToggle?: boolean;
   children?: React.ReactNode;
-  data: WorkflowNodeExpressionRecords;
+  data?: WorkflowNodeExpressionRecords;
 }
 
 function WorkflowUiFormExpression({
-  data,
   path,
   label,
   labelId,
   noToggle,
   children,
+  data = {},
   className,
   ...props
 }: WorkflowFormExpressionProps) {

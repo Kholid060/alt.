@@ -11,6 +11,7 @@ import {
   LucideIcon,
   PlugZapIcon,
   RepeatIcon,
+  TimerIcon,
 } from 'lucide-react';
 import { WorkflowEditorNodeGroup } from '/@/interface/workflow-editor.interface';
 
@@ -98,5 +99,18 @@ export const WORKFLOW_NODES: {
     handleTarget: ['default'],
     handleSource: ['default'],
     type: WORKFLOW_NODE_TYPE.CODE,
+  },
+  [WORKFLOW_NODE_TYPE.DELAY]: {
+    group: 'Core',
+    subtitle: 'Core',
+    title: 'Delay',
+    icon: TimerIcon,
+    defaultData: {
+      delayMs: 500,
+      isDisabled: false,
+    },
+    handleTarget: ['default'],
+    handleSource: ['default'],
+    type: WORKFLOW_NODE_TYPE.DELAY,
   },
 } as const;

@@ -73,6 +73,11 @@ export type WorkflowNodeDoNothing = WorkflowNodeBase<
   WORKFLOW_NODE_TYPE.DO_NOTHING
 >;
 
+export type WorkflowNodeDelay = WorkflowNodeBase<
+  { delayMs: number },
+  WORKFLOW_NODE_TYPE.DELAY
+>;
+
 export interface WorkflowNodeTriggerManual {
   type: 'manual';
 }
@@ -85,6 +90,7 @@ export type WorkflowNodeTrigger = WorkflowNodeBase<
 export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoop;
   [WORKFLOW_NODE_TYPE.CODE]: WorkflowNodeCode;
+  [WORKFLOW_NODE_TYPE.DELAY]: WorkflowNodeDelay;
   [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeCommand;
   [WORKFLOW_NODE_TYPE.TRIGGER]: WorkflowNodeTrigger;
   [WORKFLOW_NODE_TYPE.DO_NOTHING]: WorkflowNodeDoNothing;

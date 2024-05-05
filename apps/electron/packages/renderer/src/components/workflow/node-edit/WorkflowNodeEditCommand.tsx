@@ -1,20 +1,11 @@
 import { WorkflowNodeCommand } from '#packages/common/interface/workflow-nodes.interface';
-import {
-  UiInput,
-  UiList,
-  UiSelect,
-  UiSwitch,
-  UiTabs,
-  UiTabsContent,
-  UiTabsList,
-  UiTabsTrigger,
-} from '@repo/ui';
+import { UiInput, UiList, UiSelect, UiSwitch } from '@repo/ui';
 import UiExtensionIcon from '../../ui/UiExtensionIcon';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
 import { ChevronDown } from 'lucide-react';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
-import WorkflowNodeErrorHandler from './WorklflowNodeErrorHandler';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
+import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
 
 function CommandArgs({ data }: { data: WorkflowNodeCommand['data'] }) {
   const updateEditNode = useWorkflowEditorStore.use.updateEditNode();
@@ -116,39 +107,25 @@ function CommandArgs({ data }: { data: WorkflowNodeCommand['data'] }) {
 }
 
 function WorkflowNodeEditCommand() {
-  const { data } = useWorkflowEditorStore.use.editNode() as WorkflowNodeCommand;
+  const node = useWorkflowEditorStore.use.editNode() as WorkflowNodeCommand;
+  const { data } = node;
 
   return (
-    <>
-      <div className="p-4 pb-2 flex items-center gap-2">
-        <div className="h-10 w-10">
-          <UiExtensionIcon
-            alt={`${data.title} icon`}
-            id={data.extension.id}
-            icon={data.icon}
-            iconWrapper={(icon) => <UiList.Icon icon={icon} />}
-          />
-        </div>
-        <div className="flex-grow">
-          <p className="leading-tight">{data.title} </p>
-          <p className="text-sm text-muted-foreground">
-            {data.extension.title}
-          </p>
-        </div>
-      </div>
-      <UiTabs variant="line" defaultValue="parameters">
-        <UiTabsList>
-          <UiTabsTrigger value="parameters">Parameters</UiTabsTrigger>
-          <UiTabsTrigger value="error">Error Handler</UiTabsTrigger>
-        </UiTabsList>
-        <UiTabsContent value="parameters" className="p-4 mt-0">
-          <CommandArgs data={data} />
-        </UiTabsContent>
-        <UiTabsContent value="error" className="p-4 mt-0">
-          <WorkflowNodeErrorHandler data={data.$errorHandler} />
-        </UiTabsContent>
-      </UiTabs>
-    </>
+    <WorkflowNodeLayoutEdit
+      node={node}
+      icon={
+        <UiExtensionIcon
+          alt={`${data.title} icon`}
+          id={data.extension.id}
+          icon={data.icon}
+          iconWrapper={(icon) => <UiList.Icon icon={icon} />}
+        />
+      }
+      title={data.title}
+      subtitle={data.extension.title}
+    >
+      <CommandArgs data={data} />
+    </WorkflowNodeLayoutEdit>
   );
 }
 
