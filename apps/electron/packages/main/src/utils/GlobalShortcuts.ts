@@ -6,6 +6,13 @@ import DBService from '../services/database/database.service';
 import WindowCommand from '../window/command-window';
 import SharedProcessService from '../services/shared-process.service';
 
+type GlobalShortcutCallback = (shortcut: string, id?: string) => void;
+interface GlobalShortcutItem {
+  id?: string;
+  keys: string;
+  callback: GlobalShortcutCallback;
+}
+
 class GlobalShortcut {
   private static _instance: GlobalShortcut | null = null;
 
@@ -17,36 +24,59 @@ class GlobalShortcut {
     return this._instance;
   }
 
-  private _shortcuts: Map<string, { metadata?: unknown; keys: string }> =
-    new Map();
+  private shortcuts: Record<string, GlobalShortcutItem[]> = {};
 
   constructor() {}
 
-  get shortcuts() {
-    return [...this._shortcuts.values()];
+  private shortcutListener(keys: string) {
+    const items = this.shortcuts[keys];
+    if (!items || items.length === 0) return;
+
+    items.forEach((item) => item.callback(keys, item.id));
   }
 
-  register(
-    keys: string,
-    callback: (keys: string, metadata?: unknown) => void,
-    metadata?: unknown,
-  ) {
-    if (this._shortcuts.has(keys)) {
-      throw new Error(`"${keys}" shortcut is already registered`);
+  register({
+    id,
+    keys,
+    callback,
+  }: {
+    id?: string;
+    keys: string;
+    callback: GlobalShortcutCallback;
+  }) {
+    if (!this.shortcuts[keys]) this.shortcuts[keys] = [];
+
+    this.shortcuts[keys].push({ callback, keys, id });
+    globalShortcut.register(keys, () => {
+      this.shortcutListener(keys);
+    });
+  }
+
+  unregister(keys: string, ids?: string[]) {
+    const items = this.shortcuts[keys];
+    if (!items) return;
+
+    let unregisterShortcut = !ids;
+
+    if (ids && ids.length > 0) {
+      items.forEach((item, index) => {
+        if (!item.id || !ids.includes(item.id)) return;
+
+        this.shortcuts[keys].splice(index, 1);
+      });
+      unregisterShortcut = this.shortcuts[keys].length === 0;
     }
 
-    globalShortcut.register(keys, () => {
-      callback(keys, metadata);
-    });
-    this._shortcuts.set(keys, { keys, metadata });
+    if (unregisterShortcut) {
+      globalShortcut.unregister(keys);
+    }
   }
 
-  unregister(keys: string | string[]) {
-    const keysArr = Array.isArray(keys) ? keys : [keys];
-
-    keysArr.forEach((item) => {
-      globalShortcut.unregister(item);
-      this._shortcuts.delete(item);
+  unregisterById(id: string) {
+    Object.keys(this.shortcuts).forEach((key) => {
+      this.shortcuts[key] = this.shortcuts[key].filter(
+        (item) => item.id !== id,
+      );
     });
   }
 }
@@ -57,20 +87,14 @@ export class GlobalShortcutExtension {
     commandId: string,
     keys: string | null,
   ) {
-    const metadata = `${extensionId}:${commandId}`;
-
-    const registeredShorcut = GlobalShortcut.instance.shortcuts.find(
-      (shortcut) => shortcut.metadata === metadata,
-    );
-    if (registeredShorcut) {
-      GlobalShortcut.instance.unregister(registeredShorcut.keys);
-    }
+    const shortcutId = `${extensionId}:${commandId}`;
+    GlobalShortcut.instance.unregisterById(shortcutId);
 
     if (!keys) return;
 
-    GlobalShortcut.instance.register(
+    GlobalShortcut.instance.register({
       keys,
-      async () => {
+      callback: async () => {
         try {
           await SharedProcessService.executeExtensionCommand({
             commandId,
@@ -88,8 +112,8 @@ export class GlobalShortcutExtension {
           );
         }
       },
-      metadata,
-    );
+      id: shortcutId,
+    });
   }
 
   static async registerAllShortcuts() {
@@ -115,12 +139,12 @@ export class GlobalShortcutExtension {
 
 export async function registerGlobalShortcuts() {
   try {
-    GlobalShortcut.instance.register(
-      GLOBAL_SHORTCUTS.toggleCommandWindow,
-      () => {
+    GlobalShortcut.instance.register({
+      keys: GLOBAL_SHORTCUTS.toggleCommandWindow,
+      callback: () => {
         WindowCommand.instance.toggleWindow();
       },
-    );
+    });
     await GlobalShortcutExtension.registerAllShortcuts();
   } catch (error) {
     logger('error', ['globalShorcut', 'registerGlobalShortcuts'], error);
