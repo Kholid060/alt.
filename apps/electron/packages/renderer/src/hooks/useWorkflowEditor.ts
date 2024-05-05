@@ -2,6 +2,7 @@ import { useContext } from 'react';
 import { WorkflowEditorContext } from '../context/workflow-editor.context';
 import {
   WorkflowClipboardData,
+  WorkflowEdge,
   WorkflowNewNode,
 } from '#packages/common/interface/workflow.interface';
 import {
@@ -10,12 +11,13 @@ import {
 } from '#packages/common/utils/constant/constant';
 import { parseJSON } from '@repo/shared';
 import { nanoid } from 'nanoid';
-import { Connection, useStore, useStoreApi } from 'reactflow';
+import { Connection, useReactFlow, useStore, useStoreApi } from 'reactflow';
 import { isIPCEventError } from '../utils/helper';
 import preloadAPI from '../utils/preloadAPI';
 import { useWorkflowEditorStore } from '../stores/workflow-editor.store';
 import { useShallow } from 'zustand/react/shallow';
 import { useToast } from '@repo/ui';
+import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
 
 export function useWorkflowEditor() {
   const storeApi = useStoreApi();
@@ -30,6 +32,7 @@ export function useWorkflowEditor() {
   const unselectAll = useStore((state) => state.unselectNodesAndEdges);
 
   const { toast } = useToast();
+  const { deleteElements } = useReactFlow();
 
   function selectAllNodes() {
     const nodes = storeApi.getState().getNodes();
@@ -75,38 +78,36 @@ export function useWorkflowEditor() {
 
     return null;
   }
-  function copyElements(element: { nodeId?: string; edgeId?: string }) {
+  async function copyElements(
+    { edges, nodes }: { nodes?: WorkflowNodes[]; edges?: WorkflowEdge[] },
+    cut?: boolean,
+  ) {
     const state = useWorkflowEditorStore.getState();
     if (!state.workflow) return;
 
-    const { edges, nodes } = state.selection;
-    let workflowClipboardData: WorkflowClipboardData | null = null;
+    const workflowClipboardData: WorkflowClipboardData = {
+      edges: edges || [],
+      nodes: nodes || [],
+    };
 
-    if (edges.length > 0 || nodes.length > 0) {
-      workflowClipboardData = { edges, nodes };
-    } else if (element?.nodeId) {
-      const node = state.workflow.nodes.find(
-        (item) => item.id === element.nodeId,
-      );
-      if (!node) return;
-
-      workflowClipboardData = { edges: [], nodes: [node] };
-    } else if (element?.edgeId) {
-      const edge = state.workflow.edges.find(
-        (item) => item.id === element.edgeId,
-      );
-      if (!edge) return;
-
-      workflowClipboardData = { edges: [edge], nodes: [] };
-    }
-
-    if (!workflowClipboardData) return;
-
-    preloadAPI.main.ipc.invoke(
+    const result = await preloadAPI.main.ipc.invoke(
       'clipboard:copy-buffer',
       APP_WORKFLOW_ELS_FORMAT,
       JSON.stringify(workflowClipboardData),
     );
+    if (isIPCEventError(result)) {
+      toast({
+        title: 'Error',
+        variant: 'destructive',
+        description: result.message,
+      });
+
+      return;
+    }
+
+    if (!cut) return;
+
+    deleteElements({ nodes, edges });
   }
   function runCurrentWorkflow(startNodeId?: string) {
     const { workflow } = useWorkflowEditorStore.getState();

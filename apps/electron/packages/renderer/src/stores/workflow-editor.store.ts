@@ -14,7 +14,7 @@ import { subscribeWithSelector } from 'zustand/middleware';
 import createStoreSelectors from '../utils/createStoreSelector';
 import { nanoid } from 'nanoid/non-secure';
 import {
-  WorkflowEdge,
+  WorkflowElement,
   WorkflowNewNode,
 } from '#common/interface/workflow.interface';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
@@ -24,11 +24,6 @@ import {
 } from '#packages/main/src/interface/database.interface';
 import { createDebounce } from '@repo/shared';
 import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
-
-interface WorkflowElement {
-  edges: WorkflowEdge[];
-  nodes: WorkflowNodes[];
-}
 
 export interface WorkflowEditorStoreState {
   selection: WorkflowElement;

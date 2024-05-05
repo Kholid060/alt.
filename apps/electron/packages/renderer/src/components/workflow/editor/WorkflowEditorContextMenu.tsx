@@ -19,6 +19,11 @@ import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
 import preloadAPI from '/@/utils/preloadAPI';
 import { APP_WORKFLOW_ELS_FORMAT } from '#packages/common/utils/constant/constant';
 import { isIPCEventError } from '/@/utils/helper';
+import {
+  WorkflowEdge,
+  WorkflowElement,
+} from '#packages/common/interface/workflow.interface';
+import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
 
 const ContextMenuContext =
   // @ts-expect-error not default val is expected
@@ -57,19 +62,48 @@ function ContextMenuItemPaste() {
   );
 }
 
-function ContextMenuItemCopy({
+function ContextMenuItemClipboard({
   nodeId,
   edgeId,
+  copySelection,
 }: {
   nodeId?: string;
   edgeId?: string;
+  copySelection?: boolean;
 }) {
   const { copyElements } = useWorkflowEditor();
+  const { getEdge, getNode } = useReactFlow();
+
+  function copy(cut?: boolean) {
+    let element: WorkflowElement = { edges: [], nodes: [] };
+    if (edgeId && !copySelection) {
+      const edge = getEdge(edgeId);
+      if (edge) element.edges.push(edge as WorkflowEdge);
+    }
+    if (nodeId && !copySelection) {
+      const node = getNode(nodeId);
+      if (node) element.nodes.push(node as WorkflowNodes);
+    }
+
+    if (copySelection) {
+      const { selection } = useWorkflowEditorStore.getState();
+      if (selection.nodes.length === 0) return;
+
+      element = selection;
+    }
+
+    copyElements(element, cut);
+  }
 
   return (
-    <UiContextMenuItem onClick={() => copyElements({ edgeId, nodeId })}>
-      <p>Copy</p>
-    </UiContextMenuItem>
+    <>
+      <UiContextMenuItem onClick={() => copy()}>
+        <p>Copy</p>
+      </UiContextMenuItem>
+      <UiContextMenuItem onClick={() => copy(true)}>
+        <p>Cut</p>
+      </UiContextMenuItem>
+    </>
   );
 }
 
@@ -192,7 +226,7 @@ function ContextMenuNode() {
       <UiContextMenuItem onClick={() => runCurrentWorkflow(contextMenu.nodeId)}>
         Run workflow from here
       </UiContextMenuItem>
-      <ContextMenuItemCopy nodeId={contextMenu.nodeId} />
+      <ContextMenuItemClipboard nodeId={contextMenu.nodeId} />
       <ContextMenuItemPaste />
       <ContextMenuItemSelection />
       <UiContextMenuSeparator />
@@ -219,7 +253,7 @@ function ContextMenuSelection() {
   return (
     <>
       <ContextMenuItemAddNode />
-      <ContextMenuItemCopy />
+      <ContextMenuItemClipboard copySelection />
       <ContextMenuItemPaste />
       <ContextMenuItemSelection />
       <UiContextMenuSeparator />

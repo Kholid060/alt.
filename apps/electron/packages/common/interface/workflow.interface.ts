@@ -28,3 +28,8 @@ export interface WorkflowRunPayload {
 }
 
 export interface WorkflowSettings {}
+
+export interface WorkflowElement {
+  edges: WorkflowEdge[];
+  nodes: WorkflowNodes[];
+}
