@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "1c8b099d-83c2-476f-85eb-032b09c085a6",
+  "id": "99e52d88-a838-4be0-82a2-d2094b659366",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "commands": {
@@ -422,6 +422,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "variables": {
+          "name": "variables",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'(json_array())'"
         },
         "execute_count": {
           "name": "execute_count",

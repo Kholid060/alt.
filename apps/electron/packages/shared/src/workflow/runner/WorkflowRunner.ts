@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import EventEmitter from 'eventemitter3';
 import type { WorkflowRunnerRunPayload } from '#packages/common/interface/workflow-runner.interace';
 import {
@@ -15,6 +16,8 @@ import WorkflowRunnerData from './WorkflowRunnerData';
 import type { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
 import type { WorkflowNodeHandlerExecuteReturn } from '../node-handler/WorkflowNodeHandler';
 import WorkflowRunnerSandbox from './WorkflowRunnerSandbox';
+import { clipboard } from 'electron';
+import { nanoid } from 'nanoid';
 
 export type NodeHandlersObj = Record<
   WORKFLOW_NODE_TYPE,
@@ -151,8 +154,8 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     this.nodeHandlers = nodeHandlers;
     this.state = WorkflowRunnerState.Idle;
 
-    this.sandbox = new WorkflowRunnerSandbox();
     this.dataStorage = new WorkflowRunnerData();
+    this.sandbox = new WorkflowRunnerSandbox(this);
 
     this.nodesIdxMap = new Map(
       workflow.nodes.map((node, index) => [node.id, index]),
@@ -178,10 +181,30 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
       return;
     }
 
+    // Init Connection Map
     this.connectionsMap = getNodeConnectionsMap(
       this.workflow.nodes,
       this.workflow.edges,
     );
+
+    // Store workflow initial variable
+    const varExpValue: Record<string, string> = {
+      clipboard: clipboard.readText(),
+      date: dayjs().format('DD-MM-YYYY'),
+      currentTime: dayjs().format('HH:mm:ss'),
+    };
+    this.workflow.variables.forEach((variable) => {
+      const varValue = this.sandbox.mustacheTagRenderer({
+        str: variable.value,
+        replacer(path, rawPath) {
+          if (Object.hasOwn(varExpValue, path)) return varExpValue[path];
+          if (path === 'random') return nanoid();
+
+          return rawPath;
+        },
+      });
+      this.dataStorage.variables.set(variable.name, varValue);
+    });
 
     this.state = WorkflowRunnerState.Running;
 
@@ -404,6 +427,12 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     this.nodesIdxMap.clear();
     this.dataStorage.destroy();
     this.removeAllListeners();
+
+    // @ts-expect-error clear value
+    this.workflow = null;
+    this.startNodeId = '';
+    // @ts-expect-error clear value
+    this.nodeHandlers = {};
   }
 }
 

@@ -1,13 +1,16 @@
 import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import type {
   WorkflowEdge,
-  WorkflowNodeTrigger,
-  WorkflowNodes,
   WorkflowSettings,
+  WorkflowVariable,
 } from '#common/interface/workflow.interface';
 import type { Viewport } from 'reactflow';
 import { sql } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
+import type {
+  WorkflowNodeTrigger,
+  WorkflowNodes,
+} from '#packages/common/interface/workflow-nodes.interface';
 
 export const workflows = sqliteTable('workflows', {
   id: text('id')
@@ -38,6 +41,10 @@ export const workflows = sqliteTable('workflows', {
   updatedAt: text('updated_at')
     .notNull()
     .$defaultFn(() => new Date().toISOString()),
+  variables: text('variables', { mode: 'json' })
+    .notNull()
+    .default(sql`(json_array())`)
+    .$type<WorkflowVariable[]>(),
   executeCount: integer('execute_count').notNull().default(0),
   settings: text('settings', { mode: 'json' }).$type<WorkflowSettings>(),
 });

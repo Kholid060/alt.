@@ -33,3 +33,9 @@ export interface WorkflowElement {
   edges: WorkflowEdge[];
   nodes: WorkflowNodes[];
 }
+
+export interface WorkflowVariable {
+  id: string;
+  name: string;
+  value: string;
+}

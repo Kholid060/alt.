@@ -2,6 +2,7 @@ import { isObject } from '@repo/shared';
 import { getProperty } from 'dot-prop';
 import type { QuickJSContext, QuickJSRuntime } from 'quickjs-emscripten';
 import { Scope, getQuickJS } from 'quickjs-emscripten';
+import type WorkflowRunner from './WorkflowRunner';
 
 const MUSTACHE_REGEX = /\{\{(.*?)\}\}/g;
 
@@ -62,10 +63,19 @@ const CODE_RUNTIME_MEMORY_LIMIT_BYTE = 2.5 * 1024 * 1024; // 2.5MB
 const CODE_RUNTIME_MAX_STACK_SIZE_BYTE = 1 * 1024 * 1024; // 1MB
 const CODE_RUNTIME_MAX_AGE_MS = 2.5 * 1000 * 60; // 2.5 Minutesl
 
+interface EvaluateExpressionOptions {
+  data?: Record<PropertyKey, unknown>;
+}
+interface EvaluateCodeOptions {
+  isPromise?: boolean;
+  signal?: AbortSignal;
+  data?: Record<PropertyKey, unknown>;
+}
+
 class WorkflowRunnerSandbox {
   private _expRuntime: QuickJSRuntime | null = null;
 
-  constructor() {}
+  constructor(private runner: WorkflowRunner) {}
 
   private async getExpRuntime() {
     if (this._expRuntime) return this._expRuntime;
@@ -86,7 +96,7 @@ class WorkflowRunnerSandbox {
   ) {
     const getVarsFunc = scope.manage(
       context.newFunction('$vars', (pathHandle) => {
-        const pathValue = context.dump(pathHandle);
+        const pathValue = context.dump(scope.manage(pathHandle));
         if (typeof pathValue !== 'string') {
           return scope.manage(
             context.newError('The path must be string or array of string'),
@@ -95,7 +105,10 @@ class WorkflowRunnerSandbox {
 
         const value = convertToJSHandle(
           context,
-          getProperty({ ...data }, pathValue),
+          getProperty(
+            { ...data, ...this.runner.dataStorage.variables.getAll() },
+            pathValue,
+          ),
           scope,
         );
 
@@ -107,15 +120,7 @@ class WorkflowRunnerSandbox {
 
   async evaluateCode(
     code: string,
-    {
-      signal,
-      isPromise,
-      data = {},
-    }: {
-      isPromise?: boolean;
-      signal?: AbortSignal;
-      data?: Record<PropertyKey, unknown>;
-    } = {},
+    { signal, isPromise, data = {} }: EvaluateCodeOptions = {},
   ) {
     const quickJS = await getQuickJS();
 
@@ -173,17 +178,35 @@ class WorkflowRunnerSandbox {
     });
   }
 
+  mustacheTagRenderer({
+    str,
+    data,
+    replacer,
+  }: {
+    str: string;
+    data?: Record<PropertyKey, unknown>;
+    replacer?(path: string, rawPath: string): string;
+  }) {
+    return str.replaceAll(MUSTACHE_REGEX, (tag) => {
+      const path = tag.slice(2, -2).trim();
+      if (replacer) return replacer(path, tag);
+
+      const value = getProperty(data ?? {}, path, tag);
+      return typeof value !== 'string' ? JSON.stringify(value) : value;
+    });
+  }
+
   async evaluateExpression<T extends Record<string, string>>(
     expression: T,
-    data?: Record<PropertyKey, unknown>,
+    options?: EvaluateExpressionOptions,
   ): Promise<Record<keyof T, unknown>>;
   async evaluateExpression(
     expression: string,
-    data?: Record<PropertyKey, unknown>,
+    options?: EvaluateExpressionOptions,
   ): Promise<unknown>;
   async evaluateExpression(
     expression: string | Record<string, string>,
-    data: Record<PropertyKey, unknown> = {},
+    { data = {} }: EvaluateExpressionOptions = {},
   ) {
     const expRuntime = await this.getExpRuntime();
     const isMultipleExp = isObject(expression);

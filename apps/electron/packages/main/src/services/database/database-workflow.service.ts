@@ -73,6 +73,7 @@ class DBWorkflowService {
       settings,
       triggers,
       viewport,
+      variables,
       isDisabled,
       description,
     }: DatabaseWorkflowUpdatePayload,
@@ -89,6 +90,7 @@ class DBWorkflowService {
       settings,
       triggers,
       viewport,
+      variables,
       isDisabled,
       description,
     };

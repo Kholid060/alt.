@@ -22,6 +22,10 @@ class StorageData<T = unknown> {
     delete this._data[key];
   }
 
+  getAll() {
+    return this._data;
+  }
+
   clear() {
     this._data = {};
   }
@@ -32,8 +36,15 @@ class WorkflowRunnerData {
   loopData: StorageData<WorkflowRunnerLoopData>;
 
   constructor() {
-    this.variables = new StorageData();
     this.loopData = new StorageData();
+    this.variables = new StorageData();
+  }
+
+  getContextData() {
+    return {
+      looping: this.loopData.getAll(),
+      variables: this.variables.getAll(),
+    };
   }
 
   destroy() {

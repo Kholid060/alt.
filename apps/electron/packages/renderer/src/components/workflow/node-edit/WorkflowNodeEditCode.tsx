@@ -1,24 +1,12 @@
 import { WorkflowNodeCode } from '#packages/common/interface/workflow-nodes.interface';
 import { UiDialog } from '@repo/ui';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
-import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
-import { tokyoNightInit } from '@uiw/codemirror-theme-tokyo-night';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import { ExpandIcon } from 'lucide-react';
 import { useState } from 'react';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
-
-const editorTheme = tokyoNightInit({
-  theme: 'dark',
-  settings: {
-    fontSize: 'inherit',
-    fontFamily: 'var(--font-mono)',
-    gutterBorder: 'rgb(var(--border))',
-    background: 'inherit !important',
-    gutterBackground: 'inherit !important',
-  },
-});
+import UiCodeEditor from '../ui/UiCodeEditor';
 
 function WorkflowNodeEditCode() {
   const node = useWorkflowEditorStore.use.editNode() as WorkflowNodeCode;
@@ -42,25 +30,24 @@ function WorkflowNodeEditCode() {
               <UiDialog.Header className="px-4 pt-4">
                 <UiDialog.Title>Code</UiDialog.Title>
               </UiDialog.Header>
-              <CodeMirror
-                theme="dark"
+              <UiCodeEditor
                 value={node.data.jsCode}
                 className="text-sm min-h-72 border-t"
                 style={{ maxHeight: 'calc(100vh - 10rem)' }}
                 placeholder="Your code here..."
-                extensions={[javascript(), editorTheme]}
+                extensions={[javascript()]}
                 onChange={(value) => updateEditNode({ jsCode: value })}
               />
             </UiDialog.Content>
           </UiDialog>
         </div>
         {!expandEditor && (
-          <CodeMirror
+          <UiCodeEditor
             theme="dark"
             value={node.data.jsCode}
             className="text-xs max-h-96 [&_.cm-scroller]:min-h-52 overflow-auto"
             placeholder="Your code here..."
-            extensions={[javascript(), editorTheme]}
+            extensions={[javascript()]}
             onChange={(value) => updateEditNode({ jsCode: value })}
           />
         )}

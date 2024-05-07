@@ -65,6 +65,7 @@
   },
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/lang-json": "^6.0.1",
     "@floating-ui/react": "^0.26.12",
     "@hookform/resolvers": "^3.3.4",
     "@n8n_io/riot-tmpl": "^4.0.1",

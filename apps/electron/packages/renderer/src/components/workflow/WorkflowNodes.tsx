@@ -16,6 +16,7 @@ import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import clsx from 'clsx';
 import {
   BanIcon,
+  CopyIcon,
   EllipsisIcon,
   PlayIcon,
   ToggleLeftIcon,
@@ -123,9 +124,12 @@ function NodeToolbarMenu({
 }) {
   const updateNodeData = useWorkflowEditorStore.use.updateNodeData();
 
-  const { deleteElements } = useReactFlow();
-  const { runCurrentWorkflow, event: workflowEditorEvent } =
-    useWorkflowEditor();
+  const { deleteElements, getNode } = useReactFlow();
+  const {
+    copyElements,
+    runCurrentWorkflow,
+    event: workflowEditorEvent,
+  } = useWorkflowEditor();
 
   function deleteNode() {
     deleteElements({ nodes: [{ id: nodeId }] });
@@ -155,6 +159,17 @@ function NodeToolbarMenu({
         ) : (
           <ToggleRightIcon className="h-6 w-6 fill-primary stroke-foreground" />
         )}
+      </NodeToolbarButton>
+      <NodeToolbarButton
+        title="Copy node"
+        onClick={() => {
+          const node = getNode(nodeId) as NodesType.WorkflowNodes;
+          if (!node) return;
+
+          copyElements({ nodes: [node] });
+        }}
+      >
+        <CopyIcon size="18px" />
       </NodeToolbarButton>
       <NodeToolbarButton
         title="Run workflow from here"

@@ -79,6 +79,10 @@ class GlobalShortcut {
       );
     });
   }
+
+  isKeysRegistered(keys: string) {
+    return Object.hasOwn(this.shortcuts, keys);
+  }
 }
 
 export class GlobalShortcutExtension {

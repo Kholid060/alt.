@@ -1,5 +1,13 @@
-import { UiButton, useToast } from '@repo/ui';
-import { ChevronLeftIcon, PlayIcon, RedoIcon, UndoIcon } from 'lucide-react';
+import { UiButton, UiDialog, UiTooltip, useToast } from '@repo/ui';
+import {
+  ChevronLeftIcon,
+  PlayIcon,
+  PlusIcon,
+  RedoIcon,
+  TrashIcon,
+  UndoIcon,
+  VariableIcon,
+} from 'lucide-react';
 import {
   Link,
   useBlocker,
@@ -12,7 +20,9 @@ import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { DatabaseWorkflowUpdatePayload } from '#packages/main/src/interface/database.interface';
 import preloadAPI from '/@/utils/preloadAPI';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
+import { nanoid } from 'nanoid/non-secure';
+import { WorkflowVariable } from '#packages/common/interface/workflow.interface';
 
 function WorkflowInformation() {
   const workflow = useWorkflowEditorStore.use.workflow();
@@ -34,6 +44,169 @@ function WorkflowInformation() {
         </p>
       </div>
     </>
+  );
+}
+
+function WorkflowVariableModal() {
+  const variables = useWorkflowEditorStore(
+    (state) => state.workflow?.variables ?? [],
+  );
+  const updateWorkflow = useWorkflowEditorStore.use.updateWorkflow();
+
+  const prevVariableName = useRef('');
+
+  function addVariable() {
+    if (!variables) return;
+
+    const varName = `var_${nanoid(4)}`;
+    updateWorkflow({
+      variables: [...variables, { id: nanoid(6), name: varName, value: '' }],
+    });
+  }
+  function updateVariable(
+    id: string,
+    variable: Partial<Pick<WorkflowVariable, 'name' | 'value'>>,
+  ) {
+    if (Object.hasOwn(variable, 'name')) {
+      const usePrevValue =
+        !variable.name!.trim() ||
+        variables.some((item) => item.id !== id && item.name === variable.name);
+      if (usePrevValue) {
+        variable.name = prevVariableName.current;
+
+        const variableInputEl = document.getElementById(
+          variable.name,
+        ) as HTMLInputElement;
+        if (variableInputEl) variableInputEl.value = variable.name;
+
+        return;
+      }
+
+      prevVariableName.current = '';
+    }
+
+    const updatedVariables = variables.map((item) => {
+      if (item.id !== id) return item;
+
+      return {
+        ...item,
+        ...variable,
+      };
+    });
+    updateWorkflow({
+      variables: updatedVariables,
+    });
+  }
+  function deleteVariable(id: string) {
+    updateWorkflow({
+      variables: variables.filter((variable) => variable.id !== id),
+    });
+  }
+
+  if (!variables) return null;
+
+  return (
+    <UiDialog>
+      <UiTooltip label="Workflow variables">
+        <UiDialog.Trigger asChild>
+          <UiButton size="icon" variant="ghost">
+            <VariableIcon />
+          </UiButton>
+        </UiDialog.Trigger>
+      </UiTooltip>
+      <UiDialog.Content className="max-w-2xl p-0">
+        <UiDialog.Header className="px-6 pt-6">
+          <UiDialog.Title>Workflow variables</UiDialog.Title>
+          <UiDialog.Description>
+            Create or modifiy variables.
+          </UiDialog.Description>
+        </UiDialog.Header>
+        <div
+          style={{ maxHeight: 'calc(100vh - 12rem)' }}
+          className="overflow-auto px-6 pb-6"
+        >
+          <div className="border rounded-md mt-2">
+            <table className="table-fixed w-full text-sm">
+              <thead>
+                <tr className="text-left divide-x border-b">
+                  <th className="h-12 px-3 w-5/12">Name</th>
+                  <th className="h-12 px-3 w-5/12">Value</th>
+                  <th className="h-12 px-3 w-2/12">
+                    <UiButton
+                      variant="secondary"
+                      size="icon-sm"
+                      onClick={addVariable}
+                    >
+                      <PlusIcon className="h-5 w-5" />
+                    </UiButton>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {variables.length === 0 ? (
+                  <tr>
+                    <td colSpan={9} className="p-3">
+                      <p className="text-center text-muted-foreground">
+                        No variables data
+                      </p>
+                    </td>
+                  </tr>
+                ) : (
+                  variables.map((variable) => (
+                    <tr
+                      key={variable.id}
+                      className="divide-x hover:bg-secondary/50 focus-within:bg-secondary/50 group/variable"
+                    >
+                      <td className="h-12">
+                        <input
+                          defaultValue={variable.name}
+                          id={variable.name}
+                          onFocus={() => {
+                            prevVariableName.current = variable.name;
+                          }}
+                          onBlur={({ target }) =>
+                            updateVariable(variable.id, { name: target.value })
+                          }
+                          className="w-full h-full px-3 bg-transparent focus:outline focus:outline-primary focus:bg-card"
+                          placeholder="variable name"
+                        />
+                      </td>
+                      <td className="h-12">
+                        <input
+                          defaultValue={variable.value}
+                          onBlur={({ target }) => {
+                            updateVariable(variable.id, {
+                              value: target.value,
+                            });
+                          }}
+                          className="w-full h-full px-3 bg-transparent focus:outline focus:outline-primary focus:bg-card"
+                          placeholder="variable value"
+                        />
+                      </td>
+                      <td className="px-3 h-12">
+                        <UiButton
+                          size="icon-sm"
+                          variant="ghost"
+                          onClick={() => deleteVariable(variable.id)}
+                          className="invisible group-focus-within/variable:visible group-hover/variable:visible"
+                        >
+                          <TrashIcon className="h-5 w-5" />
+                        </UiButton>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-sm text-muted-foreground mt-2">
+            You can use a dynamic placeholder as the variable value such as{' '}
+            {'{{currentTime}}'}, {'{{date}}'}, {'{{random}}'}, and{' '}
+            {'{{clipboard}}'}
+          </p>
+        </div>
+      </UiDialog.Content>
+    </UiDialog>
   );
 }
 
@@ -139,6 +312,8 @@ function WorkflowEditorHeader() {
       <UiButton variant="ghost" size="icon" className="ml-1">
         <RedoIcon className="h-5 w-5" />
       </UiButton>
+      <div className="ml-3"></div>
+      <WorkflowVariableModal />
       <hr className="h-2/6 bg-border/50 w-px mx-4" />
       <UiButton variant="secondary" onClick={() => runCurrentWorkflow()}>
         <PlayIcon className="h-4 w-4 mr-2 -ml-0.5" />

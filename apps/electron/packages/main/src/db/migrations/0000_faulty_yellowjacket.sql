@@ -61,6 +61,7 @@ CREATE TABLE `workflows` (
 	`is_disabled` integer NOT NULL,
 	`created_at` text NOT NULL,
 	`updated_at` text NOT NULL,
+	`variables` text DEFAULT '(json_array())' NOT NULL,
 	`execute_count` integer DEFAULT 0 NOT NULL,
 	`settings` text
 );
