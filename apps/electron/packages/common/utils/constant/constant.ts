@@ -35,6 +35,7 @@ export enum WORKFLOW_NODE_TYPE {
   DELAY = 'node-delay',
   COMMAND = 'node-command',
   TRIGGER = 'node-trigger',
+  CLIPBOARD = 'node-clipboard',
   DO_NOTHING = 'node-do-nothing',
 }
 

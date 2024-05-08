@@ -3,6 +3,7 @@ import type { WorkflowNodeErroHandlerAction } from './workflow.interface';
 import type { ExtensionCommandArgument } from '@repo/extension-core';
 import type { WORKFLOW_NODE_TYPE } from '../utils/constant/constant';
 import type { Node } from 'reactflow';
+import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 
 export type WorkflowNodeHandleSource = 'default' | 'error-fallback';
 
@@ -78,6 +79,17 @@ export type WorkflowNodeDelay = WorkflowNodeBase<
   WORKFLOW_NODE_TYPE.DELAY
 >;
 
+export type WorkflowNodeClipboard = WorkflowNodeBase<
+  {
+    varName: string;
+    insertToVar: boolean;
+    newClipboardVal: string;
+    action: 'read' | 'write' | 'paste';
+    format: ExtensionAPI.clipboard.ClipboardContentType;
+  },
+  WORKFLOW_NODE_TYPE.CLIPBOARD
+>;
+
 export interface WorkflowNodeTriggerManual {
   type: 'manual';
 }
@@ -93,6 +105,7 @@ export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.DELAY]: WorkflowNodeDelay;
   [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeCommand;
   [WORKFLOW_NODE_TYPE.TRIGGER]: WorkflowNodeTrigger;
+  [WORKFLOW_NODE_TYPE.CLIPBOARD]: WorkflowNodeClipboard;
   [WORKFLOW_NODE_TYPE.DO_NOTHING]: WorkflowNodeDoNothing;
 }
 

@@ -6,6 +6,7 @@ import {
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import {
   CircleSlash2Icon,
+  ClipboardIcon,
   CommandIcon,
   FileCode2Icon,
   LucideIcon,
@@ -112,5 +113,22 @@ export const WORKFLOW_NODES: {
     handleTarget: ['default'],
     handleSource: ['default'],
     type: WORKFLOW_NODE_TYPE.DELAY,
+  },
+  [WORKFLOW_NODE_TYPE.CLIPBOARD]: {
+    group: 'Core',
+    subtitle: 'Core',
+    title: 'Clipboard',
+    icon: ClipboardIcon,
+    defaultData: {
+      varName: '',
+      action: 'read',
+      format: 'text',
+      isDisabled: false,
+      insertToVar: false,
+      newClipboardVal: '',
+    },
+    handleTarget: ['default'],
+    handleSource: ['default'],
+    type: WORKFLOW_NODE_TYPE.CLIPBOARD,
   },
 } as const;

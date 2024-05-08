@@ -43,7 +43,9 @@ export interface WorkflowEditorStoreActions {
   deleteEdge: (edgeId: string | string[]) => void;
   toggleSaveWorkflowBtn: (enable: boolean) => void;
   setWorkflow: (workflow: DatabaseWorkflowDetail) => void;
-  updateEditNode(node: Partial<WorkflowNodes['data']>): void;
+  updateEditNode<T extends WorkflowNodes = WorkflowNodes>(
+    node: Partial<T['data']>,
+  ): void;
   updateWorkflow: (
     data:
       | DatabaseWorkflowUpdatePayload

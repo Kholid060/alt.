@@ -20,6 +20,7 @@ const editComponents = Object.fromEntries(
     },
   ),
 );
+console.log(editComponents);
 
 function Loading() {
   return (

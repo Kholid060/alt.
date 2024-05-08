@@ -5,3 +5,12 @@ export type PossibleTypes =
   | 'Boolean'
   | 'Null'
   | 'Undefined';
+
+export interface PossibleTypesTypeMap {
+  Null: null;
+  Object: object;
+  String: string;
+  Number: number;
+  Boolean: boolean;
+  Undefined: undefined;
+}

@@ -1,13 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { PossibleTypes } from '../interface/common.interface';
+import type {
+  PossibleTypes,
+  PossibleTypesTypeMap,
+} from '../interface/common.interface';
+import { NodeInvalidType } from './custom-errors';
 
 export function getExactType(data: unknown) {
   return Object.prototype.toString.call(data).slice(8, -1) as PossibleTypes;
 }
 
-export function isValidType(value: unknown, expectedType: PossibleTypes[]) {
+export function isValidType<T extends PossibleTypes[]>(
+  value: unknown,
+  expectedType: T,
+  throwError = false,
+): value is PossibleTypesTypeMap[T[number]] {
   const valType = getExactType(value);
-  return !expectedType.some((type) => valType !== type);
+  const isValid = !expectedType.some((type) => valType !== type);
+
+  if (!isValid && throwError) {
+    throw new NodeInvalidType(valType, expectedType);
+  }
+
+  return isValid;
 }
 
 export function promiseWithSignal<T = void>(

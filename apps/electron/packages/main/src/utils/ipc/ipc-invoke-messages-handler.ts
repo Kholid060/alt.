@@ -8,6 +8,7 @@ import DBService from '/@/services/database/database.service';
 import { emitDBChanges } from '../database-utils';
 import WindowCommand from '/@/window/command-window';
 import SharedProcessService from '/@/services/shared-process.service';
+import { Key, keyboard } from '@nut-tree/nut-js';
 
 /** EXTENSION */
 IPCMain.handle('extension:import', async () => {
@@ -65,6 +66,14 @@ IPCMain.handle('clipboard:copy', (_, content) => {
   clipboard.writeText(content);
 
   return Promise.resolve();
+});
+IPCMain.handle('clipboard:paste', async (_) => {
+  const keys = [
+    process.platform === 'darwin' ? Key.LeftCmd : Key.LeftControl,
+    Key.V,
+  ];
+  await keyboard.pressKey(...keys);
+  await keyboard.releaseKey(...keys);
 });
 IPCMain.handle('clipboard:copy-buffer', (_, contentType, content) => {
   const buffer = Buffer.from(content);
