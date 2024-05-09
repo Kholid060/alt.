@@ -106,7 +106,7 @@ function WorkflowVariableModal() {
   if (!variables) return null;
 
   return (
-    <UiDialog>
+    <UiDialog modal>
       <UiTooltip label="Workflow variables">
         <UiDialog.Trigger asChild>
           <UiButton size="icon" variant="ghost">

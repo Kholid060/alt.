@@ -128,7 +128,6 @@ function WorkflowNodeEditCommand() {
     </WorkflowNodeLayoutEdit>
   );
 }
-
-export const nodeType = WORKFLOW_NODE_TYPE.COMMAND;
+WorkflowNodeEditCommand.type = WORKFLOW_NODE_TYPE.COMMAND;
 
 export default WorkflowNodeEditCommand;

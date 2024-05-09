@@ -43,6 +43,7 @@ export interface WorkflowEditorStoreActions {
   deleteEdge: (edgeId: string | string[]) => void;
   toggleSaveWorkflowBtn: (enable: boolean) => void;
   setWorkflow: (workflow: DatabaseWorkflowDetail) => void;
+  deleteEdgeBy: (by: 'source' | 'sourceHandle', ids: string[]) => void;
   updateEditNode<T extends WorkflowNodes = WorkflowNodes>(
     node: Partial<T['data']>,
   ): void;
@@ -271,6 +272,14 @@ const workflowEditorStore = create(
 
         return {
           edges: workflow.edges.filter((edge) => !edgeIds.has(edge.id)),
+        };
+      });
+    },
+    deleteEdgeBy(by, ids) {
+      get().updateWorkflow((workflow) => {
+        const edgeIds = new Set(ids);
+        return {
+          edges: workflow.edges.filter((edge) => !edgeIds.has(edge[by] ?? '')),
         };
       });
     },

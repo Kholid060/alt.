@@ -89,6 +89,56 @@ export type WorkflowNodeClipboard = WorkflowNodeBase<
   },
   WORKFLOW_NODE_TYPE.CLIPBOARD
 >;
+export type WorkflowNodeConditionItemOperator =
+  | 'str:equal'
+  | 'any:is-nullish'
+  | 'str:ends-with'
+  | 'str:starts-with'
+  | 'str:match-regex'
+  | 'str:contains'
+  | 'int:equal'
+  | 'int:greater'
+  | 'int:greater-equal'
+  | 'int:less'
+  | 'int:less-equal'
+  | 'bool:equal'
+  | 'bool:is-true'
+  | 'bool:is-false'
+  | 'array:contains'
+  | 'array:len-less'
+  | 'array:len-equal'
+  | 'array:len-greater'
+  | 'array:len-less-equal'
+  | 'array:len-greater-equal'
+  | 'array:contains'
+  | 'obj:is-empty'
+  | 'obj:has-property';
+
+export interface WorkflowNodeConditionItem {
+  id: string;
+  value1: string;
+  value2: unknown;
+  type: 'and' | 'or';
+  reverseValue: boolean; // equals => !equals;
+  operator: WorkflowNodeConditionItemOperator;
+  $expData?: {
+    value1?: WorkflowNodeExpressionData;
+    value2?: WorkflowNodeExpressionData;
+  };
+}
+export type WorkflowNodeConditionItems = WorkflowNodeConditionItem[][];
+
+export interface WorkflowNodeConditionPath {
+  id: string;
+  name: string;
+  items: WorkflowNodeConditionItems;
+}
+export type WorkflowNodeConditional = WorkflowNodeBase<
+  {
+    conditions: WorkflowNodeConditionPath[];
+  },
+  WORKFLOW_NODE_TYPE.CONDITIONAL
+>;
 
 export interface WorkflowNodeTriggerManual {
   type: 'manual';
@@ -107,6 +157,7 @@ export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.TRIGGER]: WorkflowNodeTrigger;
   [WORKFLOW_NODE_TYPE.CLIPBOARD]: WorkflowNodeClipboard;
   [WORKFLOW_NODE_TYPE.DO_NOTHING]: WorkflowNodeDoNothing;
+  [WORKFLOW_NODE_TYPE.CONDITIONAL]: WorkflowNodeConditional;
 }
 
 export type WorkflowNodes = WorkflowNodesMap[keyof WorkflowNodesMap];

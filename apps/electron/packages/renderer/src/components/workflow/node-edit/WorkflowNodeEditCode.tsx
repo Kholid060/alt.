@@ -6,7 +6,7 @@ import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import { ExpandIcon } from 'lucide-react';
 import { useState } from 'react';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
-import UiCodeEditor from '../ui/UiCodeEditor';
+import UiCodeEditor from '../../ui/UiCodeEditor';
 
 function WorkflowNodeEditCode() {
   const node = useWorkflowEditorStore.use.editNode() as WorkflowNodeCode;
@@ -55,7 +55,6 @@ function WorkflowNodeEditCode() {
     </WorkflowNodeLayoutEdit>
   );
 }
-
-export const nodeType = WORKFLOW_NODE_TYPE.CODE;
+WorkflowNodeEditCode.type = WORKFLOW_NODE_TYPE.CODE;
 
 export default WorkflowNodeEditCode;

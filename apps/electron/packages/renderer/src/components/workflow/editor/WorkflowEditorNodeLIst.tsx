@@ -298,9 +298,13 @@ export function WorkflowEditorNodeListModal() {
     [screenToFlowPosition, workflowEditor.lastMousePos],
   );
 
-  useHotkeys(['mod+shift+a'], () => {
-    openModal();
-  });
+  useHotkeys(
+    ['shift+a'],
+    () => {
+      openModal();
+    },
+    { preventDefault: true },
+  );
 
   function onSelectItem(node: WorkflowNewNode) {
     if (!newNodeData.current) return;

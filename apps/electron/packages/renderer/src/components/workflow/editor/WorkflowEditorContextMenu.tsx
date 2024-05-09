@@ -162,7 +162,7 @@ function ContextMenuItemSelection() {
       <UiContextMenuItem onClick={() => selectAllNodes()}>
         <p>Select all</p>
         <UiContextMenuShortcut>
-          <UiShortcut shortcut="CmdOrCtrl+A" />
+          <UiShortcut shortcut="A" />
         </UiContextMenuShortcut>
       </UiContextMenuItem>
       <UiContextMenuItem onClick={() => unselectAll()}>
@@ -187,7 +187,7 @@ function ContextMenuItemAddNode() {
       >
         <p>Add node</p>
         <UiContextMenuShortcut>
-          <UiShortcut shortcut="CmdOrCtrl+Shift+A" />
+          <UiShortcut shortcut="Shift+A" />
         </UiContextMenuShortcut>
       </UiContextMenuItem>
     </>

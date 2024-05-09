@@ -76,7 +76,6 @@ function WorkflowNodeEditLoop() {
     </WorkflowNodeLayoutEdit>
   );
 }
-
-export const nodeType = WORKFLOW_NODE_TYPE.LOOP;
+WorkflowNodeEditLoop.type = WORKFLOW_NODE_TYPE.LOOP;
 
 export default WorkflowNodeEditLoop;

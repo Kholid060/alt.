@@ -29,7 +29,7 @@ export function WorkflowUiExpressionInput({
         className,
       )}
     >
-      <div className="bg-card border-r rounded-l-md pt-2 w-8 text-center">
+      <div className="bg-card border-r rounded-l-md pt-2 w-8 text-center expression-input-icon">
         <FunctionSquareIcon className="h-5 w-5 text-muted-foreground inline-block" />
       </div>
       <textarea
@@ -50,8 +50,11 @@ interface WorkflowFormExpressionProps
   label?: string;
   labelId?: string;
   noToggle?: boolean;
+  labelClass?: string;
+  inputClass?: string;
   children?: React.ReactNode;
   data?: WorkflowNodeExpressionRecords;
+  onDataChange?: (data: WorkflowNodeExpressionRecords) => void;
 }
 
 function WorkflowUiFormExpression({
@@ -62,6 +65,9 @@ function WorkflowUiFormExpression({
   children,
   data = {},
   className,
+  labelClass,
+  inputClass,
+  onDataChange,
   ...props
 }: WorkflowFormExpressionProps) {
   const updateEditNode = useWorkflowEditorStore.use.updateEditNode();
@@ -73,18 +79,26 @@ function WorkflowUiFormExpression({
     const expData: WorkflowNodeExpressionData = data[path]
       ? { ...data[path], ...value }
       : { active: true, value: '', ...value };
+    const $expData = {
+      ...data,
+      [path]: expData,
+    };
+
+    if (onDataChange) {
+      onDataChange($expData);
+      return;
+    }
 
     updateEditNode({
-      $expData: {
-        ...data,
-        [path]: expData,
-      },
+      $expData,
     });
   }
 
   return (
     <div className={clsx('group/expression', className)} {...props}>
-      <div className="flex items-center justify-between mb-0.5">
+      <div
+        className={clsx('flex items-center justify-between mb-0.5', labelClass)}
+      >
         <div className="flex-grow">
           {label && (
             <UiLabel htmlFor={labelId} className="ml-1 line-clamp-1">
@@ -116,6 +130,7 @@ function WorkflowUiFormExpression({
       </div>
       {isActive ? (
         <WorkflowUiExpressionInput
+          className={inputClass}
           labelId={labelId}
           value={data[path]?.value ?? ''}
           onValueChange={(value) => updateExpressionData({ value: value })}

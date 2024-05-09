@@ -12,13 +12,13 @@ export function getExactType(data: unknown) {
 export function isValidType<T extends PossibleTypes[]>(
   value: unknown,
   expectedType: T,
-  throwError = false,
+  throwError?: { throw?: boolean; errorName?: string },
 ): value is PossibleTypesTypeMap[T[number]] {
   const valType = getExactType(value);
   const isValid = !expectedType.some((type) => valType !== type);
 
-  if (!isValid && throwError) {
-    throw new NodeInvalidType(valType, expectedType);
+  if (!isValid && throwError?.throw) {
+    throw new NodeInvalidType(valType, expectedType, throwError.errorName);
   }
 
   return isValid;

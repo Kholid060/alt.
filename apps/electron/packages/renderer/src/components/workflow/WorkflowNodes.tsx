@@ -44,10 +44,11 @@ function NodeHandleWithLabel({
       )}
       {...props}
     >
-      <p className="pl-1 text-muted-foreground">{label}</p>
+      <p className="pl-1 text-muted-foreground line-clamp-1">{label}</p>
       <Handle
         type="source"
         id={handleId}
+        className="flex-shrink-0"
         style={{
           top: 0,
           right: 0,
@@ -266,6 +267,55 @@ export const WorkflowNodeCommand: React.FC<
   );
 });
 WorkflowNodeCommand.displayName = 'WorkflowNodeCommand';
+
+export const WorkflowNodeConditional: React.FC<
+  NodeProps<NodesType.WorkflowNodeConditional['data']>
+> = memo(({ id, data }) => {
+  const updateNodeInternals = useUpdateNodeInternals();
+
+  const nodeData = WORKFLOW_NODES[WORKFLOW_NODE_TYPE.CONDITIONAL];
+
+  useEffect(() => {
+    updateNodeInternals(id);
+  }, [data.conditions, updateNodeInternals, id]);
+
+  return (
+    <>
+      <NodeToolbarMenu nodeId={id} nodeData={data} />
+      <NodeCard
+        title={nodeData.title}
+        subtitle={nodeData.subtitle}
+        isDisabled={data.isDisabled}
+        icon={<UiList.Icon icon={nodeData.icon} />}
+      >
+        <Handle type="target" position={Position.Left} />
+        <div className="mb-1.5 flex flex-col items-end gap-1">
+          {data.conditions.map((item) => (
+            <NodeHandleWithLabel
+              key={item.id}
+              label={item.name}
+              handleId={`condition-${item.id}:${id}`}
+              style={{ position: 'relative', bottom: 10, right: -9 }}
+              className="text-primary"
+            />
+          ))}
+          <NodeHandleWithLabel
+            label="else"
+            handleId={`condition-fallback:${id}`}
+            title="will execute when no condition is match"
+            style={{ position: 'relative', bottom: 10, right: -9 }}
+            className="text-orange-500 max-w-48"
+          />
+        </div>
+        <NodeErrorHandlerHandle
+          nodeId={id}
+          errorHandlerAction={data.$errorHandler?.action}
+        />
+      </NodeCard>
+    </>
+  );
+});
+WorkflowNodeConditional.displayName = 'WorkflowNodeConditional';
 
 export const WorkflowNodeLoop: React.FC<
   NodeProps<NodesType.WorkflowNodeLoop['data']>

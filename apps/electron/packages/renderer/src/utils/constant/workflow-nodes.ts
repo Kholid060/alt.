@@ -12,6 +12,7 @@ import {
   LucideIcon,
   PlugZapIcon,
   RepeatIcon,
+  SplitIcon,
   TimerIcon,
 } from 'lucide-react';
 import { WorkflowEditorNodeGroup } from '/@/interface/workflow-editor.interface';
@@ -130,5 +131,18 @@ export const WORKFLOW_NODES: {
     handleTarget: ['default'],
     handleSource: ['default'],
     type: WORKFLOW_NODE_TYPE.CLIPBOARD,
+  },
+  [WORKFLOW_NODE_TYPE.CONDITIONAL]: {
+    group: 'Flow',
+    subtitle: 'Control Flow',
+    title: 'Conditional',
+    icon: SplitIcon,
+    defaultData: {
+      conditions: [],
+      isDisabled: false,
+    },
+    handleTarget: ['default'],
+    handleSource: ['default'],
+    type: WORKFLOW_NODE_TYPE.CONDITIONAL,
   },
 } as const;

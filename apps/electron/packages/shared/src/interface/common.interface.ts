@@ -4,6 +4,8 @@ export type PossibleTypes =
   | 'Number'
   | 'Boolean'
   | 'Null'
+  | 'Array'
+  | 'RegExp'
   | 'Undefined';
 
 export interface PossibleTypesTypeMap {
@@ -11,6 +13,8 @@ export interface PossibleTypesTypeMap {
   Object: object;
   String: string;
   Number: number;
+  RegExp: RegExp;
   Boolean: boolean;
   Undefined: undefined;
+  Array: Array<unknown>;
 }

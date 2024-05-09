@@ -1,3 +1,5 @@
+import type { WorkflowNodeConditionItemOperator } from 'interface/workflow-nodes.interface';
+
 export const APP_TEMP_DIR_NAME = {} as const;
 
 export const APP_ICON_DIR_PREFIX = '$app';
@@ -37,6 +39,7 @@ export enum WORKFLOW_NODE_TYPE {
   TRIGGER = 'node-trigger',
   CLIPBOARD = 'node-clipboard',
   DO_NOTHING = 'node-do-nothing',
+  CONDITIONAL = 'node-conditional',
 }
 
 export const DATABASE_CHANGES_ALL_ARGS = '$database-all-args$' as const;

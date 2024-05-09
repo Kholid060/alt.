@@ -3,8 +3,9 @@ import { UiInput } from '@repo/ui';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
+import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 
-function WorkflowNodeEditCommand() {
+function WorkflowNodeEditDelay() {
   const node = useWorkflowEditorStore.use.editNode() as WorkflowNodeDelay;
   const updateEditNode = useWorkflowEditorStore.use.updateEditNode();
 
@@ -29,5 +30,6 @@ function WorkflowNodeEditCommand() {
     </WorkflowNodeLayoutEdit>
   );
 }
+WorkflowNodeEditDelay.type = WORKFLOW_NODE_TYPE.DELAY;
 
-export default WorkflowNodeEditCommand;
+export default WorkflowNodeEditDelay;

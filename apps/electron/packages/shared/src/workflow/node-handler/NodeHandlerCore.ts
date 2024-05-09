@@ -10,6 +10,7 @@ import WorkflowNodeHandler from './WorkflowNodeHandler';
 import { NodeInvalidType } from '/@/utils/custom-errors';
 import { getExactType, isValidType, promiseWithSignal } from '/@/utils/helper';
 import { clipboard, nativeImage } from 'electron';
+import { testNodeConditions } from '../utils/test-node-condtion';
 
 export class NodeHandlerCode extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.CODE> {
   private controller = new AbortController();
@@ -63,6 +64,48 @@ export class NodeHandlerDelay extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.DEL
 
     return {
       value: null,
+    };
+  }
+
+  destroy() {
+    this.controller.abort();
+    this.timers.forEach((value) => {
+      clearTimeout(value);
+    });
+
+    this.timers.clear();
+  }
+}
+
+export class NodeHandlerConditional extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.CONDITIONAL> {
+  private controller = new AbortController();
+  private timers = new Set<NodeJS.Timeout>();
+
+  constructor() {
+    super(WORKFLOW_NODE_TYPE.CONDITIONAL);
+  }
+
+  async execute({
+    node,
+    runner,
+  }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.CONDITIONAL>): Promise<WorkflowNodeHandlerExecuteReturn> {
+    let nextNodeHandle = 'condition-fallback';
+
+    for (const condition of node.data.conditions) {
+      const isConditionMatch = await testNodeConditions({
+        name: condition.name,
+        conditions: condition.items,
+        evaluateExpression: (exp) => runner.sandbox.evaluateExpression(exp),
+      });
+      if (isConditionMatch) {
+        nextNodeHandle = `condition-${condition.id}`;
+        break;
+      }
+    }
+
+    return {
+      value: null,
+      nextNodeHandle,
     };
   }
 

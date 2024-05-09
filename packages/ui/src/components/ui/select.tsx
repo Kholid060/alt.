@@ -46,8 +46,9 @@ export interface UiSelectProps
   placeholder?: string;
   contentClass?: string;
   viewportClass?: string;
-  triggerLeft?: React.ReactNode;
   children?: React.ReactNode;
+  valueSlot?: React.ReactNode;
+  triggerLeft?: React.ReactNode;
   position?: SelectPrimitive.SelectContentProps['position'];
 }
 
@@ -64,6 +65,7 @@ export const UiSelectRoot = React.forwardRef<
       className,
       placeholder,
       viewportClass,
+      valueSlot,
       triggerLeft,
       contentClass,
       ...props
@@ -82,9 +84,13 @@ export const UiSelectRoot = React.forwardRef<
           )}
         >
           {triggerLeft}
-          <span className="truncate flex-1 text-left">
-            <SelectPrimitive.Value placeholder={placeholder} />
-          </span>
+          {valueSlot ? (
+            valueSlot
+          ) : (
+            <span className="truncate flex-1 text-left">
+              <SelectPrimitive.Value placeholder={placeholder} />
+            </span>
+          )}
           <SelectPrimitive.Icon>
             <ChevronDownIcon />
           </SelectPrimitive.Icon>
@@ -178,6 +184,7 @@ const UiSelectNative = React.forwardRef<
   React.SelectHTMLAttributes<HTMLSelectElement> & {
     placeholder?: string;
     selectClass?: string;
+    prefixIcon?: React.ReactNode;
   } & VariantProps<typeof uiSelectVariants>
 >(
   (
@@ -186,6 +193,7 @@ const UiSelectNative = React.forwardRef<
       children,
       className,
       inputSize,
+      prefixIcon,
       placeholder,
       selectClass,
       ...props
@@ -199,6 +207,7 @@ const UiSelectNative = React.forwardRef<
             uiSelectVariants({ variant, className, inputSize }),
         )}
       >
+        {prefixIcon}
         <select
           ref={ref}
           className={cn(
@@ -207,7 +216,10 @@ const UiSelectNative = React.forwardRef<
               selectVariantPadding.default,
             selectClass,
           )}
-          style={{ paddingRight: '40px' }}
+          style={{
+            paddingRight: '40px',
+            paddingLeft: prefixIcon ? '40px' : undefined,
+          }}
           {...props}
         >
           {placeholder && (
