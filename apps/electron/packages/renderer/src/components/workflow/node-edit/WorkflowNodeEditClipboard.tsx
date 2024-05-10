@@ -23,28 +23,26 @@ type ClipboardComponent = React.FC<{
 const ReadAction: ClipboardComponent = ({ node, onUpdateNode }) => {
   return (
     <>
-      <div>
-        <div className="flex items-center justify-between">
-          <UiLabel className="ml-1" htmlFor="clipboard-assign-var">
-            Assign value to variable
-          </UiLabel>
-          <UiSwitch
-            size="sm"
-            id="clipboard-assign-var"
-            checked={node.data.insertToVar}
-            onCheckedChange={(insertToVar) => onUpdateNode({ insertToVar })}
-          />
-        </div>
-        <UiInput
-          value={node.data.varName}
-          min={0}
-          inputSize="sm"
-          className="mt-1"
-          placeholder="Variable name"
-          disabled={!node.data.insertToVar}
-          onValueChange={(value) => onUpdateNode({ varName: value })}
+      <div className="flex items-center justify-between">
+        <UiLabel className="ml-1" htmlFor="clipboard-assign-var">
+          Assign value to variable
+        </UiLabel>
+        <UiSwitch
+          size="sm"
+          id="clipboard-assign-var"
+          checked={node.data.insertToVar}
+          onCheckedChange={(insertToVar) => onUpdateNode({ insertToVar })}
         />
       </div>
+      <UiInput
+        value={node.data.varName}
+        min={0}
+        inputSize="sm"
+        className="mt-1"
+        placeholder="Variable name"
+        disabled={!node.data.insertToVar}
+        onValueChange={(value) => onUpdateNode({ varName: value })}
+      />
     </>
   );
 };
@@ -57,6 +55,7 @@ const WriteAction: ClipboardComponent = ({ node, onUpdateNode }) => {
         label="Value"
         path="newClipboardVal"
         labelId="clipboard--value"
+        onDataChange={($expData) => onUpdateNode({ $expData })}
       >
         <UiInput
           value={node.data.newClipboardVal}
@@ -89,41 +88,42 @@ function WorkflowNodeEditClipboard() {
       <UiLabel className="ml-1" htmlFor="clipboard-action">
         Action
       </UiLabel>
-      <UiSelect.Native
+      <UiSelect
         id="clipboard-action"
+        inputSize="sm"
         value={node.data.action}
-        onChange={({ target }) =>
+        onValueChange={(value) =>
           updateEditNode({
-            action: target.value as WorkflowNodeClipboard['data']['action'],
+            action: value as WorkflowNodeClipboard['data']['action'],
           })
         }
       >
-        <option value="read">Read clipboard</option>
-        <option value="write">Write clipboard</option>
-        <option value="paste">Paste clipboard</option>
-      </UiSelect.Native>
+        <UiSelect.Option value="read">Read clipboard</UiSelect.Option>
+        <UiSelect.Option value="write">Write clipboard</UiSelect.Option>
+        <UiSelect.Option value="paste">Paste clipboard</UiSelect.Option>
+      </UiSelect>
       <hr className="my-4" />
       {node.data.action !== 'paste' && (
         <div className="mt-4">
           <UiLabel className="ml-1" htmlFor="clipboard-action">
             Clipboard format
           </UiLabel>
-          <UiSelect.Native
+          <UiSelect
             id="clipboard-action"
+            inputSize="sm"
             value={node.data.format}
-            onChange={({ target }) =>
+            onValueChange={(value) =>
               updateEditNode({
-                format:
-                  target.value as ExtensionAPI.clipboard.ClipboardContentType,
+                format: value as ExtensionAPI.clipboard.ClipboardContentType,
               })
             }
           >
             {EXT_CLIPBOARD_FORMATS.map((item) => (
-              <option key={item.format} value={item.format}>
+              <UiSelect.Option key={item.format} value={item.format}>
                 {item.title}
-              </option>
+              </UiSelect.Option>
             ))}
-          </UiSelect.Native>
+          </UiSelect>
         </div>
       )}
       <div className="mt-4">

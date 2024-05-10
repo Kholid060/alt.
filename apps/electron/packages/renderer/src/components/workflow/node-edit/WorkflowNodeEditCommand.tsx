@@ -96,6 +96,7 @@ function CommandArgs({ data }: { data: WorkflowNodeCommand['data'] }) {
               labelId={arg.name}
               data={data.$expData ?? {}}
               path={`argsValue.${arg.name}`}
+              onDataChange={($expData) => updateEditNode({ $expData })}
             >
               {argComponent}
             </WorkflowUiFormExpression>

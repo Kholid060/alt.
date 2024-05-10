@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { isObject } from '@repo/shared';
-import { getProperty } from 'dot-prop';
+import { getProperty, setProperty } from 'dot-prop';
 import type { QuickJSContext, QuickJSRuntime } from 'quickjs-emscripten';
 import { Scope, getQuickJS } from 'quickjs-emscripten';
 import type WorkflowRunner from './WorkflowRunner';
+import type { WorkflowNodeExpressionRecords } from '#packages/common/interface/workflow-nodes.interface';
 
 const MUSTACHE_REGEX = /\{\{(.*?)\}\}/g;
 
@@ -239,6 +241,31 @@ class WorkflowRunnerSandbox {
     });
 
     return isMultipleExp ? evalResult : evalResult.default;
+  }
+
+  async evaluateExpAndApply<T extends Record<string, any>>(
+    expressionData: WorkflowNodeExpressionRecords,
+    target: T,
+    { filter }: { filter?: (key: string) => boolean } = {},
+  ): Promise<{ isApplied: boolean; data: T }> {
+    let isEmpty = true;
+
+    const expression: Record<string, string> = {};
+    Object.entries(expressionData).forEach(([key, value]) => {
+      if (!value.active || (filter && !filter(key))) return;
+
+      isEmpty = false;
+      expression[key] = value.value;
+    });
+
+    if (isEmpty) return { isApplied: true, data: target };
+
+    const result = await this.evaluateExpression(expression);
+    Object.entries(result).forEach(([key, value]) => {
+      setProperty(target, key, value);
+    });
+
+    return { isApplied: false, data: target };
   }
 
   destroy() {

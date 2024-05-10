@@ -9,6 +9,8 @@ export default async function CommandMain(context: CommandLaunchContext) {
 
   // await _extension.mainWindow.close();
 
+  const response = await fetch('https://google.com');
+  console.log(await response.text())
   await _extension.clipboard.paste('Hello world');
 
 

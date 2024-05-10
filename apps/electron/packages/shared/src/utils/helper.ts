@@ -43,3 +43,27 @@ export function promiseWithSignal<T = void>(
     callback(resolve, reject);
   });
 }
+
+export function validateTypes<T extends Record<string, any>>(
+  data: T,
+  paths: {
+    key: keyof T;
+    name: string;
+    optional?: boolean;
+    types: PossibleTypes[];
+  }[],
+) {
+  paths.forEach((path) => {
+    if (!Object.hasOwn(data, path.key)) {
+      if (!path.optional)
+        throw new Error(
+          `The data doesn't have "${path.key.toString()}" property`,
+        );
+    }
+
+    isValidType(data[path.key], path.types, {
+      throw: true,
+      errorName: path.name,
+    });
+  });
+}

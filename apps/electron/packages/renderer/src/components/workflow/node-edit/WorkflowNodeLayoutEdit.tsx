@@ -40,7 +40,7 @@ function WorkflowNodeLayoutEdit({
         </div>
       </div>
       <UiTabs variant="line" defaultValue="parameters">
-        <UiTabsList>
+        <UiTabsList className="sticky top-0 bg-background z-50">
           <UiTabsTrigger value="parameters">Parameters</UiTabsTrigger>
           <UiTabsTrigger value="error">Error Handler</UiTabsTrigger>
         </UiTabsList>

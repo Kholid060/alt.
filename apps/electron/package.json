@@ -96,6 +96,7 @@
     "lucide-react": "^0.367.0",
     "mitt": "^3.0.1",
     "nanoid": "^5.0.6",
+    "picomatch": "^4.0.2",
     "quickjs-emscripten": "^0.29.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

@@ -43,6 +43,7 @@ export interface UiSelectProps
   extends React.ComponentPropsWithoutRef<typeof SelectPrimitive.Root>,
     VariantProps<typeof uiSelectVariants> {
   className?: string;
+  id?: string;
   placeholder?: string;
   contentClass?: string;
   viewportClass?: string;
@@ -58,6 +59,7 @@ export const UiSelectRoot = React.forwardRef<
 >(
   (
     {
+      id,
       children,
       position = 'popper',
       variant,
@@ -77,11 +79,12 @@ export const UiSelectRoot = React.forwardRef<
         <SelectPrimitive.Trigger
           ref={forwardedRef}
           className={cn(
-            'ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50' +
+            'flex ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50' +
               uiSelectVariants({ variant, inputSize, className }),
             selectVariantPadding[inputSize ?? 'default'] ??
               selectVariantPadding.default,
           )}
+          id={id}
         >
           {triggerLeft}
           {valueSlot ? (
@@ -92,7 +95,7 @@ export const UiSelectRoot = React.forwardRef<
             </span>
           )}
           <SelectPrimitive.Icon>
-            <ChevronDownIcon />
+            <ChevronDownIcon className="h-5 w-5" />
           </SelectPrimitive.Icon>
         </SelectPrimitive.Trigger>
         <SelectPrimitive.Portal>

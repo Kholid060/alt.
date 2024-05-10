@@ -303,7 +303,10 @@ export function WorkflowEditorNodeListModal() {
     () => {
       openModal();
     },
-    { preventDefault: true },
+    {
+      preventDefault: true,
+    },
+    [],
   );
 
   function onSelectItem(node: WorkflowNewNode) {

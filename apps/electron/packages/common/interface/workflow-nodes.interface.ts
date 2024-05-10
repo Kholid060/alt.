@@ -139,6 +139,29 @@ export type WorkflowNodeConditional = WorkflowNodeBase<
   },
   WORKFLOW_NODE_TYPE.CONDITIONAL
 >;
+export type WorkflowNodeHttpRequest = WorkflowNodeBase<
+  {
+    url: string;
+    jsonBody: string;
+    timeoutMs: number;
+    bodyType: 'json' | 'form-data' | 'form-urlencoded' | 'raw' | 'none';
+    method: 'GET' | 'POST' | 'DELETE' | 'PATCH' | 'PUT';
+    queries: { name: string; value: string }[];
+    headers: { name: string; value: string }[];
+    formDataBody: { name: string; value: string }[];
+    urlEncodedBody: { name: string; value: string }[];
+    $bodyExpData?: WorkflowNodeExpressionRecords;
+    response: {
+      varName: string;
+      insertToVar: boolean;
+    };
+    rawBody: {
+      data: string;
+      contentType: string;
+    };
+  },
+  WORKFLOW_NODE_TYPE.HTTP_REQUEST
+>;
 
 export interface WorkflowNodeTriggerManual {
   type: 'manual';
@@ -158,6 +181,7 @@ export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.CLIPBOARD]: WorkflowNodeClipboard;
   [WORKFLOW_NODE_TYPE.DO_NOTHING]: WorkflowNodeDoNothing;
   [WORKFLOW_NODE_TYPE.CONDITIONAL]: WorkflowNodeConditional;
+  [WORKFLOW_NODE_TYPE.HTTP_REQUEST]: WorkflowNodeHttpRequest;
 }
 
 export type WorkflowNodes = WorkflowNodesMap[keyof WorkflowNodesMap];

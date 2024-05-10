@@ -4,12 +4,12 @@ import {
 } from '#packages/common/interface/workflow-nodes.interface';
 import {
   FunctionSquareIcon,
+  InfoIcon,
   ToggleLeftIcon,
   ToggleRightIcon,
 } from 'lucide-react';
 import clsx from 'clsx';
-import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
-import { UiLabel, cn } from '@repo/ui';
+import { UiLabel, UiTooltip, cn } from '@repo/ui';
 
 export function WorkflowUiExpressionInput({
   value,
@@ -44,15 +44,84 @@ export function WorkflowUiExpressionInput({
   );
 }
 
+function WorkflowUiExpressionLabel({
+  data,
+  path,
+  label,
+  labelId,
+  children,
+  isActive,
+  position,
+  className,
+  description,
+  onToggleExpression,
+}: {
+  path: string;
+  label?: string;
+  labelId?: string;
+  isActive: boolean;
+  className?: string;
+  description?: string;
+  children?: React.ReactNode;
+  position: 'bottom' | 'top';
+  data: WorkflowNodeExpressionRecords;
+  onToggleExpression?(value: boolean): void;
+}) {
+  const SwitchIcon = isActive ? ToggleRightIcon : ToggleLeftIcon;
+
+  return (
+    <div
+      className={clsx(
+        'flex items-center justify-between mb-0.5',
+        position === 'top' ? 'mb-0.5' : 'mt-0.5',
+        className,
+      )}
+    >
+      <div className="flex-grow line-clamp-1">
+        {label && (
+          <UiLabel htmlFor={labelId} className="ml-1 line-clamp-1 inline">
+            {label}
+          </UiLabel>
+        )}
+        {description && (
+          <UiTooltip label={description} className="max-w-xs">
+            <InfoIcon className="h-4 w-4 text-muted-foreground inline-block align-sub ml-1 invisible group-hover/expression:visible" />
+          </UiTooltip>
+        )}
+        {children}
+      </div>
+      <button
+        className={clsx(
+          'group-hover/expression:visible group-focus-within/expression:visible invisible h-5 hover:bg-secondary leading-none px-1.5 rounded text-xs inline-flex items-center justify-center',
+          !isActive && 'text-muted-foreground',
+        )}
+        onClick={() => onToggleExpression?.(!data[path]?.active)}
+      >
+        {
+          <SwitchIcon
+            className={clsx(
+              'h-4 w-4 mr-1',
+              isActive && 'fill-primary stroke-white',
+            )}
+          />
+        }
+        Expression
+      </button>
+    </div>
+  );
+}
+
 interface WorkflowFormExpressionProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   path: string;
   label?: string;
   labelId?: string;
-  noToggle?: boolean;
   labelClass?: string;
   inputClass?: string;
+  description?: string;
   children?: React.ReactNode;
+  labelChildren?: React.ReactNode;
+  labelPosition?: 'top' | 'bottom';
   data?: WorkflowNodeExpressionRecords;
   onDataChange?: (data: WorkflowNodeExpressionRecords) => void;
 }
@@ -61,19 +130,18 @@ function WorkflowUiFormExpression({
   path,
   label,
   labelId,
-  noToggle,
   children,
   data = {},
   className,
   labelClass,
   inputClass,
+  description,
   onDataChange,
+  labelChildren,
+  labelPosition = 'top',
   ...props
 }: WorkflowFormExpressionProps) {
-  const updateEditNode = useWorkflowEditorStore.use.updateEditNode();
-
-  const isActive = noToggle ?? Boolean(data[path]?.active);
-  const SwitchIcon = isActive ? ToggleRightIcon : ToggleLeftIcon;
+  const isActive = Boolean(data[path]?.active);
 
   function updateExpressionData(value: Partial<WorkflowNodeExpressionData>) {
     const expData: WorkflowNodeExpressionData = data[path]
@@ -84,50 +152,27 @@ function WorkflowUiFormExpression({
       [path]: expData,
     };
 
-    if (onDataChange) {
-      onDataChange($expData);
-      return;
-    }
-
-    updateEditNode({
-      $expData,
-    });
+    onDataChange?.($expData);
   }
 
   return (
     <div className={clsx('group/expression', className)} {...props}>
-      <div
-        className={clsx('flex items-center justify-between mb-0.5', labelClass)}
-      >
-        <div className="flex-grow">
-          {label && (
-            <UiLabel htmlFor={labelId} className="ml-1 line-clamp-1">
-              {label}
-            </UiLabel>
-          )}
-        </div>
-        {!noToggle && (
-          <button
-            className={clsx(
-              'group-hover/expression:visible group-focus-within/expression:visible invisible h-5 hover:bg-secondary leading-none px-1.5 rounded text-xs inline-flex items-center justify-center',
-              !isActive && 'text-muted-foreground',
-            )}
-            onClick={() =>
-              updateExpressionData({ active: !data[path]?.active })
-            }
-          >
-            {
-              <SwitchIcon
-                className={clsx(
-                  'h-4 w-4 mr-1',
-                  isActive && 'fill-primary stroke-white',
-                )}
-              />
-            }
-            Expression
-          </button>
-        )}
-      </div>
+      {labelPosition === 'top' && (
+        <WorkflowUiExpressionLabel
+          data={data}
+          path={path}
+          label={label}
+          isActive={isActive}
+          className={labelClass}
+          position={labelPosition}
+          description={description}
+          onToggleExpression={(value) =>
+            updateExpressionData({ active: value })
+          }
+        >
+          {labelChildren}
+        </WorkflowUiExpressionLabel>
+      )}
       {isActive ? (
         <WorkflowUiExpressionInput
           className={inputClass}
@@ -137,6 +182,22 @@ function WorkflowUiFormExpression({
         />
       ) : (
         children
+      )}
+      {labelPosition === 'bottom' && (
+        <WorkflowUiExpressionLabel
+          data={data}
+          path={path}
+          label={label}
+          isActive={isActive}
+          className={labelClass}
+          position={labelPosition}
+          description={description}
+          onToggleExpression={(value) =>
+            updateExpressionData({ active: value })
+          }
+        >
+          {labelChildren}
+        </WorkflowUiExpressionLabel>
       )}
     </div>
   );

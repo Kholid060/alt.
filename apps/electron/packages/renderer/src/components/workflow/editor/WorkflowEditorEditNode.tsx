@@ -2,7 +2,8 @@ import { useShallow } from 'zustand/react/shallow';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
 import { Suspense, lazy, memo } from 'react';
 import { XIcon } from 'lucide-react';
-import { UiSkeleton } from '@repo/ui';
+import { UiScrollArea, UiSkeleton } from '@repo/ui';
+import kebabCase from 'lodash-es/kebabCase';
 
 const editComponents = Object.fromEntries(
   Object.entries(import.meta.glob('../node-edit/WorkflowNodeEdit*.tsx')).map(
@@ -14,7 +15,7 @@ const editComponents = Object.fromEntries(
           ?.replaceAll(/WorkflowNodeEdit|.tsx/g, '') ?? '';
 
       return [
-        `node-${compName.toLowerCase()}`,
+        `node-${kebabCase(compName)}`,
         lazy(value as () => Promise<{ default: React.FC }>),
       ];
     },
@@ -53,16 +54,18 @@ function WorkflowEditorEditNode() {
   if (!EditComponent) return null;
 
   return (
-    <div className="absolute right-0 h-full w-80 z-50 top-0 bg-background border-l text-sm">
+    <div className="absolute right-0 h-full w-[340px] z-50 top-0 bg-background border-l text-sm">
       <button
         onClick={() => setEditNode(null)}
         className="absolute top-0 left-0 p-1.5 -translate-x-full rounded-bl-md border-l border-b text-muted-foreground bg-background"
       >
         <XIcon className="h-5 w-5" />
       </button>
-      <Suspense fallback={<Loading />}>
-        <EditComponent key={editNode.id} />
-      </Suspense>
+      <UiScrollArea className="h-full">
+        <Suspense fallback={<Loading />}>
+          <EditComponent key={editNode.id} />
+        </Suspense>
+      </UiScrollArea>
     </div>
   );
 }

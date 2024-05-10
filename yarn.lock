@@ -8615,6 +8615,7 @@ __metadata:
     lucide-react: "npm:^0.367.0"
     mitt: "npm:^3.0.1"
     nanoid: "npm:^5.0.6"
+    picomatch: "npm:^4.0.2"
     playwright: "npm:1.41.2"
     postcss: "npm:^8.4.35"
     postcss-import: "npm:^16.0.1"
@@ -13770,6 +13771,13 @@ __metadata:
   version: 2.3.1
   resolution: "picomatch@npm:2.3.1"
   checksum: 10c0/26c02b8d06f03206fc2ab8d16f19960f2ff9e81a658f831ecb656d8f17d9edc799e8364b1f4a7873e89d9702dff96204be0fa26fe4181f6843f040f819dac4be
+  languageName: node
+  linkType: hard
+
+"picomatch@npm:^4.0.2":
+  version: 4.0.2
+  resolution: "picomatch@npm:4.0.2"
+  checksum: 10c0/7c51f3ad2bb42c776f49ebf964c644958158be30d0a510efd5a395e8d49cb5acfed5b82c0c5b365523ce18e6ab85013c9ebe574f60305892ec3fa8eee8304ccc
   languageName: node
   linkType: hard
 

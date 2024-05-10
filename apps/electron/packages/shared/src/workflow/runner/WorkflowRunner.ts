@@ -9,7 +9,6 @@ import type { WorkflowEdge } from '#packages/common/interface/workflow.interface
 import type WorkflowNodeHandler from '../node-handler/WorkflowNodeHandler';
 import type { DatabaseWorkflowDetail } from '#packages/main/src/interface/database.interface';
 import { WorkflowRunnerNodeError } from './workflow-runner-errors';
-import { setProperty } from 'dot-prop';
 import { debugLog } from '#packages/common/utils/helper';
 import { sleep } from '@repo/shared';
 import WorkflowRunnerData from './WorkflowRunnerData';
@@ -133,6 +132,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   private nodeExecutionQueue: string[] = [];
 
   id: string;
+  stepCount: number = 0;
   state: WorkflowRunnerState;
   workflow: DatabaseWorkflowDetail;
   connectionsMap: Record<string, NodeConnectionMap> = {};
@@ -227,23 +227,13 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   private async evaluateNodeExpression(node: WorkflowNodes) {
     if (!Object.hasOwn(node.data, '$expData')) return node;
 
-    let isEmpty = true;
-    const expression: Record<string, string> = {};
-    Object.entries(node.data.$expData!).forEach(([key, value]) => {
-      if (!value.active) return;
+    const nodeData = await this.sandbox.evaluateExpAndApply(
+      node.data.$expData!,
+      node.data,
+    );
+    if (!nodeData.isApplied) return node;
 
-      isEmpty = false;
-      expression[key] = value.value;
-    });
-
-    if (isEmpty) return node;
-
-    const result = await this.sandbox.evaluateExpression(expression);
-    Object.entries(result).forEach(([key, value]) => {
-      setProperty(node.data, key, value);
-    });
-
-    return node;
+    return { ...node, data: nodeData.data } as WorkflowNodes;
   }
 
   private findNextNode(
@@ -338,6 +328,8 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
           `Node with "${node.type}" doesn't have handler`,
         );
       }
+
+      this.stepCount += 1;
 
       let execResult: WorkflowNodeHandlerExecuteReturn = {
         value: prevExec?.value,
