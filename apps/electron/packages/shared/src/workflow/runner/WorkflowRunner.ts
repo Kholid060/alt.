@@ -354,6 +354,8 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
         value: execResult.value,
       });
     } catch (error) {
+      if (import.meta.env.DEV) console.error(error);
+
       if (this.state !== WorkflowRunnerState.Running) return;
 
       if (error instanceof WorkflowRunnerNodeError) {

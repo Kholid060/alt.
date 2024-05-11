@@ -43,7 +43,7 @@ const config = {
         `node:${item}`,
       ]),
     },
-    emptyOutDir: false,
+    emptyOutDir: true,
   },
   plugins: [],
 };

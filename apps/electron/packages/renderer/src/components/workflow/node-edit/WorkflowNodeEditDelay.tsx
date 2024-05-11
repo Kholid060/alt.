@@ -22,6 +22,7 @@ function WorkflowNodeEditDelay() {
           value={node.data.delayMs}
           id="delay--time"
           min={0}
+          inputSize="sm"
           type="number"
           placeholder="1000"
           onValueChange={(value) =>

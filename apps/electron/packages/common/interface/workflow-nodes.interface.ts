@@ -62,6 +62,18 @@ export type WorkflowNodeLoop = WorkflowNodeBase<
   WORKFLOW_NODE_TYPE.LOOP
 >;
 
+export type WorkflowNodeFileSystem = WorkflowNodeBase<
+  {
+    varName: string;
+    filePath: string;
+    fileData: string;
+    appendFile: boolean;
+    insertToVar: boolean;
+    action: 'read' | 'write';
+  },
+  WORKFLOW_NODE_TYPE.FILE_SYSTEM
+>;
+
 export type WorkflowNodeCode = WorkflowNodeBase<
   {
     jsCode: string;
@@ -180,6 +192,7 @@ export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.TRIGGER]: WorkflowNodeTrigger;
   [WORKFLOW_NODE_TYPE.CLIPBOARD]: WorkflowNodeClipboard;
   [WORKFLOW_NODE_TYPE.DO_NOTHING]: WorkflowNodeDoNothing;
+  [WORKFLOW_NODE_TYPE.FILE_SYSTEM]: WorkflowNodeFileSystem;
   [WORKFLOW_NODE_TYPE.CONDITIONAL]: WorkflowNodeConditional;
   [WORKFLOW_NODE_TYPE.HTTP_REQUEST]: WorkflowNodeHttpRequest;
 }

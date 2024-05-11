@@ -5,6 +5,8 @@ import type { QuickJSContext, QuickJSRuntime } from 'quickjs-emscripten';
 import { Scope, getQuickJS } from 'quickjs-emscripten';
 import type WorkflowRunner from './WorkflowRunner';
 import type { WorkflowNodeExpressionRecords } from '#packages/common/interface/workflow-nodes.interface';
+import { getExactType } from '/@/utils/helper';
+import WorkflowFileHandle from '../utils/WorkflowFileHandle';
 
 const MUSTACHE_REGEX = /\{\{(.*?)\}\}/g;
 
@@ -46,16 +48,22 @@ function convertToJSHandle(vm: QuickJSContext, value: unknown, scope: Scope) {
         return array;
       }
 
+      if (value instanceof WorkflowFileHandle) {
+        return value.toJSHandle(vm, scope);
+      }
+
       if (isObject(value)) {
         const object = vm.newObject();
         Object.keys(value).forEach((key) => {
           vm.setProp(object, key, convertToJSHandle(vm, value[key], scope));
         });
+
+        return object;
       }
     }
   }
 
-  throw new Error(`Can't convert "${typeof value}" to JSHandle`);
+  throw new Error(`Can't convert "${getExactType(value)}" to JSHandle`);
 }
 
 const EXP_RUNTIME_MEMORY_LIMIT_BYTE = 1.5 * 1024 * 1024; // 1.5MB
@@ -96,6 +104,7 @@ class WorkflowRunnerSandbox {
     scope: Scope,
     data: Record<string, unknown> = {},
   ) {
+    const $varsObj = scope.manage(context.newObject());
     const getVarsFunc = scope.manage(
       context.newFunction('$vars', (pathHandle) => {
         const pathValue = context.dump(scope.manage(pathHandle));
@@ -117,7 +126,18 @@ class WorkflowRunnerSandbox {
         return value;
       }),
     );
-    context.setProp(context.global, '$vars', getVarsFunc);
+    const setVarsFunc = scope.manage(
+      context.newFunction('$setVars', (name, value) => {
+        const nameValue = context.dump(scope.manage(name));
+        const valueValue = context.dump(scope.manage(value));
+
+        this.runner.dataStorage.variables.set(nameValue, valueValue);
+      }),
+    );
+
+    context.setProp($varsObj, 'get', getVarsFunc);
+    context.setProp($varsObj, 'set', setVarsFunc);
+    context.setProp(context.global, '$vars', $varsObj);
   }
 
   async evaluateCode(
@@ -144,7 +164,9 @@ class WorkflowRunnerSandbox {
 
       const logHandle = scope.manage(
         vm.newFunction('log', (...args) => {
-          const nativeArgs = args.map(vm.dump);
+          const nativeArgs = args.map((handle) =>
+            vm.dump(scope.manage(handle)),
+          );
           console.log('Sandbox:', ...nativeArgs);
         }),
       );

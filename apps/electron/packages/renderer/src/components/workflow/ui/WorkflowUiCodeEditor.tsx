@@ -45,7 +45,7 @@ function WorkflowUiCodeEditor({
           ({language.title})
         </span>
         <div className="flex-grow" />
-        <UiDialog open={expandEditor} onOpenChange={setExpandEditor}>
+        <UiDialog modal open={expandEditor} onOpenChange={setExpandEditor}>
           <UiDialog.Trigger asChild>
             <button className="text-xs text-muted-foreground hover:underline h-full">
               Expand
@@ -63,7 +63,7 @@ function WorkflowUiCodeEditor({
             </UiDialog.Header>
             <UiCodeEditor
               value={value}
-              className="text-sm min-h-72 border-t"
+              className="text-sm min-h-72 border-t [&_.cm-gutters]:!bg-background"
               style={{ maxHeight: 'calc(100vh - 10rem)' }}
               placeholder="Your code here..."
               extensions={[language.module()]}
@@ -76,7 +76,7 @@ function WorkflowUiCodeEditor({
         <UiCodeEditor
           theme="dark"
           value={value}
-          className="text-xs max-h-96 [&_.cm-scroller]:min-h-52 overflow-auto"
+          className="text-xs max-h-96 [&_.cm-scroller]:min-h-52 overflow-auto w-full [&_.cm-gutters]:!bg-card"
           placeholder="Your code here..."
           extensions={[javascript()]}
           onChange={(value) => onValueChange?.(value)}

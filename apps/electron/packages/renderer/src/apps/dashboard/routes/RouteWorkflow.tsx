@@ -58,6 +58,7 @@ const nodeTypes: Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>> = {
   [WORKFLOW_NODE_TYPE.CLIPBOARD]: WorkflowNodeBasic,
   [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeCommand,
   [WORKFLOW_NODE_TYPE.DO_NOTHING]: WorkflowNodeBasic,
+  [WORKFLOW_NODE_TYPE.FILE_SYSTEM]: WorkflowNodeBasic,
   [WORKFLOW_NODE_TYPE.HTTP_REQUEST]: WorkflowNodeBasic,
   [WORKFLOW_NODE_TYPE.CONDITIONAL]: WorkflowNodeConditional,
 };

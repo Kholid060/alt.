@@ -63,7 +63,7 @@ export function validateTypes<T extends Record<string, any>>(
 
     isValidType(data[path.key], path.types, {
       throw: true,
-      errorName: path.name,
+      errorName: `"${path.name}"`,
     });
   });
 }

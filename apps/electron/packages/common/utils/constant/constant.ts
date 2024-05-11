@@ -38,6 +38,7 @@ export enum WORKFLOW_NODE_TYPE {
   CLIPBOARD = 'node-clipboard',
   DO_NOTHING = 'node-do-nothing',
   CONDITIONAL = 'node-conditional',
+  FILE_SYSTEM = 'node-file-system',
   HTTP_REQUEST = 'node-http-request',
 }
 

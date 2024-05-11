@@ -2,7 +2,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
 import { Suspense, lazy, memo } from 'react';
 import { XIcon } from 'lucide-react';
-import { UiScrollArea, UiSkeleton } from '@repo/ui';
+import { UiSkeleton } from '@repo/ui';
 import kebabCase from 'lodash-es/kebabCase';
 
 const editComponents = Object.fromEntries(
@@ -21,7 +21,6 @@ const editComponents = Object.fromEntries(
     },
   ),
 );
-console.log(editComponents);
 
 function Loading() {
   return (
@@ -61,11 +60,9 @@ function WorkflowEditorEditNode() {
       >
         <XIcon className="h-5 w-5" />
       </button>
-      <UiScrollArea className="h-full">
-        <Suspense fallback={<Loading />}>
-          <EditComponent key={editNode.id} />
-        </Suspense>
-      </UiScrollArea>
+      <Suspense fallback={<Loading />}>
+        <EditComponent key={editNode.id} />
+      </Suspense>
     </div>
   );
 }

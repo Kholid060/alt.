@@ -242,7 +242,6 @@ function ContextMenuEdge() {
     <>
       <ContextMenuItemAddNode />
       <ContextMenuItemPaste />
-      <UiContextMenuSeparator />
       <ContextMenuItemSelection />
       <ContextMenuItemDelete edgeId={contextMenu.edgeId} />
     </>

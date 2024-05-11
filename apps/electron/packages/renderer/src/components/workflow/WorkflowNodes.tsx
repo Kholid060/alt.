@@ -195,45 +195,52 @@ function NodeCard({
   children,
   handleSlot,
   isDisabled,
+  description,
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & {
   title: string;
   subtitle?: string;
   isDisabled: boolean;
+  description?: string;
   icon: React.ReactNode;
   handleSlot?: React.ReactNode;
 }) {
   return (
-    <div
-      className="bg-background min-w-48 rounded-lg border-2 text-sm"
-      {...props}
-    >
-      <div className="p-3 flex items-center relative">
-        <div className="h-8 w-8 relative">
-          {isDisabled && (
-            <div className="h-full w-full absolute inline-flex items-center justify-center bg-background opacity-40">
-              <BanIcon className="text-destructive" />
-            </div>
-          )}
-          {icon}
-        </div>
-        <div className="flex-grow ml-2">
-          <p
-            className={clsx(
-              'line-clamp-1',
-              isDisabled && 'text-muted-foreground',
+    <>
+      <div
+        className="bg-background min-w-48 rounded-lg border-2 text-sm"
+        {...props}
+      >
+        <div className="p-3 flex items-center relative">
+          <div className="h-8 w-8 relative">
+            {isDisabled && (
+              <div className="h-full w-full absolute inline-flex items-center justify-center bg-background opacity-40">
+                <BanIcon className="text-destructive" />
+              </div>
             )}
-          >
-            {title}
-          </p>
-          <p className="line-clamp-1 text-xs text-muted-foreground">
-            {subtitle} {isDisabled && '(disabled)'}
-          </p>
+            {icon}
+          </div>
+          <div className="flex-grow ml-2">
+            <p
+              className={clsx(
+                'line-clamp-1',
+                isDisabled && 'text-muted-foreground',
+              )}
+            >
+              {title}
+            </p>
+            <p className="line-clamp-1 text-xs text-muted-foreground">
+              {subtitle} {isDisabled && '(disabled)'}
+            </p>
+          </div>
+          {handleSlot}
         </div>
-        {handleSlot}
+        {children}
       </div>
-      {children}
-    </div>
+      <p className="text-muted-foreground absolute pointer-events-none">
+        {description}
+      </p>
+    </>
   );
 }
 
@@ -246,6 +253,7 @@ export const WorkflowNodeCommand: React.FC<
       <NodeCard
         title={data.title}
         isDisabled={data.isDisabled}
+        description={data.description}
         subtitle={data.extension.title}
         icon={
           <UiExtensionIcon
@@ -286,6 +294,7 @@ export const WorkflowNodeConditional: React.FC<
         title={nodeData.title}
         subtitle={nodeData.subtitle}
         isDisabled={data.isDisabled}
+        description={data.description}
         icon={<UiList.Icon icon={nodeData.icon} />}
       >
         <Handle type="target" position={Position.Left} />
@@ -329,6 +338,7 @@ export const WorkflowNodeLoop: React.FC<
         title={nodeData.title}
         isDisabled={data.isDisabled}
         subtitle={nodeData.subtitle}
+        description={data.description}
         icon={<UiList.Icon icon={nodeData.icon} />}
         handleSlot={
           <>
@@ -373,6 +383,7 @@ export const WorkflowNodeBasic: React.FC<
         title={nodeData.title}
         isDisabled={data.isDisabled}
         subtitle={nodeData.subtitle}
+        description={data.description}
         icon={<UiList.Icon icon={nodeData.icon} />}
       >
         {nodeData.handleTarget.map((type, index) => (
