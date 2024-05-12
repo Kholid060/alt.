@@ -1,7 +1,10 @@
-import { UiButton, UiTooltip } from '@repo/ui';
+import { UiButton, UiKbd, UiTooltip } from '@repo/ui';
 import { MaximizeIcon, MinusIcon, PlusIcon } from 'lucide-react';
 import { useReactFlow, useStore } from 'reactflow';
 import { useShallow } from 'zustand/react/shallow';
+import { isInsideWorkflowEditor } from '../WorkflowEventListener';
+import { useHotkeys } from 'react-hotkeys-hook';
+import UiShortcut from '../../ui/UiShortcut';
 
 function WorkflowEditorControls() {
   const { minZoomReached, maxZoomReached } = useStore(
@@ -12,10 +15,37 @@ function WorkflowEditorControls() {
   );
   const { zoomIn, zoomOut, fitView } = useReactFlow();
 
+  useHotkeys(
+    ['mod+=', 'mod+minus', 'mod+0'],
+    (event) => {
+      if (!isInsideWorkflowEditor(event)) return;
+
+      switch (event.key) {
+        case '0':
+          fitView();
+          break;
+        case '-':
+          zoomOut();
+          break;
+        case '=':
+          zoomIn();
+          break;
+      }
+    },
+    [],
+  );
+
   return (
     <div className="flex items-center gap-2">
       <div className="flex items-center border border-border/60 bg-secondary rounded-md">
-        <UiTooltip label="Zoom out" sideOffset={5}>
+        <UiTooltip
+          label={
+            <>
+              Zoom out <UiShortcut shortcut="CmdOrCtrl+-" />
+            </>
+          }
+          sideOffset={5}
+        >
           <UiButton
             variant="ghost"
             size="icon"
@@ -26,7 +56,15 @@ function WorkflowEditorControls() {
           </UiButton>
         </UiTooltip>
         <hr className="h-5 bg-border/60 w-px" />
-        <UiTooltip label="Zoom in" sideOffset={5}>
+        <UiTooltip
+          label={
+            <>
+              Zoom in <UiShortcut shortcut="CmdOrCtrl" />
+              <UiKbd>+</UiKbd>
+            </>
+          }
+          sideOffset={5}
+        >
           <UiButton
             variant="ghost"
             size="icon"
@@ -37,7 +75,14 @@ function WorkflowEditorControls() {
           </UiButton>
         </UiTooltip>
       </div>
-      <UiTooltip label="Fit view" sideOffset={5}>
+      <UiTooltip
+        label={
+          <>
+            Fit view <UiShortcut shortcut="CmdOrCtrl+0" />
+          </>
+        }
+        sideOffset={5}
+      >
         <UiButton
           variant="secondary"
           className="border border-border/60"

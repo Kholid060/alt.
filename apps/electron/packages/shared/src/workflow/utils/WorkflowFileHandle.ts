@@ -4,11 +4,21 @@ import type { QuickJSContext, Scope } from 'quickjs-emscripten';
 
 class WorkflowFileHandle {
   readonly path: string;
+  readonly size: number;
   readonly filename: string;
   readonly lastModified: string;
 
-  constructor({ path, lastModified }: { path: string; lastModified: string }) {
+  constructor({
+    path,
+    size,
+    lastModified,
+  }: {
+    path: string;
+    size: number;
+    lastModified: string;
+  }) {
     this.path = path;
+    this.size = size;
     this.filename = basename(path);
     this.lastModified = lastModified;
   }

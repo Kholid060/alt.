@@ -20,9 +20,11 @@ import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { DatabaseWorkflowUpdatePayload } from '#packages/main/src/interface/database.interface';
 import preloadAPI from '/@/utils/preloadAPI';
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { nanoid } from 'nanoid/non-secure';
 import { WorkflowVariable } from '#packages/common/interface/workflow.interface';
+import UiShortcut from '../../ui/UiShortcut';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 function WorkflowInformation() {
   const workflow = useWorkflowEditorStore.use.workflow();
@@ -227,7 +229,7 @@ function WorkflowEditorHeader() {
       currentLocation.pathname !== nextLocation.pathname,
   );
 
-  async function saveWorkflow() {
+  const saveWorkflow = useCallback(async () => {
     try {
       const { workflow } = useWorkflowEditorStore.getState();
       if (!workflow) return;
@@ -266,7 +268,10 @@ function WorkflowEditorHeader() {
       console.error(error);
       toast({ variant: 'destructive', title: 'Something went wrong' });
     }
-  }
+  }, []);
+
+  useHotkeys('mod+s', saveWorkflow, []);
+  useHotkeys('alt+enter', () => runCurrentWorkflow(), []);
 
   useEffect(() => {
     if (blocker.state === 'blocked') {
@@ -315,17 +320,33 @@ function WorkflowEditorHeader() {
       <div className="ml-3"></div>
       <WorkflowVariableModal />
       <hr className="h-2/6 bg-border/50 w-px mx-4" />
-      <UiButton variant="secondary" onClick={() => runCurrentWorkflow()}>
-        <PlayIcon className="h-4 w-4 mr-2 -ml-0.5" />
-        <p>Run</p>
-      </UiButton>
-      <UiButton
-        className="ml-2 min-w-20"
-        disabled={!enableWorkflowSaveBtn}
-        onClick={saveWorkflow}
+      <UiTooltip
+        label={
+          <>
+            Run workflow <UiShortcut shortcut="Alt+Enter" />
+          </>
+        }
       >
-        Save
-      </UiButton>
+        <UiButton variant="secondary" onClick={() => runCurrentWorkflow()}>
+          <PlayIcon className="h-4 w-4 mr-2 -ml-0.5" />
+          <p>Run</p>
+        </UiButton>
+      </UiTooltip>
+      <UiTooltip
+        label={
+          <>
+            Save workflow <UiShortcut shortcut="CmdOrCtrl+S" />
+          </>
+        }
+      >
+        <UiButton
+          className="ml-2 min-w-20"
+          disabled={!enableWorkflowSaveBtn}
+          onClick={saveWorkflow}
+        >
+          Save
+        </UiButton>
+      </UiTooltip>
     </header>
   );
 }

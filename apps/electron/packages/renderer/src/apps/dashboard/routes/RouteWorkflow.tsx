@@ -11,14 +11,12 @@ import ReactFlow, {
   OnEdgeUpdateFunc,
   BackgroundVariant,
   ReactFlowProvider,
-  useOnViewportChange,
   EdgeMouseHandler,
   OnSelectionChangeFunc,
   OnEdgesChange,
   OnNodesChange,
   addEdge,
   NodeMouseHandler,
-  Viewport,
   OnNodesDelete,
   IsValidConnection,
 } from 'reactflow';
@@ -44,11 +42,11 @@ import {
 } from '/@/components/workflow/WorkflowNodes';
 import { useDatabase } from '/@/hooks/useDatabase';
 import { useNavigate, useParams } from 'react-router-dom';
-import preloadAPI from '/@/utils/preloadAPI';
 import { debugLog } from '#packages/common/utils/helper';
 import { useDashboardStore } from '/@/stores/dashboard.store';
 import WorkflowEditorEditNode from '/@/components/workflow/editor/WorkflowEditorEditNode';
 import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
+import WorkflowEventListener from '/@/components/workflow/WorkflowEventListener';
 
 const nodeTypes: Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>> = {
   [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoop,
@@ -237,9 +235,10 @@ function WorkflowEditor() {
   return (
     <ReactFlow
       nodes={nodes}
+      tabIndex={-1}
       edges={edges}
       onInit={onInit}
-      className="flex-grow"
+      className="flex-grow focus:outline-none"
       nodeTypes={nodeTypes}
       edgeTypes={edgeTypes}
       elevateNodesOnSelect
@@ -272,33 +271,6 @@ function WorkflowEditor() {
       />
     </ReactFlow>
   );
-}
-function WokflowViewportChangesListener() {
-  const { workflowId } = useParams();
-  const viewportData = useRef<Viewport | null>(null);
-
-  useOnViewportChange({
-    onEnd: (viewport) => {
-      viewportData.current = viewport;
-    },
-  });
-
-  useEffect(() => {
-    return () => {
-      if (!workflowId || !viewportData.current) return;
-
-      preloadAPI.main.ipc.invoke(
-        'database:update-workflow',
-        workflowId,
-        {
-          viewport: viewportData.current,
-        },
-        { ignoreModified: true },
-      );
-    };
-  });
-
-  return null;
 }
 
 function RouteWorkflow() {
@@ -346,7 +318,7 @@ function RouteWorkflow() {
             <WorkflowEditorEditNode />
           </div>
         </div>
-        <WokflowViewportChangesListener />
+        <WorkflowEventListener />
       </ReactFlowProvider>
     </WorkflowEditorProvider>
   );

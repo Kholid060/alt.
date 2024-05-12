@@ -56,3 +56,5 @@ thumbs.db
 # Editor-based Rest Client
 .idea/httpRequests
 /.idea/csv-plugin.xml
+
+vite.config.*.timestamp-*

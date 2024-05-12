@@ -58,6 +58,9 @@ function ContextMenuItemPaste() {
   return (
     <UiContextMenuItem onClick={pasteElements}>
       <p>Paste</p>
+      <UiContextMenuShortcut>
+        <UiShortcut variant="text" shortcut="CmdOrCtrl+V" />
+      </UiContextMenuShortcut>
     </UiContextMenuItem>
   );
 }
@@ -99,9 +102,15 @@ function ContextMenuItemClipboard({
     <>
       <UiContextMenuItem onClick={() => copy()}>
         <p>Copy</p>
+        <UiContextMenuShortcut>
+          <UiShortcut variant="text" shortcut="CmdOrCtrl+C" />
+        </UiContextMenuShortcut>
       </UiContextMenuItem>
       <UiContextMenuItem onClick={() => copy(true)}>
         <p>Cut</p>
+        <UiContextMenuShortcut>
+          <UiShortcut variant="text" shortcut="CmdOrCtrl+X" />
+        </UiContextMenuShortcut>
       </UiContextMenuItem>
     </>
   );
@@ -147,7 +156,7 @@ function ContextMenuItemDelete({
         Delete {selectedElsCount > 1 ? `(${selectedElsCount})` : ''}
       </p>
       <UiContextMenuShortcut>
-        <UiShortcut shortcut="Backspace" />
+        <UiShortcut variant="text" shortcut="Backspace" />
       </UiContextMenuShortcut>
     </UiContextMenuItem>
   );
@@ -162,7 +171,7 @@ function ContextMenuItemSelection() {
       <UiContextMenuItem onClick={() => selectAllNodes()}>
         <p>Select all</p>
         <UiContextMenuShortcut>
-          <UiShortcut shortcut="A" />
+          <UiShortcut variant="text" shortcut="CmdOrCtrl+A" />
         </UiContextMenuShortcut>
       </UiContextMenuItem>
       <UiContextMenuItem onClick={() => unselectAll()}>
@@ -187,7 +196,7 @@ function ContextMenuItemAddNode() {
       >
         <p>Add node</p>
         <UiContextMenuShortcut>
-          <UiShortcut shortcut="Shift+A" />
+          <UiShortcut variant="text" shortcut="Shift+A" />
         </UiContextMenuShortcut>
       </UiContextMenuItem>
     </>

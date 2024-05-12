@@ -26,6 +26,7 @@ export class NodeHandlerFileSystem extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
 
     const fileStat = await fs.stat(node.data.filePath);
     const fileHandle = new WorkflowFileHandle({
+      size: fileStat.size,
       path: node.data.filePath,
       lastModified: fileStat.mtime.toString(),
     });

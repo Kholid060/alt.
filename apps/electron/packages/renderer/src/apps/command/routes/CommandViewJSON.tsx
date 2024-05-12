@@ -23,7 +23,8 @@ function CommandViewJSON() {
   const runnerId = useRef('');
   const [viewData, setViewData] = useState<CommandJSONViews | null>(null);
 
-  const commandExecutePayload = activeRoute?.data as ExtensionCommandJSONViewData;
+  const commandExecutePayload =
+    activeRoute?.data as ExtensionCommandJSONViewData;
 
   useEffect(() => {
     const { commandId, extensionId, icon, subtitle, title } =

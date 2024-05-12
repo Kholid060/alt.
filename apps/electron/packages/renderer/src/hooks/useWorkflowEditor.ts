@@ -7,6 +7,7 @@ import {
 } from '#packages/common/interface/workflow.interface';
 import {
   APP_WORKFLOW_ELS_FORMAT,
+  WORKFLOW_MANUAL_TRIGGER_ID,
   WORKFLOW_NODE_TYPE,
 } from '#packages/common/utils/constant/constant';
 import { parseJSON } from '@repo/shared';
@@ -82,9 +83,6 @@ export function useWorkflowEditor() {
     { edges, nodes }: { nodes?: WorkflowNodes[]; edges?: WorkflowEdge[] },
     cut?: boolean,
   ) {
-    const state = useWorkflowEditorStore.getState();
-    if (!state.workflow) return;
-
     const workflowClipboardData: WorkflowClipboardData = {
       edges: edges || [],
       nodes: nodes || [],
@@ -113,13 +111,13 @@ export function useWorkflowEditor() {
     const { workflow } = useWorkflowEditorStore.getState();
     if (!workflow) return;
 
-    const manualTriggerNode =
-      !startNodeId &&
-      workflow.nodes.find(
-        (node) =>
-          node.type === WORKFLOW_NODE_TYPE.TRIGGER &&
-          node.data.type === 'manual',
-      );
+    const manualTriggerNode = !startNodeId
+      ? workflow.nodes.find(
+          (node) =>
+            node.type === WORKFLOW_NODE_TYPE.TRIGGER &&
+            node.data.type === 'manual',
+        )
+      : null;
     if (!startNodeId && !manualTriggerNode) {
       toast({
         variant: 'destructive',
@@ -132,7 +130,8 @@ export function useWorkflowEditor() {
     preloadAPI.main.ipc
       .invoke('workflow:execute', {
         id: workflow.id,
-        startNodeId: startNodeId || manualTriggerNode.id,
+        startNodeId:
+          startNodeId || (manualTriggerNode?.id ?? WORKFLOW_MANUAL_TRIGGER_ID),
       })
       .catch((error) => {
         console.error(error);

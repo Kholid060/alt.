@@ -11,3 +11,5 @@ server/dist
 public/dist
 .pnp.*
 .yarn
+
+vite.config.*.timestamp-*
