@@ -32,24 +32,37 @@ class StorageData<T = unknown> {
 }
 
 class WorkflowRunnerData {
+  private _prevNodeData: unknown = null;
+
   variables: StorageData;
   loopData: StorageData<WorkflowRunnerLoopData>;
 
   constructor() {
+    this._prevNodeData = null;
     this.loopData = new StorageData();
     this.variables = new StorageData();
   }
 
-  getContextData() {
+  get prevNodeData() {
+    return this._prevNodeData;
+  }
+
+  get contextData() {
     return {
-      looping: this.loopData.getAll(),
-      variables: this.variables.getAll(),
+      prevNode: this.prevNodeData,
+      vars: this.variables.getAll(),
+      loopData: this.loopData.getAll(),
     };
+  }
+
+  setPrevNodeData(data: unknown) {
+    this._prevNodeData = data;
   }
 
   destroy() {
     this.loopData.clear();
     this.variables.clear();
+    this._prevNodeData = null;
   }
 }
 

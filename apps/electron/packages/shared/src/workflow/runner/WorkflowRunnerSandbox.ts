@@ -104,9 +104,8 @@ class WorkflowRunnerSandbox {
     scope: Scope,
     data: Record<string, unknown> = {},
   ) {
-    const $varsObj = scope.manage(context.newObject());
-    const getVarsFunc = scope.manage(
-      context.newFunction('$vars', (pathHandle) => {
+    const getData = scope.manage(
+      context.newFunction('', (pathHandle) => {
         const pathValue = context.dump(scope.manage(pathHandle));
         if (typeof pathValue !== 'string') {
           return scope.manage(
@@ -117,7 +116,7 @@ class WorkflowRunnerSandbox {
         const value = convertToJSHandle(
           context,
           getProperty(
-            { ...data, ...this.runner.dataStorage.variables.getAll() },
+            { ...data, ...this.runner.dataStorage.contextData },
             pathValue,
           ),
           scope,
@@ -127,7 +126,7 @@ class WorkflowRunnerSandbox {
       }),
     );
     const setVarsFunc = scope.manage(
-      context.newFunction('$setVars', (name, value) => {
+      context.newFunction('', (name, value) => {
         const nameValue = context.dump(scope.manage(name));
         const valueValue = context.dump(scope.manage(value));
 
@@ -135,9 +134,8 @@ class WorkflowRunnerSandbox {
       }),
     );
 
-    context.setProp($varsObj, 'get', getVarsFunc);
-    context.setProp($varsObj, 'set', setVarsFunc);
-    context.setProp(context.global, '$vars', $varsObj);
+    context.setProp(context.global, '$getData', getData);
+    context.setProp(context.global, '$setVars', setVarsFunc);
   }
 
   async evaluateCode(
