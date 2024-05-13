@@ -256,14 +256,12 @@ class ElementSelector {
   }
 
   private _visibilityChangeHandler() {
-    console.log(document.visibilityState === 'hidden' && this.resolverFunc);
     if (document.visibilityState === 'hidden' && this.resolverFunc) {
       this.resolverFunc({ canceled: true, selector: '' });
     }
   }
 
   private _scrollHandler() {
-    console.log('scroll');
     if (!this.prevSelectedEl) return;
 
     this.selectElement(this.prevSelectedEl);

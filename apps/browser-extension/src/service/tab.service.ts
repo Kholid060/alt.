@@ -174,6 +174,19 @@ class TabService {
       args: [options],
     });
   }
+
+  static async waitForSelector(
+    { tabId }: TabTarget,
+    selector: ExtensionBrowserElementSelector,
+    options?: ExtensionAPI.browser.WaitForSelectorOptions,
+  ) {
+    await injectContentHandlerScript(tabId);
+    return await RuntimeMessage.instance.sendMessageToTab({
+      tabId,
+      name: 'element:wait-selector',
+      args: [selector, options],
+    });
+  }
 }
 
 export default TabService;

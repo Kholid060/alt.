@@ -7,11 +7,7 @@ export default async function CommandMain(context: CommandLaunchContext) {
   // await new Promise((r) => setTimeout(r, 4000));
 
 
-  // await _extension.mainWindow.close();
-
-  const response = await fetch('https://google.com');
-  console.log(await response.text())
-  await _extension.clipboard.paste('Hello world');
+  await _extension.mainWindow.close();
 
 
   // await _extension.storage.set('test', 'hello world');
@@ -28,12 +24,11 @@ export default async function CommandMain(context: CommandLaunchContext) {
   // await inputEl[0].type('hello world')
   // console.log(await inputEl[0].getAttributes());
 
-  const selectedEl = await _extension.browser.activeTab.selectElement();
-  console.log({selector: selectedEl});
-  if (!selectedEl.canceled) {
-    const text = await (await _extension.browser.activeTab.findElement(selectedEl.selector)).getText();
-    console.log(text);
-  }
+  console.log(_extension);
+  await new Promise((r) => setTimeout(r, 40000));
+
+  const selectedEl = await _extension.browser.activeTab.waitForSelector('img[alt="Google"]', { state: 'detached' });
+  console.log(await selectedEl.getAttributes());
 
   // const toast = _extension.ui.createToast({ title: 'Hello world' });
   // toast.show();

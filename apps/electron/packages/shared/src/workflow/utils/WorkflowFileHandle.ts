@@ -1,6 +1,12 @@
 import fs from 'fs-extra';
+import { isObject } from 'lodash-es';
 import { basename } from 'path';
 import type { QuickJSContext, Scope } from 'quickjs-emscripten';
+
+type WorkflowFileHandleObject = Pick<
+  WorkflowFileHandle,
+  'filename' | 'path' | 'size' | 'lastModified'
+>;
 
 class WorkflowFileHandle {
   readonly path: string;
@@ -36,6 +42,7 @@ class WorkflowFileHandle {
       scope.manage(vm.newString('WorkflowFileHandle')),
     );
     vm.setProp(object, 'path', scope.manage(vm.newString(this.path)));
+    vm.setProp(object, 'size', scope.manage(vm.newNumber(this.size)));
     vm.setProp(object, 'filename', scope.manage(vm.newString(this.filename)));
     vm.setProp(
       object,
@@ -69,6 +76,21 @@ class WorkflowFileHandle {
     vm.setProp(object, 'readFile', readFileFunc);
 
     return object;
+  }
+
+  static isWorkflowFileHandle(
+    value: unknown,
+  ): value is WorkflowFileHandleObject {
+    if (
+      !isObject(value) ||
+      !('$type' in value) ||
+      value.$type !== 'WorkflowFileHandle'
+    )
+      return false;
+
+    return ['filename', 'path', 'size', 'lastModified'].every((key) =>
+      Object.hasOwn(value, key),
+    );
   }
 }
 

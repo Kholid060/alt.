@@ -176,4 +176,18 @@ export function websocketEventsListener(
       callback(result);
     }),
   );
+
+  io.on(
+    'tabs:wait-for-selector',
+    wsAckHandler(async (tab, selector, options, callback) => {
+      await TabService.waitForSelector(
+        {
+          tabId: tab.tabId,
+        },
+        selector,
+        options,
+      );
+      callback();
+    }),
+  );
 }

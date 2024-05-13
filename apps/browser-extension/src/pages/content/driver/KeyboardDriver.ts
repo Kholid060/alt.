@@ -1,6 +1,6 @@
 import { SetRequired } from 'type-fest';
-import * as elementUtils from '../elements-utils';
-import * as selectionUtils from '../selection-utils';
+import * as elementUtils from '../../../utils/elements-utils';
+import * as selectionUtils from '../../../utils/selection-utils';
 import {
   KeyboardBrowserTypeOptions,
   USKeyboard,

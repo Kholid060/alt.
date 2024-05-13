@@ -21,6 +21,11 @@ export interface BrowserGetTextOptions {
   onlyVisibleText: boolean;
 }
 
+export interface BrowserWaitForSelectorOptions {
+  timeout?: number;
+  state?: 'attached' | 'detached' | 'visible' | 'hidden';
+}
+
 export interface WSAckErrorResult {
   error: boolean;
   errorMessage: string;
@@ -89,6 +94,9 @@ export interface ExtensionWSServerToClientEvents {
   'tabs:element-exists': ExtensionWSAckElementHandler<
     [multiple: boolean],
     boolean | number[]
+  >;
+  'tabs:wait-for-selector': ExtensionWSAckElementHandler<
+    [options: BrowserWaitForSelectorOptions]
   >;
 }
 

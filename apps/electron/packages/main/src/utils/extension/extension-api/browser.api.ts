@@ -153,7 +153,7 @@ ExtensionIPCEvent.instance.on(
     const selectedElement = await tempHideCommandWindow(async () => {
       const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
         browserId,
-        timeout: 90_000, // 5 minutes
+        timeout: 300_000, // 5 minutes
         name: 'tabs:select-element',
         args: [
           {
@@ -171,5 +171,30 @@ ExtensionIPCEvent.instance.on(
     });
 
     return selectedElement;
+  },
+);
+
+ExtensionIPCEvent.instance.on(
+  'browser.activeTab.waitForSelector',
+  // @ts-expect-error for waiting the element
+  async (_, selector, options) => {
+    const timeout = Math.max(+(options?.timeout || 90_000), 10_000);
+    const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
+    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
+      timeout,
+      browserId,
+      name: 'tabs:wait-for-selector',
+      args: [
+        {
+          windowId,
+          tabId: id,
+        },
+        { selector },
+        { timeout, ...(options ?? {}) },
+      ],
+    });
+    if (isWSAckError(result)) {
+      throw new ExtensionError(result.errorMessage);
+    }
   },
 );

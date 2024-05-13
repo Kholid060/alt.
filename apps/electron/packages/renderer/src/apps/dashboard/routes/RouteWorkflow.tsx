@@ -22,7 +22,6 @@ import ReactFlow, {
 } from 'reactflow';
 import WorkflowEditorHeader from '/@/components/workflow/editor/WorkflowEditorHeader';
 import WorkflowEditorControls from '/@/components/workflow/editor/WorkflowEditorControls';
-import { WorkflowEditorNodeListModal } from '../../../components/workflow/editor/WorkflowEditorNodeList';
 import {
   WorkflowEditorStore,
   useWorkflowEditorStore,
@@ -47,6 +46,7 @@ import { useDashboardStore } from '/@/stores/dashboard.store';
 import WorkflowEditorEditNode from '/@/components/workflow/editor/WorkflowEditorEditNode';
 import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
 import WorkflowEventListener from '/@/components/workflow/WorkflowEventListener';
+import { WorkflowEditorNodeListModal } from '/@/components/workflow/editor/WorkflowEditorNodeLIst';
 
 const nodeTypes: Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>> = {
   [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoop,

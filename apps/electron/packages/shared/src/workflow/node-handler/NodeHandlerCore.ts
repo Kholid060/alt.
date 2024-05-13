@@ -192,8 +192,6 @@ export class NodeHandlerClipboard extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE
         break;
     }
 
-    console.log(runner.dataStorage.variables.getAll());
-
     return { value };
   }
 

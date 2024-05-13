@@ -11,9 +11,9 @@ import type {
 } from '@repo/extension';
 import type { BetterMessagePortSync, EventMapEmit } from '@repo/shared';
 import { BetterMessagePort } from '@repo/shared';
-import { createExtensionElementHandle } from '#common/utils/extension/extension-element-handle';
 import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
 import {
+  extensionAPIBrowser,
   extensionAPIGetIconURL,
   extensionAPISearchPanelEvent,
   extensionAPIUiToast,
@@ -65,25 +65,11 @@ function initExtensionAPI({
         ...extensionAPIGetIconURL(),
         ...extensionAPIUiToast(messagePort),
         ...extensionAPISearchPanelEvent(messagePort),
-        'browser.activeTab.findElement': (selector) => {
-          return createExtensionElementHandle({
-            selector,
-            sendMessage: extensionWorkerMessage.sendMessage.bind(
-              extensionWorkerMessage,
-            ) as EventMapEmit<IPCUserExtensionEventsMap>,
-          });
-        },
-        'browser.activeTab.findAllElements': (selector) => {
-          return createExtensionElementHandle(
-            {
-              selector,
-              sendMessage: extensionWorkerMessage.sendMessage.bind(
-                extensionWorkerMessage,
-              ) as EventMapEmit<IPCUserExtensionEventsMap>,
-            },
-            true,
-          );
-        },
+        ...extensionAPIBrowser(
+          extensionWorkerMessage.sendMessage.bind(
+            extensionWorkerMessage,
+          ) as EventMapEmit<IPCUserExtensionEventsMap>,
+        ),
       },
       context: extensionWorkerMessage,
       apiHandler: extensionWorkerMessage.sendMessage,

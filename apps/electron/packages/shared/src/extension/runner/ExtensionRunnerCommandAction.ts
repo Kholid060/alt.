@@ -6,9 +6,9 @@ import ExtensionRunnerProcess, {
 import type { BetterMessagePayload } from '@repo/shared';
 import { BetterMessagePort, isObject } from '@repo/shared';
 import IPCRenderer from '#packages/common/utils/IPCRenderer';
-import type { ExtensionCommandWorkerInitMessage } from '/@/inteface/extension.interface';
 import type { MessagePortSharedCommandWindowEvents } from '#packages/common/interface/message-port-events.interface';
 import { isIPCEventError } from '#packages/common/utils/helper';
+import type { ExtensionCommandWorkerInitMessage } from '/@/interface/extension.interface';
 
 class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
   private worker: Worker | null = null;
@@ -81,7 +81,9 @@ class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
     );
 
     try {
-      this.worker = new ExtensionWorkerScript();
+      this.worker = new ExtensionWorkerScript({
+        name: `${this.command.title} (${manifest.title})`,
+      });
 
       if (typeof timeoutMs === 'number' && timeoutMs !== 0) {
         this.timeout = setTimeout(() => {

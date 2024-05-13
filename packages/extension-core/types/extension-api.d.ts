@@ -6,6 +6,7 @@ import type {
   KeyboardKeyUpOptionsType,
   KeyboardKeyDownOptionsType,
   KeyboardBrowserTypeOptions,
+  BrowserWaitForSelectorOptions,
   ExtensionBrowserElementSelector,
 } from '@repo/shared';
 
@@ -181,6 +182,7 @@ declare namespace ExtensionAPI.ui.searchPanel {
 
 declare namespace ExtensionAPI.browser {
   type GetTextOptions = BrowserGetTextOptions;
+  type WaitForSelectorOptions = BrowserWaitForSelectorOptions;
 
   type KeyboardKeys = USKeyboardKeys;
   type KeyboardModifiers = KeyboardModifiersType;
@@ -292,6 +294,12 @@ declare namespace ExtensionAPI.browser.activeTab {
   export function findAllElements(
     selector: string,
   ): Promise<ExtensionAPI.browser.ElementHandle[]>;
+
+  // @ext-api-value
+  export function waitForSelector(
+    selector: string,
+    options?: ExtensionAPI.browser.WaitForSelectorOptions,
+  ): Promise<ExtensionAPI.browser.ElementHandle | null>;
 }
 
 declare namespace ExtensionAPI.mainWindow {

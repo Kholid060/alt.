@@ -11,10 +11,10 @@ import { contextBridge } from 'electron';
 import { isExtHasApiPermission } from '#common/utils/check-ext-permission';
 import type { SetRequired } from 'type-fest';
 import { ExtensionError } from '#common/errors/custom-errors';
-import { createExtensionElementHandle } from '#common/utils/extension/extension-element-handle';
 import type { BetterMessagePortSync, EventMapEmit } from '@repo/shared';
 import { BetterMessagePort } from '@repo/shared';
 import {
+  extensionAPIBrowser,
   extensionAPIGetIconURL,
   extensionAPISearchPanelEvent,
   extensionAPIUiToast,
@@ -100,25 +100,9 @@ class ExtensionAPI {
         ...extensionAPIGetIconURL(),
         ...extensionAPIUiToast(this.messagePort),
         ...extensionAPISearchPanelEvent(this.messagePort),
-        'browser.activeTab.findElement': (selector) => {
-          return createExtensionElementHandle({
-            selector,
-            sendMessage: this.sendAction.bind(
-              this,
-            ) as EventMapEmit<IPCUserExtensionEventsMap>,
-          });
-        },
-        'browser.activeTab.findAllElements': (selector) => {
-          return createExtensionElementHandle(
-            {
-              selector,
-              sendMessage: this.sendAction.bind(
-                this,
-              ) as EventMapEmit<IPCUserExtensionEventsMap>,
-            },
-            true,
-          );
-        },
+        ...extensionAPIBrowser(
+          this.sendAction.bind(this) as EventMapEmit<IPCUserExtensionEventsMap>,
+        ),
       },
     });
 

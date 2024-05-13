@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ExtensionMessagePortEvent } from '@repo/extension';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
-import type { BetterMessagePortSync } from '@repo/shared';
+import type { BetterMessagePortSync, EventMapEmit } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { APP_ICON_DIR_PREFIX, CUSTOM_SCHEME } from '../constant/constant';
 import type { ExtensionAPIValues } from '@repo/extension-core/dist/extensionApiBuilder';
+import { createExtensionElementHandle } from './extension-element-handle';
+import type { IPCUserExtensionEventsMap } from 'interface/ipc-events.interface';
 
 export const extensionAPIGetIconURL = (): Pick<
   ExtensionAPIValues,
@@ -61,6 +63,41 @@ export function extensionAPIUiToast(
           messagePort?.sendMessage('extension:hide-toast', toastId);
         },
       };
+    },
+  };
+}
+
+export function extensionAPIBrowser(
+  sendMessage: EventMapEmit<IPCUserExtensionEventsMap>,
+): Pick<
+  ExtensionAPIValues,
+  | 'browser.activeTab.findAllElements'
+  | 'browser.activeTab.findElement'
+  | 'browser.activeTab.waitForSelector'
+> {
+  return {
+    'browser.activeTab.findElement': (selector) => {
+      return createExtensionElementHandle({
+        selector,
+        sendMessage,
+      });
+    },
+    'browser.activeTab.findAllElements': (selector) => {
+      return createExtensionElementHandle(
+        {
+          selector,
+          sendMessage,
+        },
+        true,
+      );
+    },
+    'browser.activeTab.waitForSelector': async (selector, options) => {
+      await sendMessage('browser.activeTab.waitForSelector', selector, options);
+
+      return createExtensionElementHandle({
+        selector,
+        sendMessage,
+      });
     },
   };
 }

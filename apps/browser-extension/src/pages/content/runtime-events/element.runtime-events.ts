@@ -1,24 +1,33 @@
 import { ExtensionBrowserElementSelector, sleep } from '@repo/shared';
 import QuerySelector from '@root/src/utils/QuerySelector';
 import RuntimeMessage from '@root/src/utils/RuntimeMessage';
-import KeyboardDriver from '@root/src/utils/driver/KeyboardDriver';
-import MouseDriver from '@root/src/utils/driver/MouseDriver';
+import KeyboardDriver from '@root/src/pages/content/driver/KeyboardDriver';
+import MouseDriver from '@root/src/pages/content/driver/MouseDriver';
 import ElementSelector from '../element-selector';
+import { isElementVisible } from '@root/src/utils/elements-utils';
 
 const CUSTOM_ERRORS = {
-  EL_NOT_FOUND: (selector: string) =>
+  ElNotFound: (selector: string) =>
     new Error(`Couldn't find element with "${selector}" selector`),
-  INVALID_ELEMENT: (elName: string) =>
+  InvalidElement: (elName: string) =>
     new Error(`Element is not a "${elName}" element`),
 };
 
 let elementCache: { el: Element | Element[] | null; selector: string } | null =
   null;
 
-async function queryElement({
-  selector,
-  elementIndex,
-}: ExtensionBrowserElementSelector): Promise<Element> {
+function queryElement(
+  { selector, elementIndex }: ExtensionBrowserElementSelector,
+  options: { throwError: false },
+): Promise<Element | null>;
+function queryElement(
+  { selector, elementIndex }: ExtensionBrowserElementSelector,
+  options?: { throwError: true },
+): Promise<Element>;
+async function queryElement(
+  { selector, elementIndex }: ExtensionBrowserElementSelector,
+  { throwError = true }: { throwError?: boolean } = {},
+): Promise<Element | null> {
   if (elementCache?.selector === selector) {
     if (typeof elementIndex === 'number') {
       const element = Array.isArray(elementCache.el)
@@ -26,14 +35,21 @@ async function queryElement({
         : null;
       if (element) return element;
     } else if (!Array.isArray(elementCache.el) && elementCache.el) {
-      return elementCache.el;
+      if (!elementCache.el.parentNode) {
+        elementCache = null;
+      } else {
+        return elementCache.el;
+      }
     }
   }
 
   if (typeof elementIndex === 'number') {
     const elements = await QuerySelector.findAll(selector);
-    if (!elements || !elements[elementIndex])
-      throw CUSTOM_ERRORS.EL_NOT_FOUND(selector);
+    if (!elements || !elements[elementIndex]) {
+      if (throwError) throw CUSTOM_ERRORS.ElNotFound(selector);
+
+      return null;
+    }
 
     elementCache = {
       selector,
@@ -44,7 +60,11 @@ async function queryElement({
   }
 
   const element = await QuerySelector.find(selector);
-  if (!element) throw CUSTOM_ERRORS.EL_NOT_FOUND(selector);
+  if (!element) {
+    if (throwError) throw CUSTOM_ERRORS.ElNotFound(selector);
+
+    return null;
+  }
 
   elementCache = {
     selector,
@@ -88,7 +108,7 @@ RuntimeMessage.instance.onMessage(
     const element = (await queryElement(selector)) as HTMLSelectElement;
 
     if (element.tagName !== 'SELECT')
-      throw CUSTOM_ERRORS.INVALID_ELEMENT(element.tagName);
+      throw CUSTOM_ERRORS.InvalidElement(element.tagName);
 
     const selectedValues: string[] = [];
 
@@ -222,19 +242,98 @@ RuntimeMessage.instance.onMessage(
   },
 );
 
-let elementSelectorInstance: ElementSelector | null = null;
 RuntimeMessage.instance.onMessage(
   'element:select-element',
-  async (_, options) => {
-    if (elementSelectorInstance) {
-      throw new Error('Element selector already initialized');
+  (() => {
+    let elementSelectorInstance: ElementSelector | null = null;
+
+    return async (_, options) => {
+      if (elementSelectorInstance) {
+        throw new Error('Element selector already initialized');
+      }
+
+      elementSelectorInstance = new ElementSelector(options ?? {});
+      const result = await elementSelectorInstance.start();
+
+      elementSelectorInstance = null;
+
+      return result;
+    };
+  })(),
+);
+
+const WAIT_SELECTOR_RETRY_MS = 1000;
+const WAIT_SELECTOR_MIN_TIMEOUT_MS = 1000;
+const WAIT_SELECTOR_DEFAULT_TIMEOUT_MS = 5000;
+RuntimeMessage.instance.onMessage(
+  'element:wait-selector',
+  async (_, selector, options) => {
+    let isResolved = false;
+    const { promise, reject, resolve } = Promise.withResolvers<void>();
+
+    const timeoutMs = Math.max(
+      Number(options?.timeout) || WAIT_SELECTOR_DEFAULT_TIMEOUT_MS,
+      WAIT_SELECTOR_MIN_TIMEOUT_MS,
+    );
+
+    const timeout = setTimeout(() => {
+      isResolved = true;
+      reject(new Error('TIMEOUT'));
+    }, timeoutMs);
+
+    let element = await queryElement(selector, { throwError: false });
+
+    const checkState = async (filterFunc: () => boolean | Promise<boolean>) => {
+      if (isResolved) return;
+
+      const isPass = await filterFunc();
+      if (isPass) {
+        isResolved = true;
+        clearTimeout(timeout);
+        resolve();
+        return;
+      }
+
+      setTimeout(() => checkState(filterFunc), WAIT_SELECTOR_RETRY_MS);
+    };
+
+    switch (options?.state || 'visible') {
+      case 'attached':
+        checkState(async () => {
+          if (!element) {
+            element = await queryElement(selector, { throwError: false });
+            return Boolean(element);
+          }
+
+          return true;
+        });
+        break;
+      case 'detached':
+        checkState(() => (!element ? true : !element.parentNode));
+        break;
+      case 'visible':
+        checkState(async () => {
+          if (!element) {
+            element = await queryElement(selector, { throwError: false });
+            if (!element) return false;
+          }
+
+          return isElementVisible(element);
+        });
+        break;
+      case 'hidden':
+        checkState(() => (!element ? true : !isElementVisible(element)));
+        break;
+      default:
+        reject(
+          new Error(
+            options?.state
+              ? `"${options.state}" is an invalid state value.`
+              : "The state options couldn't be empty",
+          ),
+        );
     }
 
-    elementSelectorInstance = new ElementSelector(options ?? {});
-    const result = await elementSelectorInstance.start();
-
-    elementSelectorInstance = null;
-
-    return result;
+    return promise;
   },
 );

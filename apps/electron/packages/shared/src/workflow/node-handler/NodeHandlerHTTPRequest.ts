@@ -1,8 +1,10 @@
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
+import WorkflowFileHandle from '../utils/WorkflowFileHandle';
 import type {
   WorkflowNodeHandlerExecute,
   WorkflowNodeHandlerExecuteReturn,
 } from './WorkflowNodeHandler';
+import fs from 'fs-extra';
 import WorkflowNodeHandler from './WorkflowNodeHandler';
 import { validateTypes } from '/@/utils/helper';
 
@@ -24,7 +26,6 @@ async function getRequestBody({
       node.data,
       { filter: (key) => key.startsWith(dataKey) },
     );
-    console.log('expression', expression);
     if (!expression.isApplied) return node.data;
 
     return expression.data;
@@ -34,9 +35,15 @@ async function getRequestBody({
     case 'form-data': {
       const formData = new FormData();
       const data = await evaluateExpressions('formDataBody');
-      data.formDataBody.forEach((item) => {
+      for (const item of data.formDataBody) {
+        if (WorkflowFileHandle.isWorkflowFileHandle(item.value)) {
+          const file = await fs.readFile(item.value.path);
+          formData.append(item.name, new Blob([file]), item.value.filename);
+          continue;
+        }
+
         formData.append(item.name, item.value);
-      });
+      }
 
       body = formData;
       break;
@@ -146,8 +153,6 @@ export class NodeHandlerHTTPRequest extends WorkflowNodeHandler<WORKFLOW_NODE_TY
       signal: controller.signal,
     };
 
-    console.log('REQ', requestInit);
-
     const response = await fetch(url, requestInit);
     const responseBody = await getResponseBody(response);
 
@@ -160,7 +165,6 @@ export class NodeHandlerHTTPRequest extends WorkflowNodeHandler<WORKFLOW_NODE_TY
       runner.dataStorage.variables.set(node.data.response.varName, fetchResult);
     }
 
-    console.log(this.fetchs[nodeId]);
     clearTimeout(this.fetchs[nodeId].timeout);
     delete this.fetchs[nodeId];
 

@@ -48,6 +48,10 @@ export interface RuntimeEvent {
   'element:select-element': (
     filter?: ExtensionAPI.browser.activeTab.SelectElementOptions,
   ) => { canceled: boolean; selector: string };
+  'element:wait-selector': (
+    selector: ExtensionBrowserElementSelector,
+    option?: ExtensionAPI.browser.WaitForSelectorOptions,
+  ) => void;
 }
 
 export interface RuntimeEventPayload {

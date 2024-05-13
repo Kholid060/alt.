@@ -32,3 +32,12 @@ export function submitFormInput(el: HTMLInputElement) {
 
   return true;
 }
+
+export function isElementVisible(element: Element) {
+  const { height, width } = element.getBoundingClientRect();
+  const { display, visibility } = window.getComputedStyle(element);
+
+  return (
+    height > 0 && width > 0 && display !== 'none' && visibility !== 'hidden'
+  );
+}

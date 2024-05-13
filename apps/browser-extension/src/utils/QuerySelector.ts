@@ -159,7 +159,7 @@ class QuerySelector {
     selector: string,
     multiple: boolean = false,
     elCtx: ElementContext = document,
-  ): Element | Element[] | null {
+  ) {
     const isXPath = this.isXPath(selector);
 
     if (multiple) {
