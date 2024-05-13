@@ -2,6 +2,7 @@ import { isObject } from '@repo/shared';
 import { debugLog } from '#common/utils/helper';
 import type { ExtensionMessageHandler } from './ExtensionIPCEvent';
 import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
+import type { ExtensionAPIMessagePayload } from '#packages/common/interface/extension.interface';
 
 class ExtensionMessagePortHandler {
   private ports: Map<string, Electron.MessagePortMain> = new Map();
@@ -32,8 +33,9 @@ class ExtensionMessagePortHandler {
 
   private async onMessagePortMessage(
     currentPort: Electron.MessagePortMain,
-    { data }: Electron.MessageEvent,
+    event: Electron.MessageEvent,
   ) {
+    const data: ExtensionAPIMessagePayload = event.data;
     if (
       !isObject(data) ||
       typeof data.key !== 'string' ||
@@ -47,7 +49,8 @@ class ExtensionMessagePortHandler {
     const result = await this.portMessageHandler({
       sender: null,
       key: data.key,
-      commandId: data.commandId as string,
+      commandId: data.commandId,
+      browserCtx: data.browserCtx,
       name: data.name as keyof IPCUserExtensionEventsMap,
       args: data.args as Parameters<
         IPCUserExtensionEventsMap[keyof IPCUserExtensionEventsMap]

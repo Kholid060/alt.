@@ -1,9 +1,9 @@
 import { ExtensionError } from '#packages/common/errors/custom-errors';
 import type { WSAckErrorResult } from '@repo/shared';
 import { isObject, type ExtensionWSServerToClientEvents } from '@repo/shared';
-import BrowserService from '/@/services/browser.service';
 import ExtensionWSNamespace from '/@/services/websocket/ws-namespaces/extensions.ws-namespace';
 import type { AllButFirstOrLast, Last } from '@repo/shared';
+import type { ExtensionBrowserTabContext } from '#packages/common/interface/extension.interface';
 
 type ElementHandlerWSEventMap = typeof elementHandlerWSEventMap;
 
@@ -27,11 +27,17 @@ export async function extensionBrowserElementHandle<
   P extends Parameters<
     ExtensionWSServerToClientEvents[ElementHandlerWSEventMap[T]]
   >,
->(name: T, ...args: AllButFirstOrLast<P>) {
-  const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
+>(
+  browserCtx: ExtensionBrowserTabContext,
+  name: T,
+  ...args: AllButFirstOrLast<P>
+) {
+  if (!browserCtx) {
+    throw new Error("Couldn't find active tab browser");
+  }
 
   const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
-    browserId,
+    browserId: browserCtx.browserId,
     name: elementHandlerWSEventMap[name],
     // @ts-expect-error omitted first and last params
     args: [{ tabId: id, windowId }, ...args],

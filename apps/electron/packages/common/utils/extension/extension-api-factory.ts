@@ -7,6 +7,13 @@ import { APP_ICON_DIR_PREFIX, CUSTOM_SCHEME } from '../constant/constant';
 import type { ExtensionAPIValues } from '@repo/extension-core/dist/extensionApiBuilder';
 import { createExtensionElementHandle } from './extension-element-handle';
 import type { IPCUserExtensionEventsMap } from '../../interface/ipc-events.interface';
+import extensionApiBuilder from '@repo/extension-core/dist/extensionApiBuilder';
+
+interface CreateExtensionAPI {
+  context?: unknown;
+  sendMessage: EventMapEmit<IPCUserExtensionEventsMap>;
+  messagePort: BetterMessagePortSync<ExtensionMessagePortEvent>;
+}
 
 export const extensionAPIGetIconURL = (): Pick<
   ExtensionAPIValues,
@@ -17,7 +24,7 @@ export const extensionAPIGetIconURL = (): Pick<
 });
 
 export function extensionAPISearchPanelEvent(
-  messagePort?: BetterMessagePortSync<ExtensionMessagePortEvent>,
+  messagePort?: CreateExtensionAPI['messagePort'],
 ): Pick<
   ExtensionAPIValues,
   'ui.searchPanel.onChanged' | 'ui.searchPanel.onKeydown'
@@ -39,7 +46,7 @@ export function extensionAPISearchPanelEvent(
   };
 }
 export function extensionAPIUiToast(
-  messagePort?: BetterMessagePortSync<ExtensionMessagePortEvent>,
+  messagePort?: CreateExtensionAPI['messagePort'],
 ): Pick<ExtensionAPIValues, 'ui.createToast'> {
   return {
     'ui.createToast': (options) => {
@@ -68,7 +75,7 @@ export function extensionAPIUiToast(
 }
 
 export function extensionAPIBrowser(
-  sendMessage: EventMapEmit<IPCUserExtensionEventsMap>,
+  sendMessage: CreateExtensionAPI['sendMessage'],
 ): Pick<
   ExtensionAPIValues,
   | 'browser.activeTab.findAllElements'
@@ -100,4 +107,23 @@ export function extensionAPIBrowser(
       });
     },
   };
+}
+
+export function createExtensionAPI({
+  messagePort,
+  sendMessage,
+  context = null,
+}: CreateExtensionAPI) {
+  return Object.freeze(
+    extensionApiBuilder({
+      values: {
+        ...extensionAPIGetIconURL(),
+        ...extensionAPIUiToast(messagePort),
+        ...extensionAPISearchPanelEvent(messagePort),
+        ...extensionAPIBrowser(sendMessage),
+      },
+      context,
+      apiHandler: sendMessage,
+    }),
+  );
 }

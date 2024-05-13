@@ -12,3 +12,7 @@ ExtensionIPCEvent.instance.on(
     return configValues?.value ?? {};
   },
 );
+
+ExtensionIPCEvent.instance.on('runtime.getManifest', ({ extension }) => {
+  return Promise.resolve(extension);
+});

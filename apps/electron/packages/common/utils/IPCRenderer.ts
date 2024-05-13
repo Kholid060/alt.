@@ -11,6 +11,7 @@ import type {
 import { IPC_ON_EVENT } from '#common/utils/constant/constant';
 import { isObject } from '@repo/shared';
 import { ipcRenderer } from 'electron';
+import { isIPCEventError } from './helper';
 
 class IPCRenderer {
   private static _instance: IPCRenderer;
@@ -77,6 +78,20 @@ class IPCRenderer {
     return ipcRenderer.invoke(name, ...args) as Promise<
       ReturnType<K> | IPCEventError
     >;
+  }
+
+  static async invokeWithError<
+    T extends keyof IPCEvents,
+    K extends IPCEvents[T] = IPCEvents[T],
+  >(name: T, ...args: Parameters<K>) {
+    const result = await (ipcRenderer.invoke(name, ...args) as Promise<
+      ReturnType<K> | IPCEventError
+    >);
+    if (isIPCEventError(result)) {
+      throw new Error(result.message);
+    }
+
+    return result;
   }
 
   static on<T extends keyof IPCRendererSendEvent>(

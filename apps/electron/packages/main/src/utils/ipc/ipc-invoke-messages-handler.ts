@@ -9,6 +9,7 @@ import { emitDBChanges } from '../database-utils';
 import WindowCommand from '/@/window/command-window';
 import SharedProcessService from '/@/services/shared-process.service';
 import { Key, keyboard } from '@nut-tree/nut-js';
+import BrowserService from '/@/services/browser.service';
 
 /** EXTENSION */
 IPCMain.handle('extension:import', async () => {
@@ -219,4 +220,9 @@ IPCMain.handle(
 /** WORKFLOW */
 IPCMain.handle('workflow:execute', (_, payload) => {
   return SharedProcessService.executeWorkflow(payload);
+});
+
+/** BROWSER */
+IPCMain.handle('browser:get-active-tab', () => {
+  return Promise.resolve(BrowserService.instance.getActiveTab());
 });

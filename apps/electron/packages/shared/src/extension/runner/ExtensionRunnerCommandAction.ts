@@ -7,7 +7,6 @@ import type { BetterMessagePayload } from '@repo/shared';
 import { BetterMessagePort, isObject } from '@repo/shared';
 import IPCRenderer from '#packages/common/utils/IPCRenderer';
 import type { MessagePortSharedCommandWindowEvents } from '#packages/common/interface/message-port-events.interface';
-import { isIPCEventError } from '#packages/common/utils/helper';
 import type { ExtensionCommandWorkerInitMessage } from '/@/interface/extension.interface';
 
 class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
@@ -63,15 +62,7 @@ class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
   }
 
   async start() {
-    const { extensionId, timeoutMs } = this.payload;
-
-    const manifest = await IPCRenderer.invoke(
-      'database:get-extension-manifest',
-      extensionId,
-    );
-    if (!manifest || isIPCEventError(manifest)) {
-      throw new Error("Couldn't find extension manifest");
-    }
+    const { timeoutMs } = this.payload;
 
     // Message port for accessing Extension APIs
     IPCRenderer.postMessage(
@@ -81,8 +72,12 @@ class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
     );
 
     try {
+      const browserCtx = await IPCRenderer.invokeWithError(
+        'browser:get-active-tab',
+      );
+
       this.worker = new ExtensionWorkerScript({
-        name: `${this.command.title} (${manifest.title})`,
+        name: `${this.command.title} (${this.command.extension.title})`,
       });
 
       if (typeof timeoutMs === 'number' && timeoutMs !== 0) {
@@ -99,7 +94,7 @@ class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
 
       this.worker.postMessage(
         {
-          manifest,
+          browserCtx,
           type: 'init',
           runnerId: this.id,
           payload: this.payload,

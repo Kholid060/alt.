@@ -6,7 +6,7 @@ import React from 'react';
 import type { FallbackProps } from 'react-error-boundary';
 import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
 import { mapStackTrace } from 'sourcemapped-stacktrace';
-import type { AMessagePort } from '@repo/shared';
+import type { BetterMessagePortSync } from '@repo/shared';
 import type { ExtensionMessagePortEvent } from '@repo/extension/dist/interfaces/message-events';
 import { UiButton } from '@repo/ui';
 
@@ -54,7 +54,9 @@ async function loadStyle(themeStyle: string) {
 function ErrorBoundaryFallback({
   error,
   messagePort,
-}: FallbackProps & { messagePort: AMessagePort<ExtensionMessagePortEvent> }) {
+}: FallbackProps & {
+  messagePort: BetterMessagePortSync<ExtensionMessagePortEvent>;
+}) {
   const [mappedStack, setMappedStack] = React.useState('');
 
   React.useEffect(() => {

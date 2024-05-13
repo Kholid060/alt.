@@ -21,32 +21,46 @@ ExtensionIPCEvent.instance.on('browser.activeTab.get', () => {
   );
 });
 
-ExtensionIPCEvent.instance.on('browser.activeTab.reload', async () => {
-  const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
+ExtensionIPCEvent.instance.on(
+  'browser.activeTab.reload',
+  async ({ browserCtx }) => {
+    if (!browserCtx) {
+      throw new ExtensionError("Couldn't find active tab browser");
+    }
 
-  const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
-    browserId,
-    name: 'tabs:reload',
-    args: [
-      {
-        windowId,
-        tabId: id,
-      },
-    ],
-  });
-  if (isWSAckError(result)) {
-    throw new ExtensionError(result.errorMessage);
-  }
-});
+    const { browserId, id, windowId } = browserCtx;
+    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
+      browserId,
+      name: 'tabs:reload',
+      args: [
+        {
+          windowId,
+          tabId: id,
+        },
+      ],
+    });
+    if (isWSAckError(result)) {
+      throw new ExtensionError(result.errorMessage);
+    }
+  },
+);
 
-ExtensionIPCEvent.instance.on('browser.activeTab.click', (_, selector) => {
-  return extensionBrowserElementHandle('click', getElementSelector(selector));
-});
+ExtensionIPCEvent.instance.on(
+  'browser.activeTab.click',
+  ({ browserCtx }, selector) => {
+    return extensionBrowserElementHandle(
+      browserCtx,
+      'click',
+      getElementSelector(selector),
+    );
+  },
+);
 
 ExtensionIPCEvent.instance.on(
   'browser.activeTab.type',
-  (_, selector, text, options) => {
+  ({ browserCtx }, selector, text, options) => {
     return extensionBrowserElementHandle(
+      browserCtx,
       'type',
       getElementSelector(selector),
       text,
@@ -57,8 +71,9 @@ ExtensionIPCEvent.instance.on(
 
 ExtensionIPCEvent.instance.on(
   'browser.activeTab.getText',
-  (_, selector, options) => {
+  ({ browserCtx }, selector, options) => {
     return extensionBrowserElementHandle(
+      browserCtx,
       'getText',
       getElementSelector(selector ?? 'html'),
       options,
@@ -68,8 +83,9 @@ ExtensionIPCEvent.instance.on(
 
 ExtensionIPCEvent.instance.on(
   'browser.activeTab.select',
-  (_, selector, ...values) => {
+  ({ browserCtx }, selector, ...values) => {
     return extensionBrowserElementHandle(
+      browserCtx,
       'select',
       getElementSelector(selector),
       values,
@@ -79,8 +95,9 @@ ExtensionIPCEvent.instance.on(
 
 ExtensionIPCEvent.instance.on(
   'browser.activeTab.keyDown',
-  (_, selector, ...args) => {
+  ({ browserCtx }, selector, ...args) => {
     return extensionBrowserElementHandle(
+      browserCtx,
       'keyDown',
       getElementSelector(selector),
       ...args,
@@ -90,8 +107,9 @@ ExtensionIPCEvent.instance.on(
 
 ExtensionIPCEvent.instance.on(
   'browser.activeTab.keyUp',
-  (_, selector, ...args) => {
+  ({ browserCtx }, selector, ...args) => {
     return extensionBrowserElementHandle(
+      browserCtx,
       'keyUp',
       getElementSelector(selector),
       ...args,
@@ -101,8 +119,9 @@ ExtensionIPCEvent.instance.on(
 
 ExtensionIPCEvent.instance.on(
   'browser.activeTab.press',
-  (_, selector, ...args) => {
+  ({ browserCtx }, selector, ...args) => {
     return extensionBrowserElementHandle(
+      browserCtx,
       'press',
       getElementSelector(selector),
       ...args,
@@ -112,8 +131,9 @@ ExtensionIPCEvent.instance.on(
 
 ExtensionIPCEvent.instance.on(
   'browser.activeTab.getAttributes',
-  (_, selector, attrNames) => {
+  ({ browserCtx }, selector, attrNames) => {
     return extensionBrowserElementHandle(
+      browserCtx,
       'getAttributes',
       getElementSelector(selector),
       attrNames ?? null,
@@ -123,9 +143,12 @@ ExtensionIPCEvent.instance.on(
 
 ExtensionIPCEvent.instance.on(
   'browser.activeTab.elementExists',
-  async (_, selector, multiple) => {
-    const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
+  async ({ browserCtx }, selector, multiple) => {
+    if (!browserCtx) {
+      throw new ExtensionError("Couldn't find active tab browser");
+    }
 
+    const { browserId, id, windowId } = browserCtx;
     const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
       browserId,
       name: 'tabs:element-exists',
@@ -148,8 +171,12 @@ ExtensionIPCEvent.instance.on(
 
 ExtensionIPCEvent.instance.on(
   'browser.activeTab.selectElement',
-  async (_, options) => {
-    const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
+  async ({ browserCtx }, options) => {
+    if (!browserCtx) {
+      throw new ExtensionError("Couldn't find active tab browser");
+    }
+
+    const { browserId, id, windowId } = browserCtx;
     const selectedElement = await tempHideCommandWindow(async () => {
       const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
         browserId,
@@ -176,10 +203,14 @@ ExtensionIPCEvent.instance.on(
 
 ExtensionIPCEvent.instance.on(
   'browser.activeTab.waitForSelector',
-  // @ts-expect-error for waiting the element
-  async (_, selector, options) => {
+  // @ts-expect-error only for waiting the element
+  async ({ browserCtx }, selector, options) => {
     const timeout = Math.max(+(options?.timeout || 90_000), 10_000);
-    const { browserId, id, windowId } = BrowserService.instance.getActiveTab();
+    if (!browserCtx) {
+      throw new ExtensionError("Couldn't find active tab browser");
+    }
+
+    const { browserId, id, windowId } = browserCtx;
     const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
       timeout,
       browserId,

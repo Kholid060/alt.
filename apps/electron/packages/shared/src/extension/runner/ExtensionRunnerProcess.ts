@@ -2,7 +2,7 @@ import type { ExtensionCommandExecutePayload } from '#common/interface/extension
 import type { DatabaseExtensionCommandWithExtension } from '#packages/main/src/interface/database.interface';
 import { EventEmitter } from 'eventemitter3';
 import type ExtensionCommandRunner from '../ExtensionCommandRunner';
-import type { BetterMessagePayload } from '#packages/common/utils/BetterMessagePort';
+import type { BetterMessagePayload } from '@repo/shared';
 
 export enum ExtensionRunnerProcessFinishReason {
   Done = 'done',

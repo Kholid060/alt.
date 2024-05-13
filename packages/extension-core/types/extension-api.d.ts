@@ -14,9 +14,7 @@ type OmitFirstArg<F> = F extends (x: any, ...args: infer P) => infer R
   ? (...args: P) => R
   : never;
 
-declare namespace ExtensionAPI {
-  export const manifest: ExtensionManifest;
-}
+declare namespace ExtensionAPI {}
 
 declare namespace ExtensionAPI.clipboard {
   export type ClipboardContentType = 'html' | 'text' | 'image' | 'rtf';
@@ -50,7 +48,9 @@ declare namespace ExtensionAPI.shell {
   export function openURL(url: string): Promise<void>;
 }
 
-declare namespace ExtensionAPI.runtime {}
+declare namespace ExtensionAPI.runtime {
+  export function getManifest(): Promise<ExtensionManifest>;
+}
 
 declare namespace ExtensionAPI.runtime.config {
   export function getValues<T extends object = Record<string, unknown>>(

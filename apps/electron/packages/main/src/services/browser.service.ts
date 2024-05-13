@@ -1,5 +1,5 @@
 import type { BrowserExtensionTab, BrowserInfo } from '@repo/shared';
-import { ExtensionError } from '#packages/common/errors/custom-errors';
+import type { ExtensionBrowserTabContext } from '#packages/common/interface/extension.interface';
 
 interface ActiveBrowser {
   id: string;
@@ -24,10 +24,9 @@ class BrowserService {
     this.activeBrowser = null;
   }
 
-  getActiveTab() {
-    if (!this.activeBrowser) throw new ExtensionError('No active browser');
-    if (!this.activeBrowser.tab)
-      throw new ExtensionError('No active browser tab');
+  getActiveTab(): ExtensionBrowserTabContext {
+    if (!this.activeBrowser) return null;
+    if (!this.activeBrowser.tab) return null;
 
     return { ...this.activeBrowser.tab, browserId: this.activeBrowser.id };
   }

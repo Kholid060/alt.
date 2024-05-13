@@ -1,25 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ExtensionManifest } from '@repo/extension-core';
 import type { ExtensionMessagePortEvent } from '@repo/extension';
-import extensionApiBuilder from '@repo/extension-core/dist/extensionApiBuilder';
 import {
   CUSTOM_SCHEME,
   PRELOAD_API_KEY,
 } from '#common/utils/constant/constant';
 import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
 import { contextBridge } from 'electron';
-import { isExtHasApiPermission } from '#common/utils/check-ext-permission';
-import type { SetRequired } from 'type-fest';
-import { ExtensionError } from '#common/errors/custom-errors';
 import type { BetterMessagePortSync, EventMapEmit } from '@repo/shared';
 import { BetterMessagePort } from '@repo/shared';
-import {
-  extensionAPIBrowser,
-  extensionAPIGetIconURL,
-  extensionAPISearchPanelEvent,
-  extensionAPIUiToast,
-} from '#common/utils/extension/extension-api-value';
-import IPCRenderer from '../../../common/utils/IPCRenderer';
+import { createExtensionAPI } from '#common/utils/extension/extension-api-factory';
+import IPCRenderer from '#common/utils/IPCRenderer';
+import type { ExtensionBrowserTabContext } from '#common/interface/extension.interface';
 
 function setExtView(type: 'empty' | 'error' = 'empty') {
   contextBridge.exposeInMainWorld(PRELOAD_API_KEY.extension, {
@@ -43,10 +34,7 @@ class ExtensionAPI {
 
   private key: string = '';
   private commandId: string = '';
-  private permissions: SetRequired<
-    ExtensionManifest,
-    'permissions'
-  >['permissions'] = [];
+  private browserCtx: ExtensionBrowserTabContext = null;
 
   messagePort: BetterMessagePortSync<ExtensionMessagePortEvent>;
 
@@ -66,44 +54,39 @@ class ExtensionAPI {
 
       this.commandId = commandId;
 
-      const extensionManifest = await IPCRenderer.invoke(
-        'database:get-extension-manifest',
-        extensionId,
+      const command = await IPCRenderer.invokeWithError(
+        'database:get-command',
+        { commandId, extensionId },
       );
-      if (extensionManifest && '$isError' in extensionManifest)
-        throw new Error(extensionManifest.message);
-      if (!extensionManifest) return setExtView();
+      if (!command) throw new Error('Extension command not found');
+      if (command.type !== 'view')
+        throw new Error('Command is not a "view" type');
+
+      const browserCtx = await IPCRenderer.invokeWithError(
+        'browser:get-active-tab',
+      );
+      this.browserCtx = browserCtx;
 
       this.key = extensionId;
 
-      const extensionApi = await this.getExtensionAPI(extensionManifest);
+      const extensionApi = await this.getExtensionAPI();
       contextBridge.exposeInMainWorld(PRELOAD_API_KEY.extension, {
         ...extensionApi,
         $commandId: commandId,
       });
-
-      this.permissions = extensionManifest.permissions || [];
     } catch (error) {
       console.error(error);
       setExtView('error');
     }
   }
 
-  async getExtensionAPI(
-    manifest: ExtensionManifest,
-  ): Promise<typeof _extension> {
-    const extensionAPI = extensionApiBuilder({
+  async getExtensionAPI(): Promise<typeof _extension> {
+    const extensionAPI = createExtensionAPI({
       context: this,
-      apiHandler: this.sendAction,
-      values: {
-        manifest,
-        ...extensionAPIGetIconURL(),
-        ...extensionAPIUiToast(this.messagePort),
-        ...extensionAPISearchPanelEvent(this.messagePort),
-        ...extensionAPIBrowser(
-          this.sendAction.bind(this) as EventMapEmit<IPCUserExtensionEventsMap>,
-        ),
-      },
+      messagePort: this.messagePort,
+      sendMessage: this.sendAction.bind(
+        this,
+      ) as EventMapEmit<IPCUserExtensionEventsMap>,
     });
 
     return Object.freeze(extensionAPI);
@@ -113,17 +96,12 @@ class ExtensionAPI {
     name: T,
     ...args: Parameters<IPCUserExtensionEventsMap[T]>
   ) {
-    if (!isExtHasApiPermission(name, this.permissions)) {
-      throw new ExtensionError(
-        `Doesn't have permission to access the "${name}" API`,
-      );
-    }
-
     const result = (await IPCRenderer.invoke('user-extension', {
       name,
       args,
       key: this.key,
       commandId: this.commandId,
+      browserCtx: this.browserCtx,
     })) as any;
     if (typeof result === 'object' && result && '$isError' in result) {
       throw new Error(result.message);

@@ -1,4 +1,8 @@
 import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
+import type {
+  ExtensionAPIMessagePayload,
+  ExtensionBrowserTabContext,
+} from '#packages/common/interface/extension.interface';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { isObject } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
@@ -14,18 +18,22 @@ class ExtensionWorkerMessagePort {
   commandId: string;
   extensionKey: string;
   messagePort: MessagePort;
+  browserCtx: ExtensionBrowserTabContext;
 
   constructor({
     key,
     commandId,
+    browserCtx,
     messagePort,
   }: {
     key: string;
     commandId: string;
     messagePort: MessagePort;
+    browserCtx: ExtensionBrowserTabContext;
   }) {
     this.extensionKey = key;
     this.commandId = commandId;
+    this.browserCtx = browserCtx;
     this.messagePort = messagePort;
 
     this.onMessage = this.onMessage.bind(this);
@@ -83,9 +91,10 @@ class ExtensionWorkerMessagePort {
         name,
         args,
         messageId,
+        browserCtx: null,
         key: this.extensionKey,
         commandId: this.commandId,
-      });
+      } as Omit<ExtensionAPIMessagePayload, 'sender'>);
     });
   }
 

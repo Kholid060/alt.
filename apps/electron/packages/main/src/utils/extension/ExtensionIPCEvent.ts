@@ -9,29 +9,30 @@ import { logger } from '/@/lib/log';
 import type { ExtensionManifest } from '@repo/extension-core';
 import IPCMain from '../ipc/IPCMain';
 import DBService from '/@/services/database/database.service';
+import type { ExtensionAPIMessagePayload } from '#packages/common/interface/extension.interface';
 
 export type ExtensionMessageHandler = <
   T extends keyof IPCUserExtensionEventsMap,
->(detail: {
-  name: T;
-  key: string;
-  commandId: string;
-  sender: Electron.IpcMainInvokeEvent | null;
-  args: Parameters<IPCUserExtensionEventsMap[T]>;
-}) => Promise<
-  Awaited<ReturnType<IPCUserExtensionEventsMap[T]>> | IPCEventError
->;
+>(
+  detail: ExtensionAPIMessagePayload & {
+    name: T;
+    args: Parameters<IPCUserExtensionEventsMap[T]>;
+  },
+) => Promise<Awaited<ReturnType<IPCUserExtensionEventsMap[T]>> | IPCEventError>;
+
+type ExtensionIPCCallbackFirstParam = Pick<
+  ExtensionAPIMessagePayload,
+  'commandId' | 'browserCtx' | 'sender'
+> & {
+  extensionId: string;
+  extension: ExtensionManifest;
+};
 
 export type ExtensionIPCEventCallback<
   T extends keyof IPCUserExtensionEventsMap,
 > = (
   ...args: [
-    detail: {
-      commandId: string;
-      extensionId: string;
-      extension: ExtensionManifest;
-      sender: Electron.IpcMainInvokeEvent;
-    },
+    detail: ExtensionIPCCallbackFirstParam,
     ...Parameters<IPCUserExtensionEventsMap[T]>,
   ]
 ) => ReturnType<IPCUserExtensionEventsMap[T]>;
@@ -41,8 +42,11 @@ const CACHE_MAX_AGE_MS = 120_000; // 2 minutes
 class ExtensionIPCEvent {
   static instance = new ExtensionIPCEvent();
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private handlers: Map<string, (...args: any[]) => any> = new Map();
+  private handlers: Map<
+    string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (...args: [ExtensionIPCCallbackFirstParam, ...any[]]) => any
+  > = new Map();
 
   private extensionMessagePort: ExtensionMessagePortHandler;
   private extensionCache: Map<
@@ -104,11 +108,9 @@ class ExtensionIPCEvent {
     name,
     sender,
     commandId,
-  }: {
+    browserCtx,
+  }: ExtensionAPIMessagePayload & {
     name: T;
-    key: string;
-    commandId: string;
-    sender: Electron.IpcMainInvokeEvent | null;
     args: Parameters<IPCUserExtensionEventsMap[T]>;
   }): Promise<
     Awaited<ReturnType<IPCUserExtensionEventsMap[T]>> | IPCEventError
@@ -128,7 +130,13 @@ class ExtensionIPCEvent {
       if (!handler) throw new Error(`"${name}" doesn't have handler`);
 
       const result = await handler(
-        { sender, extension: extensionManifest, commandId, extensionId: key },
+        {
+          sender,
+          commandId,
+          browserCtx,
+          extensionId: key,
+          extension: extensionManifest,
+        },
         ...args,
       );
 

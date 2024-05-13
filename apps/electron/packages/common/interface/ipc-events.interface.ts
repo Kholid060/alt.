@@ -1,6 +1,7 @@
 import type { FlatActionExtensionAPI } from '@repo/extension-core/dist/flat-extension-api';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import type {
+  ExtensionBrowserTabContext,
   ExtensionCommandConfigValuePayload,
   ExtensionCommandExecutePayload,
   ExtensionCommandExecutePayloadWithData,
@@ -86,6 +87,10 @@ export interface IPCClipboardEvents {
   'clipboard:copy-buffer': (contentType: string, content: string) => void;
 }
 
+export interface IPCBrowserEvents {
+  'browser:get-active-tab': () => ExtensionBrowserTabContext;
+}
+
 export interface IPCExtensionEvents {
   'extension:is-config-inputted': (
     extensionId: string,
@@ -109,9 +114,10 @@ export interface IPCWorkflowEvents {
 
 export interface IPCUserExtensionEvents {
   'user-extension': <T extends keyof IPCUserExtensionEventsMap>(detail: {
-    key: string;
     name: T;
+    key: string;
     commandId: string;
+    browserCtx: ExtensionBrowserTabContext;
     args: Parameters<IPCUserExtensionEventsMap[T]>;
   }) => Awaited<ReturnType<IPCUserExtensionEventsMap[T]>>;
 }
@@ -132,6 +138,7 @@ export type IPCEvents = IPCShellEvents &
   IPCDialogEvents &
   IPCWindowEvents &
   IPCScreenEvents &
+  IPCBrowserEvents &
   IPCWorkflowEvents &
   IPCClipboardEvents &
   IPCExtensionEvents &

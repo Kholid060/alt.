@@ -1,5 +1,5 @@
 import extViewRenderer from './utils/extViewRenderer';
-import { AMessagePort } from '@repo/shared';
+import { BetterMessagePort } from '@repo/shared';
 import type { ExtensionMessagePortEvent } from '@repo/extension/dist/interfaces/message-events';
 import type { ExtensionCommandViewInitMessage } from '#common/interface/extension.interface';
 
@@ -13,7 +13,11 @@ async function onMessage({
     if (typeof data !== 'object' || data.type !== 'init')
       throw new Error('Invalid payload');
 
-    const messagePort = new AMessagePort<ExtensionMessagePortEvent>(port);
+    const messagePort =
+      BetterMessagePort.createStandalone<ExtensionMessagePortEvent>(
+        'sync',
+        port,
+      );
 
     await extViewRenderer(
       { launchContext: data.launchContext, messagePort },

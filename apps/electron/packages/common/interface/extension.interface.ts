@@ -1,6 +1,7 @@
 import type { CommandLaunchContext } from '@repo/extension';
 import type { EXTENSION_PERMISSIONS } from '@repo/extension-core';
 import type { DatabaseExtensionCommandWithExtension } from '../../main/src/interface/database.interface';
+import type { BrowserExtensionTab } from '@repo/shared';
 
 export type ExtensionPermissions = (typeof EXTENSION_PERMISSIONS)[number];
 
@@ -47,3 +48,16 @@ export type ExtensionCommandConfigValuePayload =
       requireInput: true;
       type: 'extension' | 'command';
     };
+
+export type ExtensionBrowserTabContext =
+  | (BrowserExtensionTab & { browserId: string })
+  | null;
+
+export interface ExtensionAPIMessagePayload {
+  key: string;
+  name: string;
+  args: unknown[];
+  commandId: string;
+  browserCtx: ExtensionBrowserTabContext;
+  sender: Electron.IpcMainInvokeEvent | null;
+}

@@ -6,7 +6,8 @@
   "type": "module",
   "main": "packages/main/dist/index.js",
   "scripts": {
-    "build": "yarn run build:main && yarn run build:preload && yarn run build:renderer",
+    "build": "yarn run build:main && yarn build:shared && yarn run build:preload && yarn run build:renderer",
+    "build:shared": "cd ./packages/extension && vite build",
     "build:extension": "cd ./packages/extension && vite build",
     "build:main": "cd ./packages/main && vite build",
     "build:preload": "cd ./packages/preload && vite build",
@@ -14,10 +15,11 @@
     "compile": "cross-env MODE=production yarn run build && electron-builder build --config electron-builder.yml --dir --config.asar=false",
     "dev": "node scripts/watch.js",
     "lint": "eslint . --ext js,mjs,cjs,ts,mts,cts,tsx",
+    "typecheck:shared": "tsc --noEmit -p packages/shared/tsconfig.json",
     "typecheck:main": "tsc --noEmit -p packages/main/tsconfig.json",
     "typecheck:preload": "tsc --noEmit -p packages/preload/tsconfig.json",
     "typecheck:renderer": "tsc --noEmit -p packages/renderer/tsconfig.json",
-    "typecheck": "yarn run typecheck:main && yarn run typecheck:preload && yarn run typecheck:renderer",
+    "typecheck": "yarn run typecheck:main && yarn run typecheck:shared && yarn run typecheck:preload && yarn run typecheck:renderer",
     "postinstall": "cross-env ELECTRON_RUN_AS_NODE=1 electron scripts/update-electron-vendors.js && electron-builder install-app-deps",
     "format": "npx prettier --write \"**/*.{js,mjs,cjs,ts,mts,cts,tsx,json}\"",
     "db:generate": "drizzle-kit generate:sqlite"
