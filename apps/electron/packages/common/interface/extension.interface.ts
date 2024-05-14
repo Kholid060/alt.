@@ -8,7 +8,7 @@ export type ExtensionPermissions = (typeof EXTENSION_PERMISSIONS)[number];
 export interface ExtensionCommandViewInitMessage {
   type: 'init';
   themeStyle: string;
-  launchContext: CommandLaunchContext;
+  payload: ExtensionCommandExecutePayload;
 }
 
 export interface ExtensionConfigData {
@@ -19,10 +19,11 @@ export interface ExtensionConfigData {
 }
 
 export interface ExtensionCommandExecutePayload {
-  timeoutMs?: number;
   commandId: string;
+  timeoutMs?: number;
   extensionId: string;
   launchContext: CommandLaunchContext;
+  browserCtx?: ExtensionBrowserTabContext;
 }
 
 export interface ExtensionCommandViewData

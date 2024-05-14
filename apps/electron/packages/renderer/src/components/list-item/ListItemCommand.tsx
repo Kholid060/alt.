@@ -54,14 +54,6 @@ function ListItemCommand({
           args[arg.name] = argsValues[arg.name];
         }
       }
-
-      commandStore.setCommandArgs(
-        {
-          args: {},
-          commandId: '',
-        },
-        true,
-      );
     }
 
     executeCommand({

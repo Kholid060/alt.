@@ -56,6 +56,7 @@ function initExtensionAPI({
   });
 
   const extensionAPI = createExtensionAPI({
+    browserCtx,
     messagePort,
     sendMessage: extensionWorkerMessage.sendMessage.bind(
       extensionWorkerMessage,
@@ -162,8 +163,8 @@ self.onmessage = async ({
       runnerId: data.runnerId,
       apiData: {
         mainMessagePort: ports[0],
-        browserCtx: data.browserCtx,
         key: data.payload.extensionId,
+        browserCtx: data.payload.browserCtx ?? null,
         messagePort: BetterMessagePort.createStandalone('sync', ports[1]),
       },
     };

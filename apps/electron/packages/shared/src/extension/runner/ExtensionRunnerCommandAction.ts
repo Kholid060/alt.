@@ -72,10 +72,6 @@ class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
     );
 
     try {
-      const browserCtx = await IPCRenderer.invokeWithError(
-        'browser:get-active-tab',
-      );
-
       this.worker = new ExtensionWorkerScript({
         name: `${this.command.title} (${this.command.extension.title})`,
       });
@@ -94,11 +90,11 @@ class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
 
       this.worker.postMessage(
         {
-          browserCtx,
           type: 'init',
           runnerId: this.id,
           payload: this.payload,
           command: this.command,
+          browserCtx: this.payload.browserCtx,
         } as ExtensionCommandWorkerInitMessage,
         {
           transfer: [this.mainMessageChannel.port1, this.messageChannel.port1],

@@ -10,7 +10,10 @@ import type { BetterMessagePortSync, EventMapEmit } from '@repo/shared';
 import { BetterMessagePort } from '@repo/shared';
 import { createExtensionAPI } from '#common/utils/extension/extension-api-factory';
 import IPCRenderer from '#common/utils/IPCRenderer';
-import type { ExtensionBrowserTabContext } from '#common/interface/extension.interface';
+import type {
+  ExtensionCommandExecutePayload,
+  ExtensionCommandViewInitMessage,
+} from '#common/interface/extension.interface';
 
 function setExtView(type: 'empty' | 'error' = 'empty') {
   contextBridge.exposeInMainWorld(PRELOAD_API_KEY.extension, {
@@ -22,23 +25,32 @@ class ExtensionAPI {
   static init() {
     window.addEventListener(
       'message',
-      ({ ports }) => {
-        const [port] = ports;
-        if (!port) throw new Error('PORT IS EMPTY');
+      ({ ports, data }: MessageEvent<ExtensionCommandViewInitMessage>) => {
+        const [messagePort] = ports;
+        if (!messagePort) throw new Error('PORT IS EMPTY');
 
-        new ExtensionAPI(port).loadAPI();
+        new ExtensionAPI({
+          messagePort,
+          payload: data.payload,
+        }).loadAPI();
       },
       { once: true },
     );
   }
 
   private key: string = '';
-  private commandId: string = '';
-  private browserCtx: ExtensionBrowserTabContext = null;
 
+  payload: ExtensionCommandExecutePayload;
   messagePort: BetterMessagePortSync<ExtensionMessagePortEvent>;
 
-  constructor(messagePort: MessagePort) {
+  constructor({
+    payload,
+    messagePort,
+  }: {
+    messagePort: MessagePort;
+    payload: ExtensionCommandExecutePayload;
+  }) {
+    this.payload = payload;
     this.messagePort = BetterMessagePort.createStandalone('sync', messagePort);
   }
 
@@ -47,13 +59,7 @@ class ExtensionAPI {
       if (!window.location.href.startsWith(CUSTOM_SCHEME.extension))
         return setExtView();
 
-      const { 0: extensionId, 2: commandId } = window.location.pathname
-        .substring(2)
-        .split('/');
-      if (!extensionId || !commandId) return setExtView();
-
-      this.commandId = commandId;
-
+      const { extensionId, commandId } = this.payload;
       const command = await IPCRenderer.invokeWithError(
         'database:get-command',
         { commandId, extensionId },
@@ -61,11 +67,6 @@ class ExtensionAPI {
       if (!command) throw new Error('Extension command not found');
       if (command.type !== 'view')
         throw new Error('Command is not a "view" type');
-
-      const browserCtx = await IPCRenderer.invokeWithError(
-        'browser:get-active-tab',
-      );
-      this.browserCtx = browserCtx;
 
       this.key = extensionId;
 
@@ -84,6 +85,7 @@ class ExtensionAPI {
     const extensionAPI = createExtensionAPI({
       context: this,
       messagePort: this.messagePort,
+      browserCtx: this.payload.browserCtx,
       sendMessage: this.sendAction.bind(
         this,
       ) as EventMapEmit<IPCUserExtensionEventsMap>,
@@ -100,8 +102,8 @@ class ExtensionAPI {
       name,
       args,
       key: this.key,
-      commandId: this.commandId,
-      browserCtx: this.browserCtx,
+      commandId: this.payload.commandId,
+      browserCtx: this.payload.browserCtx ?? null,
     })) as any;
     if (typeof result === 'object' && result && '$isError' in result) {
       throw new Error(result.message);

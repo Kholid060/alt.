@@ -91,9 +91,9 @@ class ExtensionWorkerMessagePort {
         name,
         args,
         messageId,
-        browserCtx: null,
         key: this.extensionKey,
         commandId: this.commandId,
+        browserCtx: this.browserCtx,
       } as Omit<ExtensionAPIMessagePayload, 'sender'>);
     });
   }

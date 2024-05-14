@@ -1,9 +1,11 @@
 import { memo, useEffect, useRef, useState } from 'react';
 import { EXTENSION_VIEW } from '#common/utils/constant/constant';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
-import { CommandLaunchContext } from '@repo/extension';
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
-import { ExtensionCommandViewInitMessage } from '#common/interface/extension.interface';
+import {
+  ExtensionCommandExecutePayload,
+  ExtensionCommandViewInitMessage,
+} from '#common/interface/extension.interface';
 import { BetterMessagePort } from '@repo/shared';
 
 function CommandView() {
@@ -37,7 +39,7 @@ function CommandView() {
       const payload: ExtensionCommandViewInitMessage = {
         type: 'init',
         themeStyle: '',
-        launchContext: activeRoute.data as CommandLaunchContext,
+        payload: activeRoute.data as ExtensionCommandExecutePayload,
       };
 
       payload.themeStyle = (

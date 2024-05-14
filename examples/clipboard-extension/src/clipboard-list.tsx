@@ -20,6 +20,9 @@ function CommandMain() {
     _extension.ui.searchPanel.onKeydown.addListener((value) => {
       console.log('onKeydown', value);
     });
+
+    _extension.browser.activeTab.get().then(console.log);
+    _extension.browser.activeTab.type('textarea[name="q"]', 'Hello 世界').then(console.log);
   }, []);
 
   const customItem: UiListItem[] = [

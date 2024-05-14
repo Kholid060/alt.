@@ -172,11 +172,11 @@ declare namespace ExtensionAPI.ui.searchPanel {
 
   export const onChanged: {
     removeListener(callback: () => void): void;
-    addListener(callback: (value: string) => void): void;
+    addListener(callback: (value: string) => void): () => void;
   };
   export const onKeydown: {
     removeListener(callback: () => void): void;
-    addListener(callback: (event: KeydownEvent) => void): void;
+    addListener(callback: (event: KeydownEvent) => void): () => void;
   };
 }
 
@@ -228,8 +228,6 @@ declare namespace ExtensionAPI.browser.activeTab {
   export function selectElement(
     options?: SelectElementOptions,
   ): Promise<{ selector: string; canceled: boolean }>;
-
-  export function get(): Promise<ActiveTab | null>;
 
   export function reload(): Promise<void>;
 
@@ -300,6 +298,9 @@ declare namespace ExtensionAPI.browser.activeTab {
     selector: string,
     options?: ExtensionAPI.browser.WaitForSelectorOptions,
   ): Promise<ExtensionAPI.browser.ElementHandle | null>;
+
+  // @ext-api-value
+  export function get(): Promise<ActiveTab | null>;
 }
 
 declare namespace ExtensionAPI.mainWindow {

@@ -1,6 +1,5 @@
 import { ExtensionError } from '#packages/common/errors/custom-errors';
 import ExtensionIPCEvent from '../ExtensionIPCEvent';
-import BrowserService from '/@/services/browser.service';
 import ExtensionWSNamespace from '/@/services/websocket/ws-namespaces/extensions.ws-namespace';
 import {
   extensionBrowserElementHandle,
@@ -12,14 +11,7 @@ import { tempHideCommandWindow } from '../../helper';
 const getElementSelector = (
   selector: ExtensionAPI.browser.ElementSelector,
 ): ExtensionAPI.browser.ElementSelectorDetail =>
-  typeof selector === 'string' ? getElementSelector(selector) : selector;
-
-ExtensionIPCEvent.instance.on('browser.activeTab.get', () => {
-  const activeTab = BrowserService.instance.activeBrowser?.tab;
-  return Promise.resolve(
-    activeTab ? { url: activeTab.url, title: activeTab.title } : null,
-  );
-});
+  typeof selector === 'string' ? { selector } : selector;
 
 ExtensionIPCEvent.instance.on(
   'browser.activeTab.reload',

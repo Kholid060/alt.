@@ -1,5 +1,5 @@
 import { ExtensionError } from '#packages/common/errors/custom-errors';
-import type { WSAckErrorResult } from '@repo/shared';
+import type { AllButLast, WSAckErrorResult } from '@repo/shared';
 import { isObject, type ExtensionWSServerToClientEvents } from '@repo/shared';
 import ExtensionWSNamespace from '/@/services/websocket/ws-namespaces/extensions.ws-namespace';
 import type { AllButFirstOrLast, Last } from '@repo/shared';
@@ -39,8 +39,10 @@ export async function extensionBrowserElementHandle<
   const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
     browserId: browserCtx.browserId,
     name: elementHandlerWSEventMap[name],
-    // @ts-expect-error omitted first and last params
-    args: [{ tabId: id, windowId }, ...args],
+    args: [
+      { tabId: browserCtx.id, windowId: browserCtx.windowId },
+      ...args,
+    ] as unknown as AllButLast<P>,
   });
   if (isWSAckError(result)) {
     throw new ExtensionError(result.errorMessage);

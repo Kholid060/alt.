@@ -14,6 +14,8 @@ import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { CommandRouteContext } from '/@/context/command-route.context';
 import preloadAPI from '/@/utils/preloadAPI';
+import ExtensionAPI from '@repo/extension-core/types/extension-api';
+import { useShallow } from 'zustand/react/shallow';
 
 const CommandInputArguments = forwardRef<
   HTMLDivElement,
@@ -28,7 +30,9 @@ const CommandInputArguments = forwardRef<
   const selectedItem = useUiList(
     (state) => state.selectedItem,
   ) as UiListSelectedItem<CommandListItems['metadata']>;
-  const setCommandArgs = useCommandStore((state) => state.setCommandArgs);
+  const [args, setCommandArgs] = useCommandStore(
+    useShallow((state) => [state.commandArgs.args, state.setCommandArgs]),
+  );
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -70,6 +74,7 @@ const CommandInputArguments = forwardRef<
               <div className="rounded-sm relative max-w-28 h-full focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background">
                 <select
                   key={key}
+                  value={`${args[argument.name] ?? ''}`}
                   required={argument.required}
                   data-command-argument={argument.name}
                   className="appearance-none transition-colors bg-secondary hover:bg-secondary-hover w-full h-full pl-2 pr-6 focus:outline-none rounded-sm"
@@ -90,7 +95,7 @@ const CommandInputArguments = forwardRef<
                     {argument.placeholder || 'Select'}
                   </option>
                   {argument.options.map((option) => (
-                    <option key={key + option.value} value={option.value}>
+                    <option key={option.value} value={option.value}>
                       {option.label}
                     </option>
                   ))}
@@ -106,6 +111,7 @@ const CommandInputArguments = forwardRef<
               <input
                 type={type}
                 key={key}
+                value={`${args[argument.name] ?? ''}`}
                 required={argument.required}
                 data-command-argument={argument.name}
                 placeholder={argument.placeholder}
@@ -129,6 +135,7 @@ const CommandInputArguments = forwardRef<
               <span key={key} className="inline-flex items-center gap-1">
                 <UiSwitch
                   size="sm"
+                  checked={Boolean(args[argument.name] ?? false)}
                   data-command-argument={argument.name}
                   onFocus={() => onArgFieldFocus?.(argument.name)}
                   onCheckedChange={(checked) => {
@@ -298,15 +305,18 @@ function CommandInput() {
     }
 
     const messagePort = commandCtx.runnerMessagePort.current;
-    if (messagePort && commandKeys.has(event.key)) {
+    const viewMessagePort = commandCtx.commandViewMessagePort.current;
+    if ((messagePort || viewMessagePort) && commandKeys.has(event.key)) {
       const { key, ctrlKey, altKey, metaKey, shiftKey } = event;
-      messagePort.event.sendMessage('extension:keydown-event', {
+      const keydownEvent: ExtensionAPI.ui.searchPanel.KeydownEvent = {
         key,
         altKey,
         ctrlKey,
         metaKey,
         shiftKey,
-      });
+      };
+      viewMessagePort?.sendMessage('extension:keydown-event', keydownEvent);
+      messagePort?.event.sendMessage('extension:keydown-event', keydownEvent);
     }
 
     switch (event.code) {
@@ -327,8 +337,10 @@ function CommandInput() {
     moveArgumentContainer(value);
 
     const messagePort = commandCtx.runnerMessagePort.current;
-    if (messagePort) {
-      messagePort.event.sendMessage('extension:query-change', value);
+    const viewMessagePort = commandCtx.commandViewMessagePort.current;
+    if (messagePort || viewMessagePort) {
+      viewMessagePort?.sendMessage('extension:query-change', value);
+      messagePort?.event.sendMessage('extension:query-change', value);
     }
 
     uiListStore.setState('search', value);

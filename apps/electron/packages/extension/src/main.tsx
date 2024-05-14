@@ -20,7 +20,7 @@ async function onMessage({
       );
 
     await extViewRenderer(
-      { launchContext: data.launchContext, messagePort },
+      { launchContext: data.payload.launchContext, messagePort },
       data.themeStyle,
     );
   } catch (error) {

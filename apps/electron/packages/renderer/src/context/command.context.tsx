@@ -39,7 +39,7 @@ export function CommandCtxProvider({
   const clearAllPanel = useCommandPanelStore.use.clearAll();
   const addPanelStatus = useCommandPanelStore.use.addStatus();
 
-  const setCommandStore = useCommandStore.use.setState();
+  const setCommandStoreState = useCommandStore.use.setState();
   const addExtensionError = useCommandStore.use.addExtensionError();
 
   const runnerMessagePort = useRef<
@@ -95,7 +95,7 @@ export function CommandCtxProvider({
     const offBrowserTabsActive = preloadAPI.main.ipc.on(
       'browser:tabs:active',
       (_, browserTab) => {
-        setCommandStore('activeBrowserTab', browserTab);
+        setCommandStoreState('activeBrowserTab', browserTab);
       },
     );
 

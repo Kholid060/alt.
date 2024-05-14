@@ -128,10 +128,7 @@ class WindowCommand extends WindowUtils implements WindowBase {
     if (!this.browserWindow) return;
 
     const isHidden = WindowsManager.instance.isWindowHidden('command');
-    if (
-      !isHidden ||
-      (typeof showWindow === 'boolean' && showWindow === false)
-    ) {
+    if ((!isHidden && showWindow !== true) || showWindow === false) {
       this.browserWindow.minimize();
       this.browserWindow.hide();
       return;

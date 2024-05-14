@@ -8,9 +8,11 @@ import type { ExtensionAPIValues } from '@repo/extension-core/dist/extensionApiB
 import { createExtensionElementHandle } from './extension-element-handle';
 import type { IPCUserExtensionEventsMap } from '../../interface/ipc-events.interface';
 import extensionApiBuilder from '@repo/extension-core/dist/extensionApiBuilder';
+import type { ExtensionBrowserTabContext } from 'interface/extension.interface';
 
 interface CreateExtensionAPI {
   context?: unknown;
+  browserCtx: ExtensionBrowserTabContext;
   sendMessage: EventMapEmit<IPCUserExtensionEventsMap>;
   messagePort: BetterMessagePortSync<ExtensionMessagePortEvent>;
 }
@@ -34,6 +36,10 @@ export function extensionAPISearchPanelEvent(
   ) => ({
     addListener: (callback: (...args: any[]) => void) => {
       messagePort?.on(key, callback);
+
+      return () => {
+        messagePort?.on(key, callback);
+      };
     },
     removeListener: (callback: (...args: any[]) => void) => {
       messagePort?.off(key, callback);
@@ -110,6 +116,7 @@ export function extensionAPIBrowser(
 }
 
 export function createExtensionAPI({
+  browserCtx,
   messagePort,
   sendMessage,
   context = null,
@@ -121,6 +128,12 @@ export function createExtensionAPI({
         ...extensionAPIUiToast(messagePort),
         ...extensionAPISearchPanelEvent(messagePort),
         ...extensionAPIBrowser(sendMessage),
+        'browser.activeTab.get': () =>
+          Promise.resolve(
+            browserCtx
+              ? { title: browserCtx.title, url: browserCtx.url }
+              : null,
+          ),
       },
       context,
       apiHandler: sendMessage,

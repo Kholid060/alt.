@@ -3,12 +3,19 @@ import type { WorkflowRunPayload } from '#packages/common/interface/workflow.int
 import ExtensionLoader from '../utils/extension/ExtensionLoader';
 import IPCMain from '../utils/ipc/IPCMain';
 import WindowCommand from '../window/command-window';
+import BrowserService from './browser.service';
 import DBService from './database/database.service';
 
 class SharedProcessService {
   static async executeExtensionCommand(
-    payload: ExtensionCommandExecutePayload,
+    executePayload: ExtensionCommandExecutePayload,
   ): Promise<string | null> {
+    const payload: ExtensionCommandExecutePayload = {
+      ...executePayload,
+      browserCtx: Object.hasOwn(executePayload, 'browserCtx')
+        ? executePayload.browserCtx
+        : BrowserService.instance.getActiveTab(),
+    };
     const { commandId, extensionId } = payload;
 
     const command = await DBService.instance.extension.getCommand({
