@@ -14,7 +14,7 @@ import { UiListProvider } from '@repo/ui/dist/context/list.context';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import UiExtensionIcon from '../../ui/UiExtensionIcon';
 import { Connection, useReactFlow } from 'reactflow';
-import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
+import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import type {
   WorkflowEditorNodeGroup,

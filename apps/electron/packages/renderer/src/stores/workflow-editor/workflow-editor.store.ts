@@ -11,9 +11,10 @@ import {
 } from 'reactflow';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
-import createStoreSelectors from '../utils/createStoreSelector';
+import createStoreSelectors from '../../utils/createStoreSelector';
 import { nanoid } from 'nanoid/non-secure';
 import {
+  WorkflowEdge,
   WorkflowElement,
   WorkflowNewNode,
 } from '#common/interface/workflow.interface';
@@ -24,6 +25,10 @@ import {
 } from '#packages/main/src/interface/database.interface';
 import { createDebounce } from '@repo/shared';
 import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
+import {
+  UndoRedoStoreSlice,
+  createUndoRedoStoreSlice,
+} from './undo-redo.store-slice';
 
 export interface WorkflowEditorStoreState {
   selection: WorkflowElement;
@@ -40,10 +45,9 @@ export interface WorkflowEditorStoreActions {
   addEdges: (connections: Connection[]) => void;
   setEditNode(node: WorkflowNodes | null): void;
   setSelection(selection: WorkflowElement): void;
-  deleteEdge: (edgeId: string | string[]) => void;
   toggleSaveWorkflowBtn: (enable: boolean) => void;
   setWorkflow: (workflow: DatabaseWorkflowDetail) => void;
-  deleteEdgeBy: (by: 'source' | 'sourceHandle', ids: string[]) => void;
+  deleteEdgeBy: (by: 'id' | 'source' | 'sourceHandle', ids: string[]) => void;
   updateEditNode<T extends WorkflowNodes = WorkflowNodes>(
     node: Partial<T['data']>,
   ): void;
@@ -65,7 +69,8 @@ export interface WorkflowEditorStoreActions {
 }
 
 export type WorkflowEditorStore = WorkflowEditorStoreState &
-  WorkflowEditorStoreActions;
+  WorkflowEditorStoreActions &
+  UndoRedoStoreSlice;
 
 const initialState: WorkflowEditorStoreState = {
   workflow: null,
@@ -78,8 +83,9 @@ const initialState: WorkflowEditorStoreState = {
 const updateWorkflowNodeDebounce = createDebounce();
 
 const workflowEditorStore = create(
-  subscribeWithSelector<WorkflowEditorStore>((set, get) => ({
+  subscribeWithSelector<WorkflowEditorStore>((set, get, ...rest) => ({
     ...initialState,
+    ...createUndoRedoStoreSlice(set, get, ...rest),
     clearWorkflowChanges() {
       set({
         workflowChanges: new Set(),
@@ -247,6 +253,8 @@ const workflowEditorStore = create(
 
         if (newNodes.length === 0) return {};
 
+        get().addCommands([{ type: 'node-added', nodes: newNodes }]);
+
         return {
           nodes: [...oldNodes, ...newNodes],
         };
@@ -256,30 +264,46 @@ const workflowEditorStore = create(
       if (connections.length <= 0) return;
 
       get().updateWorkflow((workflow) => {
-        const newEdges = connections.reduce<Edge[]>(
-          (acc, connection) => addEdge(connection, acc),
-          workflow.edges ?? [],
-        );
+        const newEdgeIds: string[] = [];
+        const newEdges = connections.reduce<Edge[]>((acc, connection) => {
+          const edgeId = nanoid(6);
+          newEdgeIds.push(edgeId);
+
+          return addEdge({ ...connection, id: edgeId }, acc);
+        }, workflow.edges ?? []);
+
+        const addedEdges = newEdgeIds.reduce<WorkflowEdge[]>((acc, edgeId) => {
+          const edge = newEdges.find((edge) => edge.id === edgeId);
+          if (edge) acc.push(edge as WorkflowEdge);
+
+          return acc;
+        }, []);
+        if (addedEdges.length > 0) {
+          get().addCommands([{ type: 'edge-added', edges: addedEdges }]);
+        }
 
         return {
           edges: newEdges,
         };
       });
     },
-    deleteEdge(edgeId) {
-      get().updateWorkflow((workflow) => {
-        const edgeIds = new Set(Array.isArray(edgeId) ? edgeId : [edgeId]);
-
-        return {
-          edges: workflow.edges.filter((edge) => !edgeIds.has(edge.id)),
-        };
-      });
-    },
     deleteEdgeBy(by, ids) {
       get().updateWorkflow((workflow) => {
+        const deletedEdges: WorkflowEdge[] = [];
+
         const edgeIds = new Set(ids);
+        const newEdges = workflow.edges.filter((edge) => {
+          if (!edgeIds.has(edge[by] ?? '')) return true;
+
+          deletedEdges.push(edge);
+
+          return false;
+        });
+
+        get().addCommands([{ type: 'edge-removed', edges: deletedEdges }]);
+
         return {
-          edges: workflow.edges.filter((edge) => !edgeIds.has(edge[by] ?? '')),
+          edges: newEdges,
         };
       });
     },
@@ -287,6 +311,7 @@ const workflowEditorStore = create(
       set({ workflow });
     },
     $reset() {
+      get().$resetUndoRedo();
       set(initialState);
     },
   })),

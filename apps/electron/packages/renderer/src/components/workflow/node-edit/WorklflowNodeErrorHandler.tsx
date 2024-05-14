@@ -1,6 +1,6 @@
 import { WorkflowNodeErroHandlerAction } from '#packages/common/interface/workflow.interface';
 import { UiInput, UiLabel, UiSelect, UiSwitch } from '@repo/ui';
-import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
+import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import { WorkflowNodeErrorHandler as WorkflowNodeErrorHandlerType } from '#packages/common/interface/workflow-nodes.interface';
 
 const errorActions: { title: string; id: WorkflowNodeErroHandlerAction }[] = [

@@ -8,7 +8,7 @@ import type { ExtensionAPIValues } from '@repo/extension-core/dist/extensionApiB
 import { createExtensionElementHandle } from './extension-element-handle';
 import type { IPCUserExtensionEventsMap } from '../../interface/ipc-events.interface';
 import extensionApiBuilder from '@repo/extension-core/dist/extensionApiBuilder';
-import type { ExtensionBrowserTabContext } from 'interface/extension.interface';
+import type { ExtensionBrowserTabContext } from '../../interface/extension.interface';
 
 interface CreateExtensionAPI {
   context?: unknown;

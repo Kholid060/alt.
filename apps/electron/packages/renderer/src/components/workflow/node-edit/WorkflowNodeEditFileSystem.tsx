@@ -1,6 +1,6 @@
 import { WorkflowNodeFileSystem } from '#packages/common/interface/workflow-nodes.interface';
 import { UiInput, UiLabel, UiSelect, UiSwitch } from '@repo/ui';
-import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
+import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';

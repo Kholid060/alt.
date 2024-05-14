@@ -4,7 +4,7 @@ import {
 } from '#packages/common/interface/workflow-nodes.interface';
 import { UiButton, UiDialog } from '@repo/ui';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
-import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
+import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import { PencilIcon, SignpostIcon, TrashIcon } from 'lucide-react';
 import { useState } from 'react';
 import WorkflowUiConditionBuilder from '../ui/WorkflowUiConditionBuilder';

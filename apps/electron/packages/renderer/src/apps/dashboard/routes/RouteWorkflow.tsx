@@ -15,17 +15,20 @@ import ReactFlow, {
   OnSelectionChangeFunc,
   OnEdgesChange,
   OnNodesChange,
-  addEdge,
   NodeMouseHandler,
   OnNodesDelete,
   IsValidConnection,
+  NodeDragHandler,
+  XYPosition,
+  OnEdgesDelete,
+  SelectionDragHandler,
 } from 'reactflow';
 import WorkflowEditorHeader from '/@/components/workflow/editor/WorkflowEditorHeader';
 import WorkflowEditorControls from '/@/components/workflow/editor/WorkflowEditorControls';
 import {
   WorkflowEditorStore,
   useWorkflowEditorStore,
-} from '/@/stores/workflow-editor.store';
+} from '/@/stores/workflow-editor/workflow-editor.store';
 import { useShallow } from 'zustand/react/shallow';
 import { WorkflowEditorProvider } from '/@/context/workflow-editor.context';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
@@ -65,14 +68,15 @@ const edgeTypes = {
 };
 
 const selector = (state: WorkflowEditorStore) => ({
+  addEdges: state.addEdges,
   edges: state.workflow?.edges,
   nodes: state.workflow?.nodes,
-  deleteEdge: state.deleteEdge,
   updateEdge: state.updateEdge,
+  addCommands: state.addCommands,
   setEditNode: state.setEditNode,
+  deleteEdgeBy: state.deleteEdgeBy,
   setSelection: state.setSelection,
   viewport: state.workflow?.viewport,
-  updateWorkflow: state.updateWorkflow,
   applyElementChanges: state.applyElementChanges,
 });
 const nodeConnectionValidator: IsValidConnection = (edge) => {
@@ -87,16 +91,18 @@ function WorkflowEditor() {
     handleId: string;
   } | null>(null);
   const applyChanges = useRef(false);
+  const nodeMoveChanges = useRef<Map<string, XYPosition> | null>(null);
 
   const {
     edges,
     nodes,
     viewport,
+    addEdges,
     updateEdge,
-    deleteEdge,
+    deleteEdgeBy,
+    addCommands,
     setEditNode,
     setSelection,
-    updateWorkflow,
     applyElementChanges,
   } = useWorkflowEditorStore(useShallow(selector));
 
@@ -136,11 +142,9 @@ function WorkflowEditor() {
   const onConnect: OnConnect = useCallback(
     (connection) => {
       connectingNodeEdge.current = null;
-      updateWorkflow((workflow) => ({
-        edges: addEdge(connection, workflow.edges),
-      }));
+      addEdges([connection]);
     },
-    [updateWorkflow],
+    [addEdges],
   );
 
   const onPaneContextMenu = useCallback(
@@ -187,14 +191,13 @@ function WorkflowEditor() {
   );
   const onEdgeDoubleClick: EdgeMouseHandler = useCallback(
     (_, edge) => {
-      deleteEdge(edge.id);
+      deleteEdgeBy('id', [edge.id]);
     },
-    [deleteEdge],
+    [deleteEdgeBy],
   );
   const onEdgesChange: OnEdgesChange = useCallback(
     (edges) => {
       if (!applyChanges.current) return;
-
       applyElementChanges({ edges });
     },
     [applyElementChanges],
@@ -220,6 +223,8 @@ function WorkflowEditor() {
   }, []);
   const onNodesDelete: OnNodesDelete = useCallback(
     (nodes) => {
+      addCommands([{ type: 'node-removed', nodes: nodes as WorkflowNodes[] }]);
+
       const { editNode } = useWorkflowEditorStore.getState();
       const closeEditNodePanel =
         editNode && nodes.some((node) => node.id === editNode.id);
@@ -227,7 +232,104 @@ function WorkflowEditor() {
 
       setEditNode(null);
     },
-    [setEditNode],
+    [setEditNode, addCommands],
+  );
+  const onNodeDragStop: NodeDragHandler = useCallback(
+    (_event, _node, nodes) => {
+      const positions = nodeMoveChanges.current;
+      if (!positions) return;
+
+      const filteredNodes = nodes.reduce<Map<string, XYPosition>>(
+        (acc, node) => {
+          const prevPosition = positions.get(node.id);
+          if (!prevPosition) return acc;
+
+          if (
+            Math.abs(node.position.x - prevPosition.x) > 50 ||
+            Math.abs(node.position.y - prevPosition.y) > 50
+          ) {
+            acc.set(node.id, node.position);
+          }
+
+          return acc;
+        },
+        new Map(),
+      );
+      if (filteredNodes.size === 0) return;
+
+      addCommands([
+        {
+          type: 'node-move',
+          oldPositions: positions,
+          positions: filteredNodes,
+        },
+      ]);
+
+      nodeMoveChanges.current = null;
+    },
+    [addCommands],
+  );
+  const onNodeDragStart: NodeDragHandler = useCallback(
+    (_event, _node, nodes) => {
+      nodeMoveChanges.current = new Map(
+        nodes.map((node) => [node.id, node.position]),
+      );
+    },
+    [],
+  );
+  const onSelectionDragStart: SelectionDragHandler = useCallback((_, nodes) => {
+    nodeMoveChanges.current = new Map(
+      nodes.map((node) => [node.id, node.position]),
+    );
+  }, []);
+  const onSelectionDragStop: SelectionDragHandler = useCallback(
+    (_, nodes) => {
+      const positions = nodeMoveChanges.current;
+      if (!positions) return;
+
+      const filteredNodes = nodes.reduce<Map<string, XYPosition>>(
+        (acc, node) => {
+          const prevPosition = positions.get(node.id);
+          if (!prevPosition) return acc;
+
+          if (
+            Math.abs(node.position.x - prevPosition.x) > 50 ||
+            Math.abs(node.position.y - prevPosition.y) > 50
+          ) {
+            acc.set(node.id, node.position);
+          }
+
+          return acc;
+        },
+        new Map(),
+      );
+      if (filteredNodes.size === 0) return;
+
+      addCommands([
+        {
+          type: 'node-move',
+          oldPositions: positions,
+          positions: filteredNodes,
+        },
+      ]);
+
+      nodeMoveChanges.current = null;
+    },
+    [addCommands],
+  );
+  const onEdgesDelete: OnEdgesDelete = useCallback(
+    (edges) => {
+      const seen = new Set<string>();
+      const deletedEdges = edges.filter((edge) => {
+        if (seen.has(edge.id)) return false;
+
+        seen.add(edge.id);
+
+        return true;
+      });
+      addCommands([{ type: 'edge-removed', edges: deletedEdges }]);
+    },
+    [addCommands],
   );
 
   if (!nodes || !edges) return null;
@@ -245,16 +347,21 @@ function WorkflowEditor() {
       onConnect={onConnect}
       onConnectEnd={onConnectEnd}
       onEdgeUpdate={onEdgeUpdate}
+      onEdgesDelete={onEdgesDelete}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onNodesDelete={onNodesDelete}
       onConnectStart={onConnectStart}
+      onNodeDragStop={onNodeDragStop}
+      onNodeDragStart={onNodeDragStart}
       onPaneContextMenu={onPaneContextMenu}
       onNodeContextMenu={onNodeContextMenu}
       onEdgeDoubleClick={onEdgeDoubleClick}
       onEdgeContextMenu={onEdgeContextMenu}
       onNodeDoubleClick={onNodeDoubleClick}
       defaultViewport={viewport ?? undefined}
+      onSelectionDragStop={onSelectionDragStop}
+      onSelectionDragStart={onSelectionDragStart}
       isValidConnection={nodeConnectionValidator}
       onSelectionContextMenu={onSelectionContextMenu}
       onSelectionChange={setSelection as OnSelectionChangeFunc}

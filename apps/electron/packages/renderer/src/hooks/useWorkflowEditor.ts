@@ -15,7 +15,7 @@ import { nanoid } from 'nanoid';
 import { Connection, useReactFlow, useStore, useStoreApi } from 'reactflow';
 import { isIPCEventError } from '../utils/helper';
 import preloadAPI from '../utils/preloadAPI';
-import { useWorkflowEditorStore } from '../stores/workflow-editor.store';
+import { useWorkflowEditorStore } from '../stores/workflow-editor/workflow-editor.store';
 import { useShallow } from 'zustand/react/shallow';
 import { useToast } from '@repo/ui';
 import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';

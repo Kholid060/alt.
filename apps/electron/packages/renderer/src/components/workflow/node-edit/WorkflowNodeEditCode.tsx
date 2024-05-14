@@ -1,5 +1,5 @@
 import { WorkflowNodeCode } from '#packages/common/interface/workflow-nodes.interface';
-import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
+import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
 import WorkflowUiCodeEditor from '../ui/WorkflowUiCodeEditor';

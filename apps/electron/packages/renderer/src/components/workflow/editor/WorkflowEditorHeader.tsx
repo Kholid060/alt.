@@ -14,7 +14,7 @@ import {
   useNavigate,
   useSearchParams,
 } from 'react-router-dom';
-import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
+import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import { UiExtIcon } from '@repo/extension';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 import { isIPCEventError } from '#packages/common/utils/helper';
@@ -25,6 +25,7 @@ import { nanoid } from 'nanoid/non-secure';
 import { WorkflowVariable } from '#packages/common/interface/workflow.interface';
 import UiShortcut from '../../ui/UiShortcut';
 import { useHotkeys } from 'react-hotkeys-hook';
+import { useShallow } from 'zustand/react/shallow';
 
 function WorkflowInformation() {
   const workflow = useWorkflowEditorStore.use.workflow();
@@ -212,22 +213,98 @@ function WorkflowVariableModal() {
   );
 }
 
-function WorkflowEditorHeader() {
+function WorkflowUndoRedo() {
+  const { undo, redo, historyLen, historyIndex } = useWorkflowEditorStore(
+    useShallow((state) => ({
+      undo: state.undo,
+      redo: state.redo,
+      historyLen: state.history.length,
+      historyIndex: state.historyIndex,
+    })),
+  );
+
+  useHotkeys('mod+z', undo, []);
+  useHotkeys('mod+shift+z', redo, []);
+
+  return (
+    <>
+      <UiTooltip
+        label={
+          <>
+            Undo <UiShortcut shortcut="CmdOrCtrl+Z" />
+          </>
+        }
+      >
+        <UiButton
+          variant="ghost"
+          size="icon"
+          disabled={historyIndex < 0}
+          onClick={undo}
+        >
+          <UndoIcon className="h-5 w-5" />
+        </UiButton>
+      </UiTooltip>
+      <UiTooltip
+        label={
+          <>
+            Redo <UiShortcut shortcut="CmdOrCtrl+Shift+Z" />
+          </>
+        }
+      >
+        <UiButton
+          variant="ghost"
+          size="icon"
+          disabled={historyIndex >= historyLen - 1}
+          className="ml-1"
+          onClick={redo}
+        >
+          <RedoIcon className="h-5 w-5" />
+        </UiButton>
+      </UiTooltip>
+    </>
+  );
+}
+
+function WorkflowSaveButton() {
   const enableWorkflowSaveBtn =
     useWorkflowEditorStore.use.enableWorkflowSaveBtn();
   const toggleSaveWorkflowBtn =
     useWorkflowEditorStore.use.toggleSaveWorkflowBtn();
 
+  const [_searchParams, setSearchParams] = useSearchParams();
+
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { runCurrentWorkflow } = useWorkflowEditor();
-  const [_searchParams, setSearchParams] = useSearchParams();
 
   const blocker = useBlocker(
     ({ currentLocation, nextLocation }) =>
       enableWorkflowSaveBtn &&
       currentLocation.pathname !== nextLocation.pathname,
   );
+
+  useEffect(() => {
+    if (blocker.state === 'blocked') {
+      const isConfirmed = window.confirm(
+        "Exit editor? There some changes haven't been saved",
+      );
+
+      if (isConfirmed) blocker.proceed();
+      else blocker.reset();
+    } else if (blocker.state === 'proceeding') {
+      navigate(blocker.location.pathname.replace('/dashboard', ''));
+    }
+
+    return () => {
+      blocker?.reset?.();
+    };
+  }, [blocker, navigate]);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+    params.append('preventCloseWindow', `${enableWorkflowSaveBtn}`);
+
+    setSearchParams(params);
+  }, [enableWorkflowSaveBtn, setSearchParams]);
 
   const saveWorkflow = useCallback(async () => {
     try {
@@ -271,31 +348,30 @@ function WorkflowEditorHeader() {
   }, []);
 
   useHotkeys('mod+s', saveWorkflow, []);
+
+  return (
+    <UiTooltip
+      label={
+        <>
+          Save workflow <UiShortcut shortcut="CmdOrCtrl+S" />
+        </>
+      }
+    >
+      <UiButton
+        className="ml-2 min-w-20"
+        disabled={!enableWorkflowSaveBtn}
+        onClick={saveWorkflow}
+      >
+        Save
+      </UiButton>
+    </UiTooltip>
+  );
+}
+
+function WorkflowEditorHeader() {
+  const { runCurrentWorkflow } = useWorkflowEditor();
+
   useHotkeys('alt+enter', () => runCurrentWorkflow(), []);
-
-  useEffect(() => {
-    if (blocker.state === 'blocked') {
-      const isConfirmed = window.confirm(
-        "Exit editor? There some changes haven't been saved",
-      );
-
-      if (isConfirmed) blocker.proceed();
-      else blocker.reset();
-    } else if (blocker.state === 'proceeding') {
-      navigate(blocker.location.pathname.replace('/dashboard', ''));
-    }
-
-    return () => {
-      blocker?.reset?.();
-    };
-  }, [blocker, navigate]);
-
-  useEffect(() => {
-    const params = new URLSearchParams();
-    params.append('preventCloseWindow', `${enableWorkflowSaveBtn}`);
-
-    setSearchParams(params);
-  }, [enableWorkflowSaveBtn, setSearchParams]);
 
   return (
     <header className="h-20 border-b flex items-center px-4">
@@ -311,12 +387,7 @@ function WorkflowEditorHeader() {
       </UiButton>
       <hr className="h-2/6 bg-border/50 w-px mx-4" />
       <WorkflowInformation />
-      <UiButton variant="ghost" size="icon" disabled>
-        <UndoIcon className="h-5 w-5" />
-      </UiButton>
-      <UiButton variant="ghost" size="icon" className="ml-1">
-        <RedoIcon className="h-5 w-5" />
-      </UiButton>
+      <WorkflowUndoRedo />
       <div className="ml-3"></div>
       <WorkflowVariableModal />
       <hr className="h-2/6 bg-border/50 w-px mx-4" />
@@ -332,21 +403,7 @@ function WorkflowEditorHeader() {
           <p>Run</p>
         </UiButton>
       </UiTooltip>
-      <UiTooltip
-        label={
-          <>
-            Save workflow <UiShortcut shortcut="CmdOrCtrl+S" />
-          </>
-        }
-      >
-        <UiButton
-          className="ml-2 min-w-20"
-          disabled={!enableWorkflowSaveBtn}
-          onClick={saveWorkflow}
-        >
-          Save
-        </UiButton>
-      </UiTooltip>
+      <WorkflowSaveButton />
     </header>
   );
 }

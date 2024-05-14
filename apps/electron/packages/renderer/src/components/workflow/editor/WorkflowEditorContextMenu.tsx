@@ -15,7 +15,7 @@ import {
 } from '/@/interface/workflow-editor.interface';
 import UiShortcut from '../../ui/UiShortcut';
 import { useReactFlow } from 'reactflow';
-import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
+import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import preloadAPI from '/@/utils/preloadAPI';
 import { APP_WORKFLOW_ELS_FORMAT } from '#packages/common/utils/constant/constant';
 import { isIPCEventError } from '/@/utils/helper';

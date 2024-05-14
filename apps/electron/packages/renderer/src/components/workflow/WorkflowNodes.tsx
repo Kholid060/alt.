@@ -23,7 +23,7 @@ import {
   ToggleRightIcon,
   TrashIcon,
 } from 'lucide-react';
-import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
+import { useWorkflowEditorStore } from '../../stores/workflow-editor/workflow-editor.store';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 import { WorkflowEditorContextMenuType } from '/@/interface/workflow-editor.interface';
 

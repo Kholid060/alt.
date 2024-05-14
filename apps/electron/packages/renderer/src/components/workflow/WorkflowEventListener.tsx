@@ -4,7 +4,7 @@ import { Viewport, useOnViewportChange } from 'reactflow';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
-import { useWorkflowEditorStore } from '/@/stores/workflow-editor.store';
+import { useWorkflowEditorStore } from '../../stores/workflow-editor/workflow-editor.store';
 
 export const isInsideWorkflowEditor = (event: Event) =>
   event.target instanceof HTMLElement &&
