@@ -1,3 +1,4 @@
+import { Notification } from 'electron';
 import { MESSAGE_PORT_CHANNEL_IDS } from '#packages/common/utils/constant/constant';
 import IPCMain from './IPCMain';
 import SharedProcessService from '/@/services/shared-process.service';
@@ -50,4 +51,14 @@ IPCMain.on('message-port:port-bridge', ({ ports }, channelId) => {
 IPCMain.on('extension:stop-execute-command', (_, runnerId) => {
   SharedProcessService.stopExecuteExtensionCommand(runnerId);
   return Promise.resolve();
+});
+
+IPCMain.on('app:show-notification', (_, { title, body, silent, subtitle }) => {
+  const notification = new Notification({
+    body,
+    silent,
+    title,
+    subtitle,
+  });
+  notification.show();
 });

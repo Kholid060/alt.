@@ -85,7 +85,7 @@ class ExtensionAPI {
     const extensionAPI = createExtensionAPI({
       context: this,
       messagePort: this.messagePort,
-      browserCtx: this.payload.browserCtx,
+      browserCtx: this.payload.browserCtx ?? null,
       sendMessage: this.sendAction.bind(
         this,
       ) as EventMapEmit<IPCUserExtensionEventsMap>,

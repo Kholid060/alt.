@@ -369,22 +369,32 @@ function WorkflowSaveButton() {
 }
 
 function WorkflowEditorHeader() {
+  const navigate = useNavigate();
   const { runCurrentWorkflow } = useWorkflowEditor();
 
   useHotkeys('alt+enter', () => runCurrentWorkflow(), []);
+  useHotkeys('alt+arrowLeft', () => navigate('/workflows'), []);
 
   return (
     <header className="h-20 border-b flex items-center px-4">
-      <UiButton
-        variant="outline"
-        size="icon-sm"
-        className="flex-shrink-0"
-        asChild
+      <UiTooltip
+        label={
+          <>
+            Go back <UiShortcut shortcut="Alt+←" />
+          </>
+        }
       >
-        <Link to="/workflows">
-          <ChevronLeftIcon className="h-5 w-5" />
-        </Link>
-      </UiButton>
+        <UiButton
+          variant="outline"
+          size="icon-sm"
+          className="flex-shrink-0"
+          asChild
+        >
+          <Link to="/workflows">
+            <ChevronLeftIcon className="h-5 w-5" />
+          </Link>
+        </UiButton>
+      </UiTooltip>
       <hr className="h-2/6 bg-border/50 w-px mx-4" />
       <WorkflowInformation />
       <WorkflowUndoRedo />

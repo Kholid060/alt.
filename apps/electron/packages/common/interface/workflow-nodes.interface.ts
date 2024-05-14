@@ -184,6 +184,11 @@ export type WorkflowNodeTrigger = WorkflowNodeBase<
   WORKFLOW_NODE_TYPE.TRIGGER
 >;
 
+export type WorkflowNodeNotification = WorkflowNodeBase<
+  Required<ExtensionAPI.notifications.NotificationOptions>,
+  WORKFLOW_NODE_TYPE.NOTIFICATION
+>;
+
 export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoop;
   [WORKFLOW_NODE_TYPE.CODE]: WorkflowNodeCode;
@@ -195,6 +200,7 @@ export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.FILE_SYSTEM]: WorkflowNodeFileSystem;
   [WORKFLOW_NODE_TYPE.CONDITIONAL]: WorkflowNodeConditional;
   [WORKFLOW_NODE_TYPE.HTTP_REQUEST]: WorkflowNodeHttpRequest;
+  [WORKFLOW_NODE_TYPE.NOTIFICATION]: WorkflowNodeNotification;
 }
 
 export type WorkflowNodes = WorkflowNodesMap[keyof WorkflowNodesMap];

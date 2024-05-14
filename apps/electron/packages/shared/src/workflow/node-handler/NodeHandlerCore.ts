@@ -8,7 +8,12 @@ import type {
 } from './WorkflowNodeHandler';
 import WorkflowNodeHandler from './WorkflowNodeHandler';
 import { NodeInvalidType } from '/@/utils/custom-errors';
-import { getExactType, isValidType, promiseWithSignal } from '/@/utils/helper';
+import {
+  getExactType,
+  isValidType,
+  promiseWithSignal,
+  validateTypes,
+} from '/@/utils/helper';
 import { clipboard, nativeImage } from 'electron';
 import { testNodeConditions } from '../utils/test-node-condtion';
 
@@ -117,6 +122,31 @@ export class NodeHandlerConditional extends WorkflowNodeHandler<WORKFLOW_NODE_TY
 
     this.timers.clear();
   }
+}
+
+export class NodeHandlerNotification extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.NOTIFICATION> {
+  constructor() {
+    super(WORKFLOW_NODE_TYPE.NOTIFICATION);
+  }
+
+  async execute({
+    node,
+  }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.NOTIFICATION>): Promise<WorkflowNodeHandlerExecuteReturn> {
+    validateTypes(node.data, [
+      { key: 'body', name: 'Body', types: ['String'] },
+      { key: 'title', name: 'Title', types: ['String'] },
+      { key: 'silent', name: 'Silent', types: ['Boolean'] },
+      { key: 'subtitle', name: 'Subtitle', types: ['String'] },
+    ]);
+
+    IPCRenderer.send('app:show-notification', node.data);
+
+    return {
+      value: null,
+    };
+  }
+
+  destroy() {}
 }
 
 export class NodeHandlerClipboard extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.CLIPBOARD> {

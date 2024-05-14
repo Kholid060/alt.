@@ -40,6 +40,7 @@ export enum WORKFLOW_NODE_TYPE {
   CONDITIONAL = 'node-conditional',
   FILE_SYSTEM = 'node-file-system',
   HTTP_REQUEST = 'node-http-request',
+  NOTIFICATION = 'node-notification',
 }
 
 export const DATABASE_CHANGES_ALL_ARGS = '$database-all-args$' as const;

@@ -5,6 +5,7 @@ import {
 } from '#packages/common/interface/workflow-nodes.interface';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import {
+  BellIcon,
   CircleSlash2Icon,
   ClipboardIcon,
   CommandIcon,
@@ -193,5 +194,21 @@ export const WORKFLOW_NODES: {
     handleTarget: ['default'],
     handleSource: ['default'],
     type: WORKFLOW_NODE_TYPE.HTTP_REQUEST,
+  },
+  [WORKFLOW_NODE_TYPE.NOTIFICATION]: {
+    group: 'Core',
+    subtitle: 'Core',
+    title: 'Notification',
+    icon: BellIcon,
+    defaultData: {
+      body: '',
+      title: '',
+      subtitle: '',
+      silent: false,
+      isDisabled: false,
+    },
+    handleTarget: ['default'],
+    handleSource: ['default'],
+    type: WORKFLOW_NODE_TYPE.NOTIFICATION,
   },
 } as const;
