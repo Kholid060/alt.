@@ -4,6 +4,7 @@ import type { ExtensionCommandArgument } from '@repo/extension-core';
 import type { WORKFLOW_NODE_TYPE } from '../utils/constant/constant';
 import type { Node } from 'reactflow';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
+import type { KeyboardShortcut } from '@repo/shared';
 
 export type WorkflowNodeHandleSource = 'default' | 'error-fallback';
 
@@ -175,13 +176,13 @@ export type WorkflowNodeHttpRequest = WorkflowNodeBase<
   WORKFLOW_NODE_TYPE.HTTP_REQUEST
 >;
 
-export interface WorkflowNodeTriggerManual {
-  type: 'manual';
-}
-
 export type WorkflowNodeTrigger = WorkflowNodeBase<
-  WorkflowNodeTriggerManual,
+  object,
   WORKFLOW_NODE_TYPE.TRIGGER
+>;
+export type WorkflowNodeTriggerShortcut = WorkflowNodeBase<
+  { shortcut: KeyboardShortcut | null },
+  WORKFLOW_NODE_TYPE.TRIGGER_SHORTCUT
 >;
 
 export type WorkflowNodeNotification = WorkflowNodeBase<
@@ -201,6 +202,7 @@ export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.CONDITIONAL]: WorkflowNodeConditional;
   [WORKFLOW_NODE_TYPE.HTTP_REQUEST]: WorkflowNodeHttpRequest;
   [WORKFLOW_NODE_TYPE.NOTIFICATION]: WorkflowNodeNotification;
+  [WORKFLOW_NODE_TYPE.TRIGGER_SHORTCUT]: WorkflowNodeTriggerShortcut;
 }
 
 export type WorkflowNodes = WorkflowNodesMap[keyof WorkflowNodesMap];

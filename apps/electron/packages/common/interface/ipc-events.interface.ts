@@ -12,6 +12,7 @@ import type { BrowserExtensionTab } from '@repo/shared';
 import type {
   DatabaseEvents,
   DatabaseExtension,
+  DatabaseWorkflowUpdatePayload,
 } from '../../main/src/interface/database.interface';
 import type { WorkflowRunPayload } from './workflow.interface';
 import type Electron from 'electron';
@@ -110,6 +111,10 @@ export interface IPCExtensionEvents {
 
 export interface IPCWorkflowEvents {
   'workflow:execute': (payload: WorkflowRunPayload) => string;
+  'workflow:save': (
+    workflowId: string,
+    payload: DatabaseWorkflowUpdatePayload,
+  ) => void;
 }
 
 export interface IPCUserExtensionEvents {

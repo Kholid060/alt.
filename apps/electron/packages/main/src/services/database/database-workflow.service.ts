@@ -49,6 +49,10 @@ class DBWorkflowService {
     return result ?? null;
   }
 
+  getAll(): Promise<DatabaseWorkflowDetail[]> {
+    return this.database.query.workflows.findMany();
+  }
+
   async insert(workflow: DatabaseWorkflowInsertPayload) {
     const workflowId = nanoid();
     await this.database.insert(workflows).values({
@@ -80,7 +84,7 @@ class DBWorkflowService {
     {
       excludeEmit,
       ignoreModified = false,
-    }: Partial<{ ignoreModified: boolean; excludeEmit?: number[] }>,
+    }: Partial<{ ignoreModified: boolean; excludeEmit?: number[] }> = {},
   ) {
     const payload: Partial<SelectWorkflow> = {
       icon,

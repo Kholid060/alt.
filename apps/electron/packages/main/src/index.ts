@@ -13,6 +13,7 @@ import { initDefaultWebsocketServer } from './services/websocket/websocket.servi
 import { registerGlobalShortcuts } from './utils/GlobalShortcuts';
 import ExtensionLoader from './utils/extension/ExtensionLoader';
 import DBService from './services/database/database.service';
+import WorkflowService from './services/workflow.service';
 
 app.commandLine.appendSwitch('wm-window-animations-disabled');
 
@@ -81,8 +82,9 @@ app
     initDefaultWebsocketServer();
 
     await Promise.all([
-      await registerGlobalShortcuts(),
-      await ExtensionLoader.instance.loadExtensions(),
+      registerGlobalShortcuts(),
+      WorkflowService.trigger.registerAll(),
+      ExtensionLoader.instance.loadExtensions(),
     ]);
 
     WindowsManager.instance.restoreOrCreateWindow('command');

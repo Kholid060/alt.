@@ -25,6 +25,12 @@ export class NodeHandlerTrigger extends NodeHandlerNoOp<WORKFLOW_NODE_TYPE.TRIGG
   }
 }
 
+export class NodeHandlerTriggerShortcut extends NodeHandlerNoOp<WORKFLOW_NODE_TYPE.TRIGGER_SHORTCUT> {
+  constructor() {
+    super(WORKFLOW_NODE_TYPE.TRIGGER_SHORTCUT);
+  }
+}
+
 export class NodeHandlerDoNothing extends NodeHandlerNoOp<WORKFLOW_NODE_TYPE.DO_NOTHING> {
   constructor() {
     super(WORKFLOW_NODE_TYPE.DO_NOTHING);

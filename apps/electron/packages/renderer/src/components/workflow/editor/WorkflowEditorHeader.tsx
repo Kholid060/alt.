@@ -325,7 +325,7 @@ function WorkflowSaveButton() {
       });
 
       const result = await preloadAPI.main.ipc.invoke(
-        'database:update-workflow',
+        'workflow:save',
         workflow.id,
         payload,
       );

@@ -12,6 +12,7 @@ import {
   FileCode2Icon,
   FileIcon,
   GlobeIcon,
+  KeyboardIcon,
   LucideIcon,
   PlugZapIcon,
   RepeatIcon,
@@ -87,7 +88,6 @@ export const WORKFLOW_NODES: {
     handleTarget: [],
     handleSource: ['default'],
     defaultData: {
-      type: 'manual',
       isDisabled: false,
     },
     type: WORKFLOW_NODE_TYPE.TRIGGER,
@@ -210,5 +210,18 @@ export const WORKFLOW_NODES: {
     handleTarget: ['default'],
     handleSource: ['default'],
     type: WORKFLOW_NODE_TYPE.NOTIFICATION,
+  },
+  [WORKFLOW_NODE_TYPE.TRIGGER_SHORTCUT]: {
+    group: 'Triggers',
+    subtitle: 'Trigger',
+    title: 'Hotkey Trigger',
+    icon: KeyboardIcon,
+    defaultData: {
+      shortcut: null,
+      isDisabled: false,
+    },
+    handleTarget: [],
+    handleSource: ['default'],
+    type: WORKFLOW_NODE_TYPE.TRIGGER_SHORTCUT,
   },
 } as const;

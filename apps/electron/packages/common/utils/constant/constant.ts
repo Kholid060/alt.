@@ -41,6 +41,7 @@ export enum WORKFLOW_NODE_TYPE {
   FILE_SYSTEM = 'node-file-system',
   HTTP_REQUEST = 'node-http-request',
   NOTIFICATION = 'node-notification',
+  TRIGGER_SHORTCUT = 'node-trigger-shortcut',
 }
 
 export const DATABASE_CHANGES_ALL_ARGS = '$database-all-args$' as const;

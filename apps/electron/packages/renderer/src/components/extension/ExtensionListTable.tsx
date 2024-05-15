@@ -4,7 +4,6 @@ import {
   UiDropdownMenuContent,
   UiDropdownMenuItem,
   UiDropdownMenuTrigger,
-  UiKbd,
   UiList,
   UiPopover,
   UiPopoverContent,
@@ -33,12 +32,11 @@ import {
   DatabaseExtensionUpdatePayload,
 } from '#packages/main/src/interface/database.interface';
 import CommandShortcut from '../ui/UiShortcut';
-import { COMMAND_MOD_NAME_MAP } from '../../utils/constant/constant';
-
-const VALID_SHORTCUT_KEYS_REGEX = /[0-9A-Za-z!-/~`{[\]|;:,.?=+<>\\()*$%^&,@_#]/;
+import { KeyboardShortcutUtils } from '#common/utils/KeyboardShortcutUtils';
+import UiShortcut from '../ui/UiShortcut';
 
 interface RecordingShortcutData {
-  keys: string[];
+  keys: string;
   isDirty: boolean;
   commandId: string;
   extensionId: string;
@@ -118,13 +116,7 @@ function ExtensionCommandList({
                 </span>
                 <span className="text-foreground">
                   {recordingShortcutData.keys.length ? (
-                    <>
-                      {recordingShortcutData.keys.map((key) => (
-                        <UiKbd key={key}>
-                          {COMMAND_MOD_NAME_MAP[key] || key}
-                        </UiKbd>
-                      ))}
-                    </>
+                    <UiShortcut shortcut={recordingShortcutData.keys} />
                   ) : (
                     'Stop recording'
                   )}
@@ -186,7 +178,7 @@ function ExtensionListTable({
         recordingData.extensionId !== extensionId ||
         recordingData.commandId !== commandId
       ) {
-        setRecordingData({ keys: [], commandId, extensionId, isDirty: false });
+        setRecordingData({ keys: '', commandId, extensionId, isDirty: false });
         return;
       } else if (!recordingData.isDirty) {
         setRecordingData(null);
@@ -197,7 +189,7 @@ function ExtensionListTable({
         'database:update-extension-command',
         extensionId,
         recordingData.commandId,
-        { shortcut: recordingData.keys.join('+') },
+        { shortcut: recordingData.keys },
       );
 
       setRecordingData(null);
@@ -237,43 +229,31 @@ function ExtensionListTable({
   }
 
   useEffect(() => {
-    const onKeyboardEvent = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
-        setRecordingData(null);
-        return;
-      }
+    const shortcutRecorder = KeyboardShortcutUtils.createRecorder({
+      onChange: (value) => {
+        if (value.canceled) {
+          setRecordingData(null);
+          return;
+        }
 
-      if (
-        event.repeat ||
-        event.key.length > 1 ||
-        !VALID_SHORTCUT_KEYS_REGEX.test(event.key)
-      )
-        return;
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      const keys: string[] = [];
-
-      if (event.ctrlKey || event.metaKey) keys.push('CmdOrCtrl');
-      if (event.shiftKey) keys.push('Shift');
-      if (event.altKey) keys.push('Alt');
-
-      if (keys.length === 0) return;
-
-      keys.push(event.key.toUpperCase());
-
-      setRecordingData((prevValue) =>
-        prevValue ? { ...prevValue, isDirty: true, keys } : prevValue,
-      );
-    };
+        setRecordingData((prevValue) =>
+          prevValue
+            ? {
+                ...prevValue,
+                isDirty: true,
+                keys: KeyboardShortcutUtils.toElectronShortcut(value.keys),
+              }
+            : prevValue,
+        );
+      },
+    });
 
     if (recordingData) {
-      window.addEventListener('keydown', onKeyboardEvent);
+      window.addEventListener('keydown', shortcutRecorder);
     }
 
     return () => {
-      window.removeEventListener('keydown', onKeyboardEvent);
+      window.removeEventListener('keydown', shortcutRecorder);
     };
   }, [recordingData]);
 

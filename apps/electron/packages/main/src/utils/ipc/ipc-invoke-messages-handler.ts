@@ -10,6 +10,7 @@ import WindowCommand from '/@/window/command-window';
 import SharedProcessService from '/@/services/shared-process.service';
 import { Key, keyboard } from '@nut-tree/nut-js';
 import BrowserService from '/@/services/browser.service';
+import WorkflowService from '/@/services/workflow.service';
 
 /** EXTENSION */
 IPCMain.handle('extension:import', async () => {
@@ -219,7 +220,11 @@ IPCMain.handle(
 
 /** WORKFLOW */
 IPCMain.handle('workflow:execute', (_, payload) => {
-  return SharedProcessService.executeWorkflow(payload);
+  return WorkflowService.execute(payload);
+});
+IPCMain.handle('workflow:save', async (_, workflowId, payload) => {
+  await WorkflowService.updateWorkflow(workflowId, payload);
+  await WorkflowService.trigger.register(workflowId);
 });
 
 /** BROWSER */

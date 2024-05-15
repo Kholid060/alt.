@@ -77,11 +77,27 @@ class GlobalShortcut {
       this.shortcuts[key] = this.shortcuts[key].filter(
         (item) => item.id !== id,
       );
+
+      if (this.shortcuts[key].length === 0) {
+        globalShortcut.unregister(key);
+      }
     });
   }
 
   isKeysRegistered(keys: string) {
     return Object.hasOwn(this.shortcuts, keys);
+  }
+
+  getById(id: string, keys?: string) {
+    if (keys) {
+      return this.shortcuts[keys]?.find((item) => item.id == id) ?? null;
+    }
+
+    return (
+      Object.values(this.shortcuts)
+        .flat()
+        .find((item) => item.id == id) ?? null
+    );
   }
 }
 

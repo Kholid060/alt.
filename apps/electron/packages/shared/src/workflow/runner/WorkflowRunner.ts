@@ -167,10 +167,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
 
     const startNode = this.workflow.nodes.find((node) => {
       if (this.startNodeId === WORKFLOW_MANUAL_TRIGGER_ID) {
-        return (
-          node.type === WORKFLOW_NODE_TYPE.TRIGGER &&
-          node.data.type === 'manual'
-        );
+        return node.type === WORKFLOW_NODE_TYPE.TRIGGER;
       }
 
       return node.id === this.startNodeId;
@@ -423,6 +420,8 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     this.nodesIdxMap.clear();
     this.dataStorage.destroy();
     this.removeAllListeners();
+
+    this.stepCount = 0;
 
     // @ts-expect-error clear value
     this.workflow = null;
