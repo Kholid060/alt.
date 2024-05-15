@@ -106,6 +106,7 @@ export {
   UiTabsContent,
 } from './components/ui/tabs';
 export { UiLabel } from './components/ui/label';
+export { UiBadge, uiBadgeVariants } from './components/ui/badge';
 export {
   UiAlertDialog,
   UiAlertDialogTitle,

@@ -17,6 +17,7 @@ import type { WorkflowNodeHandlerExecuteReturn } from '../node-handler/WorkflowN
 import WorkflowRunnerSandbox from './WorkflowRunnerSandbox';
 import { clipboard } from 'electron';
 import { nanoid } from 'nanoid';
+import { validateTypes } from '/@/utils/helper';
 
 export type NodeHandlersObj = Record<
   WORKFLOW_NODE_TYPE,
@@ -333,6 +334,11 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
       };
       if (!node.data.isDisabled) {
         const renderedNode = await this.evaluateNodeExpression(node);
+
+        if (nodeHandler.dataValidation) {
+          validateTypes(renderedNode.data, nodeHandler.dataValidation);
+        }
+
         execResult = await nodeHandler.execute({
           runner: this,
           node: renderedNode,

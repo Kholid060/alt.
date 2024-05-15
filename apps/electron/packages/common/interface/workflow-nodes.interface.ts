@@ -190,6 +190,11 @@ export type WorkflowNodeNotification = WorkflowNodeBase<
   WORKFLOW_NODE_TYPE.NOTIFICATION
 >;
 
+export type WorkflowNodeBreakLoop = WorkflowNodeBase<
+  { loopNodeId: string },
+  WORKFLOW_NODE_TYPE.BREAK_LOOP
+>;
+
 export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoop;
   [WORKFLOW_NODE_TYPE.CODE]: WorkflowNodeCode;
@@ -198,6 +203,7 @@ export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.TRIGGER]: WorkflowNodeTrigger;
   [WORKFLOW_NODE_TYPE.CLIPBOARD]: WorkflowNodeClipboard;
   [WORKFLOW_NODE_TYPE.DO_NOTHING]: WorkflowNodeDoNothing;
+  [WORKFLOW_NODE_TYPE.BREAK_LOOP]: WorkflowNodeBreakLoop;
   [WORKFLOW_NODE_TYPE.FILE_SYSTEM]: WorkflowNodeFileSystem;
   [WORKFLOW_NODE_TYPE.CONDITIONAL]: WorkflowNodeConditional;
   [WORKFLOW_NODE_TYPE.HTTP_REQUEST]: WorkflowNodeHttpRequest;

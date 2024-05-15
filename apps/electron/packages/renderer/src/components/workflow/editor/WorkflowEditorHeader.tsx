@@ -376,7 +376,7 @@ function WorkflowEditorHeader() {
   useHotkeys('alt+arrowLeft', () => navigate('/workflows'), []);
 
   return (
-    <header className="h-20 border-b flex items-center px-4">
+    <header className="h-16 border-b flex items-center px-4">
       <UiTooltip
         label={
           <>

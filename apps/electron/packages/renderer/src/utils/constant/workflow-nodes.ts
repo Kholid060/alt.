@@ -5,6 +5,7 @@ import {
 } from '#packages/common/interface/workflow-nodes.interface';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import {
+  CornerDownLeftIcon,
   BellIcon,
   CircleSlash2Icon,
   ClipboardIcon,
@@ -223,5 +224,18 @@ export const WORKFLOW_NODES: {
     handleTarget: [],
     handleSource: ['default'],
     type: WORKFLOW_NODE_TYPE.TRIGGER_SHORTCUT,
+  },
+  [WORKFLOW_NODE_TYPE.BREAK_LOOP]: {
+    group: 'Flow',
+    subtitle: 'Control Flow',
+    title: 'Break Loop',
+    icon: CornerDownLeftIcon,
+    defaultData: {
+      loopNodeId: '',
+      isDisabled: false,
+    },
+    handleTarget: ['default'],
+    handleSource: ['default'],
+    type: WORKFLOW_NODE_TYPE.BREAK_LOOP,
   },
 } as const;

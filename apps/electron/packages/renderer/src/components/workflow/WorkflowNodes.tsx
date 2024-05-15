@@ -230,16 +230,19 @@ function NodeCard({
               {title}
             </p>
             <p className="line-clamp-1 text-xs text-muted-foreground">
-              {subtitle} {isDisabled && '(disabled)'}
+              {subtitle}
+              {isDisabled && ' (disabled)'}
             </p>
           </div>
           {handleSlot}
         </div>
         {children}
       </div>
-      <p className="text-muted-foreground absolute pointer-events-none">
-        {description}
-      </p>
+      <div className="absolute">
+        <p className="text-muted-foreground pointer-events-none">
+          {description}
+        </p>
+      </div>
     </>
   );
 }

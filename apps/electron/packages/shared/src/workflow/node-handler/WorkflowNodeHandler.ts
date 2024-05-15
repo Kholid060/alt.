@@ -1,7 +1,11 @@
-import type { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
+import type {
+  WorkflowNodes,
+  WorkflowNodesMap,
+} from '#packages/common/interface/workflow-nodes.interface';
 import type { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
 import type WorkflowRunner from '../runner/WorkflowRunner';
 import type { WorkflowRunnerPrevNodeExecution } from '../runner/WorkflowRunner';
+import type { PossibleTypes } from '/@/interface/common.interface';
 
 export interface WorkflowNodeHandlerExecuteReturn {
   value: unknown;
@@ -17,13 +21,28 @@ export interface WorkflowNodeHandlerExecute<
   prevExecution?: WorkflowRunnerPrevNodeExecution;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type NodeDataValidationSchema<T extends Record<string, any>> = {
+  key: keyof T;
+  name: string;
+  optional?: boolean;
+  types: PossibleTypes[];
+}[];
+
 abstract class WorkflowNodeHandler<
   T extends WORKFLOW_NODE_TYPE = WORKFLOW_NODE_TYPE,
 > {
   type: T;
+  dataValidation?: NodeDataValidationSchema<WorkflowNodesMap[T]['data']>;
 
-  constructor(type: T) {
+  constructor(
+    type: T,
+    options?: {
+      dataValidation?: NodeDataValidationSchema<WorkflowNodesMap[T]['data']>;
+    },
+  ) {
     this.type = type;
+    this.dataValidation = options?.dataValidation;
   }
 
   abstract execute(

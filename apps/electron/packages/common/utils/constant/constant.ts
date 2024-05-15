@@ -37,6 +37,7 @@ export enum WORKFLOW_NODE_TYPE {
   TRIGGER = 'node-trigger',
   CLIPBOARD = 'node-clipboard',
   DO_NOTHING = 'node-do-nothing',
+  BREAK_LOOP = 'node-break-loop',
   CONDITIONAL = 'node-conditional',
   FILE_SYSTEM = 'node-file-system',
   HTTP_REQUEST = 'node-http-request',

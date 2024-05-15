@@ -112,11 +112,7 @@ export function useWorkflowEditor() {
     if (!workflow) return;
 
     const manualTriggerNode = !startNodeId
-      ? workflow.nodes.find(
-          (node) =>
-            node.type === WORKFLOW_NODE_TYPE.TRIGGER &&
-            node.data.type === 'manual',
-        )
+      ? workflow.nodes.find((node) => node.type === WORKFLOW_NODE_TYPE.TRIGGER)
       : null;
     if (!startNodeId && !manualTriggerNode) {
       toast({

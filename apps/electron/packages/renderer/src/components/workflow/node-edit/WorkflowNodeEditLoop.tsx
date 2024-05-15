@@ -58,20 +58,20 @@ function WorkflowNodeEditLoop() {
       <UiLabel htmlFor="loop--data-source" className="ml-1">
         Data source
       </UiLabel>
-      <UiSelect.Native
+      <UiSelect
         inputSize="sm"
         id="loop--data-source"
         value={data.dataSource}
-        onChange={({ target }) =>
-          updateEditNode({ dataSource: target.value as DataSource })
+        onValueChange={(value) =>
+          updateEditNode({ dataSource: value as DataSource })
         }
       >
         {dataSource.map((item) => (
-          <option value={item.id} key={item.id}>
+          <UiSelect.Option value={item.id} key={item.id}>
             {item.name}
-          </option>
+          </UiSelect.Option>
         ))}
-      </UiSelect.Native>
+      </UiSelect>
       {content}
     </WorkflowNodeLayoutEdit>
   );

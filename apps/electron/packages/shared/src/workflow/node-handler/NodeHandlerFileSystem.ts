@@ -5,14 +5,17 @@ import type {
 } from './WorkflowNodeHandler';
 import WorkflowNodeHandler from './WorkflowNodeHandler';
 import fs from 'fs-extra';
-import { validateTypes } from '/@/utils/helper';
 import WorkflowFileHandle from '../utils/WorkflowFileHandle';
 
 type ExecuteParams = WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.FILE_SYSTEM>;
 
 export class NodeHandlerFileSystem extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.FILE_SYSTEM> {
   constructor() {
-    super(WORKFLOW_NODE_TYPE.FILE_SYSTEM);
+    super(WORKFLOW_NODE_TYPE.FILE_SYSTEM, {
+      dataValidation: [
+        { key: 'filePath', name: 'File path', types: ['String'] },
+      ],
+    });
   }
 
   private async readFile({
@@ -42,10 +45,6 @@ export class NodeHandlerFileSystem extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
     node,
     runner,
   }: ExecuteParams): Promise<WorkflowNodeHandlerExecuteReturn> {
-    validateTypes(node.data, [
-      { key: 'filePath', name: 'File path', types: ['String'] },
-    ]);
-
     let value: unknown = null;
 
     if (node.data.action === 'read') {

@@ -1,5 +1,6 @@
 interface WorkflowRunnerLoopData {
   index: number;
+  label?: string;
   data: unknown[];
 }
 

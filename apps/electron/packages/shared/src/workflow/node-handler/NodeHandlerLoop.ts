@@ -90,3 +90,26 @@ export class NodeHandlerLoop extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.LOOP
 
   destroy(): void {}
 }
+
+export class NodeHandlerBreakLoop extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.BREAK_LOOP> {
+  constructor() {
+    super(WORKFLOW_NODE_TYPE.BREAK_LOOP, {
+      dataValidation: [
+        { key: 'loopNodeId', name: 'Loop node id', types: ['String'] },
+      ],
+    });
+  }
+
+  async execute({
+    node,
+    runner,
+  }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.BREAK_LOOP>): Promise<WorkflowNodeHandlerExecuteReturn> {
+    runner.dataStorage.loopData.delete(node.data.loopNodeId);
+
+    return {
+      value: null,
+    };
+  }
+
+  destroy() {}
+}

@@ -228,6 +228,9 @@ function ContextMenuNode() {
 
     setEditNode(node);
   }
+  function copyNodeId() {
+    preloadAPI.main.ipc.invoke('clipboard:copy', contextMenu.nodeId);
+  }
 
   return (
     <>
@@ -235,6 +238,8 @@ function ContextMenuNode() {
       <UiContextMenuItem onClick={() => runCurrentWorkflow(contextMenu.nodeId)}>
         Run workflow from here
       </UiContextMenuItem>
+      <UiContextMenuSeparator />
+      <UiContextMenuItem onClick={copyNodeId}>Copy node id</UiContextMenuItem>
       <ContextMenuItemClipboard nodeId={contextMenu.nodeId} />
       <ContextMenuItemPaste />
       <ContextMenuItemSelection />

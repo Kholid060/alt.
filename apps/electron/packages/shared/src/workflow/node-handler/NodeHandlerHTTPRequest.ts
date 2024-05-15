@@ -6,7 +6,6 @@ import type {
 } from './WorkflowNodeHandler';
 import fs from 'fs-extra';
 import WorkflowNodeHandler from './WorkflowNodeHandler';
-import { validateTypes } from '/@/utils/helper';
 
 async function getRequestBody({
   node,
@@ -105,18 +104,18 @@ export class NodeHandlerHTTPRequest extends WorkflowNodeHandler<WORKFLOW_NODE_TY
   > = {};
 
   constructor() {
-    super(WORKFLOW_NODE_TYPE.HTTP_REQUEST);
+    super(WORKFLOW_NODE_TYPE.HTTP_REQUEST, {
+      dataValidation: [
+        { key: 'url', name: 'Endpoint URL', types: ['String'] },
+        { key: 'timeoutMs', name: 'Timeout', types: ['Number'] },
+      ],
+    });
   }
 
   async execute({
     node,
     runner,
   }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.HTTP_REQUEST>): Promise<WorkflowNodeHandlerExecuteReturn> {
-    validateTypes(node.data, [
-      { key: 'url', name: 'Endpoint URL', types: ['String'] },
-      { key: 'timeoutMs', name: 'Timeout', types: ['Number'] },
-    ]);
-
     const nodeId = `${node.id}${runner.stepCount}`;
 
     const controller = new AbortController();

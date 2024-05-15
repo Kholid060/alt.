@@ -4,10 +4,14 @@ import {
   UiTabsList,
   UiTabsTrigger,
   UiTabsContent,
+  UiBadge,
+  UiTooltip,
 } from '@repo/ui';
 import WorkflowNodeErrorHandler from './WorklflowNodeErrorHandler';
 import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
 import { WORKFLOW_NODES } from '/@/utils/constant/workflow-nodes';
+import { useState } from 'react';
+import preloadAPI from '/@/utils/preloadAPI';
 
 interface WorkflowNodeLayoutEditProps {
   title?: string;
@@ -15,6 +19,30 @@ interface WorkflowNodeLayoutEditProps {
   node: WorkflowNodes;
   icon?: React.ReactNode;
   children?: React.ReactNode;
+}
+
+function NodeId({ nodeId }: { nodeId: string }) {
+  const [copied, setCopied] = useState(false);
+
+  function copyNodeId() {
+    preloadAPI.main.ipc.invoke('clipboard:copy', nodeId).then(() => {
+      setCopied(true);
+
+      setTimeout(() => {
+        setCopied(false);
+      }, 1000);
+    });
+  }
+
+  return (
+    <UiTooltip label={copied ? '✅ Copied' : 'Node id (click to copy)'}>
+      <button onClick={copyNodeId}>
+        <UiBadge variant="secondary" className="max-w-20 flex-shrink-0">
+          <span className="line-clamp-1">{nodeId} _</span>
+        </UiBadge>
+      </button>
+    </UiTooltip>
+  );
 }
 
 function WorkflowNodeLayoutEdit({
@@ -38,6 +66,7 @@ function WorkflowNodeLayoutEdit({
             {subtitle || nodeData.subtitle}
           </p>
         </div>
+        <NodeId nodeId={node.id} />
       </div>
       <UiTabs variant="line" defaultValue="parameters">
         <UiTabsList className="sticky top-0 bg-background z-50">
