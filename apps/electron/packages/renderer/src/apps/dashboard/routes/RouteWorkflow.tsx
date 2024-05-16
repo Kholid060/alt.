@@ -34,7 +34,7 @@ import { WorkflowEditorProvider } from '/@/context/workflow-editor.context';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 import { WorkflowEditorContextMenuType } from '/@/interface/workflow-editor.interface';
 import WorkflowEditorContextMenu from '/@/components/workflow/editor/WorkflowEditorContextMenu';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
+import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
 import WorkflowEdgeDefault from '/@/components/workflow/edge/WorkflowEdgeDefault';
 import {
   WorkflowNodeBasic,

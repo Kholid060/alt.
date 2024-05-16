@@ -22,17 +22,17 @@ function WorkflowEditorControls() {
 
       switch (event.key) {
         case '0':
-          fitView();
+          fitView({ duration: 250 });
           break;
         case '-':
-          zoomOut();
+          zoomOut({ duration: 100 });
           break;
         case '=':
-          zoomIn();
+          zoomIn({ duration: 100 });
           break;
       }
     },
-    [],
+    [zoomIn, zoomOut, fitView],
   );
 
   return (

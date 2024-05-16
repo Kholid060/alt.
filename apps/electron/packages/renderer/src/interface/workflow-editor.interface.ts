@@ -1,4 +1,5 @@
 import { WorkflowNodesMap } from '#packages/common/interface/workflow-nodes.interface';
+import { WORKFLOW_NODE_GROUP } from '#packages/common/utils/constant/workflow.const';
 import { UiListItem } from '@repo/ui';
 import { SetRequired } from 'type-fest';
 
@@ -8,13 +9,6 @@ export enum WorkflowEditorContextMenuType {
   EDGE,
   SELECTION,
 }
-
-export type WorkflowEditorNodeGroup =
-  | 'Flow'
-  | 'Core'
-  | 'Triggers'
-  | 'Commands'
-  | 'Scripts';
 
 export interface XYPosition {
   x: number;
@@ -40,7 +34,7 @@ export type WorkflowEditorContextMenuEventPayload =
     };
 
 type WorkflowEditorNodeItemBase<T> = SetRequired<
-  UiListItem<T> & { group: WorkflowEditorNodeGroup },
+  UiListItem<T> & { group: (typeof WORKFLOW_NODE_GROUP)[number] },
   'metadata'
 >;
 

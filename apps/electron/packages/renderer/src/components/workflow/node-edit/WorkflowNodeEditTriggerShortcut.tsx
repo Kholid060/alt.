@@ -2,7 +2,7 @@ import { WorkflowNodeTriggerShortcut } from '#packages/common/interface/workflow
 import { UiButton } from '@repo/ui';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor/workflow-editor.store';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
+import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
 import UiShortcut from '../../ui/UiShortcut';
 import { CircleDotIcon, Disc2Icon } from 'lucide-react';
 import { useEffect, useState } from 'react';

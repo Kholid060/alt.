@@ -181,7 +181,8 @@ export interface IPCSendEventRendererToMain {
 export interface IPCSendEventRendererToRenderer {
   'dashboard-window:open': [path?: string];
   'data:changes': [type: 'extension' | 'command'];
-  'database:changes': [type: keyof DatabaseEvents, ...args: unknown[]];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  'database:changes': [Record<any, any[]>];
 }
 
 export interface IPCPostEventRendererToMain {

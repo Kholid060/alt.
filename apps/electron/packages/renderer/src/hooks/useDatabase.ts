@@ -28,14 +28,14 @@ export function useDatabase() {
       name,
       onData,
       onError,
-      onChange,
-      refreshOnChange = true,
+      onDBChange,
+      autoRefreshOnChange = true,
     }: {
       name: T;
-      refreshOnChange?: boolean;
+      autoRefreshOnChange?: boolean;
       onError?: (message: string) => void;
       args: Parameters<DatabaseQueriesEvent[T]>;
-      onChange?: (detail: { refresh: () => void }) => void;
+      onDBChange?: (detail: { refresh: () => void }) => void;
       onData?: (data: ReturnType<DatabaseQueriesEvent[T]>) => void;
     }): (() => void) => {
       const fetchData = () => {
@@ -53,12 +53,13 @@ export function useDatabase() {
             onError?.(error.message);
           });
       };
-      const changeListener = onChange
-        ? () => {
-            if (refreshOnChange) fetchData();
-            onChange({ refresh: fetchData });
-          }
-        : null;
+      const changeListener =
+        onDBChange || autoRefreshOnChange
+          ? () => {
+              if (autoRefreshOnChange) fetchData();
+              if (onDBChange) onDBChange({ refresh: fetchData });
+            }
+          : null;
 
       fetchData();
 
@@ -121,12 +122,13 @@ export function useDatabaseQuery<T extends keyof DatabaseQueriesEvent>(
         data: result as ReturnType<DatabaseQueriesEvent[T]>,
       });
     });
-  }, [name]);
+  }, []);
 
   useEffect(() => {
     fetchQuery();
 
     const onDataChange = (...args: unknown[]) => {
+      console.log(args);
       if (
         args[0] !== DATABASE_CHANGES_ALL_ARGS &&
         !shallowEqualArrays(args, args)

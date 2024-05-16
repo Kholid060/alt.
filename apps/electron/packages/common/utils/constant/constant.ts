@@ -29,29 +29,9 @@ export const IPC_POST_MESSAGE_EVENT = {
   extensionPortCreated: 'extension-port-created',
 } as const;
 
-export enum WORKFLOW_NODE_TYPE {
-  LOOP = 'node-loop',
-  CODE = 'node-code',
-  DELAY = 'node-delay',
-  COMMAND = 'node-command',
-  TRIGGER = 'node-trigger',
-  CLIPBOARD = 'node-clipboard',
-  DO_NOTHING = 'node-do-nothing',
-  BREAK_LOOP = 'node-break-loop',
-  CONDITIONAL = 'node-conditional',
-  FILE_SYSTEM = 'node-file-system',
-  HTTP_REQUEST = 'node-http-request',
-  NOTIFICATION = 'node-notification',
-  TRIGGER_SHORTCUT = 'node-trigger-shortcut',
-}
-
 export const DATABASE_CHANGES_ALL_ARGS = '$database-all-args$' as const;
 
 export const APP_DEEP_LINK = 'app-app';
-
-export const APP_WORKFLOW_ELS_FORMAT = 'APP_NAME/workflow-elements' as const;
-
-export const WORKFLOW_MANUAL_TRIGGER_ID = '$manual$' as const;
 
 export const MESSAGE_PORT_CHANNEL_IDS = {
   sharedWithCommand: 'shared-with-command',

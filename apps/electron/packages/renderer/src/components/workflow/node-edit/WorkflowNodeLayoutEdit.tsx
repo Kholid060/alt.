@@ -9,7 +9,7 @@ import {
 } from '@repo/ui';
 import WorkflowNodeErrorHandler from './WorklflowNodeErrorHandler';
 import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
-import { WORKFLOW_NODES } from '/@/utils/constant/workflow-nodes';
+import { WORKFLOW_NODES } from '#common/utils/constant/workflow-nodes.const';
 import { useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 

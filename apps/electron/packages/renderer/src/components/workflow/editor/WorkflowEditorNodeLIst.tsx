@@ -15,17 +15,20 @@ import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import UiExtensionIcon from '../../ui/UiExtensionIcon';
 import { Connection, useReactFlow } from 'reactflow';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
+import {
+  WORKFLOW_NODE_GROUP,
+  WORKFLOW_NODE_TYPE,
+} from '#packages/common/utils/constant/workflow.const';
 import type {
-  WorkflowEditorNodeGroup,
   WorkflowEditorNodeListItem,
   WorkflowEditorNodeListItems,
   WorkflowEditorOpenNodeListModalPayload,
 } from '/@/interface/workflow-editor.interface';
 import { nanoid } from 'nanoid/non-secure';
 import { WorkflowNewNode } from '#packages/common/interface/workflow.interface';
-import { WORKFLOW_NODES } from '/@/utils/constant/workflow-nodes';
+import { WORKFLOW_NODES } from '#packages/common/utils/constant/workflow-nodes.const';
 
+type WorkflowEditorNodeGroup = (typeof WORKFLOW_NODE_GROUP)[number];
 type NodeCommandItem = WorkflowEditorNodeListItem<WORKFLOW_NODE_TYPE.COMMAND>;
 
 const nodeTypes: (WorkflowEditorNodeGroup | 'All')[] = [

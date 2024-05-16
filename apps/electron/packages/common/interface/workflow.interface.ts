@@ -1,10 +1,10 @@
-import type {
-  WORKFLOW_MANUAL_TRIGGER_ID,
-  WORKFLOW_NODE_TYPE,
-} from '../utils/constant/constant';
 import type { Edge } from 'reactflow';
 import type { SetOptional } from 'type-fest';
 import type { WorkflowNodes } from './workflow-nodes.interface';
+import type {
+  WORKFLOW_NODE_TYPE,
+  WORKFLOW_MANUAL_TRIGGER_ID,
+} from '../utils/constant/workflow.const';
 
 export type WorkflowNodeErroHandlerAction = 'continue' | 'stop' | 'fallback';
 

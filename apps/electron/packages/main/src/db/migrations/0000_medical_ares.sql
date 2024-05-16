@@ -61,9 +61,20 @@ CREATE TABLE `workflows` (
 	`is_disabled` integer NOT NULL,
 	`created_at` text NOT NULL,
 	`updated_at` text NOT NULL,
-	`variables` text DEFAULT '(json_array())' NOT NULL,
+	`variables` text DEFAULT (json_array()) NOT NULL,
 	`execute_count` integer DEFAULT 0 NOT NULL,
 	`settings` text
+);
+--> statement-breakpoint
+CREATE TABLE `workflows_history` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`started_at` text NOT NULL,
+	`ended_at` text,
+	`duration` integer,
+	`error_message` text,
+	`error_location` text,
+	`workflow_id` text NOT NULL,
+	`status` text NOT NULL
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `commands_shortcut_unique` ON `commands` (`shortcut`);--> statement-breakpoint

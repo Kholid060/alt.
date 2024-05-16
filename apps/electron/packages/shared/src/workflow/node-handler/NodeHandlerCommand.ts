@@ -1,4 +1,4 @@
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
+import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
 import WorkflowNodeHandler from './WorkflowNodeHandler';
 import IPCRenderer from '#packages/common/utils/IPCRenderer';
 import { isIPCEventError } from '#packages/common/utils/helper';

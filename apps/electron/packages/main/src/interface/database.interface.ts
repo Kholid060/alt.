@@ -5,7 +5,12 @@ import type {
   SelectExtensionConfig,
   SelectExtesionCommand,
 } from '../db/schema/extension.schema';
-import type { NewWorkflow, SelectWorkflow } from '../db/schema/workflow.schema';
+import type {
+  NewWorkflow,
+  NewWorkflowHistory,
+  SelectWorkflow,
+  SelectWorkflowHistory,
+} from '../db/schema/workflow.schema';
 
 export type DatabaseExtensionCommand = SelectExtesionCommand;
 
@@ -72,6 +77,22 @@ export type DatabaseWorkflowUpdatePayload = Partial<
   Omit<SelectWorkflow, 'id' | 'createdAt' | 'updatedAt'>
 >;
 
+export type DatabaseWorkflowHistoryInsertPayload = Omit<
+  NewWorkflowHistory,
+  'id'
+>;
+export type DatabaseWorkflowHistoryUpdatePayload = Partial<
+  Pick<
+    SelectWorkflowHistory,
+    | 'duration'
+    | 'startedAt'
+    | 'endedAt'
+    | 'errorLocation'
+    | 'errorMessage'
+    | 'status'
+  >
+>;
+
 export type DatabaseExtensionConfig = Omit<SelectExtensionConfig, 'id'>;
 export type DatabaseExtensionConfigWithSchema = DatabaseExtensionConfig & {
   config: ExtensionConfig[];
@@ -97,6 +118,24 @@ export interface DatabaseGetExtensionConfig {
 
 export type DatabaseWorkfowListQueryOptions = 'commands';
 
+export type DatabaseWorkflowHistory = SelectWorkflowHistory & {
+  workflow: Pick<DatabaseWorkflow, 'name' | 'description'>;
+};
+
+export interface DatabaseWorkflowHistoryListOptions {
+  filter?: {
+    name?: string;
+  };
+  sort?: {
+    asc: boolean;
+    by: 'startedAt' | 'name' | 'duration';
+  };
+  pagination?: {
+    page: number;
+    pageSize: number;
+  };
+}
+
 export interface DatabaseQueriesEvent {
   'database:get-command': (
     commandId: string | { commandId: string; extensionId: string },
@@ -117,12 +156,21 @@ export interface DatabaseQueriesEvent {
   'database:get-extension-manifest': (
     extensionId: string,
   ) => ExtensionManifest | null;
+  'database:get-workflow-history': (
+    historyId: number,
+  ) => DatabaseWorkflowHistory | null;
+  'database:get-workflow-history-list': (
+    options?: DatabaseWorkflowHistoryListOptions,
+  ) => { count: number; items: DatabaseWorkflowHistory[] };
 }
 
 export interface DatabaseInsertEvents {
   'database:insert-workflow': (
     workflow: DatabaseWorkflowInsertPayload,
   ) => string;
+  'database:insert-workflow-history': (
+    history: DatabaseWorkflowHistoryInsertPayload,
+  ) => number;
   'database:insert-extension-config': (
     cofig: DatabaseExtensionConfigInsertPayload,
   ) => void;
@@ -145,6 +193,10 @@ export interface DatabaseUpdateEvents {
     extensionId: string,
     data: DatabaseExtensionUpdatePayload,
   ) => void;
+  'database:update-workflow-history': (
+    historyId: number,
+    data: DatabaseWorkflowHistoryUpdatePayload,
+  ) => void;
   'database:update-extension-command': (
     extensionId: string,
     commandId: string,
@@ -154,6 +206,7 @@ export interface DatabaseUpdateEvents {
 
 export interface DatabaseDeleteEvents {
   'database:delete-workflow': (workflowId: string) => void;
+  'database:delete-workflow-history': (historyId: number | number[]) => void;
 }
 
 export type DatabaseEvents = DatabaseQueriesEvent &

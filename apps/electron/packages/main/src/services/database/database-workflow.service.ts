@@ -1,17 +1,22 @@
-import { asc, desc, eq, sql } from 'drizzle-orm';
+import { asc, count, desc, eq, inArray, like, sql } from 'drizzle-orm';
 import type { SQLiteDatabase } from './database.service';
 import type { SelectWorkflow } from '/@/db/schema/workflow.schema';
-import { workflows } from '/@/db/schema/workflow.schema';
+import { workflows, workflowsHistory } from '/@/db/schema/workflow.schema';
 import type {
   DatabaseWorkflow,
   DatabaseWorkflowDetail,
+  DatabaseWorkflowHistory,
+  DatabaseWorkflowHistoryInsertPayload,
+  DatabaseWorkflowHistoryListOptions,
+  DatabaseWorkflowHistoryUpdatePayload,
   DatabaseWorkflowInsertPayload,
   DatabaseWorkflowUpdatePayload,
   DatabaseWorkfowListQueryOptions,
 } from '/@/interface/database.interface';
 import { nanoid } from 'nanoid';
-import { emitDBChanges } from '/@/utils/database-utils';
+import { emitDBChanges, withPagination } from '/@/utils/database-utils';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
+import type { SQLiteColumn } from 'drizzle-orm/sqlite-core';
 
 class DBWorkflowService {
   constructor(private database: SQLiteDatabase) {}
@@ -61,7 +66,7 @@ class DBWorkflowService {
     });
 
     emitDBChanges({
-      'database:get-workflow-list': DATABASE_CHANGES_ALL_ARGS,
+      'database:get-workflow-list': [DATABASE_CHANGES_ALL_ARGS],
     });
 
     return workflowId;
@@ -108,7 +113,7 @@ class DBWorkflowService {
     emitDBChanges(
       {
         'database:get-workflow': [workflowId],
-        'database:get-workflow-list': DATABASE_CHANGES_ALL_ARGS,
+        'database:get-workflow-list': [DATABASE_CHANGES_ALL_ARGS],
       },
       excludeEmit,
     );
@@ -119,7 +124,7 @@ class DBWorkflowService {
 
     emitDBChanges({
       'database:get-workflow': [id],
-      'database:get-workflow-list': DATABASE_CHANGES_ALL_ARGS,
+      'database:get-workflow-list': [DATABASE_CHANGES_ALL_ARGS],
     });
   }
 
@@ -130,6 +135,145 @@ class DBWorkflowService {
         executeCount: sql`${workflows.executeCount} + 1`,
       })
       .where(eq(workflows.id, workflowId));
+  }
+
+  async insertHistory({
+    status,
+    endedAt,
+    duration,
+    startedAt,
+    workflowId,
+    errorMessage,
+    errorLocation,
+  }: DatabaseWorkflowHistoryInsertPayload) {
+    const result = await this.database.insert(workflowsHistory).values({
+      status,
+      duration,
+      workflowId,
+      errorMessage,
+      errorLocation,
+      endedAt: endedAt && new Date(endedAt).toISOString(),
+      startedAt: startedAt
+        ? new Date(startedAt).toISOString()
+        : new Date().toISOString(),
+    });
+
+    emitDBChanges({
+      'database:get-workflow-history-list': [DATABASE_CHANGES_ALL_ARGS],
+    });
+
+    return result.lastInsertRowid as number;
+  }
+
+  async getHistory(historyId: number): Promise<DatabaseWorkflowHistory | null> {
+    const result = await this.database.query.workflowsHistory.findFirst({
+      where(fields, operators) {
+        return operators.eq(fields.id, historyId);
+      },
+      with: {
+        workflow: { columns: { name: true, description: true } },
+      },
+    });
+    return result ?? null;
+  }
+
+  async updateHistory(
+    historyId: number,
+    {
+      status,
+      endedAt,
+      duration,
+      errorMessage,
+      errorLocation,
+    }: DatabaseWorkflowHistoryUpdatePayload,
+  ) {
+    await this.database
+      .update(workflowsHistory)
+      .set({ duration, endedAt, errorLocation, errorMessage, status })
+      .where(eq(workflowsHistory.id, historyId));
+
+    emitDBChanges({
+      'database:get-workflow-history': [historyId],
+      'database:get-workflow-history-list': [DATABASE_CHANGES_ALL_ARGS],
+    });
+  }
+
+  async listHistory({
+    sort,
+    filter,
+    pagination,
+  }: DatabaseWorkflowHistoryListOptions = {}): Promise<{
+    count: number;
+    items: DatabaseWorkflowHistory[];
+  }> {
+    let query = this.database
+      .select({
+        id: workflowsHistory.id,
+        status: workflowsHistory.status,
+        endedAt: workflowsHistory.endedAt,
+        duration: workflowsHistory.duration,
+        startedAt: workflowsHistory.startedAt,
+        workflowId: workflowsHistory.workflowId,
+        errorMessage: workflowsHistory.errorMessage,
+        errorLocation: workflowsHistory.errorLocation,
+        workflow: {
+          name: workflows.name,
+          description: workflows.description,
+        },
+      })
+      .from(workflowsHistory)
+      .leftJoin(workflows, eq(workflows.id, workflowsHistory.workflowId))
+      .$dynamic();
+
+    if (filter?.name) {
+      query = query.where(like(workflows.name, `%${filter.name}%`));
+    }
+    if (sort) {
+      let sortColumn: SQLiteColumn = workflowsHistory.id;
+      switch (sort.by) {
+        case 'startedAt':
+          sortColumn = workflowsHistory.startedAt;
+          break;
+        case 'duration':
+          sortColumn = workflowsHistory.duration;
+          break;
+        case 'name':
+          sortColumn = workflows.name;
+          break;
+      }
+
+      query = query.orderBy(sort.asc ? asc(sortColumn) : desc(sortColumn));
+    }
+    if (pagination) {
+      query = withPagination(query, pagination.page, pagination.pageSize);
+    }
+
+    const items = (await query.execute()) as DatabaseWorkflowHistory[];
+    const historyLength = filter
+      ? items.length
+      : (
+          await this.database.select({ count: count() }).from(workflowsHistory)
+        )[0].count;
+
+    return {
+      items,
+      count: historyLength,
+    };
+  }
+
+  async deleteHistory(historyId: number | number[]) {
+    await this.database
+      .delete(workflowsHistory)
+      .where(
+        Array.isArray(historyId)
+          ? inArray(workflowsHistory.id, historyId)
+          : eq(workflowsHistory.id, historyId),
+      );
+
+    emitDBChanges({
+      'database:get-workflow-history': [DATABASE_CHANGES_ALL_ARGS],
+      'database:get-workflow-history-list': [DATABASE_CHANGES_ALL_ARGS],
+    });
   }
 }
 

@@ -9,11 +9,12 @@
   },
   "extends": ["@repo/typescript-config/vite.json"],
   "include": [
-    "types/**/*.d.ts",
     "src/**/*.ts",
     "src/**/*.tsx",
-    "../preload/preload.d.ts",
-    "../../types/**/*.d.ts"
-, "../common/interface/workflow.interface.ts", "../common/utils/message-port-renderer.ts", "../common/utils/KeyboardShortcutUtils.ts"  ],
+    "types/**/*.d.ts",
+    "../common/**/*.ts",
+    "../../types/**/*.d.ts",
+    "../preload/preload.d.ts"
+  ],
   "exclude": ["**/*.spec.ts", "**/*.test.ts"]
 }

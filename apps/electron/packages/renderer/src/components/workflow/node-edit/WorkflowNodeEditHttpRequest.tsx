@@ -15,7 +15,7 @@ import {
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
+import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
 import { PlusIcon } from 'lucide-react';
 import WorkflowUiCodeEditor from '../ui/WorkflowUiCodeEditor';
 

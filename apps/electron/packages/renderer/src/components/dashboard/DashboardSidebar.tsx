@@ -2,6 +2,7 @@ import { cn } from '@repo/ui';
 import { NavLink } from 'react-router-dom';
 import {
   BlocksIcon,
+  HistoryIcon,
   InfoIcon,
   LucideIcon,
   SettingsIcon,
@@ -22,6 +23,11 @@ const navigationItems: { title: string; path: string; icon: LucideIcon }[] = [
     icon: WorkflowIcon,
     path: '/workflows',
     title: 'Workflows',
+  },
+  {
+    icon: HistoryIcon,
+    path: '/workflow-history',
+    title: 'Workflow history',
   },
   {
     icon: UserCog2Icon,

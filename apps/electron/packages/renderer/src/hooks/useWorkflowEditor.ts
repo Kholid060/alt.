@@ -6,10 +6,10 @@ import {
   WorkflowNewNode,
 } from '#packages/common/interface/workflow.interface';
 import {
-  APP_WORKFLOW_ELS_FORMAT,
+  WORKFLOW_ELEMENT_FORMAT,
   WORKFLOW_MANUAL_TRIGGER_ID,
   WORKFLOW_NODE_TYPE,
-} from '#packages/common/utils/constant/constant';
+} from '#packages/common/utils/constant/workflow.const';
 import { parseJSON } from '@repo/shared';
 import { nanoid } from 'nanoid';
 import { Connection, useReactFlow, useStore, useStoreApi } from 'reactflow';
@@ -42,7 +42,7 @@ export function useWorkflowEditor() {
   async function pasteElements() {
     const copiedElements = await preloadAPI.main.ipc.invoke(
       'clipboard:read-buffer',
-      APP_WORKFLOW_ELS_FORMAT,
+      WORKFLOW_ELEMENT_FORMAT,
     );
     if (isIPCEventError(copiedElements)) return null;
 
@@ -90,7 +90,7 @@ export function useWorkflowEditor() {
 
     const result = await preloadAPI.main.ipc.invoke(
       'clipboard:copy-buffer',
-      APP_WORKFLOW_ELS_FORMAT,
+      WORKFLOW_ELEMENT_FORMAT,
       JSON.stringify(workflowClipboardData),
     );
     if (isIPCEventError(result)) {

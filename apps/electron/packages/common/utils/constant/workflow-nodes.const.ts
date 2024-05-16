@@ -1,26 +1,26 @@
-import {
-  WorkflowNodeHandleSource,
-  WorkflowNodeHandleTarget,
+import type {
   WorkflowNodesMap,
-} from '#packages/common/interface/workflow-nodes.interface';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
+  WorkflowNodeHandleTarget,
+  WorkflowNodeHandleSource,
+} from '../../interface/workflow-nodes.interface';
+import type { LucideIcon } from 'lucide-react';
 import {
-  CornerDownLeftIcon,
-  BellIcon,
-  CircleSlash2Icon,
-  ClipboardIcon,
   CommandIcon,
+  CircleSlash2Icon,
+  RepeatIcon,
+  PlugZapIcon,
   FileCode2Icon,
+  TimerIcon,
+  ClipboardIcon,
+  SplitIcon,
   FileIcon,
   GlobeIcon,
+  BellIcon,
   KeyboardIcon,
-  LucideIcon,
-  PlugZapIcon,
-  RepeatIcon,
-  SplitIcon,
-  TimerIcon,
+  CornerDownLeftIcon,
 } from 'lucide-react';
-import { WorkflowEditorNodeGroup } from '/@/interface/workflow-editor.interface';
+import type { WORKFLOW_NODE_GROUP } from './workflow.const';
+import { WORKFLOW_NODE_TYPE } from './workflow.const';
 
 export const WORKFLOW_NODES: {
   [T in WORKFLOW_NODE_TYPE]: {
@@ -29,7 +29,7 @@ export const WORKFLOW_NODES: {
     icon: LucideIcon;
     subtitle?: string;
     invisible?: boolean;
-    group: WorkflowEditorNodeGroup;
+    group: (typeof WORKFLOW_NODE_GROUP)[number];
     defaultData: WorkflowNodesMap[T]['data'];
     handleTarget: WorkflowNodeHandleTarget[];
     handleSource: WorkflowNodeHandleSource[];

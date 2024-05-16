@@ -17,7 +17,7 @@ import UiShortcut from '../../ui/UiShortcut';
 import { useReactFlow } from 'reactflow';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import preloadAPI from '/@/utils/preloadAPI';
-import { APP_WORKFLOW_ELS_FORMAT } from '#packages/common/utils/constant/constant';
+import { WORKFLOW_ELEMENT_FORMAT } from '#packages/common/utils/constant/workflow.const';
 import { isIPCEventError } from '/@/utils/helper';
 import {
   WorkflowEdge,
@@ -45,7 +45,7 @@ function ContextMenuItemPaste() {
 
   useEffect(() => {
     preloadAPI.main.ipc
-      .invoke('clipboard:has-buffer', APP_WORKFLOW_ELS_FORMAT)
+      .invoke('clipboard:has-buffer', WORKFLOW_ELEMENT_FORMAT)
       .then((hasValue) => {
         if (isIPCEventError(hasValue) || !hasValue) return;
 

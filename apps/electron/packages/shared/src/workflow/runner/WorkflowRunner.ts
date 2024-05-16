@@ -4,7 +4,7 @@ import type { WorkflowRunnerRunPayload } from '#packages/common/interface/workfl
 import {
   WORKFLOW_MANUAL_TRIGGER_ID,
   WORKFLOW_NODE_TYPE,
-} from '#packages/common/utils/constant/constant';
+} from '#packages/common/utils/constant/workflow.const';
 import type { WorkflowEdge } from '#packages/common/interface/workflow.interface';
 import type WorkflowNodeHandler from '../node-handler/WorkflowNodeHandler';
 import type { DatabaseWorkflowDetail } from '#packages/main/src/interface/database.interface';
@@ -133,6 +133,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   private nodeExecutionQueue: string[] = [];
 
   id: string;
+  startedAt: string;
   stepCount: number = 0;
   state: WorkflowRunnerState;
   workflow: DatabaseWorkflowDetail;
@@ -154,6 +155,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     this.startNodeId = startNodeId;
     this.nodeHandlers = nodeHandlers;
     this.state = WorkflowRunnerState.Idle;
+    this.startedAt = new Date().toString();
 
     this.dataStorage = new WorkflowRunnerData();
     this.sandbox = new WorkflowRunnerSandbox(this);
@@ -206,6 +208,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
 
     this.state = WorkflowRunnerState.Running;
 
+    this.startedAt = new Date().toString();
     this.executeNode(startNode);
   }
 

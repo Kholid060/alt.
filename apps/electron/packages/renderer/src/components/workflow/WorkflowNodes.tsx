@@ -11,8 +11,8 @@ import { WorkflowNodeErroHandlerAction } from '#common/interface/workflow.interf
 import { UiList } from '@repo/ui';
 import UiExtensionIcon from '../ui/UiExtensionIcon';
 import type * as NodesType from '#packages/common/interface/workflow-nodes.interface';
-import { WORKFLOW_NODES } from '/@/utils/constant/workflow-nodes';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
+import { WORKFLOW_NODES } from '#common/utils/constant/workflow-nodes.const';
+import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
 import clsx from 'clsx';
 import {
   BanIcon,

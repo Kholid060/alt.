@@ -1,7 +1,7 @@
 import type { SetRequired } from 'type-fest';
 import type { WorkflowNodeErroHandlerAction } from './workflow.interface';
 import type { ExtensionCommandArgument } from '@repo/extension-core';
-import type { WORKFLOW_NODE_TYPE } from '../utils/constant/constant';
+import type { WORKFLOW_NODE_TYPE } from '../utils/constant/workflow.const';
 import type { Node } from 'reactflow';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import type { KeyboardShortcut } from '@repo/shared';

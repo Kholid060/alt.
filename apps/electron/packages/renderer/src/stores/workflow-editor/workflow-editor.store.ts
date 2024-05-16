@@ -18,7 +18,7 @@ import {
   WorkflowElement,
   WorkflowNewNode,
 } from '#common/interface/workflow.interface';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
+import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
 import {
   DatabaseWorkflowDetail,
   DatabaseWorkflowUpdatePayload,
@@ -230,15 +230,9 @@ const workflowEditorStore = create(
         let isHasManualTrigger = false;
 
         const newNodes = nodes.reduce<WorkflowNodes[]>((acc, node) => {
-          if (
-            node.type === WORKFLOW_NODE_TYPE.TRIGGER &&
-            node.data.type === 'manual' &&
-            !isHasManualTrigger
-          ) {
+          if (node.type === WORKFLOW_NODE_TYPE.TRIGGER && !isHasManualTrigger) {
             isHasManualTrigger = oldNodes.some(
-              (oldNode) =>
-                oldNode.type === WORKFLOW_NODE_TYPE.TRIGGER &&
-                oldNode.data.type === 'manual',
+              (oldNode) => oldNode.type === WORKFLOW_NODE_TYPE.TRIGGER,
             );
             if (isHasManualTrigger) return acc;
           }

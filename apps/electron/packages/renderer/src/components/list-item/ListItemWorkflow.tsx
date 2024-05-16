@@ -1,4 +1,4 @@
-import { WORKFLOW_MANUAL_TRIGGER_ID } from '#packages/common/utils/constant/constant';
+import { WORKFLOW_MANUAL_TRIGGER_ID } from '#packages/common/utils/constant/workflow.const';
 import { UiList, UiListItemAction } from '@repo/ui';
 import { ListItemRenderDetail } from '/@/apps/command/routes/CommandList';
 import preloadAPI from '/@/utils/preloadAPI';

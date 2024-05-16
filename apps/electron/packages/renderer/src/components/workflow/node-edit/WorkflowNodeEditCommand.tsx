@@ -4,7 +4,7 @@ import UiExtensionIcon from '../../ui/UiExtensionIcon';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import { ChevronDown } from 'lucide-react';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/constant';
+import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
 
 function CommandArgs({ data }: { data: WorkflowNodeCommand['data'] }) {

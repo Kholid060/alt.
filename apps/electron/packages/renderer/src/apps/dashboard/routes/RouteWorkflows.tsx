@@ -395,9 +395,23 @@ function RouteWorkflows() {
   const workflowsQuery = useDatabaseQuery('database:get-workflow-list', []);
 
   const [search, setSearch] = useState('');
-  const [sort, setSort] = useState<WorkflowSort>({
-    asc: false,
-    by: 'createdAt',
+  const [sort, setSort] = useState<WorkflowSort>(() => {
+    const savedSort = parseJSON<WorkflowSort, null>(
+      localStorage.getItem(LOCALSTORAGE_KEYS.workflowListSort) ?? '',
+      null,
+    );
+
+    if (
+      savedSort &&
+      Object.hasOwn(savedSort, 'asc') &&
+      Object.hasOwn(savedSort, 'by')
+    )
+      return savedSort;
+
+    return {
+      asc: false,
+      by: 'createdAt',
+    };
   });
 
   const filteredWorkflows = arrayObjSorter({
@@ -420,20 +434,6 @@ function RouteWorkflows() {
       JSON.stringify(sort),
     );
   }, [sort]);
-  useEffect(() => {
-    const savedSort = parseJSON<WorkflowSort, null>(
-      localStorage.getItem(LOCALSTORAGE_KEYS.workflowListSort) ?? '',
-      null,
-    );
-    if (
-      !savedSort ||
-      !Object.hasOwn(savedSort, 'asc') ||
-      !Object.hasOwn(savedSort, 'by')
-    )
-      return;
-
-    setSort(savedSort);
-  }, []);
 
   return (
     <div className="p-8 container">
@@ -463,28 +463,21 @@ function RouteWorkflows() {
             )}
           </UiButton>
           <hr className="h-6 w-px bg-border" />
-          <UiSelect.Native
+          <UiSelect
             value={sort.by}
-            className="border-0 bg-background"
-            selectClass="px-2"
+            className="border-0 bg-background px-2"
             placeholder="Sort by"
-            onChange={(event) =>
+            onValueChange={(value) =>
               setSort((prevValue) => ({
                 ...prevValue,
-                by: event.target.value as WorkflowSortBy,
+                by: value as WorkflowSortBy,
               }))
             }
           >
-            <option value="name" className="bg-background">
-              Name
-            </option>
-            <option value="updatedAt" className="bg-background">
-              Modified date
-            </option>
-            <option value="createdAt" className="bg-background">
-              Created date
-            </option>
-          </UiSelect.Native>
+            <UiSelect.Option value="name">Name</UiSelect.Option>
+            <UiSelect.Option value="updatedAt">Modified date</UiSelect.Option>
+            <UiSelect.Option value="createdAt">Created date</UiSelect.Option>
+          </UiSelect>
         </div>
         <div className="flex-grow"></div>
         <WorkflowCreateDialog />

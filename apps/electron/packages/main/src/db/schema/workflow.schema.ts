@@ -5,12 +5,13 @@ import type {
   WorkflowVariable,
 } from '#common/interface/workflow.interface';
 import type { Viewport } from 'reactflow';
-import { sql } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import type {
   WorkflowNodeTrigger,
   WorkflowNodes,
-} from '#packages/common/interface/workflow-nodes.interface';
+} from '#common/interface/workflow-nodes.interface';
+import type { WORKFLOW_HISTORY_STATUS } from '#packages/common/utils/constant/workflow.const';
 
 export const workflows = sqliteTable('workflows', {
   id: text('id')
@@ -50,3 +51,32 @@ export const workflows = sqliteTable('workflows', {
 });
 export type NewWorkflow = typeof workflows.$inferInsert;
 export type SelectWorkflow = typeof workflows.$inferSelect;
+
+export const workflowsRelations = relations(workflows, ({ many }) => ({
+  history: many(workflowsHistory),
+}));
+
+export const workflowsHistory = sqliteTable('workflows_history', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  startedAt: text('started_at')
+    .notNull()
+    .$defaultFn(() => new Date().toISOString()),
+  endedAt: text('ended_at'),
+  duration: integer('duration'),
+  errorMessage: text('error_message'),
+  errorLocation: text('error_location'),
+  workflowId: text('workflow_id').notNull(),
+  status: text('status').notNull().$type<WORKFLOW_HISTORY_STATUS>(),
+});
+export type NewWorkflowHistory = typeof workflowsHistory.$inferInsert;
+export type SelectWorkflowHistory = typeof workflowsHistory.$inferSelect;
+
+export const workflowsHistoryRelations = relations(
+  workflowsHistory,
+  ({ one }) => ({
+    workflow: one(workflows, {
+      references: [workflows.id],
+      fields: [workflowsHistory.workflowId],
+    }),
+  }),
+);

@@ -108,6 +108,15 @@ export {
 export { UiLabel } from './components/ui/label';
 export { UiBadge, uiBadgeVariants } from './components/ui/badge';
 export {
+  UiPagination,
+  UiPaginationLink,
+  UiPaginationNext,
+  UiPaginationItem,
+  UiPaginationContent,
+  UiPaginationEllipsis,
+  UiPaginationPrevious,
+} from './components/ui/pagination';
+export {
   UiAlertDialog,
   UiAlertDialogTitle,
   UiAlertDialogPortal,

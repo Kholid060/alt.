@@ -1,6 +1,7 @@
 import { fontFamily } from 'tailwindcss/defaultTheme'
 import { Config } from 'tailwindcss/types/config';
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette';
+import { handler as tailwindAnimate } from 'tailwindcss-animate';
 
 const rgbVarColor = (varName: string) => `rgb(var(--${varName}) / <alpha-value>)`;
 const generateRadixColors = (name: string, reverse = false) => {
@@ -15,7 +16,7 @@ const generateRadixColors = (name: string, reverse = false) => {
 const config: Omit<Config, 'content'> = {
   darkMode: ['class'],
   plugins: [
-    require('tailwindcss-animate'),
+    tailwindAnimate,
     function ({ matchUtilities, theme }) {
       matchUtilities(
         {
@@ -44,6 +45,8 @@ const config: Omit<Config, 'content'> = {
         'input-focus': rgbVarColor('input-focus'),
         background: rgbVarColor('background'),
         foreground: rgbVarColor('foreground'),
+        lime: generateRadixColors('lime'),
+        amber: generateRadixColors('amber'),
         mauve: generateRadixColors('mauve'),
         'mauve-dark': generateRadixColors('mauve', true),
         violet: generateRadixColors('violet'),

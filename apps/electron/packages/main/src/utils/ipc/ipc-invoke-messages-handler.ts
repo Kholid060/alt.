@@ -185,6 +185,21 @@ IPCMain.handle('database:insert-extension-config', (_, config) => {
 IPCMain.handle('database:update-extension-config', (_, configId, data) => {
   return DBService.instance.extension.updateConfig(configId, data);
 });
+IPCMain.handle('database:get-workflow-history', (_, historyId) => {
+  return DBService.instance.workflow.getHistory(historyId);
+});
+IPCMain.handle('database:get-workflow-history-list', (_, options) => {
+  return DBService.instance.workflow.listHistory(options);
+});
+IPCMain.handle('database:insert-workflow-history', (_, payload) => {
+  return DBService.instance.workflow.insertHistory(payload);
+});
+IPCMain.handle('database:update-workflow-history', (_, historyId, payload) => {
+  return DBService.instance.workflow.updateHistory(historyId, payload);
+});
+IPCMain.handle('database:delete-workflow-history', (_, historyId) => {
+  return DBService.instance.workflow.deleteHistory(historyId);
+});
 
 /** SHELL */
 IPCMain.handle('shell:open-in-folder', async (_, filePath) => {

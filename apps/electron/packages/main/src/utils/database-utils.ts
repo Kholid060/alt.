@@ -1,7 +1,7 @@
 import type { ExtensionCommand, ExtensionManifest } from '@repo/extension-core';
 import type { SQL } from 'drizzle-orm';
 import { getTableColumns, sql } from 'drizzle-orm';
-import type { SQLiteTable } from 'drizzle-orm/sqlite-core';
+import type { SQLiteSelect, SQLiteTable } from 'drizzle-orm/sqlite-core';
 import type {
   NewExtension,
   NewExtensionCommand,
@@ -75,19 +75,22 @@ export const mapManifestToDB = {
 export function emitDBChanges(
   changes: {
     [T in keyof Partial<DatabaseQueriesEvent>]:
-      | typeof DATABASE_CHANGES_ALL_ARGS
+      | [typeof DATABASE_CHANGES_ALL_ARGS]
       | Parameters<DatabaseQueriesEvent[T]>;
   },
   excludeWindow?: number[],
 ) {
-  for (const _key in changes) {
-    const key = _key as keyof DatabaseQueriesEvent;
-    const params = changes[key];
+  WindowsManager.instance.sendMessageToAllWindows({
+    excludeWindow,
+    args: [changes],
+    name: 'database:changes',
+  });
+}
 
-    WindowsManager.instance.sendMessageToAllWindows({
-      name: 'database:changes',
-      excludeWindow,
-      args: [key, ...(Array.isArray(params) ? params : [params])],
-    });
-  }
+export function withPagination<T extends SQLiteSelect>(
+  qb: T,
+  page: number = 1,
+  pageSize: number = 10,
+) {
+  return qb.limit(pageSize).offset((page - 1) * pageSize);
 }

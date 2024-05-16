@@ -56,10 +56,11 @@ const defaultCommandActions: {
     onAction({ executePayload, addStatus }, data) {
       preloadAPI.main.ipc
         .invoke('user-extension', {
-          commandId: executePayload.commandId,
-          key: executePayload.extensionId,
           name: 'clipboard.write',
           args: ['text', data.content],
+          key: executePayload.extensionId,
+          commandId: executePayload.commandId,
+          browserCtx: executePayload.browserCtx ?? null,
         })
         .then((result) => {
           resultHandler({ addStatus, result }, () => {
@@ -78,10 +79,11 @@ const defaultCommandActions: {
     onAction({ executePayload, addStatus }, data) {
       preloadAPI.main.ipc
         .invoke('user-extension', {
-          commandId: executePayload.commandId,
-          key: executePayload.extensionId,
-          name: 'clipboard.paste',
           args: [data.content],
+          name: 'clipboard.paste',
+          key: executePayload.extensionId,
+          commandId: executePayload.commandId,
+          browserCtx: executePayload.browserCtx ?? null,
         })
         .then((result) => {
           resultHandler({ addStatus, result });
@@ -95,10 +97,11 @@ const defaultCommandActions: {
     onAction({ executePayload, addStatus }, data) {
       preloadAPI.main.ipc
         .invoke('user-extension', {
-          commandId: executePayload.commandId,
-          key: executePayload.extensionId,
-          name: 'shell.openURL',
           args: [data.url],
+          name: 'shell.openURL',
+          key: executePayload.extensionId,
+          commandId: executePayload.commandId,
+          browserCtx: executePayload.browserCtx ?? null,
         })
         .then((result) => {
           resultHandler({ addStatus, result });
@@ -112,10 +115,11 @@ const defaultCommandActions: {
     onAction({ executePayload, addStatus }, data) {
       preloadAPI.main.ipc
         .invoke('user-extension', {
-          commandId: executePayload.commandId,
-          key: executePayload.extensionId,
-          name: 'shell.showItemInFolder',
           args: [data.path],
+          name: 'shell.showItemInFolder',
+          key: executePayload.extensionId,
+          commandId: executePayload.commandId,
+          browserCtx: executePayload.browserCtx ?? null,
         })
         .then((result) => {
           resultHandler({ addStatus, result });
@@ -129,10 +133,11 @@ const defaultCommandActions: {
     onAction({ executePayload, addStatus }, data) {
       preloadAPI.main.ipc
         .invoke('user-extension', {
-          commandId: executePayload.commandId,
-          key: executePayload.extensionId,
-          name: 'shell.moveToTrash',
           args: [data.path],
+          name: 'shell.moveToTrash',
+          key: executePayload.extensionId,
+          commandId: executePayload.commandId,
+          browserCtx: executePayload.browserCtx ?? null,
         })
         .then((result) => {
           resultHandler({ addStatus, result });
