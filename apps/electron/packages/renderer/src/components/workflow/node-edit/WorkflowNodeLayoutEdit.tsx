@@ -35,10 +35,12 @@ function NodeId({ nodeId }: { nodeId: string }) {
   }
 
   return (
-    <UiTooltip label={copied ? '✅ Copied' : 'Node id (click to copy)'}>
+    <UiTooltip label="Node id (click to copy)">
       <button onClick={copyNodeId}>
         <UiBadge variant="secondary" className="max-w-20 flex-shrink-0">
-          <span className="line-clamp-1">{nodeId} _</span>
+          <span className="line-clamp-1">
+            {copied ? '✅Copied' : `${nodeId} _`}
+          </span>
         </UiBadge>
       </button>
     </UiTooltip>

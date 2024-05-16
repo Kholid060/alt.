@@ -1,10 +1,17 @@
 import { UiButton, UiKbd, UiTooltip } from '@repo/ui';
-import { MaximizeIcon, MinusIcon, PlusIcon } from 'lucide-react';
+import {
+  MaximizeIcon,
+  MinusIcon,
+  PlusIcon,
+  RedoIcon,
+  UndoIcon,
+} from 'lucide-react';
 import { useReactFlow, useStore } from 'reactflow';
 import { useShallow } from 'zustand/react/shallow';
 import { isInsideWorkflowEditor } from '../WorkflowEventListener';
 import { useHotkeys } from 'react-hotkeys-hook';
 import UiShortcut from '../../ui/UiShortcut';
+import { useWorkflowEditorStore } from '/@/stores/workflow-editor/workflow-editor.store';
 
 function WorkflowEditorControls() {
   const { minZoomReached, maxZoomReached } = useStore(
@@ -90,6 +97,59 @@ function WorkflowEditorControls() {
           onClick={() => fitView({ duration: 500 })}
         >
           <MaximizeIcon className="h-5 w-5" />
+        </UiButton>
+      </UiTooltip>
+    </div>
+  );
+}
+
+export function WorkflowUndoRedo() {
+  const { undo, redo, historyLen, historyIndex } = useWorkflowEditorStore(
+    useShallow((state) => ({
+      undo: state.undo,
+      redo: state.redo,
+      historyLen: state.history.length,
+      historyIndex: state.historyIndex,
+    })),
+  );
+
+  useHotkeys('mod+z', undo, []);
+  useHotkeys('mod+shift+z', redo, []);
+
+  return (
+    <div className="border border-border/60 bg-secondary rounded-md">
+      <UiTooltip
+        label={
+          <>
+            Undo <UiShortcut shortcut="CmdOrCtrl+Z" />
+          </>
+        }
+      >
+        <UiButton
+          variant="ghost"
+          size="icon"
+          disabled={historyIndex < 0}
+          onClick={undo}
+        >
+          <UndoIcon className="h-5 w-5" />
+        </UiButton>
+      </UiTooltip>
+      <hr className="h-5 bg-border/60 w-px inline-block" />
+      <UiTooltip
+        label={
+          <>
+            Redo <UiShortcut shortcut="CmdOrCtrl+Shift+Z" />
+          </>
+        }
+      >
+        <UiButton
+          variant="ghost"
+          size="icon"
+          disabled={historyIndex >= historyLen - 1}
+          className="ml-1"
+          onClick={redo}
+        >
+          <RedoIcon className="h-5 w-5" />
         </UiButton>
       </UiTooltip>
     </div>

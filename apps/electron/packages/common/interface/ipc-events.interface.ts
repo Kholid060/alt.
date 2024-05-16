@@ -110,6 +110,8 @@ export interface IPCExtensionEvents {
 }
 
 export interface IPCWorkflowEvents {
+  'workflow:export': (workflowId: string) => void;
+  'workflow:import': (filePaths?: string[]) => void;
   'workflow:execute': (payload: WorkflowRunPayload) => string;
   'workflow:save': (
     workflowId: string,

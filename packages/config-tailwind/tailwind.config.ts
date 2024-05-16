@@ -1,7 +1,6 @@
 import { fontFamily } from 'tailwindcss/defaultTheme'
 import { Config } from 'tailwindcss/types/config';
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette';
-import { handler as tailwindAnimate } from 'tailwindcss-animate';
 
 const rgbVarColor = (varName: string) => `rgb(var(--${varName}) / <alpha-value>)`;
 const generateRadixColors = (name: string, reverse = false) => {
@@ -16,7 +15,7 @@ const generateRadixColors = (name: string, reverse = false) => {
 const config: Omit<Config, 'content'> = {
   darkMode: ['class'],
   plugins: [
-    tailwindAnimate,
+    require('tailwindcss-animate'),
     function ({ matchUtilities, theme }) {
       matchUtilities(
         {

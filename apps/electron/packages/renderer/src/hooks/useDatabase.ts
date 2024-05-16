@@ -128,7 +128,6 @@ export function useDatabaseQuery<T extends keyof DatabaseQueriesEvent>(
     fetchQuery();
 
     const onDataChange = (...args: unknown[]) => {
-      console.log(args);
       if (
         args[0] !== DATABASE_CHANGES_ALL_ARGS &&
         !shallowEqualArrays(args, args)

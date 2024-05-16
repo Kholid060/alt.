@@ -58,12 +58,18 @@ class DBWorkflowService {
     return this.database.query.workflows.findMany();
   }
 
-  async insert(workflow: DatabaseWorkflowInsertPayload) {
+  async insert(
+    workflow: DatabaseWorkflowInsertPayload | DatabaseWorkflowInsertPayload[],
+  ) {
     const workflowId = nanoid();
-    await this.database.insert(workflows).values({
-      ...workflow,
-      id: workflowId,
-    });
+    const newWorkflows = Array.isArray(workflow) ? workflow : [workflow];
+
+    await this.database.insert(workflows).values(
+      newWorkflows.map((item) => ({
+        ...item,
+        id: workflowId,
+      })),
+    );
 
     emitDBChanges({
       'database:get-workflow-list': [DATABASE_CHANGES_ALL_ARGS],

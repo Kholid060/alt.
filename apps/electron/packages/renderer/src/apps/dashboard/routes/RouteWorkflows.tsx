@@ -51,7 +51,7 @@ import { useForm } from 'react-hook-form';
 import { UiExtIcon } from '@repo/extension';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '/@/utils/helper';
 import { arrayObjSorter } from '#packages/common/utils/helper';
@@ -117,6 +117,28 @@ function WorkflowCards({ workflows }: { workflows: DatabaseWorkflow[] }) {
       console.error(error);
       toast({
         title: 'Something went wrong',
+      });
+    }
+  }
+  async function exportWorkflow(workflowId: string) {
+    try {
+      const result = await preloadAPI.main.ipc.invoke(
+        'workflow:export',
+        workflowId,
+      );
+      if (isIPCEventError(result)) {
+        toast({
+          title: 'Error!',
+          variant: 'destructive',
+          description: result.message,
+        });
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: 'destructive',
+        title: 'Something went wrong!',
       });
     }
   }
@@ -187,7 +209,9 @@ function WorkflowCards({ workflows }: { workflows: DatabaseWorkflow[] }) {
                 >
                   Open
                 </UiDropdownMenuItem>
-                <UiDropdownMenuItem>Export</UiDropdownMenuItem>
+                <UiDropdownMenuItem onClick={() => exportWorkflow(workflow.id)}>
+                  Export
+                </UiDropdownMenuItem>
                 <UiDropdownMenuSeparator />
                 <UiDropdownMenuItem
                   onClick={() =>
@@ -394,6 +418,8 @@ type WorkflowSort = { asc: boolean; by: WorkflowSortBy };
 function RouteWorkflows() {
   const workflowsQuery = useDatabaseQuery('database:get-workflow-list', []);
 
+  const { toast } = useToast();
+
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState<WorkflowSort>(() => {
     const savedSort = parseJSON<WorkflowSort, null>(
@@ -428,12 +454,68 @@ function RouteWorkflows() {
     order: sort.asc ? 'asc' : 'desc',
   });
 
+  const importWorkflow = useCallback(
+    async (filePaths?: string[]) => {
+      try {
+        const result = await preloadAPI.main.ipc.invoke(
+          'workflow:import',
+          filePaths,
+        );
+        if (isIPCEventError(result)) {
+          toast({
+            title: 'Error!',
+            variant: 'destructive',
+            description: result.message,
+          });
+          return;
+        }
+      } catch (error) {
+        console.error(error);
+        toast({
+          variant: 'destructive',
+          title: 'Something went wrong!',
+        });
+      }
+    },
+    [toast],
+  );
+
   useEffect(() => {
     localStorage.setItem(
       LOCALSTORAGE_KEYS.workflowListSort,
       JSON.stringify(sort),
     );
   }, [sort]);
+  useEffect(() => {
+    const onDragOver = (event: DragEvent) => {
+      event.preventDefault();
+    };
+    const onDrop = (event: DragEvent) => {
+      event.preventDefault();
+      const files: File[] = Array.from(event.dataTransfer?.files ?? []).filter(
+        (file) => file.name.endsWith('.json'),
+      );
+      if (files.length === 0) {
+        toast({
+          title: 'Error!',
+          variant: 'destructive',
+          description: 'Invalid workflow file',
+        });
+        return;
+      }
+
+      console.log(files.map((file) => file.path));
+      importWorkflow(files.map((file) => file.path));
+    };
+
+    document.addEventListener('drop', onDrop);
+    document.addEventListener('dragover', onDragOver);
+
+    return () => {
+      document.removeEventListener('drop', onDrop);
+      document.removeEventListener('dragover', onDragOver);
+    };
+  }, [importWorkflow, toast]);
 
   return (
     <div className="p-8 container">
@@ -480,6 +562,13 @@ function RouteWorkflows() {
           </UiSelect>
         </div>
         <div className="flex-grow"></div>
+        <UiButton
+          variant="secondary"
+          className="mr-2"
+          onClick={() => importWorkflow()}
+        >
+          Import workflow
+        </UiButton>
         <WorkflowCreateDialog />
       </div>
       {workflowsQuery.state === 'error' ? (

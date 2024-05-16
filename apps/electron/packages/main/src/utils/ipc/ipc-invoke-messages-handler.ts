@@ -241,6 +241,15 @@ IPCMain.handle('workflow:save', async (_, workflowId, payload) => {
   await WorkflowService.updateWorkflow(workflowId, payload);
   await WorkflowService.trigger.register(workflowId);
 });
+IPCMain.handle('workflow:export', ({ sender }, workflowId) => {
+  return WorkflowService.export(
+    workflowId,
+    BrowserWindow.fromWebContents(sender) ?? undefined,
+  );
+});
+IPCMain.handle('workflow:import', (_, paths) => {
+  return WorkflowService.import(paths);
+});
 
 /** BROWSER */
 IPCMain.handle('browser:get-active-tab', () => {

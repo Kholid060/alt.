@@ -233,64 +233,66 @@ function RouteWorkflowHistory() {
           </tbody>
         </table>
       </div>
-      <div className="flex items-center mt-4 text-sm text-muted-foreground">
-        <p className="tabular-nums">
-          {pagination.page * pagination.pageSize - pagination.pageSize + 1}-
-          {Math.min(
-            pagination.page * pagination.pageSize,
-            workflowHistory.count,
-          )}{' '}
-          of {workflowHistory.count}
-        </p>
-        <div className="flex-grow"></div>
-        <UiLabel htmlFor="pagination-select">Rows per page</UiLabel>
-        <UiSelect
-          className="w-16 ml-2"
-          id="pagination-select"
-          inputSize="sm"
-          value={pagination.pageSize.toString()}
-          onValueChange={(value) =>
-            setPagination((prevVal) => ({
-              ...prevVal,
-              pageSize: +value,
-            }))
-          }
-        >
-          <UiSelect.Option value="10">10</UiSelect.Option>
-          <UiSelect.Option value="25">25</UiSelect.Option>
-          <UiSelect.Option value="50">50</UiSelect.Option>
-        </UiSelect>
-        <hr className="h-6 bg-border w-px mx-4" />
-        <UiButton
-          variant="outline"
-          size="sm"
-          disabled={pagination.page <= 1}
-          onClick={() =>
-            setPagination((prevVal) => ({
-              ...prevVal,
-              page: Math.max(prevVal.page - 1, 1),
-            }))
-          }
-        >
-          Prev
-        </UiButton>
-        <p className="mx-2 tabular-nums">
-          {pagination.page}/{maxPaginationPage}
-        </p>
-        <UiButton
-          variant="outline"
-          size="sm"
-          disabled={pagination.page >= maxPaginationPage}
-          onClick={() =>
-            setPagination((prevVal) => ({
-              ...prevVal,
-              page: Math.min(prevVal.page + 1, maxPaginationPage),
-            }))
-          }
-        >
-          Next
-        </UiButton>
-      </div>
+      {workflowHistory.items.length >= 10 && (
+        <div className="flex items-center mt-4 text-sm text-muted-foreground">
+          <p className="tabular-nums">
+            {pagination.page * pagination.pageSize - pagination.pageSize + 1}-
+            {Math.min(
+              pagination.page * pagination.pageSize,
+              workflowHistory.count,
+            )}{' '}
+            of {workflowHistory.count}
+          </p>
+          <div className="flex-grow"></div>
+          <UiLabel htmlFor="pagination-select">Rows per page</UiLabel>
+          <UiSelect
+            className="w-16 ml-2"
+            id="pagination-select"
+            inputSize="sm"
+            value={pagination.pageSize.toString()}
+            onValueChange={(value) =>
+              setPagination((prevVal) => ({
+                ...prevVal,
+                pageSize: +value,
+              }))
+            }
+          >
+            <UiSelect.Option value="10">10</UiSelect.Option>
+            <UiSelect.Option value="25">25</UiSelect.Option>
+            <UiSelect.Option value="50">50</UiSelect.Option>
+          </UiSelect>
+          <hr className="h-6 bg-border w-px mx-4" />
+          <UiButton
+            variant="outline"
+            size="sm"
+            disabled={pagination.page <= 1}
+            onClick={() =>
+              setPagination((prevVal) => ({
+                ...prevVal,
+                page: Math.max(prevVal.page - 1, 1),
+              }))
+            }
+          >
+            Prev
+          </UiButton>
+          <p className="mx-2 tabular-nums">
+            {pagination.page}/{maxPaginationPage}
+          </p>
+          <UiButton
+            variant="outline"
+            size="sm"
+            disabled={pagination.page >= maxPaginationPage}
+            onClick={() =>
+              setPagination((prevVal) => ({
+                ...prevVal,
+                page: Math.min(prevVal.page + 1, maxPaginationPage),
+              }))
+            }
+          >
+            Next
+          </UiButton>
+        </div>
+      )}
     </div>
   );
 }

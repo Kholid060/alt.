@@ -24,7 +24,9 @@ import ReactFlow, {
   SelectionDragHandler,
 } from 'reactflow';
 import WorkflowEditorHeader from '/@/components/workflow/editor/WorkflowEditorHeader';
-import WorkflowEditorControls from '/@/components/workflow/editor/WorkflowEditorControls';
+import WorkflowEditorControls, {
+  WorkflowUndoRedo,
+} from '/@/components/workflow/editor/WorkflowEditorControls';
 import {
   WorkflowEditorStore,
   useWorkflowEditorStore,
@@ -425,6 +427,9 @@ function RouteWorkflow() {
           <div className="flex-grow flex relative">
             <WorkflowEditorNodeListModal />
             <WorkflowEditor />
+            <Panel position="bottom-right">
+              <WorkflowUndoRedo />
+            </Panel>
             <WorkflowEditorEditNode />
           </div>
         </div>

@@ -3,7 +3,7 @@ import RouteExtension from './routes/RouteExtension';
 import DashboardApp from './DashboardApp';
 import RouteWorkflow from './routes/RouteWorkflow';
 import RouteWorkflows from './routes/RouteWorkflows';
-import RouteWorkflowHistory from './routes/RouteWorkflowHistoryt';
+import RouteWorkflowHistory from './routes/RouteWorkflowHistory';
 
 const router = createBrowserRouter(
   [

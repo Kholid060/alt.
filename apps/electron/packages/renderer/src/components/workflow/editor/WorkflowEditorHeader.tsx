@@ -1,11 +1,22 @@
-import { UiButton, UiDialog, UiTooltip, useToast } from '@repo/ui';
+import {
+  UiButton,
+  UiDialog,
+  UiDropdownMenu,
+  UiDropdownMenuContent,
+  UiDropdownMenuItem,
+  UiDropdownMenuTrigger,
+  UiLabel,
+  UiSwitch,
+  UiTooltip,
+  useToast,
+} from '@repo/ui';
 import {
   ChevronLeftIcon,
+  DownloadIcon,
+  EllipsisVerticalIcon,
   PlayIcon,
   PlusIcon,
-  RedoIcon,
   TrashIcon,
-  UndoIcon,
   VariableIcon,
 } from 'lucide-react';
 import {
@@ -25,12 +36,11 @@ import { nanoid } from 'nanoid/non-secure';
 import { WorkflowVariable } from '#packages/common/interface/workflow.interface';
 import UiShortcut from '../../ui/UiShortcut';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { useShallow } from 'zustand/react/shallow';
 
 function WorkflowInformation() {
   const workflow = useWorkflowEditorStore.use.workflow();
 
-  if (!workflow) return null;
+  if (!workflow) return <div className="flex-grow"></div>;
 
   const WorkflowIcon =
     UiExtIcon[workflow.icon as keyof typeof UiExtIcon] ?? UiExtIcon.Command;
@@ -213,58 +223,6 @@ function WorkflowVariableModal() {
   );
 }
 
-function WorkflowUndoRedo() {
-  const { undo, redo, historyLen, historyIndex } = useWorkflowEditorStore(
-    useShallow((state) => ({
-      undo: state.undo,
-      redo: state.redo,
-      historyLen: state.history.length,
-      historyIndex: state.historyIndex,
-    })),
-  );
-
-  useHotkeys('mod+z', undo, []);
-  useHotkeys('mod+shift+z', redo, []);
-
-  return (
-    <>
-      <UiTooltip
-        label={
-          <>
-            Undo <UiShortcut shortcut="CmdOrCtrl+Z" />
-          </>
-        }
-      >
-        <UiButton
-          variant="ghost"
-          size="icon"
-          disabled={historyIndex < 0}
-          onClick={undo}
-        >
-          <UndoIcon className="h-5 w-5" />
-        </UiButton>
-      </UiTooltip>
-      <UiTooltip
-        label={
-          <>
-            Redo <UiShortcut shortcut="CmdOrCtrl+Shift+Z" />
-          </>
-        }
-      >
-        <UiButton
-          variant="ghost"
-          size="icon"
-          disabled={historyIndex >= historyLen - 1}
-          className="ml-1"
-          onClick={redo}
-        >
-          <RedoIcon className="h-5 w-5" />
-        </UiButton>
-      </UiTooltip>
-    </>
-  );
-}
-
 function WorkflowSaveButton() {
   const enableWorkflowSaveBtn =
     useWorkflowEditorStore.use.enableWorkflowSaveBtn();
@@ -367,6 +325,70 @@ function WorkflowSaveButton() {
     </UiTooltip>
   );
 }
+function WorkflowDisableBtn() {
+  const workflow = useWorkflowEditorStore.use.workflow();
+  const updateWorkflow = useWorkflowEditorStore.use.updateWorkflow();
+
+  if (!workflow) return;
+
+  return (
+    <div className="flex items-center px-2 h-10 rounded-md border gap-2 mr-2 text-sm">
+      <UiSwitch
+        size="sm"
+        checked={workflow.isDisabled}
+        id="workflow-disabled-switch"
+        onCheckedChange={(isDisabled) => updateWorkflow({ isDisabled })}
+      />
+      <UiLabel htmlFor="workflow-disabled-switch">Disabled</UiLabel>
+    </div>
+  );
+}
+
+function WorkflowMoreMenu() {
+  const { toast } = useToast();
+
+  async function exportWorkflow() {
+    try {
+      const { workflow } = useWorkflowEditorStore.getState();
+      if (!workflow) return;
+
+      const result = await preloadAPI.main.ipc.invoke(
+        'workflow:export',
+        workflow.id,
+      );
+      if (isIPCEventError(result)) {
+        toast({
+          title: 'Error!',
+          variant: 'destructive',
+          description: result.message,
+        });
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: 'destructive',
+        title: 'Something went wrong!',
+      });
+    }
+  }
+
+  return (
+    <UiDropdownMenu>
+      <UiDropdownMenuTrigger asChild>
+        <UiButton variant="ghost" size="icon" className="ml-2">
+          <EllipsisVerticalIcon className="h-5 w-5" />
+        </UiButton>
+      </UiDropdownMenuTrigger>
+      <UiDropdownMenuContent>
+        <UiDropdownMenuItem onClick={exportWorkflow}>
+          <DownloadIcon className="mr-2 h-4 w-4" />
+          Export workflow
+        </UiDropdownMenuItem>
+      </UiDropdownMenuContent>
+    </UiDropdownMenu>
+  );
+}
 
 function WorkflowEditorHeader() {
   const navigate = useNavigate();
@@ -397,10 +419,10 @@ function WorkflowEditorHeader() {
       </UiTooltip>
       <hr className="h-2/6 bg-border/50 w-px mx-4" />
       <WorkflowInformation />
-      <WorkflowUndoRedo />
-      <div className="ml-3"></div>
       <WorkflowVariableModal />
+      <WorkflowMoreMenu />
       <hr className="h-2/6 bg-border/50 w-px mx-4" />
+      <WorkflowDisableBtn />
       <UiTooltip
         label={
           <>
