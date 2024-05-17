@@ -1,4 +1,4 @@
-import { and, eq, notInArray } from 'drizzle-orm';
+import { and, eq, inArray, notInArray } from 'drizzle-orm';
 import type {
   NewExtension,
   NewExtensionCommand,
@@ -30,10 +30,8 @@ import type {
   DatabaseExtensionCommandInsertPayload,
   DatabaseExtensionCommandListFilter,
 } from '/@/interface/database.interface';
-import {
-  DATABASE_CHANGES_ALL_ARGS,
-  USER_SCRIPT_EXT_ID,
-} from '#packages/common/utils/constant/constant';
+import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
+import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
 import type { SQLiteDatabase } from './database.service';
 import { MemoryCache } from '@repo/shared';
 import { ExtensionError } from '#packages/common/errors/custom-errors';
@@ -56,8 +54,8 @@ class DBExtensionService {
         version: '0.0.0',
         icon: 'icon:FileCode',
         title: 'User Scripts',
-        id: USER_SCRIPT_EXT_ID,
-        name: USER_SCRIPT_EXT_ID,
+        id: EXTENSION_BUILT_IN_ID.userScript,
+        name: EXTENSION_BUILT_IN_ID.userScript,
       })
       .onConflictDoNothing({ target: extensions.id });
   }
@@ -186,6 +184,18 @@ class DBExtensionService {
 
     emitDBChanges({
       'database:get-extension': [extensionId],
+      'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
+    });
+  }
+
+  async deleteCommand(id: string | string[]) {
+    await this.database
+      .delete(commands)
+      .where(
+        Array.isArray(id) ? inArray(commands.id, id) : eq(commands.id, id),
+      );
+    emitDBChanges({
+      'database:get-extension': [DATABASE_CHANGES_ALL_ARGS],
       'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
     });
   }

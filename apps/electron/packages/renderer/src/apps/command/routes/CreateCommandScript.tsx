@@ -20,8 +20,7 @@ import UiSelectIcon from '/@/components/ui/UiSelectIcon';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { UiExtIcon } from '@repo/extension';
-import { USER_SCRIPT_EXT_ID } from '#packages/common/utils/constant/constant';
-import { nanoid } from 'nanoid';
+import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
 
 const newCommandScriptSchema = z.object({
   icon: z.string(),
@@ -95,10 +94,10 @@ function CreateCommandScript() {
         {
           title: name,
           type: 'script',
+          name: filename,
           path: scriptPath,
           icon: `icon:${icon}`,
-          extensionId: USER_SCRIPT_EXT_ID,
-          name: `${nanoid(5)}-${filename}`,
+          extensionId: EXTENSION_BUILT_IN_ID.userScript,
         },
       );
       if (isIPCEventError(result)) {

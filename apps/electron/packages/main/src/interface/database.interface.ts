@@ -220,6 +220,7 @@ export interface DatabaseUpdateEvents {
 
 export interface DatabaseDeleteEvents {
   'database:delete-workflow': (workflowId: string) => void;
+  'database:delete-extension-command': (id: string | string[]) => void;
   'database:delete-workflow-history': (historyId: number | number[]) => void;
 }
 

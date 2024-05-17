@@ -42,7 +42,7 @@
     "autoprefixer": "^10.4.17",
     "cross-env": "7.0.3",
     "drizzle-kit": "^0.20.14",
-    "electron": "^30.0.1",
+    "electron": "^30.0.6",
     "electron-builder": "^24.13.3",
     "eslint": "8.56.0",
     "eslint-config-prettier": "^9.1.0",

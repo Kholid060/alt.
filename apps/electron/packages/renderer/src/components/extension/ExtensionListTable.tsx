@@ -11,6 +11,7 @@ import {
   UiSwitch,
   UiTooltip,
   cn,
+  useDialog,
   useToast,
 } from '@repo/ui';
 import UiExtensionIcon from '../ui/UiExtensionIcon';
@@ -20,8 +21,10 @@ import {
   ChevronRightIcon,
   EllipsisIcon,
   FileIcon,
+  FolderOpenIcon,
   RotateCcwIcon,
   StopCircleIcon,
+  TrashIcon,
   XIcon,
 } from 'lucide-react';
 import preloadAPI from '/@/utils/preloadAPI';
@@ -34,6 +37,7 @@ import {
 import CommandShortcut from '../ui/UiShortcut';
 import { KeyboardShortcutUtils } from '#common/utils/KeyboardShortcutUtils';
 import UiShortcut from '../ui/UiShortcut';
+import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
 
 interface RecordingShortcutData {
   keys: string;
@@ -47,6 +51,7 @@ function ExtensionCommandList({
   extensionId,
   extensionIcon,
   recordingData,
+  onDeleteCommand,
   onRemoveShortcut,
   extensionDisabled,
   onToggleRecordingShortcut,
@@ -58,6 +63,7 @@ function ExtensionCommandList({
   recordingData: RecordingShortcutData | null;
   onRemoveShortcut?: (commandId: string) => void;
   onToggleRecordingShortcut?: (commandId: string) => void;
+  onDeleteCommand?: (command: DatabaseExtensionCommand) => void;
 }) {
   const recordingShortcutData =
     recordingData && recordingData.extensionId === extensionId
@@ -70,7 +76,7 @@ function ExtensionCommandList({
         <tr
           key={extensionId + command.name}
           className={cn(
-            'border-b border-border/50 hover:bg-card',
+            'border-b border-border/50 hover:bg-card group/row',
             extensionDisabled && 'opacity-60',
           )}
         >
@@ -140,7 +146,36 @@ function ExtensionCommandList({
               'Record Shortcut'
             )}
           </td>
-          <td></td>
+          <td className="text-right px-3">
+            {extensionId === EXTENSION_BUILT_IN_ID.userScript &&
+              command.path && (
+                <div className="invisible space-x-1 group-hover/row:visible">
+                  <UiTooltip label="Open file location">
+                    <UiButton
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() =>
+                        preloadAPI.main.ipc.invoke(
+                          'shell:open-in-folder',
+                          command.path!,
+                        )
+                      }
+                    >
+                      <FolderOpenIcon className="h-5 w-5" />
+                    </UiButton>
+                  </UiTooltip>
+                  <UiTooltip label="Delete script">
+                    <UiButton
+                      variant="ghost"
+                      size="icon-sm"
+                      onClick={() => onDeleteCommand?.(command)}
+                    >
+                      <TrashIcon className="h-5 w-5 text-destructive-text" />
+                    </UiButton>
+                  </UiTooltip>
+                </div>
+              )}
+          </td>
         </tr>
       ))}
     </>
@@ -165,6 +200,7 @@ function ExtensionListTable({
   onExtensionSelected,
   ...props
 }: ExtensionListTableProps) {
+  const dialog = useDialog();
   const { toast } = useToast();
 
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
@@ -224,6 +260,40 @@ function ExtensionListTable({
         title: 'Error!',
         variant: 'destructive',
         description: 'Something went wrong',
+      });
+    }
+  }
+  async function deleteCommand(command: DatabaseExtensionCommand) {
+    try {
+      const isConfirmed = await dialog.confirm({
+        title: 'Delete script?',
+        body: (
+          <>
+            Are you sure you want to delete <b>&quot;{command.title}&quot;</b>{' '}
+            script?
+          </>
+        ),
+        okText: 'Delete',
+        okButtonVariant: 'destructive',
+      });
+      if (!isConfirmed) return;
+
+      const result = await preloadAPI.main.ipc.invoke(
+        'database:delete-extension-command',
+        command.id,
+      );
+      if (isIPCEventError(result)) {
+        toast({
+          title: 'Error!',
+          variant: 'destructive',
+          description: result.message,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: 'destructive',
+        title: 'Something went wrong!',
       });
     }
   }
@@ -405,6 +475,7 @@ function ExtensionListTable({
                   commands={extension.commands}
                   extensionIcon={extensionIcon}
                   recordingData={recordingData}
+                  onDeleteCommand={deleteCommand}
                   extensionDisabled={extension.isDisabled}
                   onRemoveShortcut={(commandId) =>
                     removeShortcut(extension.id, commandId)

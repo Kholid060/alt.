@@ -6,7 +6,7 @@ import '/@/assets/css/fonts.css';
 import '/@/assets/css/workflow-editor-style.css';
 import { RouterProvider } from 'react-router-dom';
 import router from './routes';
-import { UiToaster, UiTooltipProvider } from '@repo/ui';
+import { DialogProvider, UiToaster, UiTooltipProvider } from '@repo/ui';
 import { HotkeysProvider } from 'react-hotkeys-hook';
 import { DatabaseProvider } from '/@/context/database.context';
 
@@ -17,12 +17,14 @@ if (window.location.pathname === '/') {
 ReactDOM.createRoot(document.getElementById('app')!).render(
   <React.StrictMode>
     <HotkeysProvider>
-      <UiTooltipProvider>
-        <DatabaseProvider>
-          <UiToaster />
-          <RouterProvider router={router} />
-        </DatabaseProvider>
-      </UiTooltipProvider>
+      <DialogProvider>
+        <UiTooltipProvider>
+          <DatabaseProvider>
+            <UiToaster />
+            <RouterProvider router={router} />
+          </DatabaseProvider>
+        </UiTooltipProvider>
+      </DialogProvider>
     </HotkeysProvider>
   </React.StrictMode>,
 );

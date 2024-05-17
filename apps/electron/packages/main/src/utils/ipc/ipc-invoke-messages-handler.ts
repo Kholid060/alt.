@@ -170,6 +170,9 @@ IPCMain.handle('database:insert-extension-command', (_, data) => {
 IPCMain.handle('database:get-extension-config', (_, configId) => {
   return DBService.instance.extension.getConfig(configId);
 });
+IPCMain.handle('database:delete-extension-command', (_, id) => {
+  return DBService.instance.extension.deleteCommand(id);
+});
 IPCMain.handle(
   'database:update-extension-command',
   async (_, extensionId, commandId, value) => {
@@ -211,8 +214,9 @@ IPCMain.handle('database:delete-workflow-history', (_, historyId) => {
 });
 
 /** SHELL */
-IPCMain.handle('shell:open-in-folder', async (_, filePath) => {
-  await shell.openPath(filePath);
+IPCMain.handle('shell:open-in-folder', (_, filePath) => {
+  shell.showItemInFolder(filePath);
+  return Promise.resolve();
 });
 
 /** SCREEN */

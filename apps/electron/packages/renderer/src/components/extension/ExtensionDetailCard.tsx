@@ -6,6 +6,7 @@ import { UiList } from '@repo/ui';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import { ExtensionPermissions } from '#packages/common/interface/extension.interface';
 import { DatabaseExtensionCommand } from '#packages/main/src/interface/database.interface';
+import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
 
 function getPermissionsDescription(
   permissions: ExtensionPermissions[],
@@ -51,6 +52,8 @@ function getPermissionsDescription(
 
   return [...descriptions];
 }
+
+const builtInExtensionIds = Object.values(EXTENSION_BUILT_IN_ID) as string[];
 
 interface ExtensionDetailCardProps {
   extensionId: string;
@@ -99,7 +102,7 @@ function ExtensionDetailCard({
       <div className="p-4 text-sm space-y-4 text-muted-foreground">
         <div>
           <p className="text-foreground">Description</p>
-          <p>{extension.data.description}</p>
+          <p>{extension.data.description || '-'}</p>
         </div>
         <div>
           <p className="text-foreground">Version</p>
@@ -131,6 +134,8 @@ function ExtensionDetailCard({
                 {extension.data.path}
               </button>
             </p>
+          ) : builtInExtensionIds.includes(extensionId) ? (
+            'Built-in extesion'
           ) : (
             'Marketplace'
           )}

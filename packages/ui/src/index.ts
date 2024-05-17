@@ -130,6 +130,9 @@ export {
   UiAlertDialogDescription,
 } from './components/ui/alert-dialog';
 
+export { DialogProvider, useDialog } from './context/dialog.context';
+export type { DialogConfirmOptions } from './context/dialog.context';
+
 export { useUiList } from './context/list.context';
 
 export { useToast } from './hooks/useToast';

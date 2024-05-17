@@ -14,8 +14,6 @@ export const EXTENSION_VIEW = {
   frameName: 'extension-sandbox',
 };
 
-export const USER_SCRIPT_EXT_ID = 'user-scripts';
-
 export const PRELOAD_API_KEY = {
   main: '__mainAPI',
   extension: '_extension',
