@@ -16,6 +16,7 @@ import {
 import preloadAPI from '/@/utils/preloadAPI';
 import {
   BlocksIcon,
+  FileCodeIcon,
   LayoutDashboardIcon,
   SettingsIcon,
   WorkflowIcon,
@@ -81,7 +82,7 @@ function CommandList() {
       cleanedQuery = query.slice(QUERY_PREFIX.EXT.length);
       commandItems = commandItems.filter((item) => {
         const metadata = item.metadata as CommandListItems['metadata'];
-        if (metadata.type !== 'command') return false;
+        if (metadata.type !== 'command' || !metadata.extension) return false;
 
         return metadata.extension.id === cleanedQuery;
       });
@@ -222,6 +223,19 @@ function CommandList() {
             description: 'Something went wrong',
           });
         }
+      },
+      metadata: {
+        type: 'builtin-command',
+      },
+    },
+    {
+      group: 'Commands',
+      title: 'Create Command Script',
+      value: 'create-command-script',
+      subtitle: 'Utils',
+      icon: <UiList.Icon icon={FileCodeIcon} />,
+      onSelected() {
+        navigate('/create-command-script');
       },
       metadata: {
         type: 'builtin-command',

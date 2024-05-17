@@ -38,13 +38,9 @@ import {
   UiFormLabel,
   UiFormMessage,
   UiInput,
-  UiPopover,
-  UiPopoverContent,
-  UiPopoverTrigger,
   UiSelect,
   UiSwitch,
   UiTextarea,
-  UiTooltip,
   useToast,
 } from '@repo/ui';
 import { useForm } from 'react-hook-form';
@@ -60,6 +56,7 @@ import { parseJSON } from '@repo/shared';
 import dayjs from '/@/lib/dayjs';
 import clsx from 'clsx';
 import { Link, useNavigate } from 'react-router-dom';
+import UiSelectIcon from '/@/components/ui/UiSelectIcon';
 
 type IconsName = keyof typeof UiExtIcon;
 
@@ -308,39 +305,22 @@ function WorkflowCreateForm({
     <UiForm {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <div className="flex items-start gap-4 mt-7">
-          <UiPopover modal>
-            <UiTooltip label="Workflow icon">
-              <UiPopoverTrigger asChild>
-                <UiButton tabIndex={-1} variant="secondary" size="icon">
-                  <UiFormField
-                    name="icon"
-                    control={form.control}
-                    render={({ field }) => {
-                      const Icon =
-                        UiExtIcon[field.value as keyof typeof UiExtIcon] ??
-                        UiExtIcon.Command;
-                      return <Icon className="h-5 w-5" />;
-                    }}
-                  />
-                </UiButton>
-              </UiPopoverTrigger>
-            </UiTooltip>
-            <UiPopoverContent className="h-80 w-72 overflow-auto" side="bottom">
-              <p>Icons</p>
-              <div className="grid grid-cols-5 gap-1 mt-2 text-muted-foreground">
-                {Object.entries(UiExtIcon).map(([name, Icon]) => (
-                  <button
-                    key={name}
-                    title={name}
-                    className="hover:bg-secondary rounded-lg h-10 w-full inline-flex items-center justify-center hover:text-foreground"
-                    onClick={() => form.setValue('icon', name)}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </button>
-                ))}
-              </div>
-            </UiPopoverContent>
-          </UiPopover>
+          <UiSelectIcon
+            label="Workflow icon"
+            renderIcon={
+              <UiFormField
+                name="icon"
+                control={form.control}
+                render={({ field }) => {
+                  const Icon =
+                    UiExtIcon[field.value as keyof typeof UiExtIcon] ??
+                    UiExtIcon.Command;
+                  return <Icon className="h-5 w-5" />;
+                }}
+              />
+            }
+            onValueChange={(icon) => form.setValue('icon', icon)}
+          />
           <UiFormField
             name="name"
             control={form.control}
@@ -504,7 +484,6 @@ function RouteWorkflows() {
         return;
       }
 
-      console.log(files.map((file) => file.path));
       importWorkflow(files.map((file) => file.path));
     };
 

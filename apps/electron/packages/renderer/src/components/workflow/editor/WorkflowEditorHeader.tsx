@@ -332,7 +332,7 @@ function WorkflowDisableBtn() {
   if (!workflow) return;
 
   return (
-    <div className="flex items-center px-2 h-10 rounded-md border gap-2 mr-2 text-sm">
+    <div className="flex items-center px-2 h-10 rounded-md border border-border/60 gap-2 mr-2 text-sm">
       <UiSwitch
         size="sm"
         checked={workflow.isDisabled}

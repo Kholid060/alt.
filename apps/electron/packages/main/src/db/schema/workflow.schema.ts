@@ -11,7 +11,7 @@ import type {
   WorkflowNodeTrigger,
   WorkflowNodes,
 } from '#common/interface/workflow-nodes.interface';
-import type { WORKFLOW_HISTORY_STATUS } from '#packages/common/utils/constant/workflow.const';
+import type { WORKFLOW_HISTORY_STATUS } from '#common/utils/constant/workflow.const';
 
 export const workflows = sqliteTable('workflows', {
   id: text('id')

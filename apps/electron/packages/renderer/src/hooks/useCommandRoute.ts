@@ -32,7 +32,6 @@ export function useCommandNavigate() {
     path: CommandNavigateParams[0],
     detail?: CommandNavigateOptions,
   ) {
-    console.trace(path);
     if (detail && Object.hasOwn(detail, 'panelHeader')) {
       setCommandPanelHeader(detail.panelHeader!);
     }

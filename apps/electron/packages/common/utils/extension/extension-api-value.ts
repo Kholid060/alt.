@@ -27,6 +27,10 @@ export function extensionAPISearchPanelEvent(
   ) => ({
     addListener: (callback: (...args: any[]) => void) => {
       messagePort?.on(key, callback);
+
+      return () => {
+        messagePort?.off(key, callback);
+      };
     },
     removeListener: (callback: (...args: any[]) => void) => {
       messagePort?.off(key, callback);

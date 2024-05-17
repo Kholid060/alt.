@@ -27,8 +27,13 @@ import type {
   DatabaseExtensionConfigWithSchema,
   DatabaseGetExtensionConfig,
   DatabaseExtensionConfigUpdatePayload,
+  DatabaseExtensionCommandInsertPayload,
+  DatabaseExtensionCommandListFilter,
 } from '/@/interface/database.interface';
-import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
+import {
+  DATABASE_CHANGES_ALL_ARGS,
+  USER_SCRIPT_EXT_ID,
+} from '#packages/common/utils/constant/constant';
 import type { SQLiteDatabase } from './database.service';
 import { MemoryCache } from '@repo/shared';
 import { ExtensionError } from '#packages/common/errors/custom-errors';
@@ -39,6 +44,23 @@ class DBExtensionService {
   private cache: MemoryCache = new MemoryCache();
 
   constructor(private database: SQLiteDatabase) {}
+
+  async $initialData() {
+    // Extension for user script
+    await this.database
+      .insert(extensions)
+      .values({
+        path: '',
+        author: 'user',
+        description: '',
+        version: '0.0.0',
+        icon: 'icon:FileCode',
+        title: 'User Scripts',
+        id: USER_SCRIPT_EXT_ID,
+        name: USER_SCRIPT_EXT_ID,
+      })
+      .onConflictDoNothing({ target: extensions.id });
+  }
 
   async list(
     activeExtOnly: boolean = false,
@@ -83,12 +105,18 @@ class DBExtensionService {
     return extension ?? null;
   }
 
-  getCommands() {
+  getCommands(filter?: DatabaseExtensionCommandListFilter) {
     return this.database.query.commands.findMany({
-      with: {
-        extension: {
-          columns: { isError: true, isDisabled: true },
-        },
+      where(fields, operators) {
+        if (!filter) return;
+
+        switch (filter) {
+          case 'user-script':
+            return operators.and(
+              operators.isNotNull(fields.path),
+              operators.eq(fields.type, 'script'),
+            );
+        }
       },
     });
   }
@@ -136,7 +164,7 @@ class DBExtensionService {
       },
     });
 
-    return result ?? null;
+    return result as DatabaseExtensionCommandWithExtension;
   }
 
   getCommandsByExtensionId(extensionId: string) {
@@ -158,7 +186,7 @@ class DBExtensionService {
 
     emitDBChanges({
       'database:get-extension': [extensionId],
-      'database:get-extension-list': DATABASE_CHANGES_ALL_ARGS,
+      'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
     });
   }
 
@@ -201,6 +229,47 @@ class DBExtensionService {
     );
   }
 
+  async insertCommand({
+    name,
+    type,
+    icon,
+    path,
+    title,
+    config,
+    context,
+    shortcut,
+    subtitle,
+    isDisabled,
+    extensionId,
+    description,
+    arguments: commandArgs,
+  }: DatabaseExtensionCommandInsertPayload) {
+    const id = `${extensionId}:${name}`;
+    await this.database.insert(commands).values({
+      id,
+      name,
+      type,
+      icon,
+      path,
+      title,
+      config,
+      context,
+      shortcut,
+      subtitle,
+      isDisabled,
+      extensionId,
+      description,
+      arguments: commandArgs,
+    });
+
+    emitDBChanges({
+      'database:get-command-list': [DATABASE_CHANGES_ALL_ARGS],
+      'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
+    });
+
+    return id;
+  }
+
   async configExists(configId: string) {
     return Boolean(
       await this.database.query.configs.findFirst({
@@ -232,7 +301,7 @@ class DBExtensionService {
 
     if (commandId) {
       const command = await this.getCommand({ commandId, extensionId });
-      if (!command || !command.config) return null;
+      if (!command || !command.config || !command.extension) return null;
 
       configData = {
         ...configData,
@@ -355,7 +424,7 @@ class DBExtensionService {
     emitDBChanges({
       'database:get-extension': [extensionId],
       'database:get-command': [{ commandId, extensionId }],
-      'database:get-extension-list': DATABASE_CHANGES_ALL_ARGS,
+      'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
     });
   }
 
@@ -363,11 +432,13 @@ class DBExtensionService {
     extensionData: NewExtension,
     commandsData: NewExtensionCommand[],
   ): Promise<DatabaseExtension> {
-    await this.database.insert(extensions).values(extensionData);
-    await this.database.insert(commandsSchema).values(commandsData).returning();
+    await this.database.transaction(async (tx) => {
+      await tx.insert(extensions).values(extensionData);
+      await tx.insert(commandsSchema).values(commandsData);
+    });
 
     emitDBChanges({
-      'database:get-extension-list': DATABASE_CHANGES_ALL_ARGS,
+      'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
     });
 
     const extension = await this.get(extensionData.id);

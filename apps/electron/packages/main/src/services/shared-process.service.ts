@@ -25,11 +25,9 @@ class SharedProcessService {
     if (!command) throw new Error("Coudln't find command");
     if (command.extension.isDisabled) return null;
 
-    const commandFilePath = ExtensionLoader.instance.getPath(
-      extensionId,
-      'base',
-      commandId,
-    );
+    const commandFilePath =
+      command.path ||
+      ExtensionLoader.instance.getPath(extensionId, 'base', commandId);
     if (!commandFilePath) throw new Error("Coudln't find command file");
 
     const commandConfig = await DBService.instance.extension.isConfigInputted(

@@ -61,6 +61,7 @@ export const commands = sqliteTable('commands', {
   description: text('description'),
   title: text('title').notNull(),
   name: text('name').notNull(),
+  path: text('path'),
   context: text('context', { mode: 'json' }).$type<
     ('all' | `host:${string}`)[]
   >(),

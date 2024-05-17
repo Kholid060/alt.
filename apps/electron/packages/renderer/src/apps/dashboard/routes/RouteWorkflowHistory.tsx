@@ -124,8 +124,6 @@ function RouteWorkflowHistory() {
     });
   }, [queryDatabase, search, pagination, sort]);
 
-  console.log(workflowHistory);
-
   return (
     <div className="p-8 container">
       <h2 className="text-2xl font-semibold leading-tight -mt-0.5">

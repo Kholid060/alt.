@@ -63,6 +63,8 @@ class DBService {
       ),
     });
 
+    await Promise.all([this.extension.$initialData()]);
+
     this.intialized = true;
   }
 

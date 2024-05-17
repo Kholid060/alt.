@@ -121,6 +121,10 @@ export const ExtensionCommandSchema = z.object({
     .custom<'all' | `host:${string}`>(
       (val) =>
         typeof val === 'string' && (val.startsWith('host') || val === 'all'),
+      {
+        message:
+          'Command context must be "All" or match the "host:URL" pattern',
+      },
     )
     .array()
     .optional(),

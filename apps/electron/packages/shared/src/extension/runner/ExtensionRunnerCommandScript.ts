@@ -10,7 +10,10 @@ import ExtensionRunnerProcess, {
 const FILE_EXT_COMMAND_MAP: Record<string, string> = {
   '.sh': 'sh',
   '.js': 'node',
+  '.mjs': 'node',
+  '.cjs': 'node',
   '.py': 'python',
+  '.pyi': 'python',
   '.ps1': 'powershell',
 };
 const ARGS_PREFIX = '__ARGS__';

@@ -2,6 +2,7 @@ import CommandList from './routes/CommandList';
 import CommandView from './routes/CommandView';
 import CommandViewJSON from './routes/CommandViewJSON';
 import ConfigInput from './routes/ConfigInput';
+import CreateCommandScript from './routes/CreateCommandScript';
 import { CommandRoute } from '/@/interface/command-route.interface';
 
 export const commandAppRoutes = [
@@ -11,14 +12,19 @@ export const commandAppRoutes = [
     element: CommandList,
   },
   {
+    element: CommandView,
     name: 'extension-command-view',
     path: '/extensions/:extensionId/:commandId/view',
-    element: CommandView,
   },
   {
+    element: CommandViewJSON,
     name: 'extension-command-view-json',
     path: '/extensions/:extensionId/:commandId/view-json',
-    element: CommandViewJSON,
+  },
+  {
+    element: CreateCommandScript,
+    name: 'create-command-script',
+    path: '/create-command-script',
   },
   {
     element: ConfigInput,

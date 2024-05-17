@@ -126,7 +126,12 @@ class DBWorkflowService {
   }
 
   async delete(id: string) {
-    await this.database.delete(workflows).where(eq(workflows.id, id));
+    this.database.transaction(async (tx) => {
+      await tx.delete(workflows).where(eq(workflows.id, id));
+      await tx
+        .delete(workflowsHistory)
+        .where(eq(workflowsHistory.workflowId, id));
+    });
 
     emitDBChanges({
       'database:get-workflow': [id],

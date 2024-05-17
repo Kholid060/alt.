@@ -1,5 +1,6 @@
 import type { ExtensionConfig, ExtensionManifest } from '@repo/extension-core';
 import type {
+  NewExtensionCommand,
   NewExtensionConfig,
   SelectExtension,
   SelectExtensionConfig,
@@ -53,6 +54,11 @@ export type DatabaseExtensionUpdatePayload = Partial<
 
 export type DatabaseExtensionCommandUpdatePayload = Partial<
   Pick<DatabaseExtensionCommand, 'shortcut' | 'subtitle'>
+>;
+
+export type DatabaseExtensionCommandInsertPayload = Omit<
+  NewExtensionCommand,
+  'id'
 >;
 
 export type DatabaseWorkflow = Pick<
@@ -136,6 +142,8 @@ export interface DatabaseWorkflowHistoryListOptions {
   };
 }
 
+export type DatabaseExtensionCommandListFilter = 'user-script';
+
 export interface DatabaseQueriesEvent {
   'database:get-command': (
     commandId: string | { commandId: string; extensionId: string },
@@ -152,6 +160,9 @@ export interface DatabaseQueriesEvent {
   'database:get-workflow': (
     workflowId: string,
   ) => DatabaseWorkflowDetail | null;
+  'database:get-command-list': (
+    filter?: DatabaseExtensionCommandListFilter,
+  ) => SelectExtesionCommand[];
   'database:get-extension': (extensionId: string) => DatabaseExtension | null;
   'database:get-extension-manifest': (
     extensionId: string,
@@ -172,8 +183,11 @@ export interface DatabaseInsertEvents {
     history: DatabaseWorkflowHistoryInsertPayload,
   ) => number;
   'database:insert-extension-config': (
-    cofig: DatabaseExtensionConfigInsertPayload,
+    config: DatabaseExtensionConfigInsertPayload,
   ) => void;
+  'database:insert-extension-command': (
+    command: DatabaseExtensionCommandInsertPayload,
+  ) => string;
 }
 
 export interface DatabaseUpdateEvents {

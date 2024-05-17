@@ -7,6 +7,7 @@ CREATE TABLE `commands` (
 	`description` text,
 	`title` text NOT NULL,
 	`name` text NOT NULL,
+	`path` text,
 	`context` text,
 	`config` text,
 	`arguments` text,

@@ -133,7 +133,7 @@ const ConfigInputFile: ConfigComponent<'input:file'> = ({ config, form }) => {
               onClick={selectFile}
               readOnly
               onKeyDown={(event) => {
-                if (event.key !== 'Enter') return;
+                if (event.key !== 'Enter' && event.code !== 'Space') return;
 
                 event.preventDefault();
                 event.stopPropagation();

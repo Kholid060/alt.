@@ -16,7 +16,6 @@ export function DatabaseProvider({ children }: { children?: React.ReactNode }) {
     const offDbChanges = preloadAPI.main.ipc.on(
       'database:changes',
       (_, changes) => {
-        console.log(changes);
         for (const key in changes) {
           emitter.current.emit(
             key as keyof DatabaseQueriesEvent,

@@ -56,8 +56,11 @@ IPCMain.handle(
 IPCMain.handle('apps:get-list', () => InstalledApps.instance.getApps());
 
 /** DIALOG */
-IPCMain.handle('dialog:open', (_, options) => {
-  return dialog.showOpenDialog(options);
+IPCMain.handle('dialog:open', ({ sender }, options) => {
+  const browserWindow = BrowserWindow.fromWebContents(sender);
+  return browserWindow
+    ? dialog.showOpenDialog(browserWindow, options)
+    : dialog.showOpenDialog(options);
 });
 IPCMain.handle('dialog:message-box', (_, options) => {
   return dialog.showMessageBox(options);
@@ -157,6 +160,12 @@ IPCMain.handle('database:update-extension', async (_, extensionId, data) => {
 });
 IPCMain.handle('database:get-command', (_, query) => {
   return DBService.instance.extension.getCommand(query);
+});
+IPCMain.handle('database:get-command-list', (_, filter) => {
+  return DBService.instance.extension.getCommands(filter);
+});
+IPCMain.handle('database:insert-extension-command', (_, data) => {
+  return DBService.instance.extension.insertCommand(data);
 });
 IPCMain.handle('database:get-extension-config', (_, configId) => {
   return DBService.instance.extension.getConfig(configId);
