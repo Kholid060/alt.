@@ -73,6 +73,7 @@ export const commands = sqliteTable('commands', {
     .notNull()
     .$default(() => false),
   extensionId: text('extension_id').notNull(),
+  dismissAlert: integer('dismiss_alert', { mode: 'boolean' }),
 });
 export type NewExtensionCommand = typeof commands.$inferInsert;
 export type SelectExtesionCommand = typeof commands.$inferSelect;

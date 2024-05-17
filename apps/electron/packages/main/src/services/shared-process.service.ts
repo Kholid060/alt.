@@ -108,6 +108,7 @@ class SharedProcessService {
   static async executeWorkflow(payload: WorkflowRunPayload) {
     const workflow = await DBService.instance.workflow.get(payload.id);
     if (!workflow) throw new Error("Couldn't find workflow");
+    if (workflow.isDisabled) return null;
 
     DBService.instance.workflow.incExecuteCount(payload.id);
 

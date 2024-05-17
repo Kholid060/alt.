@@ -14,7 +14,6 @@ import type {
 import { app, dialog } from 'electron';
 import path from 'path';
 import fs from 'fs-extra';
-import type { SelectWorkflow } from '../db/schema/workflow.schema';
 import { z } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 import { logger } from '../lib/log';
@@ -122,7 +121,8 @@ class WorkflowService {
   }
 
   static async export(workflowId: string, window?: Electron.BrowserWindow) {
-    const workflow = await this.get(workflowId);
+    const workflow =
+      await DBService.instance.workflow.getExportValue(workflowId);
     if (!workflow) throw new Error("Couldn't find workflow");
 
     const options: Electron.SaveDialogOptions = {
@@ -135,16 +135,6 @@ class WorkflowService {
       ? dialog.showSaveDialog(window, options)
       : dialog.showSaveDialog(options));
     if (result.canceled || !result.filePath) return;
-
-    const deleteKeys: (keyof Required<SelectWorkflow>)[] = [
-      'createdAt',
-      'executeCount',
-      'id',
-      'isDisabled',
-    ];
-    deleteKeys.forEach((key) => {
-      delete workflow[key];
-    });
 
     await fs.writeFile(result.filePath, JSON.stringify(workflow));
   }

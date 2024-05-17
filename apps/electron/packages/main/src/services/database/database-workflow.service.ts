@@ -54,6 +54,26 @@ class DBWorkflowService {
     return result ?? null;
   }
 
+  async getExportValue(workflowId: string) {
+    const result = await this.database.query.workflows.findFirst({
+      columns: {
+        icon: true,
+        name: true,
+        nodes: true,
+        edges: true,
+        settings: true,
+        viewport: true,
+        variables: true,
+        description: true,
+      },
+      where(fields, operators) {
+        return operators.eq(fields.id, workflowId);
+      },
+    });
+
+    return result ?? null;
+  }
+
   getAll(): Promise<DatabaseWorkflowDetail[]> {
     return this.database.query.workflows.findMany();
   }

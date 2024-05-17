@@ -1,25 +1,36 @@
+import type { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
+
 interface WorkflowRunnerLoopData {
   index: number;
   label?: string;
   data: unknown[];
 }
 
-class StorageData<T = unknown> {
-  private _data: Record<PropertyKey, T> = {};
+class StorageData<
+  T extends Record<string | number, unknown> = Record<string | number, unknown>,
+> {
+  private _data: T;
 
-  set(key: PropertyKey, value: T) {
+  initialData: T;
+
+  constructor(defaultData: T) {
+    this._data = defaultData;
+    this.initialData = defaultData;
+  }
+
+  set<K extends keyof T>(key: K, value: T[K]) {
     this._data[key] = value;
   }
 
-  get<P = T>(key: PropertyKey) {
+  get<K extends keyof T, P = T[K]>(key: K) {
     return (this._data[key] ?? null) as P | null;
   }
 
-  has(key: PropertyKey): boolean {
+  has<K extends keyof T>(key: K): boolean {
     return Object.hasOwn(this._data, key);
   }
 
-  delete(key: PropertyKey) {
+  delete<K extends keyof T>(key: K) {
     delete this._data[key];
   }
 
@@ -28,42 +39,41 @@ class StorageData<T = unknown> {
   }
 
   clear() {
-    this._data = {};
+    this._data = this.initialData;
   }
 }
 
-class WorkflowRunnerData {
-  private _prevNodeData: unknown = null;
+type NodeData = {
+  prevNode: { id: string; value: unknown } | null;
+  currentNode: { id: string; type: WORKFLOW_NODE_TYPE } | null;
+};
 
+class WorkflowRunnerData {
   variables: StorageData;
-  loopData: StorageData<WorkflowRunnerLoopData>;
+  nodeData: StorageData<NodeData>;
+  loopData: StorageData<Record<string, WorkflowRunnerLoopData>>;
 
   constructor() {
-    this._prevNodeData = null;
-    this.loopData = new StorageData();
-    this.variables = new StorageData();
-  }
-
-  get prevNodeData() {
-    return this._prevNodeData;
+    this.nodeData = new StorageData({
+      prevNode: null,
+      currentNode: null,
+    });
+    this.loopData = new StorageData({});
+    this.variables = new StorageData({});
   }
 
   get contextData() {
     return {
-      prevNode: this.prevNodeData,
       vars: this.variables.getAll(),
       loopData: this.loopData.getAll(),
+      prevNode: this.nodeData.get('prevNode')?.value ?? null,
     };
-  }
-
-  setPrevNodeData(data: unknown) {
-    this._prevNodeData = data;
   }
 
   destroy() {
     this.loopData.clear();
+    this.nodeData.clear();
     this.variables.clear();
-    this._prevNodeData = null;
   }
 }
 

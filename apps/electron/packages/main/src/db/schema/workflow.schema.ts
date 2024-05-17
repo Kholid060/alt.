@@ -47,6 +47,7 @@ export const workflows = sqliteTable('workflows', {
     .default(sql`(json_array())`)
     .$type<WorkflowVariable[]>(),
   executeCount: integer('execute_count').notNull().default(0),
+  dismissAlert: integer('dismiss_alert', { mode: 'boolean' }),
   settings: text('settings', { mode: 'json' }).$type<WorkflowSettings>(),
 });
 export type NewWorkflow = typeof workflows.$inferInsert;

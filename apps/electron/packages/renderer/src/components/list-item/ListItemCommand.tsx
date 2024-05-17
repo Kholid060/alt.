@@ -2,13 +2,13 @@ import { UiList, UiListItemAction } from '@repo/ui';
 import { ListItemRenderDetail } from '../../apps/command/routes/CommandList';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
-import { APP_DEEP_LINK } from '#common/utils/constant/constant';
 import { BoltIcon, LinkIcon } from 'lucide-react';
 import { useCommandStore } from '/@/stores/command.store';
 import { CommandLaunchBy } from '@repo/extension';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
 import CommandShortcut from '../ui/UiShortcut';
+import DeepLinkURL from '#packages/common/utils/DeepLinkURL';
 
 function ListItemCommand({
   item,
@@ -72,7 +72,7 @@ function ListItemCommand({
         preloadAPI.main.ipc
           .invoke(
             'clipboard:copy',
-            `${APP_DEEP_LINK}://extensions/${extension.id}/${command.name}`,
+            DeepLinkURL.getExtensionCommand(extension.id, command.name),
           )
           .then((value) => {
             if (value && '$isError' in value) return;

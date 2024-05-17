@@ -3,12 +3,13 @@ import type { ExtensionMessagePortEvent } from '@repo/extension';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import type { BetterMessagePortSync, EventMapEmit } from '@repo/shared';
 import { nanoid } from 'nanoid/non-secure';
-import { APP_ICON_DIR_PREFIX, CUSTOM_SCHEME } from '../constant/constant';
+import { CUSTOM_SCHEME } from '../constant/constant';
 import type { ExtensionAPIValues } from '@repo/extension-core/dist/extensionApiBuilder';
 import { createExtensionElementHandle } from './extension-element-handle';
 import type { IPCUserExtensionEventsMap } from '../../interface/ipc-events.interface';
 import extensionApiBuilder from '@repo/extension-core/dist/extensionApiBuilder';
 import type { ExtensionBrowserTabContext } from '../../interface/extension.interface';
+import { APP_ICON_DIR_PREFIX } from '../../utils/constant/app.const';
 
 interface CreateExtensionAPI {
   context?: unknown;

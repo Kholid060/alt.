@@ -3,7 +3,9 @@ import { UiList, UiListItemAction } from '@repo/ui';
 import { ListItemRenderDetail } from '/@/apps/command/routes/CommandList';
 import preloadAPI from '/@/utils/preloadAPI';
 import { UiExtIcon } from '@repo/extension';
-import { EditIcon } from 'lucide-react';
+import { EditIcon, LinkIcon } from 'lucide-react';
+import DeepLinkURL from '#packages/common/utils/DeepLinkURL';
+import { useCommandPanelStore } from '/@/stores/command-panel.store';
 
 function ListItemWorkflow({
   item,
@@ -11,6 +13,8 @@ function ListItemWorkflow({
   props,
   selected,
 }: ListItemRenderDetail<'workflow'>) {
+  const addPanelStatus = useCommandPanelStore.use.addStatus();
+
   const Icon =
     UiExtIcon[item.icon as keyof typeof UiExtIcon] ?? UiExtIcon.Command;
 
@@ -28,6 +32,26 @@ function ListItemWorkflow({
           );
         });
       },
+    },
+    {
+      onAction() {
+        preloadAPI.main.ipc
+          .invoke(
+            'clipboard:copy',
+            DeepLinkURL.getWorkflow(item.metadata.workflowId),
+          )
+          .then((value) => {
+            if (value && '$isError' in value) return;
+
+            addPanelStatus({
+              type: 'success',
+              title: 'Copied to clipboard',
+            });
+          });
+      },
+      icon: LinkIcon,
+      title: 'Copy Deep Link',
+      value: 'copy-deeplink',
     },
   ];
 

@@ -4,6 +4,7 @@ import type {
   NewExtensionCommand,
   NewExtensionConfig,
   SelectExtensionStorage,
+  SelectExtesionCommand,
 } from '/@/db/schema/extension.schema';
 import {
   extensions,
@@ -424,11 +425,16 @@ class DBExtensionService {
   async updateCommand(
     extensionId: string,
     commandId: string,
-    value: DatabaseExtensionCommandUpdatePayload,
+    {
+      shortcut,
+      subtitle,
+      dismissAlert,
+    }: DatabaseExtensionCommandUpdatePayload &
+      Partial<Pick<SelectExtesionCommand, 'dismissAlert'>>,
   ) {
     await this.database
       .update(commands)
-      .set(value)
+      .set({ shortcut, subtitle, dismissAlert })
       .where(eq(commands.id, `${extensionId}:${commandId}`));
 
     emitDBChanges({

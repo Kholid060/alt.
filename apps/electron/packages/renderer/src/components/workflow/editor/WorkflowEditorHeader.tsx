@@ -12,6 +12,7 @@ import {
 } from '@repo/ui';
 import {
   ChevronLeftIcon,
+  CopyIcon,
   DownloadIcon,
   EllipsisVerticalIcon,
   PlayIcon,
@@ -36,6 +37,7 @@ import { nanoid } from 'nanoid/non-secure';
 import { WorkflowVariable } from '#packages/common/interface/workflow.interface';
 import UiShortcut from '../../ui/UiShortcut';
 import { useHotkeys } from 'react-hotkeys-hook';
+import DeepLinkURL from '#packages/common/utils/DeepLinkURL';
 
 function WorkflowInformation() {
   const workflow = useWorkflowEditorStore.use.workflow();
@@ -335,11 +337,11 @@ function WorkflowDisableBtn() {
     <div className="flex items-center px-2 h-10 rounded-md border border-border/60 gap-2 mr-2 text-sm">
       <UiSwitch
         size="sm"
-        checked={workflow.isDisabled}
+        checked={!workflow.isDisabled}
         id="workflow-disabled-switch"
-        onCheckedChange={(isDisabled) => updateWorkflow({ isDisabled })}
+        onCheckedChange={(value) => updateWorkflow({ isDisabled: !value })}
       />
-      <UiLabel htmlFor="workflow-disabled-switch">Disabled</UiLabel>
+      <UiLabel htmlFor="workflow-disabled-switch">Enable</UiLabel>
     </div>
   );
 }
@@ -372,6 +374,24 @@ function WorkflowMoreMenu() {
       });
     }
   }
+  async function copyDeepLink() {
+    try {
+      const { workflow } = useWorkflowEditorStore.getState();
+      if (!workflow) return;
+
+      const result = await preloadAPI.main.ipc.invoke(
+        'clipboard:copy',
+        DeepLinkURL.getWorkflow(workflow.id),
+      );
+      if (isIPCEventError(result)) return;
+
+      toast({
+        title: 'Copied to clipboard',
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <UiDropdownMenu>
@@ -381,6 +401,10 @@ function WorkflowMoreMenu() {
         </UiButton>
       </UiDropdownMenuTrigger>
       <UiDropdownMenuContent>
+        <UiDropdownMenuItem onClick={copyDeepLink}>
+          <CopyIcon className="mr-2 h-4 w-4" />
+          Copy deep link
+        </UiDropdownMenuItem>
         <UiDropdownMenuItem onClick={exportWorkflow}>
           <DownloadIcon className="mr-2 h-4 w-4" />
           Export workflow

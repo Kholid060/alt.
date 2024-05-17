@@ -57,6 +57,7 @@ import dayjs from '/@/lib/dayjs';
 import clsx from 'clsx';
 import { Link, useNavigate } from 'react-router-dom';
 import UiSelectIcon from '/@/components/ui/UiSelectIcon';
+import DeepLinkURL from '#packages/common/utils/DeepLinkURL';
 
 type IconsName = keyof typeof UiExtIcon;
 
@@ -139,6 +140,21 @@ function WorkflowCards({ workflows }: { workflows: DatabaseWorkflow[] }) {
       });
     }
   }
+  async function copyDeepLink(workflowId: string) {
+    try {
+      const result = await preloadAPI.main.ipc.invoke(
+        'clipboard:copy',
+        DeepLinkURL.getWorkflow(workflowId),
+      );
+      if (isIPCEventError(result)) return;
+
+      toast({
+        title: 'Copied to clipboard',
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   if (workflows.length === 0) {
     return (
@@ -208,6 +224,9 @@ function WorkflowCards({ workflows }: { workflows: DatabaseWorkflow[] }) {
                 </UiDropdownMenuItem>
                 <UiDropdownMenuItem onClick={() => exportWorkflow(workflow.id)}>
                   Export
+                </UiDropdownMenuItem>
+                <UiDropdownMenuItem onClick={() => copyDeepLink(workflow.id)}>
+                  Copy deep link
                 </UiDropdownMenuItem>
                 <UiDropdownMenuSeparator />
                 <UiDropdownMenuItem

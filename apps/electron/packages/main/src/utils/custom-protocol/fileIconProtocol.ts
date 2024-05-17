@@ -3,12 +3,10 @@ import {
   createErrorResponse,
   type CustomProtocolHandler,
 } from './CustomProtocol';
-import {
-  APP_ICON_DIR_PREFIX,
-  CUSTOM_SCHEME,
-} from '#common/utils/constant/constant';
+import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
 import { app } from 'electron';
 import InstalledApps from '../InstalledApps';
+import { APP_ICON_DIR_PREFIX } from '#packages/common/utils/constant/app.const';
 
 const appIconProtocol: CustomProtocolHandler = {
   scheme: CUSTOM_SCHEME.fileIcon,

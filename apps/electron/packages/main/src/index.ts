@@ -6,7 +6,7 @@ import { platform } from 'node:process';
 import updater from 'electron-updater';
 import CustomProtocol from './utils/custom-protocol/CustomProtocol';
 import WindowsManager from './window/WindowsManager';
-import { APP_DEEP_LINK } from '#packages/common/utils/constant/constant';
+import { APP_DEEP_LINK } from '#packages/common/utils/constant/app.const';
 import path from 'node:path';
 import DeepLink from './utils/DeepLink';
 import { initDefaultWebsocketServer } from './services/websocket/websocket.service';

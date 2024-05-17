@@ -349,7 +349,10 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
         });
       }
 
-      this.dataStorage.setPrevNodeData(execResult.value);
+      this.dataStorage.nodeData.set('prevNode', {
+        id: node.id,
+        value: execResult.value,
+      });
 
       const nextNode = this.findNextNode(
         execResult.nextNodeId ?? node.id,
