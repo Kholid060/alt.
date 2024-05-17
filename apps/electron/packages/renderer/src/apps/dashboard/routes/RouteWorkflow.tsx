@@ -22,6 +22,8 @@ import ReactFlow, {
   XYPosition,
   OnEdgesDelete,
   SelectionDragHandler,
+  OnInit,
+  useStoreApi,
 } from 'reactflow';
 import WorkflowEditorHeader from '/@/components/workflow/editor/WorkflowEditorHeader';
 import WorkflowEditorControls, {
@@ -89,6 +91,7 @@ const nodeConnectionValidator: IsValidConnection = (edge) => {
 };
 
 function WorkflowEditor() {
+  const storeApi = useStoreApi();
   const { event: workflowEditorEvent } = useWorkflowEditor();
 
   const connectingNodeEdge = useRef<{
@@ -221,11 +224,23 @@ function WorkflowEditor() {
     },
     [setEditNode],
   );
-  const onInit = useCallback(() => {
-    setTimeout(() => {
-      applyChanges.current = true;
-    }, 500);
-  }, []);
+  const onInit: OnInit = useCallback(
+    (reactFlow) => {
+      setTimeout(() => {
+        applyChanges.current = true;
+      }, 500);
+
+      const searchParams = new URLSearchParams(window.location.search);
+      if (!searchParams.has('toNode')) return;
+
+      const node = reactFlow.getNode(searchParams.get('toNode') ?? '');
+      if (!node) return;
+
+      reactFlow.setCenter(node.position.x, node.position.y);
+      storeApi.getState().addSelectedNodes([node.id]);
+    },
+    [storeApi],
+  );
   const onNodesDelete: OnNodesDelete = useCallback(
     (nodes) => {
       addCommands([{ type: 'node-removed', nodes: nodes as WorkflowNodes[] }]);

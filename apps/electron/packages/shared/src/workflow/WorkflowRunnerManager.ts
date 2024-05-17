@@ -73,11 +73,12 @@ class WorkflowRunnerManager {
       nodeHandlers,
       id: runnerId,
     });
-    runner.once('error', (message) => {
+    runner.once('error', ({ message, location }) => {
       debugLog(`Error on "${workflow.name}" workflow: ${message}`);
 
       updateWorkflowHistory(historyId, {
         errorMessage: message,
+        errorLocation: location,
         startedAt: runner.startedAt,
         status: WORKFLOW_HISTORY_STATUS.Error,
       });

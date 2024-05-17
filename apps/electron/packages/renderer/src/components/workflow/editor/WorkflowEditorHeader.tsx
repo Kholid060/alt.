@@ -260,11 +260,11 @@ function WorkflowSaveButton() {
   }, [blocker, navigate]);
 
   useEffect(() => {
-    const params = new URLSearchParams();
-    params.append('preventCloseWindow', `${enableWorkflowSaveBtn}`);
+    const params = new URLSearchParams(window.location.search);
+    params.set('preventCloseWindow', `${enableWorkflowSaveBtn}`);
 
     setSearchParams(params);
-  }, [enableWorkflowSaveBtn, setSearchParams]);
+  }, [enableWorkflowSaveBtn]);
 
   const saveWorkflow = useCallback(async () => {
     try {

@@ -30,8 +30,8 @@ export interface WorkflowRunnerOptions extends WorkflowRunnerRunPayload {
 }
 
 export interface WorkflowRunnerEvents {
-  error: (message: string) => void;
   finish: (reason: WorkflowRunnerFinishReason) => void;
+  error: (error: { message: string; location?: string }) => void;
 }
 
 export enum WorkflowRunnerState {
@@ -177,7 +177,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     });
     if (!startNode) {
       this.state = WorkflowRunnerState.Error;
-      this.emit('error', "Couldn't find the starting node");
+      this.emit('error', { message: "Couldn't find the starting node" });
       return;
     }
 
@@ -251,7 +251,9 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
       } {
     if (!this.nodesIdxMap.has(nodeId)) {
       this.state = WorkflowRunnerState.Error;
-      this.emit('error', `Couldn't find node with "${nodeId}" id`);
+      this.emit('error', {
+        message: `Couldn't find node with "${nodeId}" id`,
+      });
 
       return {
         node: null,
@@ -296,7 +298,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     const nextNode = nodeConnection && this.getNode(nodeConnection.nodeId);
     if (!nextNode) {
       this.state = WorkflowRunnerState.Error;
-      this.emit('error', "Couldn't find the next node");
+      this.emit('error', { message: "Couldn't find the next node" });
 
       return {
         node: null,
@@ -319,7 +321,10 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
 
       if (node.id === prevExec?.node.id) {
         this.state = WorkflowRunnerState.Error;
-        this.emit('error', 'Stopped to prevent infinite loop');
+        this.emit('error', {
+          message: 'Stopped to prevent infinite loop',
+          location: `${node.type}:${node.id}`,
+        });
         return;
       }
 
@@ -336,6 +341,11 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
         value: prevExec?.value,
       };
       if (!node.data.isDisabled) {
+        this.dataStorage.nodeData.set('currentNode', {
+          id: node.id,
+          type: node.type,
+        });
+
         const renderedNode = await this.evaluateNodeExpression(node);
 
         if (nodeHandler.dataValidation) {
@@ -369,15 +379,20 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
 
       if (this.state !== WorkflowRunnerState.Running) return;
 
-      if (error instanceof WorkflowRunnerNodeError) {
+      if (
+        error instanceof WorkflowRunnerNodeError ||
+        !node.data.$errorHandler
+      ) {
         this.state = WorkflowRunnerState.Error;
-        this.emit('error', error.message);
-        return;
-      }
 
-      if (!node.data.$errorHandler) {
-        this.state = WorkflowRunnerState.Error;
-        this.emit('error', (<Error>error).message);
+        const currentNode = this.dataStorage.nodeData.get('currentNode');
+
+        this.emit('error', {
+          message: (<Error>error).message,
+          location: currentNode
+            ? `${currentNode.type}:${currentNode.id}`
+            : undefined,
+        });
         return;
       }
 
@@ -419,7 +434,9 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
       }
 
       this.state = WorkflowRunnerState.Error;
-      this.emit('error', (<Error>error).message);
+      this.emit('error', {
+        message: (<Error>error).message,
+      });
     }
   }
 

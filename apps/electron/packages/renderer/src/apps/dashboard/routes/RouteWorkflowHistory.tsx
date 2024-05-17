@@ -10,6 +10,9 @@ import {
   UiButton,
   UiInput,
   UiLabel,
+  UiPopover,
+  UiPopoverContent,
+  UiPopoverTrigger,
   UiSelect,
   useToast,
 } from '@repo/ui';
@@ -21,10 +24,14 @@ import {
   TrashIcon,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { WORKFLOW_HISTORY_STATUS } from '#packages/common/utils/constant/workflow.const';
+import {
+  WORKFLOW_HISTORY_STATUS,
+  WORKFLOW_NODE_TYPE,
+} from '#packages/common/utils/constant/workflow.const';
 import dayjs from 'dayjs';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '#packages/common/utils/helper';
+import { WORKFLOW_NODES } from '#packages/common/utils/constant/workflow-nodes.const';
 
 function WorkflowHistoryStatusBadge({
   status,
@@ -65,6 +72,38 @@ function formatDuration(duration: number) {
 }
 
 type HistorySort = Required<DatabaseWorkflowHistoryListOptions>['sort'];
+
+function WorkflowHistoryError({ item }: { item: DatabaseWorkflowHistory }) {
+  let nodeId = '';
+  let nodeName = '';
+
+  if (item.errorLocation) {
+    let type = '';
+    [type, nodeId] = item.errorLocation.split(':');
+
+    nodeName = WORKFLOW_NODES[type as WORKFLOW_NODE_TYPE]?.title ?? 'Node';
+  }
+
+  return (
+    <>
+      {nodeName && nodeId && (
+        <p className="text-sm mb-2">
+          Error occured on the{' '}
+          <Link
+            to={`/workflows/${item.workflowId}?toNode=${nodeId}`}
+            className="underline"
+          >
+            &quot;{nodeName}&quot;
+          </Link>{' '}
+          node
+        </p>
+      )}
+      <pre className="whitespace-pre-wrap text-sm p-2 rounded-md bg-background">
+        {item.errorMessage!}
+      </pre>
+    </>
+  );
+}
 
 function RouteWorkflowHistory() {
   const { toast } = useToast();
@@ -179,7 +218,7 @@ function RouteWorkflowHistory() {
               <th className="h-12 px-3 text-center">Status</th>
               <th className="h-12 px-3">Started at</th>
               <th className="h-12 px-3">Duration</th>
-              <th className="h-12 px-3 w-14"></th>
+              <th className="h-12 px-3 w-36"></th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -216,15 +255,30 @@ function RouteWorkflowHistory() {
                 <td className="p-3">
                   {item.duration ? formatDuration(item.duration) : '-'}
                 </td>
-                <td className="p-3 text-right">
-                  <UiButton
-                    size="icon-sm"
-                    variant="ghost"
-                    onClick={() => deleteHistory(item.id)}
-                    className="invisible group-hover:visible"
-                  >
-                    <TrashIcon className="h-5 w-5 text-destructive-text" />
-                  </UiButton>
+                <td className="p-3">
+                  <div className="flex items-center justify-end gap-3">
+                    {item.errorMessage && (
+                      <UiPopover>
+                        <UiPopoverTrigger className="underline h-8">
+                          see error
+                        </UiPopoverTrigger>
+                        <UiPopoverContent
+                          side="left"
+                          className="max-h-72 overflow-auto w-80"
+                        >
+                          <WorkflowHistoryError item={item} />
+                        </UiPopoverContent>
+                      </UiPopover>
+                    )}
+                    <UiButton
+                      size="icon-sm"
+                      variant="ghost"
+                      onClick={() => deleteHistory(item.id)}
+                      className="invisible group-hover:visible"
+                    >
+                      <TrashIcon className="h-5 w-5 text-destructive-text" />
+                    </UiButton>
+                  </div>
                 </td>
               </tr>
             ))}
