@@ -13,14 +13,6 @@ import { WORKFLOW_NODES } from '#common/utils/constant/workflow-nodes.const';
 import { useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 
-interface WorkflowNodeLayoutEditProps {
-  title?: string;
-  subtitle?: string;
-  node: WorkflowNodes;
-  icon?: React.ReactNode;
-  children?: React.ReactNode;
-}
-
 function NodeId({ nodeId }: { nodeId: string }) {
   const [copied, setCopied] = useState(false);
 
@@ -47,12 +39,23 @@ function NodeId({ nodeId }: { nodeId: string }) {
   );
 }
 
+interface WorkflowNodeLayoutEditProps {
+  title?: string;
+  subtitle?: string;
+  node: WorkflowNodes;
+  icon?: React.ReactNode;
+  tabsSlot?: React.ReactNode;
+  children?: React.ReactNode;
+  tabContentSlot?: React.ReactNode;
+}
 function WorkflowNodeLayoutEdit({
   node,
   icon,
   title,
+  tabsSlot,
   subtitle,
   children,
+  tabContentSlot,
 }: WorkflowNodeLayoutEditProps) {
   const nodeData = WORKFLOW_NODES[node.type];
 
@@ -74,6 +77,7 @@ function WorkflowNodeLayoutEdit({
         <UiTabsList className="sticky top-0 bg-background z-50">
           <UiTabsTrigger value="parameters">Parameters</UiTabsTrigger>
           <UiTabsTrigger value="error">Error Handler</UiTabsTrigger>
+          {tabsSlot}
         </UiTabsList>
         <UiTabsContent value="parameters" className="p-4 mt-0">
           {children}
@@ -81,6 +85,7 @@ function WorkflowNodeLayoutEdit({
         <UiTabsContent value="error" className="p-4 mt-0">
           <WorkflowNodeErrorHandler data={node.data.$errorHandler} />
         </UiTabsContent>
+        {tabContentSlot}
       </UiTabs>
     </>
   );

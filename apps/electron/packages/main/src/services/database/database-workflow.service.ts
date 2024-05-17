@@ -272,6 +272,25 @@ class DBWorkflowService {
     };
   }
 
+  async commandExist(ids: string[]) {
+    const queryResult = await this.database.query.commands.findMany({
+      columns: {
+        id: true,
+      },
+      where(fields, operators) {
+        return operators.inArray(fields.id, ids);
+      },
+    });
+
+    const commandIds = new Set(queryResult.map((item) => item.id));
+    const result = ids.reduce<Record<string, boolean>>((acc, curr) => {
+      acc[curr] = commandIds.has(curr);
+      return acc;
+    }, {});
+
+    return result;
+  }
+
   async deleteHistory(historyId: number | number[]) {
     await this.database
       .delete(workflowsHistory)

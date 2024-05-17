@@ -1,5 +1,5 @@
 import { WorkflowNodeCommand } from '#packages/common/interface/workflow-nodes.interface';
-import { UiInput, UiList, UiSelect, UiSwitch } from '@repo/ui';
+import { UiInput, UiList, UiSelect, UiSwitch, UiTabsTrigger } from '@repo/ui';
 import UiExtensionIcon from '../../ui/UiExtensionIcon';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import { ChevronDown } from 'lucide-react';
@@ -17,6 +17,10 @@ function CommandArgs({ data }: { data: WorkflowNodeCommand['data'] }) {
         [name]: value,
       },
     });
+  }
+
+  if (data.args.length === 0) {
+    return <p className="text-center text-muted-foreground">No parameters</p>;
   }
 
   return (
@@ -123,6 +127,7 @@ function WorkflowNodeEditCommand() {
         />
       }
       title={data.title}
+      tabsSlot={<UiTabsTrigger value="extension">Extension</UiTabsTrigger>}
       subtitle={data.extension.title}
     >
       <CommandArgs data={data} />

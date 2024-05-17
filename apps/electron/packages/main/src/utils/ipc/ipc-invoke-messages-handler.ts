@@ -212,6 +212,9 @@ IPCMain.handle('database:update-workflow-history', (_, historyId, payload) => {
 IPCMain.handle('database:delete-workflow-history', (_, historyId) => {
   return DBService.instance.workflow.deleteHistory(historyId);
 });
+IPCMain.handle('database:extension-command-exists', (_, ids) => {
+  return DBService.instance.workflow.commandExist(ids);
+});
 
 /** SHELL */
 IPCMain.handle('shell:open-in-folder', (_, filePath) => {

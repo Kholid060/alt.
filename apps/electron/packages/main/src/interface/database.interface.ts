@@ -170,6 +170,9 @@ export interface DatabaseQueriesEvent {
   'database:get-workflow-history': (
     historyId: number,
   ) => DatabaseWorkflowHistory | null;
+  'database:extension-command-exists': (
+    ids: string[],
+  ) => Record<string, boolean>;
   'database:get-workflow-history-list': (
     options?: DatabaseWorkflowHistoryListOptions,
   ) => { count: number; items: DatabaseWorkflowHistory[] };

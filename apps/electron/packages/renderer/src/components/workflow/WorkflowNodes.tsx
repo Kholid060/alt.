@@ -1,4 +1,4 @@
-import { memo, useEffect, useRef } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import {
   Handle,
   NodeProps,
@@ -8,7 +8,7 @@ import {
   useUpdateNodeInternals,
 } from 'reactflow';
 import { WorkflowNodeErroHandlerAction } from '#common/interface/workflow.interface';
-import { UiList } from '@repo/ui';
+import { UiList, UiTooltip } from '@repo/ui';
 import UiExtensionIcon from '../ui/UiExtensionIcon';
 import type * as NodesType from '#packages/common/interface/workflow-nodes.interface';
 import { WORKFLOW_NODES } from '#common/utils/constant/workflow-nodes.const';
@@ -22,6 +22,7 @@ import {
   ToggleLeftIcon,
   ToggleRightIcon,
   TrashIcon,
+  TriangleAlertIcon,
 } from 'lucide-react';
 import { useWorkflowEditorStore } from '../../stores/workflow-editor/workflow-editor.store';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
@@ -250,6 +251,20 @@ function NodeCard({
 export const WorkflowNodeCommand: React.FC<
   NodeProps<NodesType.WorkflowNodeCommand['data']>
 > = memo(({ id, data }) => {
+  const { isExtCommandExists } = useWorkflowEditor();
+  const [commandExists, setCommandExists] = useState(true);
+
+  useEffect(() => {
+    const command = isExtCommandExists(
+      `${data.extension.id}:${data.commandId}`,
+    );
+    command.result.then(setCommandExists).catch(() => {
+      // do nothing
+    });
+
+    return () => command.cancel();
+  }, []);
+
   return (
     <>
       <NodeToolbarMenu nodeId={id} nodeData={data} />
@@ -273,6 +288,18 @@ export const WorkflowNodeCommand: React.FC<
           nodeId={id}
           errorHandlerAction={data.$errorHandler?.action}
         />
+        {!commandExists && (
+          <UiTooltip
+            label={
+              <p className="text-xs max-w-64 text-muted-foreground leading-tight">
+                Couldn&apos;t find the command. <br /> Make sure the extension
+                that include this command is installed.
+              </p>
+            }
+          >
+            <TriangleAlertIcon className="absolute h-4 w-4 text-destructive-text top-2 right-2" />
+          </UiTooltip>
+        )}
       </NodeCard>
     </>
   );
