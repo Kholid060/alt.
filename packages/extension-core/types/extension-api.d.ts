@@ -8,6 +8,7 @@ import type {
   KeyboardBrowserTypeOptions,
   BrowserWaitForSelectorOptions,
   ExtensionBrowserElementSelector,
+  BrowserGetHTMLOptions,
 } from '@repo/shared';
 
 type OmitFirstArg<F> = F extends (x: any, ...args: infer P) => infer R
@@ -181,6 +182,7 @@ declare namespace ExtensionAPI.ui.searchPanel {
 }
 
 declare namespace ExtensionAPI.browser {
+  type GetHTMLOptions = BrowserGetHTMLOptions;
   type GetTextOptions = BrowserGetTextOptions;
   type WaitForSelectorOptions = BrowserWaitForSelectorOptions;
 
@@ -204,6 +206,7 @@ declare namespace ExtensionAPI.browser {
     getText: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.getText>;
     keyDown: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.keyDown>;
     getText: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.getText>;
+    getHTML: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.getHTML>;
     getAttributes: OmitFirstArg<
       typeof ExtensionAPI.browser.activeTab.getAttributes
     >;
@@ -250,6 +253,11 @@ declare namespace ExtensionAPI.browser.activeTab {
   export function getText(
     selector?: ExtensionAPI.browser.ElementSelector,
     options?: Partial<ExtensionAPI.browser.GetTextOptions>,
+  ): Promise<string>;
+
+  export function getHTML(
+    selector?: ExtensionAPI.browser.ElementSelector,
+    options?: Partial<ExtensionAPI.browser.GetHTMLOptions>,
   ): Promise<string>;
 
   export function getAttributes(

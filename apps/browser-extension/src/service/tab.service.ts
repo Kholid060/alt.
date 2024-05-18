@@ -2,6 +2,7 @@ import Browser from 'webextension-polyfill';
 import { injectContentHandlerScript } from '../utils/background-content-utils';
 import RuntimeMessage from '../utils/RuntimeMessage';
 import {
+  BrowserGetHTMLOptions,
   BrowserGetTextOptions,
   ExtensionBrowserElementSelector,
   KeyboardBrowserTypeOptions,
@@ -68,6 +69,25 @@ class TabService {
       frameId,
       name: 'element:get-text',
       args: [selector, getTextOptions],
+    });
+  }
+
+  static async getHTML(
+    { tabId, frameId = 0 }: TabTarget,
+    selector?: ExtensionBrowserElementSelector,
+    options?: Partial<BrowserGetHTMLOptions>,
+  ) {
+    const getHTMLOptions: BrowserGetHTMLOptions = {
+      outerHTML: false,
+      ...(options ?? {}),
+    };
+    await injectContentHandlerScript(tabId);
+
+    return await RuntimeMessage.instance.sendMessageToTab({
+      tabId,
+      frameId,
+      name: 'element:get-html',
+      args: [selector, getHTMLOptions],
     });
   }
 

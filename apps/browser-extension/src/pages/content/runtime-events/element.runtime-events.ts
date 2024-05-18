@@ -103,6 +103,20 @@ RuntimeMessage.instance.onMessage(
 );
 
 RuntimeMessage.instance.onMessage(
+  'element:get-html',
+  async (_, selector, options) => {
+    const element = selector ? await queryElement(selector) : document.body;
+
+    let html = '';
+    if (element instanceof HTMLElement) {
+      html = options?.outerHTML ? element.outerHTML : element.innerHTML;
+    }
+
+    return html;
+  },
+);
+
+RuntimeMessage.instance.onMessage(
   'element:select',
   async (_, selector, ...values) => {
     const element = (await queryElement(selector)) as HTMLSelectElement;

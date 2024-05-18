@@ -27,8 +27,10 @@ export default async function CommandMain(context: CommandLaunchContext) {
   console.log(_extension);
   await new Promise((r) => setTimeout(r, 40000));
 
-  const selectedEl = await _extension.browser.activeTab.waitForSelector('img[alt="Google"]', { state: 'detached' });
-  console.log(await selectedEl.getAttributes());
+  console.log(
+    await _extension.browser.activeTab.getHTML('body'),
+    await _extension.browser.activeTab.getHTML('body', { outerHTML: true }),
+  );
 
   // const toast = _extension.ui.createToast({ title: 'Hello world' });
   // toast.show();

@@ -21,6 +21,10 @@ export interface BrowserGetTextOptions {
   onlyVisibleText: boolean;
 }
 
+export interface BrowserGetHTMLOptions {
+  outerHTML: boolean;
+}
+
 export interface BrowserWaitForSelectorOptions {
   timeout?: number;
   state?: 'attached' | 'detached' | 'visible' | 'hidden';
@@ -75,6 +79,10 @@ export interface ExtensionWSServerToClientEvents {
   >;
   'tabs:get-text': ExtensionWSAckElementHandler<
     [options: Partial<BrowserGetTextOptions>],
+    string
+  >;
+  'tabs:get-html': ExtensionWSAckElementHandler<
+    [options: Partial<BrowserGetHTMLOptions>],
     string
   >;
   'tabs:select': ExtensionWSAckElementHandler<[values: string[]], string[]>;

@@ -14,6 +14,7 @@ const elementHandlerWSEventMap = {
   keyUp: 'tabs:key-up',
   select: 'tabs:select',
   getText: 'tabs:get-text',
+  getHTML: 'tabs:get-html',
   keyDown: 'tabs:key-down',
   getAttributes: 'tabs:get-attributes',
 } as const;

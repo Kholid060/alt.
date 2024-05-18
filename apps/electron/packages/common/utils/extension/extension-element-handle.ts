@@ -66,6 +66,13 @@ export function extensionElementHandleFactory(
         ...args,
       );
     },
+    getHTML(...args) {
+      return sendMessage(
+        'browser.activeTab.getHTML',
+        { selector, elementIndex },
+        ...args,
+      );
+    },
   };
 }
 

@@ -1,5 +1,6 @@
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import {
+  BrowserGetHTMLOptions,
   BrowserGetTextOptions,
   ExtensionBrowserElementSelector,
   KeyboardBrowserTypeOptions,
@@ -30,7 +31,11 @@ export interface RuntimeEvent {
   ) => void;
   'element:get-text': (
     selector?: ExtensionBrowserElementSelector,
-    options?: Partial<BrowserGetTextOptions>,
+    options?: BrowserGetTextOptions,
+  ) => string;
+  'element:get-html': (
+    selector?: ExtensionBrowserElementSelector,
+    options?: BrowserGetHTMLOptions,
   ) => string;
   'element:keyboard-type': (
     selector: ExtensionBrowserElementSelector,

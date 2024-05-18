@@ -9,21 +9,25 @@ export default function inlineVitePreloadScript(): PluginOption {
   let __vitePreload = '';
   return {
     name: 'replace-vite-preload-script-plugin',
-    async renderChunk(code, chunk, options, meta) {
+    async renderChunk(code, chunk, _options, meta) {
       if (!/content/.test(chunk.fileName)) {
         return null;
       }
       if (!__vitePreload) {
-        const chunkName: string | undefined = Object.keys(meta.chunks).find(key => /preload/.test(key));
+        const chunkName: string | undefined = Object.keys(meta.chunks).find(
+          (key) => /preload/.test(key),
+        );
+        if (!chunkName) return null;
+
         const modules = meta.chunks?.[chunkName]?.modules;
-        __vitePreload = modules?.[Object.keys(modules)?.[0]]?.code;
+        __vitePreload = modules?.[Object.keys(modules)?.[0]]?.code ?? '';
         __vitePreload = __vitePreload?.replaceAll('const ', 'var ');
         if (!__vitePreload) {
           return null;
         }
       }
       return {
-        code: __vitePreload + code.split(`\n`).slice(1).join(`\n`),
+        code: __vitePreload + code.split('\n').slice(1).join('\n'),
         map: new MagicString(code).generateMap({ hires: true }),
       };
     },

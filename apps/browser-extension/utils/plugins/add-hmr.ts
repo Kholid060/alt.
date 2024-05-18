@@ -2,10 +2,13 @@ import * as path from 'path';
 import { readFileSync } from 'fs';
 import type { PluginOption } from 'vite';
 
-const DUMMY_CODE = `export default function(){};`;
+const DUMMY_CODE = 'export default function(){};';
 
 function getInjectionCode(fileName: string): string {
-  return readFileSync(path.resolve(__dirname, '..', 'reload', 'injections', fileName), { encoding: 'utf8' });
+  return readFileSync(
+    path.resolve(__dirname, '..', 'reload', 'injections', fileName),
+    { encoding: 'utf8' },
+  );
 }
 
 type Config = {
@@ -28,6 +31,8 @@ export default function addHmr(config: Config): PluginOption {
       if (id === idInBackgroundScript || id === idInView) {
         return getResolvedId(id);
       }
+
+      return undefined;
     },
     load(id) {
       if (id === getResolvedId(idInBackgroundScript)) {
@@ -37,6 +42,8 @@ export default function addHmr(config: Config): PluginOption {
       if (id === getResolvedId(idInView)) {
         return view ? viewHmrCode : DUMMY_CODE;
       }
+
+      return undefined;
     },
   };
 }

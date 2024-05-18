@@ -74,6 +74,18 @@ ExtensionIPCEvent.instance.on(
 );
 
 ExtensionIPCEvent.instance.on(
+  'browser.activeTab.getHTML',
+  ({ browserCtx }, selector, options) => {
+    return extensionBrowserElementHandle(
+      browserCtx,
+      'getHTML',
+      getElementSelector(selector ?? 'html'),
+      options ?? {},
+    );
+  },
+);
+
+ExtensionIPCEvent.instance.on(
   'browser.activeTab.select',
   ({ browserCtx }, selector, ...values) => {
     return extensionBrowserElementHandle(

@@ -190,4 +190,18 @@ export function websocketEventsListener(
       callback();
     }),
   );
+
+  io.on(
+    'tabs:get-html',
+    wsAckHandler(async (tab, selector, options, callback) => {
+      const html = await TabService.getHTML(
+        {
+          tabId: tab.tabId,
+        },
+        selector,
+        options,
+      );
+      callback(html);
+    }),
+  );
 }
