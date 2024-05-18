@@ -14,9 +14,9 @@ export interface CommandPanelStatus {
 }
 
 export interface CommandPanelHeader {
-  icon?: string;
   title: string;
   subtitle?: string;
+  icon?: string | React.ReactNode;
 }
 
 export interface CommandPanelStoreState {

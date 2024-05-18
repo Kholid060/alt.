@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import InstalledApps from '../InstalledApps';
 import ExtensionLoader from '../extension/ExtensionLoader';
 import './ipc-extension-messages';
@@ -270,4 +271,14 @@ IPCMain.handle('workflow:import', (_, paths) => {
 /** BROWSER */
 IPCMain.handle('browser:get-active-tab', () => {
   return Promise.resolve(BrowserService.instance.getActiveTab());
+});
+
+/** CRYPTO */
+IPCMain.handle('crypto:create-hash', (_, algorithm, data, options) => {
+  return Promise.resolve(
+    crypto
+      .createHash(algorithm, { outputLength: options?.outputLength })
+      .update(data)
+      .digest(options?.digest ?? 'hex'),
+  );
 });

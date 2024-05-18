@@ -23,6 +23,8 @@ export interface CommandListItemCommand extends UiListItem {
   metadata: {
     type: 'command';
     commandIcon: string;
+    isFallback: boolean;
+    fallbackStr?: string;
     command: DatabaseExtensionCommand;
     extension: DatabaseExtensionListItem;
   };

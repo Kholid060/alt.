@@ -20,6 +20,8 @@ import { extensions as extensionsSchema } from '/@/db/schema/extension.schema';
 import { mapManifestToDB } from '../database-utils';
 import type { DatabaseExtension } from '/@/interface/database.interface';
 import DBService from '/@/services/database/database.service';
+import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
+import { eq } from 'drizzle-orm';
 
 const validatorLogger = loggerBuilder(['ExtensionLoader', 'manifestValidator']);
 
@@ -129,7 +131,7 @@ class ExtensionLoader {
   @ErrorLogger('ExtensionLoader', 'loadExtensions')
   async loadExtensions() {
     await DBService.instance.db.transaction(async (tx) => {
-      const extensions = await DBService.instance.db.query.extensions.findMany({
+      const extensions = await tx.query.extensions.findMany({
         columns: {
           id: true,
           path: true,
@@ -137,6 +139,12 @@ class ExtensionLoader {
           isError: true,
           version: true,
           updatedAt: true,
+        },
+        where(fields, operators) {
+          return operators.notInArray(
+            fields.id,
+            Object.values(EXTENSION_BUILT_IN_ID),
+          );
         },
       });
 
@@ -179,7 +187,10 @@ class ExtensionLoader {
               );
             }
 
-            await tx.update(extensionsSchema).set(updateExtensionPayload);
+            await tx
+              .update(extensionsSchema)
+              .set(updateExtensionPayload)
+              .where(eq(extensionsSchema.id, extension.id));
 
             return;
           }

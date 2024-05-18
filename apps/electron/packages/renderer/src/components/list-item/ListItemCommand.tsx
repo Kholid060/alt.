@@ -62,6 +62,7 @@ function ListItemCommand({
       launchContext: {
         args,
         launchBy: CommandLaunchBy.USER,
+        fallbackSearch: item.metadata.fallbackStr,
       },
     });
   }

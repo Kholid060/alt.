@@ -138,6 +138,7 @@ function RouteExtension() {
         {selectedExtensionId && (
           <div className="w-72 flex-shrink-0">
             <ExtensionDetailCard
+              key={selectedExtensionId}
               extensionId={selectedExtensionId}
               onClose={() => setSelectedExtensionId('')}
             >

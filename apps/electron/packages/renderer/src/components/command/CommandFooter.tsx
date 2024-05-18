@@ -8,8 +8,8 @@ import { useCommandStore } from '/@/stores/command.store';
 function CommandHeaderPanel() {
   const header = useCommandPanelStore((state) => state.header);
 
-  let headerIcon: React.ReactNode = null;
-  if (header?.icon) {
+  let headerIcon: React.ReactNode = header?.icon ?? null;
+  if (header?.icon && typeof header.icon === 'string') {
     if (header.icon.startsWith('icon:')) {
       let iconName = header.icon.slice(
         'icon:'.length,

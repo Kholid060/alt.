@@ -12,7 +12,9 @@ CREATE TABLE `commands` (
 	`config` text,
 	`arguments` text,
 	`is_disabled` integer NOT NULL,
-	`extension_id` text NOT NULL
+	`is_fallback` integer,
+	`extension_id` text NOT NULL,
+	`dismiss_alert` integer
 );
 --> statement-breakpoint
 CREATE TABLE `configs` (
@@ -64,6 +66,7 @@ CREATE TABLE `workflows` (
 	`updated_at` text NOT NULL,
 	`variables` text DEFAULT (json_array()) NOT NULL,
 	`execute_count` integer DEFAULT 0 NOT NULL,
+	`dismiss_alert` integer,
 	`settings` text
 );
 --> statement-breakpoint

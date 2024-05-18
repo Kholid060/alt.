@@ -8,6 +8,7 @@ export enum CommandLaunchBy {
 
 export interface CommandLaunchContext<T = Record<string, unknown>> {
   args: T;
+  fallbackSearch?: string;
   launchBy: CommandLaunchBy;
 }
 

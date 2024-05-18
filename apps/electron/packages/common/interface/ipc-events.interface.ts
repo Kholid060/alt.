@@ -138,11 +138,23 @@ export interface IPCDialogEvents {
   ) => Electron.MessageBoxReturnValue;
 }
 
+export interface IPCCryptoEvents {
+  'crypto:create-hash': (
+    algorithm: 'sha256' | 'shake256',
+    data: string,
+    options?: {
+      outputLength?: number;
+      digest?: 'hex' | 'base64' | 'base64url';
+    },
+  ) => string;
+}
+
 export type IPCEvents = IPCShellEvents &
   IPCAppEvents &
   IPCAppsEvents &
   DatabaseEvents &
   IPCDialogEvents &
+  IPCCryptoEvents &
   IPCWindowEvents &
   IPCScreenEvents &
   IPCBrowserEvents &

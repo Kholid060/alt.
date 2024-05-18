@@ -3,6 +3,7 @@ import CommandView from './routes/CommandView';
 import CommandViewJSON from './routes/CommandViewJSON';
 import ConfigInput from './routes/ConfigInput';
 import CreateCommandScript from './routes/CreateCommandScript';
+import FallbackCommands from './routes/FallbackCommands';
 import { CommandRoute } from '/@/interface/command-route.interface';
 
 export const commandAppRoutes = [
@@ -25,6 +26,11 @@ export const commandAppRoutes = [
     element: CreateCommandScript,
     name: 'create-command-script',
     path: '/create-command-script',
+  },
+  {
+    element: FallbackCommands,
+    name: 'fallback-commands',
+    path: '/fallback-commands',
   },
   {
     element: ConfigInput,

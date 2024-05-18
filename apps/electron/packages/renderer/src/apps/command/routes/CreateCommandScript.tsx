@@ -83,21 +83,25 @@ function CreateCommandScript() {
     scriptPath,
   }: z.infer<typeof newCommandScriptSchema>) {
     try {
-      const filename = new URL(`file://${scriptPath}`).pathname
-        .split('/')
-        .pop()
-        ?.replaceAll(/\s/g, '-');
+      const filePath = new URL(`file://${scriptPath}`).pathname.split('/');
+      const filename = filePath.pop()?.replaceAll(/\s/g, '-');
       if (!filename) return;
+
+      const filePathHex = await preloadAPI.main.ipc.invokeWithError(
+        'crypto:create-hash',
+        'sha256',
+        filePath.join('').trim(),
+      );
 
       const result = await preloadAPI.main.ipc.invoke(
         'database:insert-extension-command',
         {
           title: name,
           type: 'script',
-          name: filename,
           path: scriptPath,
           icon: `icon:${icon}`,
           extensionId: EXTENSION_BUILT_IN_ID.userScript,
+          name: `${filePathHex.slice(0, 12)}-${filename}`,
         },
       );
       if (isIPCEventError(result)) {
@@ -113,7 +117,9 @@ function CreateCommandScript() {
     } catch (error) {
       addPanelStatus({
         type: 'error',
-        title: 'Something went wrong',
+        title: (error as Error).message.includes('UNIQUE constraint')
+          ? 'The script file has already been added'
+          : 'Something went wrong',
       });
       console.error(error);
     }

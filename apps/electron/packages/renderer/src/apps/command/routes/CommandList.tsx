@@ -18,6 +18,7 @@ import {
   BlocksIcon,
   FileCodeIcon,
   LayoutDashboardIcon,
+  SearchSlashIcon,
   SettingsIcon,
   WorkflowIcon,
 } from 'lucide-react';
@@ -90,9 +91,24 @@ function CommandList() {
       return commandItems;
     }
 
-    return uiListItemsFilter(commandItems, cleanedQuery)
+    const result = uiListItemsFilter(commandItems, cleanedQuery)
       .slice(0, 10)
       .map((item) => ({ ...item, group: 'Search results' }));
+    if (result.length === 0) {
+      return commandItems.reduce<UiListItem[]>((acc, command) => {
+        if (command.metadata?.isFallback) {
+          acc.push({
+            ...command,
+            group: `Or use "${cleanedQuery}" with...`,
+            metadata: { ...command.metadata, fallbackStr: cleanedQuery },
+          });
+        }
+
+        return acc;
+      }, []);
+    }
+
+    return result;
   }, []);
 
   const workflowCommands = useMemo<CommandListItemWorkflow[]>(() => {
@@ -162,6 +178,7 @@ function CommandList() {
             command,
             extension,
             type: 'command',
+            isFallback: command.isFallback ?? false,
             commandIcon: command.icon ?? extension.icon,
           },
           value: `command:${extension.id}:${command.name}`,
@@ -241,58 +258,69 @@ function CommandList() {
         type: 'builtin-command',
       },
     },
+    {
+      group: 'Commands',
+      title: 'Fallback Commands',
+      value: 'fallback-commands',
+      subtitle: 'Utils',
+      icon: <UiList.Icon icon={SearchSlashIcon} />,
+      onSelected() {
+        navigate('/fallback-commands');
+      },
+      metadata: {
+        type: 'builtin-command',
+      },
+    },
     ...dashboardPageCommands,
   ];
 
   return (
-    <>
-      <UiList
-        className="p-2"
-        items={[
-          ...extensionCommands.suggestionItems,
-          ...extensionCommands.commandItems,
-          ...builtInCommands,
-          ...workflowCommands,
-        ]}
-        customFilter={customListFilter}
-        renderItem={({ ref, item, ...detail }) => {
-          const commandItem = item as CommandListItems;
-          switch (commandItem.metadata.type) {
-            case 'builtin-command':
-              return (
-                <UiList.Item
-                  ref={ref}
-                  selected={detail.selected}
-                  {...{ ...detail.props, ...commandItem }}
-                />
-              );
-            case 'command':
-              return (
-                <ListItemCommand
-                  itemRef={ref}
-                  item={commandItem as CommandListItemCommand}
-                  {...{ ...detail }}
-                />
-              );
-            case 'workflow':
-              return (
-                <ListItemWorkflow
-                  itemRef={ref}
-                  item={commandItem as CommandListItemWorkflow}
-                  {...{ ...detail }}
-                />
-              );
-            default:
-              return null;
-          }
-        }}
-        renderGroupHeader={(label, index) => (
-          <UiList.GroupHeading className={`${index !== 0 ? 'mt-1 block' : ''}`}>
-            {label}
-          </UiList.GroupHeading>
-        )}
-      />
-    </>
+    <UiList
+      className="p-2"
+      items={[
+        ...extensionCommands.suggestionItems,
+        ...extensionCommands.commandItems,
+        ...builtInCommands,
+        ...workflowCommands,
+      ]}
+      customFilter={customListFilter}
+      renderItem={({ ref, item, ...detail }) => {
+        const commandItem = item as CommandListItems;
+        switch (commandItem.metadata.type) {
+          case 'builtin-command':
+            return (
+              <UiList.Item
+                ref={ref}
+                selected={detail.selected}
+                {...{ ...detail.props, ...commandItem }}
+              />
+            );
+          case 'command':
+            return (
+              <ListItemCommand
+                itemRef={ref}
+                item={commandItem as CommandListItemCommand}
+                {...{ ...detail }}
+              />
+            );
+          case 'workflow':
+            return (
+              <ListItemWorkflow
+                itemRef={ref}
+                item={commandItem as CommandListItemWorkflow}
+                {...{ ...detail }}
+              />
+            );
+          default:
+            return null;
+        }
+      }}
+      renderGroupHeader={(label, index) => (
+        <UiList.GroupHeading className={`${index !== 0 ? 'mt-1 block' : ''}`}>
+          {label}
+        </UiList.GroupHeading>
+      )}
+    />
   );
 }
 

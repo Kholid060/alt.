@@ -72,6 +72,7 @@ export const commands = sqliteTable('commands', {
   isDisabled: integer('is_disabled', { mode: 'boolean' })
     .notNull()
     .$default(() => false),
+  isFallback: integer('is_fallback', { mode: 'boolean' }),
   extensionId: text('extension_id').notNull(),
   dismissAlert: integer('dismiss_alert', { mode: 'boolean' }),
 });

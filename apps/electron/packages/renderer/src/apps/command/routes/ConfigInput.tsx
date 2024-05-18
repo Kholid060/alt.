@@ -358,6 +358,10 @@ function ConfigInput({
         data.extensionId,
       ),
     });
+
+    return () => {
+      setPanelHeader(null);
+    };
   }, [data, setPanelHeader]);
 
   if (!Array.isArray(data.config)) return null;

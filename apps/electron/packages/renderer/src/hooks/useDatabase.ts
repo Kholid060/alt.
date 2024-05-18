@@ -75,9 +75,13 @@ export function useDatabase() {
   return { ...databaseCtx, queryDatabase };
 }
 
+interface UseDatabaseQueryOptions {
+  disableAutoRefresh?: boolean;
+}
 export function useDatabaseQuery<T extends keyof DatabaseQueriesEvent>(
   name: T,
-  args: Parameters<DatabaseQueriesEvent[T]>,
+  queryArgs: Parameters<DatabaseQueriesEvent[T]>,
+  options?: UseDatabaseQueryOptions,
 ) {
   type ReturnValue = ReturnType<DatabaseQueriesEvent[T]>;
 
@@ -106,7 +110,7 @@ export function useDatabaseQuery<T extends keyof DatabaseQueriesEvent>(
   }
 
   const fetchQuery = useCallback(() => {
-    preloadAPI.main.ipc.invoke(name, ...args).then((result) => {
+    preloadAPI.main.ipc.invoke(name, ...queryArgs).then((result) => {
       if (isIPCEventError(result)) {
         setState({
           data: null,
@@ -130,16 +134,20 @@ export function useDatabaseQuery<T extends keyof DatabaseQueriesEvent>(
     const onDataChange = (...args: unknown[]) => {
       if (
         args[0] !== DATABASE_CHANGES_ALL_ARGS &&
-        !shallowEqualArrays(args, args)
+        !shallowEqualArrays(args, queryArgs)
       )
         return;
 
       fetchQuery();
     };
-    databaseCtx.emitter.on(name, onDataChange);
+    if (!options?.disableAutoRefresh) {
+      databaseCtx.emitter.on(name, onDataChange);
+    }
 
     return () => {
-      databaseCtx.emitter.off(name, onDataChange);
+      if (!options?.disableAutoRefresh) {
+        databaseCtx.emitter.off(name, onDataChange);
+      }
     };
   }, [fetchQuery, databaseCtx.emitter]);
 
