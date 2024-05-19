@@ -8,6 +8,7 @@ export enum WORKFLOW_NODE_TYPE {
   DO_NOTHING = 'node-do-nothing',
   BREAK_LOOP = 'node-break-loop',
   CONDITIONAL = 'node-conditional',
+  USE_BROWSER = 'node-use-browser',
   FILE_SYSTEM = 'node-file-system',
   HTTP_REQUEST = 'node-http-request',
   NOTIFICATION = 'node-notification',
@@ -22,6 +23,7 @@ export const WORKFLOW_NODE_GROUP = [
   'Flow',
   'Core',
   'Triggers',
+  'Browser',
   'Commands',
   'Scripts',
 ] as const;

@@ -7,11 +7,23 @@ import {
 } from '../ExtensionBrowserElementHandle';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import { tempHideCommandWindow } from '../../helper';
+import BrowserService from '/@/services/browser.service';
 
 const getElementSelector = (
   selector: ExtensionAPI.browser.ElementSelector,
 ): ExtensionAPI.browser.ElementSelectorDetail =>
   typeof selector === 'string' ? { selector } : selector;
+
+ExtensionIPCEvent.instance.on(
+  'browser.activeTab.isAvailable',
+  ({ browserCtx }) => {
+    if (!browserCtx) return Promise.resolve(false);
+
+    return Promise.resolve(
+      Boolean(BrowserService.instance.getBrowser(browserCtx.browserId)),
+    );
+  },
+);
 
 ExtensionIPCEvent.instance.on(
   'browser.activeTab.reload',

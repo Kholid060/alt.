@@ -49,7 +49,7 @@ const dashboardPageCommands: CommandListItemCommandBuiltIn[] = (
   ] as const
 ).map((page) => ({
   title: page.title,
-  group: 'Commands',
+  group: 'Dashboard',
   subtitle: 'Dashboard',
   value: `dashboard:${page.path || ''}`,
   icon: <UiList.Icon icon={page.icon} />,

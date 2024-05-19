@@ -18,6 +18,7 @@ import {
   BellIcon,
   KeyboardIcon,
   CornerDownLeftIcon,
+  CompassIcon,
 } from 'lucide-react';
 import type { WORKFLOW_NODE_GROUP } from './workflow.const';
 import { WORKFLOW_NODE_TYPE } from './workflow.const';
@@ -50,6 +51,7 @@ export const WORKFLOW_NODES: {
       argsValue: {},
       commandId: '',
       isDisabled: false,
+      $nodeType: WORKFLOW_NODE_TYPE.COMMAND,
       extension: { id: '', title: '', version: '' },
     },
     type: WORKFLOW_NODE_TYPE.COMMAND,
@@ -63,6 +65,7 @@ export const WORKFLOW_NODES: {
     handleSource: ['default'],
     defaultData: {
       isDisabled: false,
+      $nodeType: WORKFLOW_NODE_TYPE.DO_NOTHING,
     },
     type: WORKFLOW_NODE_TYPE.DO_NOTHING,
   },
@@ -76,6 +79,7 @@ export const WORKFLOW_NODES: {
       varName: '',
       expression: '',
       isDisabled: false,
+      $nodeType: WORKFLOW_NODE_TYPE.LOOP,
       dataSource: 'prev-node',
     },
     subtitle: 'Control Flow',
@@ -90,6 +94,7 @@ export const WORKFLOW_NODES: {
     handleSource: ['default'],
     defaultData: {
       isDisabled: false,
+      $nodeType: WORKFLOW_NODE_TYPE.TRIGGER,
     },
     type: WORKFLOW_NODE_TYPE.TRIGGER,
   },
@@ -101,6 +106,7 @@ export const WORKFLOW_NODES: {
     defaultData: {
       jsCode: '',
       isDisabled: false,
+      $nodeType: WORKFLOW_NODE_TYPE.CODE,
     },
     handleTarget: ['default'],
     handleSource: ['default'],
@@ -114,6 +120,7 @@ export const WORKFLOW_NODES: {
     defaultData: {
       delayMs: 500,
       isDisabled: false,
+      $nodeType: WORKFLOW_NODE_TYPE.DELAY,
     },
     handleTarget: ['default'],
     handleSource: ['default'],
@@ -131,6 +138,7 @@ export const WORKFLOW_NODES: {
       isDisabled: false,
       insertToVar: false,
       newClipboardVal: '',
+      $nodeType: WORKFLOW_NODE_TYPE.CLIPBOARD,
     },
     handleTarget: ['default'],
     handleSource: ['default'],
@@ -144,6 +152,7 @@ export const WORKFLOW_NODES: {
     defaultData: {
       conditions: [],
       isDisabled: false,
+      $nodeType: WORKFLOW_NODE_TYPE.CONDITIONAL,
     },
     handleTarget: ['default'],
     handleSource: ['default'],
@@ -162,6 +171,7 @@ export const WORKFLOW_NODES: {
       isDisabled: false,
       appendFile: false,
       insertToVar: false,
+      $nodeType: WORKFLOW_NODE_TYPE.FILE_SYSTEM,
     },
     handleTarget: ['default'],
     handleSource: ['default'],
@@ -191,6 +201,7 @@ export const WORKFLOW_NODES: {
       timeoutMs: 10000,
       isDisabled: false,
       urlEncodedBody: [],
+      $nodeType: WORKFLOW_NODE_TYPE.HTTP_REQUEST,
     },
     handleTarget: ['default'],
     handleSource: ['default'],
@@ -207,6 +218,7 @@ export const WORKFLOW_NODES: {
       subtitle: '',
       silent: false,
       isDisabled: false,
+      $nodeType: WORKFLOW_NODE_TYPE.NOTIFICATION,
     },
     handleTarget: ['default'],
     handleSource: ['default'],
@@ -220,6 +232,7 @@ export const WORKFLOW_NODES: {
     defaultData: {
       shortcut: null,
       isDisabled: false,
+      $nodeType: WORKFLOW_NODE_TYPE.TRIGGER_SHORTCUT,
     },
     handleTarget: [],
     handleSource: ['default'],
@@ -233,9 +246,25 @@ export const WORKFLOW_NODES: {
     defaultData: {
       loopNodeId: '',
       isDisabled: false,
+      $nodeType: WORKFLOW_NODE_TYPE.BREAK_LOOP,
     },
     handleTarget: ['default'],
     handleSource: ['default'],
     type: WORKFLOW_NODE_TYPE.BREAK_LOOP,
+  },
+  [WORKFLOW_NODE_TYPE.USE_BROWSER]: {
+    group: 'Browser',
+    subtitle: 'Browser',
+    title: 'Use Browser',
+    icon: CompassIcon,
+    defaultData: {
+      isDisabled: false,
+      preferBrowser: 'any',
+      useOpenedBrowser: true,
+      $nodeType: WORKFLOW_NODE_TYPE.USE_BROWSER,
+    },
+    handleTarget: ['default'],
+    handleSource: ['default'],
+    type: WORKFLOW_NODE_TYPE.USE_BROWSER,
   },
 } as const;

@@ -228,6 +228,8 @@ declare namespace ExtensionAPI.browser.activeTab {
     filter?: SelectElementFilter;
   }
 
+  export function isAvailable(): Promise<boolean>;
+
   export function selectElement(
     options?: SelectElementOptions,
   ): Promise<{ selector: string; canceled: boolean }>;

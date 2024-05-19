@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
   BrowserInfo,
+  BrowserType,
   ExtensionSocketData,
   ExtensionWSClientToServerEvents,
   ExtensionWSInterServerEvents,
@@ -24,11 +25,17 @@ interface SocketEvents {
 }
 
 const BROWSER_EMIT_TIMEOUT_MS = 10_000;
+const BROWSER_TYPE = [
+  'edge',
+  'chrome',
+  'firefox',
+] as const satisfies BrowserType[];
 
 const BrowserInfoValidation = z.object({
   id: z.string(),
   name: z.string(),
   version: z.string(),
+  type: z.enum(BROWSER_TYPE),
 }) satisfies z.ZodType<BrowserInfo>;
 
 class ExtensionWSNamespace {

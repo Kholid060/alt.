@@ -4,10 +4,10 @@ import WindowsManager from '/@/window/WindowsManager';
 
 export function initExtensionWSEventsListener(this: ExtensionWSNamespace) {
   this.onSocketEvent('tabs:active', ({ browserInfo }, tab) => {
-    BrowserService.instance.activeBrowser = {
+    BrowserService.instance.setActiveTab({
       tab,
       id: browserInfo.id,
-    };
+    });
 
     WindowsManager.instance.sendMessageToWindow(
       'command',
@@ -17,9 +17,9 @@ export function initExtensionWSEventsListener(this: ExtensionWSNamespace) {
   });
 
   this.on('socket:connected', (browser) => {
-    BrowserService.instance.browsers.set(browser.id, browser);
+    BrowserService.instance.addConnectedBrowser(browser);
   });
   this.on('socket:disconnect', (browser) => {
-    BrowserService.instance.browsers.delete(browser.id);
+    BrowserService.instance.removeConnectedBrowser(browser.id);
   });
 }

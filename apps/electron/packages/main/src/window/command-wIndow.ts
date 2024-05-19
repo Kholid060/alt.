@@ -87,9 +87,9 @@ class WindowCommand extends WindowUtils implements WindowBase {
       event.preventDefault();
     });
 
-    browserWindow.on('ready-to-show', () => {
-      browserWindow.webContents.openDevTools({ mode: 'undocked' });
-    });
+    // browserWindow.on('ready-to-show', () => {
+    //   browserWindow.webContents.openDevTools({ mode: 'undocked' });
+    // });
 
     /**
      * Load the main page of the main window.

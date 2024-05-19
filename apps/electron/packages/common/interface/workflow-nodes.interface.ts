@@ -4,7 +4,7 @@ import type { ExtensionCommandArgument } from '@repo/extension-core';
 import type { WORKFLOW_NODE_TYPE } from '../utils/constant/workflow.const';
 import type { Node } from 'reactflow';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
-import type { KeyboardShortcut } from '@repo/shared';
+import type { KeyboardShortcut, BrowserType } from '@repo/shared';
 
 export type WorkflowNodeHandleSource = 'default' | 'error-fallback';
 
@@ -26,7 +26,8 @@ export type WorkflowNodeExpressionRecords = Record<
   WorkflowNodeExpressionData
 >;
 
-export interface WorkflowNodeBaseData {
+export interface WorkflowNodeBaseData<T extends WORKFLOW_NODE_TYPE> {
+  $nodeType: T;
   isDisabled: boolean;
   description?: string;
   $expData?: WorkflowNodeExpressionRecords;
@@ -35,8 +36,8 @@ export interface WorkflowNodeBaseData {
 
 export type WorkflowNodeBase<
   T = unknown,
-  P extends string = string,
-> = SetRequired<Node<T & WorkflowNodeBaseData, P>, 'type'>;
+  P extends WORKFLOW_NODE_TYPE = WORKFLOW_NODE_TYPE,
+> = SetRequired<Node<T & WorkflowNodeBaseData<P>, P>, 'type'>;
 
 export type WorkflowNodeCommand = WorkflowNodeBase<
   {
@@ -195,6 +196,14 @@ export type WorkflowNodeBreakLoop = WorkflowNodeBase<
   WORKFLOW_NODE_TYPE.BREAK_LOOP
 >;
 
+export type WorkflowNodeUseBrowser = WorkflowNodeBase<
+  {
+    useOpenedBrowser: boolean;
+    preferBrowser: 'any' | BrowserType;
+  },
+  WORKFLOW_NODE_TYPE.USE_BROWSER
+>;
+
 export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoop;
   [WORKFLOW_NODE_TYPE.CODE]: WorkflowNodeCode;
@@ -204,6 +213,7 @@ export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.CLIPBOARD]: WorkflowNodeClipboard;
   [WORKFLOW_NODE_TYPE.DO_NOTHING]: WorkflowNodeDoNothing;
   [WORKFLOW_NODE_TYPE.BREAK_LOOP]: WorkflowNodeBreakLoop;
+  [WORKFLOW_NODE_TYPE.USE_BROWSER]: WorkflowNodeUseBrowser;
   [WORKFLOW_NODE_TYPE.FILE_SYSTEM]: WorkflowNodeFileSystem;
   [WORKFLOW_NODE_TYPE.CONDITIONAL]: WorkflowNodeConditional;
   [WORKFLOW_NODE_TYPE.HTTP_REQUEST]: WorkflowNodeHttpRequest;

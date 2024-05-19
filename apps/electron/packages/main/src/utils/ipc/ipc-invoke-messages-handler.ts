@@ -55,6 +55,7 @@ IPCMain.handle(
 
 /** APPS */
 IPCMain.handle('apps:get-list', () => InstalledApps.instance.getApps());
+IPCMain.handle('apps:get-browsers', () => InstalledApps.instance.getBrowsers());
 
 /** DIALOG */
 IPCMain.handle('dialog:open', ({ sender }, options) => {
@@ -271,6 +272,9 @@ IPCMain.handle('workflow:import', (_, paths) => {
 /** BROWSER */
 IPCMain.handle('browser:get-active-tab', () => {
   return Promise.resolve(BrowserService.instance.getActiveTab());
+});
+IPCMain.handle('browser:get-connected-browsers', () => {
+  return Promise.resolve(BrowserService.instance.getConnectedBrowser());
 });
 
 /** CRYPTO */

@@ -16,12 +16,12 @@ class BrowserService {
     return this._instance;
   }
 
-  activeBrowser: ActiveBrowser | null;
-  browsers: Map<string, BrowserInfo>;
+  private activeBrowser: ActiveBrowser | null;
+  private connectedBrowsers: Map<string, BrowserInfo & { active: boolean }>;
 
   constructor() {
-    this.browsers = new Map();
     this.activeBrowser = null;
+    this.connectedBrowsers = new Map();
   }
 
   getActiveTab(): ExtensionBrowserTabContext {
@@ -29,6 +29,33 @@ class BrowserService {
     if (!this.activeBrowser.tab) return null;
 
     return { ...this.activeBrowser.tab, browserId: this.activeBrowser.id };
+  }
+
+  setActiveTab(browser: ActiveBrowser | null) {
+    this.activeBrowser = browser;
+
+    if (!browser || !this.connectedBrowsers.has(browser.id)) return;
+
+    const browserInfo = this.connectedBrowsers.get(browser.id)!;
+    browserInfo.active = true;
+
+    this.connectedBrowsers.set(browser.id, browserInfo);
+  }
+
+  getBrowser(browserId: string) {
+    return this.connectedBrowsers.get(browserId);
+  }
+
+  addConnectedBrowser(browser: BrowserInfo) {
+    this.connectedBrowsers.set(browser.id, { ...browser, active: false });
+  }
+
+  getConnectedBrowser() {
+    return [...this.connectedBrowsers.values()];
+  }
+
+  removeConnectedBrowser(browserId: string) {
+    this.connectedBrowsers.delete(browserId);
   }
 }
 

@@ -137,6 +137,21 @@ class ManifestUtils {
 
     await Promise.all(
       manifest.commands.map(async (command) => {
+        if (seenCommand.has(command.name)) {
+          throw new BuildError(`"${chalk.bold(command.name)}" has duplicate`);
+        }
+
+        // validate command arguments
+        const seenArg = new Set<string>();
+        command.arguments?.forEach((arg) => {
+          if (seenArg.has(arg.name)) {
+            throw new BuildError(
+              `"${chalk.bold(arg.name)}" argument in "${command.title}" command has duplicate`,
+            );
+          }
+          seenArg.add(arg.name);
+        });
+
         const [commandFilePath] = await glob(
           command.type === 'script'
             ? path.join(this.getExtPath('src'), command.name)
@@ -154,12 +169,6 @@ class ManifestUtils {
         if (!commandFilePath) {
           throw new BuildError(
             `Couldn't find "${chalk.bold(command.name)}" command file`,
-          );
-        }
-
-        if (seenCommand.has(command.name)) {
-          throw new BuildError(
-            `Couldn't resolve "${chalk.bold(command.name)}" command file`,
           );
         }
 

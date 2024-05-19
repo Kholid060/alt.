@@ -16,6 +16,7 @@ import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.con
 import clsx from 'clsx';
 import {
   BanIcon,
+  CircleAlertIcon,
   CopyIcon,
   EllipsisIcon,
   PlayIcon,
@@ -404,16 +405,22 @@ WorkflowNodeLoop.displayName = 'WorkflowNodeLoop';
 export const WorkflowNodeBasic: React.FC<
   NodeProps<NodesType.WorkflowNodes['data']>
 > = memo(({ id, type, data }) => {
-  const nodeData = WORKFLOW_NODES[type as WORKFLOW_NODE_TYPE];
+  const nodeData = WORKFLOW_NODES[type as WORKFLOW_NODE_TYPE] ||
+    WORKFLOW_NODES[data.$nodeType] || {
+      handleSource: [],
+      handleTarget: [],
+      title: 'Invalid node',
+      icon: CircleAlertIcon,
+    };
 
   return (
     <>
       <NodeToolbarMenu nodeId={id} nodeData={data} />
       <NodeCard
         title={nodeData.title}
-        isDisabled={data.isDisabled}
+        isDisabled={data?.isDisabled ?? true}
         subtitle={nodeData.subtitle}
-        description={data.description}
+        description={data?.description ?? ''}
         icon={<UiList.Icon icon={nodeData.icon} />}
       >
         {nodeData.handleTarget.map((type, index) => (

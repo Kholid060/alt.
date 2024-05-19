@@ -34,6 +34,20 @@
   }
 }
 
+.react-flow__node-default {
+  padding: 0 !important;
+  width: auto !important;
+  color: inherit !important;
+  border-width: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font-size: inherit !important;
+  text-align: inherit !important;
+  border-color: unset !important;
+  border-style: inherit !important;
+  background-color: transparent !important;
+}
+
 .react-flow__edge {
   &-path {
     stroke-width: theme(spacing[0.5]);

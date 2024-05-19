@@ -8,7 +8,11 @@ import type {
   ExtensionCommandJSONViewData,
   ExtensionCommandViewData,
 } from './extension.interface';
-import type { BrowserExtensionTab } from '@repo/shared';
+import type {
+  BrowserExtensionTab,
+  BrowserInfo,
+  BrowserType,
+} from '@repo/shared';
 import type {
   DatabaseEvents,
   DatabaseExtension,
@@ -76,7 +80,13 @@ export interface IPCShellEvents {
   'shell:move-to-trash': (path: string) => void;
 }
 
+export interface BrowserApp {
+  name: string;
+  location: string;
+  type: BrowserType;
+}
 export interface IPCAppsEvents {
+  'apps:get-browsers': () => BrowserApp[];
   'apps:get-list': () => ExtensionAPI.shell.installedApps.AppDetail[];
 }
 
@@ -90,6 +100,7 @@ export interface IPCClipboardEvents {
 
 export interface IPCBrowserEvents {
   'browser:get-active-tab': () => ExtensionBrowserTabContext;
+  'browser:get-connected-browsers': () => (BrowserInfo & { active: boolean })[];
 }
 
 export interface IPCExtensionEvents {

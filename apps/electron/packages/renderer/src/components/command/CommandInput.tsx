@@ -6,7 +6,6 @@ import {
 import { ArrowLeftIcon, ChevronDownIcon, SearchIcon } from 'lucide-react';
 import { forwardRef, useRef, useEffect, useCallback, useContext } from 'react';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
-import { mergeRefs } from '/@/utils/helper';
 import { ExtensionCommandArgument } from '@repo/extension-core';
 import { useCommandStore } from '/@/stores/command.store';
 import { CommandListItems } from '/@/interface/command.interface';
@@ -34,16 +33,16 @@ const CommandInputArguments = forwardRef<
     useShallow((state) => [state.commandArgs.args, state.setCommandArgs]),
   );
 
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const mergedRefs = mergeRefs(ref, containerRef);
   const selectedCommand =
     selectedItem && selectedItem.metadata?.type === 'command'
       ? selectedItem.metadata
       : null;
 
   useEffect(() => {
-    if (selectedCommand?.command.arguments?.length) {
+    const clearArgs =
+      selectedCommand?.command.arguments?.length &&
+      useCommandStore.getState().commandArgs.commandId;
+    if (clearArgs) {
       setCommandArgs(
         {
           args: {},
@@ -62,12 +61,13 @@ const CommandInputArguments = forwardRef<
   return (
     <div
       {...props}
-      ref={mergedRefs}
+      ref={ref}
       style={{ translate: '0px 0px' }}
       className="flex items-center absolute top-1/2 -translate-y-1/2 left-4 text-sm h-7 gap-2"
     >
       {selectedCommand?.command.arguments?.map((argument) => {
-        const key = selectedCommand.command.name + argument.name;
+        const key = selectedCommand.command.id + argument.name;
+
         switch (argument.type) {
           case 'select':
             return (
@@ -100,7 +100,7 @@ const CommandInputArguments = forwardRef<
                     </option>
                   ))}
                 </select>
-                <ChevronDownIcon className="h-4 w-4 right-1.5 top-1/2 -translate-y-1/2 absolute" />
+                <ChevronDownIcon className="h-4 w-4 right-1.5 top-1/2 -translate-y-1/2 absolute pointer-events-none" />
               </div>
             );
           case 'input:text':

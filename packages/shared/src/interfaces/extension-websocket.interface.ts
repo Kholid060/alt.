@@ -1,21 +1,9 @@
+import { BrowserExtensionTab, BrowserInfo } from './browser.interface';
 import {
   KeyboardKeyUpOptions,
   KeyboardKeyDownOptions,
   KeyboardBrowserTypeOptions,
 } from './keyboard.interface';
-
-export interface BrowserExtensionTab {
-  title: string;
-  url: string;
-  id: number;
-  windowId: number;
-}
-
-export interface BrowserInfo {
-  id: string;
-  name: string;
-  version: string;
-}
 
 export interface BrowserGetTextOptions {
   onlyVisibleText: boolean;

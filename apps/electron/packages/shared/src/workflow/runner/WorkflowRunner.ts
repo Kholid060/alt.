@@ -126,11 +126,18 @@ export interface WorkflowRunnerPrevNodeExecution {
   isRetrying?: boolean;
 }
 
+interface WorkflowBrowserContext {
+  id: string | null;
+  tabId: number | null;
+}
+
 class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   private startNodeId: string;
   private nodeHandlers: NodeHandlersObj;
   private nodesIdxMap: Map<string, number>;
   private nodeExecutionQueue: string[] = [];
+
+  private browserCtx: WorkflowBrowserContext;
 
   id: string;
   startedAt: string;
@@ -156,6 +163,8 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     this.nodeHandlers = nodeHandlers;
     this.state = WorkflowRunnerState.Idle;
     this.startedAt = new Date().toString();
+
+    this.browserCtx = { id: null, tabId: null };
 
     this.dataStorage = new WorkflowRunnerData();
     this.sandbox = new WorkflowRunnerSandbox(this);
@@ -215,6 +224,14 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   stop() {
     this.state = WorkflowRunnerState.Stop;
     this.emit('finish', WorkflowRunnerFinishReason.Stop);
+  }
+
+  getBrowserCtx() {
+    return Object.freeze(this.browserCtx);
+  }
+
+  setBrowserCtx(ctxData: Partial<WorkflowBrowserContext>) {
+    this.browserCtx = { ...this.browserCtx, ...ctxData };
   }
 
   private getNode(nodeId: string): WorkflowNodes | null {

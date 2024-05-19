@@ -33,11 +33,7 @@ type NodeCommandItem = WorkflowEditorNodeListItem<WORKFLOW_NODE_TYPE.COMMAND>;
 
 const nodeTypes: (WorkflowEditorNodeGroup | 'All')[] = [
   'All',
-  'Core',
-  'Triggers',
-  'Commands',
-  'Scripts',
-  'Flow',
+  ...WORKFLOW_NODE_GROUP,
 ];
 const defaultNodes: Record<
   WorkflowEditorNodeGroup,
@@ -46,6 +42,7 @@ const defaultNodes: Record<
   Core: [],
   Flow: [],
   Scripts: [],
+  Browser: [],
   Commands: [],
   Triggers: [],
 };
@@ -67,6 +64,7 @@ const allNodesItems = Object.values(WORKFLOW_NODES).reduce((acc, node) => {
 
   return acc;
 }, defaultNodes);
+console.log(allNodesItems);
 
 export function WorkflowEditorNodeList({
   className,
@@ -145,6 +143,7 @@ export function WorkflowEditorNodeList({
     allNodesItems.Triggers,
     allNodesItems.Core,
     allNodesItems.Flow,
+    allNodesItems.Browser,
     commandItems,
   );
   const filteredItems =

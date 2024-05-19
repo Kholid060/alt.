@@ -5,6 +5,8 @@ import { globby } from 'globby';
 import path from 'path';
 import { nanoid } from 'nanoid/non-secure';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
+import type { BrowserApp } from '#packages/common/interface/ipc-events.interface';
+import type { BrowserType } from '@repo/shared';
 
 interface InstalledAppDetail
   extends Pick<
@@ -113,6 +115,13 @@ async function extractShortcutDetail(shortcut: string) {
   return null;
 }
 
+const browserDetail: { name: string; filename: string; type: BrowserType }[] = [
+  { name: 'Firefox', filename: 'firefox.exe', type: 'firefox' },
+  { name: 'Microsoft Edge', filename: 'msedge.exe', type: 'edge' },
+  { name: 'Google Chrome', filename: 'chrome.exe', type: 'chrome' },
+];
+const browserRegex = /firefox|chrome|edge/i;
+
 class InstalledApps {
   static instance = new InstalledApps();
 
@@ -127,6 +136,7 @@ class InstalledApps {
       isUrlShortcut: boolean;
     }
   > = new Map();
+  private browsers: BrowserApp[] = [];
 
   constructor() {}
 
@@ -165,6 +175,19 @@ class InstalledApps {
           isUrlShortcut: appDetail.isUrlShortcut,
         });
 
+        if (browserRegex.test(appDetail.name)) {
+          const browser = browserDetail.find((browser) => {
+            return path.basename(appDetail.target) === browser.filename;
+          });
+          if (browser) {
+            this.browsers.push({
+              name: browser.name,
+              type: browser.type,
+              location: appDetail.target,
+            });
+          }
+        }
+
         return {
           appId,
           name: appDetail.name,
@@ -191,6 +214,14 @@ class InstalledApps {
     await this.fetchApps();
 
     return this.apps;
+  }
+
+  async getBrowsers() {
+    if (this.isAppsFetched) return this.browsers;
+
+    await this.fetchApps();
+
+    return this.browsers;
   }
 
   getAppPath(appId: string) {

@@ -4,6 +4,8 @@ import { Suspense, lazy, memo } from 'react';
 import { XIcon } from 'lucide-react';
 import { UiSkeleton } from '@repo/ui';
 import kebabCase from 'lodash-es/kebabCase';
+import WorkflowNodeLayoutEdit from '../node-edit/WorkflowNodeLayoutEdit';
+import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
 
 const editComponents = Object.fromEntries(
   Object.entries(import.meta.glob('../node-edit/WorkflowNodeEdit*.tsx')).map(
@@ -39,6 +41,16 @@ function Loading() {
   );
 }
 
+function WorkflowEditNodeDefault() {
+  const node = useWorkflowEditorStore.use.editNode() as WorkflowNodes;
+
+  return (
+    <WorkflowNodeLayoutEdit node={node}>
+      <p className="py-4 text-center">This node doesn&apos;t have parameters</p>
+    </WorkflowNodeLayoutEdit>
+  );
+}
+
 function WorkflowEditorEditNode() {
   const editNode = useWorkflowEditorStore(
     useShallow((state) =>
@@ -49,8 +61,10 @@ function WorkflowEditorEditNode() {
   );
   const setEditNode = useWorkflowEditorStore.use.setEditNode();
 
-  const EditComponent = editNode && editComponents[editNode.type];
-  if (!EditComponent) return null;
+  const EditComponent = editNode
+    ? editComponents[editNode.type] || WorkflowEditNodeDefault
+    : null;
+  if (!EditComponent || !editNode) return null;
 
   return (
     <div className="absolute right-0 h-full w-[340px] z-50 top-0 bg-background border-l text-sm">

@@ -34,7 +34,7 @@ export default {
           type: 'input:text'
         },
         {
-          name: 'test',
+          name: 'test1',
           title: 'Test',
           type: 'toggle',
           placeholder: 'Test',

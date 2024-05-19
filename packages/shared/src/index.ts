@@ -25,5 +25,6 @@ export type {
 } from './utils/UsKeyboardLayout';
 
 export type * from './interfaces/utils.interface';
+export type * from './interfaces/browser.interface';
 export type * from './interfaces/keyboard.interface';
 export type * from './interfaces/extension-websocket.interface';

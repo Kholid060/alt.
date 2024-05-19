@@ -55,19 +55,12 @@ import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interfa
 import WorkflowEventListener from '/@/components/workflow/WorkflowEventListener';
 import { WorkflowEditorNodeListModal } from '/@/components/workflow/editor/WorkflowEditorNodeLIst';
 
-const nodeTypes: Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>> = {
+const nodeTypes: Partial<
+  Record<WORKFLOW_NODE_TYPE | 'default', React.FC<NodeProps>>
+> = {
+  default: WorkflowNodeBasic,
   [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoop,
-  [WORKFLOW_NODE_TYPE.CODE]: WorkflowNodeBasic,
-  [WORKFLOW_NODE_TYPE.DELAY]: WorkflowNodeBasic,
-  [WORKFLOW_NODE_TYPE.TRIGGER]: WorkflowNodeBasic,
-  [WORKFLOW_NODE_TYPE.CLIPBOARD]: WorkflowNodeBasic,
   [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeCommand,
-  [WORKFLOW_NODE_TYPE.DO_NOTHING]: WorkflowNodeBasic,
-  [WORKFLOW_NODE_TYPE.BREAK_LOOP]: WorkflowNodeBasic,
-  [WORKFLOW_NODE_TYPE.FILE_SYSTEM]: WorkflowNodeBasic,
-  [WORKFLOW_NODE_TYPE.HTTP_REQUEST]: WorkflowNodeBasic,
-  [WORKFLOW_NODE_TYPE.NOTIFICATION]: WorkflowNodeBasic,
-  [WORKFLOW_NODE_TYPE.TRIGGER_SHORTCUT]: WorkflowNodeBasic,
   [WORKFLOW_NODE_TYPE.CONDITIONAL]: WorkflowNodeConditional,
 };
 const edgeTypes = {
