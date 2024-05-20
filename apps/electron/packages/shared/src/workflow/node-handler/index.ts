@@ -3,5 +3,7 @@ export * from './NodeHandlerCore';
 export * from './NodeHandlerLoop';
 export * from './NodeHandlerCommand';
 export * from './NodeHandlerBrowser';
+export * from './NodeHandlerTriggers';
 export * from './NodeHandlerFileSystem';
 export * from './NodeHandlerHTTPRequest';
+export * from './NodeHandlerExecuteWorkflow';

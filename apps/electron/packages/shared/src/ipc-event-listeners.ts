@@ -9,7 +9,9 @@ IPCRenderer.instance.handle('shared-window:execute-command', (payload) => {
 });
 IPCRenderer.instance.handle('shared-window:execute-workflow', (payload) => {
   debugLog(`Execute workflow: "${payload.workflow.name}"`, payload);
-  return WorkflowRunnerManager.instance.execute(payload);
+  return WorkflowRunnerManager.instance
+    .execute(payload)
+    .then((runner) => runner.id);
 });
 
 IPCRenderer.on('shared-window:stop-execute-command', (_, runnerId) => {

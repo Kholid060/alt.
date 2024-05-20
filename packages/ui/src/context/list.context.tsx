@@ -6,6 +6,7 @@ import {
   useRef,
   useMemo,
   createContext,
+  useEffect,
 } from 'react';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -180,6 +181,24 @@ export function UiListProvider({ children }: { children: React.ReactNode }) {
     }),
     [],
   );
+
+  useEffect(() => {
+    const listenersList = listeners.current;
+
+    return () => {
+      state.current = {
+        search: '',
+        selectedItem: {
+          id: '',
+          index: -1,
+          actions: [],
+          metadata: {},
+          actionIndex: -1,
+        },
+      };
+      listenersList.clear();
+    };
+  }, []);
 
   return (
     <UiListStoreContext.Provider value={{ ...store, listController }}>

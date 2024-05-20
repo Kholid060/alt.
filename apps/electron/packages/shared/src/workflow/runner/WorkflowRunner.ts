@@ -24,9 +24,15 @@ export type NodeHandlersObj = Record<
   WorkflowNodeHandler<WORKFLOW_NODE_TYPE>
 >;
 
+export interface WorkflowRunnerParent {
+  id: string;
+  vars: Record<PropertyKey, unknown>;
+}
+
 export interface WorkflowRunnerOptions extends WorkflowRunnerRunPayload {
   id: string;
   nodeHandlers: NodeHandlersObj;
+  parentWorkflow: WorkflowRunnerParent;
 }
 
 export interface WorkflowRunnerEvents {
@@ -149,11 +155,14 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   sandbox: WorkflowRunnerSandbox;
   dataStorage: WorkflowRunnerData;
 
+  readonly parentWorkflow: WorkflowRunnerParent | null;
+
   constructor({
     id,
     workflow,
     startNodeId,
     nodeHandlers,
+    parentWorkflow,
   }: WorkflowRunnerOptions) {
     super();
 
@@ -161,13 +170,15 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     this.workflow = workflow;
     this.startNodeId = startNodeId;
     this.nodeHandlers = nodeHandlers;
+    this.parentWorkflow = parentWorkflow;
+
     this.state = WorkflowRunnerState.Idle;
     this.startedAt = new Date().toString();
 
     this.browserCtx = { id: null, tabId: null };
 
-    this.dataStorage = new WorkflowRunnerData();
     this.sandbox = new WorkflowRunnerSandbox(this);
+    this.dataStorage = new WorkflowRunnerData(this);
 
     this.nodesIdxMap = new Map(
       workflow.nodes.map((node, index) => [node.id, index]),

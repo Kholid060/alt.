@@ -1,4 +1,5 @@
 import type { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
+import type WorkflowRunner from './WorkflowRunner';
 
 interface WorkflowRunnerLoopData {
   index: number;
@@ -53,19 +54,21 @@ class WorkflowRunnerData {
   nodeData: StorageData<NodeData>;
   loopData: StorageData<Record<string, WorkflowRunnerLoopData>>;
 
-  constructor() {
+  constructor(private runner: WorkflowRunner) {
+    this.loopData = new StorageData({});
+    this.variables = new StorageData({});
+
     this.nodeData = new StorageData({
       prevNode: null,
       currentNode: null,
     });
-    this.loopData = new StorageData({});
-    this.variables = new StorageData({});
   }
 
   get contextData() {
     return {
       vars: this.variables.getAll(),
       loopData: this.loopData.getAll(),
+      parentWorkflow: this.runner.parentWorkflow,
       prevNode: this.nodeData.get('prevNode')?.value ?? null,
     };
   }

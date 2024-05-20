@@ -116,6 +116,7 @@ export function WorkflowEditorNodeList({
             args: command.arguments ?? [],
             nodeType: WORKFLOW_NODE_TYPE.COMMAND,
             icon: command.icon || extension.icon,
+            $nodeType: WORKFLOW_NODE_TYPE.COMMAND,
           },
           subtitle: extension.title,
           icon: command.icon ? (
@@ -345,7 +346,11 @@ export function WorkflowEditorNodeListModal() {
           x: position.x + 250,
           y: position.y - 100,
         },
-        data: { $expData: {}, isDisabled: false },
+        data: {
+          $expData: {},
+          isDisabled: false,
+          $nodeType: WORKFLOW_NODE_TYPE.DO_NOTHING,
+        },
       });
       newEdges.push(
         {

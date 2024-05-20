@@ -1,6 +1,10 @@
 import type { WorkflowRunnerRunPayload } from '#packages/common/interface/workflow-runner.interace';
 import { nanoid } from 'nanoid';
-import type { NodeHandlersObj } from './runner/WorkflowRunner';
+import type {
+  NodeHandlersObj,
+  WorkflowRunnerFinishReason,
+  WorkflowRunnerParent,
+} from './runner/WorkflowRunner';
 import WorkflowRunner from './runner/WorkflowRunner';
 import * as nodeHandlersClasses from './node-handler';
 import { debugLog } from '#packages/common/utils/helper';
@@ -35,6 +39,18 @@ async function updateWorkflowHistory(
   );
 }
 
+export interface WorkflowRunnerExecuteOptions extends WorkflowRunnerRunPayload {
+  onFinish?(
+    runner: WorkflowRunner,
+    reason: WorkflowRunnerFinishReason,
+  ): void | Promise<void>;
+  onError?(
+    runner: WorkflowRunner,
+    error: { message: string; location?: string },
+  ): void | Promise<void>;
+  parent: WorkflowRunnerParent;
+}
+
 class WorkflowRunnerManager {
   private static _instance: WorkflowRunnerManager;
 
@@ -46,7 +62,13 @@ class WorkflowRunnerManager {
 
   constructor() {}
 
-  async execute({ startNodeId, workflow }: WorkflowRunnerRunPayload) {
+  async execute({
+    parent,
+    onError,
+    workflow,
+    onFinish,
+    startNodeId,
+  }: WorkflowRunnerExecuteOptions) {
     const runnerId = nanoid(5);
 
     const historyId = await IPCRenderer.invokeWithError(
@@ -72,37 +94,50 @@ class WorkflowRunnerManager {
       startNodeId,
       nodeHandlers,
       id: runnerId,
+      parentWorkflow: parent,
     });
-    runner.once('error', ({ message, location }) => {
-      debugLog(`Error on "${workflow.name}" workflow: ${message}`);
+    runner.once('error', async ({ message, location }) => {
+      try {
+        debugLog(`Error on "${workflow.name}" workflow: ${message}`);
 
-      updateWorkflowHistory(historyId, {
-        errorMessage: message,
-        errorLocation: location,
-        startedAt: runner.startedAt,
-        status: WORKFLOW_HISTORY_STATUS.Error,
-      });
+        await updateWorkflowHistory(historyId, {
+          errorMessage: message,
+          errorLocation: location,
+          startedAt: runner.startedAt,
+          status: WORKFLOW_HISTORY_STATUS.Error,
+        });
 
-      runner.destroy();
-      this.runners.delete(runnerId);
+        if (onError) await onError(runner, { message, location });
+      } catch (error) {
+        console.error(error);
+      } finally {
+        runner.destroy();
+        this.runners.delete(runnerId);
+      }
     });
-    runner.once('finish', (reason) => {
-      debugLog(`Finish "${workflow.name}" execution: ${reason}`);
+    runner.once('finish', async (reason) => {
+      try {
+        debugLog(`Finish "${workflow.name}" execution: ${reason}`);
 
-      updateWorkflowHistory(historyId, {
-        startedAt: runner.startedAt,
-        status: WORKFLOW_HISTORY_STATUS.Finish,
-      });
+        await updateWorkflowHistory(historyId, {
+          startedAt: runner.startedAt,
+          status: WORKFLOW_HISTORY_STATUS.Finish,
+        });
 
-      runner.destroy();
-      this.runners.delete(runnerId);
+        if (onFinish) await onFinish(runner, reason);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        runner.destroy();
+        this.runners.delete(runnerId);
+      }
     });
 
     runner.start();
 
     this.runners.set(runnerId, runner);
 
-    return runnerId;
+    return runner;
   }
 
   stop(runnerId: string) {

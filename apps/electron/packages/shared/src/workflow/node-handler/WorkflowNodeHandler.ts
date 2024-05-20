@@ -54,4 +54,21 @@ abstract class WorkflowNodeHandler<
   abstract destroy(): void;
 }
 
+export class NodeHandlerNoOp<
+  T extends WORKFLOW_NODE_TYPE,
+> extends WorkflowNodeHandler<T> {
+  constructor(type: T) {
+    super(type);
+  }
+
+  execute(): WorkflowNodeHandlerExecuteReturn {
+    // do nothing
+    return { value: null };
+  }
+
+  destroy(): void {
+    // do nothing
+  }
+}
+
 export default WorkflowNodeHandler;

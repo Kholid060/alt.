@@ -19,6 +19,8 @@ import {
   KeyboardIcon,
   CornerDownLeftIcon,
   CompassIcon,
+  WorkflowIcon,
+  ZapIcon,
 } from 'lucide-react';
 import type { WORKFLOW_NODE_GROUP } from './workflow.const';
 import { WORKFLOW_NODE_TYPE } from './workflow.const';
@@ -266,5 +268,36 @@ export const WORKFLOW_NODES: {
     handleTarget: ['default'],
     handleSource: ['default'],
     type: WORKFLOW_NODE_TYPE.USE_BROWSER,
+  },
+  [WORKFLOW_NODE_TYPE.EXECUTE_WORKFLOW]: {
+    group: 'Core',
+    subtitle: 'Core',
+    title: 'Execute Workflow',
+    icon: WorkflowIcon,
+    defaultData: {
+      variables: {},
+      varName: '',
+      workflowId: '',
+      exposeVars: '',
+      isDisabled: false,
+      insertToVar: false,
+      $nodeType: WORKFLOW_NODE_TYPE.EXECUTE_WORKFLOW,
+    },
+    handleTarget: ['default'],
+    handleSource: ['default'],
+    type: WORKFLOW_NODE_TYPE.EXECUTE_WORKFLOW,
+  },
+  [WORKFLOW_NODE_TYPE.TRIGGER_EXECUTE_WORKFLOW]: {
+    group: 'Triggers',
+    subtitle: 'Trigger',
+    title: 'Trigger Execute Workflow',
+    icon: ZapIcon,
+    defaultData: {
+      isDisabled: false,
+      $nodeType: WORKFLOW_NODE_TYPE.TRIGGER_EXECUTE_WORKFLOW,
+    },
+    handleTarget: [],
+    handleSource: ['default'],
+    type: WORKFLOW_NODE_TYPE.TRIGGER_EXECUTE_WORKFLOW,
   },
 } as const;

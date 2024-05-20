@@ -204,6 +204,22 @@ export type WorkflowNodeUseBrowser = WorkflowNodeBase<
   WORKFLOW_NODE_TYPE.USE_BROWSER
 >;
 
+export type WorkflowNodeExecuteWorkflow = WorkflowNodeBase<
+  {
+    varName: string;
+    exposeVars: string;
+    workflowId: string;
+    insertToVar: boolean;
+    variables: Record<string, unknown>;
+  },
+  WORKFLOW_NODE_TYPE.EXECUTE_WORKFLOW
+>;
+
+export type WorkflowNodeTriggerExecuteWorkflow = WorkflowNodeBase<
+  object,
+  WORKFLOW_NODE_TYPE.TRIGGER_EXECUTE_WORKFLOW
+>;
+
 export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoop;
   [WORKFLOW_NODE_TYPE.CODE]: WorkflowNodeCode;
@@ -218,7 +234,9 @@ export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.CONDITIONAL]: WorkflowNodeConditional;
   [WORKFLOW_NODE_TYPE.HTTP_REQUEST]: WorkflowNodeHttpRequest;
   [WORKFLOW_NODE_TYPE.NOTIFICATION]: WorkflowNodeNotification;
+  [WORKFLOW_NODE_TYPE.EXECUTE_WORKFLOW]: WorkflowNodeExecuteWorkflow;
   [WORKFLOW_NODE_TYPE.TRIGGER_SHORTCUT]: WorkflowNodeTriggerShortcut;
+  [WORKFLOW_NODE_TYPE.TRIGGER_EXECUTE_WORKFLOW]: WorkflowNodeTriggerExecuteWorkflow;
 }
 
 export type WorkflowNodes = WorkflowNodesMap[keyof WorkflowNodesMap];

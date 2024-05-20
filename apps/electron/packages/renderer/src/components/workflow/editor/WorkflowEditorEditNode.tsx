@@ -46,7 +46,9 @@ function WorkflowEditNodeDefault() {
 
   return (
     <WorkflowNodeLayoutEdit node={node}>
-      <p className="py-4 text-center">This node doesn&apos;t have parameters</p>
+      <p className="py-4 text-center text-muted-foreground">
+        This node doesn&apos;t have parameters
+      </p>
     </WorkflowNodeLayoutEdit>
   );
 }

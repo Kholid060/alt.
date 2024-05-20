@@ -210,8 +210,9 @@ function NodeCard({
   return (
     <>
       <div
-        className="bg-background min-w-48 rounded-lg border-2 text-sm"
+        className="bg-background min-w-48 rounded-lg border-2 text-sm max-w-52"
         {...props}
+        title={title}
       >
         <div className="p-3 flex items-center relative">
           <div className="h-8 w-8 relative">

@@ -12,7 +12,9 @@ export enum WORKFLOW_NODE_TYPE {
   FILE_SYSTEM = 'node-file-system',
   HTTP_REQUEST = 'node-http-request',
   NOTIFICATION = 'node-notification',
+  EXECUTE_WORKFLOW = 'node-execute-workflow',
   TRIGGER_SHORTCUT = 'node-trigger-shortcut',
+  TRIGGER_EXECUTE_WORKFLOW = 'node-trigger-execute-workflow',
 }
 
 export const WORKFLOW_MANUAL_TRIGGER_ID = '$manual$' as const;
