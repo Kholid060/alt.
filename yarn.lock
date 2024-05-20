@@ -4667,6 +4667,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/picomatch@npm:^2.3.3":
+  version: 2.3.3
+  resolution: "@types/picomatch@npm:2.3.3"
+  checksum: 10c0/5ad7f891eb3e16e8eb1f51615f0b755bc44ac5dff5a1e2513229f307f72e226c917c6b9a829a97134cedbec727036f885890a55b1975b6e3f381b6545b962c4d
+  languageName: node
+  linkType: hard
+
 "@types/plist@npm:^3.0.1":
   version: 3.0.5
   resolution: "@types/plist@npm:3.0.5"
@@ -8593,6 +8600,7 @@ __metadata:
     "@types/lodash-es": "npm:^4.17.12"
     "@types/mime-types": "npm:^2.1.4"
     "@types/node": "npm:20.11.17"
+    "@types/picomatch": "npm:^2.3.3"
     "@types/react": "npm:^18.2.55"
     "@types/react-dom": "npm:^18.2.19"
     "@types/which": "npm:^3.0.3"
@@ -8625,13 +8633,11 @@ __metadata:
     eventemitter3: "npm:^5.0.1"
     framer-motion: "npm:^11.0.5"
     fs-extra: "npm:^11.2.0"
-    fuzzysort: "npm:^2.0.4"
     globby: "npm:^14.0.1"
     happy-dom: "npm:13.3.8"
     immer: "npm:^10.0.4"
     lodash-es: "npm:^4.17.21"
     lucide-react: "npm:^0.367.0"
-    mime-types: "npm:^2.1.35"
     mitt: "npm:^3.0.1"
     nanoid: "npm:^5.0.6"
     picomatch: "npm:^4.0.2"
@@ -8667,7 +8673,6 @@ __metadata:
     ws: "npm:^8.16.0"
     zod: "npm:^3.22.4"
     zod-validation-error: "npm:^3.0.3"
-    zundo: "npm:^2.1.0"
     zustand: "npm:^4.5.1"
   languageName: unknown
   linkType: soft
@@ -12492,7 +12497,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mime-types@npm:^2.1.12, mime-types@npm:^2.1.35, mime-types@npm:~2.1.34":
+"mime-types@npm:^2.1.12, mime-types@npm:~2.1.34":
   version: 2.1.35
   resolution: "mime-types@npm:2.1.35"
   dependencies:
@@ -18076,18 +18081,6 @@ __metadata:
   version: 3.22.4
   resolution: "zod@npm:3.22.4"
   checksum: 10c0/7578ab283dac0eee66a0ad0fc4a7f28c43e6745aadb3a529f59a4b851aa10872b3890398b3160f257f4b6817b4ce643debdda4fb21a2c040adda7862cab0a587
-  languageName: node
-  linkType: hard
-
-"zundo@npm:^2.1.0":
-  version: 2.1.0
-  resolution: "zundo@npm:2.1.0"
-  peerDependencies:
-    zustand: ^4.3.0
-  peerDependenciesMeta:
-    zustand:
-      optional: false
-  checksum: 10c0/d4c74d4cb92e97d7c60469bb35580a620d7e62758d45f8dfd2e5d35350f8240037250b8d471956273e388b8ed32969a1c079f3c27717f98b284fb4f90471b5bf
   languageName: node
   linkType: hard
 

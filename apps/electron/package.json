@@ -33,6 +33,7 @@
     "@types/lodash-es": "^4.17.12",
     "@types/mime-types": "^2.1.4",
     "@types/node": "20.11.17",
+    "@types/picomatch": "^2.3.3",
     "@types/react": "^18.2.55",
     "@types/react-dom": "^18.2.19",
     "@types/which": "^3.0.3",
@@ -92,12 +93,10 @@
     "eventemitter3": "^5.0.1",
     "framer-motion": "^11.0.5",
     "fs-extra": "^11.2.0",
-    "fuzzysort": "^2.0.4",
     "globby": "^14.0.1",
     "immer": "^10.0.4",
     "lodash-es": "^4.17.21",
     "lucide-react": "^0.367.0",
-    "mime-types": "^2.1.35",
     "mitt": "^3.0.1",
     "nanoid": "^5.0.6",
     "picomatch": "^4.0.2",
@@ -120,7 +119,6 @@
     "ws": "^8.16.0",
     "zod": "^3.22.4",
     "zod-validation-error": "^3.0.3",
-    "zundo": "^2.1.0",
     "zustand": "^4.5.1"
   }
 }

@@ -40,8 +40,14 @@ function WorkflowNodeEditDelay() {
         ))}
       </UiSelect>
       {node.data.action === 'write' && (
-        <div className="flex items-center justify-between mt-4">
-          <UiLabel htmlFor="fs--append">Append</UiLabel>
+        <WorkflowUiFormExpression
+          data={node.data.$expData}
+          label="Append"
+          path="appendFile"
+          labelId="fs--append"
+          className="mt-2"
+          onDataChange={($expData) => updateEditNode({ $expData })}
+        >
           <UiSwitch
             size="sm"
             id="fs--append"
@@ -50,26 +56,59 @@ function WorkflowNodeEditDelay() {
               updateEditNode<WorkflowNodeFileSystem>({ appendFile })
             }
           />
-        </div>
+        </WorkflowUiFormExpression>
       )}
       <hr className="my-4" />
-      <WorkflowUiFormExpression
-        data={node.data.$expData}
-        label="File path"
-        path="filePath"
-        labelId="fs--file-path"
-        onDataChange={($expData) => updateEditNode({ $expData })}
-      >
-        <UiInput
-          value={node.data.filePath}
-          id="fs--file-path"
-          inputSize="sm"
-          placeholder="D:\documents\file.txt"
-          onValueChange={(value) =>
-            updateEditNode<WorkflowNodeFileSystem>({ filePath: value })
-          }
-        />
-      </WorkflowUiFormExpression>
+      {node.data.action === 'read' ? (
+        <div>
+          <WorkflowUiFormExpression
+            data={node.data.$expData}
+            label="File pattern"
+            path="readFilePath"
+            labelId="fs--file-path"
+            onDataChange={($expData) => updateEditNode({ $expData })}
+          >
+            <UiInput
+              value={node.data.readFilePath}
+              id="fs--file-path"
+              inputSize="sm"
+              placeholder="D:/documents/**/*.txt"
+              onValueChange={(value) =>
+                updateEditNode<WorkflowNodeFileSystem>({ readFilePath: value })
+              }
+            />
+          </WorkflowUiFormExpression>
+          <p className="text-xs text-muted-foreground">
+            See supported{' '}
+            <a
+              href="https://github.com/isaacs/minimatch#usage"
+              className="underline"
+              target="_blank"
+              rel="noreferrer"
+            >
+              patterns
+            </a>
+          </p>
+        </div>
+      ) : node.data.action === 'write' ? (
+        <WorkflowUiFormExpression
+          data={node.data.$expData}
+          label="File path"
+          path="writeFilePath"
+          labelId="fs--file-path"
+          onDataChange={($expData) => updateEditNode({ $expData })}
+        >
+          <UiInput
+            value={node.data.writeFilePath}
+            id="fs--file-path"
+            inputSize="sm"
+            placeholder="D:\documents\file.txt"
+            onValueChange={(value) =>
+              updateEditNode<WorkflowNodeFileSystem>({ writeFilePath: value })
+            }
+          />
+        </WorkflowUiFormExpression>
+      ) : null}
       {node.data.action === 'write' && (
         <WorkflowUiFormExpression
           data={node.data.$expData}
@@ -92,7 +131,24 @@ function WorkflowNodeEditDelay() {
       )}
       {node.data.action === 'read' && (
         <div className="mt-4">
-          <div className="flex items-center justify-between">
+          <WorkflowUiFormExpression
+            data={node.data.$expData}
+            label="Throw error if no match"
+            path="throwIfEmpty"
+            labelId="fs--throwIfEmpty"
+            className="mt-2"
+            onDataChange={($expData) => updateEditNode({ $expData })}
+          >
+            <UiSwitch
+              size="sm"
+              id="fs--throwIfEmpty"
+              checked={node.data.throwIfEmpty}
+              onCheckedChange={(throwIfEmpty) =>
+                updateEditNode<WorkflowNodeFileSystem>({ throwIfEmpty })
+              }
+            />
+          </WorkflowUiFormExpression>
+          <div className="flex items-center justify-between mt-4">
             <UiLabel className="ml-1" htmlFor="http-assign-var">
               Assign file to variable
             </UiLabel>

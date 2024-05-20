@@ -5,6 +5,7 @@ import type {
 } from './WorkflowNodeHandler';
 import WorkflowNodeHandler from './WorkflowNodeHandler';
 import fs from 'fs-extra';
+import { globby } from 'globby';
 import WorkflowFileHandle from '../utils/WorkflowFileHandle';
 
 type ExecuteParams = WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.FILE_SYSTEM>;
@@ -13,7 +14,12 @@ export class NodeHandlerFileSystem extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
   constructor() {
     super(WORKFLOW_NODE_TYPE.FILE_SYSTEM, {
       dataValidation: [
-        { key: 'filePath', name: 'File path', types: ['String'] },
+        {
+          key: 'readFilePath',
+          name: 'Read file path pattern',
+          types: ['String'],
+        },
+        { key: 'writeFilePath', name: 'Write file path', types: ['String'] },
       ],
     });
   }
@@ -22,23 +28,28 @@ export class NodeHandlerFileSystem extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
     node,
     runner,
   }: Pick<ExecuteParams, 'node' | 'runner'>) {
-    const fileExists = fs.existsSync(node.data.filePath);
-    if (!fileExists) {
-      throw new Error(`Couldn't find a file at "${node.data.filePath}"`);
+    const files = await globby(node.data.readFilePath, { gitignore: false });
+    if (files.length === 0 && node.data.throwIfEmpty) {
+      throw new Error("Couldn't find files with inputted patterns");
     }
 
-    const fileStat = await fs.stat(node.data.filePath);
-    const fileHandle = new WorkflowFileHandle({
-      size: fileStat.size,
-      path: node.data.filePath,
-      lastModified: fileStat.mtime.toString(),
-    });
+    const filesHandle = await Promise.all(
+      files.map(async (filePath) => {
+        const fileStat = await fs.stat(filePath);
+
+        return new WorkflowFileHandle({
+          path: filePath,
+          size: fileStat.size,
+          lastModified: fileStat.mtime.toString(),
+        });
+      }),
+    );
 
     if (node.data.insertToVar) {
-      runner.dataStorage.variables.set(node.data.varName, fileHandle);
+      runner.dataStorage.variables.set(node.data.varName, filesHandle);
     }
 
-    return fileHandle;
+    return filesHandle;
   }
 
   async execute({
@@ -51,9 +62,9 @@ export class NodeHandlerFileSystem extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
       value = await this.readFile({ node, runner });
     } else if (node.data.action === 'write') {
       if (node.data.appendFile) {
-        await fs.appendFile(node.data.filePath, node.data.fileData);
+        await fs.appendFile(node.data.writeFilePath, node.data.fileData);
       } else {
-        await fs.writeFile(node.data.filePath, node.data.fileData);
+        await fs.writeFile(node.data.writeFilePath, node.data.fileData);
       }
     }
 

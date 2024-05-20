@@ -67,10 +67,12 @@ export type WorkflowNodeLoop = WorkflowNodeBase<
 export type WorkflowNodeFileSystem = WorkflowNodeBase<
   {
     varName: string;
-    filePath: string;
     fileData: string;
     appendFile: boolean;
+    readFilePath: string;
     insertToVar: boolean;
+    writeFilePath: string;
+    throwIfEmpty: boolean;
     action: 'read' | 'write';
   },
   WORKFLOW_NODE_TYPE.FILE_SYSTEM

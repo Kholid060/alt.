@@ -168,10 +168,12 @@ export const WORKFLOW_NODES: {
     defaultData: {
       varName: '',
       fileData: '',
-      filePath: '',
       action: 'read',
+      readFilePath: '',
+      writeFilePath: '',
       isDisabled: false,
       appendFile: false,
+      throwIfEmpty: true,
       insertToVar: false,
       $nodeType: WORKFLOW_NODE_TYPE.FILE_SYSTEM,
     },

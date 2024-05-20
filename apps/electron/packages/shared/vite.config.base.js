@@ -14,11 +14,15 @@ const config = {
   root: PACKAGE_ROOT,
   envDir: PROJECT_ROOT,
   base: './',
+  ssr: {
+    target: 'node',
+  },
   resolve: {
     alias: {
       '#packages': join(PACKAGE_ROOT, '../'),
       '/@/': join(PACKAGE_ROOT, 'src') + '/',
       '#common': join(PACKAGE_ROOT, '../common'),
+      'unicorn-magic': join(PACKAGE_ROOT, 'utils/unicorn-magic.js'),
     },
   },
   define: {
