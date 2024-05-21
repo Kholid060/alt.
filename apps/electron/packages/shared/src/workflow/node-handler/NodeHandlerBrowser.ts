@@ -27,7 +27,7 @@ async function getOpenedBrowser(
   if (preferBrowser === 'any') {
     browserId =
       connectedBrowsers.find((browser) => browser.active)?.id ??
-      connectedBrowsers[0].id ??
+      connectedBrowsers[0]?.id ??
       null;
   } else {
     browserId =

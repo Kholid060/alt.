@@ -59,7 +59,7 @@ const today = new Date();
 function formatDate(dateStr: string) {
   const date = new Date(dateStr);
   if (date.getDate() !== today.getDate()) {
-    return dayjs(date).format('DD MMM HH:mm');
+    return dayjs(date).format('DD MMM, HH:mm');
   }
 
   return dayjs(date).fromNow();

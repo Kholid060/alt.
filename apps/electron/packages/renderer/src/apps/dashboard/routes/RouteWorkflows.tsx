@@ -58,6 +58,7 @@ import clsx from 'clsx';
 import { Link, useNavigate } from 'react-router-dom';
 import UiSelectIcon from '/@/components/ui/UiSelectIcon';
 import DeepLinkURL from '#packages/common/utils/DeepLinkURL';
+import { WORKFLOW_MANUAL_TRIGGER_ID } from '#packages/common/utils/constant/workflow.const';
 
 type IconsName = keyof typeof UiExtIcon;
 
@@ -218,9 +219,19 @@ function WorkflowCards({ workflows }: { workflows: DatabaseWorkflow[] }) {
               </UiDropdownMenuTrigger>
               <UiDropdownMenuContent>
                 <UiDropdownMenuItem
+                  onClick={() =>
+                    preloadAPI.main.ipc.invoke('workflow:execute', {
+                      id: workflow.id,
+                      startNodeId: WORKFLOW_MANUAL_TRIGGER_ID,
+                    })
+                  }
+                >
+                  Run
+                </UiDropdownMenuItem>
+                <UiDropdownMenuItem
                   onClick={() => navigate(`/workflows/${workflow.id}`)}
                 >
-                  Open
+                  Edit
                 </UiDropdownMenuItem>
                 <UiDropdownMenuItem onClick={() => exportWorkflow(workflow.id)}>
                   Export

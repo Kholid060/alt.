@@ -4,10 +4,12 @@ import {
   UiDropdownMenu,
   UiDropdownMenuContent,
   UiDropdownMenuItem,
+  UiDropdownMenuSeparator,
   UiDropdownMenuTrigger,
   UiLabel,
   UiSwitch,
   UiTooltip,
+  useDialog,
   useToast,
 } from '@repo/ui';
 import {
@@ -347,7 +349,9 @@ function WorkflowDisableBtn() {
 }
 
 function WorkflowMoreMenu() {
+  const dialog = useDialog();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   async function exportWorkflow() {
     try {
@@ -389,7 +393,45 @@ function WorkflowMoreMenu() {
         title: 'Copied to clipboard',
       });
     } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Something went wrong',
+      });
       console.error(error);
+    }
+  }
+  async function deleteWorkflow() {
+    try {
+      const { workflow } = useWorkflowEditorStore.getState();
+      if (!workflow) return;
+
+      const isConfirmed = await dialog.confirm({
+        okText: 'Delete',
+        title: 'Delete workflow?',
+        okButtonVariant: 'destructive',
+        body: 'Are you sure you want to delete this workflow?',
+      });
+      if (!isConfirmed) return;
+
+      const result = await preloadAPI.main.ipc.invoke(
+        'database:delete-workflow',
+        workflow.id,
+      );
+      if (isIPCEventError(result)) {
+        toast({
+          variant: 'destructive',
+          title: 'Something went wrong',
+        });
+        return;
+      }
+
+      navigate('/workflows', { replace: true });
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: 'destructive',
+        title: 'Something went wrong',
+      });
     }
   }
 
@@ -408,6 +450,14 @@ function WorkflowMoreMenu() {
         <UiDropdownMenuItem onClick={exportWorkflow}>
           <DownloadIcon className="mr-2 h-4 w-4" />
           Export workflow
+        </UiDropdownMenuItem>
+        <UiDropdownMenuSeparator />
+        <UiDropdownMenuItem
+          onClick={deleteWorkflow}
+          className="text-destructive-text data-[highlighted]:bg-destructive/20 data-[highlighted]:text-destructive-text"
+        >
+          <TrashIcon className="mr-2 h-4 w-4" />
+          Delete workflow
         </UiDropdownMenuItem>
       </UiDropdownMenuContent>
     </UiDropdownMenu>
