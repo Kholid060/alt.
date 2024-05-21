@@ -40,6 +40,10 @@ export interface ExtensionBrowserElementSelector {
 }
 
 type ExtensionWSAckHandler<T extends unknown[] = [], R = void> = (
+  ...args: [...T, cb: WSAckCallback<R>]
+) => void;
+
+type ExtensionWSAckTabHandler<T extends unknown[] = [], R = void> = (
   tab: ExtensionBrowserTabDetail,
   ...args: [...T, cb: WSAckCallback<R>]
 ) => void;
@@ -47,11 +51,16 @@ type ExtensionWSAckHandler<T extends unknown[] = [], R = void> = (
 type ExtensionWSAckElementHandler<
   T extends unknown[] = [],
   R = void,
-> = ExtensionWSAckHandler<[selector: ExtensionBrowserElementSelector, ...T], R>;
+> = ExtensionWSAckTabHandler<
+  [selector: ExtensionBrowserElementSelector, ...T],
+  R
+>;
 
 export interface ExtensionWSServerToClientEvents {
-  'tabs:reload': ExtensionWSAckHandler;
-  'tabs:select-element': ExtensionWSAckHandler<
+  'tabs:reload': ExtensionWSAckTabHandler;
+  'tabs:get-active': ExtensionWSAckHandler<[], BrowserExtensionTab>;
+  'tabs:create-new': ExtensionWSAckHandler<[url: string], BrowserExtensionTab>;
+  'tabs:select-element': ExtensionWSAckTabHandler<
     [
       options: {
         title?: string;

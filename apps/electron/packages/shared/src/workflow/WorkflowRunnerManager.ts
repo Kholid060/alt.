@@ -48,7 +48,7 @@ export interface WorkflowRunnerExecuteOptions extends WorkflowRunnerRunPayload {
     runner: WorkflowRunner,
     error: { message: string; location?: string },
   ): void | Promise<void>;
-  parent: WorkflowRunnerParent;
+  parent?: WorkflowRunnerParent;
 }
 
 class WorkflowRunnerManager {

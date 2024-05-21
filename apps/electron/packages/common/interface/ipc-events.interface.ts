@@ -99,8 +99,12 @@ export interface IPCClipboardEvents {
 }
 
 export interface IPCBrowserEvents {
-  'browser:get-active-tab': () => ExtensionBrowserTabContext;
+  'browser:get-active-tab': (browserId?: string) => ExtensionBrowserTabContext;
   'browser:get-connected-browsers': () => (BrowserInfo & { active: boolean })[];
+  'browser:new-tab': (
+    browserId: string,
+    url: string,
+  ) => ExtensionBrowserTabContext;
 }
 
 export interface IPCExtensionEvents {

@@ -1,8 +1,7 @@
 export interface BrowserExtensionTab {
-  title: string;
-  url: string;
   id: number;
-  windowId: number;
+  url: string;
+  title: string;
 }
 
 export type BrowserType = 'chrome' | 'firefox' | 'edge';

@@ -12,6 +12,7 @@ import SharedProcessService from '/@/services/shared-process.service';
 import { Key, keyboard } from '@nut-tree/nut-js';
 import BrowserService from '/@/services/browser.service';
 import WorkflowService from '/@/services/workflow.service';
+import { isWSAckError } from '../extension/ExtensionBrowserElementHandle';
 
 /** EXTENSION */
 IPCMain.handle('extension:import', async () => {
@@ -270,11 +271,33 @@ IPCMain.handle('workflow:import', (_, paths) => {
 });
 
 /** BROWSER */
-IPCMain.handle('browser:get-active-tab', () => {
-  return Promise.resolve(BrowserService.instance.getActiveTab());
+IPCMain.handle('browser:get-active-tab', async (_, browserId) => {
+  const currentActiveTab = BrowserService.instance.getActiveTab();
+  if (!browserId) return currentActiveTab;
+
+  if (currentActiveTab?.browserId === browserId) return currentActiveTab;
+
+  const tab = await BrowserService.instance.socket.emitToBrowserWithAck({
+    args: [],
+    browserId,
+    name: 'tabs:get-active',
+  });
+  if (isWSAckError(tab)) throw new Error(tab.errorMessage);
+
+  return { ...tab, browserId };
 });
 IPCMain.handle('browser:get-connected-browsers', () => {
   return Promise.resolve(BrowserService.instance.getConnectedBrowser());
+});
+IPCMain.handle('browser:new-tab', async (_, browserId, url) => {
+  const tab = await BrowserService.instance.socket.emitToBrowserWithAck({
+    browserId,
+    args: [url],
+    name: 'tabs:create-new',
+  });
+  if (isWSAckError(tab)) throw new Error(tab.errorMessage);
+
+  return { ...tab, browserId };
 });
 
 /** CRYPTO */

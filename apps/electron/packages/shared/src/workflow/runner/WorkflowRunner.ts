@@ -18,6 +18,8 @@ import WorkflowRunnerSandbox from './WorkflowRunnerSandbox';
 import { clipboard } from 'electron';
 import { nanoid } from 'nanoid';
 import { validateTypes } from '/@/utils/helper';
+import type { ExtensionBrowserTabContext } from '#packages/common/interface/extension.interface';
+import type { SetNullable } from '#packages/common/interface/utils.interface';
 
 export type NodeHandlersObj = Record<
   WORKFLOW_NODE_TYPE,
@@ -32,7 +34,7 @@ export interface WorkflowRunnerParent {
 export interface WorkflowRunnerOptions extends WorkflowRunnerRunPayload {
   id: string;
   nodeHandlers: NodeHandlersObj;
-  parentWorkflow: WorkflowRunnerParent;
+  parentWorkflow?: WorkflowRunnerParent;
 }
 
 export interface WorkflowRunnerEvents {
@@ -132,10 +134,10 @@ export interface WorkflowRunnerPrevNodeExecution {
   isRetrying?: boolean;
 }
 
-interface WorkflowBrowserContext {
-  id: string | null;
-  tabId: number | null;
-}
+type WorkflowBrowserContext = SetNullable<
+  NonNullable<ExtensionBrowserTabContext>,
+  'id' | 'windowId' | 'browserId'
+>;
 
 class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   private startNodeId: string;
@@ -170,12 +172,18 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     this.workflow = workflow;
     this.startNodeId = startNodeId;
     this.nodeHandlers = nodeHandlers;
-    this.parentWorkflow = parentWorkflow;
+    this.parentWorkflow = parentWorkflow ?? null;
 
     this.state = WorkflowRunnerState.Idle;
     this.startedAt = new Date().toString();
 
-    this.browserCtx = { id: null, tabId: null };
+    this.browserCtx = {
+      url: '',
+      id: null,
+      title: '',
+      windowId: null,
+      browserId: null,
+    };
 
     this.sandbox = new WorkflowRunnerSandbox(this);
     this.dataStorage = new WorkflowRunnerData(this);

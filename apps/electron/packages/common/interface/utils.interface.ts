@@ -44,3 +44,12 @@ export type EventMapEmit<Event> = <T extends keyof Event, K extends Event[T]>(
   name: T,
   ...args: K extends FunctionType ? Parameters<K> : K extends any[] ? K : [K]
 ) => K extends FunctionType ? ReturnType<K> : void;
+
+export type SetNullable<
+  BaseType,
+  Keys extends keyof BaseType = keyof BaseType,
+> = {
+  [Key in keyof BaseType]: Key extends Keys
+    ? BaseType[Key] | null
+    : BaseType[Key];
+};

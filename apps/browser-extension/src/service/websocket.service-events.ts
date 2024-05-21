@@ -4,6 +4,7 @@ import {
 } from '@repo/shared';
 import { Socket } from 'socket.io-client';
 import TabService from './tab.service';
+import Browser from 'webextension-polyfill';
 
 function wsAckHandler<T extends unknown[]>(
   fn: (...args: T) => Promise<void> | void,
@@ -202,6 +203,38 @@ export function websocketEventsListener(
         options,
       );
       callback(html);
+    }),
+  );
+
+  io.on(
+    'tabs:get-active',
+    wsAckHandler(async (callback) => {
+      let [tab] = await Browser.tabs.query({
+        active: true,
+        currentWindow: true,
+      });
+      if (!tab) [tab] = await Browser.tabs.query({ active: true });
+
+      callback({
+        id: tab.id!,
+        url: tab.url!,
+        title: tab.title!,
+      });
+    }),
+  );
+
+  io.on(
+    'tabs:create-new',
+    wsAckHandler(async (url, callback) => {
+      const tab = await Browser.tabs.create({
+        url,
+      });
+
+      callback({
+        id: tab.id!,
+        url: tab.url!,
+        title: tab.title!,
+      });
     }),
   );
 }

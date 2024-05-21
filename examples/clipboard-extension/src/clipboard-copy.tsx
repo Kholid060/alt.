@@ -24,8 +24,9 @@ export default async function CommandMain(context: CommandLaunchContext) {
   // await inputEl[0].type('hello world')
   // console.log(await inputEl[0].getAttributes());
 
-  console.log(_extension);
-  await new Promise((r) => setTimeout(r, 40000));
+  const isAvailable = await _extension.browser.activeTab.get();
+  console.log(_extension, { isAvailable });
+  if (!isAvailable) throw new Error('TABB!!!');
 
   console.log(
     await _extension.browser.activeTab.getHTML('body'),

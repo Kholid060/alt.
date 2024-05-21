@@ -1,5 +1,6 @@
 import type { BrowserExtensionTab, BrowserInfo } from '@repo/shared';
 import type { ExtensionBrowserTabContext } from '#packages/common/interface/extension.interface';
+import ExtensionWSNamespace from './websocket/ws-namespaces/extensions.ws-namespace';
 
 interface ActiveBrowser {
   id: string;
@@ -19,9 +20,12 @@ class BrowserService {
   private activeBrowser: ActiveBrowser | null;
   private connectedBrowsers: Map<string, BrowserInfo & { active: boolean }>;
 
+  socket: ExtensionWSNamespace;
+
   constructor() {
     this.activeBrowser = null;
     this.connectedBrowsers = new Map();
+    this.socket = ExtensionWSNamespace.instance;
   }
 
   getActiveTab(): ExtensionBrowserTabContext {

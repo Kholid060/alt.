@@ -235,6 +235,14 @@ export type WorkflowNodeTriggerExecuteWorkflow = WorkflowNodeBase<
   WORKFLOW_NODE_TYPE.TRIGGER_EXECUTE_WORKFLOW
 >;
 
+export type WorkflowNodeBrowserTab = WorkflowNodeBase<
+  {
+    newTabURL: string;
+    action: 'open-tab' | 'use-active-tab';
+  },
+  WORKFLOW_NODE_TYPE.BROWSER_TAB
+>;
+
 export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoop;
   [WORKFLOW_NODE_TYPE.CODE]: WorkflowNodeCode;
@@ -244,6 +252,7 @@ export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.CLIPBOARD]: WorkflowNodeClipboard;
   [WORKFLOW_NODE_TYPE.DO_NOTHING]: WorkflowNodeDoNothing;
   [WORKFLOW_NODE_TYPE.BREAK_LOOP]: WorkflowNodeBreakLoop;
+  [WORKFLOW_NODE_TYPE.BROWSER_TAB]: WorkflowNodeBrowserTab;
   [WORKFLOW_NODE_TYPE.INSERT_DATA]: WorkflowNodeInsertData;
   [WORKFLOW_NODE_TYPE.USE_BROWSER]: WorkflowNodeUseBrowser;
   [WORKFLOW_NODE_TYPE.FILE_SYSTEM]: WorkflowNodeFileSystem;

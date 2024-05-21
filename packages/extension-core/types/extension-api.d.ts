@@ -215,6 +215,7 @@ declare namespace ExtensionAPI.browser {
 
 declare namespace ExtensionAPI.browser.activeTab {
   interface ActiveTab {
+    id: number;
     url: string;
     title: string;
   }
@@ -227,8 +228,6 @@ declare namespace ExtensionAPI.browser.activeTab {
     description?: string;
     filter?: SelectElementFilter;
   }
-
-  export function isAvailable(): Promise<boolean>;
 
   export function selectElement(
     options?: SelectElementOptions,

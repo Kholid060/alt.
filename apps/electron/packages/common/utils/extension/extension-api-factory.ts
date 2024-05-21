@@ -132,7 +132,11 @@ export function createExtensionAPI({
         'browser.activeTab.get': () =>
           Promise.resolve(
             browserCtx
-              ? { title: browserCtx.title, url: browserCtx.url }
+              ? {
+                  id: browserCtx.id,
+                  url: browserCtx.url,
+                  title: browserCtx.title,
+                }
               : null,
           ),
       },

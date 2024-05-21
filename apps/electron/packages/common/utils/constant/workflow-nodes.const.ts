@@ -22,6 +22,7 @@ import {
   WorkflowIcon,
   ZapIcon,
   DatabaseIcon,
+  PanelTopIcon,
 } from 'lucide-react';
 import type { WORKFLOW_NODE_GROUP } from './workflow.const';
 import { WORKFLOW_NODE_TYPE } from './workflow.const';
@@ -316,5 +317,20 @@ export const WORKFLOW_NODES: {
     handleTarget: ['default'],
     handleSource: ['default'],
     type: WORKFLOW_NODE_TYPE.INSERT_DATA,
+  },
+  [WORKFLOW_NODE_TYPE.BROWSER_TAB]: {
+    group: 'Browser',
+    subtitle: 'Browser',
+    icon: PanelTopIcon,
+    title: 'Browser Tab',
+    defaultData: {
+      newTabURL: '',
+      isDisabled: false,
+      action: 'use-active-tab',
+      $nodeType: WORKFLOW_NODE_TYPE.BROWSER_TAB,
+    },
+    handleTarget: ['default'],
+    handleSource: ['default'],
+    type: WORKFLOW_NODE_TYPE.BROWSER_TAB,
   },
 } as const;

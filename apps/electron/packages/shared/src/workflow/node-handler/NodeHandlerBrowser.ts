@@ -1,7 +1,7 @@
 import type { WorkflowNodeUseBrowser } from '#packages/common/interface/workflow-nodes.interface';
 import IPCRenderer from '#packages/common/utils/IPCRenderer';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
-import type { BrowserType } from '@repo/shared';
+import { isValidURL, type BrowserType } from '@repo/shared';
 import type {
   WorkflowNodeHandlerExecute,
   WorkflowNodeHandlerExecuteReturn,
@@ -63,9 +63,6 @@ async function findBrowser(
 const MAX_RETRY_FIND_CONNECT_BROWSER = 5;
 
 export class NodeHandlerOpenBrowser extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.USE_BROWSER> {
-  private controller = new AbortController();
-  private timers = new Set<NodeJS.Timeout>();
-
   constructor() {
     super(WORKFLOW_NODE_TYPE.USE_BROWSER, {
       dataValidation: [
@@ -87,8 +84,8 @@ export class NodeHandlerOpenBrowser extends WorkflowNodeHandler<WORKFLOW_NODE_TY
       const browserId = await getOpenedBrowser(node.data.preferBrowser);
       if (browserId) {
         runner.setBrowserCtx({
-          tabId: null,
-          id: browserId,
+          id: null,
+          browserId,
         });
 
         return { value: null };
@@ -117,8 +114,8 @@ export class NodeHandlerOpenBrowser extends WorkflowNodeHandler<WORKFLOW_NODE_TY
       );
       if (activeBrowser) {
         runner.setBrowserCtx({
-          tabId: null,
-          id: activeBrowser.id,
+          id: null,
+          browserId: activeBrowser.id,
         });
       }
 
@@ -130,12 +127,57 @@ export class NodeHandlerOpenBrowser extends WorkflowNodeHandler<WORKFLOW_NODE_TY
     };
   }
 
-  destroy() {
-    this.controller.abort();
-    this.timers.forEach((value) => {
-      clearTimeout(value);
-    });
+  destroy() {}
+}
 
-    this.timers.clear();
+export class NodeHandlerBrowserTab extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.BROWSER_TAB> {
+  constructor() {
+    super(WORKFLOW_NODE_TYPE.BROWSER_TAB);
   }
+
+  async execute({
+    node,
+    runner,
+  }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.BROWSER_TAB>): Promise<WorkflowNodeHandlerExecuteReturn> {
+    const { browserId } = runner.getBrowserCtx();
+    if (!browserId) {
+      throw new Error(
+        'Couldn\'t find an active browser. Use the "Use Browser" node before using this node.',
+      );
+    }
+
+    if (node.data.action === 'use-active-tab') {
+      const activeTab = await IPCRenderer.invokeWithError(
+        'browser:get-active-tab',
+        browserId,
+      );
+      if (!activeTab) throw new Error("Couldn't find active tab");
+
+      runner.setBrowserCtx({ browserId, id: activeTab.id });
+    } else {
+      const url = node.data.newTabURL;
+      if (
+        typeof url !== 'string' ||
+        !url.startsWith('http') ||
+        !isValidURL(node.data.newTabURL)
+      ) {
+        throw new Error(`"${node.data.newTabURL}" is invalid URL`);
+      }
+
+      const activeTab = await IPCRenderer.invokeWithError(
+        'browser:new-tab',
+        browserId,
+        url,
+      );
+      if (!activeTab) throw new Error("Couldn't create a new tab");
+
+      runner.setBrowserCtx({ browserId, id: activeTab.id });
+    }
+
+    return {
+      value: null,
+    };
+  }
+
+  destroy() {}
 }

@@ -11,6 +11,7 @@ export enum WORKFLOW_NODE_TYPE {
   INSERT_DATA = 'node-insert-data',
   USE_BROWSER = 'node-use-browser',
   FILE_SYSTEM = 'node-file-system',
+  BROWSER_TAB = 'node-browser-tab',
   HTTP_REQUEST = 'node-http-request',
   NOTIFICATION = 'node-notification',
   EXECUTE_WORKFLOW = 'node-execute-workflow',

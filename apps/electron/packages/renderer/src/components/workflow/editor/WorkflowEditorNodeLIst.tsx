@@ -64,8 +64,6 @@ const allNodesItems = Object.values(WORKFLOW_NODES).reduce((acc, node) => {
 
   return acc;
 }, defaultNodes);
-console.log(allNodesItems);
-
 export function WorkflowEditorNodeList({
   className,
   onSelectItem,

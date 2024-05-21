@@ -10,7 +10,10 @@ import type {
 } from './WorkflowNodeHandler';
 import ExtensionCommandRunner from '/@/extension/ExtensionCommandRunner';
 import { CommandLaunchBy } from '@repo/extension';
-import type { ExtensionCommandExecutePayloadWithData } from '#packages/common/interface/extension.interface';
+import type {
+  ExtensionBrowserTabContext,
+  ExtensionCommandExecutePayloadWithData,
+} from '#packages/common/interface/extension.interface';
 import type { ExtensionCommandArgument } from '@repo/extension-core';
 
 type CommandDataWithPath = DatabaseExtensionCommandWithExtension & {
@@ -140,6 +143,7 @@ export class NodeHandlerCommand extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.C
 
   async execute({
     node,
+    runner,
   }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.COMMAND>): Promise<WorkflowNodeHandlerExecuteReturn> {
     const { commandId, extension } = node.data;
 
@@ -164,6 +168,12 @@ export class NodeHandlerCommand extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.C
       this.inputtedConfigCache.add(inputtedConfigCacheId);
     }
 
+    let browserCtx: ReturnType<typeof runner.getBrowserCtx> | null =
+      runner.getBrowserCtx();
+    if (browserCtx.id === null || browserCtx.browserId === null) {
+      browserCtx = null;
+    }
+
     const command = await this.getCommandData({
       commandId,
       nodeId: node.id,
@@ -178,6 +188,7 @@ export class NodeHandlerCommand extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.C
         launchBy: CommandLaunchBy.WORKFLOW,
       },
       commandFilePath: command.filePath,
+      browserCtx: browserCtx as ExtensionBrowserTabContext,
     });
 
     return { value };
