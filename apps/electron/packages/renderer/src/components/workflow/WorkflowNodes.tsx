@@ -427,22 +427,18 @@ export const WorkflowNodeBasic: React.FC<
         {nodeData.handleTarget.map((type, index) => (
           <Handle key={type + index} type="target" position={Position.Left} />
         ))}
-        {nodeData.handleSource.map((type, index) =>
-          type === 'error-fallback' ? (
-            <NodeErrorHandlerHandle
-              nodeId={id}
-              key={type + index}
-              errorHandlerAction={data.$errorHandler?.action}
-            />
-          ) : (
-            <Handle
-              key={type + index}
-              type="source"
-              position={Position.Right}
-              id={`default:${id}`}
-            />
-          ),
-        )}
+        {nodeData.handleSource.map((type, index) => (
+          <Handle
+            key={type + index}
+            type="source"
+            position={Position.Right}
+            id={`default:${id}`}
+          />
+        ))}
+        <NodeErrorHandlerHandle
+          nodeId={id}
+          errorHandlerAction={data.$errorHandler?.action}
+        />
       </NodeCard>
     </>
   );

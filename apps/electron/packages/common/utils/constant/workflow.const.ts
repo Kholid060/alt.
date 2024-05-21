@@ -8,6 +8,7 @@ export enum WORKFLOW_NODE_TYPE {
   DO_NOTHING = 'node-do-nothing',
   BREAK_LOOP = 'node-break-loop',
   CONDITIONAL = 'node-conditional',
+  INSERT_DATA = 'node-insert-data',
   USE_BROWSER = 'node-use-browser',
   FILE_SYSTEM = 'node-file-system',
   HTTP_REQUEST = 'node-http-request',

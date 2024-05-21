@@ -81,22 +81,22 @@ function WorkflowNodeErrorHandler({
       <UiLabel htmlFor="error-handler-select" className="ml-1">
         On error
       </UiLabel>
-      <UiSelect.Native
+      <UiSelect
         value={errorHandler.action}
         id="error-handler-select"
         inputSize="sm"
-        onChange={({ target }) => {
+        onValueChange={(value) => {
           updateErrorHandler({
-            action: target.value as WorkflowNodeErroHandlerAction,
+            action: value as WorkflowNodeErroHandlerAction,
           });
         }}
       >
         {errorActions.map((action) => (
-          <option value={action.id} key={action.id}>
+          <UiSelect.Option value={action.id} key={action.id}>
             {action.title}
-          </option>
+          </UiSelect.Option>
         ))}
-      </UiSelect.Native>
+      </UiSelect>
     </>
   );
 }

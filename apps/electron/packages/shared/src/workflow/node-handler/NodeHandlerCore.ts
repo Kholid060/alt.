@@ -11,6 +11,8 @@ import { NodeInvalidType } from '/@/utils/custom-errors';
 import { getExactType, isValidType, promiseWithSignal } from '/@/utils/helper';
 import { clipboard, nativeImage } from 'electron';
 import { testNodeConditions } from '../utils/test-node-condtion';
+import { isObject } from 'lodash-es';
+import WorkflowFileHandle from '../utils/WorkflowFileHandle';
 
 export class NodeHandlerCode extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.CODE> {
   private controller = new AbortController();
@@ -218,6 +220,59 @@ export class NodeHandlerClipboard extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE
     }
 
     return { value };
+  }
+
+  destroy() {}
+}
+
+export class NodeHandlerInsertData extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.INSERT_DATA> {
+  constructor() {
+    super(WORKFLOW_NODE_TYPE.INSERT_DATA);
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private appendValue(valA: any, valB: any) {
+    if (Array.isArray(valA)) {
+      return [...valA, valB];
+    } else if (isObject(valA) && isObject(valB)) {
+      return { ...valA, ...valB };
+    } else if (WorkflowFileHandle.isWorkflowFileHandle(valB)) {
+      return valB;
+    }
+
+    return valA + valB;
+  }
+
+  execute({
+    node,
+    runner,
+  }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.INSERT_DATA>): WorkflowNodeHandlerExecuteReturn {
+    const items: Record<PropertyKey, unknown> = {};
+    const { variables } = runner.dataStorage;
+
+    for (const item of node.data.items) {
+      let newValue: unknown;
+
+      switch (item.mode) {
+        case 'append':
+          newValue = variables.has(item.name)
+            ? this.appendValue(variables.get(item.name), item.value)
+            : item.value;
+          break;
+        case 'replace':
+          newValue = item.value;
+          break;
+        default:
+          throw new Error('Unsupported insert data mode');
+      }
+
+      items[item.name] = newValue;
+      variables.set(item.name, newValue);
+    }
+
+    return {
+      value: items,
+    };
   }
 
   destroy() {}

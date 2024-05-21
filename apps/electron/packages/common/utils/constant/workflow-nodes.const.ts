@@ -21,6 +21,7 @@ import {
   CompassIcon,
   WorkflowIcon,
   ZapIcon,
+  DatabaseIcon,
 } from 'lucide-react';
 import type { WORKFLOW_NODE_GROUP } from './workflow.const';
 import { WORKFLOW_NODE_TYPE } from './workflow.const';
@@ -301,5 +302,19 @@ export const WORKFLOW_NODES: {
     handleTarget: [],
     handleSource: ['default'],
     type: WORKFLOW_NODE_TYPE.TRIGGER_EXECUTE_WORKFLOW,
+  },
+  [WORKFLOW_NODE_TYPE.INSERT_DATA]: {
+    group: 'Core',
+    subtitle: 'Core',
+    title: 'Insert Data',
+    icon: DatabaseIcon,
+    defaultData: {
+      items: [],
+      isDisabled: false,
+      $nodeType: WORKFLOW_NODE_TYPE.INSERT_DATA,
+    },
+    handleTarget: ['default'],
+    handleSource: ['default'],
+    type: WORKFLOW_NODE_TYPE.INSERT_DATA,
   },
 } as const;
