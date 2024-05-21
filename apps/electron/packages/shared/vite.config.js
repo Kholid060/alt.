@@ -35,6 +35,9 @@ const config = {
     assetsDir: '.',
     minify: process.env.MODE !== 'development',
     lib: {
+      entry: {
+        main: join(__dirname, '/src/main.ts'),
+      },
       formats: ['cjs'],
     },
     rollupOptions: {

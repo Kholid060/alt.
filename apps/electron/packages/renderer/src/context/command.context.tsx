@@ -1,4 +1,4 @@
-import { RefObject, createContext, useEffect, useRef } from 'react';
+import { createContext, useEffect, useRef } from 'react';
 import { useCommandPanelStore } from '../stores/command-panel.store';
 import preloadAPI from '../utils/preloadAPI';
 import { useCommandStore } from '../stores/command.store';
@@ -18,18 +18,14 @@ type CommandViewMessagePort = BetterMessagePortSync<ExtensionMessagePortEvent>;
 export interface CommandContextState {
   executeCommand(payload: ExtensionCommandExecutePayload): void;
   setCommandViewMessagePort(port: CommandViewMessagePort | null): void;
-  runnerMessagePort: RefObject<
+  runnerMessagePort: React.MutableRefObject<
     MessagePortRenderer<MessagePortSharedCommandWindowEvents>
   >;
-  commandViewMessagePort: RefObject<CommandViewMessagePort | null>;
+  commandViewMessagePort: React.RefObject<CommandViewMessagePort>;
 }
 
-export const CommandContext = createContext<CommandContextState>({
-  executeCommand() {},
-  setCommandViewMessagePort() {},
-  runnerMessagePort: { current: null },
-  commandViewMessagePort: { current: null },
-});
+// @ts-expect-error ...
+export const CommandContext = createContext<CommandContextState>();
 
 export function CommandCtxProvider({
   children,
@@ -102,9 +98,9 @@ export function CommandCtxProvider({
     const offSharedMessagePortListener = MessagePortListener.on(
       MESSAGE_PORT_CHANNEL_IDS.sharedWithCommand,
       ({ ports: [port] }) => {
-        debugLog('Receive MessagePort from shared process');
         if (!port) return;
 
+        debugLog('Receive MessagePort from shared process', port);
         runnerMessagePort.current.changePort(port);
       },
     );

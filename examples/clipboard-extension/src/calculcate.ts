@@ -2,12 +2,16 @@ import { CommandViewJSONRenderer } from '@repo/extension';
 import { evaluate } from 'mathjs';
 
 const CommandMain: CommandViewJSONRenderer = ({ updateView }) => {
-  console.log('hello world');
+  console.log('hello world CLEAR');
+  _extension.ui.searchPanel.clearValue();
   _extension.ui.searchPanel.onChanged.addListener((value) => {
+    if (!value.trim()) return;
+    console.log('changed', value);
     try {
       const result = evaluate(value);
       updateView({
         type: 'list',
+        shouldFilter: false,
         items: [
           {
             title: result,
@@ -21,13 +25,7 @@ const CommandMain: CommandViewJSONRenderer = ({ updateView }) => {
         ],
       });
     } catch (error) {
-      updateView({
-        type: 'text',
-        color: 'destructive',
-        textStyle: 'heading-4',
-        text: `Error:\n${error.message}`,
-      });
-      console.error(error);
+      updateView(null);
     }
   });
 

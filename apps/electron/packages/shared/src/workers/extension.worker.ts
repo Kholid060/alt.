@@ -55,6 +55,8 @@ function initExtensionAPI({
     messagePort: mainMessagePort,
   });
 
+  messagePort.sendMessage('extension:query-clear-value');
+
   const extensionAPI = createExtensionAPI({
     browserCtx,
     messagePort,
@@ -66,6 +68,7 @@ function initExtensionAPI({
 
   Object.defineProperty(self, PRELOAD_API_KEY.extension, {
     writable: false,
+    configurable: false,
     value: extensionAPI,
   });
 }
@@ -87,27 +90,20 @@ async function getCommandExecution({
 
 interface CommandRunnerData extends ExtensionCommandExecutePayload {
   runnerId: string;
-  apiData: Omit<InitExtensionAPIData, 'manifest' | 'commandId'>;
+  executeCommand: ExtensionCommand;
+  messagePort: InitExtensionAPIData['messagePort'];
 }
 
 async function commandViewJSONRunner({
-  apiData,
   runnerId,
   commandId,
   extensionId,
+  messagePort,
   launchContext,
+  executeCommand,
 }: CommandRunnerData) {
-  const executeCommand = await getCommandExecution({
-    commandId,
-    extensionId,
-  });
-  initExtensionAPI({
-    commandId,
-    ...apiData,
-  });
-
   const updateView: CommandViewJSONLaunchContext['updateView'] = (viewData) => {
-    apiData.messagePort.sendMessage('command-json:update-ui', {
+    messagePort.sendMessage('command-json:update-ui', {
       viewData,
       runnerId,
       commandId,
@@ -123,20 +119,9 @@ async function commandViewJSONRunner({
 }
 
 async function commandActionRunner({
-  apiData,
-  commandId,
-  extensionId,
   launchContext,
+  executeCommand,
 }: CommandRunnerData) {
-  const executeCommand = await getCommandExecution({
-    commandId,
-    extensionId,
-  });
-  initExtensionAPI({
-    commandId,
-    ...apiData,
-  });
-
   const returnValue = await executeCommand(launchContext);
 
   self.postMessage({ type: 'finish', message: returnValue });
@@ -158,15 +143,26 @@ self.onmessage = async ({
     self.name = '';
     self.onmessage = null;
 
+    const messagePort = BetterMessagePort.createStandalone('sync', ports[1]);
+    const { commandId, extensionId, browserCtx } = data.payload;
+
+    const executeCommand = await getCommandExecution({
+      commandId,
+      extensionId,
+    });
+    initExtensionAPI({
+      commandId,
+      messagePort,
+      key: extensionId,
+      mainMessagePort: ports[0],
+      browserCtx: browserCtx ?? null,
+    });
+
     const commandRunnerPayload: CommandRunnerData = {
       ...data.payload,
+      messagePort,
+      executeCommand,
       runnerId: data.runnerId,
-      apiData: {
-        mainMessagePort: ports[0],
-        key: data.payload.extensionId,
-        browserCtx: data.payload.browserCtx ?? null,
-        messagePort: BetterMessagePort.createStandalone('sync', ports[1]),
-      },
     };
 
     if (data.command.type === 'action') {

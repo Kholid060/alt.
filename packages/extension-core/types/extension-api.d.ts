@@ -179,6 +179,9 @@ declare namespace ExtensionAPI.ui.searchPanel {
     removeListener(callback: () => void): void;
     addListener(callback: (event: KeydownEvent) => void): () => void;
   };
+
+  // @ext-api-value
+  export function clearValue(): void;
 }
 
 declare namespace ExtensionAPI.browser {

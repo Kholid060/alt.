@@ -316,7 +316,7 @@ function CommandInput() {
         shiftKey,
       };
       viewMessagePort?.sendMessage('extension:keydown-event', keydownEvent);
-      messagePort?.event.sendMessage('extension:keydown-event', keydownEvent);
+      messagePort.event.sendMessage('extension:keydown-event', keydownEvent);
     }
 
     switch (event.code) {
@@ -345,6 +345,20 @@ function CommandInput() {
 
     uiListStore.setState('search', value);
   }
+
+  useEffect(() => {
+    const messagePort = commandCtx.runnerMessagePort.current;
+    const offListener = messagePort.event.on(
+      'extension:query-clear-value',
+      () => {
+        uiListStore.setState('search', '');
+      },
+    );
+
+    return () => {
+      offListener();
+    };
+  }, [uiListStore, commandCtx.runnerMessagePort]);
 
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions

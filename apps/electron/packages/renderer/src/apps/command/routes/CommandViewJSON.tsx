@@ -9,6 +9,7 @@ import { ExtensionCommandJSONViewData } from '#common/interface/extension.interf
 import { MessagePortCommandJSONUpdateUI } from '#packages/common/interface/message-port-events.interface';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
+import { debounce } from '@repo/shared';
 
 const componentsMap = {
   text: CommandViewJSONText,
@@ -34,14 +35,15 @@ function CommandViewJSON() {
     // runnerId.current = commandExecutePayload.runnerId;
 
     const messagePort = runnerMessagePort.current;
-    const onUpdateUI = (data: MessagePortCommandJSONUpdateUI) => {
+    const onUpdateUI = debounce((data: MessagePortCommandJSONUpdateUI) => {
+      console.log(data);
       if (data.commandId !== commandId || data.extensionId !== extensionId) {
         return;
       }
 
       runnerId.current = data.runnerId;
       setViewData(data.viewData);
-    };
+    }, 100);
     messagePort?.event.on('command-json:update-ui', onUpdateUI);
 
     return () => {

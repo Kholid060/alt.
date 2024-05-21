@@ -136,7 +136,7 @@ export interface WorkflowRunnerPrevNodeExecution {
 
 type WorkflowBrowserContext = SetNullable<
   NonNullable<ExtensionBrowserTabContext>,
-  'id' | 'windowId' | 'browserId'
+  'id' | 'browserId'
 >;
 
 class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
@@ -181,7 +181,6 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
       url: '',
       id: null,
       title: '',
-      windowId: null,
       browserId: null,
     };
 

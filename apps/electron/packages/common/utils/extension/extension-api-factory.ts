@@ -18,7 +18,7 @@ interface CreateExtensionAPI {
   messagePort: BetterMessagePortSync<ExtensionMessagePortEvent>;
 }
 
-export const extensionAPIGetIconURL = (): Pick<
+const extensionAPIGetIconURL = (): Pick<
   ExtensionAPIValues,
   'shell.installedApps.getIconURL'
 > => ({
@@ -26,34 +26,39 @@ export const extensionAPIGetIconURL = (): Pick<
     `${CUSTOM_SCHEME.fileIcon}://${APP_ICON_DIR_PREFIX}/${appId}`,
 });
 
-export function extensionAPISearchPanelEvent(
-  messagePort?: CreateExtensionAPI['messagePort'],
+function extensionAPISearchPanelEvent(
+  messagePort: CreateExtensionAPI['messagePort'],
 ): Pick<
   ExtensionAPIValues,
-  'ui.searchPanel.onChanged' | 'ui.searchPanel.onKeydown'
+  | 'ui.searchPanel.onChanged'
+  | 'ui.searchPanel.onKeydown'
+  | 'ui.searchPanel.clearValue'
 > {
   const createEventListener = (
     key: 'extension:query-change' | 'extension:keydown-event',
   ) => ({
     addListener: (callback: (...args: any[]) => void) => {
-      messagePort?.on(key, callback);
+      messagePort.on(key, callback);
 
       return () => {
-        messagePort?.on(key, callback);
+        messagePort.on(key, callback);
       };
     },
     removeListener: (callback: (...args: any[]) => void) => {
-      messagePort?.off(key, callback);
+      messagePort.off(key, callback);
     },
   });
 
   return {
     'ui.searchPanel.onChanged': createEventListener('extension:query-change'),
     'ui.searchPanel.onKeydown': createEventListener('extension:keydown-event'),
+    'ui.searchPanel.clearValue': () => {
+      messagePort.sendMessage('extension:query-clear-value');
+    },
   };
 }
-export function extensionAPIUiToast(
-  messagePort?: CreateExtensionAPI['messagePort'],
+function extensionAPIUiToast(
+  messagePort: CreateExtensionAPI['messagePort'],
 ): Pick<ExtensionAPIValues, 'ui.createToast'> {
   return {
     'ui.createToast': (options) => {
@@ -68,20 +73,20 @@ export function extensionAPIUiToast(
       return {
         ...toastOptions,
         show(showOptions = {}) {
-          messagePort?.sendMessage('extension:show-toast', toastId, {
+          messagePort.sendMessage('extension:show-toast', toastId, {
             ...toastOptions,
             ...showOptions,
           });
         },
         hide() {
-          messagePort?.sendMessage('extension:hide-toast', toastId);
+          messagePort.sendMessage('extension:hide-toast', toastId);
         },
       };
     },
   };
 }
 
-export function extensionAPIBrowser(
+function extensionAPIBrowser(
   sendMessage: CreateExtensionAPI['sendMessage'],
 ): Pick<
   ExtensionAPIValues,

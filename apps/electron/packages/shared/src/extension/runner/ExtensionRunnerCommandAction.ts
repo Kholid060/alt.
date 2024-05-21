@@ -4,9 +4,8 @@ import ExtensionRunnerProcess, {
   ExtensionRunnerProcessFinishReason,
 } from './ExtensionRunnerProcess';
 import type { BetterMessagePayload } from '@repo/shared';
-import { BetterMessagePort, isObject } from '@repo/shared';
+import { isObject } from '@repo/shared';
 import IPCRenderer from '#packages/common/utils/IPCRenderer';
-import type { MessagePortSharedCommandWindowEvents } from '#packages/common/interface/message-port-events.interface';
 import type { ExtensionCommandWorkerInitMessage } from '/@/interface/extension.interface';
 
 class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
@@ -26,16 +25,14 @@ class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
   }
 
   private initWorkerMessagePort() {
-    const messagePort =
-      BetterMessagePort.createStandalone<MessagePortSharedCommandWindowEvents>(
-        'sync',
-        this.messageChannel.port2,
+    // forward message to command window
+    this.messageChannel.port2.onmessage = (event) => {
+      this.runner.messagePort.event.sendMessage(
+        event.data.name,
+        ...event.data.args,
       );
-
-    messagePort.on('command-json:update-ui', (data) => {
-      // forward to command window
-      this.runner.messagePort.event.sendMessage('command-json:update-ui', data);
-    });
+    };
+    this.messageChannel.port2.start();
   }
 
   private onWorkerMessage(
