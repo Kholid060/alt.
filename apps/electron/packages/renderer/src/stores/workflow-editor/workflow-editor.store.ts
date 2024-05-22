@@ -227,14 +227,21 @@ const workflowEditorStore = create(
 
       get().updateWorkflow((workflow) => {
         const oldNodes = workflow.nodes;
-        let isHasManualTrigger = false;
+
+        const noDuplicateNodes: Partial<Record<WORKFLOW_NODE_TYPE, boolean>> = {
+          [WORKFLOW_NODE_TYPE.TRIGGER]: false,
+          [WORKFLOW_NODE_TYPE.TRIGGER_EXECUTE_WORKFLOW]: false,
+        };
 
         const newNodes = nodes.reduce<WorkflowNodes[]>((acc, node) => {
-          if (node.type === WORKFLOW_NODE_TYPE.TRIGGER && !isHasManualTrigger) {
-            isHasManualTrigger = oldNodes.some(
-              (oldNode) => oldNode.type === WORKFLOW_NODE_TYPE.TRIGGER,
+          if (
+            Object.hasOwn(noDuplicateNodes, node.type) &&
+            !noDuplicateNodes[node.type]
+          ) {
+            noDuplicateNodes[node.type] = oldNodes.some(
+              (oldNode) => oldNode.type === node.type,
             );
-            if (isHasManualTrigger) return acc;
+            if (noDuplicateNodes[node.type]) return acc;
           }
 
           acc.push({

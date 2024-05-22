@@ -83,7 +83,8 @@ export function WorkflowEditorNodeList({
   const commandItems = useMemo(() => {
     if (extensionsQuery.state !== 'idle') return [];
 
-    const items: NodeCommandItem[] = [];
+    const scriptItems: NodeCommandItem[] = [];
+    const commandItems: NodeCommandItem[] = [];
 
     extensionsQuery.data.forEach((extension) => {
       const extIcon = (
@@ -98,8 +99,9 @@ export function WorkflowEditorNodeList({
       extension.commands.forEach((command) => {
         if (command.type === 'view' || command.type === 'view:json') return;
 
+        const isScript = command.type === 'script';
         const item: NodeCommandItem = {
-          group: command.type === 'script' ? 'Scripts' : 'Commands',
+          group: isScript ? 'Scripts' : 'Commands',
           metadata: {
             title: command.title,
             commandId: command.name,
@@ -131,11 +133,12 @@ export function WorkflowEditorNodeList({
           value: extension.id + command.name,
         };
 
-        items.push(item);
+        if (isScript) scriptItems.push(item);
+        else commandItems.push(item);
       });
     });
 
-    return items;
+    return commandItems.concat(scriptItems);
   }, [extensionsQuery]);
 
   const items = ([] as WorkflowEditorNodeListItems[]).concat(
@@ -277,7 +280,7 @@ export function WorkflowEditorNodeListModal() {
 
       if (!position) {
         modalPosition = workflowEditor.lastMousePos.current;
-        newNodeData.current.position = modalPosition;
+        newNodeData.current.position = screenToFlowPosition(modalPosition);
       } else {
         newNodeData.current.position = screenToFlowPosition(
           workflowEditor.lastMousePos.current,

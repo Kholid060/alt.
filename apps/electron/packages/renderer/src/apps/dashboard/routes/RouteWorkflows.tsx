@@ -31,22 +31,12 @@ import {
   UiDropdownMenuItem,
   UiDropdownMenuSeparator,
   UiDropdownMenuTrigger,
-  UiForm,
-  UiFormControl,
-  UiFormField,
-  UiFormItem,
-  UiFormLabel,
-  UiFormMessage,
   UiInput,
   UiSelect,
   UiSwitch,
-  UiTextarea,
   useToast,
 } from '@repo/ui';
-import { useForm } from 'react-hook-form';
 import { UiExtIcon } from '@repo/extension';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { useCallback, useEffect, useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '/@/utils/helper';
@@ -56,9 +46,11 @@ import { parseJSON } from '@repo/shared';
 import dayjs from '/@/lib/dayjs';
 import clsx from 'clsx';
 import { Link, useNavigate } from 'react-router-dom';
-import UiSelectIcon from '/@/components/ui/UiSelectIcon';
 import DeepLinkURL from '#packages/common/utils/DeepLinkURL';
 import { WORKFLOW_MANUAL_TRIGGER_ID } from '#packages/common/utils/constant/workflow.const';
+import WorkflowDetailForm, {
+  NewWorkflowSchema,
+} from '/@/components/workflow/WorkflowDetailForm';
 
 type IconsName = keyof typeof UiExtIcon;
 
@@ -281,109 +273,33 @@ function WorkflowCards({ workflows }: { workflows: DatabaseWorkflow[] }) {
   );
 }
 
-const newWorkflowSchema = z.object({
-  description: z
-    .string()
-    .max(128, { message: 'Description must be less than 128 characters.' })
-    .optional(),
-  icon: z.string().default('Command'),
-  name: z
-    .string()
-    .min(3, { message: 'Name must be at least 3 characters.' })
-    .max(64, { message: 'Name must be less than 64 characters.' }),
-});
-type NewWorkflowSchema = z.infer<typeof newWorkflowSchema>;
-function WorkflowCreateForm({
-  children,
-  onInserted,
-}: {
-  onInserted?: (workflowId: string) => void;
-  children?: React.ReactNode;
-}) {
+function WorkflowCreateDialog() {
   const { toast } = useToast();
-  const form = useForm<NewWorkflowSchema>({
-    resolver: zodResolver(newWorkflowSchema),
-    defaultValues: {
-      name: '',
-      description: '',
-      icon: 'Command',
-    },
-  });
+  const navigate = useNavigate();
 
-  async function onSubmit(values: NewWorkflowSchema) {
+  const [open, setOpen] = useState(false);
+
+  async function createNewWorkflow(values: NewWorkflowSchema) {
     try {
-      const result = await preloadAPI.main.ipc.invoke(
+      const workflowId = await preloadAPI.main.ipc.invoke(
         'database:insert-workflow',
         values,
       );
-      if (isIPCEventError(result)) {
+      if (isIPCEventError(workflowId)) {
         toast({
           title: 'Error!',
           variant: 'destructive',
-          description: result.message,
+          description: workflowId.message,
         });
         return;
       }
 
-      onInserted?.(result);
+      setOpen(false);
+      navigate(`/workflows/${workflowId}`);
     } catch (error) {
       console.error(error);
     }
   }
-
-  return (
-    <UiForm {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="flex items-start gap-4 mt-7">
-          <UiSelectIcon
-            label="Workflow icon"
-            renderIcon={
-              <UiFormField
-                name="icon"
-                control={form.control}
-                render={({ field }) => {
-                  const Icon =
-                    UiExtIcon[field.value as keyof typeof UiExtIcon] ??
-                    UiExtIcon.Command;
-                  return <Icon className="h-5 w-5" />;
-                }}
-              />
-            }
-            onValueChange={(icon) => form.setValue('icon', icon)}
-          />
-          <UiFormField
-            name="name"
-            control={form.control}
-            render={({ field }) => (
-              <UiFormItem className="flex-grow space-y-0 relative">
-                <UiFormLabel className="ml-2 absolute -top-5">Name</UiFormLabel>
-                <UiFormControl>
-                  <UiInput {...field} placeholder="Workflow name" />
-                </UiFormControl>
-                <UiFormMessage />
-              </UiFormItem>
-            )}
-          ></UiFormField>
-        </div>
-        <UiFormField
-          name="description"
-          control={form.control}
-          render={({ field }) => (
-            <UiFormItem className="space-y-1 mt-4">
-              <UiFormLabel className="ml-2">Description</UiFormLabel>
-              <UiTextarea {...field} placeholder="Workflow description" />
-              <UiFormMessage />
-            </UiFormItem>
-          )}
-        />
-        {children}
-      </form>
-    </UiForm>
-  );
-}
-function WorkflowCreateDialog() {
-  const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
 
   return (
     <UiDialog open={open} onOpenChange={setOpen}>
@@ -398,12 +314,7 @@ function WorkflowCreateDialog() {
           <UiDialog.Title>New workflow</UiDialog.Title>
           <UiDialog.Description>Create a new workflow</UiDialog.Description>
         </UiDialog.Header>
-        <WorkflowCreateForm
-          onInserted={(workflowId) => {
-            setOpen(false);
-            navigate(`/workflows/${workflowId}`);
-          }}
-        >
+        <WorkflowDetailForm onSubmit={createNewWorkflow}>
           <UiDialog.Footer className="mt-10 gap-2">
             <UiButton
               type="button"
@@ -417,7 +328,7 @@ function WorkflowCreateDialog() {
               Create
             </UiButton>
           </UiDialog.Footer>
-        </WorkflowCreateForm>
+        </WorkflowDetailForm>
       </UiDialog.Content>
     </UiDialog>
   );

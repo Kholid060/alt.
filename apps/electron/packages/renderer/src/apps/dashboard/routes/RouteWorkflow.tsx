@@ -55,14 +55,23 @@ import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interfa
 import WorkflowEventListener from '/@/components/workflow/WorkflowEventListener';
 import { WorkflowEditorNodeListModal } from '/@/components/workflow/editor/WorkflowEditorNodeLIst';
 
+const defaultNodeTypes = Object.values(WORKFLOW_NODE_TYPE).reduce<
+  Partial<Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>>>
+>((acc, curr) => {
+  acc[curr] = WorkflowNodeBasic;
+
+  return acc;
+}, {});
 const nodeTypes: Partial<
   Record<WORKFLOW_NODE_TYPE | 'default', React.FC<NodeProps>>
 > = {
+  ...defaultNodeTypes,
   default: WorkflowNodeBasic,
   [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoop,
   [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeCommand,
   [WORKFLOW_NODE_TYPE.CONDITIONAL]: WorkflowNodeConditional,
 };
+
 const edgeTypes = {
   default: WorkflowEdgeDefault,
 };

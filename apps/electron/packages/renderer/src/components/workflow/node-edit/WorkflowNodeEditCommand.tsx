@@ -1,7 +1,7 @@
 import { WorkflowNodeCommand } from '#packages/common/interface/workflow-nodes.interface';
-import { UiInput, UiList, UiSelect, UiSwitch, UiTabsTrigger } from '@repo/ui';
+import { UiInput, UiList, UiSelect, UiSwitch } from '@repo/ui';
 import UiExtensionIcon from '../../ui/UiExtensionIcon';
-import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
+import { useWorkflowEditorStore } from '/@/stores/workflow-editor/workflow-editor.store';
 import { ChevronDown } from 'lucide-react';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
@@ -113,24 +113,22 @@ function CommandArgs({ data }: { data: WorkflowNodeCommand['data'] }) {
 
 function WorkflowNodeEditCommand() {
   const node = useWorkflowEditorStore.use.editNode() as WorkflowNodeCommand;
-  const { data } = node;
 
   return (
     <WorkflowNodeLayoutEdit
       node={node}
       icon={
         <UiExtensionIcon
-          alt={`${data.title} icon`}
-          id={data.extension.id}
-          icon={data.icon}
+          alt={`${node.data.title} icon`}
+          id={node.data.extension.id}
+          icon={node.data.icon}
           iconWrapper={(icon) => <UiList.Icon icon={icon} />}
         />
       }
-      title={data.title}
-      tabsSlot={<UiTabsTrigger value="extension">Extension</UiTabsTrigger>}
-      subtitle={data.extension.title}
+      title={node.data.title}
+      subtitle={node.data.extension.title}
     >
-      <CommandArgs data={data} />
+      <CommandArgs data={node.data} />
     </WorkflowNodeLayoutEdit>
   );
 }

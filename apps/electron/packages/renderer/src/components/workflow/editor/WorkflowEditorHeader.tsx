@@ -17,6 +17,7 @@ import {
   CopyIcon,
   DownloadIcon,
   EllipsisVerticalIcon,
+  PencilIcon,
   PlayIcon,
   PlusIcon,
   TrashIcon,
@@ -34,15 +35,19 @@ import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { DatabaseWorkflowUpdatePayload } from '#packages/main/src/interface/database.interface';
 import preloadAPI from '/@/utils/preloadAPI';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { nanoid } from 'nanoid/non-secure';
 import { WorkflowVariable } from '#packages/common/interface/workflow.interface';
 import UiShortcut from '../../ui/UiShortcut';
 import { useHotkeys } from 'react-hotkeys-hook';
 import DeepLinkURL from '#packages/common/utils/DeepLinkURL';
+import WorkflowDetailForm from '../WorkflowDetailForm';
 
 function WorkflowInformation() {
   const workflow = useWorkflowEditorStore.use.workflow();
+  const updateWorkflow = useWorkflowEditorStore.use.updateWorkflow();
+
+  const [open, setOpen] = useState(false);
 
   if (!workflow) return <div className="flex-grow"></div>;
 
@@ -55,11 +60,49 @@ function WorkflowInformation() {
         <WorkflowIcon />
       </div>
       <div className="ml-2 flex-grow mr-4">
-        <h2 className="font-semibold line-clamp-1">{workflow.name}</h2>
+        <div className="flex items-center">
+          <h2 className="font-semibold line-clamp-1">{workflow.name}</h2>
+          <PencilIcon
+            onClick={() => setOpen(true)}
+            className="h-4 w-4 inline align-sub ml-2 text-muted-foreground flex-shrink-0"
+          />
+        </div>
         <p className="text-muted-foreground text-xs leading-tight line-clamp-1">
           {workflow.description}
         </p>
       </div>
+      <UiDialog open={open} onOpenChange={setOpen}>
+        <UiDialog.Content>
+          <UiDialog.Header>
+            <UiDialog.Title>Update workflow</UiDialog.Title>
+          </UiDialog.Header>
+          <WorkflowDetailForm
+            defaultValue={{
+              name: workflow.name,
+              icon: workflow.icon ?? 'Command',
+              description: workflow.description ?? '',
+            }}
+            onSubmit={(value) => {
+              updateWorkflow(value);
+              setOpen(false);
+            }}
+          >
+            <UiDialog.Footer className="mt-10 gap-2">
+              <UiButton
+                type="button"
+                className="min-w-28"
+                variant="secondary"
+                onClick={() => setOpen(false)}
+              >
+                Cancel
+              </UiButton>
+              <UiButton type="submit" className="min-w-28">
+                Update
+              </UiButton>
+            </UiDialog.Footer>
+          </WorkflowDetailForm>
+        </UiDialog.Content>
+      </UiDialog>
     </>
   );
 }
