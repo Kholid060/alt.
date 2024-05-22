@@ -5,7 +5,6 @@ import {
   UiLabel,
   UiScrollArea,
   UiSelect,
-  UiSwitch,
   UiTabs,
   UiTabsContent,
   UiTabsList,
@@ -233,37 +232,6 @@ const RequestBody: HTTPRequestComponent = ({ data, onUpdate }) => {
   );
 };
 
-const RequestResponse: HTTPRequestComponent = ({ data, onUpdate }) => {
-  return (
-    <>
-      <div className="flex items-center justify-between">
-        <UiLabel className="ml-1" htmlFor="http-assign-var">
-          Assign response to variable
-        </UiLabel>
-        <UiSwitch
-          size="sm"
-          id="http-assign-var"
-          checked={data.response.insertToVar}
-          onCheckedChange={(insertToVar) =>
-            onUpdate({ response: { ...data.response, insertToVar } })
-          }
-        />
-      </div>
-      <UiInput
-        value={data.response.varName}
-        min={0}
-        inputSize="sm"
-        className="mt-1"
-        placeholder="Variable name"
-        disabled={!data.response.insertToVar}
-        onValueChange={(value) =>
-          onUpdate({ response: { ...data.response, varName: value } })
-        }
-      />
-    </>
-  );
-};
-
 function WorkflowNodeEditHttpRequest() {
   const node = useWorkflowEditorStore.use.editNode() as WorkflowNodeHttpRequest;
   const updateEditNode = useWorkflowEditorStore.use.updateEditNode();
@@ -332,19 +300,10 @@ function WorkflowNodeEditHttpRequest() {
       </WorkflowUiFormExpression>
       <UiTabs className="mt-4" variant="line" defaultValue="headers">
         <UiScrollArea orientation="horizontal">
-          <UiTabsList className="justify-between">
-            <UiTabsTrigger value="headers" className="px-2">
-              Headers
-            </UiTabsTrigger>
-            <UiTabsTrigger value="query" className="px-2">
-              Query
-            </UiTabsTrigger>
-            <UiTabsTrigger value="response" className="px-2">
-              Response
-            </UiTabsTrigger>
-            <UiTabsTrigger value="body" className="px-2">
-              Body
-            </UiTabsTrigger>
+          <UiTabsList>
+            <UiTabsTrigger value="headers">Headers</UiTabsTrigger>
+            <UiTabsTrigger value="query">Query</UiTabsTrigger>
+            <UiTabsTrigger value="body">Body</UiTabsTrigger>
           </UiTabsList>
         </UiScrollArea>
         <UiTabsContent value="headers" className="py-1">
@@ -367,9 +326,6 @@ function WorkflowNodeEditHttpRequest() {
         </UiTabsContent>
         <UiTabsContent value="body" className="py-1">
           <RequestBody data={node.data} onUpdate={updateEditNode} />
-        </UiTabsContent>
-        <UiTabsContent value="response" className="py-1">
-          <RequestResponse data={node.data} onUpdate={updateEditNode} />
         </UiTabsContent>
       </UiTabs>
     </WorkflowNodeLayoutEdit>

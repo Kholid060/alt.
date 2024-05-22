@@ -7,7 +7,7 @@ import {
   UiBadge,
   UiTooltip,
 } from '@repo/ui';
-import WorkflowNodeErrorHandler from './WorklflowNodeErrorHandler';
+import WorkflowNodeSettings from './WorkflowNodeSettings';
 import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
 import { WORKFLOW_NODES } from '#common/utils/constant/workflow-nodes.const';
 import { useState } from 'react';
@@ -76,14 +76,14 @@ function WorkflowNodeLayoutEdit({
       <UiTabs variant="line" defaultValue="parameters">
         <UiTabsList className="sticky top-0 bg-background z-50">
           <UiTabsTrigger value="parameters">Parameters</UiTabsTrigger>
-          <UiTabsTrigger value="error">Error Handler</UiTabsTrigger>
+          <UiTabsTrigger value="settings">Settings</UiTabsTrigger>
           {tabsSlot}
         </UiTabsList>
         <UiTabsContent value="parameters" className="p-4 mt-0">
           {children}
         </UiTabsContent>
-        <UiTabsContent value="error" className="p-4 mt-0">
-          <WorkflowNodeErrorHandler data={node.data.$errorHandler} />
+        <UiTabsContent value="settings" className="p-4 mt-0">
+          <WorkflowNodeSettings data={node.data} />
         </UiTabsContent>
         {tabContentSlot}
       </UiTabs>

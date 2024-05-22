@@ -136,11 +136,9 @@ export const WORKFLOW_NODES: {
     title: 'Clipboard',
     icon: ClipboardIcon,
     defaultData: {
-      varName: '',
       action: 'read',
       format: 'text',
       isDisabled: false,
-      insertToVar: false,
       newClipboardVal: '',
       $nodeType: WORKFLOW_NODE_TYPE.CLIPBOARD,
     },
@@ -168,7 +166,6 @@ export const WORKFLOW_NODES: {
     title: 'File System',
     icon: FileIcon,
     defaultData: {
-      varName: '',
       fileData: '',
       action: 'read',
       readFilePath: '',
@@ -176,7 +173,6 @@ export const WORKFLOW_NODES: {
       isDisabled: false,
       appendFile: false,
       throwIfEmpty: true,
-      insertToVar: false,
       $nodeType: WORKFLOW_NODE_TYPE.FILE_SYSTEM,
     },
     handleTarget: ['default'],
@@ -194,10 +190,6 @@ export const WORKFLOW_NODES: {
       rawBody: {
         data: '',
         contentType: '',
-      },
-      response: {
-        varName: '',
-        insertToVar: false,
       },
       url: '',
       jsonBody: '',
@@ -280,11 +272,9 @@ export const WORKFLOW_NODES: {
     icon: WorkflowIcon,
     defaultData: {
       variables: {},
-      varName: '',
       workflowId: '',
       exposeVars: '',
       isDisabled: false,
-      insertToVar: false,
       $nodeType: WORKFLOW_NODE_TYPE.EXECUTE_WORKFLOW,
     },
     handleTarget: ['default'],

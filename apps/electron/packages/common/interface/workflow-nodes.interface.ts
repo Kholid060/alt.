@@ -30,6 +30,7 @@ export interface WorkflowNodeBaseData<T extends WORKFLOW_NODE_TYPE> {
   $nodeType: T;
   isDisabled: boolean;
   description?: string;
+  $outputVarName?: string;
   $expData?: WorkflowNodeExpressionRecords;
   $errorHandler?: WorkflowNodeErrorHandler;
 }
@@ -66,11 +67,9 @@ export type WorkflowNodeLoop = WorkflowNodeBase<
 
 export type WorkflowNodeFileSystem = WorkflowNodeBase<
   {
-    varName: string;
     fileData: string;
     appendFile: boolean;
     readFilePath: string;
-    insertToVar: boolean;
     writeFilePath: string;
     throwIfEmpty: boolean;
     action: 'read' | 'write';
@@ -97,8 +96,6 @@ export type WorkflowNodeDelay = WorkflowNodeBase<
 
 export type WorkflowNodeClipboard = WorkflowNodeBase<
   {
-    varName: string;
-    insertToVar: boolean;
     newClipboardVal: string;
     action: 'read' | 'write' | 'paste';
     format: ExtensionAPI.clipboard.ClipboardContentType;
@@ -167,10 +164,6 @@ export type WorkflowNodeHttpRequest = WorkflowNodeBase<
     formDataBody: { name: string; value: string }[];
     urlEncodedBody: { name: string; value: string }[];
     $bodyExpData?: WorkflowNodeExpressionRecords;
-    response: {
-      varName: string;
-      insertToVar: boolean;
-    };
     rawBody: {
       data: string;
       contentType: string;
@@ -208,10 +201,8 @@ export type WorkflowNodeUseBrowser = WorkflowNodeBase<
 
 export type WorkflowNodeExecuteWorkflow = WorkflowNodeBase<
   {
-    varName: string;
     exposeVars: string;
     workflowId: string;
-    insertToVar: boolean;
     variables: Record<string, unknown>;
   },
   WORKFLOW_NODE_TYPE.EXECUTE_WORKFLOW

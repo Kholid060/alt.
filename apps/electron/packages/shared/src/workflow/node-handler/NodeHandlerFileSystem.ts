@@ -24,10 +24,7 @@ export class NodeHandlerFileSystem extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
     });
   }
 
-  private async readFile({
-    node,
-    runner,
-  }: Pick<ExecuteParams, 'node' | 'runner'>) {
+  private async readFile({ node }: Pick<ExecuteParams, 'node'>) {
     const files = await globby(node.data.readFilePath, { gitignore: false });
     if (files.length === 0 && node.data.throwIfEmpty) {
       throw new Error("Couldn't find files with inputted patterns");
@@ -45,21 +42,16 @@ export class NodeHandlerFileSystem extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
       }),
     );
 
-    if (node.data.insertToVar) {
-      runner.dataStorage.variables.set(node.data.varName, filesHandle);
-    }
-
     return filesHandle;
   }
 
   async execute({
     node,
-    runner,
   }: ExecuteParams): Promise<WorkflowNodeHandlerExecuteReturn> {
     let value: unknown = null;
 
     if (node.data.action === 'read') {
-      value = await this.readFile({ node, runner });
+      value = await this.readFile({ node });
     } else if (node.data.action === 'write') {
       if (node.data.appendFile) {
         await fs.appendFile(node.data.writeFilePath, node.data.fileData);

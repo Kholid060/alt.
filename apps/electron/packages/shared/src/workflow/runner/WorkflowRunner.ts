@@ -382,7 +382,6 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
         });
 
         const renderedNode = await this.evaluateNodeExpression(node);
-
         if (nodeHandler.dataValidation) {
           validateTypes(renderedNode.data, nodeHandler.dataValidation);
         }
@@ -392,6 +391,13 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
           node: renderedNode,
           prevExecution: prevExec,
         });
+
+        if (node.data.$outputVarName) {
+          this.dataStorage.variables.set(
+            node.data.$outputVarName,
+            execResult.value,
+          );
+        }
       }
 
       this.dataStorage.nodeData.set('prevNode', {

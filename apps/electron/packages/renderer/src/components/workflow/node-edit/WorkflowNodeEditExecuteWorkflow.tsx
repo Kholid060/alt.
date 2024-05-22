@@ -1,13 +1,5 @@
 import { WorkflowNodeExecuteWorkflow } from '#packages/common/interface/workflow-nodes.interface';
-import {
-  UiInput,
-  UiLabel,
-  UiList,
-  UiListItem,
-  UiSwitch,
-  UiTextarea,
-  UiTooltip,
-} from '@repo/ui';
+import { UiInput, UiList, UiListItem, UiTextarea } from '@repo/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
@@ -18,7 +10,6 @@ import {
   UiListProvider,
   useUiListStore,
 } from '@repo/ui/dist/context/list.context';
-import { InfoIcon } from 'lucide-react';
 
 function WorkflowCombobox({
   data,
@@ -139,38 +130,6 @@ function WorkflowNodeEditDelay() {
             </code>{' '}
             to expose all variables
           </p>
-        </section>
-        <section className="group/var">
-          <div className="flex items-center justify-between">
-            <UiLabel className="ml-1" htmlFor="clipboard-assign-var">
-              Assign last node value to variable
-              <UiTooltip
-                label="Assign the last node value of the sub-workflow to a variable"
-                className="max-w-xs"
-              >
-                <InfoIcon className="h-4 w-4 text-muted-foreground inline-block align-sub ml-1 invisible group-hover/var:visible" />
-              </UiTooltip>
-            </UiLabel>
-            <UiSwitch
-              size="sm"
-              id="clipboard-assign-var"
-              checked={node.data.insertToVar}
-              onCheckedChange={(insertToVar) =>
-                updateEditNode<WorkflowNodeExecuteWorkflow>({ insertToVar })
-              }
-            />
-          </div>
-          <UiInput
-            value={node.data.varName}
-            min={0}
-            inputSize="sm"
-            className="mt-1"
-            placeholder="Variable name"
-            disabled={!node.data.insertToVar}
-            onValueChange={(value) =>
-              updateEditNode<WorkflowNodeExecuteWorkflow>({ varName: value })
-            }
-          />
         </section>
       </div>
     </WorkflowNodeLayoutEdit>

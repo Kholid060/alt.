@@ -155,15 +155,6 @@ export class NodeHandlerHTTPRequest extends WorkflowNodeHandler<WORKFLOW_NODE_TY
     const response = await fetch(url, requestInit);
     const responseBody = await getResponseBody(response);
 
-    const fetchResult = {
-      body: responseBody,
-      status: response.status,
-      headers: Object.fromEntries(response.headers),
-    };
-    if (node.data.response.insertToVar) {
-      runner.dataStorage.variables.set(node.data.response.varName, fetchResult);
-    }
-
     clearTimeout(this.fetchs[nodeId].timeout);
     delete this.fetchs[nodeId];
 
@@ -174,7 +165,11 @@ export class NodeHandlerHTTPRequest extends WorkflowNodeHandler<WORKFLOW_NODE_TY
     }
 
     return {
-      value: fetchResult,
+      value: {
+        body: responseBody,
+        status: response.status,
+        headers: Object.fromEntries(response.headers),
+      },
     };
   }
 

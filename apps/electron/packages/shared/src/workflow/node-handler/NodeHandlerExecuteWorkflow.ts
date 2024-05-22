@@ -86,9 +86,6 @@ export class NodeHandlerExecuteWorkflow extends WorkflowNodeHandler<WORKFLOW_NOD
       startNodeId: triggerNode.id,
       parent: { id: runner.workflow.id, vars: exposedVars },
     });
-    if (node.data.insertToVar) {
-      runner.dataStorage.variables.set(node.data.varName, result);
-    }
 
     return {
       value: result,
