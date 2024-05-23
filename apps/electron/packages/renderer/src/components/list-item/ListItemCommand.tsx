@@ -106,16 +106,21 @@ function ListItemCommand({
       ref={itemRef}
       {...{ ...props, ...item, selected }}
       actions={actions}
+      alias={
+        item.alias && (
+          <span className="border ml-1 px-1 rounded">{item.alias}</span>
+        )
+      }
       suffix={
         <div className="space-x-3">
-          {command.shortcut && (
-            <span>
-              <CommandShortcut shortcut={command.shortcut} />
-            </span>
-          )}
           {command.type === 'script' && (
             <span className="text-xs text-muted-foreground">
               Command Script
+            </span>
+          )}
+          {command.shortcut && (
+            <span>
+              <CommandShortcut shortcut={command.shortcut} />
             </span>
           )}
         </div>

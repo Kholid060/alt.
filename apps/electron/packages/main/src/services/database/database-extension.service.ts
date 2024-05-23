@@ -428,6 +428,7 @@ class DBExtensionService {
     extensionId: string,
     commandId: string,
     {
+      alias,
       shortcut,
       subtitle,
       isFallback,
@@ -437,7 +438,7 @@ class DBExtensionService {
   ) {
     await this.database
       .update(commands)
-      .set({ shortcut, subtitle, dismissAlert, isFallback })
+      .set({ shortcut, subtitle, dismissAlert, isFallback, alias })
       .where(eq(commands.id, `${extensionId}:${commandId}`));
 
     emitDBChanges({

@@ -36,7 +36,7 @@ export class KeyboardShortcutUtils {
     return {
       mod1: modKeys[0],
       mod2: modKeys[1],
-      key: event.key as KeyboardShortcutKeys,
+      key: event.key.toUpperCase() as KeyboardShortcutKeys,
     };
   }
 

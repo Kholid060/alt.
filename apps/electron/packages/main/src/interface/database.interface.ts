@@ -53,7 +53,10 @@ export type DatabaseExtensionUpdatePayload = Partial<
 >;
 
 export type DatabaseExtensionCommandUpdatePayload = Partial<
-  Pick<DatabaseExtensionCommand, 'shortcut' | 'subtitle' | 'isFallback'>
+  Pick<
+    DatabaseExtensionCommand,
+    'shortcut' | 'subtitle' | 'isFallback' | 'alias'
+  >
 >;
 
 export type DatabaseExtensionCommandInsertPayload = Omit<

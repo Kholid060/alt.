@@ -329,6 +329,16 @@ function CommandInput() {
         navigateBack();
         break;
       }
+      case 'Space': {
+        const hasAlias = useCommandStore
+          .getState()
+          .commandAliases.has(target.value.trimEnd());
+        if (hasAlias) {
+          uiListStore.listController.current?.selectItem();
+          event.preventDefault();
+        }
+        break;
+      }
       default:
         uiListStore.listControllerKeyBind(event.nativeEvent);
     }

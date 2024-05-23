@@ -15,7 +15,7 @@ import {
   useToast,
 } from '@repo/ui';
 import UiExtensionIcon from '../ui/UiExtensionIcon';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import {
   AlertTriangleIcon,
   ChevronRightIcon,
@@ -32,6 +32,7 @@ import { isIPCEventError } from '/@/utils/helper';
 import {
   DatabaseExtensionCommand,
   DatabaseExtensionListItem,
+  DatabaseExtensionCommandUpdatePayload,
   DatabaseExtensionUpdatePayload,
 } from '#packages/main/src/interface/database.interface';
 import CommandShortcut from '../ui/UiShortcut';
@@ -51,6 +52,7 @@ function ExtensionCommandList({
   extensionId,
   extensionIcon,
   recordingData,
+  onUpdateAlias,
   onDeleteCommand,
   onRemoveShortcut,
   extensionDisabled,
@@ -63,8 +65,11 @@ function ExtensionCommandList({
   recordingData: RecordingShortcutData | null;
   onRemoveShortcut?: (commandId: string) => void;
   onToggleRecordingShortcut?: (commandId: string) => void;
+  onUpdateAlias?: (commandId: string, alias: string | null) => void;
   onDeleteCommand?: (command: DatabaseExtensionCommand) => void;
 }) {
+  const commandAlias = useRef({ id: '', alias: '' });
+
   const recordingShortcutData =
     recordingData && recordingData.extensionId === extensionId
       ? recordingData
@@ -80,9 +85,7 @@ function ExtensionCommandList({
             extensionDisabled && 'opacity-60',
           )}
         >
-          <td className="relative">
-            {/* <span className="absolute w-4/12 left-1/2 h-px bg-border" /> */}
-          </td>
+          <td></td>
           <td className="pr-3">
             <div className="flex items-center py-3 border-l border-border/50 pl-3">
               <div className="h-7 w-7 flex-shrink-0">
@@ -145,6 +148,33 @@ function ExtensionCommandList({
             ) : (
               'Record Shortcut'
             )}
+          </td>
+          <td className="p-3">
+            <input
+              type="text"
+              defaultValue={command.alias ?? ''}
+              placeholder="Add alias"
+              max="12"
+              maxLength={6}
+              onFocus={() => {
+                commandAlias.current = {
+                  id: command.name,
+                  alias: command.alias ?? '',
+                };
+              }}
+              onBlur={(event) => {
+                const value = event.target.value.trim();
+                if (
+                  command.name === commandAlias.current.id &&
+                  value === commandAlias.current.alias
+                ) {
+                  return;
+                }
+
+                onUpdateAlias?.(command.name, value || null);
+              }}
+              className="w-24 p-1 rounded-sm bg-transparent hover:border-border border-transparent border cursor-default"
+            />
           </td>
           <td className="text-right px-3">
             {extensionId === EXTENSION_BUILT_IN_ID.userScript &&
@@ -243,19 +273,27 @@ function ExtensionListTable({
       });
     }
   }
-  async function removeShortcut(extensionId: string, commandId: string) {
+  async function updateCommand(
+    extensionId: string,
+    commandId: string,
+    data: DatabaseExtensionCommandUpdatePayload,
+  ) {
     try {
-      await preloadAPI.main.ipc.invoke(
+      const result = await preloadAPI.main.ipc.invoke(
         'database:update-extension-command',
         extensionId,
         commandId,
-        { shortcut: null },
+        data,
       );
+      if (isIPCEventError(result)) {
+        toast({
+          title: 'Error!',
+          variant: 'destructive',
+          description: 'Something went wrong',
+        });
+      }
     } catch (error) {
       console.error(error);
-
-      if (!(error instanceof Error)) return;
-
       toast({
         title: 'Error!',
         variant: 'destructive',
@@ -297,6 +335,15 @@ function ExtensionListTable({
       });
     }
   }
+  async function reloadExtension(extensionId: string) {
+    const result = await preloadAPI.main.ipc.invoke(
+      'extension:reload',
+      extensionId,
+    );
+    if (!result || isIPCEventError(result)) return;
+
+    onReloadExtension?.(result);
+  }
 
   useEffect(() => {
     const shortcutRecorder = KeyboardShortcutUtils.createRecorder({
@@ -327,16 +374,6 @@ function ExtensionListTable({
     };
   }, [recordingData]);
 
-  async function reloadExtension(extensionId: string) {
-    const result = await preloadAPI.main.ipc.invoke(
-      'extension:reload',
-      extensionId,
-    );
-    if (!result || isIPCEventError(result)) return;
-
-    onReloadExtension?.(result);
-  }
-
   return (
     <table className={cn('w-full cursor-default', className)} {...props}>
       <thead className="text-sm border-b h-12 w-full">
@@ -345,6 +382,7 @@ function ExtensionListTable({
           <th className="h-12 pr-3">Name</th>
           <th className="h-12 px-3">Type</th>
           <th className="h-12 px-3">Shortcut</th>
+          <th className="h-12 px-3">Alias</th>
           <th className="h-12 px-3 w-32"></th>
         </tr>
       </thead>
@@ -411,6 +449,7 @@ function ExtensionListTable({
                 </td>
                 <td className="p-3">Extension</td>
                 <td className="p-3 text-muted-foreground">━</td>
+                <td className="p-3 text-muted-foreground">━</td>
                 <td
                   className="p-3"
                   onClick={(event) => event.stopPropagation()}
@@ -476,9 +515,12 @@ function ExtensionListTable({
                   extensionIcon={extensionIcon}
                   recordingData={recordingData}
                   onDeleteCommand={deleteCommand}
+                  onUpdateAlias={(commandId, alias) =>
+                    updateCommand(extension.id, commandId, { alias })
+                  }
                   extensionDisabled={extension.isDisabled}
                   onRemoveShortcut={(commandId) =>
-                    removeShortcut(extension.id, commandId)
+                    updateCommand(extension.id, commandId, { shortcut: null })
                   }
                   onToggleRecordingShortcut={(commandId) =>
                     toggleRecording(extension.id, commandId)

@@ -11,6 +11,7 @@ interface ExtensionCommandArgs {
 interface CommandStoreState {
   query: string;
   isWindowHidden: boolean;
+  commandAliases: Set<string>;
   commandArgs: ExtensionCommandArgs;
   activeBrowserTab: BrowserExtensionTab | null;
   extensionErrors: Record<string, CommandErrorOverlayData[]>;
@@ -24,6 +25,7 @@ interface CommandErrorOverlayData {
 
 interface CommandStoreActions {
   $reset(): void;
+  setCommandAliases(aliases: Set<string>): void;
   setCommandArgs: (
     data: Partial<ExtensionCommandArgs>,
     replace?: boolean,
@@ -48,6 +50,7 @@ const initialState: CommandStoreState = {
   extensionErrors: {},
   isWindowHidden: false,
   activeBrowserTab: null,
+  commandAliases: new Set(),
   commandArgs: {
     args: {},
     commandId: '',
@@ -69,6 +72,9 @@ const commandStore = create<CommandStore>()(
           ],
         };
       });
+    },
+    setCommandAliases(aliases) {
+      set({ commandAliases: aliases });
     },
     addExtensionError(extId, error) {
       set((state) => {

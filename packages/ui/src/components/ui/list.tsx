@@ -41,6 +41,7 @@ export interface UiListItem<T = any> {
   value: string;
   title: string;
   metadata?: T;
+  alias?: string;
   group?: string;
   subtitle?: string;
   keywords?: string[];
@@ -49,8 +50,8 @@ export interface UiListItem<T = any> {
   icon?: React.ReactNode;
   onSelected?: () => void;
   detail?: React.ReactNode;
-  suffix?: string | React.ReactNode;
   actions?: UiListItemAction[];
+  suffix?: string | React.ReactNode;
 }
 
 type UiListGroupItem = [string, UiListItem[]];
@@ -134,6 +135,7 @@ export function uiListItemsFilter(items: UiListItem[], query: string) {
         threshold: matchSorter.rankings.STARTS_WITH,
         key: 'keywords',
       },
+      { threshold: matchSorter.rankings.EQUAL, key: 'alias' },
       { minRanking: matchSorter.rankings.EQUAL, key: 'subtitle' },
     ],
   });
@@ -493,6 +495,7 @@ function UiListItemRenderer({
     <UiListItem
       ref={elRef}
       icon={item.icon}
+      alias={item.alias}
       title={item.title}
       value={item.value}
       suffix={item.suffix}
@@ -599,15 +602,17 @@ interface UiListItemProps
   actions?: UiListItemAction[];
   icon?: string | React.ReactNode;
   title: string | React.ReactNode;
+  alias?: string | React.ReactNode;
   suffix?: string | React.ReactNode;
   subtitle?: string | React.ReactNode;
-  onSelected?: (value: string | undefined) => void;
   description?: string | React.ReactNode;
+  onSelected?: (value: string | undefined) => void;
 }
 const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
   (
     {
       icon,
+      alias,
       title,
       value,
       suffix,
@@ -671,6 +676,11 @@ const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
                 <span className="text-muted-foreground leading-tight ml-2 text-xs">
                   {subtitle}
                 </span>
+                {alias && (
+                  <span className="text-muted-foreground leading-tight ml-2 text-xs">
+                    • {alias}
+                  </span>
+                )}
               </p>
               <span className="text-muted-foreground leading-tight">
                 {description}

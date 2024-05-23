@@ -1,4 +1,4 @@
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useCommandStore } from '/@/stores/command.store';
 import {
   UiListItem,
@@ -181,6 +181,7 @@ function CommandList() {
             isFallback: command.isFallback ?? false,
             commandIcon: command.icon ?? extension.icon,
           },
+          alias: command.alias ?? undefined,
           value: `command:${extension.id}:${command.name}`,
           subtitle: command.subtitle || extension.title,
           icon: command.icon ? (
@@ -271,8 +272,20 @@ function CommandList() {
         type: 'builtin-command',
       },
     },
-    ...dashboardPageCommands,
   ];
+
+  useEffect(() => {
+    const aliases: Set<string> = new Set();
+    extensionQuery.data?.forEach((extension) => {
+      extension.commands.forEach((command) => {
+        if (!command.alias) return;
+
+        aliases.add(command.alias);
+      });
+    });
+
+    useCommandStore.getState().setCommandAliases(aliases);
+  }, [extensionQuery]);
 
   return (
     <UiList
@@ -282,6 +295,7 @@ function CommandList() {
         ...extensionCommands.commandItems,
         ...builtInCommands,
         ...workflowCommands,
+        ...dashboardPageCommands,
       ]}
       customFilter={customListFilter}
       renderItem={({ ref, item, ...detail }) => {

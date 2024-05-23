@@ -70,7 +70,9 @@ function RouteExtension() {
           }
 
           return (
-            isMatchFilter && command.title.toLowerCase().includes(searchStr)
+            isMatchFilter &&
+            (command.title.toLowerCase().includes(searchStr) ||
+              command.alias?.includes(searchStr))
           );
         });
 
