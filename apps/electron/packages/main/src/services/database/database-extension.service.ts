@@ -432,13 +432,14 @@ class DBExtensionService {
       shortcut,
       subtitle,
       isFallback,
+      isDisabled,
       dismissAlert,
     }: DatabaseExtensionCommandUpdatePayload &
       Partial<Pick<SelectExtesionCommand, 'dismissAlert'>>,
   ) {
     await this.database
       .update(commands)
-      .set({ shortcut, subtitle, dismissAlert, isFallback, alias })
+      .set({ shortcut, subtitle, dismissAlert, isFallback, alias, isDisabled })
       .where(eq(commands.id, `${extensionId}:${commandId}`));
 
     emitDBChanges({

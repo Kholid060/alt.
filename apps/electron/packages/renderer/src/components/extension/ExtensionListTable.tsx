@@ -3,6 +3,7 @@ import {
   UiDropdownMenu,
   UiDropdownMenuContent,
   UiDropdownMenuItem,
+  UiDropdownMenuSeparator,
   UiDropdownMenuTrigger,
   UiList,
   UiPopover,
@@ -18,10 +19,12 @@ import UiExtensionIcon from '../ui/UiExtensionIcon';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import {
   AlertTriangleIcon,
+  BoltIcon,
   ChevronRightIcon,
   EllipsisIcon,
   FileIcon,
   FolderOpenIcon,
+  LinkIcon,
   RotateCcwIcon,
   StopCircleIcon,
   TrashIcon,
@@ -39,6 +42,7 @@ import CommandShortcut from '../ui/UiShortcut';
 import { KeyboardShortcutUtils } from '#common/utils/KeyboardShortcutUtils';
 import UiShortcut from '../ui/UiShortcut';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
+import DeepLinkURL from '#packages/common/utils/DeepLinkURL';
 
 interface RecordingShortcutData {
   keys: string;
@@ -52,9 +56,8 @@ function ExtensionCommandList({
   extensionId,
   extensionIcon,
   recordingData,
-  onUpdateAlias,
+  onUpdateCommand,
   onDeleteCommand,
-  onRemoveShortcut,
   extensionDisabled,
   onToggleRecordingShortcut,
 }: {
@@ -63,11 +66,15 @@ function ExtensionCommandList({
   extensionIcon: React.ReactNode;
   commands: DatabaseExtensionCommand[];
   recordingData: RecordingShortcutData | null;
-  onRemoveShortcut?: (commandId: string) => void;
   onToggleRecordingShortcut?: (commandId: string) => void;
-  onUpdateAlias?: (commandId: string, alias: string | null) => void;
+  onUpdateCommand?: (
+    commandId: string,
+    payload: DatabaseExtensionCommandUpdatePayload,
+  ) => void;
   onDeleteCommand?: (command: DatabaseExtensionCommand) => void;
 }) {
+  const { toast } = useToast();
+
   const commandAlias = useRef({ id: '', alias: '' });
 
   const recordingShortcutData =
@@ -82,7 +89,7 @@ function ExtensionCommandList({
           key={extensionId + command.name}
           className={cn(
             'border-b border-border/50 hover:bg-card group/row',
-            extensionDisabled && 'opacity-60',
+            (extensionDisabled || command.isDisabled) && 'opacity-60',
           )}
         >
           <td></td>
@@ -139,7 +146,7 @@ function ExtensionCommandList({
                   title="Remove shortcut"
                   onClick={(event) => {
                     event.stopPropagation();
-                    onRemoveShortcut?.(command.name);
+                    onUpdateCommand?.(command.name, { shortcut: null });
                   }}
                 >
                   <XIcon className="h-4 w-4" />
@@ -171,40 +178,96 @@ function ExtensionCommandList({
                   return;
                 }
 
-                onUpdateAlias?.(command.name, value || null);
+                onUpdateCommand?.(command.name, { alias: value || null });
               }}
               className="w-24 p-1 rounded-sm bg-transparent hover:border-border border-transparent border cursor-default"
             />
           </td>
           <td className="text-right px-3">
-            {extensionId === EXTENSION_BUILT_IN_ID.userScript &&
-              command.path && (
-                <div className="invisible space-x-1 group-hover/row:visible">
-                  <UiTooltip label="Open file location">
-                    <UiButton
-                      variant="ghost"
-                      size="icon-sm"
+            <div className="flex items-center justify-end gap-2">
+              <UiSwitch
+                checked={!command.isDisabled}
+                size="sm"
+                className="align-middle"
+                onCheckedChange={(value) =>
+                  onUpdateCommand?.(command.name, {
+                    isDisabled: !value,
+                  })
+                }
+              />
+              <UiDropdownMenu>
+                <UiDropdownMenuTrigger asChild>
+                  <UiButton variant="ghost" size="icon-sm">
+                    <EllipsisIcon className="h-5 w-5" />
+                  </UiButton>
+                </UiDropdownMenuTrigger>
+                <UiDropdownMenuContent align="end" className="min-w-32">
+                  <UiDropdownMenuItem
+                    onClick={() =>
+                      preloadAPI.main.ipc
+                        .invoke(
+                          'clipboard:copy',
+                          DeepLinkURL.getExtensionCommand(
+                            extensionId,
+                            command.name,
+                          ),
+                        )
+                        .then((value) => {
+                          if (!isIPCEventError(value)) {
+                            toast({
+                              title: 'Copied to clipboard',
+                            });
+                          }
+                        })
+                    }
+                  >
+                    <LinkIcon className="h-4 w-4 mr-2" />
+                    <span>Copy Deep Link</span>
+                  </UiDropdownMenuItem>
+                  {command.config && command.config.length > 0 && (
+                    <UiDropdownMenuItem
                       onClick={() =>
-                        preloadAPI.main.ipc.invoke(
-                          'shell:open-in-folder',
-                          command.path!,
+                        preloadAPI.main.ipc.send(
+                          'command-window:input-config',
+                          {
+                            extensionId,
+                            type: 'command',
+                            commandId: command.name,
+                          },
                         )
                       }
                     >
-                      <FolderOpenIcon className="h-5 w-5" />
-                    </UiButton>
-                  </UiTooltip>
-                  <UiTooltip label="Delete script">
-                    <UiButton
-                      variant="ghost"
-                      size="icon-sm"
-                      onClick={() => onDeleteCommand?.(command)}
-                    >
-                      <TrashIcon className="h-5 w-5 text-destructive-text" />
-                    </UiButton>
-                  </UiTooltip>
-                </div>
-              )}
+                      <BoltIcon className="h-4 w-4 mr-2" />
+                      <span>Configuration</span>
+                    </UiDropdownMenuItem>
+                  )}
+                  {extensionId === EXTENSION_BUILT_IN_ID.userScript &&
+                    command.path && (
+                      <>
+                        <UiDropdownMenuItem
+                          onClick={() =>
+                            preloadAPI.main.ipc.invoke(
+                              'shell:open-in-folder',
+                              command.path!,
+                            )
+                          }
+                        >
+                          <FolderOpenIcon className="h-4 w-4 mr-2" />
+                          <span>Open file location</span>
+                        </UiDropdownMenuItem>
+                        <UiDropdownMenuSeparator />
+                        <UiDropdownMenuItem
+                          variant="destructive"
+                          onClick={() => onDeleteCommand?.(command)}
+                        >
+                          <TrashIcon className="h-4 w-4 mr-2" />
+                          <span>Delete script</span>
+                        </UiDropdownMenuItem>
+                      </>
+                    )}
+                </UiDropdownMenuContent>
+              </UiDropdownMenu>
+            </div>
           </td>
         </tr>
       ))}
@@ -489,6 +552,23 @@ function ExtensionListTable({
                         </UiButton>
                       </UiDropdownMenuTrigger>
                       <UiDropdownMenuContent align="end" className="min-w-32">
+                        {extension.config && extension.config.length > 0 && (
+                          <UiDropdownMenuItem
+                            onClick={() =>
+                              preloadAPI.main.ipc.send(
+                                'command-window:input-config',
+                                {
+                                  commandId: '',
+                                  type: 'extension',
+                                  extensionId: extension.id,
+                                },
+                              )
+                            }
+                          >
+                            <BoltIcon className="h-4 w-4 mr-2" />
+                            <span>Configuration</span>
+                          </UiDropdownMenuItem>
+                        )}
                         <UiDropdownMenuItem
                           onClick={() => onExtensionSelected?.(extension.id)}
                         >
@@ -515,12 +595,9 @@ function ExtensionListTable({
                   extensionIcon={extensionIcon}
                   recordingData={recordingData}
                   onDeleteCommand={deleteCommand}
-                  onUpdateAlias={(commandId, alias) =>
-                    updateCommand(extension.id, commandId, { alias })
-                  }
                   extensionDisabled={extension.isDisabled}
-                  onRemoveShortcut={(commandId) =>
-                    updateCommand(extension.id, commandId, { shortcut: null })
+                  onUpdateCommand={(commandId, payload) =>
+                    updateCommand(extension.id, commandId, payload)
                   }
                   onToggleRecordingShortcut={(commandId) =>
                     toggleRecording(extension.id, commandId)

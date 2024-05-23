@@ -2,13 +2,19 @@ import { UiList, UiListItemAction } from '@repo/ui';
 import { ListItemRenderDetail } from '../../apps/command/routes/CommandList';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
-import { BoltIcon, LinkIcon } from 'lucide-react';
+import {
+  BoltIcon,
+  LinkIcon,
+  ToggleLeftIcon,
+  ToggleRightIcon,
+} from 'lucide-react';
 import { useCommandStore } from '/@/stores/command.store';
 import { CommandLaunchBy } from '@repo/extension';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
 import CommandShortcut from '../ui/UiShortcut';
 import DeepLinkURL from '#packages/common/utils/DeepLinkURL';
+import { isIPCEventError } from '#packages/common/utils/helper';
 
 function ListItemCommand({
   item,
@@ -76,21 +82,34 @@ function ListItemCommand({
             DeepLinkURL.getExtensionCommand(extension.id, command.name),
           )
           .then((value) => {
-            if (value && '$isError' in value) return;
-
-            addPanelStatus({
-              type: 'success',
-              title: 'Copied to clipboard',
-            });
+            if (!isIPCEventError(value)) {
+              addPanelStatus({
+                type: 'success',
+                title: 'Copied to clipboard',
+              });
+            }
           });
       },
       icon: LinkIcon,
       title: 'Copy Deep Link',
       value: 'copy-deeplink',
     },
+    {
+      onAction() {
+        preloadAPI.main.ipc.invoke(
+          'database:update-extension-command',
+          command.extensionId,
+          command.name,
+          { isDisabled: !command.isDisabled },
+        );
+      },
+      value: 'toggle-command',
+      title: command.isDisabled ? 'Enable' : 'Disable',
+      icon: command.isDisabled ? ToggleLeftIcon : ToggleRightIcon,
+    },
   ];
   if (command.config && command.config.length > 0) {
-    actions.push({
+    actions.splice(1, 0, {
       icon: BoltIcon,
       onAction() {
         navigate(`/configs/${extension.id}:${command.name}`);
@@ -106,6 +125,7 @@ function ListItemCommand({
       ref={itemRef}
       {...{ ...props, ...item, selected }}
       actions={actions}
+      className={command.isDisabled ? 'opacity-60' : ''}
       alias={
         item.alias && (
           <span className="border ml-1 px-1 rounded">{item.alias}</span>

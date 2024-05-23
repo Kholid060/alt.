@@ -72,17 +72,23 @@ const UiDropdownMenuContent = React.forwardRef<
 ));
 UiDropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
 
+const variantsClasses = {
+  destructive:
+    'data-[highlighted]:bg-destructive/20 data-[highlighted]:text-destructive-text text-destructive-text',
+};
 const UiDropdownMenuItem = React.forwardRef<
   React.ElementRef<typeof DropdownMenuPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Item> & {
     inset?: boolean;
+    variant?: keyof typeof variantsClasses;
   }
->(({ className, inset, ...props }, ref) => (
+>(({ className, inset, variant, ...props }, ref) => (
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
       'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
       inset && 'pl-8',
+      variant && (variantsClasses[variant] ?? ''),
       className,
     )}
     {...props}

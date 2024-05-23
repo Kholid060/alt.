@@ -23,7 +23,12 @@ class SharedProcessService {
       extensionId,
     });
     if (!command) throw new Error("Coudln't find command");
-    if (command.extension.isDisabled) return null;
+    if (command.extension.isDisabled) {
+      throw new Error(
+        `The extension of the "${command.title}" command is disabled`,
+      );
+    }
+    if (command.isDisabled) throw new Error('This command is disabled');
 
     const commandFilePath =
       command.path ||

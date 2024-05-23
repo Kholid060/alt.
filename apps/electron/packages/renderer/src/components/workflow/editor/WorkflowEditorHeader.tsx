@@ -495,10 +495,7 @@ function WorkflowMoreMenu() {
           Export workflow
         </UiDropdownMenuItem>
         <UiDropdownMenuSeparator />
-        <UiDropdownMenuItem
-          onClick={deleteWorkflow}
-          className="text-destructive-text data-[highlighted]:bg-destructive/20 data-[highlighted]:text-destructive-text"
-        >
+        <UiDropdownMenuItem onClick={deleteWorkflow} variant="destructive">
           <TrashIcon className="mr-2 h-4 w-4" />
           Delete workflow
         </UiDropdownMenuItem>

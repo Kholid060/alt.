@@ -183,14 +183,6 @@ export interface IPCSendEventMainToRenderer {
   'window:visibility-change': [isHidden: boolean];
   'browser:tabs:active': [BrowserExtensionTab | null];
   'app:update-route': [path: string, routeData?: unknown];
-  'command-window:input-config': [
-    detail: {
-      commandId: string;
-      extensionId: string;
-      type: 'extension' | 'command';
-      executeCommandPayload?: ExtensionCommandExecutePayload;
-    },
-  ];
   'command-window:open-command-json-view': [
     executeCommandPayload: ExtensionCommandJSONViewData,
   ];
@@ -210,6 +202,14 @@ export interface IPCSendEventRendererToMain {
 export interface IPCSendEventRendererToRenderer {
   'dashboard-window:open': [path?: string];
   'data:changes': [type: 'extension' | 'command'];
+  'command-window:input-config': [
+    detail: {
+      commandId: string;
+      extensionId: string;
+      type: 'extension' | 'command';
+      executeCommandPayload?: ExtensionCommandExecutePayload;
+    },
+  ];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   'database:changes': [Record<any, any[]>];
 }

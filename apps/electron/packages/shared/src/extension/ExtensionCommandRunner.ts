@@ -62,6 +62,13 @@ class ExtensionCommandRunner {
     commandFilePath,
     ...payload
   }: ExtensionCommandExecutePayloadWithData) {
+    if (command.extension.isDisabled) {
+      throw new Error(
+        `The extension of the "${command.title}" command is disabled`,
+      );
+    }
+    if (command.isDisabled) throw new Error('This command is disabled');
+
     const runnerId = nanoid(5);
 
     try {
