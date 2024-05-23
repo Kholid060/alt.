@@ -3,7 +3,7 @@ import { CommandLaunchContext } from '@repo/extension';
 const filePath = 'D:\\test.txt';
 
 async function commandExecution() {
-  const test = await _extension.runtime.launchCommand({
+  const test = await _extension.runtime.command.launch({
     name: 'javascript.js',
     args: {
       test: 'hello worldo',
@@ -13,7 +13,7 @@ async function commandExecution() {
 }
 async function commandExecutionFail() {
   try {
-    const test = await _extension.runtime.launchCommand({
+    const test = await _extension.runtime.command.launch({
       name: 'a-command',
       args: {
         test: 'hello world',
@@ -32,8 +32,12 @@ export default async function CommandMain(context: CommandLaunchContext) {
 
   await _extension.mainWindow.close();
 
-  await commandExecutionFail();
-  await commandExecution();
+  // await commandExecutionFail();
+  // await commandExecution();
+
+  await _extension.runtime.command.updateDetail({
+    subtitle: 'Hello worldo!!!',
+  });
 
   // await _extension.storage.set('test', 'hello world');
   // await _extension.shell.showItemInFolder(filePath);

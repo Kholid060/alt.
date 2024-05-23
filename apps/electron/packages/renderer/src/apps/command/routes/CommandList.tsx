@@ -183,7 +183,8 @@ function CommandList() {
           },
           alias: command.alias ?? undefined,
           value: `command:${extension.id}:${command.name}`,
-          subtitle: command.subtitle || extension.title,
+          subtitle:
+            command.customSubtitle || command.subtitle || extension.title,
           icon: command.icon ? (
             <UiExtensionIcon
               id={extension.id}

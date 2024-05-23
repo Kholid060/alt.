@@ -58,6 +58,7 @@ export const commands = sqliteTable('commands', {
   icon: text('icon'),
   type: text('type').$type<ExtensionCommand['type']>().notNull(),
   subtitle: text('subtitle'),
+  customSubtitle: text('custom_subtitle'),
   description: text('description'),
   title: text('title').notNull(),
   name: text('name').notNull(),

@@ -16,7 +16,7 @@ class ExtensionService {
 
   private executionResolvers = new Map<
     string,
-    PromiseWithResolvers<ExtensionAPI.runtime.LaunchCommandResult>
+    PromiseWithResolvers<ExtensionAPI.runtime.command.LaunchResult>
   >();
 
   constructor() {
@@ -34,7 +34,7 @@ class ExtensionService {
 
   async executeCommandAndWait(executePayload: ExtensionCommandExecutePayload) {
     const resolver =
-      Promise.withResolvers<ExtensionAPI.runtime.LaunchCommandResult>();
+      Promise.withResolvers<ExtensionAPI.runtime.command.LaunchResult>();
 
     const runnerId = await this.executeCommand(executePayload, 'script');
     if (!runnerId) throw new Error("Config hasn't been inputted");

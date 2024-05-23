@@ -51,17 +51,22 @@ declare namespace ExtensionAPI.shell {
 
 declare namespace ExtensionAPI.runtime {
   export function getManifest(): Promise<ExtensionManifest>;
+}
 
-  interface LaunchCommandOptions {
+declare namespace ExtensionAPI.runtime.command {
+  interface LaunchOptions {
     name: string;
     args?: Record<string, unknown>;
   }
-  type LaunchCommandResult =
+  type LaunchResult =
     | { success: true; result: unknown }
     | { success: false; errorMessage: string };
-  export function launchCommand(
-    options: LaunchCommandOptions,
-  ): Promise<LaunchCommandResult>;
+  export function launch(options: LaunchOptions): Promise<LaunchResult>;
+
+  interface UpdateDetailOptions {
+    subtitle?: string | null;
+  }
+  export function updateDetail(options: UpdateDetailOptions): Promise<void>;
 }
 
 declare namespace ExtensionAPI.runtime.config {

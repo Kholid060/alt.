@@ -196,7 +196,7 @@ export interface IPCSendEventRendererToMain {
   'window:open-command': [path?: string, routeData?: unknown];
   'extension:finish-command-exec': [
     runnerId: string,
-    data: ExtensionAPI.runtime.LaunchCommandResult,
+    data: ExtensionAPI.runtime.command.LaunchResult,
   ];
   'app:show-notification': [
     options: ExtensionAPI.notifications.NotificationOptions,

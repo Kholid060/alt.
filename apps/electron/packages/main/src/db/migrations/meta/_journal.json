@@ -15,6 +15,13 @@
       "when": 1716428635340,
       "tag": "0001_late_eternals",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1716451960192,
+      "tag": "0002_hesitant_mandarin",
+      "breakpoints": true
     }
   ]
 }

@@ -22,7 +22,7 @@ ExtensionIPCEvent.instance.on('runtime.getManifest', ({ extension }) => {
 });
 
 ExtensionIPCEvent.instance.on(
-  'runtime.launchCommand',
+  'runtime.command.launch',
   ({ extensionId }, options) => {
     if (typeof options.args !== 'undefined' && !isObject(options.args)) {
       throw new Error('"args" options type must be an object.');
@@ -40,5 +40,36 @@ ExtensionIPCEvent.instance.on(
       .catch((error) => {
         throw new ExtensionError(error);
       });
+  },
+);
+
+ExtensionIPCEvent.instance.on(
+  'runtime.command.launch',
+  ({ extensionId }, options) => {
+    if (typeof options.args !== 'undefined' && !isObject(options.args)) {
+      throw new Error('"args" options type must be an object.');
+    }
+
+    return ExtensionService.instance
+      .executeCommandAndWait({
+        extensionId,
+        launchContext: {
+          args: options.args ?? {},
+          launchBy: CommandLaunchBy.COMMAND,
+        },
+        commandId: options.name,
+      })
+      .catch((error) => {
+        throw new ExtensionError(error);
+      });
+  },
+);
+
+ExtensionIPCEvent.instance.on(
+  'runtime.command.updateDetail',
+  async ({ extensionId, commandId }, { subtitle }) => {
+    await DBService.instance.extension.updateCommand(extensionId, commandId, {
+      customSubtitle: subtitle,
+    });
   },
 );
