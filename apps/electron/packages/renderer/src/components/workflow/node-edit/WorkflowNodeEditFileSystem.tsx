@@ -148,30 +148,6 @@ function WorkflowNodeEditDelay() {
               }
             />
           </WorkflowUiFormExpression>
-          <div className="flex items-center justify-between mt-4">
-            <UiLabel className="ml-1" htmlFor="http-assign-var">
-              Assign file to variable
-            </UiLabel>
-            <UiSwitch
-              size="sm"
-              id="http-assign-var"
-              checked={node.data.insertToVar}
-              onCheckedChange={(insertToVar) =>
-                updateEditNode<WorkflowNodeFileSystem>({ insertToVar })
-              }
-            />
-          </div>
-          <UiInput
-            value={node.data.varName}
-            min={0}
-            inputSize="sm"
-            className="mt-1"
-            placeholder="Variable name"
-            disabled={!node.data.insertToVar}
-            onValueChange={(value) =>
-              updateEditNode<WorkflowNodeFileSystem>({ varName: value })
-            }
-          />
         </div>
       )}
     </WorkflowNodeLayoutEdit>

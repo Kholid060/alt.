@@ -4,7 +4,7 @@ import { logger } from '../lib/log';
 import { CommandLaunchBy } from '@repo/extension';
 import DBService from '../services/database/database.service';
 import WindowCommand from '../window/command-window';
-import SharedProcessService from '../services/shared-process.service';
+import ExtensionService from '../services/extension.service';
 
 type GlobalShortcutCallback = (shortcut: string, id?: string) => void;
 interface GlobalShortcutItem {
@@ -116,7 +116,7 @@ export class GlobalShortcutExtension {
       keys,
       callback: async () => {
         try {
-          await SharedProcessService.executeExtensionCommand({
+          await ExtensionService.instance.executeCommand({
             commandId,
             extensionId,
             launchContext: {

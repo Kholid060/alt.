@@ -1,6 +1,6 @@
 import { sleep } from '@repo/shared';
 import ExtensionIPCEvent from '../ExtensionIPCEvent';
-import WindowCommand from '/@/window/command-window';
+import WindowCommand from '../../../window/command-window';
 
 ExtensionIPCEvent.instance.on('mainWindow.close', () => {
   WindowCommand.instance.toggleWindow(false);

@@ -1,5 +1,5 @@
 import { WorkflowNodeClipboard } from '#packages/common/interface/workflow-nodes.interface';
-import { UiInput, UiLabel, UiSelect, UiSwitch } from '@repo/ui';
+import { UiInput, UiLabel, UiSelect } from '@repo/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
@@ -19,33 +19,6 @@ type ClipboardComponent = React.FC<{
   node: WorkflowNodeClipboard;
   onUpdateNode: (data: Partial<WorkflowNodeClipboard['data']>) => void;
 }>;
-
-const ReadAction: ClipboardComponent = ({ node, onUpdateNode }) => {
-  return (
-    <>
-      <div className="flex items-center justify-between">
-        <UiLabel className="ml-1" htmlFor="clipboard-assign-var">
-          Assign value to variable
-        </UiLabel>
-        <UiSwitch
-          size="sm"
-          id="clipboard-assign-var"
-          checked={node.data.insertToVar}
-          onCheckedChange={(insertToVar) => onUpdateNode({ insertToVar })}
-        />
-      </div>
-      <UiInput
-        value={node.data.varName}
-        min={0}
-        inputSize="sm"
-        className="mt-1"
-        placeholder="Variable name"
-        disabled={!node.data.insertToVar}
-        onValueChange={(value) => onUpdateNode({ varName: value })}
-      />
-    </>
-  );
-};
 
 const WriteAction: ClipboardComponent = ({ node, onUpdateNode }) => {
   return (
@@ -72,8 +45,8 @@ const actionComps: Record<
   WorkflowNodeClipboard['data']['action'],
   ClipboardComponent | null
 > = {
+  read: null,
   paste: null,
-  read: ReadAction,
   write: WriteAction,
 };
 

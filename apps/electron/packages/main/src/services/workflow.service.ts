@@ -6,7 +6,6 @@ import type {
 import GlobalShortcut from '../utils/GlobalShortcuts';
 import DBService from './database/database.service';
 import { KeyboardShortcutUtils } from '#common/utils/KeyboardShortcutUtils';
-import SharedProcessService from './shared-process.service';
 import type {
   WorkflowEdge,
   WorkflowRunPayload,
@@ -18,9 +17,12 @@ import { z } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 import { logger } from '../lib/log';
 import type { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
+import IPCMain from '../utils/ipc/IPCMain';
 
 class WorkflowTriggerService {
-  static async register(workflowId: string | DatabaseWorkflowDetail) {
+  constructor(private workflowService: WorkflowService) {}
+
+  async register(workflowId: string | DatabaseWorkflowDetail) {
     const workflow =
       typeof workflowId === 'string'
         ? await DBService.instance.workflow.get(workflowId)
@@ -37,7 +39,7 @@ class WorkflowTriggerService {
                 node.data.shortcut,
               ),
               callback: () => {
-                SharedProcessService.executeWorkflow({
+                this.workflowService.execute({
                   id: workflow.id,
                   startNodeId: node.id,
                 });
@@ -50,11 +52,11 @@ class WorkflowTriggerService {
     }
   }
 
-  static async unregister(workflowId: string) {
+  async unregister(workflowId: string) {
     GlobalShortcut.instance.unregisterById(`workflow:${workflowId}`);
   }
 
-  static async reRegisterTriggers(workflowId: string | DatabaseWorkflowDetail) {
+  async reRegisterTriggers(workflowId: string | DatabaseWorkflowDetail) {
     const workflow =
       typeof workflowId === 'string'
         ? await DBService.instance.workflow.get(workflowId)
@@ -65,7 +67,7 @@ class WorkflowTriggerService {
     await this.register(workflow);
   }
 
-  static async registerAll() {
+  async registerAll() {
     const workflows = await DBService.instance.workflow.getAll();
     await Promise.allSettled(
       workflows.map(async (workflow) => this.register(workflow)),
@@ -105,22 +107,44 @@ const workflowFileSchema = z.object({
 });
 
 class WorkflowService {
-  static get(workflowId: string) {
+  private static _instance: WorkflowService;
+
+  static get instance() {
+    return this._instance || (this._instance = new WorkflowService());
+  }
+
+  trigger: WorkflowTriggerService;
+
+  constructor() {
+    this.trigger = new WorkflowTriggerService(this);
+  }
+
+  get(workflowId: string) {
     return DBService.instance.workflow.get(workflowId);
   }
 
-  static execute(payload: WorkflowRunPayload) {
-    return SharedProcessService.executeWorkflow(payload);
+  async execute(payload: WorkflowRunPayload) {
+    const workflow = await DBService.instance.workflow.get(payload.id);
+    if (!workflow) throw new Error("Couldn't find workflow");
+    if (workflow.isDisabled) return null;
+
+    DBService.instance.workflow.incExecuteCount(payload.id);
+
+    return IPCMain.instance.invoke(
+      'shared-process',
+      'shared-window:execute-workflow',
+      {
+        ...payload,
+        workflow,
+      },
+    );
   }
 
-  static updateWorkflow(
-    workflowId: string,
-    payload: DatabaseWorkflowUpdatePayload,
-  ) {
+  updateWorkflow(workflowId: string, payload: DatabaseWorkflowUpdatePayload) {
     return DBService.instance.workflow.update(workflowId, payload);
   }
 
-  static async export(workflowId: string, window?: Electron.BrowserWindow) {
+  async export(workflowId: string, window?: Electron.BrowserWindow) {
     const workflow =
       await DBService.instance.workflow.getExportValue(workflowId);
     if (!workflow) throw new Error("Couldn't find workflow");
@@ -139,7 +163,7 @@ class WorkflowService {
     await fs.writeFile(result.filePath, JSON.stringify(workflow));
   }
 
-  static async import(filePath?: string[]) {
+  async import(filePath?: string[]) {
     try {
       let workflowsFilePath = filePath;
       if (!workflowsFilePath) {
@@ -187,8 +211,6 @@ class WorkflowService {
       throw error;
     }
   }
-
-  static trigger = WorkflowTriggerService;
 }
 
 export default WorkflowService;

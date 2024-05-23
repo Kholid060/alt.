@@ -7,12 +7,12 @@ import IPCMain from './IPCMain';
 import { GlobalShortcutExtension } from '../GlobalShortcuts';
 import DBService from '/@/services/database/database.service';
 import { emitDBChanges } from '../database-utils';
-import WindowCommand from '/@/window/command-window';
-import SharedProcessService from '/@/services/shared-process.service';
+import WindowCommand from '../../window/command-window';
 import { Key, keyboard } from '@nut-tree/nut-js';
 import BrowserService from '/@/services/browser.service';
 import WorkflowService from '/@/services/workflow.service';
 import { isWSAckError } from '../extension/ExtensionBrowserElementHandle';
+import ExtensionService from '/@/services/extension.service';
 
 /** EXTENSION */
 IPCMain.handle('extension:import', async () => {
@@ -40,7 +40,7 @@ IPCMain.handle('extension:reload', async (_, extId) => {
   });
 });
 IPCMain.handle('extension:execute-command', (_, payload) => {
-  return SharedProcessService.executeExtensionCommand(payload);
+  return ExtensionService.instance.executeCommand(payload);
 });
 IPCMain.handle('extension:is-config-inputted', (_, extensionId, commandId) => {
   return DBService.instance.extension.isConfigInputted(extensionId, commandId);
@@ -254,20 +254,20 @@ IPCMain.handle(
 
 /** WORKFLOW */
 IPCMain.handle('workflow:execute', (_, payload) => {
-  return WorkflowService.execute(payload);
+  return WorkflowService.instance.execute(payload);
 });
 IPCMain.handle('workflow:save', async (_, workflowId, payload) => {
-  await WorkflowService.updateWorkflow(workflowId, payload);
-  await WorkflowService.trigger.register(workflowId);
+  await WorkflowService.instance.updateWorkflow(workflowId, payload);
+  await WorkflowService.instance.trigger.register(workflowId);
 });
 IPCMain.handle('workflow:export', ({ sender }, workflowId) => {
-  return WorkflowService.export(
+  return WorkflowService.instance.export(
     workflowId,
     BrowserWindow.fromWebContents(sender) ?? undefined,
   );
 });
 IPCMain.handle('workflow:import', (_, paths) => {
-  return WorkflowService.import(paths);
+  return WorkflowService.instance.import(paths);
 });
 
 /** BROWSER */

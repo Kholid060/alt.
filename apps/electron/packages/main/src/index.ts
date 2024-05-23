@@ -83,7 +83,7 @@ app
 
     await Promise.all([
       registerGlobalShortcuts(),
-      WorkflowService.trigger.registerAll(),
+      WorkflowService.instance.trigger.registerAll(),
       ExtensionLoader.instance.loadExtensions(),
     ]);
 

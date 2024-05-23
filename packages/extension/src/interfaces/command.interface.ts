@@ -2,6 +2,7 @@ import { CommandJSONViews } from './command-json-view.interface';
 
 export enum CommandLaunchBy {
   USER = 'user',
+  COMMAND = 'command',
   WORKFLOW = 'workflow',
   DEEP_LINK = 'deep-link',
 }

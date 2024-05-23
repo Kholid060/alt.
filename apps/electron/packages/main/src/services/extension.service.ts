@@ -1,14 +1,52 @@
 import type { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
-import type { WorkflowRunPayload } from '#packages/common/interface/workflow.interface';
+import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import ExtensionLoader from '../utils/extension/ExtensionLoader';
 import IPCMain from '../utils/ipc/IPCMain';
 import WindowCommand from '../window/command-window';
 import BrowserService from './browser.service';
 import DBService from './database/database.service';
+import type { ExtensionCommandType } from '@repo/extension-core';
 
-class SharedProcessService {
-  static async executeExtensionCommand(
+class ExtensionService {
+  private static _instance: ExtensionService;
+
+  static get instance() {
+    return this._instance || (this._instance = new ExtensionService());
+  }
+
+  private executionResolvers = new Map<
+    string,
+    PromiseWithResolvers<ExtensionAPI.runtime.LaunchCommandResult>
+  >();
+
+  constructor() {
+    this.initIPCEventListener();
+  }
+
+  private initIPCEventListener() {
+    IPCMain.on('extension:finish-command-exec', (_, runnerId, result) => {
+      const resolver = this.executionResolvers.get(runnerId);
+      if (!resolver) return;
+
+      resolver.resolve(result);
+    });
+  }
+
+  async executeCommandAndWait(executePayload: ExtensionCommandExecutePayload) {
+    const resolver =
+      Promise.withResolvers<ExtensionAPI.runtime.LaunchCommandResult>();
+
+    const runnerId = await this.executeCommand(executePayload, 'script');
+    if (!runnerId) throw new Error("Config hasn't been inputted");
+
+    this.executionResolvers.set(runnerId, resolver);
+
+    return resolver.promise;
+  }
+
+  async executeCommand(
     executePayload: ExtensionCommandExecutePayload,
+    filterCommandType?: ExtensionCommandType,
   ): Promise<string | null> {
     const payload: ExtensionCommandExecutePayload = {
       ...executePayload,
@@ -29,6 +67,10 @@ class SharedProcessService {
       );
     }
     if (command.isDisabled) throw new Error('This command is disabled');
+
+    if (filterCommandType && command.type !== filterCommandType) {
+      throw new Error(`It only supported "${filterCommandType}" command type`);
+    }
 
     const commandFilePath =
       command.path ||
@@ -102,30 +144,13 @@ class SharedProcessService {
     }
   }
 
-  static stopExecuteExtensionCommand(runnerId: string) {
+  stopCommandExecution(runnerId: string) {
     IPCMain.sendToWindow(
       'shared-process',
       'shared-window:stop-execute-command',
       runnerId,
     );
   }
-
-  static async executeWorkflow(payload: WorkflowRunPayload) {
-    const workflow = await DBService.instance.workflow.get(payload.id);
-    if (!workflow) throw new Error("Couldn't find workflow");
-    if (workflow.isDisabled) return null;
-
-    DBService.instance.workflow.incExecuteCount(payload.id);
-
-    return IPCMain.instance.invoke(
-      'shared-process',
-      'shared-window:execute-workflow',
-      {
-        ...payload,
-        workflow,
-      },
-    );
-  }
 }
 
-export default SharedProcessService;
+export default ExtensionService;

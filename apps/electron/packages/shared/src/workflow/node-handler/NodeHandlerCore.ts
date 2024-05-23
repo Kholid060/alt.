@@ -199,7 +199,6 @@ export class NodeHandlerClipboard extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE
 
   async execute({
     node,
-    runner,
   }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.CLIPBOARD>): Promise<WorkflowNodeHandlerExecuteReturn> {
     let value: unknown = null;
 
@@ -209,9 +208,6 @@ export class NodeHandlerClipboard extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE
         break;
       case 'read': {
         value = await this.readClipboard(node.data.format);
-        if (node.data.insertToVar) {
-          runner.dataStorage.variables.set(node.data.varName, value);
-        }
         break;
       }
       case 'write':

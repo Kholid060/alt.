@@ -7,23 +7,11 @@ import {
 } from '../ExtensionBrowserElementHandle';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import { tempHideCommandWindow } from '../../helper';
-import BrowserService from '/@/services/browser.service';
 
 const getElementSelector = (
   selector: ExtensionAPI.browser.ElementSelector,
 ): ExtensionAPI.browser.ElementSelectorDetail =>
   typeof selector === 'string' ? { selector } : selector;
-
-ExtensionIPCEvent.instance.on(
-  'browser.activeTab.isAvailable',
-  ({ browserCtx }) => {
-    if (!browserCtx) return Promise.resolve(false);
-
-    return Promise.resolve(
-      Boolean(BrowserService.instance.getBrowser(browserCtx.browserId)),
-    );
-  },
-);
 
 ExtensionIPCEvent.instance.on(
   'browser.activeTab.reload',
@@ -32,13 +20,12 @@ ExtensionIPCEvent.instance.on(
       throw new ExtensionError("Couldn't find active tab browser");
     }
 
-    const { browserId, id, windowId } = browserCtx;
+    const { browserId, id } = browserCtx;
     const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
       browserId,
       name: 'tabs:reload',
       args: [
         {
-          windowId,
           tabId: id,
         },
       ],
@@ -164,13 +151,12 @@ ExtensionIPCEvent.instance.on(
       throw new ExtensionError("Couldn't find active tab browser");
     }
 
-    const { browserId, id, windowId } = browserCtx;
+    const { browserId, id } = browserCtx;
     const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
       browserId,
       name: 'tabs:element-exists',
       args: [
         {
-          windowId,
           tabId: id,
         },
         { selector },
@@ -192,7 +178,7 @@ ExtensionIPCEvent.instance.on(
       throw new ExtensionError("Couldn't find active tab browser");
     }
 
-    const { browserId, id, windowId } = browserCtx;
+    const { browserId, id } = browserCtx;
     const selectedElement = await tempHideCommandWindow(async () => {
       const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
         browserId,
@@ -200,7 +186,6 @@ ExtensionIPCEvent.instance.on(
         name: 'tabs:select-element',
         args: [
           {
-            windowId,
             tabId: id,
           },
           options ?? {},
@@ -226,14 +211,13 @@ ExtensionIPCEvent.instance.on(
       throw new ExtensionError("Couldn't find active tab browser");
     }
 
-    const { browserId, id, windowId } = browserCtx;
+    const { browserId, id } = browserCtx;
     const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
       timeout,
       browserId,
       name: 'tabs:wait-for-selector',
       args: [
         {
-          windowId,
           tabId: id,
         },
         { selector },

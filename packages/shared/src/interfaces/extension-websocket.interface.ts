@@ -31,7 +31,6 @@ export interface ExtensionWSClientToServerEvents {
 
 export interface ExtensionBrowserTabDetail {
   tabId: number;
-  windowId: number;
 }
 
 export interface ExtensionBrowserElementSelector {

@@ -2,6 +2,29 @@ import { CommandLaunchContext } from '@repo/extension';
 
 const filePath = 'D:\\test.txt';
 
+async function commandExecution() {
+  const test = await _extension.runtime.launchCommand({
+    name: 'javascript.js',
+    args: {
+      test: 'hello worldo',
+    },
+  });
+  console.log('execution', test);
+}
+async function commandExecutionFail() {
+  try {
+    const test = await _extension.runtime.launchCommand({
+      name: 'a-command',
+      args: {
+        test: 'hello world',
+      },
+    });
+    console.log('execution-', test);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export default async function CommandMain(context: CommandLaunchContext) {
   console.log(JSON.stringify(context));
   // await new Promise((r) => setTimeout(r, 4000));
@@ -9,6 +32,8 @@ export default async function CommandMain(context: CommandLaunchContext) {
 
   await _extension.mainWindow.close();
 
+  await commandExecutionFail();
+  await commandExecution();
 
   // await _extension.storage.set('test', 'hello world');
   // await _extension.shell.showItemInFolder(filePath);
@@ -24,14 +49,15 @@ export default async function CommandMain(context: CommandLaunchContext) {
   // await inputEl[0].type('hello world')
   // console.log(await inputEl[0].getAttributes());
 
-  const isAvailable = await _extension.browser.activeTab.get();
-  console.log(_extension, { isAvailable });
-  if (!isAvailable) throw new Error('TABB!!!');
+  // const isAvailable = await _extension.browser.activeTab.get();
+  // console.log(_extension, { isAvailable });
+  // if (!isAvailable) throw new Error('TABB!!!');
 
-  console.log(
-    await _extension.browser.activeTab.getHTML('body'),
-    await _extension.browser.activeTab.getHTML('body', { outerHTML: true }),
-  );
+
+  // console.log(
+  //   await _extension.browser.activeTab.getHTML('body'),
+  //   await _extension.browser.activeTab.getHTML('body', { outerHTML: true }),
+  // );
 
   // const toast = _extension.ui.createToast({ title: 'Hello world' });
   // toast.show();

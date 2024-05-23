@@ -194,6 +194,10 @@ export interface IPCSendEventMainToRenderer {
 export interface IPCSendEventRendererToMain {
   'extension:stop-execute-command': [runnerId: string];
   'window:open-command': [path?: string, routeData?: unknown];
+  'extension:finish-command-exec': [
+    runnerId: string,
+    data: ExtensionAPI.runtime.LaunchCommandResult,
+  ];
   'app:show-notification': [
     options: ExtensionAPI.notifications.NotificationOptions,
   ];

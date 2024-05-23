@@ -1,9 +1,9 @@
 import { Notification } from 'electron';
 import { MESSAGE_PORT_CHANNEL_IDS } from '#packages/common/utils/constant/constant';
 import IPCMain from './IPCMain';
-import SharedProcessService from '/@/services/shared-process.service';
 import WindowsManager from '/@/window/WindowsManager';
-import WindowCommand from '/@/window/command-window';
+import WindowCommand from '../../window/command-window';
+import ExtensionService from '/@/services/extension.service';
 
 IPCMain.on('dashboard-window:open', (_, path) => {
   WindowsManager.instance.restoreOrCreateWindow('dashboard').then((window) => {
@@ -50,7 +50,7 @@ IPCMain.on('message-port:port-bridge', ({ ports }, channelId) => {
 });
 
 IPCMain.on('extension:stop-execute-command', (_, runnerId) => {
-  SharedProcessService.stopExecuteExtensionCommand(runnerId);
+  ExtensionService.instance.stopCommandExecution(runnerId);
   return Promise.resolve();
 });
 

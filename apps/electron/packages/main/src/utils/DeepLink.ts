@@ -6,9 +6,10 @@ import { CommandLaunchBy } from '@repo/extension';
 import type { APP_DEEP_LINK_HOST } from '#packages/common/utils/constant/app.const';
 import { APP_DEEP_LINK } from '#packages/common/utils/constant/app.const';
 import DBService from '../services/database/database.service';
-import SharedProcessService from '../services/shared-process.service';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { WORKFLOW_MANUAL_TRIGGER_ID } from '#packages/common/utils/constant/workflow.const';
+import ExtensionService from '../services/extension.service';
+import WorkflowService from '../services/workflow.service';
 
 function convertArgValue(argument: ExtensionCommandArgument, value: string) {
   let convertedValue: unknown = value;
@@ -102,7 +103,7 @@ class DeepLinkHandler {
       launchBy: CommandLaunchBy.DEEP_LINK,
     };
 
-    await SharedProcessService.executeExtensionCommand({
+    await ExtensionService.instance.executeCommand({
       commandId,
       extensionId,
       launchContext,
@@ -131,7 +132,7 @@ class DeepLinkHandler {
       }
     }
 
-    await SharedProcessService.executeWorkflow({
+    await WorkflowService.instance.execute({
       id: workflow.id,
       startNodeId: WORKFLOW_MANUAL_TRIGGER_ID,
     });

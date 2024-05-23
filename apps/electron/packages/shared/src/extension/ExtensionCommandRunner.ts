@@ -107,6 +107,11 @@ class ExtensionCommandRunner {
           message,
           this.runners.size,
         );
+
+        IPCRenderer.send('extension:finish-command-exec', runnerId, {
+          success: false,
+          errorMessage: message,
+        });
       });
       commandRunner.once('finish', (reason, data) => {
         this.destroyRunningCommand(runnerId);
@@ -115,6 +120,11 @@ class ExtensionCommandRunner {
           { reason, data },
           this.runners.size,
         );
+
+        IPCRenderer.send('extension:finish-command-exec', runnerId, {
+          result: data,
+          success: true,
+        });
       });
 
       if (commandRunner.onCommandWindowEvents) {

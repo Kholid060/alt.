@@ -40,10 +40,7 @@ export async function extensionBrowserElementHandle<
   const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
     browserId: browserCtx.browserId,
     name: elementHandlerWSEventMap[name],
-    args: [
-      { tabId: browserCtx.id, windowId: browserCtx.windowId },
-      ...args,
-    ] as unknown as AllButLast<P>,
+    args: [{ tabId: browserCtx.id }, ...args] as unknown as AllButLast<P>,
   });
   if (isWSAckError(result)) {
     throw new ExtensionError(result.errorMessage);
