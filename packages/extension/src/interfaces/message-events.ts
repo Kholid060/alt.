@@ -17,6 +17,7 @@ export interface ExtensionMessagePortEvent {
     toastId: string,
     options: Required<ExtensionAPI.ui.ToastOptions>,
   ];
+  'extension:query-clear-value': [];
   'extension:hide-toast': [toastId: string];
   'extension:finish-execute': [ExtensionExecutionFinishReason, string?];
 }

@@ -137,18 +137,19 @@ export class GlobalShortcutExtension {
   }
 
   static async registerAllShortcuts() {
-    const commands = await DBService.instance.db.query.commands.findMany({
-      columns: {
-        name: true,
-        shortcut: true,
-      },
-      with: {
-        extension: { columns: { id: true } },
-      },
-      where(fields, operators) {
-        return operators.isNotNull(fields.shortcut);
-      },
-    });
+    const commands =
+      await DBService.instance.db.query.extensionCommands.findMany({
+        columns: {
+          name: true,
+          shortcut: true,
+        },
+        with: {
+          extension: { columns: { id: true } },
+        },
+        where(fields, operators) {
+          return operators.isNotNull(fields.shortcut);
+        },
+      });
     commands.map((command) => {
       if (!command.extension) return;
 

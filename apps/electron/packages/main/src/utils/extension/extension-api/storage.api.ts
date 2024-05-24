@@ -1,5 +1,5 @@
 import { safeStorage } from 'electron';
-import { storages } from '/@/db/schema/extension.schema';
+import { extensionStorages } from '/@/db/schema/extension.schema';
 import { parseJSON } from '@repo/shared';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import { and, eq, inArray } from 'drizzle-orm';
@@ -50,7 +50,7 @@ ExtensionIPCEvent.instance.on(
       typeof value === 'string' ? value : JSON.stringify(value),
     );
 
-    await DBService.instance.db.insert(storages).values({
+    await DBService.instance.db.insert(extensionStorages).values({
       key,
       value: encryptedValue,
       extensionId: extensionId,
@@ -62,13 +62,13 @@ ExtensionIPCEvent.instance.on(
   'storage.remove',
   async ({ extensionId }, key) => {
     await DBService.instance.db
-      .delete(storages)
+      .delete(extensionStorages)
       .where(
         and(
-          eq(storages.extensionId, extensionId),
+          eq(extensionStorages.extensionId, extensionId),
           Array.isArray(key)
-            ? inArray(storages.key, key)
-            : eq(storages.key, key),
+            ? inArray(extensionStorages.key, key)
+            : eq(extensionStorages.key, key),
         ),
       );
   },
@@ -88,6 +88,6 @@ ExtensionIPCEvent.instance.on('storage.getAll', async ({ extensionId }) => {
 
 ExtensionIPCEvent.instance.on('storage.clear', async ({ extensionId }) => {
   await DBService.instance.db
-    .delete(storages)
-    .where(eq(storages.extensionId, extensionId));
+    .delete(extensionStorages)
+    .where(eq(extensionStorages.extensionId, extensionId));
 });

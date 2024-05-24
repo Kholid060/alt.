@@ -8,9 +8,9 @@ import type {
 } from '/@/db/schema/extension.schema';
 import {
   extensions,
-  commands as commandsSchema,
-  commands,
-  configs,
+  extensionCommands as commandsSchema,
+  extensionCommands,
+  extensionConfigs,
 } from '/@/db/schema/extension.schema';
 import type { ExtensionCommand, ExtensionManifest } from '@repo/extension-core';
 import {
@@ -105,7 +105,7 @@ class DBExtensionService {
   }
 
   getCommands(filter?: DatabaseExtensionCommandListFilter) {
-    return this.database.query.commands.findMany({
+    return this.database.query.extensionCommands.findMany({
       where(fields, operators) {
         if (!filter) return;
 
@@ -144,7 +144,7 @@ class DBExtensionService {
       typeof query === 'string'
         ? query
         : `${query.extensionId}:${query.commandId}`;
-    const result = await this.database.query.commands.findFirst({
+    const result = await this.database.query.extensionCommands.findFirst({
       with: {
         extension: {
           columns: {
@@ -167,7 +167,7 @@ class DBExtensionService {
   }
 
   getCommandsByExtensionId(extensionId: string) {
-    return this.database.query.commands.findMany({
+    return this.database.query.extensionCommands.findMany({
       where(fields, operators) {
         return operators.eq(fields.extensionId, extensionId);
       },
@@ -191,9 +191,11 @@ class DBExtensionService {
 
   async deleteCommand(id: string | string[]) {
     await this.database
-      .delete(commands)
+      .delete(extensionCommands)
       .where(
-        Array.isArray(id) ? inArray(commands.id, id) : eq(commands.id, id),
+        Array.isArray(id)
+          ? inArray(extensionCommands.id, id)
+          : eq(extensionCommands.id, id),
       );
     emitDBChanges({
       'database:get-extension': [DATABASE_CHANGES_ALL_ARGS],
@@ -257,7 +259,7 @@ class DBExtensionService {
     arguments: commandArgs,
   }: DatabaseExtensionCommandInsertPayload) {
     const id = `${extensionId}:${name}`;
-    await this.database.insert(commands).values({
+    await this.database.insert(extensionCommands).values({
       id,
       name,
       type,
@@ -285,7 +287,7 @@ class DBExtensionService {
 
   async configExists(configId: string) {
     return Boolean(
-      await this.database.query.configs.findFirst({
+      await this.database.query.extensionConfigs.findFirst({
         columns: {
           configId: true,
         },
@@ -347,7 +349,7 @@ class DBExtensionService {
   async getConfigValue(configId: string[]): Promise<DatabaseExtensionConfig[]>;
   async getConfigValue(configIds: string | string[]): Promise<unknown> {
     if (Array.isArray(configIds)) {
-      return await this.database.query.configs.findMany({
+      return await this.database.query.extensionConfigs.findMany({
         columns: {
           id: true,
           value: true,
@@ -360,7 +362,7 @@ class DBExtensionService {
       });
     }
 
-    return await this.database.query.configs.findFirst({
+    return await this.database.query.extensionConfigs.findFirst({
       columns: {
         id: true,
         value: true,
@@ -386,7 +388,7 @@ class DBExtensionService {
     extensionId: string,
   ): Promise<unknown> {
     if (typeof keys === 'string') {
-      const result = await this.database.query.storages.findFirst({
+      const result = await this.database.query.extensionStorages.findFirst({
         columns: {
           key: true,
           value: true,
@@ -398,7 +400,7 @@ class DBExtensionService {
       return result;
     }
 
-    const result = await this.database.query.storages.findMany({
+    const result = await this.database.query.extensionStorages.findMany({
       columns: {
         key: true,
         value: true,
@@ -411,7 +413,7 @@ class DBExtensionService {
   }
 
   async storageList(extensionId: string) {
-    const result = await this.database.query.storages.findMany({
+    const result = await this.database.query.extensionStorages.findMany({
       columns: {
         key: true,
         value: true,
@@ -439,7 +441,7 @@ class DBExtensionService {
       Partial<Pick<SelectExtesionCommand, 'dismissAlert'>>,
   ) {
     await this.database
-      .update(commands)
+      .update(extensionCommands)
       .set({
         alias,
         shortcut,
@@ -449,7 +451,7 @@ class DBExtensionService {
         dismissAlert,
         customSubtitle,
       })
-      .where(eq(commands.id, `${extensionId}:${commandId}`));
+      .where(eq(extensionCommands.id, `${extensionId}:${commandId}`));
 
     emitDBChanges({
       'database:get-extension': [extensionId],
@@ -530,7 +532,7 @@ class DBExtensionService {
   }
 
   async insertConfig({ configId, extensionId, value }: NewExtensionConfig) {
-    await this.database.insert(configs).values({
+    await this.database.insert(extensionConfigs).values({
       value,
       configId,
       extensionId,
@@ -542,11 +544,11 @@ class DBExtensionService {
     { value }: DatabaseExtensionConfigUpdatePayload,
   ) {
     await this.database
-      .update(configs)
+      .update(extensionConfigs)
       .set({
         value,
       })
-      .where(eq(configs.configId, configId));
+      .where(eq(extensionConfigs.configId, configId));
   }
 }
 

@@ -47,12 +47,12 @@ export type NewExtension = typeof extensions.$inferInsert;
 export type SelectExtension = typeof extensions.$inferSelect;
 
 export const extensionsRelations = relations(extensions, ({ many }) => ({
-  configs: many(configs),
-  storages: many(storages),
-  commands: many(commands),
+  configs: many(extensionConfigs),
+  storages: many(extensionStorages),
+  commands: many(extensionCommands),
 }));
 
-export const commands = sqliteTable('commands', {
+export const extensionCommands = sqliteTable('extension_commands', {
   id: text('id').primaryKey(),
   shortcut: text('shortcut').unique(),
   icon: text('icon'),
@@ -78,17 +78,17 @@ export const commands = sqliteTable('commands', {
   extensionId: text('extension_id').notNull(),
   dismissAlert: integer('dismiss_alert', { mode: 'boolean' }),
 });
-export type NewExtensionCommand = typeof commands.$inferInsert;
-export type SelectExtesionCommand = typeof commands.$inferSelect;
+export type NewExtensionCommand = typeof extensionCommands.$inferInsert;
+export type SelectExtesionCommand = typeof extensionCommands.$inferSelect;
 
-export const commandsRelations = relations(commands, ({ one }) => ({
+export const commandsRelations = relations(extensionCommands, ({ one }) => ({
   extension: one(extensions, {
     references: [extensions.id],
-    fields: [commands.extensionId],
+    fields: [extensionCommands.extensionId],
   }),
 }));
 
-export const storages = sqliteTable('storages', {
+export const extensionStorages = sqliteTable('extension_storages', {
   id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
   createdAt: text('created_at')
     .notNull()
@@ -100,18 +100,21 @@ export const storages = sqliteTable('storages', {
   key: text('key').notNull(),
   value: blob('value', { mode: 'buffer' }).notNull(),
 });
-export type NewExtensionStorage = typeof storages.$inferInsert;
-export type SelectExtensionStorage = typeof storages.$inferSelect;
+export type NewExtensionStorage = typeof extensionStorages.$inferInsert;
+export type SelectExtensionStorage = typeof extensionStorages.$inferSelect;
 
-export const extensionsStorageRelations = relations(storages, ({ one }) => ({
-  extension: one(extensions, {
-    fields: [storages.extensionId],
-    references: [extensions.id],
+export const extensionsStorageRelations = relations(
+  extensionStorages,
+  ({ one }) => ({
+    extension: one(extensions, {
+      fields: [extensionStorages.extensionId],
+      references: [extensions.id],
+    }),
   }),
-}));
+);
 
-export const configs = sqliteTable(
-  'configs',
+export const extensionConfigs = sqliteTable(
+  'extension_configs',
   {
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
     extensionId: text('extension_id').notNull(),
@@ -124,12 +127,15 @@ export const configs = sqliteTable(
     configIdIdx: uniqueIndex('config_id_idx').on(table.configId),
   }),
 );
-export type NewExtensionConfig = typeof configs.$inferInsert;
-export type SelectExtensionConfig = typeof configs.$inferSelect;
+export type NewExtensionConfig = typeof extensionConfigs.$inferInsert;
+export type SelectExtensionConfig = typeof extensionConfigs.$inferSelect;
 
-export const extensionsConfigRelations = relations(configs, ({ one }) => ({
-  extension: one(extensions, {
-    fields: [configs.extensionId],
-    references: [extensions.id],
+export const extensionsConfigRelations = relations(
+  extensionConfigs,
+  ({ one }) => ({
+    extension: one(extensions, {
+      fields: [extensionConfigs.extensionId],
+      references: [extensions.id],
+    }),
   }),
-}));
+);

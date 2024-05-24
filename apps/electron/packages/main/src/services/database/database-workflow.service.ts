@@ -293,7 +293,7 @@ class DBWorkflowService {
   }
 
   async commandExist(ids: string[]) {
-    const queryResult = await this.database.query.commands.findMany({
+    const queryResult = await this.database.query.extensionCommands.findMany({
       columns: {
         id: true,
       },
