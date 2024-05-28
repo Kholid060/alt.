@@ -242,7 +242,7 @@ function NodeCard({
         {children}
       </div>
       <div className="absolute">
-        <p className="text-muted-foreground pointer-events-none">
+        <p className="text-muted-foreground pointer-events-none whitespace-pre-wrap text-xs">
           {description}
         </p>
       </div>

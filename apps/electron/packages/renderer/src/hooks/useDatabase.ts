@@ -75,17 +75,24 @@ export function useDatabase() {
   return { ...databaseCtx, queryDatabase };
 }
 
-interface UseDatabaseQueryOptions {
+interface UseDatabaseQueryOptions<K, R> {
+  transform?: (data: K) => R;
   disableAutoRefresh?: boolean;
 }
-export function useDatabaseQuery<T extends keyof DatabaseQueriesEvent>(
+type UseDatabaseQueryReturn<T> = QueryDBState<T> & {
+  refresh(): void;
+  updateState(data: T | ((value: T) => T)): void;
+};
+export function useDatabaseQuery<
+  T extends keyof DatabaseQueriesEvent,
+  K extends ReturnType<DatabaseQueriesEvent[T]>,
+  R = K,
+>(
   name: T,
   queryArgs: Parameters<DatabaseQueriesEvent[T]>,
-  options?: UseDatabaseQueryOptions,
-) {
-  type ReturnValue = ReturnType<DatabaseQueriesEvent[T]>;
-
-  const [state, setState] = useState<QueryDBState<ReturnValue>>({
+  options?: UseDatabaseQueryOptions<K, R>,
+): UseDatabaseQueryReturn<R> {
+  const [state, setState] = useState<QueryDBState<R>>({
     data: null,
     error: null,
     state: 'loading',
@@ -93,13 +100,12 @@ export function useDatabaseQuery<T extends keyof DatabaseQueriesEvent>(
 
   const databaseCtx = useDatabase();
 
-  function updateState(
-    data: ReturnValue | ((prevState: ReturnValue) => ReturnValue),
-  ) {
+  const updateState: UseDatabaseQueryReturn<R>['updateState'] = (data) => {
     if (state.state !== 'idle') {
       throw new Error('DB data can only updated when the state is "idle"');
     }
 
+    // @ts-expect-error it's not expected
     const stateData = typeof data === 'function' ? data(state.data) : data;
 
     setState({
@@ -107,7 +113,7 @@ export function useDatabaseQuery<T extends keyof DatabaseQueriesEvent>(
       state: 'idle',
       data: stateData,
     });
-  }
+  };
 
   const fetchQuery = useCallback(() => {
     preloadAPI.main.ipc.invoke(name, ...queryArgs).then((result) => {
@@ -120,10 +126,14 @@ export function useDatabaseQuery<T extends keyof DatabaseQueriesEvent>(
         return;
       }
 
+      const finalResult = options?.transform
+        ? options.transform(result as K)
+        : result;
+
       setState({
         error: null,
         state: 'idle',
-        data: result as ReturnType<DatabaseQueriesEvent[T]>,
+        data: finalResult as R,
       });
     });
   }, []);

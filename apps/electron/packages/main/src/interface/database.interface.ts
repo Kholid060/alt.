@@ -130,6 +130,11 @@ export interface DatabaseGetExtensionConfig {
   extensionId: string;
 }
 
+export type DatabaseExtensionCredentials = Pick<
+  SelectExtension,
+  'id' | 'title' | 'credentials'
+>[];
+
 export type DatabaseWorkfowListQueryOptions = 'commands';
 
 export type DatabaseWorkflowHistory = SelectWorkflowHistory & {
@@ -159,6 +164,7 @@ export interface DatabaseQueriesEvent {
   'database:get-extension-config': (
     query: DatabaseGetExtensionConfig,
   ) => null | DatabaseExtensionConfigWithSchema;
+  'database:get-extension-creds': () => DatabaseExtensionCredentials;
   'database:get-extension-list': (
     activeExtOnly?: boolean,
   ) => DatabaseExtensionListItem[];

@@ -4,6 +4,7 @@ import {
   BlocksIcon,
   HistoryIcon,
   InfoIcon,
+  KeyRoundIcon,
   LucideIcon,
   SettingsIcon,
   UserCog2Icon,
@@ -33,6 +34,11 @@ const navigationItems: { title: string; path: string; icon: LucideIcon }[] = [
     icon: UserCog2Icon,
     path: '/accounts',
     title: 'Accounts',
+  },
+  {
+    icon: KeyRoundIcon,
+    path: '/credentials',
+    title: 'Credentials',
   },
   {
     path: '/settings',

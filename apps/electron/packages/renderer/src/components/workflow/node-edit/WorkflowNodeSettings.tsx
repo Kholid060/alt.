@@ -1,5 +1,12 @@
 import { WorkflowNodeErroHandlerAction } from '#packages/common/interface/workflow.interface';
-import { UiInput, UiLabel, UiSelect, UiSwitch, UiTooltip } from '@repo/ui';
+import {
+  UiInput,
+  UiLabel,
+  UiSelect,
+  UiSwitch,
+  UiTextarea,
+  UiTooltip,
+} from '@repo/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import {
   WorkflowNodeErrorHandler as WorkflowNodeErrorHandlerType,
@@ -157,6 +164,18 @@ function WorkflowNodeSettings({ data }: { data: WorkflowNodes['data'] }) {
 
   return (
     <>
+      <UiLabel htmlFor="node--description" className="ml-1">
+        Description
+      </UiLabel>
+      <UiTextarea
+        id="node--description"
+        placeholder="Node description"
+        value={data.description}
+        onChange={(event) =>
+          updateEditNode({ description: event.target.value })
+        }
+      />
+      <hr className="my-4" />
       <WorkflowNodeErrorHandler data={data} onUpdate={updateEditNode} />
       <hr className="my-4" />
       <WorkflowNodeOutput data={data} onUpdate={updateEditNode} />

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ExtensionCredentialSchema } from './manifest-credential';
 
 export const URL_FRIENDLY_REGEX = /^[a-zA-Z0-9_-]*$/;
 
@@ -139,6 +140,7 @@ export const ExtensionManifestSchema = z.object({
   description: z.string().min(12).max(128),
   commands: ExtensionCommandSchema.array().min(1),
   config: ExtensionConfigSchema.array().optional(),
+  credentials: ExtensionCredentialSchema.array().optional(),
   permissions: z.enum(EXTENSION_PERMISSIONS).array().optional(),
   name: z
     .string()

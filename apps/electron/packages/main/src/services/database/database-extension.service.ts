@@ -30,6 +30,7 @@ import type {
   DatabaseExtensionConfigUpdatePayload,
   DatabaseExtensionCommandInsertPayload,
   DatabaseExtensionCommandListFilter,
+  DatabaseExtensionCredentials,
 } from '/@/interface/database.interface';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
@@ -116,6 +117,19 @@ class DBExtensionService {
               operators.eq(fields.type, 'script'),
             );
         }
+      },
+    });
+  }
+
+  getCredentials(): Promise<DatabaseExtensionCredentials> {
+    return this.database.query.extensions.findMany({
+      columns: {
+        id: true,
+        title: true,
+        credentials: true,
+      },
+      where(fields, operators) {
+        return operators.isNotNull(fields.credentials);
       },
     });
   }

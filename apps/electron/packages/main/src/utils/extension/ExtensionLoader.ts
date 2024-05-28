@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs-extra';
-import { nanoid } from 'nanoid';
+import crypto from 'node:crypto';
 import type { ExtensionManifest } from '@repo/extension-core';
 import { ExtensionManifestSchema } from '@repo/extension-core';
 import validateSemver from 'semver/functions/valid';
@@ -248,7 +248,10 @@ class ExtensionLoader {
       throw new ValidationError(manifest.message);
     }
 
-    const id = nanoid();
+    const id = crypto
+      .createHash('sha256')
+      .update(normalizeManifestPath)
+      .digest('hex');
     const insertCommands: NewExtensionCommand[] = manifest.data.commands.map(
       (command) => ({
         id: `${id}:${command.name}`,

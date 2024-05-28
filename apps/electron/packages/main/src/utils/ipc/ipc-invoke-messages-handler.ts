@@ -152,6 +152,9 @@ IPCMain.handle('database:insert-workflow', (_, data) => {
 IPCMain.handle('database:get-extension', (_, extensionId) => {
   return DBService.instance.extension.get(extensionId);
 });
+IPCMain.handle('database:get-extension-creds', () => {
+  return DBService.instance.extension.getCredentials();
+});
 IPCMain.handle('database:get-extension-list', (_, activeExtOnly) => {
   return DBService.instance.extension.list(activeExtOnly);
 });

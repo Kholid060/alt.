@@ -10,6 +10,22 @@ export default {
   description,
   title: 'Clipboard',
   icon: 'icon:Clipboard',
+  credentials: [
+    {
+      providerId: 'google-drive',
+      providerName: 'Google Drive',
+      description: 'Auth google drive',
+      providerIcon: 'google-drive',
+      auth: {
+        type: 'oauth2',
+        grantType: 'code',
+        extraParams: { query: 'query1' },
+        tokenUrl: 'https://oauth2.googleapis.com/token',
+        scope: 'https://www.googleapis.com/auth/drive.readonly',
+        authorizeUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
+      },
+    }
+  ],
   config: [
     { name: 'number', type: 'input:number', title: 'Input number', placeholder: 'Number placeholder', required: true },
   ],

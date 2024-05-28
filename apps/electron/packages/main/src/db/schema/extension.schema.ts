@@ -4,6 +4,7 @@ import type {
   ExtensionCommandArgument,
   ExtensionConfig,
 } from '@repo/extension-core';
+import type { ExtensionCredential } from '@repo/extension-core/src/client/manifest/manifest-credential';
 import { relations, sql } from 'drizzle-orm';
 import {
   text,
@@ -27,6 +28,9 @@ export const extensions = sqliteTable('extensions', {
     (typeof EXTENSION_PERMISSIONS)[number][]
   >(),
   config: text('config', { mode: 'json' }).$type<ExtensionConfig[]>(),
+  credentials: text('credentials', {
+    mode: 'json',
+  }).$type<ExtensionCredential[]>(),
   isError: integer('is_error', { mode: 'boolean' })
     .notNull()
     .$default(() => false),

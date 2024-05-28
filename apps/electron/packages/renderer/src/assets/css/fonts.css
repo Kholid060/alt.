@@ -7,11 +7,19 @@
   src: url("../fonts/InterVariable.woff2") format("woff2");
 }
 
-/* roboto-mono-regular - latin */
+/* dm-mono-regular - latin */
 @font-face {
   font-display: swap;
-  font-family: 'Roboto Mono';
+  font-family: 'DM Mono';
   font-style: normal;
   font-weight: 400;
-  src: url('../fonts/roboto-mono-v23-latin-regular.woff2') format('woff2');
+  src: url('../fonts/dm-mono-v14-latin-regular.woff2') format('woff2');
+}
+/* dm-mono-500 - latin */
+@font-face {
+  font-display: swap;
+  font-family: 'DM Mono';
+  font-style: normal;
+  font-weight: 500;
+  src: url('../fonts/dm-mono-v14-latin-500.woff2') format('woff2');
 }
