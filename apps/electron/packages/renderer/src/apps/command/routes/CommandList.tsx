@@ -17,6 +17,7 @@ import preloadAPI from '/@/utils/preloadAPI';
 import {
   BlocksIcon,
   FileCodeIcon,
+  KeyRoundIcon,
   LayoutDashboardIcon,
   SearchSlashIcon,
   SettingsIcon,
@@ -45,6 +46,7 @@ const dashboardPageCommands: CommandListItemCommandBuiltIn[] = (
     { title: 'Dashboard Page', icon: LayoutDashboardIcon, path: '/dashboard' },
     { title: 'Workflows Page', icon: WorkflowIcon, path: '/workflows' },
     { title: 'Extensions Page', icon: BlocksIcon, path: '/extensions' },
+    { title: 'Credentials Page', icon: KeyRoundIcon, path: '/credentials' },
     { title: 'Settings Page', icon: SettingsIcon, path: '/settings' },
   ] as const
 ).map((page) => ({

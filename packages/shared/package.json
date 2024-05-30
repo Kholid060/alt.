@@ -2,19 +2,11 @@
   "name": "@repo/shared",
   "version": "0.0.0",
   "type": "module",
-  "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "lint": "eslint . --max-warnings 0"
-  },
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./src/index.ts",
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@typescript-eslint/eslint-plugin": "^7.4.0",
-    "electron": "workspace:^",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",

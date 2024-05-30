@@ -2,8 +2,10 @@ import type { ExtensionConfig, ExtensionManifest } from '@repo/extension-core';
 import type {
   NewExtensionCommand,
   NewExtensionConfig,
+  NewExtensionCredential,
   SelectExtension,
   SelectExtensionConfig,
+  SelectExtensionCredential,
   SelectExtesionCommand,
 } from '../db/schema/extension.schema';
 import type {
@@ -67,6 +69,16 @@ export type DatabaseExtensionCommandUpdatePayload = Partial<
 export type DatabaseExtensionCommandInsertPayload = Omit<
   NewExtensionCommand,
   'id'
+>;
+
+export type DatabaseExtensionCredentialInsertPayload = Omit<
+  NewExtensionCredential,
+  'id' | 'value'
+> & { value: Record<string, string> };
+export type DatabaseExtensionCredentialUpdatePayload = Partial<
+  Pick<NewExtensionCredential, 'name'> & {
+    value: Record<string, string>;
+  }
 >;
 
 export type DatabaseWorkflow = Pick<
@@ -134,6 +146,28 @@ export type DatabaseExtensionCredentials = Pick<
   SelectExtension,
   'id' | 'title' | 'credentials'
 >[];
+export interface DatabaseExtensionCredentialsValueListOptions {
+  filter?: {
+    name?: string;
+    extensionId?: string;
+  };
+  sort?: {
+    asc: boolean;
+    by: 'createdAt' | 'updatedAt' | 'name';
+  };
+  pagination?: {
+    page: number;
+    pageSize: number;
+  };
+}
+export type DatabaseExtensionCredentialsValueList = (Pick<
+  SelectExtensionCredential,
+  'id' | 'name' | 'type' | 'updatedAt' | 'createdAt' | 'providerId'
+> & { extension: { title: string; id: string } })[];
+export type DatabaseExtensionCredentialsValueDetail = Omit<
+  SelectExtensionCredential,
+  'value'
+> & { value: Record<string, string>; extension: { title: string; id: string } };
 
 export type DatabaseWorkfowListQueryOptions = 'commands';
 
@@ -165,6 +199,13 @@ export interface DatabaseQueriesEvent {
     query: DatabaseGetExtensionConfig,
   ) => null | DatabaseExtensionConfigWithSchema;
   'database:get-extension-creds': () => DatabaseExtensionCredentials;
+  'database:get-extension-creds-value': (
+    options?: DatabaseExtensionCredentialsValueListOptions,
+  ) => { count: number; items: DatabaseExtensionCredentialsValueList };
+  'database:get-extension-creds-value-detail': (
+    credentialId: string,
+    maskSecret?: boolean,
+  ) => DatabaseExtensionCredentialsValueDetail | null;
   'database:get-extension-list': (
     activeExtOnly?: boolean,
   ) => DatabaseExtensionListItem[];
@@ -205,6 +246,9 @@ export interface DatabaseInsertEvents {
   'database:insert-extension-command': (
     command: DatabaseExtensionCommandInsertPayload,
   ) => string;
+  'database:insert-extension-credential': (
+    credential: DatabaseExtensionCredentialInsertPayload,
+  ) => string;
 }
 
 export interface DatabaseUpdateEvents {
@@ -233,11 +277,16 @@ export interface DatabaseUpdateEvents {
     commandId: string,
     data: DatabaseExtensionCommandUpdatePayload,
   ) => void;
+  'database:update-extension-credential': (
+    credentialId: string,
+    data: DatabaseExtensionCredentialUpdatePayload,
+  ) => void;
 }
 
 export interface DatabaseDeleteEvents {
   'database:delete-workflow': (workflowId: string) => void;
   'database:delete-extension-command': (id: string | string[]) => void;
+  'database:delete-extension-credential': (id: string | string[]) => void;
   'database:delete-workflow-history': (historyId: number | number[]) => void;
 }
 

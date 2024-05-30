@@ -1,1 +1,0 @@
-ALTER TABLE commands ADD `custom_subtitle` text;

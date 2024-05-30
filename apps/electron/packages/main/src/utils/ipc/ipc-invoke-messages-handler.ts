@@ -8,7 +8,7 @@ import { GlobalShortcutExtension } from '../GlobalShortcuts';
 import DBService from '/@/services/database/database.service';
 import { emitDBChanges } from '../database-utils';
 import WindowCommand from '../../window/command-window';
-import { Key, keyboard } from '@nut-tree/nut-js';
+// import { Key, keyboard } from '@nut-tree/nut-js';
 import BrowserService from '/@/services/browser.service';
 import WorkflowService from '/@/services/workflow.service';
 import { isWSAckError } from '../extension/ExtensionBrowserElementHandle';
@@ -76,12 +76,12 @@ IPCMain.handle('clipboard:copy', (_, content) => {
   return Promise.resolve();
 });
 IPCMain.handle('clipboard:paste', async (_) => {
-  const keys = [
-    process.platform === 'darwin' ? Key.LeftCmd : Key.LeftControl,
-    Key.V,
-  ];
-  await keyboard.pressKey(...keys);
-  await keyboard.releaseKey(...keys);
+  // const keys = [
+  //   process.platform === 'darwin' ? Key.LeftCmd : Key.LeftControl,
+  //   Key.V,
+  // ];
+  // await keyboard.pressKey(...keys);
+  // await keyboard.releaseKey(...keys);
 });
 IPCMain.handle('clipboard:copy-buffer', (_, contentType, content) => {
   const buffer = Buffer.from(content);
@@ -197,6 +197,31 @@ IPCMain.handle(
     }
   },
 );
+IPCMain.handle('database:insert-extension-credential', (_, payload) => {
+  return DBService.instance.extension.insertCredential(payload);
+});
+IPCMain.handle(
+  'database:update-extension-credential',
+  (_, credentialId, payload) => {
+    return DBService.instance.extension.updateCredential(credentialId, payload);
+  },
+);
+IPCMain.handle('database:get-extension-creds-value', (_, options) => {
+  return DBService.instance.extension.getCredentialValueList(options);
+});
+IPCMain.handle(
+  'database:get-extension-creds-value-detail',
+  (_, credentialId, maskSecret) => {
+    return DBService.instance.extension.getCredentialValueDetail(
+      credentialId,
+      maskSecret,
+    );
+  },
+);
+IPCMain.handle('database:delete-extension-credential', (_, id) => {
+  return DBService.instance.extension.deleteCredentials(id);
+});
+
 IPCMain.handle('database:insert-extension-config', (_, config) => {
   return DBService.instance.extension.insertConfig(config);
 });
@@ -225,6 +250,10 @@ IPCMain.handle('database:extension-command-exists', (_, ids) => {
 /** SHELL */
 IPCMain.handle('shell:open-in-folder', (_, filePath) => {
   shell.showItemInFolder(filePath);
+  return Promise.resolve();
+});
+IPCMain.handle('shell:open-url', (_, url) => {
+  shell.openExternal(url);
   return Promise.resolve();
 });
 

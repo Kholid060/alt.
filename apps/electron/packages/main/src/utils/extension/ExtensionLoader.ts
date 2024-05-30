@@ -185,6 +185,12 @@ class ExtensionLoader {
                 extensionManifest.data.commands,
                 tx,
               );
+
+              await DBService.instance.extension.deleteNotExistsCreds(
+                extension.id,
+                extensionManifest.data.credentials || [],
+                tx,
+              );
             }
 
             await tx

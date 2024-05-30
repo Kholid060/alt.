@@ -10,6 +10,7 @@ import { fileURLToPath } from 'url';
 import { DATABASE_FOLDER } from '/@/utils/constant';
 import { ErrorLogger } from '/@/lib/log';
 import DBWorkflowService from './database-workflow.service';
+import fs from 'fs-extra';
 import { debuglog } from 'util';
 
 const dbPath = path.join(DATABASE_FOLDER, 'extensions.db');
@@ -42,6 +43,8 @@ class DBService {
   @ErrorLogger('DBService', 'initDB')
   async initDB() {
     if (this.intialized) return;
+
+    await fs.ensureFile(dbPath);
 
     debuglog('Init Sqlite DB...');
 

@@ -1,4 +1,13 @@
-import { and, eq, inArray, notInArray } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  inArray,
+  like,
+  notInArray,
+} from 'drizzle-orm';
 import type {
   NewExtension,
   NewExtensionCommand,
@@ -11,12 +20,14 @@ import {
   extensionCommands as commandsSchema,
   extensionCommands,
   extensionConfigs,
+  extensionCreds,
 } from '/@/db/schema/extension.schema';
 import type { ExtensionCommand, ExtensionManifest } from '@repo/extension-core';
 import {
   buildConflictUpdateColumns,
   emitDBChanges,
   mapManifestToDB,
+  withPagination,
 } from '/@/utils/database-utils';
 import type {
   DatabaseExtension,
@@ -31,14 +42,23 @@ import type {
   DatabaseExtensionCommandInsertPayload,
   DatabaseExtensionCommandListFilter,
   DatabaseExtensionCredentials,
+  DatabaseExtensionCredentialInsertPayload,
+  DatabaseExtensionCredentialUpdatePayload,
+  DatabaseExtensionCredentialsValueList,
+  DatabaseExtensionCredentialsValueDetail,
+  DatabaseExtensionCredentialsValueListOptions,
 } from '/@/interface/database.interface';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
 import type { SQLiteDatabase } from './database.service';
-import { MemoryCache } from '@repo/shared';
+import { MemoryCache, parseJSON } from '@repo/shared';
 import { ExtensionError } from '#packages/common/errors/custom-errors';
 import { getExtensionConfigDefaultValue } from '/@/utils/helper';
 import type { ExtensionCommandConfigValuePayload } from '#packages/common/interface/extension.interface';
+import { safeStorage } from 'electron';
+import { nanoid } from 'nanoid';
+import type { ExtensionCredential } from '@repo/extension-core/src/client/manifest/manifest-credential';
+import type { SQLiteColumn } from 'drizzle-orm/sqlite-core';
 
 class DBExtensionService {
   private cache: MemoryCache = new MemoryCache();
@@ -563,6 +583,198 @@ class DBExtensionService {
         value,
       })
       .where(eq(extensionConfigs.configId, configId));
+  }
+
+  async insertCredential({
+    type,
+    name,
+    value,
+    providerId,
+    extensionId,
+  }: DatabaseExtensionCredentialInsertPayload) {
+    const id = nanoid();
+    const encryptedValue = safeStorage.encryptString(JSON.stringify(value));
+
+    await this.database.insert(extensionCreds).values({
+      id,
+      name,
+      type,
+      providerId,
+      extensionId,
+      value: encryptedValue,
+      updatedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+    });
+
+    emitDBChanges({
+      'database:get-extension-creds-value': [DATABASE_CHANGES_ALL_ARGS],
+    });
+
+    return id;
+  }
+
+  async updateCredential(
+    credentialId: string,
+    { name, value }: DatabaseExtensionCredentialUpdatePayload,
+  ) {
+    const updatedValue = value;
+    if (updatedValue) {
+      Object.keys(value).forEach((key) => {
+        if (key.startsWith('__MASK_VALUE__')) {
+          delete updatedValue[key];
+        }
+      });
+    }
+
+    const encryptedValue = updatedValue
+      ? safeStorage.encryptString(JSON.stringify(updatedValue))
+      : undefined;
+    await this.database
+      .update(extensionCreds)
+      .set({
+        name,
+        value: encryptedValue,
+        updatedAt: new Date().toISOString(),
+      })
+      .where(eq(extensionCreds.id, credentialId));
+
+    emitDBChanges({
+      'database:get-extension-creds-value-detail': [credentialId],
+      'database:get-extension-creds-value': [DATABASE_CHANGES_ALL_ARGS],
+    });
+  }
+
+  async getCredentialValueList({
+    sort,
+    filter,
+    pagination,
+  }: DatabaseExtensionCredentialsValueListOptions = {}): Promise<{
+    count: number;
+    items: DatabaseExtensionCredentialsValueList;
+  }> {
+    let query = this.database
+      .select({
+        id: extensionCreds.id,
+        name: extensionCreds.name,
+        type: extensionCreds.type,
+        updatedAt: extensionCreds.updatedAt,
+        createdAt: extensionCreds.createdAt,
+        providerId: extensionCreds.providerId,
+        extension: {
+          id: extensions.id,
+          title: extensions.title,
+        },
+      })
+      .from(extensionCreds)
+      .leftJoin(extensions, eq(extensions.id, extensionCreds.extensionId))
+      .$dynamic();
+
+    if (filter?.extensionId) {
+      query = query.where(eq(extensionCreds.extensionId, filter.extensionId));
+    }
+    if (filter?.name) {
+      query = query.where(like(extensionCreds.name, `%${filter.name}%`));
+    }
+
+    if (sort) {
+      let sortColumn: SQLiteColumn = extensionCreds.createdAt;
+      switch (sort.by) {
+        case 'updatedAt':
+          sortColumn = extensionCreds.updatedAt;
+          break;
+        case 'name':
+          sortColumn = extensionCreds.name;
+          break;
+      }
+
+      query = query.orderBy(sort.asc ? asc(sortColumn) : desc(sortColumn));
+    }
+    if (pagination) {
+      query = withPagination(query, pagination.page, pagination.pageSize);
+    }
+
+    const items =
+      (await query.execute()) as DatabaseExtensionCredentialsValueList;
+    const itemsLength = filter
+      ? items.length
+      : (await this.database.select({ count: count() }).from(extensionCreds))[0]
+          .count;
+
+    return { items, count: itemsLength };
+  }
+
+  async getCredentialValueDetail(credentialId: string, maskSecret?: boolean) {
+    const result = await this.database.query.extensionCreds.findFirst({
+      with: {
+        extension: {
+          columns: {
+            id: true,
+            title: true,
+          },
+        },
+      },
+      where(fields, operators) {
+        return operators.eq(fields.id, credentialId);
+      },
+    });
+    if (!result) return null;
+
+    const finalResult = {
+      ...result,
+      value: parseJSON(safeStorage.decryptString(result.value), {}),
+    } as DatabaseExtensionCredentialsValueDetail;
+    if (!maskSecret) return finalResult;
+
+    switch (finalResult.type) {
+      case 'oauth2':
+        finalResult.value.clientSecret = `__MASK_VALUE__${result.id}`;
+        break;
+    }
+
+    return finalResult;
+  }
+
+  async deleteCredentials(ids: string | string[]) {
+    const idsArr = Array.isArray(ids) ? ids : [ids];
+    await this.database
+      .delete(extensionCreds)
+      .where(inArray(extensionCreds.id, idsArr));
+
+    emitDBChanges({
+      'database:get-extension-creds-value': [DATABASE_CHANGES_ALL_ARGS],
+      'database:get-extension-creds-value-detail': [DATABASE_CHANGES_ALL_ARGS],
+    });
+  }
+
+  async deleteNotExistsCreds(
+    extensionId: string,
+    credentials: ExtensionCredential[],
+    tx?: Parameters<Parameters<typeof this.database.transaction>[0]>[0],
+  ) {
+    const db = tx || this.database;
+    const credsValue = await db.query.extensionCreds.findMany({
+      columns: {
+        id: true,
+        providerId: true,
+      },
+      where(fields, operators) {
+        return operators.eq(fields.extensionId, extensionId);
+      },
+    });
+    const currentCreds = new Set(credentials.map((item) => item.providerId));
+    const notExistsCreds = credsValue.reduce<string[]>((acc, item) => {
+      if (!currentCreds.has(item.providerId)) {
+        acc.push(item.providerId);
+      }
+
+      return acc;
+    }, []);
+
+    if (notExistsCreds.length === 0) return;
+
+    await db
+      .delete(extensionCreds)
+      .where(notInArray(extensionCreds.id, notExistsCreds));
   }
 }
 

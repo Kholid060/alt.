@@ -56,7 +56,6 @@ class BackgroundTabManager {
           id: this.activeTab.id!,
           url: this.activeTab.url!,
           title: this.activeTab.title!,
-          windowId: this.activeTab.windowId!,
         }
       : null;
     WebsocketService.instance.emitEvent('tabs:active', payload);

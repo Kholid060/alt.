@@ -5,36 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1715995631215,
-      "tag": "0000_condemned_northstar",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1716428635340,
-      "tag": "0001_late_eternals",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1716451960192,
-      "tag": "0002_hesitant_mandarin",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1716522737733,
-      "tag": "0003_flashy_lady_deathstrike",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1716522809796,
-      "tag": "0004_jittery_thor_girl",
+      "when": 1717052901017,
+      "tag": "0000_lazy_ben_urich",
       "breakpoints": true
     }
   ]

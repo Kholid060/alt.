@@ -5,7 +5,7 @@ export function debounce<T extends unknown[]>(
   fn: (...args: T) => void,
   delay: number,
 ) {
-  let timeoutId: number;
+  let timeoutId: ReturnType<typeof setTimeout>;
 
   return (...args: T) => {
     clearTimeout(timeoutId);
@@ -16,10 +16,10 @@ export function debounce<T extends unknown[]>(
 }
 
 export function createDebounce() {
-  let timeout: number = -1;
+  let timeout: null | ReturnType<typeof setTimeout> = null;
 
   return (callback: () => void, timeoutMs: number) => {
-    if (timeout > 0) {
+    if (timeout !== null) {
       clearTimeout(timeout);
       timeout = setTimeout(callback, timeoutMs);
       return;
@@ -35,7 +35,7 @@ export function throttle<T extends unknown[]>(
   limit = 1000,
 ): ThrottledFunction<T> {
   let lastExecutionTime = 0;
-  let timeout: number = -1;
+  let timeout: number | ReturnType<typeof setTimeout> = -1;
 
   return function throttledFunc(...args: T): void {
     const now = Date.now();

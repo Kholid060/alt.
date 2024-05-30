@@ -1,3 +1,4 @@
+/// <reference lib="dom" />
 import { ElectronMessagePortPolyfill } from '../interfaces/polyfill.interface';
 import { generateRandomString, isObject } from './helper';
 

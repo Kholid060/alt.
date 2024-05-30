@@ -6,7 +6,9 @@ export interface ElectronStore {
 }
 
 export const store = new Store<ElectronStore>({
-  encryptionKey: Buffer.from(import.meta.env.VITE_STORE_KEY),
+  encryptionKey: Buffer.from(
+    import.meta.env.VITE_STORE_KEY || 'some-random-string',
+  ),
   schema: {
     bypassCommands: {
       type: 'array',

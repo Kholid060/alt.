@@ -1,1 +1,1 @@
-export type CredentialType = 'oauth2' | 'basic' | 'apiKey';
+export type CredentialType = 'oauth2';

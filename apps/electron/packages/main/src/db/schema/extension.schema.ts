@@ -1,3 +1,4 @@
+import type { CredentialType } from '#packages/common/interface/credential.interface';
 import type {
   EXTENSION_PERMISSIONS,
   ExtensionCommand,
@@ -13,6 +14,7 @@ import {
   blob,
   uniqueIndex,
 } from 'drizzle-orm/sqlite-core';
+import { nanoid } from 'nanoid';
 
 export const extensions = sqliteTable('extensions', {
   id: text('id').primaryKey(),
@@ -54,6 +56,7 @@ export const extensionsRelations = relations(extensions, ({ many }) => ({
   configs: many(extensionConfigs),
   storages: many(extensionStorages),
   commands: many(extensionCommands),
+  credentials: many(extensionCreds),
 }));
 
 export const extensionCommands = sqliteTable('extension_commands', {
@@ -143,3 +146,29 @@ export const extensionsConfigRelations = relations(
     }),
   }),
 );
+
+export const extensionCreds = sqliteTable('extension_credentials', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => nanoid()),
+  name: text('name'),
+  extensionId: text('extension_id').notNull(),
+  createdAt: text('created_at')
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text('updated_at')
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+  providerId: text('provider_id').notNull(),
+  value: blob('value', { mode: 'buffer' }).notNull(),
+  type: text('type').notNull().$type<CredentialType>().default('oauth2'),
+});
+export type NewExtensionCredential = typeof extensionCreds.$inferInsert;
+export type SelectExtensionCredential = typeof extensionCreds.$inferSelect;
+
+export const extensionCredsRelations = relations(extensionCreds, ({ one }) => ({
+  extension: one(extensions, {
+    references: [extensions.id],
+    fields: [extensionCreds.extensionId],
+  }),
+}));
