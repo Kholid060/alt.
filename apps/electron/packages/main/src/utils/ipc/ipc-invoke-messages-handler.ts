@@ -13,6 +13,7 @@ import BrowserService from '/@/services/browser.service';
 import WorkflowService from '/@/services/workflow.service';
 import { isWSAckError } from '../extension/ExtensionBrowserElementHandle';
 import ExtensionService from '/@/services/extension.service';
+import OauthService from '/@/services/oauth.service';
 
 /** EXTENSION */
 IPCMain.handle('extension:import', async () => {
@@ -340,4 +341,9 @@ IPCMain.handle('crypto:create-hash', (_, algorithm, data, options) => {
       .update(data)
       .digest(options?.digest ?? 'hex'),
   );
+});
+
+/** OAUTH */
+IPCMain.handle('oauth:connect-account', async (_, credentialId) => {
+  await OauthService.instance.startAuth(credentialId);
 });

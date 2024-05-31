@@ -21,6 +21,7 @@ import {
   extensionCommands,
   extensionConfigs,
   extensionCreds,
+  extensionCredOauthTokens,
 } from '/@/db/schema/extension.schema';
 import type { ExtensionCommand, ExtensionManifest } from '@repo/extension-core';
 import {
@@ -47,6 +48,8 @@ import type {
   DatabaseExtensionCredentialsValueList,
   DatabaseExtensionCredentialsValueDetail,
   DatabaseExtensionCredentialsValueListOptions,
+  DatabaseExtensionCredOauthTokenInsertPayload,
+  DatabaseExtensionCredOauthTokenUpdatePayload,
 } from '/@/interface/database.interface';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
@@ -664,9 +667,14 @@ class DBExtensionService {
           id: extensions.id,
           title: extensions.title,
         },
+        tokenId: extensionCredOauthTokens.id,
       })
       .from(extensionCreds)
       .leftJoin(extensions, eq(extensions.id, extensionCreds.extensionId))
+      .leftJoin(
+        extensionCredOauthTokens,
+        eq(extensionCredOauthTokens.credentialId, extensionCreds.id),
+      )
       .$dynamic();
 
     if (filter?.extensionId) {
@@ -710,6 +718,13 @@ class DBExtensionService {
           columns: {
             id: true,
             title: true,
+            credentials: true,
+          },
+        },
+        oauthToken: {
+          columns: {
+            id: true,
+            expiresTimestamp: true,
           },
         },
       },
@@ -775,6 +790,69 @@ class DBExtensionService {
     await db
       .delete(extensionCreds)
       .where(notInArray(extensionCreds.id, notExistsCreds));
+  }
+
+  async insertCredentialOauthToken({
+    scope,
+    tokenType,
+    accessToken,
+    credentialId,
+    refreshToken,
+    expiresTimestamp,
+  }: DatabaseExtensionCredOauthTokenInsertPayload) {
+    const encryptedAccessToken = safeStorage.encryptString(accessToken);
+    const encryptedRefreshToken = refreshToken
+      ? safeStorage.encryptString(refreshToken)
+      : null;
+    const result = await this.database.insert(extensionCredOauthTokens).values({
+      scope,
+      tokenType,
+      credentialId,
+      expiresTimestamp,
+      accessToken: encryptedAccessToken,
+      refreshToken: encryptedRefreshToken,
+      updatedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+    });
+
+    emitDBChanges({
+      'database:get-extension-creds-value': [DATABASE_CHANGES_ALL_ARGS],
+      'database:get-extension-creds-value-detail': [DATABASE_CHANGES_ALL_ARGS],
+    });
+
+    return result.lastInsertRowid;
+  }
+
+  async updateCredentialOauthToken({
+    scope,
+    tokenType,
+    accessToken,
+    credentialId,
+    refreshToken,
+    expiresTimestamp,
+  }: DatabaseExtensionCredOauthTokenUpdatePayload) {
+    const encryptedAccessToken = accessToken
+      ? safeStorage.encryptString(accessToken)
+      : undefined;
+    const encryptedRefreshToken = refreshToken
+      ? safeStorage.encryptString(refreshToken)
+      : undefined;
+    const result = await this.database.update(extensionCredOauthTokens).set({
+      scope,
+      tokenType,
+      credentialId,
+      expiresTimestamp,
+      accessToken: encryptedAccessToken,
+      refreshToken: encryptedRefreshToken,
+      updatedAt: new Date().toISOString(),
+    });
+
+    emitDBChanges({
+      'database:get-extension-creds-value': [DATABASE_CHANGES_ALL_ARGS],
+      'database:get-extension-creds-value-detail': [DATABASE_CHANGES_ALL_ARGS],
+    });
+
+    return result.lastInsertRowid;
   }
 }
 

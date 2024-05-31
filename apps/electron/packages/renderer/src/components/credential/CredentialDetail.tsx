@@ -19,6 +19,7 @@ import { Loader2Icon } from 'lucide-react';
 import { useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '#packages/common/utils/helper';
+import { OAUTH_CALLBACK_URL } from '#packages/common/utils/constant/constant';
 
 type CredentialProps = Omit<
   React.FormHTMLAttributes<HTMLFormElement>,
@@ -86,10 +87,10 @@ function CredentialOAuth2({
               Callback URL
             </UiLabel>
             <UiInput
-              id="cred-callback-url"
               readOnly
+              id="cred-callback-url"
               onClick={(event) => (event.target as HTMLInputElement).select()}
-              value="http://localhost:40401/oauth2/callback"
+              value={OAUTH_CALLBACK_URL}
             />
           </div>
           <UiFormField

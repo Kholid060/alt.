@@ -9,6 +9,7 @@ import {
   ArrowDownAzIcon,
   ArrowUpAzIcon,
   EllipsisVerticalIcon,
+  LinkIcon,
   Loader2Icon,
   PlusIcon,
   SearchIcon,
@@ -30,6 +31,7 @@ import {
   UiList,
   UiListItem,
   UiSelect,
+  UiTooltip,
   useDialog,
   useToast,
 } from '@repo/ui';
@@ -48,7 +50,11 @@ import dayjs from '/@/lib/dayjs';
 
 type CredentialProviders = Record<
   string,
-  { items: Record<string, ExtensionCredential>; id: string; title: string }
+  {
+    items: Record<string, ExtensionCredential & { connected: boolean }>;
+    id: string;
+    title: string;
+  }
 >;
 
 interface CredentialDetailProps {
@@ -70,6 +76,8 @@ function AddCredentials({ providers }: { providers: CredentialProviders }) {
       const extension = providers[extensionId];
       for (const credentialId in extension.items) {
         const credential = extension.items[credentialId];
+        if (credential.connected) continue;
+
         listItems.push({
           icon: (
             <UiExtensionIcon
@@ -134,6 +142,11 @@ function AddCredentials({ providers }: { providers: CredentialProviders }) {
               />
             </div>
             <UiList items={credentials} onItemSelected={onItemSelected} />
+            {credentials.length === 0 && (
+              <p className="text-center text-muted-foreground">
+                No available apps
+              </p>
+            )}
           </>
         )}
       </UiDialog.Content>
@@ -190,6 +203,7 @@ type ExtensionCredentialListItem =
 function CredentialCard({
   onEdit,
   onDelete,
+  onConnect,
   providers,
   credential,
 }: {
@@ -197,6 +211,7 @@ function CredentialCard({
   credential: ExtensionCredentialListItem;
   onEdit?(item: ExtensionCredentialListItem): void;
   onDelete?(item: ExtensionCredentialListItem): void;
+  onConnect?(item: ExtensionCredentialListItem): void;
 }) {
   const provider =
     providers[credential.extension.id].items[credential.providerId];
@@ -212,7 +227,28 @@ function CredentialCard({
             icon={provider.providerIcon}
           />
         </div>
-        <UiButton variant="secondary">Connect</UiButton>
+        {credential.tokenId !== null ? (
+          <div className="flex items-center relative">
+            <div className="text-green-500 relative rounded-md bg-secondary cursor-default h-10 px-4 rounded-r-none flex items-center text-sm">
+              Connected
+              <hr className="h-6 w-px bg-border absolute right-0" />
+            </div>
+            <UiTooltip label="Reconnect account">
+              <UiButton
+                size="icon"
+                variant="secondary"
+                className="rounded-l-none"
+                onClick={() => onConnect?.(credential)}
+              >
+                <LinkIcon className="h-5 w-5" />
+              </UiButton>
+            </UiTooltip>
+          </div>
+        ) : (
+          <UiButton variant="secondary" onClick={() => onConnect?.(credential)}>
+            Connect
+          </UiButton>
+        )}
       </UiCardHeader>
       <UiCardContent
         onClick={() => onEdit?.(credential)}
@@ -277,8 +313,9 @@ function RouteCredentials() {
 
   const [credentials, setCredentials] = useState<{
     count: number;
+    isFetched: boolean;
     items: DatabaseExtensionCredentialsValueList;
-  }>({ count: 0, items: [] });
+  }>({ count: 0, items: [], isFetched: false });
   const [editCredential, setEditCredential] =
     useState<ExtensionCredentialListItem | null>(null);
 
@@ -292,35 +329,45 @@ function RouteCredentials() {
     by: 'createdAt',
   });
 
-  const credentialProviders = useDatabaseQuery(
+  const credentialProvidersQuery = useDatabaseQuery(
     'database:get-extension-creds',
     [],
-    {
-      transform(data) {
-        if (!data) return {};
-
-        const providers: CredentialProviders = {};
-        data.forEach((extension) => {
-          if (!extension.credentials || extension.credentials.length === 0)
-            return;
-
-          if (!providers[extension.id]) {
-            providers[extension.id] = {
-              items: {},
-              id: extension.id,
-              title: extension.title,
-            };
-          }
-
-          extension.credentials?.forEach((provider) => {
-            providers[extension.id].items[provider.providerId] = provider;
-          });
-        });
-
-        return providers;
-      },
-    },
   );
+
+  const credentialProviders = useMemo<CredentialProviders>(() => {
+    if (!credentialProvidersQuery.data || !credentials.isFetched) return {};
+
+    const inputtedCredential = new Set<string>();
+    credentials.items.forEach((item) => {
+      if (item.tokenId === null) return;
+
+      inputtedCredential.add(`${item.extension.id}:${item.providerId}`);
+    });
+
+    const providers: CredentialProviders = {};
+    credentialProvidersQuery.data.forEach((extension) => {
+      if (!extension.credentials || extension.credentials.length === 0) return;
+
+      if (!providers[extension.id]) {
+        providers[extension.id] = {
+          items: {},
+          id: extension.id,
+          title: extension.title,
+        };
+      }
+
+      extension.credentials?.forEach((provider) => {
+        providers[extension.id].items[provider.providerId] = {
+          ...provider,
+          connected: inputtedCredential.has(
+            `${extension.id}:${provider.providerId}`,
+          ),
+        };
+      });
+    });
+
+    return providers;
+  }, [credentialProvidersQuery.data, credentials]);
 
   async function onDeleteCredential(credential: ExtensionCredentialListItem) {
     try {
@@ -356,25 +403,51 @@ function RouteCredentials() {
       });
     }
   }
+  async function onConnectCredential(credential: ExtensionCredentialListItem) {
+    try {
+      const result = await preloadAPI.main.ipc.invoke(
+        'oauth:connect-account',
+        credential.id,
+      );
+      if (isIPCEventError(result)) {
+        toast({
+          title: 'Error!',
+          variant: 'destructive',
+          description: result.message,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: 'destructive',
+        title: 'Something went wrong',
+      });
+    }
+  }
 
-  useEffect(() => {
-    queryDatabase({
-      args: [
-        {
-          sort,
-          pagination,
-          filter: { name: search.trim() || undefined },
+  useEffect(
+    () =>
+      queryDatabase({
+        args: [
+          {
+            sort,
+            pagination,
+            filter: { name: search.trim() || undefined },
+          },
+        ],
+        name: 'database:get-extension-creds-value',
+        onData(data) {
+          setCredentials({
+            ...data,
+            isFetched: true,
+          });
         },
-      ],
-      name: 'database:get-extension-creds-value',
-      onData(data) {
-        setCredentials(data);
-      },
-      onError(message) {
-        console.error(message);
-      },
-    });
-  }, [queryDatabase, search, sort, pagination]);
+        onError(message) {
+          console.error(message);
+        },
+      }),
+    [queryDatabase, search, sort, pagination],
+  );
 
   return (
     <div className="p-8 container">
@@ -423,7 +496,7 @@ function RouteCredentials() {
         </div>
         <div className="flex-grow"></div>
         <UiListProvider>
-          <AddCredentials providers={credentialProviders.data ?? {}} />
+          <AddCredentials providers={credentialProviders} />
         </UiListProvider>
       </div>
       <div className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
@@ -433,7 +506,8 @@ function RouteCredentials() {
             credential={cred}
             onEdit={setEditCredential}
             onDelete={onDeleteCredential}
-            providers={credentialProviders.data ?? {}}
+            onConnect={onConnectCredential}
+            providers={credentialProviders}
           />
         ))}
       </div>
@@ -448,8 +522,8 @@ function RouteCredentials() {
       {editCredential && (
         <EditCredential
           credential={editCredential}
+          providers={credentialProviders}
           onClose={() => setEditCredential(null)}
-          providers={credentialProviders.data ?? {}}
         />
       )}
     </div>

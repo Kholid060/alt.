@@ -257,7 +257,8 @@ class ExtensionLoader {
     const id = crypto
       .createHash('sha256')
       .update(normalizeManifestPath)
-      .digest('hex');
+      .digest('hex')
+      .slice(0, 24);
     const insertCommands: NewExtensionCommand[] = manifest.data.commands.map(
       (command) => ({
         id: `${id}:${command.name}`,
@@ -301,6 +302,7 @@ class ExtensionLoader {
     const extensionManifest = await extractExtManifest(manifestFilePath);
 
     let updateExtensionPayload: Partial<NewExtension> = {
+      updatedAt: new Date().toISOString(),
       isError: extensionManifest.isError,
       errorMessage: extensionManifest.isError
         ? extensionManifest.message
@@ -328,7 +330,8 @@ class ExtensionLoader {
 
     await DBService.instance.db
       .update(extensionsSchema)
-      .set(updateExtensionPayload);
+      .set(updateExtensionPayload)
+      .where(eq(extensionsSchema.id, extension.id));
 
     return true;
   }

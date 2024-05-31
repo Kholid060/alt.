@@ -82,7 +82,9 @@ export const extensionCommands = sqliteTable('extension_commands', {
     .$default(() => false),
   isFallback: integer('is_fallback', { mode: 'boolean' }),
   alias: text('alias'),
-  extensionId: text('extension_id').notNull(),
+  extensionId: text('extension_id')
+    .notNull()
+    .references(() => extensions.id, { onDelete: 'cascade' }),
   dismissAlert: integer('dismiss_alert', { mode: 'boolean' }),
 });
 export type NewExtensionCommand = typeof extensionCommands.$inferInsert;
@@ -103,7 +105,9 @@ export const extensionStorages = sqliteTable('extension_storages', {
   updatedAt: text('updated_at')
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
-  extensionId: text('extension_id').notNull(),
+  extensionId: text('extension_id')
+    .notNull()
+    .references(() => extensions.id, { onDelete: 'cascade' }),
   key: text('key').notNull(),
   value: blob('value', { mode: 'buffer' }).notNull(),
 });
@@ -124,7 +128,9 @@ export const extensionConfigs = sqliteTable(
   'extension_configs',
   {
     id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-    extensionId: text('extension_id').notNull(),
+    extensionId: text('extension_id')
+      .notNull()
+      .references(() => extensions.id, { onDelete: 'cascade' }),
     configId: text('config_id').unique().notNull(),
     value: text('value', { mode: 'json' })
       .notNull()
@@ -152,7 +158,9 @@ export const extensionCreds = sqliteTable('extension_credentials', {
     .primaryKey()
     .$defaultFn(() => nanoid()),
   name: text('name'),
-  extensionId: text('extension_id').notNull(),
+  extensionId: text('extension_id')
+    .notNull()
+    .references(() => extensions.id, { onDelete: 'cascade' }),
   createdAt: text('created_at')
     .notNull()
     .default(sql`CURRENT_TIMESTAMP`),
@@ -171,4 +179,33 @@ export const extensionCredsRelations = relations(extensionCreds, ({ one }) => ({
     references: [extensions.id],
     fields: [extensionCreds.extensionId],
   }),
+  oauthToken: one(extensionCredOauthTokens, {
+    fields: [extensionCreds.id],
+    references: [extensionCredOauthTokens.credentialId],
+  }),
 }));
+
+export const extensionCredOauthTokens = sqliteTable(
+  'extension_credential_oauth_tokens',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    credentialId: text('credential_id')
+      .notNull()
+      .references(() => extensionCreds.id, { onDelete: 'cascade' }),
+    expiresTimestamp: integer('expires_timestamp').notNull(),
+    createdAt: text('created_at')
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: text('updated_at')
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    scope: text('scope'),
+    tokenType: text('token_type'),
+    refreshToken: blob('refresh_token', { mode: 'buffer' }),
+    accessToken: blob('access_token', { mode: 'buffer' }).notNull(),
+  },
+);
+export type NewExtensionCredentialOauthTokens =
+  typeof extensionCredOauthTokens.$inferInsert;
+export type SelectextensionCredentialOauthTokens =
+  typeof extensionCredOauthTokens.$inferSelect;

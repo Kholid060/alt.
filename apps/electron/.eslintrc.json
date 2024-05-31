@@ -5,6 +5,7 @@
     "node": true,
     "browser": false
   },
+  "plugins": ["drizzle"],
   "extends": [
     "@repo/eslint-config/base.js"
   ],

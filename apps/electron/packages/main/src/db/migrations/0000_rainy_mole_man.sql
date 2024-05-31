@@ -16,14 +16,29 @@ CREATE TABLE `extension_commands` (
 	`is_fallback` integer,
 	`alias` text,
 	`extension_id` text NOT NULL,
-	`dismiss_alert` integer
+	`dismiss_alert` integer,
+	FOREIGN KEY (`extension_id`) REFERENCES `extensions`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `extension_configs` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`extension_id` text NOT NULL,
 	`config_id` text NOT NULL,
-	`value` text NOT NULL
+	`value` text NOT NULL,
+	FOREIGN KEY (`extension_id`) REFERENCES `extensions`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
+CREATE TABLE `extension_credential_oauth_tokens` (
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`credential_id` text NOT NULL,
+	`expires_timestamp` integer NOT NULL,
+	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	`updated_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	`scope` text,
+	`token_type` text,
+	`refresh_token` blob,
+	`access_token` blob NOT NULL,
+	FOREIGN KEY (`credential_id`) REFERENCES `extension_credentials`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `extension_credentials` (
@@ -34,7 +49,8 @@ CREATE TABLE `extension_credentials` (
 	`updated_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	`provider_id` text NOT NULL,
 	`value` blob NOT NULL,
-	`type` text DEFAULT 'oauth2' NOT NULL
+	`type` text DEFAULT 'oauth2' NOT NULL,
+	FOREIGN KEY (`extension_id`) REFERENCES `extensions`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `extension_storages` (
@@ -43,7 +59,8 @@ CREATE TABLE `extension_storages` (
 	`updated_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	`extension_id` text NOT NULL,
 	`key` text NOT NULL,
-	`value` blob NOT NULL
+	`value` blob NOT NULL,
+	FOREIGN KEY (`extension_id`) REFERENCES `extensions`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `extensions` (

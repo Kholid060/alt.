@@ -143,21 +143,23 @@ function RouteWorkflowHistory() {
       });
   }
 
-  useEffect(() => {
-    queryDatabase({
-      name: 'database:get-workflow-history-list',
-      args: [
-        { filter: search ? { name: search } : undefined, pagination, sort },
-      ],
-      autoRefreshOnChange: false,
-      onData(data) {
-        setWorkflowHistory(data);
-      },
-      onError(message) {
-        console.error(message);
-      },
-    });
-  }, [queryDatabase, search, pagination, sort]);
+  useEffect(
+    () =>
+      queryDatabase({
+        name: 'database:get-workflow-history-list',
+        args: [
+          { filter: search ? { name: search } : undefined, pagination, sort },
+        ],
+        autoRefreshOnChange: false,
+        onData(data) {
+          setWorkflowHistory(data);
+        },
+        onError(message) {
+          console.error(message);
+        },
+      }),
+    [queryDatabase, search, pagination, sort],
+  );
 
   return (
     <div className="p-8 container">

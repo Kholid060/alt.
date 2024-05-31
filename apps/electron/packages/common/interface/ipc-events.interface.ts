@@ -107,6 +107,10 @@ export interface IPCBrowserEvents {
   ) => ExtensionBrowserTabContext;
 }
 
+export interface IPCOAuthEvents {
+  'oauth:connect-account': (credentalId: string) => void;
+}
+
 export interface IPCExtensionEvents {
   'extension:is-config-inputted': (
     extensionId: string,
@@ -167,6 +171,7 @@ export interface IPCCryptoEvents {
 export type IPCEvents = IPCShellEvents &
   IPCAppEvents &
   IPCAppsEvents &
+  IPCOAuthEvents &
   DatabaseEvents &
   IPCDialogEvents &
   IPCCryptoEvents &

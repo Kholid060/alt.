@@ -30,3 +30,6 @@ export const DATABASE_CHANGES_ALL_ARGS = '$database-all-args$' as const;
 export const MESSAGE_PORT_CHANNEL_IDS = {
   sharedWithCommand: 'shared-with-command',
 } as const;
+
+export const OAUTH_SERVER_PORT = 4568;
+export const OAUTH_CALLBACK_URL = `http://localhost:${OAUTH_SERVER_PORT}/oauth/callback`;

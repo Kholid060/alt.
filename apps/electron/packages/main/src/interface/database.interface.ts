@@ -3,6 +3,7 @@ import type {
   NewExtensionCommand,
   NewExtensionConfig,
   NewExtensionCredential,
+  NewExtensionCredentialOauthTokens,
   SelectExtension,
   SelectExtensionConfig,
   SelectExtensionCredential,
@@ -14,6 +15,7 @@ import type {
   SelectWorkflow,
   SelectWorkflowHistory,
 } from '../db/schema/workflow.schema';
+import type { ExtensionCredential } from '@repo/extension-core/src/client/manifest/manifest-credential';
 
 export type DatabaseExtensionCommand = SelectExtesionCommand;
 
@@ -136,6 +138,17 @@ export type DatabaseExtensionConfigInsertPayload = Pick<
   'value' | 'extensionId' | 'configId'
 >;
 
+export type DatabaseExtensionCredOauthTokenInsertPayload = Omit<
+  NewExtensionCredentialOauthTokens,
+  'id' | 'createdAt' | 'updatedAt' | 'refreshToken' | 'accessToken'
+> & { refreshToken?: string; accessToken: string };
+export type DatabaseExtensionCredOauthTokenUpdatePayload = Partial<
+  Omit<
+    NewExtensionCredentialOauthTokens,
+    'id' | 'createdAt' | 'updatedAt' | 'refreshToken' | 'accessToken'
+  > & { refreshToken: string; accessToken: string }
+>;
+
 export interface DatabaseGetExtensionConfig {
   configId: string;
   commandId?: string;
@@ -163,11 +176,15 @@ export interface DatabaseExtensionCredentialsValueListOptions {
 export type DatabaseExtensionCredentialsValueList = (Pick<
   SelectExtensionCredential,
   'id' | 'name' | 'type' | 'updatedAt' | 'createdAt' | 'providerId'
-> & { extension: { title: string; id: string } })[];
+> & { extension: { title: string; id: string }; tokenId: number | null })[];
 export type DatabaseExtensionCredentialsValueDetail = Omit<
   SelectExtensionCredential,
   'value'
-> & { value: Record<string, string>; extension: { title: string; id: string } };
+> & {
+  value: Record<string, string>;
+  oauthToken: null | { id: number; expiresTimestamp: number };
+  extension: { title: string; id: string; credentials: ExtensionCredential[] };
+};
 
 export type DatabaseWorkfowListQueryOptions = 'commands';
 
