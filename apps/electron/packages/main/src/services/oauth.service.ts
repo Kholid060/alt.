@@ -91,10 +91,10 @@ class OauthServiceServer extends EventEmitter<OauthServiceServerEvents> {
 }
 
 const Oauth2ResponseSchema = z.object({
-  scope: z.string(),
-  expires_in: z.number(),
   token_type: z.string(),
   access_token: z.string(),
+  scope: z.string().default(''),
+  expires_in: z.number().default(0),
   refresh_token: z.string().optional(),
 });
 type Oauth2Response = z.infer<typeof Oauth2ResponseSchema>;
@@ -156,6 +156,9 @@ class Oauth2Provider implements OAuth2ProviderOptions {
       `${this.provider.auth.tokenUrl}?${searchParams.toString()}`,
       {
         method: 'POST',
+        headers: {
+          Accept: 'application/json',
+        },
       },
     );
     if (!response.ok) {

@@ -25,7 +25,21 @@ export default {
         scope: 'profile',
         authorizeUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
       },
-    }
+    },
+    {
+      providerId: 'github',
+      providerName: 'GitHub',
+      providerIcon: 'github',
+      documentationUrl: 'https://github.com',
+      auth: {
+        type: 'oauth2',
+        grantType: 'code',
+        scope: 'user',
+        tokenUrl: 'https://github.com/login/oauth/access_token',
+        authorizeUrl: 'https://github.com/login/oauth/authorize',
+        extraParams: { prompt: 'consent', access_type: 'offline' },
+      },
+    },
   ],
   config: [
     { name: 'number', type: 'input:number', title: 'Input number', placeholder: 'Number placeholder', required: true },

@@ -124,7 +124,7 @@ export class BetterMessagePortAsync<MessagePortEvents> {
     ...args: ExtractParams<MessagePortEvents, K>
   ): Promise<ExtractReturnType<MessagePortEvents, K>> {
     return new Promise((resolve, reject) => {
-      const messageId = `promise::${generateRandomString(8)}`;
+      const messageId = `promise::${generateRandomString(5)}`;
 
       const timeout = setTimeout(() => {
         reject(new Error('TIMEOUT'));

@@ -958,6 +958,41 @@ class DBExtensionService {
       refreshToken: refreshToken && safeStorage.decryptString(refreshToken),
     };
   }
+
+  async deleteCredentialOAuthToken(
+    tokenId: number | { extensionId: string; providerId: string },
+  ) {
+    if (typeof tokenId === 'number') {
+      await this.database
+        .delete(extensionCredOauthTokens)
+        .where(eq(extensionCredOauthTokens, tokenId));
+      return;
+    }
+
+    const credential = await this.database.query.extensionCreds.findFirst({
+      columns: {
+        id: true,
+      },
+      with: {
+        oauthToken: {
+          columns: {
+            id: true,
+          },
+        },
+      },
+      where(fields, operators) {
+        return operators.and(
+          operators.eq(fields.extensionId, tokenId.extensionId),
+          operators.eq(fields.providerId, tokenId.providerId),
+        );
+      },
+    });
+    if (!credential?.oauthToken) return;
+
+    await this.database
+      .delete(extensionCredOauthTokens)
+      .where(eq(extensionCredOauthTokens, credential.oauthToken.id));
+  }
 }
 
 export default DBExtensionService;

@@ -343,9 +343,9 @@ declare namespace ExtensionAPI.oauth {
     accessToken: string;
   }
 
-  export function removeToken(providerId: string): Promise<void>;
+  export function removeTokens(providerId: string): Promise<void>;
 
-  export function getToken(providerId: string): Promise<OAuthToken | null>;
+  export function getTokens(providerId: string): Promise<OAuthToken | null>;
 
   export function refreshAccessToken(providerId: string): Promise<OAuthToken>;
 

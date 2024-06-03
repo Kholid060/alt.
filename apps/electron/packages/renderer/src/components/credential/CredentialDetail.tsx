@@ -212,7 +212,8 @@ function CredentialDetail({
         {credential.providerName}
       </h2>
       <p className="text-muted-foreground text-sm line-clamp-2">
-        {extension.title} • {credential.description}
+        {extension.title} extension{' '}
+        {credential.description ? `• ${credential.description}` : ''}
       </p>
       <CredentialOAuth2
         className="mt-3"

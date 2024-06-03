@@ -1,7 +1,23 @@
+import fs from 'fs-extra';
 import { BrowserWindow } from 'electron';
 import { fileURLToPath } from 'node:url';
 import type WindowBase from './WindowBase';
 import WindowUtils from './WindowUtils';
+import path from 'node:path';
+import { sleep } from '@repo/shared';
+
+const BASE_DIR = fileURLToPath(new URL('./../../shared/dist', import.meta.url));
+
+const mainJSPath = path.join(BASE_DIR, 'main.js');
+async function checkMainJSFile(browserWindow: BrowserWindow) {
+  if (fs.existsSync(mainJSPath)) {
+    browserWindow.webContents.reload();
+    return;
+  }
+
+  await sleep(1000);
+  checkMainJSFile(browserWindow);
+}
 
 class WindowSharedProcess extends WindowUtils implements WindowBase {
   private static _instance: WindowSharedProcess | null = null;
@@ -38,9 +54,10 @@ class WindowSharedProcess extends WindowUtils implements WindowBase {
       browserWindow.webContents.openDevTools({ mode: 'detach' });
     });
 
-    await browserWindow.loadFile(
-      fileURLToPath(new URL('./../../shared/dist/index.html', import.meta.url)),
-    );
+    const htmlFilePath = path.join(BASE_DIR, 'index.html');
+    await browserWindow.loadFile(htmlFilePath);
+
+    if (import.meta.env.DEV) checkMainJSFile(browserWindow);
 
     return browserWindow;
   }

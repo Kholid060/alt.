@@ -32,4 +32,4 @@ export const MESSAGE_PORT_CHANNEL_IDS = {
 } as const;
 
 export const OAUTH_SERVER_PORT = 4568;
-export const OAUTH_CALLBACK_URL = `http://localhost:${OAUTH_SERVER_PORT}/oauth/callback`;
+export const OAUTH_CALLBACK_URL = `http://localhost:${OAUTH_SERVER_PORT}/oauth2/callback`;

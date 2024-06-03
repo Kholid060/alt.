@@ -73,7 +73,7 @@ ExtensionIPCEvent.instance.on(
 );
 
 ExtensionIPCEvent.instance.on(
-  'oauth.getToken',
+  'oauth.getTokens',
   async ({ extensionId }, providerId) => {
     const token =
       await DBService.instance.extension.getCredentialValueWithToken({
@@ -93,5 +93,15 @@ ExtensionIPCEvent.instance.on(
       scope: token.oauthToken.scope ?? '',
       accessToken: token.oauthToken.accessToken,
     };
+  },
+);
+
+ExtensionIPCEvent.instance.on(
+  'oauth.removeTokens',
+  ({ extensionId }, providerId) => {
+    return DBService.instance.extension.deleteCredentialOAuthToken({
+      extensionId,
+      providerId,
+    });
   },
 );
