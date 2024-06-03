@@ -157,7 +157,7 @@ export const extensionCreds = sqliteTable('extension_credentials', {
   id: text('id')
     .primaryKey()
     .$defaultFn(() => nanoid()),
-  name: text('name'),
+  name: text('name').notNull(),
   extensionId: text('extension_id')
     .notNull()
     .references(() => extensions.id, { onDelete: 'cascade' }),

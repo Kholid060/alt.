@@ -373,7 +373,7 @@ function CommandInput() {
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
-      className="flex items-center px-4 h-12 focus:outline-none"
+      className="flex items-center px-4 h-14 focus:outline-none"
       tabIndex={-1}
       onKeyDown={onKeyDown}
     >

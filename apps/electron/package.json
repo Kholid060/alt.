@@ -22,7 +22,7 @@
     "typecheck": "yarn run typecheck:main && yarn run typecheck:shared && yarn run typecheck:preload && yarn run typecheck:renderer",
     "postinstall": "cross-env ELECTRON_RUN_AS_NODE=1 electron scripts/update-electron-vendors.js && electron-builder install-app-deps",
     "format": "npx prettier --write \"**/*.{js,mjs,cjs,ts,mts,cts,tsx,json}\"",
-    "db:generate": "drizzle-kit generate:sqlite"
+    "db:generate": "drizzle-kit generate --config \"./drizzle.config.ts\""
   },
   "devDependencies": {
     "@electron/rebuild": "^3.6.0",
@@ -42,7 +42,7 @@
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.17",
     "cross-env": "7.0.3",
-    "drizzle-kit": "^0.20.14",
+    "drizzle-kit": "^0.22.1",
     "electron": "^30.0.9",
     "electron-builder": "^24.13.3",
     "eslint": "8.56.0",
@@ -71,10 +71,7 @@
   "dependencies": {
     "@codemirror/lang-javascript": "^6.2.2",
     "@codemirror/lang-json": "^6.0.1",
-    "@floating-ui/react": "^0.26.12",
     "@hookform/resolvers": "^3.3.4",
-    "@n8n_io/riot-tmpl": "^4.0.1",
-    "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@repo/extension": "workspace:*",
     "@repo/extension-core": "workspace:*",
     "@repo/shared": "workspace:*",
@@ -86,7 +83,7 @@
     "clsx": "^2.1.0",
     "dayjs": "^1.11.10",
     "dot-prop": "^8.0.2",
-    "drizzle-orm": "^0.30.8",
+    "drizzle-orm": "^0.31.0",
     "electron-log": "^5.1.1",
     "electron-store": "^8.1.0",
     "electron-updater": "6.1.7",
@@ -97,7 +94,6 @@
     "immer": "^10.0.4",
     "lodash-es": "^4.17.21",
     "lucide-react": "^0.367.0",
-    "mitt": "^3.0.1",
     "nanoid": "^5.0.6",
     "picomatch": "^4.0.2",
     "quickjs-emscripten": "^0.29.1",

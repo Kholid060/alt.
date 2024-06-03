@@ -68,7 +68,15 @@ class IPCRenderer {
       ...args: Parameters<IPCRendererInvokeEvent[T]>
     ) => ReturnType<IPCRendererInvokeEvent[T]>,
   ) {
+    if (this.invokeHandlers.has(name)) {
+      console.warn(`"${name}" already has handler`);
+    }
+
     this.invokeHandlers.set(name, callback);
+
+    return () => {
+      this.invokeHandlers.delete(name);
+    };
   }
 
   static invoke<

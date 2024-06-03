@@ -16,12 +16,13 @@ export default {
       providerName: 'Google Drive',
       description: 'Auth google drive',
       providerIcon: 'google-drive',
+      documentationUrl: 'https://google.com',
       auth: {
         type: 'oauth2',
         grantType: 'code',
-        extraParams: { query: 'query1' },
+        extraParams: { prompt: 'consent', access_type: 'offline' },
         tokenUrl: 'https://oauth2.googleapis.com/token',
-        scope: 'https://www.googleapis.com/auth/drive.readonly',
+        scope: 'profile',
         authorizeUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
       },
     }

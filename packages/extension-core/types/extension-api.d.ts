@@ -335,4 +335,23 @@ declare namespace ExtensionAPI.mainWindow {
   export function close(): Promise<void>;
 }
 
+declare namespace ExtensionAPI.oauth {
+  interface OAuthToken {
+    scope: string;
+    expiresIn: number;
+    isExpired: boolean;
+    accessToken: string;
+  }
+
+  export function removeToken(providerId: string): Promise<void>;
+
+  export function getToken(providerId: string): Promise<OAuthToken | null>;
+
+  export function refreshAccessToken(providerId: string): Promise<OAuthToken>;
+
+  export function authorizationRequest(
+    providerId: string,
+  ): Promise<OAuthToken | null>;
+}
+
 export default ExtensionAPI;

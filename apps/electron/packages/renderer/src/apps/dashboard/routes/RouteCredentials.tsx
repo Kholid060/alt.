@@ -229,23 +229,27 @@ function CredentialCard({
         </div>
         {credential.tokenId !== null ? (
           <div className="flex items-center relative">
-            <div className="text-green-500 relative rounded-md bg-secondary cursor-default h-10 px-4 rounded-r-none flex items-center text-sm">
+            <div className="text-green-500 relative rounded-md bg-secondary cursor-default h-9 px-3 rounded-r-none flex items-center text-sm">
               Connected
               <hr className="h-6 w-px bg-border absolute right-0" />
             </div>
             <UiTooltip label="Reconnect account">
               <UiButton
-                size="icon"
+                size="icon-sm"
                 variant="secondary"
                 className="rounded-l-none"
                 onClick={() => onConnect?.(credential)}
               >
-                <LinkIcon className="h-5 w-5" />
+                <LinkIcon className="h-4 w-4" />
               </UiButton>
             </UiTooltip>
           </div>
         ) : (
-          <UiButton variant="secondary" onClick={() => onConnect?.(credential)}>
+          <UiButton
+            variant="secondary"
+            size="sm"
+            onClick={() => onConnect?.(credential)}
+          >
             Connect
           </UiButton>
         )}
@@ -269,9 +273,9 @@ function CredentialCard({
         </div>
         <UiDropdownMenu>
           <UiDropdownMenuTrigger asChild>
-            <UiButton variant="ghost" size="icon-sm">
+            <button className="focus:outline-none" tabIndex={-1}>
               <EllipsisVerticalIcon className="h-5 w-5" />
-            </UiButton>
+            </button>
           </UiDropdownMenuTrigger>
           <UiDropdownMenuContent>
             <UiDropdownMenuItem onClick={() => onEdit?.(credential)}>

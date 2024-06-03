@@ -22,6 +22,7 @@ import type { WorkflowRunPayload } from './workflow.interface';
 import type Electron from 'electron';
 import type { MessagePortChannelIds } from './message-port-events.interface';
 import type { WorkflowRunnerRunPayload } from './workflow-runner.interace';
+import type { ExtensionCredential } from '@repo/extension-core/src/client/manifest/manifest-credential';
 
 export interface IPCRendererInvokeEventPayload {
   name: string;
@@ -250,4 +251,15 @@ export type IPCRendererSendEvent = IPCSendEventRendererToRenderer &
   IPCSendEventMainToRenderer &
   IPCPostMessageEventMainToRenderer;
 
-export type IPCRendererInvokeEvent = IPCInvokeEventMainToRenderer;
+export type IPCRendererInvokeEvent = IPCInvokeEventMainToRenderer & {
+  'command-window:show-oauth-overlay': (
+    credential: ExtensionCredential,
+    detail: {
+      commandId: string;
+      hasValue: boolean;
+      extensionId: string;
+      extensionTitle: string;
+      credentialName: string;
+    },
+  ) => Promise<boolean>;
+};

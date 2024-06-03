@@ -24,6 +24,15 @@ async function commandExecutionFail() {
     console.error(error);
   }
 }
+function authorizeCredential() {
+  return _extension.oauth.authorizationRequest('google-drive').then((token) => {
+    if (!token) {
+      throw new Error("Credential hasn't been inputted");
+    }
+
+    console.log(token);
+  });
+}
 
 export default async function CommandMain(context: CommandLaunchContext) {
   console.log(JSON.stringify(context));
@@ -35,9 +44,11 @@ export default async function CommandMain(context: CommandLaunchContext) {
   // await commandExecutionFail();
   // await commandExecution();
 
-  await _extension.runtime.command.updateDetail({
-    subtitle: 'Hello worldo!!!',
-  });
+  // await _extension.runtime.command.updateDetail({
+  //   subtitle: 'Hello worldo!!!',
+  // });
+
+  await authorizeCredential();
 
   // await _extension.storage.set('test', 'hello world');
   // await _extension.shell.showItemInFolder(filePath);

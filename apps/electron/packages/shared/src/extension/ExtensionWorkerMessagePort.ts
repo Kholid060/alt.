@@ -5,15 +5,13 @@ import type {
 } from '#packages/common/interface/extension.interface';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { isObject } from '@repo/shared';
-import { nanoid } from 'nanoid/non-secure';
-
-const EVENT_TIMEOUT_MS = 10000; // 10 seconds;
 
 class ExtensionWorkerMessagePort {
   private messages: Map<
     string,
     { resolve(value: unknown): void; reject(reason?: unknown): void }
   > = new Map();
+  private _messageId = 0;
 
   commandId: string;
   extensionKey: string;
@@ -64,38 +62,33 @@ class ExtensionWorkerMessagePort {
     this.messages.delete(data.messageId);
   }
 
+  private get messageId() {
+    this._messageId += 1;
+
+    return this._messageId;
+  }
+
   sendMessage<K extends keyof IPCUserExtensionEventsMap>(
     name: K,
     ...args: Parameters<IPCUserExtensionEventsMap[K]>
   ) {
-    return new Promise((resolve, reject) => {
-      const messageId = nanoid(5);
+    const messageId = this.messageId.toString();
+    const { promise, reject, resolve } = Promise.withResolvers();
 
-      const timeout = setTimeout(() => {
-        reject(new Error('TIMEOUT'));
-        this.messages.delete(messageId);
-      }, EVENT_TIMEOUT_MS);
-
-      this.messages.set(messageId, {
-        resolve(value) {
-          clearTimeout(timeout);
-          resolve(value);
-        },
-        reject(reason) {
-          clearTimeout(timeout);
-          reject(reason);
-        },
-      });
-
-      this.messagePort.postMessage({
-        name,
-        args,
-        messageId,
-        key: this.extensionKey,
-        commandId: this.commandId,
-        browserCtx: this.browserCtx,
-      } as Omit<ExtensionAPIMessagePayload, 'sender'>);
+    this.messages.set(messageId, {
+      reject,
+      resolve,
     });
+    this.messagePort.postMessage({
+      name,
+      args,
+      messageId,
+      key: this.extensionKey,
+      commandId: this.commandId,
+      browserCtx: this.browserCtx,
+    } as Omit<ExtensionAPIMessagePayload, 'sender'>);
+
+    return promise;
   }
 
   destroy() {

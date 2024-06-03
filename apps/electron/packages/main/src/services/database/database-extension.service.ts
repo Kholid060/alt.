@@ -711,7 +711,33 @@ class DBExtensionService {
     return { items, count: itemsLength };
   }
 
-  async getCredentialValueDetail(credentialId: string, maskSecret?: boolean) {
+  async getCredentialValue(
+    credentialId: string | { extensionId: string; providerId: string },
+  ) {
+    const result = await this.database.query.extensionCreds.findFirst({
+      columns: {
+        id: true,
+        name: true,
+      },
+      where(fields, operators) {
+        if (typeof credentialId === 'string') {
+          return operators.eq(fields.id, credentialId);
+        }
+
+        return operators.and(
+          operators.eq(fields.extensionId, credentialId.extensionId),
+          operators.eq(fields.providerId, credentialId.providerId),
+        );
+      },
+    });
+
+    return result ?? null;
+  }
+
+  async getCredentialValueDetail(
+    credentialId: string | { extensionId: string; providerId: string },
+    maskSecret?: boolean,
+  ) {
     const result = await this.database.query.extensionCreds.findFirst({
       with: {
         extension: {
@@ -729,7 +755,14 @@ class DBExtensionService {
         },
       },
       where(fields, operators) {
-        return operators.eq(fields.id, credentialId);
+        if (typeof credentialId === 'string') {
+          return operators.eq(fields.id, credentialId);
+        }
+
+        return operators.and(
+          operators.eq(fields.extensionId, credentialId.extensionId),
+          operators.eq(fields.providerId, credentialId.providerId),
+        );
       },
     });
     if (!result) return null;
@@ -747,6 +780,52 @@ class DBExtensionService {
     }
 
     return finalResult;
+  }
+
+  async getCredentialValueWithToken(
+    credentialId: string | { extensionId: string; providerId: string },
+  ) {
+    const whereFilter =
+      typeof credentialId === 'string'
+        ? eq(extensionCreds.id, credentialId)
+        : and(
+            eq(extensionCreds.extensionId, credentialId.extensionId),
+            eq(extensionCreds.providerId, credentialId.providerId),
+          );
+
+    const [result] = await this.database
+      .select({
+        id: extensionCreds.id,
+        name: extensionCreds.name,
+        providerId: extensionCreds.providerId,
+        extensionId: extensionCreds.extensionId,
+        oauthToken: {
+          id: extensionCredOauthTokens.id,
+          scope: extensionCredOauthTokens.scope,
+          accessToken: extensionCredOauthTokens.accessToken,
+          refreshToken: extensionCredOauthTokens.refreshToken,
+          expiresTimestamp: extensionCredOauthTokens.expiresTimestamp,
+        },
+      })
+      .from(extensionCreds)
+      .where(whereFilter)
+      .leftJoin(
+        extensionCredOauthTokens,
+        eq(extensionCreds.id, extensionCredOauthTokens.credentialId),
+      )
+      .limit(1);
+
+    if (!result || !result.oauthToken) return null;
+
+    const { accessToken, refreshToken } = result.oauthToken;
+    return {
+      ...result,
+      oauthToken: {
+        ...result.oauthToken,
+        accessToken: safeStorage.decryptString(accessToken),
+        refreshToken: refreshToken && safeStorage.decryptString(refreshToken),
+      },
+    };
   }
 
   async deleteCredentials(ids: string | string[]) {
@@ -853,6 +932,31 @@ class DBExtensionService {
     });
 
     return result.lastInsertRowid;
+  }
+
+  async getCredentialOAuthToken(id: number) {
+    const queryResult =
+      await this.database.query.extensionCredOauthTokens.findFirst({
+        columns: {
+          id: true,
+          scope: true,
+          accessToken: true,
+          refreshToken: true,
+          credentialId: true,
+          expiresTimestamp: true,
+        },
+        where(fields, operators) {
+          return operators.eq(fields.id, id);
+        },
+      });
+    if (!queryResult) return null;
+
+    const { accessToken, refreshToken } = queryResult;
+    return {
+      ...queryResult,
+      accessToken: safeStorage.decryptString(accessToken),
+      refreshToken: refreshToken && safeStorage.decryptString(refreshToken),
+    };
   }
 }
 

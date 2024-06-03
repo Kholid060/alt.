@@ -6,14 +6,16 @@ import type { IncomingMessage, Server, ServerResponse } from 'node:http';
 import { createServer } from 'node:http';
 import DBService from './database/database.service';
 import { debugLog } from '#packages/common/utils/helper';
-import { CustomError } from '#packages/common/errors/custom-errors';
+import {
+  CustomError,
+  ExtensionError,
+} from '#packages/common/errors/custom-errors';
 import { z } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 import { nanoid } from 'nanoid/non-secure';
 import EventEmitter from 'eventemitter3';
-import { safeStorage, shell } from 'electron';
+import { shell } from 'electron';
 import { logger } from '../lib/log';
-import { parseJSON } from '@repo/shared';
 import type { ExtensionCredential } from '@repo/extension-core/src/client/manifest/manifest-credential';
 
 const SERVER_TIMEOUT_MS = 300_000; // 5 Minutes
@@ -95,45 +97,42 @@ const Oauth2ResponseSchema = z.object({
   access_token: z.string(),
   refresh_token: z.string().optional(),
 });
+type Oauth2Response = z.infer<typeof Oauth2ResponseSchema>;
+
 interface OAuth2ProviderOptions {
   clientId: string;
   callbackURL: string;
   clientSecret: string;
   provider: ExtensionCredential;
-  resolver?: PromiseWithResolvers<void>;
+  resolver?: PromiseWithResolvers<Oauth2Response>;
   credential: { id: string; oauthTokenId: number | null };
 }
 class Oauth2Provider implements OAuth2ProviderOptions {
-  id: string;
   clientId: string;
   callbackURL: string;
   clientSecret: string;
   provider: ExtensionCredential;
-  resolver?: PromiseWithResolvers<void>;
   credential: { id: string; oauthTokenId: number | null };
 
   constructor({
     clientId,
-    resolver,
     provider,
     credential,
     callbackURL,
     clientSecret,
   }: OAuth2ProviderOptions) {
-    this.id = nanoid(8);
     this.clientId = clientId;
-    this.resolver = resolver;
     this.provider = provider;
     this.credential = credential;
     this.callbackURL = callbackURL;
     this.clientSecret = clientSecret;
   }
 
-  startAuth() {
+  startAuth(sessionId: string) {
     const { auth: providerAuth } = this.provider;
 
     const searchParams = new URLSearchParams(providerAuth.extraParams ?? '');
-    searchParams.set('state', this.id);
+    searchParams.set('state', sessionId);
     searchParams.set('response_type', 'code');
     searchParams.set('client_id', this.clientId);
     searchParams.set('redirect_uri', this.callbackURL);
@@ -160,7 +159,7 @@ class Oauth2Provider implements OAuth2ProviderOptions {
       },
     );
     if (!response.ok) {
-      throw new Error(`[${response.status}] ${response.statusText}`);
+      throw new ExtensionError(`[${response.status}] ${response.statusText}`);
     }
 
     const result = await response.json();
@@ -170,10 +169,16 @@ class Oauth2Provider implements OAuth2ProviderOptions {
   }
 
   async refreshAccessToken(refreshToken: string) {
+    if (!this.provider.auth.tokenUrl) {
+      throw new ExtensionError(
+        'The credential provider doesn\'t have "tokenUrl" in its manifest',
+      );
+    }
+
     const searchParams = new URLSearchParams();
+    searchParams.set('client_id', this.clientId);
     searchParams.set('grant_type', 'refresh_token');
     searchParams.set('refresh_token', refreshToken);
-    searchParams.set('client_id', this.clientId);
     searchParams.set('client_secret', this.clientSecret);
 
     const response = await fetch(
@@ -183,7 +188,7 @@ class Oauth2Provider implements OAuth2ProviderOptions {
       },
     );
     if (!response.ok) {
-      throw new Error(`[${response.status}] ${response.statusText}`);
+      throw new ExtensionError(`[${response.status}] ${response.statusText}`);
     }
 
     const result = await response.json();
@@ -197,7 +202,13 @@ class OauthService {
   static instance = new OauthService();
 
   private server!: OauthServiceServer;
-  private authSessions = new Map<string, Oauth2Provider>();
+  private authSessions = new Map<
+    string,
+    {
+      provider: Oauth2Provider;
+      resolver?: PromiseWithResolvers<Oauth2Response>;
+    }
+  >();
 
   constructor() {
     this.initServer();
@@ -206,28 +217,28 @@ class OauthService {
   private initServer() {
     const server = new OauthServiceServer();
     server.addListener('authorize-callback', async (url) => {
-      let resolver: undefined | PromiseWithResolvers<void>;
+      let resolver: undefined | PromiseWithResolvers<Oauth2Response>;
 
       try {
         const code = url.searchParams.get('code');
         const state = url.searchParams.get('state');
-        const authProvider = state && this.authSessions.get(state);
+        const authSession = state && this.authSessions.get(state);
 
-        if (!code || !authProvider) return;
+        if (!code || !authSession) return;
 
-        resolver = authProvider.resolver;
+        resolver = authSession.resolver;
 
-        const token = await authProvider.exchangeCode(code);
+        const token = await authSession.provider.exchangeCode(code);
         const payload = {
           scope: token.scope,
           tokenType: token.token_type,
           accessToken: token.access_token,
           refreshToken: token.refresh_token,
-          credentialId: authProvider.credential.id,
+          credentialId: authSession.provider.credential.id,
           expiresTimestamp: Date.now() + token.expires_in * 1000,
         };
 
-        if (authProvider.credential.oauthTokenId) {
+        if (authSession.provider.credential.oauthTokenId) {
           await DBService.instance.extension.updateCredentialOauthToken(
             payload,
           );
@@ -237,12 +248,12 @@ class OauthService {
           );
         }
 
-        resolver?.resolve();
+        resolver?.resolve(token);
       } catch (error) {
         logger(
           'error',
           ['OAuthService', 'authorize-callback'],
-          (<Error>error).message,
+          (<ExtensionError>error).message,
         );
 
         resolver?.reject(error);
@@ -252,7 +263,9 @@ class OauthService {
     this.server = server;
   }
 
-  async startAuth(credentialId: string, waitAuth?: boolean) {
+  async getProvider(
+    credentialId: string | { providerId: string; extensionId: string },
+  ) {
     const credential =
       await DBService.instance.extension.getCredentialValueDetail(credentialId);
     if (!credential) {
@@ -261,11 +274,7 @@ class OauthService {
       );
     }
 
-    if (credential.type !== 'oauth2') {
-      throw new Error('Unsupported Auth type');
-    }
-
-    const provider = credential.extension.credentials.find(
+    const provider = credential.extension?.credentials?.find(
       (provider) => provider.providerId === credential.providerId,
     );
     if (!provider) {
@@ -279,11 +288,9 @@ class OauthService {
       throw new CustomError(fromZodError(credentialValue.error).message);
     }
 
-    const resolver = waitAuth ? Promise.withResolvers<void>() : undefined;
     const oauth2Provider = new Oauth2Provider({
       ...credentialValue.data,
       provider,
-      resolver,
       callbackURL: OAUTH_CALLBACK_URL,
       credential: {
         id: credential.id,
@@ -291,82 +298,48 @@ class OauthService {
       },
     });
 
-    this.authSessions.set(oauth2Provider.id, oauth2Provider);
+    return oauth2Provider;
+  }
+
+  async startAuth(credentialId: string, waitAuth: false): Promise<void>;
+  async startAuth(
+    credentialId: string,
+    waitAuth: true,
+  ): Promise<Oauth2Response>;
+  async startAuth(credentialId: string, waitAuth?: boolean): Promise<unknown> {
+    const oauth2Provider = await this.getProvider(credentialId);
+    const sessionId = nanoid(8);
+
+    const resolver = waitAuth
+      ? Promise.withResolvers<Oauth2Response>()
+      : undefined;
+
+    this.authSessions.set(sessionId, {
+      resolver,
+      provider: oauth2Provider,
+    });
 
     this.server.start();
-    oauth2Provider.startAuth();
+    oauth2Provider.startAuth(sessionId);
 
     return resolver?.promise;
   }
 
   async refreshAccessToken(extensionId: string, providerId: string) {
-    const credential =
-      await DBService.instance.db.query.extensionCreds.findFirst({
-        columns: {
-          id: true,
-          type: true,
-          value: true,
-        },
-        with: {
-          extension: {
-            columns: {
-              credentials: true,
-            },
-          },
-          oauthToken: {
-            columns: {
-              // it throws "JSON cannot hold BLOB values" error
-              // refreshToken: true,
-              id: true,
-            },
-          },
-        },
-        where(fields, operators) {
-          return operators.and(
-            operators.eq(fields.providerId, providerId),
-            operators.eq(fields.extensionId, extensionId),
-          );
-        },
-      });
-    const provider = credential?.extension?.credentials?.find(
-      (item) => item.providerId === providerId,
-    );
-    if (!provider || !credential || !credential.oauthToken?.id) {
-      throw new Error("Couldn't find the extension credential");
-    }
-
-    if (!provider.auth.tokenUrl) {
-      throw new Error(
-        'The credential provider doesn\'t have "tokenUrl" in its manifest',
-      );
+    const oauthProvider = await this.getProvider({ extensionId, providerId });
+    if (typeof oauthProvider.credential.oauthTokenId !== 'number') {
+      throw new ExtensionError("This app hasn't been connected");
     }
 
     const oauthToken =
       await DBService.instance.extension.getCredentialOAuthToken(
-        credential.oauthToken.id,
+        oauthProvider.credential.oauthTokenId,
       );
-    if (!oauthToken) throw new Error("This app hasn't been connected");
-    if (!oauthToken.refreshToken) {
-      throw new Error("This app doesn't have refresh token");
+    if (!oauthToken?.refreshToken) {
+      throw new ExtensionError("This app doesn't have refresh token");
     }
 
-    const credentialValue = await Oauth2CredValueSchema.safeParseAsync(
-      parseJSON(safeStorage.decryptString(credential.value), {}),
-    );
-    if (!credentialValue.success) {
-      throw new CustomError(fromZodError(credentialValue.error).message);
-    }
-
-    const oauth2Provider = new Oauth2Provider({
-      callbackURL: OAUTH_CALLBACK_URL,
-      credential: {
-        id: credential.id,
-        oauthTokenId: oauthToken.id,
-      },
-      provider,
-      ...credentialValue.data,
-    });
-    const token = await oauth2Provider.refreshAccessToken(
+    const token = await oauthProvider.refreshAccessToken(
       oauthToken.refreshToken,
     );
 

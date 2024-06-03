@@ -16,6 +16,7 @@ import { commandAppRoutes } from './routes';
 import { useCommandStore } from '/@/stores/command.store';
 import { useEffect } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
+import CommandOAuthOverlay from '/@/components/command/CommandOAuthOverlay';
 
 const routes = createCommandRoutes(commandAppRoutes);
 
@@ -47,6 +48,7 @@ function App() {
                   <CommandHeader />
                   <CommandContent />
                   <CommandErrorOverlay />
+                  <CommandOAuthOverlay />
                 </div>
               </UiListProvider>
               <CommandFooter />

@@ -1,12 +1,12 @@
 {
-  "version": "5",
+  "version": "7",
   "dialect": "sqlite",
   "entries": [
     {
       "idx": 0,
-      "version": "5",
-      "when": 1717144667298,
-      "tag": "0000_rainy_mole_man",
+      "version": "6",
+      "when": 1717387735132,
+      "tag": "0000_pale_nekra",
       "breakpoints": true
     }
   ]

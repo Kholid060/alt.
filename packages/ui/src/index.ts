@@ -129,6 +129,11 @@ export {
   UiAlertDialogContent,
   UiAlertDialogDescription,
 } from './components/ui/alert-dialog';
+export {
+  UiAlert,
+  UiAlertTitle,
+  UiAlertDescription,
+} from './components/ui/alert';
 
 export { DialogProvider, useDialog } from './context/dialog.context';
 export type { DialogConfirmOptions } from './context/dialog.context';

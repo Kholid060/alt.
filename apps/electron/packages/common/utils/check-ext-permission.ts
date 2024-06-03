@@ -13,6 +13,7 @@ export const API_PERMISSION_MAP: [
   ExtensionAPIPaths,
   Partial<ExtensionPermission>[],
 ][] = [
+  ['oauth', []],
   ['fs', ['fs']],
   ['runtime', []],
   ['mainWindow', []],

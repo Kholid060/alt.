@@ -2,15 +2,11 @@ import { z } from 'zod';
 
 export const ExtensionCredentialOAuth2Schema = z.object({
   type: z.literal('oauth2'),
-  grantType: z.enum(['code', 'pkce', 'client_credentials']),
   authorizeUrl: z
     .string()
     .min(1, { message: 'authorizeUrl is required' })
     .url(),
-  extraParams: z.union([
-    z.string(),
-    z.record(z.string(), z.union([z.string(), z.number()])),
-  ]),
+  extraParams: z.union([z.string(), z.record(z.string(), z.string())]),
   scope: z.string().default(''),
   tokenUrl: z.string().min(1, { message: 'tokenUrl is required' }).url(),
 });

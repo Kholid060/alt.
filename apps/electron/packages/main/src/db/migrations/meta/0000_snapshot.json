@@ -1,7 +1,7 @@
 {
-  "version": "5",
+  "version": "6",
   "dialect": "sqlite",
-  "id": "3a59ab98-6625-47ea-bb9c-05eb9d44a891",
+  "id": "ad9e89be-247a-4056-9708-42a07f2fd802",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "extension_commands": {
@@ -329,7 +329,7 @@
           "name": "name",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "extension_id": {
@@ -784,5 +784,8 @@
     "schemas": {},
     "tables": {},
     "columns": {}
+  },
+  "internal": {
+    "indexes": {}
   }
 }

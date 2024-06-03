@@ -5,8 +5,8 @@ export const ipc = {
   off: IPCRenderer.off,
   send: IPCRenderer.send,
   invoke: IPCRenderer.invoke,
-  handle: IPCRenderer.instance.handle,
   invokeWithError: IPCRenderer.invokeWithError,
+  handle: IPCRenderer.instance.handle.bind(IPCRenderer.instance),
 };
 
 IPCRenderer.on('message-port:created', ({ ports }, { channelId }) => {

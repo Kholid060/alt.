@@ -15,7 +15,7 @@ import UiExtensionIcon from '../ui/UiExtensionIcon';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Loader2Icon } from 'lucide-react';
+import { BookIcon, Loader2Icon } from 'lucide-react';
 import { useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '#packages/common/utils/helper';
@@ -128,11 +128,11 @@ function CredentialOAuth2({
 
 interface CredentialDetailProps extends React.HTMLAttributes<HTMLDivElement> {
   isEditing?: boolean;
-  onClose?: () => void;
   credentialId?: string;
   credential: ExtensionCredential;
   defaultValues?: Record<string, string>;
   extension: { id: string; title: string };
+  onClose?: (type: 'submit' | 'cancel') => void;
 }
 function CredentialDetail({
   onClose,
@@ -187,7 +187,7 @@ function CredentialDetail({
         return;
       }
 
-      onClose?.();
+      onClose?.('submit');
     } catch (error) {
       console.error(error);
       toast({
@@ -221,12 +221,28 @@ function CredentialDetail({
         credential={credential}
         defaultValues={defaultValues}
       >
-        <div className="mt-8 flex items-center justify-end gap-4">
+        <div className="mt-10 flex items-center gap-4">
+          {credential.documentationUrl && (
+            <button
+              type="button"
+              className="underline text-sm text-muted-foreground hover:text-foreground"
+              onClick={() =>
+                preloadAPI.main.ipc.invoke(
+                  'shell:open-url',
+                  credential.documentationUrl!,
+                )
+              }
+            >
+              <BookIcon className="h-5 w-5 inline mr-1 align-text-top" />
+              See documentation
+            </button>
+          )}
+          <div className="flex-grow"></div>
           <UiButton
             type="reset"
             variant="ghost"
-            onClick={onClose}
             disabled={isSubmitting}
+            onClick={() => onClose?.('cancel')}
           >
             Cancel
           </UiButton>

@@ -43,7 +43,7 @@ CREATE TABLE `extension_credential_oauth_tokens` (
 --> statement-breakpoint
 CREATE TABLE `extension_credentials` (
 	`id` text PRIMARY KEY NOT NULL,
-	`name` text,
+	`name` text NOT NULL,
 	`extension_id` text NOT NULL,
 	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	`updated_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
