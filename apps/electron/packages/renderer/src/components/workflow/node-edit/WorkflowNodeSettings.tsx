@@ -2,6 +2,9 @@ import { WorkflowNodeErroHandlerAction } from '#packages/common/interface/workfl
 import {
   UiInput,
   UiLabel,
+  UiPopover,
+  UiPopoverContent,
+  UiPopoverTrigger,
   UiSelect,
   UiSwitch,
   UiTextarea,
@@ -11,9 +14,10 @@ import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow
 import {
   WorkflowNodeErrorHandler as WorkflowNodeErrorHandlerType,
   WorkflowNodes,
+  WorkflowVariableMode,
 } from '#packages/common/interface/workflow-nodes.interface';
 import React from 'react';
-import { InfoIcon } from 'lucide-react';
+import { EllipsisVerticalIcon, InfoIcon } from 'lucide-react';
 
 const errorActions: { title: string; id: WorkflowNodeErroHandlerAction }[] = [
   { id: 'stop', title: 'Stop execution' },
@@ -131,7 +135,7 @@ const WorkflowNodeErrorHandler: SettingComponent = ({ data, onUpdate }) => {
   );
 };
 
-const WorkflowNodeOutput: SettingComponent = () => {
+const WorkflowNodeOutput: SettingComponent = ({ data, onUpdate }) => {
   return (
     <>
       <p className="font-semibold">Output</p>
@@ -148,12 +152,34 @@ const WorkflowNodeOutput: SettingComponent = () => {
             <InfoIcon className="h-4 w-4 inline ml-1 invisible group-hover:visible group-focus-within:visible" />
           </UiTooltip>
         </UiLabel>
-        <UiInput
-          inputSize="sm"
-          placeholder="node_output"
-          id="output-var"
-          className="col-span-6"
-        />
+        <div className="relative col-span-6">
+          <UiInput
+            inputSize="sm"
+            id="output-var"
+            className="w-full pr-6"
+            placeholder="node_output"
+            value={data.$outputVarName}
+            onValueChange={(value) => onUpdate({ $outputVarName: value })}
+          />
+          <UiPopover>
+            <UiPopoverTrigger className="absolute right-2 top-1/2 -translate-y-1/2">
+              <EllipsisVerticalIcon className="h-4 w-4" />
+            </UiPopoverTrigger>
+            <UiPopoverContent align="end" className="text-sm">
+              <UiLabel className="ml-1">Mode</UiLabel>
+              <UiSelect
+                inputSize="sm"
+                value={data.$outputVarMode || 'replace'}
+                onValueChange={(value) =>
+                  onUpdate({ $outputVarMode: value as WorkflowVariableMode })
+                }
+              >
+                <UiSelect.Option value="replace">Replace</UiSelect.Option>
+                <UiSelect.Option value="append">Append</UiSelect.Option>
+              </UiSelect>
+            </UiPopoverContent>
+          </UiPopover>
+        </div>
       </section>
     </>
   );

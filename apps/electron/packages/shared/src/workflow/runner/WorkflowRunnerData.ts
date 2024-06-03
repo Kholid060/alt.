@@ -1,5 +1,8 @@
+import type { WorkflowVariableMode } from '#packages/common/interface/workflow-nodes.interface';
 import type { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
+import { isObject } from '@repo/shared';
 import type WorkflowRunner from './WorkflowRunner';
+import WorkflowFileHandle from '../utils/WorkflowFileHandle';
 
 interface WorkflowRunnerLoopData {
   index: number;
@@ -44,19 +47,63 @@ class StorageData<
   }
 }
 
+class WorkflowVariable extends StorageData {
+  constructor() {
+    super({});
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private appendValue(valA: any, valB: any) {
+    if (Array.isArray(valA)) {
+      return [...valA, valB];
+    } else if (isObject(valA) && isObject(valB)) {
+      return { ...valA, ...valB };
+    } else if (WorkflowFileHandle.isWorkflowFileHandle(valB)) {
+      return valB;
+    }
+
+    return valA + valB;
+  }
+
+  setVariable(
+    key: string | number,
+    value: unknown,
+    mode: WorkflowVariableMode = 'replace',
+  ) {
+    let newValue: unknown;
+
+    switch (mode) {
+      case 'append':
+        newValue = this.has(key)
+          ? this.appendValue(this.get(key), value)
+          : value;
+        break;
+      case 'replace':
+        newValue = value;
+        break;
+      default:
+        throw new Error('Unsupported variable mode');
+    }
+
+    this.set(key, newValue);
+
+    return newValue;
+  }
+}
+
 type NodeData = {
   prevNode: { id: string; value: unknown } | null;
   currentNode: { id: string; type: WORKFLOW_NODE_TYPE } | null;
 };
 
 class WorkflowRunnerData {
-  variables: StorageData;
+  variables: WorkflowVariable;
   nodeData: StorageData<NodeData>;
   loopData: StorageData<Record<string, WorkflowRunnerLoopData>>;
 
   constructor(private runner: WorkflowRunner) {
     this.loopData = new StorageData({});
-    this.variables = new StorageData({});
+    this.variables = new WorkflowVariable();
 
     this.nodeData = new StorageData({
       prevNode: null,

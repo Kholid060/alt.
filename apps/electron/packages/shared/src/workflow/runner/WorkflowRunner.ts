@@ -393,9 +393,10 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
         });
 
         if (node.data.$outputVarName) {
-          this.dataStorage.variables.set(
+          this.dataStorage.variables.setVariable(
             node.data.$outputVarName,
             execResult.value,
+            node.data.$outputVarMode,
           );
         }
       }

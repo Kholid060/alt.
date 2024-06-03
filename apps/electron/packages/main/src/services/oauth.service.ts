@@ -304,12 +304,12 @@ class OauthService {
     return oauth2Provider;
   }
 
-  async startAuth(credentialId: string, waitAuth: false): Promise<void>;
+  async startAuth(credentialId: string, waitAuth?: false): Promise<void>;
   async startAuth(
     credentialId: string,
-    waitAuth: true,
+    waitAuth?: true,
   ): Promise<Oauth2Response>;
-  async startAuth(credentialId: string, waitAuth?: boolean): Promise<unknown> {
+  async startAuth(credentialId: string, waitAuth = false): Promise<unknown> {
     const oauth2Provider = await this.getProvider(credentialId);
     const sessionId = nanoid(8);
 

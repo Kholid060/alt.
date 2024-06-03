@@ -10,6 +10,8 @@ export type WorkflowNodeHandleSource = 'default' | 'error-fallback';
 
 export type WorkflowNodeHandleTarget = 'default';
 
+export type WorkflowVariableMode = 'replace' | 'append';
+
 export interface WorkflowNodeErrorHandler {
   retry: boolean;
   retryCount: number;
@@ -31,6 +33,7 @@ export interface WorkflowNodeBaseData<T extends WORKFLOW_NODE_TYPE> {
   isDisabled: boolean;
   description?: string;
   $outputVarName?: string;
+  $outputVarMode?: WorkflowVariableMode;
   $expData?: WorkflowNodeExpressionRecords;
   $errorHandler?: WorkflowNodeErrorHandler;
 }
@@ -212,7 +215,7 @@ export interface WorkflowNodeInsertDataItem {
   id: string;
   name: string;
   value: string;
-  mode: 'replace' | 'append';
+  mode: WorkflowVariableMode;
 }
 export type WorkflowNodeInsertData = WorkflowNodeBase<
   {
