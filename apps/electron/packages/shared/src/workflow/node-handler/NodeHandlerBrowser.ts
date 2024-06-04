@@ -224,3 +224,50 @@ export class NodeHandlerBrowserMouse extends WorkflowNodeHandler<WORKFLOW_NODE_T
 
   destroy() {}
 }
+
+export class NodeHandlerBrowserKeyboard extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.BROWSER_KEYBOARD> {
+  constructor() {
+    super(WORKFLOW_NODE_TYPE.BROWSER_KEYBOARD, {
+      dataValidation: [
+        { key: 'key', name: 'Ke', types: ['String'] },
+        { key: 'text', name: 'Text', types: ['String'] },
+      ],
+    });
+  }
+
+  async execute({
+    node,
+    runner,
+  }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.BROWSER_KEYBOARD>): Promise<WorkflowNodeHandlerExecuteReturn> {
+    const selector = node.data.selector.trim();
+    if (!selector) throw new Error('Element selector is empty');
+
+    const { action, key, text, modifiers, clearFormValue } = node.data;
+
+    switch (action) {
+      case 'key-down':
+        await runner.browser.sendMessage('tabs:key-down', { selector }, key, {
+          modifiers,
+        });
+        break;
+      case 'key-up':
+        await runner.browser.sendMessage('tabs:key-up', { selector }, key, {
+          modifiers,
+        });
+        break;
+      case 'type':
+        await runner.browser.sendMessage('tabs:type', { selector }, text, {
+          clearValue: clearFormValue,
+        });
+        break;
+      default:
+        throw new Error('Unknown keyboard action');
+    }
+
+    return {
+      value: null,
+    };
+  }
+
+  destroy() {}
+}

@@ -245,6 +245,18 @@ export type WorkflowNodeBrowserMouse = WorkflowNodeBase<
   WORKFLOW_NODE_TYPE.BROWSER_MOUSE
 >;
 
+export type WorkflowNodeBrowserKeyboard = WorkflowNodeBase<
+  {
+    text: string;
+    selector: string;
+    clearFormValue: boolean;
+    key: ExtensionAPI.browser.KeyboardKeys;
+    action: 'key-down' | 'key-up' | 'type';
+    modifiers: ExtensionAPI.browser.KeyboardModifiers[];
+  },
+  WORKFLOW_NODE_TYPE.BROWSER_KEYBOARD
+>;
+
 export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoop;
   [WORKFLOW_NODE_TYPE.CODE]: WorkflowNodeCode;
@@ -262,6 +274,7 @@ export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.HTTP_REQUEST]: WorkflowNodeHttpRequest;
   [WORKFLOW_NODE_TYPE.NOTIFICATION]: WorkflowNodeNotification;
   [WORKFLOW_NODE_TYPE.BROWSER_MOUSE]: WorkflowNodeBrowserMouse;
+  [WORKFLOW_NODE_TYPE.BROWSER_KEYBOARD]: WorkflowNodeBrowserKeyboard;
   [WORKFLOW_NODE_TYPE.EXECUTE_WORKFLOW]: WorkflowNodeExecuteWorkflow;
   [WORKFLOW_NODE_TYPE.TRIGGER_SHORTCUT]: WorkflowNodeTriggerShortcut;
   [WORKFLOW_NODE_TYPE.TRIGGER_EXECUTE_WORKFLOW]: WorkflowNodeTriggerExecuteWorkflow;

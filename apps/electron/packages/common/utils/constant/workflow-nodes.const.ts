@@ -339,4 +339,23 @@ export const WORKFLOW_NODES: {
     handleSource: ['default'],
     type: WORKFLOW_NODE_TYPE.BROWSER_MOUSE,
   },
+  [WORKFLOW_NODE_TYPE.BROWSER_KEYBOARD]: {
+    title: 'Keyboard',
+    group: 'Browser',
+    icon: KeyboardIcon,
+    subtitle: 'Browser',
+    defaultData: {
+      key: ' ',
+      text: '',
+      selector: '',
+      modifiers: [],
+      action: 'type',
+      isDisabled: false,
+      clearFormValue: true,
+      $nodeType: WORKFLOW_NODE_TYPE.BROWSER_KEYBOARD,
+    },
+    handleTarget: ['default'],
+    handleSource: ['default'],
+    type: WORKFLOW_NODE_TYPE.BROWSER_KEYBOARD,
+  },
 } as const;
