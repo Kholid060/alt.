@@ -1,0 +1,1 @@
+ALTER TABLE `extension_configs` ADD `encrypted_value` blob;

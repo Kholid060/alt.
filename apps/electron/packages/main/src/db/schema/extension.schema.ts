@@ -132,6 +132,7 @@ export const extensionConfigs = sqliteTable(
       .notNull()
       .references(() => extensions.id, { onDelete: 'cascade' }),
     configId: text('config_id').unique().notNull(),
+    encryptedValue: blob('encrypted_value', { mode: 'buffer' }),
     value: text('value', { mode: 'json' })
       .notNull()
       .$type<Record<string, unknown>>(),

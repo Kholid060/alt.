@@ -95,6 +95,7 @@ export default {
       title: 'Clipboard List',
       type: 'view',
       config: [
+        { name: 'passwordd', type: 'input:password', title: 'Input password', placeholder: 'Password type', defaultValue: '' },
         { name: 'number', type: 'input:number', title: 'Input number', placeholder: 'Number placeholder', defaultValue: 10 },
         { name: 'config-file', type: 'input:file', title: 'Select config file', placeholder: 'File placeholder', required: true, fileFilter: [{ extensions: ['json', 'yaml'], name: 'Config file' }] },
         { name: 'all-file', type: 'input:file', title: 'Select any file', placeholder: 'File placeholder', required: true },

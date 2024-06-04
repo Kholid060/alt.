@@ -145,8 +145,8 @@ function CreateCommandScript() {
             control={form.control}
             name="scriptPath"
             render={({ field }) => (
-              <UiFormItem className="space-y-1">
-                <UiFormLabel>Script file</UiFormLabel>
+              <UiFormItem className="space-y-0">
+                <UiFormLabel className="ml-1">Script file</UiFormLabel>
                 <UiFormControl>
                   <UiInput
                     onClick={selectScriptFile}
@@ -195,8 +195,8 @@ function CreateCommandScript() {
               control={form.control}
               name="name"
               render={({ field }) => (
-                <UiFormItem className="space-y-1 flex-1">
-                  <UiFormLabel>Name</UiFormLabel>
+                <UiFormItem className="space-y-0 flex-1">
+                  <UiFormLabel className="ml-1">Name</UiFormLabel>
                   <UiFormControl>
                     <UiInput {...field} placeholder="Command script name" />
                   </UiFormControl>

@@ -41,10 +41,39 @@ export function websocketEventsListener(
   io.on(
     'tabs:click',
     wsAckHandler(async (tab, selector, callback) => {
-      await TabService.click(
+      await TabService.mouse(
         {
           tabId: tab.tabId,
         },
+        'click',
+        selector,
+      );
+      callback();
+    }),
+  );
+
+  io.on(
+    'tabs:mouse-down',
+    wsAckHandler(async (tab, selector, callback) => {
+      await TabService.mouse(
+        {
+          tabId: tab.tabId,
+        },
+        'down',
+        selector,
+      );
+      callback();
+    }),
+  );
+
+  io.on(
+    'tabs:mouse-up',
+    wsAckHandler(async (tab, selector, callback) => {
+      await TabService.mouse(
+        {
+          tabId: tab.tabId,
+        },
+        'up',
         selector,
       );
       callback();

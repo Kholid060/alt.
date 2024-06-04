@@ -48,6 +48,28 @@ ExtensionIPCEvent.instance.on(
 );
 
 ExtensionIPCEvent.instance.on(
+  'browser.activeTab.mouseDown',
+  ({ browserCtx }, selector) => {
+    return extensionBrowserElementHandle(
+      browserCtx,
+      'mouseDown',
+      getElementSelector(selector),
+    );
+  },
+);
+
+ExtensionIPCEvent.instance.on(
+  'browser.activeTab.mouseUp',
+  ({ browserCtx }, selector) => {
+    return extensionBrowserElementHandle(
+      browserCtx,
+      'mouseUp',
+      getElementSelector(selector),
+    );
+  },
+);
+
+ExtensionIPCEvent.instance.on(
   'browser.activeTab.type',
   ({ browserCtx }, selector, text, options) => {
     return extensionBrowserElementHandle(

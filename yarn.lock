@@ -7941,6 +7941,7 @@ __metadata:
     socket.io: "npm:^4.7.5"
     sourcemapped-stacktrace: "npm:^1.1.11"
     tailwindcss: "npm:^3.4.1"
+    tree-kill: "npm:^1.2.2"
     type-fest: "npm:^4.11.0"
     typescript: "npm:^5.4.5"
     unplugin-auto-expose: "npm:0.3.0"

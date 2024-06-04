@@ -237,6 +237,14 @@ export type WorkflowNodeBrowserTab = WorkflowNodeBase<
   WORKFLOW_NODE_TYPE.BROWSER_TAB
 >;
 
+export type WorkflowNodeBrowserMouse = WorkflowNodeBase<
+  {
+    selector: string;
+    action: 'mouse-down' | 'mouse-up' | 'click';
+  },
+  WORKFLOW_NODE_TYPE.BROWSER_MOUSE
+>;
+
 export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoop;
   [WORKFLOW_NODE_TYPE.CODE]: WorkflowNodeCode;
@@ -253,6 +261,7 @@ export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.CONDITIONAL]: WorkflowNodeConditional;
   [WORKFLOW_NODE_TYPE.HTTP_REQUEST]: WorkflowNodeHttpRequest;
   [WORKFLOW_NODE_TYPE.NOTIFICATION]: WorkflowNodeNotification;
+  [WORKFLOW_NODE_TYPE.BROWSER_MOUSE]: WorkflowNodeBrowserMouse;
   [WORKFLOW_NODE_TYPE.EXECUTE_WORKFLOW]: WorkflowNodeExecuteWorkflow;
   [WORKFLOW_NODE_TYPE.TRIGGER_SHORTCUT]: WorkflowNodeTriggerShortcut;
   [WORKFLOW_NODE_TYPE.TRIGGER_EXECUTE_WORKFLOW]: WorkflowNodeTriggerExecuteWorkflow;

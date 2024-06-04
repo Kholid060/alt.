@@ -39,7 +39,7 @@ export default async function CommandMain(context: CommandLaunchContext) {
   // await new Promise((r) => setTimeout(r, 4000));
 
 
-  await _extension.mainWindow.close();
+  // await _extension.mainWindow.close();
 
   // await commandExecutionFail();
   // await commandExecution();
@@ -48,7 +48,9 @@ export default async function CommandMain(context: CommandLaunchContext) {
   //   subtitle: 'Hello worldo!!!',
   // });
 
-  await authorizeCredential();
+  // await authorizeCredential();
+  console.log(await _extension.runtime.config.getValues('command'));
+  // await _extension.runtime.config.openConfigPage('command');
 
   // await _extension.storage.set('test', 'hello world');
   // await _extension.shell.showItemInFolder(filePath);

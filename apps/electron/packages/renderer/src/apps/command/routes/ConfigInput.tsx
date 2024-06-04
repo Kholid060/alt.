@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { UseFormReturn, useForm } from 'react-hook-form';
 import { ExtensionConfig } from '@repo/extension-core';
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
@@ -21,8 +21,11 @@ import { IPCEventError } from '#common/interface/ipc-events.interface';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
 import { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
 import { getExtIconURL, isIPCEventError } from '/@/utils/helper';
-import { useDatabaseQuery } from '/@/hooks/useDatabase';
-import { DatabaseExtensionConfigWithSchema } from '#packages/main/src/interface/database.interface';
+import { useDatabase } from '/@/hooks/useDatabase';
+import {
+  DatabaseExtensionConfigValue,
+  DatabaseExtensionConfigWithSchema,
+} from '#packages/main/src/interface/database.interface';
 
 type ConfigComponent<
   T extends ExtensionConfig['type'] = ExtensionConfig['type'],
@@ -196,6 +199,30 @@ const ConfigInputText: ConfigComponent = ({ config }) => {
   );
 };
 
+const ConfigInputPassword: ConfigComponent = ({ config }) => {
+  return (
+    <UiFormField
+      name={config.name}
+      defaultValue=""
+      rules={{ required: config.required }}
+      render={({ field }) => (
+        <UiFormItem className="space-y-1">
+          <UiFormLabel>{config.title}</UiFormLabel>
+          <UiFormControl>
+            <UiInput
+              placeholder={config.placeholder}
+              type="password"
+              {...field}
+            />
+          </UiFormControl>
+          <UiFormDescription>{config.description}</UiFormDescription>
+          <UiFormMessage />
+        </UiFormItem>
+      )}
+    />
+  );
+};
+
 const ConfigSelect: ConfigComponent<'select'> = ({ config }) => {
   return (
     <UiFormField
@@ -258,6 +285,7 @@ const configComponentMap: Record<ExtensionConfig['type'], ConfigComponent> = {
   toggle: ConfigToggle,
   'input:text': ConfigInputText,
   'input:number': ConfigInputNumber,
+  'input:password': ConfigInputPassword,
   select: ConfigSelect as ConfigComponent,
   'input:directory': ConfigInputDirectory,
   'input:file': ConfigInputFile as ConfigComponent,
@@ -308,12 +336,29 @@ function ConfigInput({
 
       let result: IPCEventError | void;
 
+      const dataTypeMap = new Map(
+        data.config.map((config) => [config.name, config.type]),
+      );
+      const valuesWithType = Object.keys(
+        values,
+      ).reduce<DatabaseExtensionConfigValue>((acc, key) => {
+        const type = dataTypeMap.get(key);
+        if (type) {
+          acc[key] = {
+            type,
+            value: values[key],
+          };
+        }
+
+        return acc;
+      }, {});
+
       if (alreadyHasValue.current) {
         result = await preloadAPI.main.ipc.invoke(
           'database:update-extension-config',
           configId,
           {
-            value: values,
+            value: valuesWithType,
           },
         );
       } else {
@@ -322,7 +367,7 @@ function ConfigInput({
           {
             configId,
             extensionId,
-            value: values,
+            value: valuesWithType,
           },
         );
       }
@@ -407,28 +452,50 @@ function ConfigInput({
 
 function ConfigInputRoute() {
   const navigate = useCommandNavigate();
+  const { queryDatabase } = useDatabase();
   const currentRoute = useCommandRoute((state) => state.currentRoute!);
 
   const executeCommandPayload = currentRoute.data?.executeCommandPayload as
     | ExtensionCommandExecutePayload
     | undefined;
 
-  const { configId } = currentRoute.params as { configId: string };
-  const [extensionId, commandId] = configId.split(':');
+  const [config, setConfig] = useState<{
+    id: string;
+    data: DatabaseExtensionConfigWithSchema;
+  } | null>(null);
 
-  const query = useDatabaseQuery('database:get-extension-config', [
-    { configId, extensionId, commandId },
-  ]);
+  useEffect(() => {
+    const { configId } = currentRoute.params as { configId: string };
+    if (!configId) {
+      navigate('');
+      return;
+    }
 
-  if (!query.data || query.data.config.length === 0) {
-    if (query.state === 'idle') navigate('');
-    return null;
-  }
+    const [extensionId, commandId] = configId.split(':');
+
+    return queryDatabase({
+      name: 'database:get-extension-config',
+      args: [{ configId, extensionId, commandId }],
+      onData(data) {
+        if (!data) {
+          navigate('');
+          return;
+        }
+
+        setConfig({
+          data,
+          id: configId,
+        });
+      },
+    });
+  }, [currentRoute.params, queryDatabase, navigate]);
+
+  if (!config) return null;
 
   return (
     <ConfigInput
-      data={query.data}
-      configId={configId}
+      data={config.data}
+      configId={config.id}
       executeCommandPayload={executeCommandPayload}
     />
   );

@@ -10,6 +10,9 @@ import type { ExtensionManifest } from '@repo/extension-core';
 import IPCMain from '../ipc/IPCMain';
 import DBService from '/@/services/database/database.service';
 import type { ExtensionAPIMessagePayload } from '#packages/common/interface/extension.interface';
+import type { ZodTuple, ZodTypeAny } from 'zod';
+import { z } from 'zod';
+import { fromZodError } from 'zod-validation-error';
 
 export type ExtensionMessageHandler = <
   T extends keyof IPCUserExtensionEventsMap,
@@ -44,8 +47,11 @@ class ExtensionIPCEvent {
 
   private handlers: Map<
     string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (...args: [ExtensionIPCCallbackFirstParam, ...any[]]) => any
+    {
+      validator?: ZodTuple<[ZodTypeAny, ...ZodTypeAny[]]>;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      func: (...args: [ExtensionIPCCallbackFirstParam, ...any[]]) => any;
+    }
   > = new Map();
 
   private extensionMessagePort: ExtensionMessagePortHandler;
@@ -129,7 +135,22 @@ class ExtensionIPCEvent {
       const handler = this.handlers.get(name);
       if (!handler) throw new Error(`"${name}" doesn't have handler`);
 
-      const result = await handler(
+      let handlerArgs = args;
+
+      if (handler.validator) {
+        if (args.length === 0) {
+          throw new ExtensionError('Arguments is empty');
+        }
+
+        const result = await handler.validator.safeParseAsync(args);
+        if (!result.success) {
+          throw new ExtensionError(fromZodError(result.error).message);
+        }
+
+        handlerArgs = result.data as Parameters<IPCUserExtensionEventsMap[T]>;
+      }
+
+      const result = await handler.func(
         {
           sender,
           commandId,
@@ -137,7 +158,7 @@ class ExtensionIPCEvent {
           extensionId: key,
           extension: extensionManifest,
         },
-        ...args,
+        ...handlerArgs,
       );
 
       return result;
@@ -161,8 +182,12 @@ class ExtensionIPCEvent {
   on<T extends keyof IPCUserExtensionEventsMap>(
     name: T,
     callback: ExtensionIPCEventCallback<T>,
+    validator?: [ZodTypeAny, ...ZodTypeAny[]],
   ) {
-    this.handlers.set(name, callback);
+    this.handlers.set(name, {
+      func: callback,
+      validator: validator ? z.tuple(validator) : undefined,
+    });
   }
 }
 

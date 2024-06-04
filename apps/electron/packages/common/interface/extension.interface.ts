@@ -1,8 +1,12 @@
 import type { CommandLaunchContext } from '@repo/extension';
-import type { EXTENSION_PERMISSIONS } from '@repo/extension-core';
+import type {
+  EXTENSION_CONFIG_TYPE,
+  EXTENSION_PERMISSIONS,
+} from '@repo/extension-core';
 import type { DatabaseExtensionCommandWithExtension } from '../../main/src/interface/database.interface';
 import type { BrowserExtensionTab } from '@repo/shared';
 
+export type ExtensionConfigType = (typeof EXTENSION_CONFIG_TYPE)[number];
 export type ExtensionPermissions = (typeof EXTENSION_PERMISSIONS)[number];
 
 export interface ExtensionCommandViewInitMessage {

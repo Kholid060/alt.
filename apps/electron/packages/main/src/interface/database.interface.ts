@@ -1,4 +1,8 @@
-import type { ExtensionConfig, ExtensionManifest } from '@repo/extension-core';
+import type {
+  ExtensionConfig,
+  ExtensionConfigType,
+  ExtensionManifest,
+} from '@repo/extension-core';
 import type {
   NewExtensionCommand,
   NewExtensionConfig,
@@ -121,7 +125,10 @@ export type DatabaseWorkflowHistoryUpdatePayload = Partial<
   >
 >;
 
-export type DatabaseExtensionConfig = Omit<SelectExtensionConfig, 'id'>;
+export type DatabaseExtensionConfig = Omit<
+  SelectExtensionConfig,
+  'id' | 'encryptedValue'
+>;
 export type DatabaseExtensionConfigWithSchema = DatabaseExtensionConfig & {
   config: ExtensionConfig[];
 } & {
@@ -130,13 +137,18 @@ export type DatabaseExtensionConfigWithSchema = DatabaseExtensionConfig & {
   extensionIcon: string;
   extensionTitle: string;
 };
-export type DatabaseExtensionConfigUpdatePayload = Partial<
-  Pick<NewExtensionConfig, 'value'>
+
+export type DatabaseExtensionConfigValue = Record<
+  string,
+  { type: ExtensionConfigType; value: unknown }
 >;
+export type DatabaseExtensionConfigUpdatePayload = Partial<{
+  value: DatabaseExtensionConfigValue;
+}>;
 export type DatabaseExtensionConfigInsertPayload = Pick<
   NewExtensionConfig,
-  'value' | 'extensionId' | 'configId'
->;
+  'extensionId' | 'configId'
+> & { value: DatabaseExtensionConfigValue };
 
 export type DatabaseExtensionCredOauthTokenInsertPayload = Omit<
   NewExtensionCredentialOauthTokens,

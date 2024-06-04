@@ -42,6 +42,7 @@ export const EXTENSION_CONFIG_TYPE = [
   'input:text',
   'input:file',
   'input:number',
+  'input:password',
   'input:directory',
 ] as const;
 export type ExtensionConfigType = (typeof EXTENSION_CONFIG_TYPE)[number];

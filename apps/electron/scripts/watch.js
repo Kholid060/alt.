@@ -3,6 +3,7 @@
 import { build, createServer } from 'vite';
 import electronPath from 'electron';
 import { spawn } from 'child_process';
+import kill from 'tree-kill';
 
 /** @type 'production' | 'development'' */
 const mode = (process.env.MODE = process.env.MODE || 'development');
@@ -19,7 +20,7 @@ const logLevel = 'warn';
 function setupMainPackageWatcher({ resolvedUrls }) {
   process.env.VITE_DEV_SERVER_URL = resolvedUrls.local[0];
 
-  /** @type {ChildProcess | null} */
+  /** @type {import('child_process').ChildProcess | null} */
   let electronApp = null;
 
   return build({
@@ -40,7 +41,10 @@ function setupMainPackageWatcher({ resolvedUrls }) {
           /** Kill electron if process already exist */
           if (electronApp !== null) {
             electronApp.removeListener('exit', process.exit);
-            electronApp.kill('SIGINT');
+
+            if (electronApp.pid) kill(electronApp.pid);
+            else electronApp.kill('SIGINT');
+
             electronApp = null;
           }
 

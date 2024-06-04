@@ -70,6 +70,8 @@ export interface ExtensionWSServerToClientEvents {
     { canceled: boolean; selector: string }
   >;
   'tabs:click': ExtensionWSAckElementHandler;
+  'tabs:mouse-up': ExtensionWSAckElementHandler;
+  'tabs:mouse-down': ExtensionWSAckElementHandler;
   'tabs:type': ExtensionWSAckElementHandler<
     [text: string, options: Partial<KeyboardBrowserTypeOptions>]
   >;

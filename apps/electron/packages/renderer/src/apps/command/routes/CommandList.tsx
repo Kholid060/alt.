@@ -29,6 +29,8 @@ import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import ListItemWorkflow from '/@/components/list-item/ListItemWorkflow';
+import ListItemExtension from '/@/components/list-item/ListItemExtension';
+import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
 
 const QUERY_PREFIX = {
   EXT: 'ext:',
@@ -63,6 +65,7 @@ const dashboardPageCommands: CommandListItemCommandBuiltIn[] = (
     type: 'builtin-command',
   },
 }));
+const builtInExtensionIds: string[] = Object.values(EXTENSION_BUILT_IN_ID);
 
 function CommandList() {
   const extensionQuery = useDatabaseQuery('database:get-extension-list', []);
@@ -131,10 +134,9 @@ function CommandList() {
     });
   }, [workflowQuery]);
   const extensionCommands = useMemo(() => {
-    type Item = CommandListItemCommand | CommandListItemExtension;
-
-    const commandItems: Item[] = [];
-    const suggestionItems: Item[] = [];
+    const commandItems: CommandListItemCommand[] = [];
+    const suggestionItems: CommandListItemCommand[] = [];
+    const extensionItems: CommandListItemExtension[] = [];
 
     extensionQuery.data?.forEach((extension) => {
       const extensionIcon = extension.isError ? (
@@ -147,6 +149,20 @@ function CommandList() {
           iconWrapper={(icon) => <UiList.Icon icon={icon} />}
         />
       );
+
+      if (!builtInExtensionIds.includes(extension.id)) {
+        extensionItems.push({
+          group: 'Extensions',
+          icon: extensionIcon,
+          title: extension.title,
+          value: 'extension:' + extension.id,
+          metadata: {
+            type: 'extension',
+            extension: extension,
+          },
+        });
+      }
+
       if (extension.isError || extension.isDisabled) return;
 
       extension.commands.forEach((command) => {
@@ -175,7 +191,7 @@ function CommandList() {
 
         if (!showCommand) return;
 
-        const commandItem: Item = {
+        const commandItem: CommandListItemCommand = {
           metadata: {
             command,
             extension,
@@ -207,7 +223,7 @@ function CommandList() {
       });
     });
 
-    return { suggestionItems, commandItems };
+    return { suggestionItems, commandItems, extensionItems };
   }, [extensionQuery, activeBrowserTab]);
   const builtInCommands: CommandListItemCommandBuiltIn[] = [
     {
@@ -297,6 +313,7 @@ function CommandList() {
         ...extensionCommands.suggestionItems,
         ...extensionCommands.commandItems,
         ...builtInCommands,
+        ...extensionCommands.extensionItems,
         ...workflowCommands,
         ...dashboardPageCommands,
       ]}
@@ -325,6 +342,14 @@ function CommandList() {
               <ListItemWorkflow
                 itemRef={ref}
                 item={commandItem as CommandListItemWorkflow}
+                {...{ ...detail }}
+              />
+            );
+          case 'extension':
+            return (
+              <ListItemExtension
+                itemRef={ref}
+                item={commandItem as CommandListItemExtension}
                 {...{ ...detail }}
               />
             );

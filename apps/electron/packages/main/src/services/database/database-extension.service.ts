@@ -11,7 +11,7 @@ import {
 import type {
   NewExtension,
   NewExtensionCommand,
-  NewExtensionConfig,
+  SelectExtensionConfig,
   SelectExtensionStorage,
   SelectExtesionCommand,
 } from '/@/db/schema/extension.schema';
@@ -50,6 +50,7 @@ import type {
   DatabaseExtensionCredentialsValueListOptions,
   DatabaseExtensionCredOauthTokenInsertPayload,
   DatabaseExtensionCredOauthTokenUpdatePayload,
+  DatabaseExtensionConfigInsertPayload,
 } from '/@/interface/database.interface';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
@@ -382,34 +383,67 @@ class DBExtensionService {
 
   async getConfigValue(
     configId: string,
-  ): Promise<DatabaseExtensionConfig | undefined>;
+  ): Promise<DatabaseExtensionConfig | null>;
   async getConfigValue(configId: string[]): Promise<DatabaseExtensionConfig[]>;
   async getConfigValue(configIds: string | string[]): Promise<unknown> {
+    const mapConfigValue = ({
+      id,
+      value,
+      configId,
+      extensionId,
+      encryptedValue,
+    }: Pick<
+      SelectExtensionConfig,
+      'id' | 'configId' | 'extensionId' | 'value' | 'encryptedValue'
+    >) => {
+      const decryptedValue = encryptedValue
+        ? parseJSON<object, object>(
+            safeStorage.decryptString(encryptedValue),
+            {},
+          )
+        : {};
+      return {
+        id,
+        configId,
+        extensionId,
+        value: {
+          ...value,
+          ...decryptedValue,
+        },
+      };
+    };
+
     if (Array.isArray(configIds)) {
-      return await this.database.query.extensionConfigs.findMany({
+      return await this.database.query.extensionConfigs
+        .findMany({
+          columns: {
+            id: true,
+            value: true,
+            configId: true,
+            extensionId: true,
+            encryptedValue: true,
+          },
+          where(fields, operators) {
+            return operators.inArray(fields.configId, configIds);
+          },
+        })
+        .then((result) => result.map(mapConfigValue));
+    }
+
+    return await this.database.query.extensionConfigs
+      .findFirst({
         columns: {
           id: true,
           value: true,
           configId: true,
           extensionId: true,
+          encryptedValue: true,
         },
         where(fields, operators) {
-          return operators.inArray(fields.configId, configIds);
+          return operators.eq(fields.configId, configIds);
         },
-      });
-    }
-
-    return await this.database.query.extensionConfigs.findFirst({
-      columns: {
-        id: true,
-        value: true,
-        configId: true,
-        extensionId: true,
-      },
-      where(fields, operators) {
-        return operators.eq(fields.configId, configIds);
-      },
-    });
+      })
+      .then((value) => (value ? mapConfigValue(value) : null));
   }
 
   async getStorage(
@@ -568,11 +602,33 @@ class DBExtensionService {
     };
   }
 
-  async insertConfig({ configId, extensionId, value }: NewExtensionConfig) {
+  async insertConfig({
+    value,
+    configId,
+    extensionId,
+  }: DatabaseExtensionConfigInsertPayload) {
+    const finalValue: Record<string, unknown> = {};
+    const encryptedValue: Record<string, unknown> = {};
+
+    let hasEncryptedValue = false;
+
+    for (const key in value) {
+      const item = value[key];
+      if (item.type === 'input:password') {
+        hasEncryptedValue = true;
+        encryptedValue[key] = item.value;
+      } else {
+        finalValue[key] = item.value;
+      }
+    }
+
     await this.database.insert(extensionConfigs).values({
-      value,
       configId,
       extensionId,
+      value: finalValue,
+      encryptedValue: hasEncryptedValue
+        ? safeStorage.encryptString(JSON.stringify(encryptedValue))
+        : null,
     });
   }
 
@@ -580,10 +636,28 @@ class DBExtensionService {
     configId: string,
     { value }: DatabaseExtensionConfigUpdatePayload,
   ) {
+    const finalValue: Record<string, unknown> = {};
+    const encryptedValue: Record<string, unknown> = {};
+
+    let hasEncryptedValue = false;
+
+    for (const key in value) {
+      const item = value[key];
+      if (item.type === 'input:password') {
+        hasEncryptedValue = true;
+        encryptedValue[key] = item.value;
+      } else {
+        finalValue[key] = item.value;
+      }
+    }
+
     await this.database
       .update(extensionConfigs)
       .set({
-        value,
+        value: finalValue,
+        encryptedValue: hasEncryptedValue
+          ? safeStorage.encryptString(JSON.stringify(encryptedValue))
+          : undefined,
       })
       .where(eq(extensionConfigs.configId, configId));
   }

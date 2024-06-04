@@ -323,4 +323,19 @@ export const WORKFLOW_NODES: {
     handleSource: ['default'],
     type: WORKFLOW_NODE_TYPE.BROWSER_TAB,
   },
+  [WORKFLOW_NODE_TYPE.BROWSER_MOUSE]: {
+    group: 'Browser',
+    subtitle: 'Browser',
+    icon: PanelTopIcon,
+    title: 'Browser Tab',
+    defaultData: {
+      selector: '',
+      action: 'click',
+      isDisabled: false,
+      $nodeType: WORKFLOW_NODE_TYPE.BROWSER_MOUSE,
+    },
+    handleTarget: ['default'],
+    handleSource: ['default'],
+    type: WORKFLOW_NODE_TYPE.BROWSER_MOUSE,
+  },
 } as const;

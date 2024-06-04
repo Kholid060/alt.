@@ -19,8 +19,9 @@ class TabService {
     return Browser.tabs.reload(tabId);
   }
 
-  static async click(
+  static async mouse(
     { tabId, frameId = 0 }: TabTarget,
+    action: 'down' | 'up' | 'click',
     selector: ExtensionBrowserElementSelector,
   ) {
     await injectContentHandlerScript(tabId);
@@ -28,7 +29,7 @@ class TabService {
       tabId,
       frameId,
       args: [selector],
-      name: 'element:click',
+      name: action === 'down' ? 'element:mouse-down' : 'element:mouse-up',
     });
   }
 

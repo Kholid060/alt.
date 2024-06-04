@@ -79,6 +79,16 @@ RuntimeMessage.instance.onMessage('element:click', async (_, selector) => {
   MouseDriver.click(element);
 });
 
+RuntimeMessage.instance.onMessage('element:mouse-down', async (_, selector) => {
+  const element = await queryElement(selector);
+  MouseDriver.down(element);
+});
+
+RuntimeMessage.instance.onMessage('element:mouse-up', async (_, selector) => {
+  const element = await queryElement(selector);
+  MouseDriver.up(element);
+});
+
 RuntimeMessage.instance.onMessage(
   'element:keyboard-type',
   async (_, selector, text, options) => {

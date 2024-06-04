@@ -4,6 +4,14 @@ import DBService from '/@/services/database/database.service';
 import ExtensionService from '/@/services/extension.service';
 import { isObject } from '@repo/shared';
 import { ExtensionError } from '#packages/common/errors/custom-errors';
+import IPCMain from '../../ipc/IPCMain';
+import { z } from 'zod';
+import WindowCommand from '/@/window/command-window';
+
+const extensionConfigType = z.union([
+  z.literal('command'),
+  z.literal('extension'),
+]);
 
 ExtensionIPCEvent.instance.on(
   'runtime.config.getValues',
@@ -15,6 +23,31 @@ ExtensionIPCEvent.instance.on(
 
     return configValues?.value ?? {};
   },
+  [extensionConfigType.optional().default('command')],
+);
+ExtensionIPCEvent.instance.on(
+  'runtime.config.openConfigPage',
+  ({ extension, commandId, extensionId }, type = 'command') => {
+    if (type === 'extension') {
+      if (!extension.config?.length) return Promise.resolve();
+    } else if (type === 'command') {
+      const command = extension.commands.find(
+        (command) => command.name === commandId,
+      );
+      if (!command?.config?.length) return Promise.resolve();
+    }
+
+    WindowCommand.instance.toggleWindow(true);
+
+    IPCMain.sendToWindow('command', 'command-window:input-config', {
+      type,
+      commandId,
+      extensionId,
+    });
+
+    return Promise.resolve();
+  },
+  [extensionConfigType],
 );
 
 ExtensionIPCEvent.instance.on('runtime.getManifest', ({ extension }) => {

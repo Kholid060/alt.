@@ -9,6 +9,8 @@ import Browser from 'webextension-polyfill';
 
 export interface RuntimeEvent {
   'element:click': (selector: ExtensionBrowserElementSelector) => void;
+  'element:mouse-up': (selector: ExtensionBrowserElementSelector) => void;
+  'element:mouse-down': (selector: ExtensionBrowserElementSelector) => void;
   'element:select': (
     selector: ExtensionBrowserElementSelector,
     ...values: string[]

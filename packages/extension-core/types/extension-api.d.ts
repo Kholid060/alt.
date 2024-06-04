@@ -70,9 +70,13 @@ declare namespace ExtensionAPI.runtime.command {
 }
 
 declare namespace ExtensionAPI.runtime.config {
+  type ConfigType = 'extension' | 'command';
+
   export function getValues<T extends object = Record<string, unknown>>(
-    type?: 'extension' | 'command',
+    type?: ConfigType,
   ): Promise<T>;
+
+  export function openConfigPage(config: ConfigType): Promise<void>;
 }
 
 declare namespace ExtensionAPI.shell.installedApps {
@@ -248,6 +252,11 @@ declare namespace ExtensionAPI.browser.activeTab {
     filter?: SelectElementFilter;
   }
 
+  interface XYPoint {
+    x: number;
+    y: number;
+  }
+
   export function selectElement(
     options?: SelectElementOptions,
   ): Promise<{ selector: string; canceled: boolean }>;
@@ -255,6 +264,14 @@ declare namespace ExtensionAPI.browser.activeTab {
   export function reload(): Promise<void>;
 
   export function click(
+    selector: ExtensionAPI.browser.ElementSelector,
+  ): Promise<void>;
+
+  export function mouseDown(
+    selector: ExtensionAPI.browser.ElementSelector,
+  ): Promise<void>;
+
+  export function mouseUp(
     selector: ExtensionAPI.browser.ElementSelector,
   ): Promise<void>;
 

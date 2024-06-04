@@ -20,6 +20,7 @@ function CommandMain() {
     _extension.ui.searchPanel.onKeydown.addListener((value) => {
       console.log('onKeydown', value);
     });
+    _extension.runtime.config.getValues('command').then(console.log)
 
     _extension.browser.activeTab.get().then(console.log);
     _extension.browser.activeTab.type('textarea[name="q"]', 'Hello 世界').then(console.log);
