@@ -14,6 +14,8 @@ import WorkflowService from '/@/services/workflow.service';
 import { isWSAckError } from '../extension/ExtensionBrowserElementHandle';
 import ExtensionService from '/@/services/extension.service';
 import OauthService from '/@/services/oauth.service';
+import ExtensionWSNamespace from '/@/services/websocket/ws-namespaces/extensions.ws-namespace';
+import { ExtensionError } from '#packages/common/errors/custom-errors';
 
 /** EXTENSION */
 IPCMain.handle('extension:import', async () => {
@@ -331,6 +333,18 @@ IPCMain.handle('browser:new-tab', async (_, browserId, url) => {
   if (isWSAckError(tab)) throw new Error(tab.errorMessage);
 
   return { ...tab, browserId };
+});
+IPCMain.handle('browser:actions', async (_, { args, browserId, name }) => {
+  const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
+    args,
+    name,
+    browserId,
+  });
+  if (isWSAckError(result)) {
+    throw new ExtensionError(result.errorMessage);
+  }
+
+  return result;
 });
 
 /** CRYPTO */

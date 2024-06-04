@@ -10,11 +10,9 @@ import type {
 } from './WorkflowNodeHandler';
 import ExtensionCommandRunner from '/@/extension/ExtensionCommandRunner';
 import { CommandLaunchBy } from '@repo/extension';
-import type {
-  ExtensionBrowserTabContext,
-  ExtensionCommandExecutePayloadWithData,
-} from '#packages/common/interface/extension.interface';
+import type { ExtensionCommandExecutePayloadWithData } from '#packages/common/interface/extension.interface';
 import type { ExtensionCommandArgument } from '@repo/extension-core';
+import type { WorkflowRunnerBrowserContext } from '../runner/WorklowRunnerBrowser';
 
 type CommandDataWithPath = DatabaseExtensionCommandWithExtension & {
   filePath: string;
@@ -168,9 +166,9 @@ export class NodeHandlerCommand extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.C
       this.inputtedConfigCache.add(inputtedConfigCacheId);
     }
 
-    let browserCtx: ReturnType<typeof runner.getBrowserCtx> | null =
-      runner.getBrowserCtx();
-    if (browserCtx.id === null || browserCtx.browserId === null) {
+    let browserCtx: WorkflowRunnerBrowserContext | null =
+      runner.browser.getContext();
+    if (browserCtx.tabId === null || browserCtx.browserId === null) {
       browserCtx = null;
     }
 
@@ -188,7 +186,14 @@ export class NodeHandlerCommand extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.C
         launchBy: CommandLaunchBy.WORKFLOW,
       },
       commandFilePath: command.filePath,
-      browserCtx: browserCtx as ExtensionBrowserTabContext,
+      browserCtx: browserCtx
+        ? {
+            url: browserCtx.url,
+            title: browserCtx.title,
+            id: browserCtx.tabId as number,
+            browserId: browserCtx.browserId as string,
+          }
+        : undefined,
     });
 
     return { value };

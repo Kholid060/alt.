@@ -230,6 +230,8 @@ declare namespace ExtensionAPI.browser {
     keyDown: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.keyDown>;
     getText: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.getText>;
     getHTML: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.getHTML>;
+    mouseUp: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.mouseUp>;
+    mouseDown: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.mouseDown>;
     getAttributes: OmitFirstArg<
       typeof ExtensionAPI.browser.activeTab.getAttributes
     >;

@@ -24,12 +24,18 @@ class TabService {
     action: 'down' | 'up' | 'click',
     selector: ExtensionBrowserElementSelector,
   ) {
+    const mouseEventMap = {
+      up: 'element:mouse-up',
+      click: 'element:click',
+      down: 'element:mouse-down',
+    } as const;
+
     await injectContentHandlerScript(tabId);
     await RuntimeMessage.instance.sendMessageToTab({
       tabId,
       frameId,
       args: [selector],
-      name: action === 'down' ? 'element:mouse-down' : 'element:mouse-up',
+      name: mouseEventMap[action],
     });
   }
 

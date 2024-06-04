@@ -18,8 +18,7 @@ import WorkflowRunnerSandbox from './WorkflowRunnerSandbox';
 import { clipboard } from 'electron';
 import { nanoid } from 'nanoid';
 import { validateTypes } from '/@/utils/helper';
-import type { ExtensionBrowserTabContext } from '#packages/common/interface/extension.interface';
-import type { SetNullable } from '#packages/common/interface/utils.interface';
+import WorkflowRunnerBrowser from './WorklowRunnerBrowser';
 
 export type NodeHandlersObj = Record<
   WORKFLOW_NODE_TYPE,
@@ -134,18 +133,11 @@ export interface WorkflowRunnerPrevNodeExecution {
   isRetrying?: boolean;
 }
 
-type WorkflowBrowserContext = SetNullable<
-  NonNullable<ExtensionBrowserTabContext>,
-  'id' | 'browserId'
->;
-
 class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   private startNodeId: string;
   private nodeHandlers: NodeHandlersObj;
   private nodesIdxMap: Map<string, number>;
   private nodeExecutionQueue: string[] = [];
-
-  private browserCtx: WorkflowBrowserContext;
 
   id: string;
   startedAt: string;
@@ -154,6 +146,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   workflow: DatabaseWorkflowDetail;
   connectionsMap: Record<string, NodeConnectionMap> = {};
 
+  browser: WorkflowRunnerBrowser;
   sandbox: WorkflowRunnerSandbox;
   dataStorage: WorkflowRunnerData;
 
@@ -177,13 +170,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     this.state = WorkflowRunnerState.Idle;
     this.startedAt = new Date().toString();
 
-    this.browserCtx = {
-      url: '',
-      id: null,
-      title: '',
-      browserId: null,
-    };
-
+    this.browser = new WorkflowRunnerBrowser();
     this.sandbox = new WorkflowRunnerSandbox(this);
     this.dataStorage = new WorkflowRunnerData(this);
 
@@ -242,14 +229,6 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   stop() {
     this.state = WorkflowRunnerState.Stop;
     this.emit('finish', WorkflowRunnerFinishReason.Stop);
-  }
-
-  getBrowserCtx() {
-    return Object.freeze(this.browserCtx);
-  }
-
-  setBrowserCtx(ctxData: Partial<WorkflowBrowserContext>) {
-    this.browserCtx = { ...this.browserCtx, ...ctxData };
   }
 
   private getNode(nodeId: string): WorkflowNodes | null {

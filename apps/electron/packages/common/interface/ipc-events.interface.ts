@@ -9,9 +9,13 @@ import type {
   ExtensionCommandViewData,
 } from './extension.interface';
 import type {
+  AllButLast,
   BrowserExtensionTab,
   BrowserInfo,
   BrowserType,
+  ExtensionActiveTabActionWSEvents,
+  Last,
+  WSAckErrorResult,
 } from '@repo/shared';
 import type {
   DatabaseEvents,
@@ -106,6 +110,20 @@ export interface IPCBrowserEvents {
     browserId: string,
     url: string,
   ) => ExtensionBrowserTabContext;
+  'browser:actions': <
+    T extends keyof ExtensionActiveTabActionWSEvents,
+    P extends Parameters<ExtensionActiveTabActionWSEvents[T]>,
+  >({
+    args,
+    name,
+    timeout,
+    browserId,
+  }: {
+    name: T;
+    timeout?: number;
+    browserId: string;
+    args: AllButLast<P>;
+  }) => Exclude<Parameters<Last<P>>[0], WSAckErrorResult>;
 }
 
 export interface IPCOAuthEvents {

@@ -162,6 +162,7 @@ function WorkflowUiFormExpression({
           data={data}
           path={path}
           label={label}
+          labelId={labelId}
           isActive={isActive}
           className={labelClass}
           position={labelPosition}
@@ -188,6 +189,7 @@ function WorkflowUiFormExpression({
           data={data}
           path={path}
           label={label}
+          labelId={labelId}
           isActive={isActive}
           className={labelClass}
           position={labelPosition}

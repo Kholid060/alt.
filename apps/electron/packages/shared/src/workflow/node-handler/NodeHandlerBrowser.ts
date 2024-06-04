@@ -83,9 +83,9 @@ export class NodeHandlerOpenBrowser extends WorkflowNodeHandler<WORKFLOW_NODE_TY
     if (node.data.useOpenedBrowser) {
       const browserId = await getOpenedBrowser(node.data.preferBrowser);
       if (browserId) {
-        runner.setBrowserCtx({
-          id: null,
+        runner.browser.setContext({
           browserId,
+          tabId: null,
         });
 
         return { value: null };
@@ -113,8 +113,8 @@ export class NodeHandlerOpenBrowser extends WorkflowNodeHandler<WORKFLOW_NODE_TY
         (connectedBrowser) => connectedBrowser.type === browser.type,
       );
       if (activeBrowser) {
-        runner.setBrowserCtx({
-          id: null,
+        runner.browser.setContext({
+          tabId: null,
           browserId: activeBrowser.id,
         });
       }
@@ -139,11 +139,16 @@ export class NodeHandlerBrowserTab extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
     node,
     runner,
   }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.BROWSER_TAB>): Promise<WorkflowNodeHandlerExecuteReturn> {
-    const { browserId } = runner.getBrowserCtx();
+    let { browserId } = runner.browser.getContext();
     if (!browserId) {
-      throw new Error(
-        'Couldn\'t find an active browser. Use the "Use Browser" node before using this node.',
-      );
+      browserId = await getOpenedBrowser('any');
+      if (!browserId) {
+        throw new Error(
+          'Couldn\'t find an active browser. Use the "Use Browser" node before using this node.',
+        );
+      }
+
+      runner.browser.setContext({ browserId });
     }
 
     if (node.data.action === 'use-active-tab') {
@@ -153,7 +158,7 @@ export class NodeHandlerBrowserTab extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
       );
       if (!activeTab) throw new Error("Couldn't find active tab");
 
-      runner.setBrowserCtx({ browserId, id: activeTab.id });
+      runner.browser.setContext({ browserId, tabId: activeTab.id });
     } else {
       const url = node.data.newTabURL;
       if (
@@ -171,7 +176,45 @@ export class NodeHandlerBrowserTab extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
       );
       if (!activeTab) throw new Error("Couldn't create a new tab");
 
-      runner.setBrowserCtx({ browserId, id: activeTab.id });
+      runner.browser.setContext({ browserId, tabId: activeTab.id });
+    }
+
+    return {
+      value: null,
+    };
+  }
+
+  destroy() {}
+}
+
+export class NodeHandlerBrowserMouse extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.BROWSER_MOUSE> {
+  constructor() {
+    super(WORKFLOW_NODE_TYPE.BROWSER_MOUSE, {
+      dataValidation: [
+        { key: 'selector', name: 'Selector', types: ['String'] },
+      ],
+    });
+  }
+
+  async execute({
+    node,
+    runner,
+  }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.BROWSER_MOUSE>): Promise<WorkflowNodeHandlerExecuteReturn> {
+    const selector = node.data.selector.trim();
+    if (!selector) throw new Error('Element selector is empty');
+
+    switch (node.data.action) {
+      case 'click':
+        await runner.browser.sendMessage('tabs:click', { selector });
+        break;
+      case 'mouse-up':
+        await runner.browser.sendMessage('tabs:mouse-up', { selector });
+        break;
+      case 'mouse-down':
+        await runner.browser.sendMessage('tabs:mouse-down', { selector });
+        break;
+      default:
+        throw new Error('Unknown mouse action');
     }
 
     return {

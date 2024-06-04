@@ -55,20 +55,7 @@ type ExtensionWSAckElementHandler<
   R
 >;
 
-export interface ExtensionWSServerToClientEvents {
-  'tabs:reload': ExtensionWSAckTabHandler;
-  'tabs:get-active': ExtensionWSAckHandler<[], BrowserExtensionTab>;
-  'tabs:create-new': ExtensionWSAckHandler<[url: string], BrowserExtensionTab>;
-  'tabs:select-element': ExtensionWSAckTabHandler<
-    [
-      options: {
-        title?: string;
-        description?: string;
-        filter?: { selector?: string };
-      },
-    ],
-    { canceled: boolean; selector: string }
-  >;
+export interface ExtensionActiveTabActionWSEvents {
   'tabs:click': ExtensionWSAckElementHandler;
   'tabs:mouse-up': ExtensionWSAckElementHandler;
   'tabs:mouse-down': ExtensionWSAckElementHandler;
@@ -104,6 +91,23 @@ export interface ExtensionWSServerToClientEvents {
   'tabs:wait-for-selector': ExtensionWSAckElementHandler<
     [options: BrowserWaitForSelectorOptions]
   >;
+  'tabs:select-element': ExtensionWSAckTabHandler<
+    [
+      options: {
+        title?: string;
+        description?: string;
+        filter?: { selector?: string };
+      },
+    ],
+    { canceled: boolean; selector: string }
+  >;
+  'tabs:reload': ExtensionWSAckTabHandler;
+}
+
+export interface ExtensionWSServerToClientEvents
+  extends ExtensionActiveTabActionWSEvents {
+  'tabs:get-active': ExtensionWSAckHandler<[], BrowserExtensionTab>;
+  'tabs:create-new': ExtensionWSAckHandler<[url: string], BrowserExtensionTab>;
 }
 
 export interface ExtensionWSInterServerEvents {}

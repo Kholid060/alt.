@@ -23,6 +23,7 @@ import {
   ZapIcon,
   DatabaseIcon,
   PanelTopIcon,
+  MouseIcon,
 } from 'lucide-react';
 import type { WORKFLOW_NODE_GROUP } from './workflow.const';
 import { WORKFLOW_NODE_TYPE } from './workflow.const';
@@ -324,10 +325,10 @@ export const WORKFLOW_NODES: {
     type: WORKFLOW_NODE_TYPE.BROWSER_TAB,
   },
   [WORKFLOW_NODE_TYPE.BROWSER_MOUSE]: {
+    title: 'Mouse',
     group: 'Browser',
+    icon: MouseIcon,
     subtitle: 'Browser',
-    icon: PanelTopIcon,
-    title: 'Browser Tab',
     defaultData: {
       selector: '',
       action: 'click',

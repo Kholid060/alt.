@@ -24,7 +24,7 @@ interface SocketEvents {
   'socket:disconnect': (browserInfo: BrowserInfo, reason: string) => void;
 }
 
-const BROWSER_EMIT_TIMEOUT_MS = 10_000;
+const BROWSER_EMIT_TIMEOUT_MS = 60_000;
 const BROWSER_TYPE = [
   'edge',
   'chrome',
