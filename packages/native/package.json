@@ -1,0 +1,34 @@
+{
+  "name": "@repo/native",
+  "version": "0.0.0",
+  "scripts": {
+    "test": "cargo test",
+    "cargo-build": "cargo build --message-format=json > cargo.log",
+    "cross-build": "cross build --message-format=json > cross.log",
+    "postcargo-build": "neon dist < cargo.log",
+    "postcross-build": "neon dist -m /target < cross.log",
+    "debug": "yarn cargo-build",
+    "build:lib": "tsup",
+    "build:cargo": "npm run cargo-build -- --release",
+    "build:cross": "npm run cross-build -- --release",
+    "build": "yarn build:lib && yarn build:cargo",
+    "cross": "yarn build:lib && yarn build:cross",
+    "lint": "eslint . --ext js,mjs,cjs,ts,mts,cts,tsx"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@neon-rs/cli": "0.1.73",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^20.14.2",
+    "@typescript-eslint/eslint-plugin": "^7.12.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "tsup": "^8.1.0",
+    "typescript": "^5.4.5"
+  }
+}

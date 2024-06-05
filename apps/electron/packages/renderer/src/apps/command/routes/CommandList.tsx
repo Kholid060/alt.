@@ -154,6 +154,7 @@ function CommandList() {
         extensionItems.push({
           group: 'Extensions',
           icon: extensionIcon,
+          subtitle: 'Extension',
           title: extension.title,
           value: 'extension:' + extension.id,
           metadata: {

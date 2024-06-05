@@ -1,0 +1,6 @@
+/** @type {import("eslint").Linter.Config} */
+{
+  "root": true,
+  "ignorePatterns": [".eslintrc.cjs"],
+  "extends": ["@repo/eslint-config/base.js"]
+}
