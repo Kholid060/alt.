@@ -13,6 +13,7 @@ const actions: {
 }[] = [
   { id: 'read', name: 'Read file' },
   { id: 'write', name: 'Write file' },
+  { id: 'stat', name: 'Stat' },
 ];
 
 function WorkflowNodeEditDelay() {

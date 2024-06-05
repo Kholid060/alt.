@@ -141,6 +141,16 @@ declare namespace ExtensionAPI.fs {
     options?: Partial<WriteOptions>,
   ): Promise<void>;
 
+  interface Stats {
+    size: number;
+    atime: string;
+    mtime: string;
+    isFile: boolean;
+    birthtime: string;
+    isDirectory: boolean;
+  }
+  export function stat(path: string): Promise<Stats>;
+
   export function readJSON(path: string): Promise<Record<any, any>>;
 
   export function exists(path: string): Promise<boolean>;

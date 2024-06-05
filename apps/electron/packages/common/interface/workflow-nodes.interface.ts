@@ -75,7 +75,7 @@ export type WorkflowNodeFileSystem = WorkflowNodeBase<
     readFilePath: string;
     writeFilePath: string;
     throwIfEmpty: boolean;
-    action: 'read' | 'write';
+    action: 'read' | 'write' | 'stat';
   },
   WORKFLOW_NODE_TYPE.FILE_SYSTEM
 >;
@@ -248,6 +248,7 @@ export type WorkflowNodeBrowserMouse = WorkflowNodeBase<
 export type WorkflowNodeBrowserKeyboard = WorkflowNodeBase<
   {
     text: string;
+    delay: number;
     selector: string;
     clearFormValue: boolean;
     key: ExtensionAPI.browser.KeyboardKeys;
@@ -255,6 +256,16 @@ export type WorkflowNodeBrowserKeyboard = WorkflowNodeBase<
     modifiers: ExtensionAPI.browser.KeyboardModifiers[];
   },
   WORKFLOW_NODE_TYPE.BROWSER_KEYBOARD
+>;
+
+export type WorkflowNodeGetElementText = WorkflowNodeBase<
+  {
+    selector: string;
+    outerHTML: boolean;
+    visibleTextOnly: boolean;
+    action: 'get-text' | 'get-html';
+  },
+  WORKFLOW_NODE_TYPE.GET_ELEMENT_TEXT
 >;
 
 export interface WorkflowNodesMap {
@@ -274,6 +285,7 @@ export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.HTTP_REQUEST]: WorkflowNodeHttpRequest;
   [WORKFLOW_NODE_TYPE.NOTIFICATION]: WorkflowNodeNotification;
   [WORKFLOW_NODE_TYPE.BROWSER_MOUSE]: WorkflowNodeBrowserMouse;
+  [WORKFLOW_NODE_TYPE.GET_ELEMENT_TEXT]: WorkflowNodeGetElementText;
   [WORKFLOW_NODE_TYPE.BROWSER_KEYBOARD]: WorkflowNodeBrowserKeyboard;
   [WORKFLOW_NODE_TYPE.EXECUTE_WORKFLOW]: WorkflowNodeExecuteWorkflow;
   [WORKFLOW_NODE_TYPE.TRIGGER_SHORTCUT]: WorkflowNodeTriggerShortcut;

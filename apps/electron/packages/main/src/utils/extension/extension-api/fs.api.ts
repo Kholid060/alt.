@@ -36,6 +36,19 @@ ExtensionIPCEvent.instance.on(
   },
 );
 
+ExtensionIPCEvent.instance.on('fs.stat', async (_, path) => {
+  const stat = await fs.stat(path);
+
+  return {
+    size: stat.size,
+    isFile: stat.isFile(),
+    isDirectory: stat.isDirectory(),
+    atime: stat.atime.toISOString(),
+    mtime: stat.mtime.toISOString(),
+    birthtime: stat.birthtime.toISOString(),
+  };
+});
+
 ExtensionIPCEvent.instance.on('fs.readJSON', (_, path) => {
   return fs.readJSON(path);
 });

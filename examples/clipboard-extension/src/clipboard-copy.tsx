@@ -48,6 +48,7 @@ export default async function CommandMain(context: CommandLaunchContext) {
   //   subtitle: 'Hello worldo!!!',
   // });
 
+  console.log(await _extension.fs.stat(filePath));
   // await authorizeCredential();
   console.log(await _extension.runtime.config.getValues('command'));
   // await _extension.runtime.config.openConfigPage('command');
