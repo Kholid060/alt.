@@ -36,7 +36,6 @@ function CommandViewJSON() {
 
     const messagePort = runnerMessagePort.current;
     const onUpdateUI = debounce((data: MessagePortCommandJSONUpdateUI) => {
-      console.log(data);
       if (data.commandId !== commandId || data.extensionId !== extensionId) {
         return;
       }

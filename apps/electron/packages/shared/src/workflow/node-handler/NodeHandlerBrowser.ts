@@ -1,14 +1,19 @@
 import type { WorkflowNodeUseBrowser } from '#packages/common/interface/workflow-nodes.interface';
 import IPCRenderer from '#packages/common/utils/IPCRenderer';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
-import { isValidURL, type BrowserType } from '@repo/shared';
+import {
+  isObject,
+  isValidURL,
+  parseJSON,
+  type BrowserType,
+} from '@repo/shared';
 import type {
   WorkflowNodeHandlerExecute,
   WorkflowNodeHandlerExecuteReturn,
 } from './WorkflowNodeHandler';
 import WorkflowNodeHandler from './WorkflowNodeHandler';
 import { shell } from 'electron';
-import { sleepWithRetry } from '/@/utils/helper';
+import { getExactType, sleepWithRetry } from '/@/utils/helper';
 
 const browserName: Record<BrowserType, string> = {
   firefox: 'Firefox',
@@ -378,6 +383,100 @@ export class NodeHandlerWaitSelector extends WorkflowNodeHandler<WORKFLOW_NODE_T
     return {
       value: null,
     };
+  }
+
+  destroy() {}
+}
+
+export class NodeHandlerElementAttributes extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.ELEMENT_ATTRIBUTES> {
+  constructor() {
+    super(WORKFLOW_NODE_TYPE.ELEMENT_ATTRIBUTES, {
+      dataValidation: [
+        { key: 'selector', name: 'Selector', types: ['String'] },
+        { key: 'getAttrs', name: 'Get attribute names', types: ['String'] },
+      ],
+    });
+  }
+
+  private async setAttributes({
+    node,
+    runner,
+    selector,
+  }: Pick<
+    WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.ELEMENT_ATTRIBUTES>,
+    'node' | 'runner'
+  > & { selector: string }) {
+    const { data } = await runner.sandbox.evaluateExpAndApply(
+      node.data.$setAttrsExp,
+      node.data,
+    );
+    let attrs: Record<string, string> = {};
+
+    if (data.useSetAttrsJSON) {
+      const jsonAttrs =
+        typeof data.setAttrsJSON === 'string'
+          ? parseJSON<Record<string, string>>(
+              data.setAttrsJSON,
+              data.setAttrsJSON,
+            )
+          : data.setAttrsJSON;
+      if (!isObject(jsonAttrs)) {
+        throw new Error(
+          `Invalid JSON attributes value. Expected "Object" but got "${getExactType(jsonAttrs)}"`,
+        );
+      }
+
+      attrs = jsonAttrs as Record<string, string>;
+    } else {
+      data.setAttrs.forEach((item) => {
+        attrs[item.name] = item.value;
+      });
+    }
+
+    await runner.browser.sendMessage(
+      'tabs:set-attributes',
+      { selector },
+      attrs,
+    );
+  }
+
+  private async getAttributes({
+    node,
+    runner,
+    selector,
+  }: Pick<
+    WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.ELEMENT_ATTRIBUTES>,
+    'node' | 'runner'
+  > & { selector: string }) {
+    const names = node.data.getAttrs.split(',');
+    const result = await runner.browser.sendMessage(
+      'tabs:get-attributes',
+      { selector },
+      names,
+    );
+
+    return result;
+  }
+
+  async execute({
+    node,
+    runner,
+  }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.ELEMENT_ATTRIBUTES>): Promise<WorkflowNodeHandlerExecuteReturn> {
+    const selector = node.data.selector.trim();
+    if (!selector) throw new Error('Element selector is empty');
+
+    let value: unknown;
+
+    switch (node.data.action) {
+      case 'set':
+        await this.setAttributes({ node, runner, selector });
+        break;
+      case 'get':
+        value = await this.getAttributes({ node, runner, selector });
+        break;
+    }
+
+    return { value };
   }
 
   destroy() {}

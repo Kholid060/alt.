@@ -26,6 +26,7 @@ import {
   MouseIcon,
   PilcrowIcon,
   LocateFixedIcon,
+  BracketsIcon,
 } from 'lucide-react';
 import type { WORKFLOW_NODE_GROUP } from './workflow.const';
 import { WORKFLOW_NODE_TYPE } from './workflow.const';
@@ -393,5 +394,25 @@ export const WORKFLOW_NODES: {
     handleTarget: ['default'],
     handleSource: ['default'],
     type: WORKFLOW_NODE_TYPE.WAIT_SELECTOR,
+  },
+  [WORKFLOW_NODE_TYPE.ELEMENT_ATTRIBUTES]: {
+    title: 'Element Attributes',
+    group: 'Browser',
+    icon: BracketsIcon,
+    subtitle: 'Browser',
+    defaultData: {
+      selector: '',
+      getAttrs: '',
+      setAttrs: [],
+      action: 'get',
+      setAttrsJSON: '',
+      $setAttrsExp: {},
+      isDisabled: false,
+      useSetAttrsJSON: false,
+      $nodeType: WORKFLOW_NODE_TYPE.ELEMENT_ATTRIBUTES,
+    },
+    handleTarget: ['default'],
+    handleSource: ['default'],
+    type: WORKFLOW_NODE_TYPE.ELEMENT_ATTRIBUTES,
   },
 } as const;

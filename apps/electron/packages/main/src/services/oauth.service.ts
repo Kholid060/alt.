@@ -139,7 +139,6 @@ class Oauth2Provider implements OAuth2ProviderOptions {
     searchParams.set('scope', this.provider.auth.scope);
 
     const authorizeUrl = `${this.provider.auth.authorizeUrl}?${searchParams.toString()}`;
-    console.log(authorizeUrl);
 
     shell.openExternal(authorizeUrl);
   }

@@ -30,7 +30,6 @@ function CommandOAuthOverlay() {
     preloadAPI.main.ipc.handle(
       'command-window:show-oauth-overlay',
       (credentialProvider, detail) => {
-        console.log('show overlay', credentialProvider);
         setCredential({
           ...credentialProvider,
           ...detail,

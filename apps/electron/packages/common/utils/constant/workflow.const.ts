@@ -20,6 +20,7 @@ export enum WORKFLOW_NODE_TYPE {
   EXECUTE_WORKFLOW = 'node-execute-workflow',
   TRIGGER_SHORTCUT = 'node-trigger-shortcut',
   GET_ELEMENT_TEXT = 'node-get-element-text',
+  ELEMENT_ATTRIBUTES = 'node-element-attributes',
   TRIGGER_EXECUTE_WORKFLOW = 'node-trigger-execute-workflow',
 }
 

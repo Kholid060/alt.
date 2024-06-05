@@ -268,6 +268,19 @@ export type WorkflowNodeGetElementText = WorkflowNodeBase<
   WORKFLOW_NODE_TYPE.GET_ELEMENT_TEXT
 >;
 
+export type WorkflowNodeElementAttributes = WorkflowNodeBase<
+  {
+    selector: string;
+    getAttrs: string;
+    setAttrsJSON: string;
+    action: 'set' | 'get';
+    useSetAttrsJSON: boolean;
+    $setAttrsExp: WorkflowNodeExpressionRecords;
+    setAttrs: { name: string; value: string }[];
+  },
+  WORKFLOW_NODE_TYPE.ELEMENT_ATTRIBUTES
+>;
+
 export type WorkflowNodeWaitSelector = WorkflowNodeBase<
   {
     selector: string;
@@ -297,6 +310,7 @@ export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.BROWSER_KEYBOARD]: WorkflowNodeBrowserKeyboard;
   [WORKFLOW_NODE_TYPE.EXECUTE_WORKFLOW]: WorkflowNodeExecuteWorkflow;
   [WORKFLOW_NODE_TYPE.TRIGGER_SHORTCUT]: WorkflowNodeTriggerShortcut;
+  [WORKFLOW_NODE_TYPE.ELEMENT_ATTRIBUTES]: WorkflowNodeElementAttributes;
   [WORKFLOW_NODE_TYPE.TRIGGER_EXECUTE_WORKFLOW]: WorkflowNodeTriggerExecuteWorkflow;
 }
 

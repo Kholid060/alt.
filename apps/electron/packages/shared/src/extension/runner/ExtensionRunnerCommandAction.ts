@@ -60,7 +60,6 @@ class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
 
   async start() {
     const { timeoutMs } = this.payload;
-    console.log(this.payload);
 
     // Message port for accessing Extension APIs
     IPCRenderer.postMessage(
