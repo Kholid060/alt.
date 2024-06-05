@@ -24,6 +24,7 @@ import {
   DatabaseIcon,
   PanelTopIcon,
   MouseIcon,
+  PilcrowIcon,
 } from 'lucide-react';
 import type { WORKFLOW_NODE_GROUP } from './workflow.const';
 import { WORKFLOW_NODE_TYPE } from './workflow.const';
@@ -347,6 +348,7 @@ export const WORKFLOW_NODES: {
     defaultData: {
       key: ' ',
       text: '',
+      delay: 100,
       selector: '',
       modifiers: [],
       action: 'type',
@@ -357,5 +359,22 @@ export const WORKFLOW_NODES: {
     handleTarget: ['default'],
     handleSource: ['default'],
     type: WORKFLOW_NODE_TYPE.BROWSER_KEYBOARD,
+  },
+  [WORKFLOW_NODE_TYPE.GET_ELEMENT_TEXT]: {
+    title: 'Get Element Text',
+    group: 'Browser',
+    icon: PilcrowIcon,
+    subtitle: 'Browser',
+    defaultData: {
+      selector: '',
+      outerHTML: false,
+      isDisabled: false,
+      action: 'get-text',
+      visibleTextOnly: true,
+      $nodeType: WORKFLOW_NODE_TYPE.GET_ELEMENT_TEXT,
+    },
+    handleTarget: ['default'],
+    handleSource: ['default'],
+    type: WORKFLOW_NODE_TYPE.GET_ELEMENT_TEXT,
   },
 } as const;

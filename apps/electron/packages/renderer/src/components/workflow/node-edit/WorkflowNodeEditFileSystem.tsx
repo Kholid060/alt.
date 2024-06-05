@@ -60,7 +60,7 @@ function WorkflowNodeEditDelay() {
         </WorkflowUiFormExpression>
       )}
       <hr className="my-4" />
-      {node.data.action === 'read' ? (
+      {node.data.action === 'read' || node.data.action === 'stat' ? (
         <div>
           <WorkflowUiFormExpression
             data={node.data.$expData}
@@ -130,7 +130,7 @@ function WorkflowNodeEditDelay() {
           />
         </WorkflowUiFormExpression>
       )}
-      {node.data.action === 'read' && (
+      {(node.data.action === 'read' || node.data.action === 'stat') && (
         <div className="mt-4">
           <WorkflowUiFormExpression
             data={node.data.$expData}

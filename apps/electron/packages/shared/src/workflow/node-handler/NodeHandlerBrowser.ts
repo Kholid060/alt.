@@ -229,8 +229,9 @@ export class NodeHandlerBrowserKeyboard extends WorkflowNodeHandler<WORKFLOW_NOD
   constructor() {
     super(WORKFLOW_NODE_TYPE.BROWSER_KEYBOARD, {
       dataValidation: [
-        { key: 'key', name: 'Ke', types: ['String'] },
+        { key: 'key', name: 'Key', types: ['String'] },
         { key: 'text', name: 'Text', types: ['String'] },
+        { key: 'delay', name: 'Text', types: ['Number'] },
       ],
     });
   }
@@ -242,7 +243,7 @@ export class NodeHandlerBrowserKeyboard extends WorkflowNodeHandler<WORKFLOW_NOD
     const selector = node.data.selector.trim();
     if (!selector) throw new Error('Element selector is empty');
 
-    const { action, key, text, modifiers, clearFormValue } = node.data;
+    const { action, key, text, modifiers, clearFormValue, delay } = node.data;
 
     switch (action) {
       case 'key-down':
@@ -252,11 +253,13 @@ export class NodeHandlerBrowserKeyboard extends WorkflowNodeHandler<WORKFLOW_NOD
         break;
       case 'key-up':
         await runner.browser.sendMessage('tabs:key-up', { selector }, key, {
+          delay,
           modifiers,
         });
         break;
       case 'type':
         await runner.browser.sendMessage('tabs:type', { selector }, text, {
+          delay,
           clearValue: clearFormValue,
         });
         break;
@@ -266,6 +269,57 @@ export class NodeHandlerBrowserKeyboard extends WorkflowNodeHandler<WORKFLOW_NOD
 
     return {
       value: null,
+    };
+  }
+
+  destroy() {}
+}
+
+export class NodeHandlerBrowserGetElementText extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.GET_ELEMENT_TEXT> {
+  constructor() {
+    super(WORKFLOW_NODE_TYPE.GET_ELEMENT_TEXT, {
+      dataValidation: [
+        { key: 'selector', name: 'Text', types: ['String'] },
+        { key: 'outerHTML', name: 'Text', types: ['Boolean'] },
+        { key: 'visibleTextOnly', name: 'Text', types: ['Boolean'] },
+      ],
+    });
+  }
+
+  async execute({
+    node,
+    runner,
+  }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.GET_ELEMENT_TEXT>): Promise<WorkflowNodeHandlerExecuteReturn> {
+    const selector = node.data.selector.trim();
+    if (!selector) throw new Error('Element selector is empty');
+
+    let value = '';
+
+    switch (node.data.action) {
+      case 'get-text':
+        value = await runner.browser.sendMessage(
+          'tabs:get-text',
+          { selector },
+          {
+            onlyVisibleText: node.data.visibleTextOnly,
+          },
+        );
+        break;
+      case 'get-html':
+        value = await runner.browser.sendMessage(
+          'tabs:get-html',
+          { selector },
+          {
+            outerHTML: node.data.outerHTML,
+          },
+        );
+        break;
+      default:
+        throw new Error('Unknown get text node action');
+    }
+
+    return {
+      value,
     };
   }
 

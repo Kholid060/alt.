@@ -79,12 +79,36 @@ function WorkflowNodeEditDelay() {
         />
       </WorkflowUiFormExpression>
       <hr className="my-4" />
+      {(node.data.action === 'key-up' || node.data.action === 'type') && (
+        <WorkflowUiFormExpression
+          data={node.data.$expData}
+          path="delay"
+          className="mt-2"
+          label="Delay (MS)"
+          labelId="browser-keyboard--delay"
+          onDataChange={($expData) =>
+            updateEditNode<WorkflowNodeBrowserKeyboard>({ $expData })
+          }
+        >
+          <UiInput
+            min={0}
+            type="number"
+            inputSize="sm"
+            value={node.data.delay}
+            id="browser-keyboard--delay"
+            placeholder="100"
+            onValueChange={(value) =>
+              updateEditNode<WorkflowNodeBrowserKeyboard>({ delay: +value })
+            }
+          />
+        </WorkflowUiFormExpression>
+      )}
       {node.data.action === 'type' ? (
         <>
           <WorkflowUiFormExpression
             data={node.data.$expData}
             path="text"
-            className="mt-2"
+            className="mt-4"
             label="Text"
             labelId="browser-keyboard--text"
             onDataChange={($expData) =>
@@ -123,7 +147,7 @@ function WorkflowNodeEditDelay() {
           <WorkflowUiFormExpression
             data={node.data.$expData}
             path="key"
-            className="mt-2"
+            className="mt-4"
             label="Keyboard key"
             labelId="browser-keyboard--key"
             onDataChange={($expData) =>

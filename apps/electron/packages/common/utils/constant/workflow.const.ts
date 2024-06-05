@@ -18,6 +18,7 @@ export enum WORKFLOW_NODE_TYPE {
   BROWSER_KEYBOARD = 'node-browser-keyboard',
   EXECUTE_WORKFLOW = 'node-execute-workflow',
   TRIGGER_SHORTCUT = 'node-trigger-shortcut',
+  GET_ELEMENT_TEXT = 'node-get-element-text',
   TRIGGER_EXECUTE_WORKFLOW = 'node-trigger-execute-workflow',
 }
 
