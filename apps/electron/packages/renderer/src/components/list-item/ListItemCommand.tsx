@@ -50,7 +50,7 @@ function ListItemCommand({
             type: 'error',
             timeout: 5000,
             name: 'command-missing-args',
-            title: 'Fill out the required fill before running the command',
+            title: 'Fill out the required form before running the command',
           });
 
           return;

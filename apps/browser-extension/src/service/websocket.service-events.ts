@@ -181,6 +181,20 @@ export function websocketEventsListener(
   );
 
   io.on(
+    'tabs:set-attributes',
+    wsAckHandler(async (tab, selector, attrs, callback) => {
+      await TabService.setAttributes(
+        {
+          tabId: tab.tabId,
+        },
+        selector,
+        attrs,
+      );
+      callback();
+    }),
+  );
+
+  io.on(
     'tabs:element-exists',
     wsAckHandler(async (tab, selector, multiple, callback) => {
       const result = await TabService.elementExist(

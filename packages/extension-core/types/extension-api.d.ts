@@ -309,6 +309,11 @@ declare namespace ExtensionAPI.browser.activeTab {
     options?: Partial<ExtensionAPI.browser.GetHTMLOptions>,
   ): Promise<string>;
 
+  export function setAttributes(
+    selector: ExtensionAPI.browser.ElementSelector,
+    attrs: Record<string, string>,
+  ): Promise<void>;
+
   export function getAttributes(
     selector: ExtensionAPI.browser.ElementSelector,
     attrNames: string,

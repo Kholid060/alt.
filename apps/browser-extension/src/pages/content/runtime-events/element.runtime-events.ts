@@ -254,6 +254,15 @@ RuntimeMessage.instance.onMessage(
 );
 
 RuntimeMessage.instance.onMessage(
+  'element:set-attributes',
+  async (_, selector, attrs) => {
+    const element = await queryElement(selector);
+    for (const name in attrs) {
+      element.setAttribute(name, attrs[name]);
+    }
+  },
+);
+RuntimeMessage.instance.onMessage(
   'element:element-exists',
   async (_, selector, multiple) => {
     if (multiple) {

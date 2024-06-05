@@ -48,6 +48,10 @@ export interface RuntimeEvent {
     selector: ExtensionBrowserElementSelector,
     attrNames?: string | string[],
   ) => string | null | Record<string, string>;
+  'element:set-attributes': (
+    selector: ExtensionBrowserElementSelector,
+    attrs: Record<string, string>,
+  ) => void;
   'element:element-exists': (
     selector: string,
     multiple?: boolean,

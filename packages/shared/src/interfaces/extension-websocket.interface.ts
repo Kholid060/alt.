@@ -84,6 +84,9 @@ export interface ExtensionActiveTabActionWSEvents {
     [attrNames: string | string[] | null],
     string | null | Record<string, string>
   >;
+  'tabs:set-attributes': ExtensionWSAckElementHandler<
+    [attrs: Record<string, string>]
+  >;
   'tabs:element-exists': ExtensionWSAckElementHandler<
     [multiple: boolean],
     boolean | number[]

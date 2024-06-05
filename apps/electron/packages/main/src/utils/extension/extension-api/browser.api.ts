@@ -167,6 +167,18 @@ ExtensionIPCEvent.instance.on(
 );
 
 ExtensionIPCEvent.instance.on(
+  'browser.activeTab.setAttributes',
+  ({ browserCtx }, selector, attrs) => {
+    return extensionBrowserElementHandle(
+      browserCtx,
+      'setAttributes',
+      getElementSelector(selector),
+      attrs,
+    );
+  },
+);
+
+ExtensionIPCEvent.instance.on(
   'browser.activeTab.elementExists',
   async ({ browserCtx }, selector, multiple) => {
     if (!browserCtx) {

@@ -172,6 +172,20 @@ class TabService {
     });
   }
 
+  static async setAttributes(
+    { tabId, frameId = 0 }: TabTarget,
+    selector: ExtensionBrowserElementSelector,
+    attrs: Record<string, string>,
+  ) {
+    await injectContentHandlerScript(tabId);
+    return await RuntimeMessage.instance.sendMessageToTab({
+      tabId,
+      frameId,
+      name: 'element:set-attributes',
+      args: [selector, attrs],
+    });
+  }
+
   static async elementExist(
     { tabId, frameId = 0 }: TabTarget,
     { selector }: ExtensionBrowserElementSelector,

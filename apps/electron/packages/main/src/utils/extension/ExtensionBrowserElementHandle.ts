@@ -19,6 +19,7 @@ const elementHandlerWSEventMap = {
   mouseUp: 'tabs:mouse-up',
   mouseDown: 'tabs:mouse-down',
   getAttributes: 'tabs:get-attributes',
+  setAttributes: 'tabs:set-attributes',
 } as const;
 
 export function isWSAckError(result: unknown): result is WSAckErrorResult {
