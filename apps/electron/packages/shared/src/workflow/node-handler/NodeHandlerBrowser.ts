@@ -242,7 +242,7 @@ export class NodeHandlerBrowserKeyboard extends WorkflowNodeHandler<WORKFLOW_NOD
       dataValidation: [
         { key: 'key', name: 'Key', types: ['String'] },
         { key: 'text', name: 'Text', types: ['String'] },
-        { key: 'delay', name: 'Text', types: ['Number'] },
+        { key: 'delay', name: 'Delay', types: ['Number'] },
       ],
     });
   }
@@ -292,13 +292,17 @@ export class NodeHandlerBrowserKeyboard extends WorkflowNodeHandler<WORKFLOW_NOD
   destroy() {}
 }
 
-export class NodeHandlerBrowserGetElementText extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.GET_ELEMENT_TEXT> {
+export class NodeHandlerGetElementText extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.GET_ELEMENT_TEXT> {
   constructor() {
     super(WORKFLOW_NODE_TYPE.GET_ELEMENT_TEXT, {
       dataValidation: [
-        { key: 'selector', name: 'Text', types: ['String'] },
-        { key: 'outerHTML', name: 'Text', types: ['Boolean'] },
-        { key: 'visibleTextOnly', name: 'Text', types: ['Boolean'] },
+        { key: 'selector', name: 'Selector', types: ['String'] },
+        { key: 'outerHTML', name: 'Outer HTML', types: ['Boolean'] },
+        {
+          key: 'visibleTextOnly',
+          name: 'Visible text only',
+          types: ['Boolean'],
+        },
       ],
     });
   }
@@ -337,6 +341,42 @@ export class NodeHandlerBrowserGetElementText extends WorkflowNodeHandler<WORKFL
 
     return {
       value,
+    };
+  }
+
+  destroy() {}
+}
+
+export class NodeHandlerWaitSelector extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.WAIT_SELECTOR> {
+  constructor() {
+    super(WORKFLOW_NODE_TYPE.WAIT_SELECTOR, {
+      dataValidation: [
+        { key: 'state', name: 'State', types: ['String'] },
+        { key: 'timeout', name: 'Timeout', types: ['Number'] },
+        { key: 'selector', name: 'Selector', types: ['String'] },
+      ],
+    });
+  }
+
+  async execute({
+    node,
+    runner,
+  }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.WAIT_SELECTOR>): Promise<WorkflowNodeHandlerExecuteReturn> {
+    const selector = node.data.selector.trim();
+    if (!selector) throw new Error('Element selector is empty');
+
+    const { state, timeout } = node.data;
+    await runner.browser.sendMessage(
+      'tabs:wait-for-selector',
+      { selector },
+      {
+        state,
+        timeout,
+      },
+    );
+
+    return {
+      value: null,
     };
   }
 

@@ -25,6 +25,7 @@ import {
   PanelTopIcon,
   MouseIcon,
   PilcrowIcon,
+  LocateFixedIcon,
 } from 'lucide-react';
 import type { WORKFLOW_NODE_GROUP } from './workflow.const';
 import { WORKFLOW_NODE_TYPE } from './workflow.const';
@@ -376,5 +377,21 @@ export const WORKFLOW_NODES: {
     handleTarget: ['default'],
     handleSource: ['default'],
     type: WORKFLOW_NODE_TYPE.GET_ELEMENT_TEXT,
+  },
+  [WORKFLOW_NODE_TYPE.WAIT_SELECTOR]: {
+    title: 'Wait for Selector',
+    group: 'Browser',
+    icon: LocateFixedIcon,
+    subtitle: 'Browser',
+    defaultData: {
+      selector: '',
+      timeout: 10_000,
+      state: 'visible',
+      isDisabled: false,
+      $nodeType: WORKFLOW_NODE_TYPE.WAIT_SELECTOR,
+    },
+    handleTarget: ['default'],
+    handleSource: ['default'],
+    type: WORKFLOW_NODE_TYPE.WAIT_SELECTOR,
   },
 } as const;

@@ -15,6 +15,7 @@ export enum WORKFLOW_NODE_TYPE {
   HTTP_REQUEST = 'node-http-request',
   NOTIFICATION = 'node-notification',
   BROWSER_MOUSE = 'node-browser-mouse',
+  WAIT_SELECTOR = 'node-wait-selector',
   BROWSER_KEYBOARD = 'node-browser-keyboard',
   EXECUTE_WORKFLOW = 'node-execute-workflow',
   TRIGGER_SHORTCUT = 'node-trigger-shortcut',

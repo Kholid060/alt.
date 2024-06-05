@@ -268,6 +268,13 @@ export type WorkflowNodeGetElementText = WorkflowNodeBase<
   WORKFLOW_NODE_TYPE.GET_ELEMENT_TEXT
 >;
 
+export type WorkflowNodeWaitSelector = WorkflowNodeBase<
+  {
+    selector: string;
+  } & Required<ExtensionAPI.browser.WaitForSelectorOptions>,
+  WORKFLOW_NODE_TYPE.WAIT_SELECTOR
+>;
+
 export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoop;
   [WORKFLOW_NODE_TYPE.CODE]: WorkflowNodeCode;
@@ -285,6 +292,7 @@ export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.HTTP_REQUEST]: WorkflowNodeHttpRequest;
   [WORKFLOW_NODE_TYPE.NOTIFICATION]: WorkflowNodeNotification;
   [WORKFLOW_NODE_TYPE.BROWSER_MOUSE]: WorkflowNodeBrowserMouse;
+  [WORKFLOW_NODE_TYPE.WAIT_SELECTOR]: WorkflowNodeWaitSelector;
   [WORKFLOW_NODE_TYPE.GET_ELEMENT_TEXT]: WorkflowNodeGetElementText;
   [WORKFLOW_NODE_TYPE.BROWSER_KEYBOARD]: WorkflowNodeBrowserKeyboard;
   [WORKFLOW_NODE_TYPE.EXECUTE_WORKFLOW]: WorkflowNodeExecuteWorkflow;
