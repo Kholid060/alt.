@@ -19,6 +19,7 @@ const mouseActions: {
   name: string;
 }[] = [
   { id: 'type', name: 'Typing' },
+  { id: 'press', name: 'Press key' },
   { id: 'key-up', name: 'Key up' },
   { id: 'key-down', name: 'Key down' },
 ];

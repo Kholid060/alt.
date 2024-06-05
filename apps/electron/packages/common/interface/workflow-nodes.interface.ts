@@ -252,7 +252,7 @@ export type WorkflowNodeBrowserKeyboard = WorkflowNodeBase<
     selector: string;
     clearFormValue: boolean;
     key: ExtensionAPI.browser.KeyboardKeys;
-    action: 'key-down' | 'key-up' | 'type';
+    action: 'key-down' | 'press' | 'key-up' | 'type';
     modifiers: ExtensionAPI.browser.KeyboardModifiers[];
   },
   WORKFLOW_NODE_TYPE.BROWSER_KEYBOARD

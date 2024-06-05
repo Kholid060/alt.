@@ -151,6 +151,11 @@ export class NodeHandlerBrowserTab extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
       runner.browser.setContext({ browserId });
     }
 
+    let value: {
+      url: string;
+      title: string;
+    };
+
     if (node.data.action === 'use-active-tab') {
       const activeTab = await IPCRenderer.invokeWithError(
         'browser:get-active-tab',
@@ -159,6 +164,10 @@ export class NodeHandlerBrowserTab extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
       if (!activeTab) throw new Error("Couldn't find active tab");
 
       runner.browser.setContext({ browserId, tabId: activeTab.id });
+      value = {
+        url: activeTab.url,
+        title: activeTab.title,
+      };
     } else {
       const url = node.data.newTabURL;
       if (
@@ -177,11 +186,13 @@ export class NodeHandlerBrowserTab extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
       if (!activeTab) throw new Error("Couldn't create a new tab");
 
       runner.browser.setContext({ browserId, tabId: activeTab.id });
+      value = {
+        url: activeTab.url,
+        title: activeTab.title,
+      };
     }
 
-    return {
-      value: null,
-    };
+    return { value };
   }
 
   destroy() {}
@@ -253,6 +264,12 @@ export class NodeHandlerBrowserKeyboard extends WorkflowNodeHandler<WORKFLOW_NOD
         break;
       case 'key-up':
         await runner.browser.sendMessage('tabs:key-up', { selector }, key, {
+          delay,
+          modifiers,
+        });
+        break;
+      case 'press':
+        await runner.browser.sendMessage('tabs:press', { selector }, key, {
           delay,
           modifiers,
         });
