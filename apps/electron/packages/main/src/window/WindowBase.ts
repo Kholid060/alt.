@@ -81,6 +81,13 @@ class WindowBaseInvokeMessage {
 
     this.messages.delete(message.messageId);
   }
+
+  clearMessages() {
+    this.messages.forEach((resolver) => {
+      resolver.reject(new Error('CLOSED'));
+    });
+    this.messages.clear();
+  }
 }
 
 class WindowBase extends EventEmitter<WindowBaseEvents> {
@@ -124,11 +131,6 @@ class WindowBase extends EventEmitter<WindowBaseEvents> {
 
     this.webContentId = browserWindow.webContents.id;
 
-    browserWindow.on('closed', () => {
-      this.window = null;
-      this.webContentId = -1;
-      this._state = WindowBaseState.Closed;
-    });
     browserWindow.on('hide', () => {
       this._state = WindowBaseState.Hidden;
       this.sendMessage('window:visibility-change', true);
@@ -232,13 +234,11 @@ class WindowBase extends EventEmitter<WindowBaseEvents> {
       const resolver = Promise.withResolvers<R>();
       this.invokeMessages.messages.set(messageId, resolver);
 
-      this.window?.webContents.send(IPC_ON_EVENT.rendererInvoke, <
-        IPCRendererInvokeEventPayload
-      >{
+      this.window?.webContents.send(IPC_ON_EVENT.rendererInvoke, {
         args,
         name,
         messageId,
-      });
+      } as IPCRendererInvokeEventPayload);
 
       return resolver.promise;
     } catch (error) {
@@ -249,6 +249,16 @@ class WindowBase extends EventEmitter<WindowBaseEvents> {
 
       throw error;
     }
+  }
+
+  destroy() {
+    this.window?.destroy();
+
+    this.invokeMessages.clearMessages();
+
+    this.window = null;
+    this.webContentId = -1;
+    this._state = WindowBaseState.Closed;
   }
 
   saveWindowBounds(bounds: Electron.Rectangle) {

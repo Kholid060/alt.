@@ -60,3 +60,8 @@ IPCMain.on('command-window:input-config', async (_, payload) => {
   await WindowCommand.instance.toggleWindow(true);
   WindowCommand.instance.sendMessage('command-window:input-config', payload);
 });
+
+IPCMain.on('window:destroy', (_, name) => {
+  const window = WindowsManager.getWindow(name);
+  window.destroy();
+});

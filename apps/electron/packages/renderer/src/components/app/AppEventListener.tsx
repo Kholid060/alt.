@@ -4,28 +4,11 @@ import {
   CommandNavigateOptions,
   useCommandNavigate,
 } from '/@/hooks/useCommandRoute';
-import { useCommandStore } from '/@/stores/command.store';
 
 function AppEventListener() {
-  const setCommandStoreState = useCommandStore((state) => state.setState);
-
   const navigate = useCommandNavigate();
 
   useEffect(() => {
-    const offWindowVisibility = preloadAPI.main.ipc.on(
-      'window:visibility-change',
-      (_, isHidden) => {
-        if (!isHidden) {
-          const inputEl = document.getElementById(
-            'input-query',
-          ) as HTMLInputElement;
-          inputEl?.focus();
-          inputEl?.select();
-        }
-
-        setCommandStoreState('isWindowHidden', isHidden);
-      },
-    );
     const offAppUpdateRoute = preloadAPI.main.ipc.on(
       'app:update-route',
       (_, path, routeData) => {
@@ -62,7 +45,6 @@ function AppEventListener() {
     return () => {
       offInputConfig();
       offAppUpdateRoute();
-      offWindowVisibility();
       offOpenCommandViewPage();
       offOpenCommandJSONViewPage();
     };

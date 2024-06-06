@@ -48,7 +48,7 @@ const initialState: CommandStoreState = {
   query: '',
   errorOverlay: null,
   extensionErrors: {},
-  isWindowHidden: false,
+  isWindowHidden: true,
   activeBrowserTab: null,
   commandAliases: new Set(),
   commandArgs: {

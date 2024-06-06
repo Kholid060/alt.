@@ -27,6 +27,7 @@ import type Electron from 'electron';
 import type { MessagePortChannelIds } from './message-port-events.interface';
 import type { WorkflowRunnerRunPayload } from './workflow-runner.interace';
 import type { ExtensionCredential } from '@repo/extension-core/src/client/manifest/manifest-credential';
+import type { WindowNames } from './window.interface';
 
 export interface IPCRendererInvokeEventPayload {
   name: string;
@@ -222,6 +223,7 @@ export interface IPCSendEventRendererToMain {
     runnerId: string,
     data: ExtensionAPI.runtime.command.LaunchResult,
   ];
+  'window:destroy': [name: WindowNames];
   'app:show-notification': [
     options: ExtensionAPI.notifications.NotificationOptions,
   ];

@@ -25,6 +25,7 @@ export interface CommandPanelStoreState {
 }
 
 export interface CommandPanelStoreActions {
+  $reset(): void;
   clearAll(): void;
   clearAllStatus(): void;
   removeStatus(statusIdOrName: string): void;
@@ -112,6 +113,9 @@ const commandPanelStore = create<
     },
     setHeader(header) {
       set({ header });
+    },
+    $reset() {
+      set({ ...initialState });
     },
   })),
 );

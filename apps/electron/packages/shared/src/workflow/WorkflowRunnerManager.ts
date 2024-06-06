@@ -12,6 +12,9 @@ import type { DatabaseWorkflowHistoryUpdatePayload } from '#packages/main/src/in
 import { WORKFLOW_HISTORY_STATUS } from '#packages/common/utils/constant/workflow.const';
 import IPCRenderer from '#packages/common/utils/IPCRenderer';
 import type { SetRequired } from 'type-fest';
+import IdleTimer from '#packages/common/utils/IdleTimer';
+
+const IDLE_TIMER_KEY = 'workflow-manager';
 
 async function updateWorkflowHistory(
   historyId: number,
@@ -133,6 +136,8 @@ class WorkflowRunnerManager {
       }
     });
 
+    IdleTimer.instance.lock(IDLE_TIMER_KEY);
+
     runner.start();
 
     this.runners.set(runnerId, runner);
@@ -145,6 +150,10 @@ class WorkflowRunnerManager {
 
     this.runners.get(runnerId)?.stop();
     this.runners.delete(runnerId);
+
+    if (this.runners.size === 0) {
+      IdleTimer.instance.unlock(IDLE_TIMER_KEY);
+    }
   }
 }
 

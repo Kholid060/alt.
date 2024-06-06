@@ -6,10 +6,13 @@ import { nanoid } from 'nanoid';
 import { MESSAGE_PORT_CHANNEL_IDS } from '#packages/common/utils/constant/constant';
 import { debugLog } from '#packages/common/utils/helper';
 import { MessagePortRenderer } from '#common/utils/message-port-renderer';
+import IdleTimer from '#common/utils/IdleTimer';
 import type { MessagePortSharedCommandWindowEvents } from '#packages/common/interface/message-port-events.interface';
 import type { SetRequired } from 'type-fest';
 import type { ExtensionRunnerProcessConstructor } from './runner/ExtensionRunnerProcess';
 import ExtensionRunnerCommandScript from './runner/ExtensionRunnerCommandScript';
+
+const IDLE_TIMER_KEY = 'extension-command';
 
 class ExtensionCommandRunner {
   private static _instance: ExtensionCommandRunner;
@@ -100,6 +103,8 @@ class ExtensionCommandRunner {
         throw new Error(`"${command.type}" doesn't have runner`);
       }
 
+      IdleTimer.instance.lock(IDLE_TIMER_KEY);
+
       commandRunner.once('error', (message) => {
         this.destroyRunningCommand(runnerId);
         debugLog(
@@ -155,6 +160,10 @@ class ExtensionCommandRunner {
   private destroyRunningCommand(runnerId: string) {
     this.runners.delete(runnerId);
     this.commandWindowEventListeners.delete(runnerId);
+
+    if (this.runners.size === 0) {
+      IdleTimer.instance.unlock(IDLE_TIMER_KEY);
+    }
   }
 }
 

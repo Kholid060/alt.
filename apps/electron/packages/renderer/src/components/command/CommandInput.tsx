@@ -182,6 +182,8 @@ const CommandInputTextField = forwardRef<
       type="text"
       ref={ref}
       id="input-query"
+      // eslint-disable-next-line jsx-a11y/no-autofocus
+      autoFocus
       onChange={(event) => onValueChange?.(event.target.value)}
       placeholder={SEARCH_INPUT_PLACEHOLDER}
       className="bg-transparent w-full focus:outline-none h-full flex-grow min-w-56"
