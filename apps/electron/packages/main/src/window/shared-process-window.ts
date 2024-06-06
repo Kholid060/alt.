@@ -1,8 +1,7 @@
 import fs from 'fs-extra';
-import { BrowserWindow } from 'electron';
+import type { BrowserWindow } from 'electron';
 import { fileURLToPath } from 'node:url';
-import type WindowBase from './WindowBase';
-import WindowUtils from './WindowUtils';
+import WindowBase from './WindowBase';
 import path from 'node:path';
 import { sleep } from '@repo/shared';
 
@@ -19,7 +18,7 @@ async function checkMainJSFile(browserWindow: BrowserWindow) {
   checkMainJSFile(browserWindow);
 }
 
-class WindowSharedProcess extends WindowUtils implements WindowBase {
+class WindowSharedProcess extends WindowBase {
   private static _instance: WindowSharedProcess | null = null;
 
   static get instance() {
@@ -27,39 +26,38 @@ class WindowSharedProcess extends WindowUtils implements WindowBase {
   }
 
   constructor() {
-    super('dashboard');
-  }
-
-  async createWindow(): Promise<Electron.BrowserWindow> {
-    const browserWindow = new BrowserWindow({
-      show: false, // Use the 'ready-to-show' event to show the instantiated BrowserWindow.
+    super('shared-process', {
+      show: false,
+      focusable: false,
       webPreferences: {
-        contextIsolation: false,
+        webviewTag: false,
         nodeIntegration: true,
-        webviewTag: false, // The webview tag is not recommended. Consider alternatives like an iframe or Electron's BrowserView. @see https://www.electronjs.org/docs/latest/api/webview-tag#warning
+        contextIsolation: false,
       },
     });
 
-    /**
-     * If the 'show' property of the BrowserWindow's constructor is omitted from the initialization options,
-     * it then defaults to 'true'. This can cause flickering as the window loads the html content,
-     * and it also has show problematic behaviour with the closing of the window.
-     * Use `show: false` and listen to the  `ready-to-show` event to show the window.
-     *
-     * @see https://github.com/electron/electron/issues/25012 for the afford mentioned issue.
-     */
-    browserWindow.on('ready-to-show', () => {
-      if (!import.meta.env.DEV) return;
+    this.init();
+  }
 
-      browserWindow.webContents.openDevTools({ mode: 'detach' });
+  private init() {
+    this.hook('window:created', async (browserWindow) => {
+      browserWindow.on('ready-to-show', () => {
+        if (!import.meta.env.DEV) return;
+
+        browserWindow.webContents.openDevTools({ mode: 'detach' });
+      });
+
+      const resolver = Promise.withResolvers<void>();
+      browserWindow.webContents.once('did-finish-load', resolver.resolve);
+
+      const htmlFilePath = path.join(BASE_DIR, 'index.html');
+      await browserWindow.loadFile(htmlFilePath);
+
+      if (import.meta.env.DEV) checkMainJSFile(browserWindow);
+
+      await resolver.promise;
+      await sleep(400);
     });
-
-    const htmlFilePath = path.join(BASE_DIR, 'index.html');
-    await browserWindow.loadFile(htmlFilePath);
-
-    if (import.meta.env.DEV) checkMainJSFile(browserWindow);
-
-    return browserWindow;
   }
 }
 

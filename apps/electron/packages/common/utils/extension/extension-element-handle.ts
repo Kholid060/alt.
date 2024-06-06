@@ -73,6 +73,20 @@ export function extensionElementHandleFactory(
         ...args,
       );
     },
+    mouseUp(...args) {
+      return sendMessage(
+        'browser.activeTab.mouseUp',
+        { selector, elementIndex },
+        ...args,
+      );
+    },
+    mouseDown(...args) {
+      return sendMessage(
+        'browser.activeTab.mouseDown',
+        { selector, elementIndex },
+        ...args,
+      );
+    },
   };
 }
 

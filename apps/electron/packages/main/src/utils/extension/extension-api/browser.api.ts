@@ -6,7 +6,7 @@ import {
   isWSAckError,
 } from '../ExtensionBrowserElementHandle';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
-import { tempHideCommandWindow } from '../../helper';
+import WindowCommand from '../../../window/command-window';
 
 const getElementSelector = (
   selector: ExtensionAPI.browser.ElementSelector,
@@ -213,24 +213,28 @@ ExtensionIPCEvent.instance.on(
     }
 
     const { browserId, id } = browserCtx;
-    const selectedElement = await tempHideCommandWindow(async () => {
-      const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
-        browserId,
-        timeout: 300_000, // 5 minutes
-        name: 'tabs:select-element',
-        args: [
+    const selectedElement = await WindowCommand.instance.tempHideWindow(
+      async () => {
+        const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck(
           {
-            tabId: id,
+            browserId,
+            timeout: 300_000, // 5 minutes
+            name: 'tabs:select-element',
+            args: [
+              {
+                tabId: id,
+              },
+              options ?? {},
+            ],
           },
-          options ?? {},
-        ],
-      });
-      if (isWSAckError(result)) {
-        throw new ExtensionError(result.errorMessage);
-      }
+        );
+        if (isWSAckError(result)) {
+          throw new ExtensionError(result.errorMessage);
+        }
 
-      return result;
-    });
+        return result;
+      },
+    );
 
     return selectedElement;
   },

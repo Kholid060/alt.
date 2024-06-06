@@ -1,6 +1,6 @@
 import BrowserService from '../../browser.service';
 import type ExtensionWSNamespace from '../ws-namespaces/extensions.ws-namespace';
-import WindowsManager from '/@/window/WindowsManager';
+import WindowCommand from '/@/window/command-window';
 
 export function initExtensionWSEventsListener(this: ExtensionWSNamespace) {
   this.onSocketEvent('tabs:active', ({ browserInfo }, tab) => {
@@ -9,9 +9,8 @@ export function initExtensionWSEventsListener(this: ExtensionWSNamespace) {
       id: browserInfo.id,
     });
 
-    WindowsManager.instance.sendMessageToWindow(
-      'command',
-      'browser:tabs:active',
+    WindowCommand.instance.sendMessage(
+      { name: 'browser:tabs:active', noThrow: true, ensureWindow: false },
       tab,
     );
   });

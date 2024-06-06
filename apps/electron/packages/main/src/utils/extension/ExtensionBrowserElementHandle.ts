@@ -37,7 +37,7 @@ export async function extensionBrowserElementHandle<
   ...args: AllButFirstOrLast<P>
 ) {
   if (!browserCtx) {
-    throw new Error("Couldn't find active tab browser");
+    throw new ExtensionError("Couldn't find active tab browser");
   }
 
   const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({

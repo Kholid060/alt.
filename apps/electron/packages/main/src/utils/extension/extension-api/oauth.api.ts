@@ -1,9 +1,8 @@
 import { ExtensionError } from '#packages/common/errors/custom-errors';
 import ExtensionIPCEvent from '../ExtensionIPCEvent';
-import IPCMain from '../../ipc/IPCMain';
 import DBService from '/@/services/database/database.service';
 import OauthService from '/@/services/oauth.service';
-import WindowCommand from '/@/window/command-window';
+import WindowCommand from '../../../window/command-window';
 
 ExtensionIPCEvent.instance.on(
   'oauth.authorizationRequest',
@@ -24,10 +23,9 @@ ExtensionIPCEvent.instance.on(
       });
     if (!credentialValue) return null;
 
-    WindowCommand.instance.toggleWindow(true);
+    await WindowCommand.instance.toggleWindow(true);
 
-    const continueOauth = await IPCMain.instance.invoke(
-      'command',
+    const continueOauth = await WindowCommand.instance.invoke(
       'command-window:show-oauth-overlay',
       credentialProvider,
       {

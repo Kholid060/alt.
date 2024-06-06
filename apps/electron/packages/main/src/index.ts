@@ -5,7 +5,6 @@ import './utils/ipc/ipc-invoke-messages-handler';
 import { platform } from 'node:process';
 import updater from 'electron-updater';
 import CustomProtocol from './utils/custom-protocol/CustomProtocol';
-import WindowsManager from './window/WindowsManager';
 import { APP_DEEP_LINK } from '#packages/common/utils/constant/app.const';
 import path from 'node:path';
 import DeepLink from './utils/DeepLink';
@@ -14,6 +13,7 @@ import { registerGlobalShortcuts } from './utils/GlobalShortcuts';
 import ExtensionLoader from './utils/extension/ExtensionLoader';
 import DBService from './services/database/database.service';
 import WorkflowService from './services/workflow.service';
+import WindowCommand from './window/command-window';
 
 app.commandLine.appendSwitch('wm-window-animations-disabled');
 
@@ -64,13 +64,6 @@ app.on('window-all-closed', () => {
 });
 
 /**
- * @see https://www.electronjs.org/docs/latest/api/app#event-activate-macos Event: 'activate'.
- */
-app.on('activate', () =>
-  WindowsManager.instance.restoreOrCreateWindow('command'),
-);
-
-/**
  * Create the application window when the background process is ready.
  */
 app
@@ -87,8 +80,7 @@ app
       ExtensionLoader.instance.loadExtensions(),
     ]);
 
-    WindowsManager.instance.restoreOrCreateWindow('command');
-    WindowsManager.instance.restoreOrCreateWindow('shared-process');
+    WindowCommand.instance.restoreOrCreateWindow();
   })
   .catch((e) => console.error('Failed create window:', e));
 

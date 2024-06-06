@@ -2,9 +2,9 @@ import { ExtensionError } from '#packages/common/errors/custom-errors';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import type { NativeImage } from 'electron';
 import { clipboard, nativeImage } from 'electron';
-import { tempHideCommandWindow } from '../../helper';
 import { Keyboard, KeyboardKey } from '@repo/native';
 import ExtensionIPCEvent from '../ExtensionIPCEvent';
+import WindowCommand from '/@/window/command-window';
 
 ExtensionIPCEvent.instance.on('clipboard.read', async (_, format) => {
   switch (format) {
@@ -44,7 +44,7 @@ ExtensionIPCEvent.instance.on('clipboard.paste', async (_, value) => {
   const content = typeof value === 'string' ? value : JSON.stringify(value);
   clipboard.writeText(content);
 
-  await tempHideCommandWindow(async () => {
+  await WindowCommand.instance.tempHideWindow(async () => {
     const keys = [
       process.platform === 'darwin' ? KeyboardKey.Meta : KeyboardKey.Control,
       KeyboardKey.V,

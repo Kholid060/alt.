@@ -6,6 +6,7 @@ import WindowCommand from '../window/command-window';
 import BrowserService from './browser.service';
 import DBService from './database/database.service';
 import type { ExtensionCommandType } from '@repo/extension-core';
+import WindowSharedProcess from '../window/shared-process-window';
 
 class ExtensionService {
   private static _instance: ExtensionService;
@@ -82,12 +83,13 @@ class ExtensionService {
       commandId,
     );
     if (commandConfig.requireInput) {
-      IPCMain.sendToWindow('command', 'command-window:input-config', {
+      await WindowCommand.instance.sendMessage('command-window:input-config', {
         commandId,
         extensionId,
         type: commandConfig.type,
         executeCommandPayload: payload,
       });
+
       return null;
     }
 
@@ -99,16 +101,14 @@ class ExtensionService {
 
     switch (command.type) {
       case 'view:json': {
-        const runnerId = await IPCMain.instance.invoke(
-          'shared-process',
+        const runnerId = await WindowSharedProcess.instance.invoke(
           'shared-window:execute-command',
           executeCommandPayload,
         );
 
         // check if command window is closed
-        WindowCommand.instance.toggleWindow(true);
-        IPCMain.sendToWindow(
-          'command',
+        await WindowCommand.instance.toggleWindow(true);
+        await WindowCommand.instance.sendMessage(
           'command-window:open-command-json-view',
           {
             ...payload,
@@ -123,14 +123,13 @@ class ExtensionService {
       }
       case 'script':
       case 'action':
-        return IPCMain.instance.invoke(
-          'shared-process',
+        return WindowSharedProcess.instance.invoke(
           'shared-window:execute-command',
           executeCommandPayload,
         );
       case 'view':
         WindowCommand.instance.toggleWindow(true);
-        IPCMain.sendToWindow('command', 'command-window:open-command-view', {
+        WindowCommand.instance.sendMessage('command-window:open-command-view', {
           ...payload,
           title: command.title,
           subtitle: command.extension.title,
@@ -145,8 +144,7 @@ class ExtensionService {
   }
 
   stopCommandExecution(runnerId: string) {
-    IPCMain.sendToWindow(
-      'shared-process',
+    WindowSharedProcess.instance.sendMessage(
       'shared-window:stop-execute-command',
       runnerId,
     );

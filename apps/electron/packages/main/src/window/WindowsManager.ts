@@ -1,134 +1,61 @@
-import type { BrowserWindow } from 'electron';
-import type { IPCRendererSendEvent } from '#packages/common/interface/ipc-events.interface';
 import WindowCommand from './command-window';
 import WindowDashboard from './dashboard-window';
 import WindowSharedProcess from './shared-process-window';
+import type { WindowNames } from '#packages/common/interface/window.interface';
+import type WindowBase from './WindowBase';
+import type { IPCRendererSendEvent } from '#packages/common/interface/ipc-events.interface';
+import type { WindowMessageName } from './WindowBase';
+import { WindowBaseState } from './WindowBase';
 
-const windows = {
+const windows: Record<WindowNames, WindowBase> = {
   command: WindowCommand.instance,
   dashboard: WindowDashboard.instance,
   'shared-process': WindowSharedProcess.instance,
 };
 
-export type WindowManagerWindows = typeof windows;
-export type WindowManagerWindowNames = keyof WindowManagerWindows;
-
 class WindowsManager {
-  private static _instance: WindowsManager | null = null;
-  static get instance() {
-    if (!this._instance) {
-      this._instance = new WindowsManager();
-    }
-
-    return this._instance;
+  static getAll() {
+    return Object.values(windows);
   }
 
-  private windows: Map<WindowManagerWindowNames, BrowserWindow> = new Map();
-  private windowsHiddenState: Map<WindowManagerWindowNames, boolean> =
-    new Map();
-
-  constructor() {}
-
-  async restoreOrCreateWindow(name: WindowManagerWindowNames) {
-    const window = await this.createWindow(name);
-
-    if (window.isMinimized()) {
-      window.restore();
-    }
-
-    window.focus();
-
-    return window;
-  }
-
-  getAllWindows() {
-    return [...this.windows.entries()].map((name, window) => ({
-      name,
-      window,
-    }));
-  }
-
-  async createWindow(name: WindowManagerWindowNames) {
-    let window = this.windows.get(name);
-    if (window && !window.isDestroyed()) return window;
-
-    window = await windows[name].createWindow();
-    if (!window) throw new Error('Invalid window name');
-
-    this.windows.set(name, window);
-    this.windowsHiddenState.set(name, !window.isVisible());
-
-    window.on('hide', () => {
-      this.windowsHiddenState.set(name, true);
-      this.sendMessageToWindow(window, 'window:visibility-change', true);
-    });
-    window.on('show', () => {
-      this.windowsHiddenState.set(name, false);
-      this.sendMessageToWindow(window, 'window:visibility-change', false);
-    });
-
-    return window;
-  }
-
-  isWindowHidden(name: WindowManagerWindowNames) {
-    return this.windowsHiddenState.get(name) ?? true;
-  }
-
-  getWindow(
-    name: WindowManagerWindowNames,
-    options?: { noThrow: false },
-  ): BrowserWindow;
-  getWindow(
-    name: WindowManagerWindowNames,
+  static getWindow(name: WindowNames, options?: { noThrow: false }): WindowBase;
+  static getWindow(
+    name: WindowNames,
     options?: { noThrow: true },
-  ): BrowserWindow | null;
-  getWindow(
-    name: WindowManagerWindowNames,
+  ): WindowBase | null;
+  static getWindow(
+    name: WindowNames,
     options?: { noThrow: boolean },
-  ): BrowserWindow | null {
-    const window = this.windows.get(name);
-    if (!window) {
+  ): WindowBase | null {
+    const browserWindow = windows[name];
+    if (!browserWindow) {
       if (options?.noThrow) return null;
-
-      throw new Error(`${name} window hasn't been initialized`);
+      throw new Error('Invalid window id');
     }
 
-    return window;
+    return browserWindow;
   }
 
-  sendMessageToAllWindows<T extends keyof IPCRendererSendEvent>({
-    args,
+  static sendMessageToAllWindows<T extends keyof IPCRendererSendEvent>({
     name,
+    args,
     excludeWindow,
   }: {
-    name: T;
+    name: T | WindowMessageName<T>;
     args: IPCRendererSendEvent[T];
-    excludeWindow?: (WindowManagerWindowNames | number)[];
+    excludeWindow?: (WindowNames | number)[];
   }) {
-    this.windows.forEach((browserWindow, key) => {
+    WindowsManager.getAll().forEach((browserWindow) => {
       if (
-        excludeWindow &&
-        (excludeWindow.includes(browserWindow.webContents.id) ||
-          excludeWindow.includes(key))
+        browserWindow.state === WindowBaseState.Closed ||
+        (excludeWindow &&
+          (excludeWindow.includes(browserWindow.windowId) ||
+            excludeWindow.includes(browserWindow.webContentId)))
       )
         return;
 
-      browserWindow.webContents.send(name, ...args);
+      browserWindow.sendMessage(name, ...args);
     });
-  }
-
-  sendMessageToWindow<T extends keyof IPCRendererSendEvent>(
-    browserWindow: WindowManagerWindowNames | BrowserWindow,
-    eventName: T,
-    ...args: IPCRendererSendEvent[T]
-  ) {
-    const window =
-      typeof browserWindow === 'string'
-        ? this.getWindow(browserWindow, { noThrow: true })
-        : browserWindow;
-    if (!window) return null;
-
-    return window.webContents.send(eventName, ...args);
   }
 }
 

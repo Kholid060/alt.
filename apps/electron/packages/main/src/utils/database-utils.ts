@@ -9,6 +9,7 @@ import type {
 import type { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import type { DatabaseQueriesEvent } from '../interface/database.interface';
 import WindowsManager from '../window/WindowsManager';
+import type { WindowNames } from '#packages/common/interface/window.interface';
 
 export function buildConflictUpdateColumns<
   T extends SQLiteTable,
@@ -80,12 +81,12 @@ export function emitDBChanges(
       | [typeof DATABASE_CHANGES_ALL_ARGS]
       | Parameters<DatabaseQueriesEvent[T]>;
   },
-  excludeWindow?: number[],
+  excludeWindow?: (WindowNames | number)[],
 ) {
-  WindowsManager.instance.sendMessageToAllWindows({
+  WindowsManager.sendMessageToAllWindows({
     excludeWindow,
     args: [changes],
-    name: 'database:changes',
+    name: { name: 'database:changes', noThrow: true },
   });
 }
 

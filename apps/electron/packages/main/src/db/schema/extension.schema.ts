@@ -1,4 +1,4 @@
-import type { CredentialType } from '#packages/common/interface/credential.interface';
+import type { CredentialType } from '#common/interface/credential.interface';
 import type {
   EXTENSION_PERMISSIONS,
   ExtensionCommand,

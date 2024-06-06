@@ -3,3 +3,5 @@ export type WindowDashboardPages =
   | 'workflows'
   | 'settings'
   | 'extensions';
+
+export type WindowNames = 'shared-process' | 'command' | 'dashboard';

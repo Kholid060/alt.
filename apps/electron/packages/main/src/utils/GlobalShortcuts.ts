@@ -162,8 +162,8 @@ export async function registerGlobalShortcuts() {
   try {
     GlobalShortcut.instance.register({
       keys: GLOBAL_SHORTCUTS.toggleCommandWindow,
-      callback: () => {
-        WindowCommand.instance.toggleWindow();
+      callback: async () => {
+        await WindowCommand.instance.toggleWindow();
       },
     });
     await GlobalShortcutExtension.registerAllShortcuts();

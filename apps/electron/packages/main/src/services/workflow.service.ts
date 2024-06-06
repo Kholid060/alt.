@@ -17,7 +17,7 @@ import { z } from 'zod';
 import { fromZodError } from 'zod-validation-error';
 import { logger } from '../lib/log';
 import type { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
-import IPCMain from '../utils/ipc/IPCMain';
+import WindowSharedProcess from '../window/shared-process-window';
 
 class WorkflowTriggerService {
   constructor(private workflowService: WorkflowService) {}
@@ -130,9 +130,8 @@ class WorkflowService {
 
     DBService.instance.workflow.incExecuteCount(payload.id);
 
-    return IPCMain.instance.invoke(
-      'shared-process',
-      'shared-window:execute-workflow',
+    return WindowSharedProcess.instance.invoke(
+      { name: 'shared-window:execute-workflow', ensureWindow: true },
       {
         ...payload,
         workflow,

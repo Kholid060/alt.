@@ -116,12 +116,10 @@ IPCMain.handle('app:toggle-lock-window', ({ sender }) => {
   return Promise.resolve();
 });
 IPCMain.handle('command-window:close', () => {
-  WindowCommand.instance.toggleWindow(false);
-  return Promise.resolve();
+  return WindowCommand.instance.toggleWindow(false);
 });
 IPCMain.handle('command-window:show', () => {
-  WindowCommand.instance.toggleWindow(true);
-  return Promise.resolve();
+  return WindowCommand.instance.toggleWindow(true);
 });
 
 /** DATABASE */
