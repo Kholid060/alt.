@@ -8,7 +8,6 @@ import { GlobalShortcutExtension } from '../GlobalShortcuts';
 import DBService from '/@/services/database/database.service';
 import { emitDBChanges } from '../database-utils';
 import WindowCommand from '../../window/command-window';
-// import { Key, keyboard } from '@nut-tree/nut-js';
 import BrowserService from '/@/services/browser.service';
 import WorkflowService from '/@/services/workflow.service';
 import { isWSAckError } from '../extension/ExtensionBrowserElementHandle';
@@ -16,6 +15,7 @@ import ExtensionService from '/@/services/extension.service';
 import OauthService from '/@/services/oauth.service';
 import ExtensionWSNamespace from '/@/services/websocket/ws-namespaces/extensions.ws-namespace';
 import { ExtensionError } from '#packages/common/errors/custom-errors';
+import { Keyboard, KeyboardKey } from '@repo/native';
 
 /** EXTENSION */
 IPCMain.handle('extension:import', async () => {
@@ -79,12 +79,12 @@ IPCMain.handle('clipboard:copy', (_, content) => {
   return Promise.resolve();
 });
 IPCMain.handle('clipboard:paste', async (_) => {
-  // const keys = [
-  //   process.platform === 'darwin' ? Key.LeftCmd : Key.LeftControl,
-  //   Key.V,
-  // ];
-  // await keyboard.pressKey(...keys);
-  // await keyboard.releaseKey(...keys);
+  const keys = [
+    process.platform === 'darwin' ? KeyboardKey.Meta : KeyboardKey.Control,
+    KeyboardKey.V,
+  ];
+  await Keyboard.keyDown(...keys);
+  await Keyboard.keyUp(...keys);
 });
 IPCMain.handle('clipboard:copy-buffer', (_, contentType, content) => {
   const buffer = Buffer.from(content);

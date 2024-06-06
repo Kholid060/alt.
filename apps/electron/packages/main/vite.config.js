@@ -37,6 +37,7 @@ const config = {
       output: {
         entryFileNames: '[name].js',
       },
+      external: ['@repo/native'],
     },
     emptyOutDir: true,
     reportCompressedSize: false,

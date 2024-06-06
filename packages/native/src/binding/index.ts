@@ -1,14 +1,14 @@
 import { createRequire } from 'module';
 import { KeyboardKey } from './KeyboardKey';
-const require = createRequire(import.meta.url);
-
-const nativeModule = require('../index.node');
 
 export { KeyboardKey } from './KeyboardKey';
 
+const _require = createRequire(import.meta.url);
+const nativeModule = _require('./index.node');
+
 export class Keyboard {
-  static type(...keys: KeyboardKey[]) {
-    nativeModule.type(...keys);
+  static type(text: string) {
+    nativeModule.type(text);
   }
 
   static keyDown(...keys: KeyboardKey[]) {

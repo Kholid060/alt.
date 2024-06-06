@@ -3,7 +3,9 @@
   "compilerOptions": {
     "lib": ["ESNext"],
     "target": "ESNext",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "types": ["node"]
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "include": ["types/**/*.d.ts", "src/**/*.ts"]
 }
