@@ -45,6 +45,9 @@ IPCMain.handle('extension:reload', async (_, extId) => {
 IPCMain.handle('extension:execute-command', (_, payload) => {
   return ExtensionService.instance.executeCommand(payload);
 });
+IPCMain.handle('extension:delete', (_, extId) => {
+  return DBService.instance.extension.delete(extId);
+});
 IPCMain.handle('extension:is-config-inputted', (_, extensionId, commandId) => {
   return DBService.instance.extension.isConfigInputted(extensionId, commandId);
 });

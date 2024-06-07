@@ -136,6 +136,7 @@ export interface IPCExtensionEvents {
     extensionId: string,
     commandId?: string,
   ) => ExtensionCommandConfigValuePayload;
+  'extension:delete': (extId: string) => void;
   'extension:reload': (extId: string) => void;
   'extension:import': () => DatabaseExtension | null;
   'extension:init-message-port': () => MessagePort;

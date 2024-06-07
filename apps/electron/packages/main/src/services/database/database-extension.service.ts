@@ -129,6 +129,20 @@ class DBExtensionService {
     return extension ?? null;
   }
 
+  async delete(extensionId: string) {
+    if ((<string[]>Object.values(EXTENSION_BUILT_IN_ID)).includes(extensionId))
+      return;
+
+    await this.database
+      .delete(extensions)
+      .where(eq(extensions.id, extensionId));
+
+    emitDBChanges({
+      'database:get-extension': [extensionId],
+      'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
+    });
+  }
+
   getCommands(filter?: DatabaseExtensionCommandListFilter) {
     return this.database.query.extensionCommands.findMany({
       where(fields, operators) {

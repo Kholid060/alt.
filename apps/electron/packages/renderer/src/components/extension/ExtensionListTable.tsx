@@ -51,6 +51,8 @@ interface RecordingShortcutData {
   extensionId: string;
 }
 
+const buildInExtIds: string[] = Object.values(EXTENSION_BUILT_IN_ID);
+
 function ExtensionCommandList({
   commands,
   extensionId,
@@ -278,8 +280,8 @@ function ExtensionCommandList({
 interface ExtensionListTableProps
   extends React.TableHTMLAttributes<HTMLTableElement> {
   extensions: DatabaseExtensionListItem[];
+  onReloadExtension?: (extensionId: string) => void;
   onExtensionSelected?: (extensionId: string) => void;
-  onReloadExtension?: (extension: DatabaseExtensionListItem) => void;
   onUpdateExtension?: (
     extensionId: string,
     data: DatabaseExtensionUpdatePayload,
@@ -399,13 +401,63 @@ function ExtensionListTable({
     }
   }
   async function reloadExtension(extensionId: string) {
-    const result = await preloadAPI.main.ipc.invoke(
-      'extension:reload',
-      extensionId,
-    );
-    if (!result || isIPCEventError(result)) return;
+    try {
+      const result = await preloadAPI.main.ipc.invoke(
+        'extension:reload',
+        extensionId,
+      );
+      if (!result) return;
+      if (isIPCEventError(result)) {
+        toast({
+          title: 'Error!',
+          variant: 'destructive',
+          description: result.message,
+        });
+      }
 
-    onReloadExtension?.(result);
+      onReloadExtension?.(extensionId);
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: 'destructive',
+        title: 'Something went wrong!',
+      });
+    }
+  }
+  async function deleteExtension(extension: DatabaseExtensionListItem) {
+    try {
+      const isConfirmed = await dialog.confirm({
+        title: 'Delete extension?',
+        body: (
+          <>
+            Are you sure you want to delete <b>&quot;{extension.title}&quot;</b>{' '}
+            extension? <br /> This will delete all the extension data and it
+            can&apos;t be undone
+          </>
+        ),
+        okText: 'Delete',
+        okButtonVariant: 'destructive',
+      });
+      if (!isConfirmed) return;
+
+      const result = await preloadAPI.main.ipc.invoke(
+        'extension:delete',
+        extension.id,
+      );
+      if (isIPCEventError(result)) {
+        toast({
+          title: 'Error!',
+          variant: 'destructive',
+          description: result.message,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: 'destructive',
+        title: 'Something went wrong!',
+      });
+    }
   }
 
   useEffect(() => {
@@ -582,6 +634,18 @@ function ExtensionListTable({
                             <RotateCcwIcon className="h-4 w-4 mr-2" />
                             <span>Reload</span>
                           </UiDropdownMenuItem>
+                        )}
+                        {!buildInExtIds.includes(extension.id) && (
+                          <>
+                            <UiDropdownMenuSeparator />
+                            <UiDropdownMenuItem
+                              variant="destructive"
+                              onClick={() => deleteExtension(extension)}
+                            >
+                              <TrashIcon className="h-4 w-4 mr-2" />
+                              <span>Delete</span>
+                            </UiDropdownMenuItem>
+                          </>
                         )}
                       </UiDropdownMenuContent>
                     </UiDropdownMenu>
