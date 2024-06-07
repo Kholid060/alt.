@@ -58,3 +58,5 @@ thumbs.db
 /.idea/csv-plugin.xml
 
 vite.config.*.timestamp-*
+
+releases

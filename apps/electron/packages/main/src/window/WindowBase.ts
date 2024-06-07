@@ -139,6 +139,11 @@ class WindowBase extends EventEmitter<WindowBaseEvents> {
       this._state = WindowBaseState.Open;
       this.sendMessage('window:visibility-change', false);
     });
+    browserWindow.once('closed', () => {
+      this.window = null;
+      this.webContentId = -1;
+      this._state = WindowBaseState.Closed;
+    });
 
     browserWindow.webContents.ipc.on(
       IPC_ON_EVENT.rendererInvoke,

@@ -10,7 +10,7 @@ const actions: {
   id: WorkflowNodeBrowserTab['data']['action'];
 }[] = [
   { id: 'use-active-tab', name: 'Use the active tab' },
-  { id: 'open-tab', name: 'Open a new tab' },
+  { id: 'open-tab', name: 'Create a new tab' },
 ];
 
 function WorkflowNodeEditBrowserTab() {

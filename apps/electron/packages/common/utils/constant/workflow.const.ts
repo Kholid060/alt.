@@ -26,7 +26,7 @@ export enum WORKFLOW_NODE_TYPE {
 
 export const WORKFLOW_MANUAL_TRIGGER_ID = '$manual$' as const;
 
-export const WORKFLOW_ELEMENT_FORMAT = 'APP_NAME/workflow-elements' as const;
+export const WORKFLOW_ELEMENT_FORMAT = 'alt-dot/workflow-elements' as const;
 
 export const WORKFLOW_NODE_GROUP = [
   'Flow',

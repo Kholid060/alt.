@@ -2,9 +2,9 @@ import { fontFamily } from 'tailwindcss/defaultTheme'
 import { Config } from 'tailwindcss/types/config';
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette';
 
-const rgbVarColor = (varName: string) => `rgb(var(--${varName}) / <alpha-value>)`;
-const generateRadixColors = (name: string, reverse = false) => {
-  return Array.from({ length: 12 }).reduce<Record<number, string>>((acc, _, idx) => {
+const rgbVarColor = (varName) => `rgb(var(--${varName}) / <alpha-value>)`;
+const generateRadixColors = (name, reverse = false) => {
+  return Array.from({ length: 12 }).reduce((acc, _, idx) => {
     const num = reverse ? 12 - idx : idx + 1;
     acc[idx + 1] = rgbVarColor(`${name}-${num}`);
   
@@ -12,7 +12,8 @@ const generateRadixColors = (name: string, reverse = false) => {
   }, {});
 }
 
-const config: Omit<Config, 'content'> = {
+/** @type {Omit<Config, 'content'>} */
+const config = {
   darkMode: ['class'],
   plugins: [
     require('tailwindcss-animate'),

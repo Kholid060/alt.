@@ -10,7 +10,6 @@ import {
   UserCog2Icon,
   WorkflowIcon,
 } from 'lucide-react';
-import AppLogo from '#packages/renderer/assets/logo.svg';
 import { useDashboardStore } from '/@/stores/dashboard.store';
 import { useEffect } from 'react';
 
@@ -61,11 +60,13 @@ function DashboardSidebar({
   if (hideSidebar) return null;
 
   return (
-    <div className="w-20 lg:w-64 border-r h-screen py-8 px-4 flex flex-col gap-8 fixed left-0 top-0">
-      <div className="flex items-center justify-center lg:justify-start gap-3">
-        <img src={AppLogo} alt="App logo" className="h-6 w-6" />
-        <h1 className="text-xl font-semibold hidden lg:block linc">App Name</h1>
-      </div>
+    <div className="w-20 lg:w-64 border-r h-screen pb-8 pt-6 px-4 flex flex-col gap-7 fixed left-0 top-0">
+      <h1
+        className="text-3xl text-center lg:text-left lg:text-4xl font-semibold leading-none cursor-default select-none"
+        style={{ fontFeatureSettings: '"ss02"' }}
+      >
+        alt<span className="text-primary">.</span>
+      </h1>
       <ul className="text-muted-foreground space-y-2">
         {navigationItems.map((item) => (
           <NavLink

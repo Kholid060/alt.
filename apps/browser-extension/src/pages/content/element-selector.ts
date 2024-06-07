@@ -4,12 +4,12 @@ import { debounce } from '@repo/shared';
 import Browser from 'webextension-polyfill';
 
 const ELEMENT_IDS = {
-  style: 'APP_NAME__element-selector',
-  overlay: 'APP_NAME__element-selector--overlay',
-  cardContainer: 'APP_NAME__element-selector--card',
-  highlighter: 'APP_NAME__element-selector--highlighter',
+  style: 'alt-dot__element-selector',
+  overlay: 'alt-dot__element-selector--overlay',
+  cardContainer: 'alt-dot__element-selector--card',
+  highlighter: 'alt-dot__element-selector--highlighter',
 };
-const HIGHLIGHTED_EL_ATTR_NAME = 'APP_NAME__selected';
+const HIGHLIGHTED_EL_ATTR_NAME = 'alt-dot__selected';
 
 interface CreateElementOptions {
   appendChild?: boolean;

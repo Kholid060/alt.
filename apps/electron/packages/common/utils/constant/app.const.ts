@@ -1,4 +1,4 @@
-export const APP_DEEP_LINK = 'app-app';
+export const APP_DEEP_LINK = 'alt-app';
 
 export const APP_TEMP_DIR_NAME = {} as const;
 

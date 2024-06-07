@@ -31,6 +31,8 @@ class WebsocketService extends EventEmitter<WSEvent> {
   }
 
   async init() {
+    if (this.socket) return;
+
     const browserInfo = await getBrowserInfo();
 
     this.socket = io('ws://localhost:4567/extensions', {
@@ -40,6 +42,7 @@ class WebsocketService extends EventEmitter<WSEvent> {
     this.socket.on('connect', () => {
       this.emit('connect');
       websocketEventsListener(this.socket!);
+
       console.log('WEBSOCKET CONNECTED');
     });
     this.socket.on('disconnect', (reason) => {
