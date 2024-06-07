@@ -1,4 +1,7 @@
-import { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
+import {
+  ExtensionBrowserTabContext,
+  ExtensionCommandExecutePayload,
+} from '#packages/common/interface/extension.interface';
 import {
   DatabaseExtensionCommand,
   DatabaseExtensionListItem,
@@ -27,6 +30,7 @@ export interface CommandListItemCommand extends UiListItem {
     fallbackStr?: string;
     command: DatabaseExtensionCommand;
     extension: DatabaseExtensionListItem;
+    browserCtx?: ExtensionBrowserTabContext;
   };
 }
 

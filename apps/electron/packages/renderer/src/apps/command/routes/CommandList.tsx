@@ -167,30 +167,34 @@ function CommandList() {
       if (extension.isError || extension.isDisabled) return;
 
       extension.commands.forEach((command) => {
-        let isInSuggestion = false;
-        const showCommand = command.context
-          ? command.context.some((context) => {
-              if (context.startsWith('host')) {
-                if (!activeBrowserTab) return false;
+        // let browserCtx: ExtensionBrowserTabContext | undefined;
 
-                const hostCtx = context.slice(
-                  context.indexOf(':') + 1,
-                  context.length - 1,
-                );
-                isInSuggestion = new URLPattern(hostCtx).test(
-                  activeBrowserTab.url,
-                );
+        const isInSuggestion = false;
+        // const showCommand = command.context
+        //   ? command.context.some((context) => {
+        //       if (context.startsWith('host')) {
+        //         if (!activeBrowserTab) return false;
 
-                return isInSuggestion;
-              } else if (context === 'all') {
-                return true;
-              }
+        //         const hostCtx = context.slice(
+        //           context.indexOf(':') + 1,
+        //           context.length - 1,
+        //         );
+        //         isInSuggestion = new URLPattern(hostCtx).test(
+        //           activeBrowserTab.url,
+        //         );
 
-              return false;
-            })
-          : true;
+        //         browserCtx = activeBrowserTab;
 
-        if (!showCommand) return;
+        //         return isInSuggestion;
+        //       } else if (context === 'all') {
+        //         return true;
+        //       }
+
+        //       return false;
+        //     })
+        //   : true;
+
+        // if (!showCommand) return;
 
         const commandItem: CommandListItemCommand = {
           metadata: {

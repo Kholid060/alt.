@@ -138,8 +138,8 @@ export function createExtensionAPI({
           Promise.resolve(
             browserCtx
               ? {
-                  id: browserCtx.id,
                   url: browserCtx.url,
+                  id: browserCtx.tabId,
                   title: browserCtx.title,
                 }
               : null,

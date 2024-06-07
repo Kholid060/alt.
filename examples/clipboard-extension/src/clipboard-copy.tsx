@@ -50,6 +50,7 @@ export default async function CommandMain(context: CommandLaunchContext) {
 
   console.log(await _extension.browser.activeTab.getAttributes('textarea'));
   console.log(await _extension.browser.activeTab.setAttributes('textarea', { hello: 'world' }));
+  console.log(await _extension.browser.activeTab.type('textarea', 'Hello!'));
   // await authorizeCredential();
   console.log(await _extension.runtime.config.getValues('command'));
   // await _extension.runtime.config.openConfigPage('command');

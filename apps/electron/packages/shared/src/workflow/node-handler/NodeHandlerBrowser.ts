@@ -30,10 +30,7 @@ async function getOpenedBrowser(
 
   let browserId: string | null = null;
   if (preferBrowser === 'any') {
-    browserId =
-      connectedBrowsers.find((browser) => browser.active)?.id ??
-      connectedBrowsers[0]?.id ??
-      null;
+    browserId = connectedBrowsers[0]?.id ?? null;
   } else {
     browserId =
       connectedBrowsers.find((browser) => browser.type === preferBrowser)?.id ??
@@ -168,7 +165,7 @@ export class NodeHandlerBrowserTab extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
       );
       if (!activeTab) throw new Error("Couldn't find active tab");
 
-      runner.browser.setContext({ browserId, tabId: activeTab.id });
+      runner.browser.setContext(activeTab);
       value = {
         url: activeTab.url,
         title: activeTab.title,
@@ -190,7 +187,7 @@ export class NodeHandlerBrowserTab extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
       );
       if (!activeTab) throw new Error("Couldn't create a new tab");
 
-      runner.browser.setContext({ browserId, tabId: activeTab.id });
+      runner.browser.setContext(activeTab);
       value = {
         url: activeTab.url,
         title: activeTab.title,

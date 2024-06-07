@@ -12,10 +12,10 @@ import type {
   WSAckErrorResult,
 } from '@repo/shared';
 
-export type WorkflowRunnerBrowserContext = Omit<
-  SetNullable<NonNullable<ExtensionBrowserTabContext>, 'browserId'>,
-  'id'
-> & { tabId: number | null };
+export type WorkflowRunnerBrowserContext = SetNullable<
+  NonNullable<ExtensionBrowserTabContext>,
+  'browserId' | 'tabId'
+>;
 
 class WorkflowRunnerBrowser {
   private context: WorkflowRunnerBrowserContext = {

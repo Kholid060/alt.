@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type {
+  BrowserConnected,
   BrowserInfo,
   BrowserType,
   ExtensionSocketData,
@@ -9,8 +10,8 @@ import type {
 } from '@repo/shared';
 import type { Namespace, Server } from 'socket.io';
 import type { AllButLast, Last } from 'socket.io/dist/typed-events';
-import { initExtensionWSEventsListener } from '../ws-events/extensions.ws-event';
 import { z } from 'zod';
+import BrowserService from '../../browser.service';
 
 export type ExtensionNamespace = Namespace<
   ExtensionWSClientToServerEvents,
@@ -19,11 +20,6 @@ export type ExtensionNamespace = Namespace<
   ExtensionSocketData
 >;
 
-interface SocketEvents {
-  'socket:connected': (browserInfo: BrowserInfo) => void;
-  'socket:disconnect': (browserInfo: BrowserInfo, reason: string) => void;
-}
-
 const BROWSER_EMIT_TIMEOUT_MS = 60_000;
 const BROWSER_TYPE = [
   'edge',
@@ -31,7 +27,7 @@ const BROWSER_TYPE = [
   'firefox',
 ] as const satisfies BrowserType[];
 
-const BrowserInfoValidation = z.object({
+const BrowserInfoSchema = z.object({
   id: z.string(),
   name: z.string(),
   version: z.string(),
@@ -55,44 +51,41 @@ class ExtensionWSNamespace {
   private _namespace: ExtensionNamespace | null = null;
   private browsersSockets: Map<string, string> = new Map();
 
-  private events: Record<string, ((...args: any[]) => void)[]> = {};
-
   constructor() {}
 
   init(server: Server) {
     this._namespace = server.of('/extensions');
 
     this._namespace.use((socket, next) => {
-      const browserInfo: BrowserInfo = socket.handshake.auth?.browserInfo;
-      const browserInfoValidation =
-        BrowserInfoValidation.safeParse(browserInfo);
-      if (!browserInfoValidation.success) {
+      const browserConnected = BrowserInfoSchema.safeParse(
+        socket.handshake.auth?.browserInfo,
+      );
+      if (!browserConnected.success) {
         next(new Error('Unauthorized'));
         return;
       }
 
-      socket.data.browserInfo = browserInfoValidation.data;
+      socket.data.browserInfo = browserConnected.data;
+      BrowserService.instance.addConnectedBrowser(socket.data.browserInfo);
 
       next();
     });
 
     this._namespace.on('connection', (socket) => {
-      this.emit('socket:connected', socket.data.browserInfo);
-
       this.browsersSockets.set(socket.data.browserInfo.id, socket.id);
       this.socketEvents.forEach((listener, eventName) => {
         socket.on(eventName, (...args) => {
           listener({ browserInfo: socket.data.browserInfo }, ...args);
         });
       });
+
       socket.on('disconnect', (reason) => {
         console.log('SOCKET DISCONNECT:', reason);
-        this.emit('socket:disconnect', socket.data.browserInfo, reason);
-        this.browsersSockets.delete(socket.data.browserInfo.id);
+        BrowserService.instance.removeConnectedBrowser(
+          socket.data.browserInfo.id,
+        );
       });
     });
-
-    initExtensionWSEventsListener.call(this);
   }
 
   get namespace() {
@@ -103,44 +96,10 @@ class ExtensionWSNamespace {
     return this._namespace;
   }
 
-  on<T extends keyof SocketEvents>(
-    name: T,
-    callback: (...args: Parameters<SocketEvents[T]>) => void,
-  ) {
-    if (!this.events[name]) this.events[name] = [];
-
-    this.events[name].push(callback as () => void);
-  }
-
-  emit<T extends keyof SocketEvents>(
-    name: T,
-    ...args: Parameters<SocketEvents[T]>
-  ) {
-    const listeners = this.events[name];
-    if (!listeners) return;
-
-    listeners.forEach((listener) => {
-      listener(...args);
-    });
-  }
-
-  off<T extends keyof SocketEvents>(
-    name: T,
-    callback: (...args: Parameters<SocketEvents[T]>) => void,
-  ) {
-    const listeners = this.events[name];
-    if (!listeners) return;
-
-    const index = listeners.indexOf(callback as () => void);
-    if (index === -1) return;
-
-    this.events[name].splice(index, 1);
-  }
-
   onSocketEvent<T extends keyof ExtensionWSClientToServerEvents>(
     name: T,
     callback: (
-      sender: { browserInfo: BrowserInfo },
+      sender: { browser: BrowserConnected },
       ...args: Parameters<ExtensionWSClientToServerEvents[T]>
     ) => void,
   ) {

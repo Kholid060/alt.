@@ -5,6 +5,7 @@ import {
 import { Socket } from 'socket.io-client';
 import TabService from './tab.service';
 import Browser from 'webextension-polyfill';
+import BrowserService from './browser.service';
 
 function wsAckHandler<T extends unknown[]>(
   fn: (...args: T) => Promise<void> | void,
@@ -262,6 +263,7 @@ export function websocketEventsListener(
         id: tab.id!,
         url: tab.url!,
         title: tab.title!,
+        windowId: tab.windowId!,
       });
     }),
   );
@@ -277,7 +279,16 @@ export function websocketEventsListener(
         id: tab.id!,
         url: tab.url!,
         title: tab.title!,
+        windowId: tab.windowId!,
       });
+    }),
+  );
+
+  io.on(
+    'browser:get-active',
+    wsAckHandler(async (isFocused, callback) => {
+      const browser = await BrowserService.instance.getDetail();
+      callback(isFocused && !browser?.focused ? null : browser);
     }),
   );
 }

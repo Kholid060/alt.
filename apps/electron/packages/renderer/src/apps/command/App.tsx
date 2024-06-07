@@ -20,8 +20,44 @@ import CommandOAuthOverlay from '/@/components/command/CommandOAuthOverlay';
 import IdleTimer from '#packages/common/utils/IdleTimer';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
+import { isIPCEventError } from '#packages/common/utils/helper';
+import { ExtensionBrowserTabContext } from '#packages/common/interface/extension.interface';
 
 const routes = createCommandRoutes(commandAppRoutes);
+
+// @ts-expect-error ...
+// eslint-disable-next-line
+const getBrowserTabCtx = (() => {
+  let cache: { tab: ExtensionBrowserTabContext; fetchedAt: number } | null =
+    null;
+  let isFetching = false;
+
+  return () => {
+    if (cache && cache.tab && Date.now() - cache.fetchedAt < 5000) {
+      return Promise.resolve(cache.tab);
+    }
+    if (isFetching) return Promise.reject('Fetching..');
+
+    isFetching = true;
+
+    return preloadAPI.main.ipc
+      .invoke('browser:get-active-tab')
+      .then((result) => {
+        if (isIPCEventError(result)) throw new Error(result.message);
+
+        cache = {
+          tab: result,
+          fetchedAt: Date.now(),
+        };
+
+        return result;
+      })
+      .catch(console.error)
+      .finally(() => {
+        isFetching = false;
+      });
+  };
+})();
 
 function IdleListener({
   onToggleHide,
@@ -53,6 +89,10 @@ function IdleListener({
 
           IdleTimer.instance.stop();
           onToggleHide(false);
+
+          // getBrowserTabCtx().then((tabCtx) => {
+          //   tabCtx && setCommandStoreState('activeBrowserTab', tabCtx);
+          // });
         } else {
           IdleTimer.instance.start();
         }

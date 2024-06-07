@@ -46,5 +46,10 @@ export function debugLog(...args: unknown[]) {
 }
 
 export function isIPCEventError(result: unknown): result is IPCEventError {
-  return Boolean(result) && isObject(result) && '$isError' in result;
+  return (
+    Boolean(result) &&
+    isObject(result) &&
+    '$isError' in result &&
+    (result.$isError as boolean)
+  );
 }

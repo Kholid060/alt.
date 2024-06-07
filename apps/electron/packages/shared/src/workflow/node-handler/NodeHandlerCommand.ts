@@ -190,7 +190,7 @@ export class NodeHandlerCommand extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.C
         ? {
             url: browserCtx.url,
             title: browserCtx.title,
-            id: browserCtx.tabId as number,
+            tabId: browserCtx.tabId as number,
             browserId: browserCtx.browserId as string,
           }
         : undefined,

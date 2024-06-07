@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import createStoreSelectors from '../utils/createStoreSelector';
-import { BrowserExtensionTab } from '@repo/shared';
+import { ExtensionBrowserTabContext } from '#packages/common/interface/extension.interface';
 
 interface ExtensionCommandArgs {
   commandId: string;
@@ -13,7 +13,7 @@ interface CommandStoreState {
   isWindowHidden: boolean;
   commandAliases: Set<string>;
   commandArgs: ExtensionCommandArgs;
-  activeBrowserTab: BrowserExtensionTab | null;
+  activeBrowserTab: ExtensionBrowserTabContext | null;
   extensionErrors: Record<string, CommandErrorOverlayData[]>;
   errorOverlay: { title: string; errors: CommandErrorOverlayData[] } | null;
 }

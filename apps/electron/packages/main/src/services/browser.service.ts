@@ -1,65 +1,43 @@
-import type { BrowserExtensionTab, BrowserInfo } from '@repo/shared';
-import type { ExtensionBrowserTabContext } from '#packages/common/interface/extension.interface';
+import type { BrowserConnected, BrowserInfo } from '@repo/shared';
+import { isWSAckError } from '../utils/extension/ExtensionBrowserElementHandle';
 import ExtensionWSNamespace from './websocket/ws-namespaces/extensions.ws-namespace';
-
-interface ActiveBrowser {
-  id: string;
-  tab: BrowserExtensionTab | null;
-}
 
 class BrowserService {
   private static _instance: BrowserService | null = null;
   static get instance() {
-    if (!this._instance) {
-      this._instance = new BrowserService();
-    }
-
-    return this._instance;
+    return this._instance || (this._instance = new BrowserService());
   }
 
-  private activeBrowser: ActiveBrowser | null;
-  private connectedBrowsers: Map<string, BrowserInfo & { active: boolean }>;
-
   socket: ExtensionWSNamespace;
+  private connectedBrowser: Map<string, BrowserInfo> = new Map();
 
   constructor() {
-    this.activeBrowser = null;
-    this.connectedBrowsers = new Map();
     this.socket = ExtensionWSNamespace.instance;
   }
 
-  getActiveTab(): ExtensionBrowserTabContext {
-    if (!this.activeBrowser) return null;
-    if (!this.activeBrowser.tab) return null;
-
-    return { ...this.activeBrowser.tab, browserId: this.activeBrowser.id };
+  getAll(focused?: boolean) {
+    return ExtensionWSNamespace.instance.namespace
+      .timeout(5000)
+      .emitWithAck('browser:get-active', focused ? 'focused-only' : 'none');
   }
 
-  setActiveTab(browser: ActiveBrowser | null) {
-    this.activeBrowser = browser;
-
-    if (!browser || !this.connectedBrowsers.has(browser.id)) return;
-
-    const browserInfo = this.connectedBrowsers.get(browser.id)!;
-    browserInfo.active = true;
-
-    this.connectedBrowsers.set(browser.id, browserInfo);
+  async getFocused(): Promise<BrowserConnected | null> {
+    const browsers = await this.getAll(true);
+    return browsers.find(
+      (browser) => !isWSAckError(browser) && browser && browser.focused,
+    ) as BrowserConnected;
   }
 
-  getBrowser(browserId: string) {
-    return this.connectedBrowsers.get(browserId);
+  getConnectedBrowsers() {
+    return [...this.connectedBrowser.values()];
   }
 
   addConnectedBrowser(browser: BrowserInfo) {
-    this.connectedBrowsers.set(browser.id, { ...browser, active: false });
-  }
-
-  getConnectedBrowser() {
-    return [...this.connectedBrowsers.values()];
+    this.connectedBrowser.set(browser.id, browser);
   }
 
   removeConnectedBrowser(browserId: string) {
-    this.connectedBrowsers.delete(browserId);
+    this.connectedBrowser.delete(browserId);
   }
 }
 

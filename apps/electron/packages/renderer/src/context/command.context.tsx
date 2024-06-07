@@ -35,7 +35,6 @@ export function CommandCtxProvider({
   const clearAllPanel = useCommandPanelStore.use.clearAll();
   const addPanelStatus = useCommandPanelStore.use.addStatus();
 
-  const setCommandStoreState = useCommandStore.use.setState();
   const addExtensionError = useCommandStore.use.addExtensionError();
 
   const runnerMessagePort = useRef<
@@ -88,12 +87,6 @@ export function CommandCtxProvider({
         }
       },
     );
-    const offBrowserTabsActive = preloadAPI.main.ipc.on(
-      'browser:tabs:active',
-      (_, browserTab) => {
-        setCommandStoreState('activeBrowserTab', browserTab);
-      },
-    );
 
     const offSharedMessagePortListener = MessagePortListener.on(
       MESSAGE_PORT_CHANNEL_IDS.sharedWithCommand,
@@ -106,7 +99,6 @@ export function CommandCtxProvider({
     );
 
     return () => {
-      offBrowserTabsActive();
       offSharedMessagePortListener();
       offCommandScriptMessageEvent();
     };

@@ -14,7 +14,10 @@ import { isWSAckError } from '../extension/ExtensionBrowserElementHandle';
 import ExtensionService from '/@/services/extension.service';
 import OauthService from '/@/services/oauth.service';
 import ExtensionWSNamespace from '/@/services/websocket/ws-namespaces/extensions.ws-namespace';
-import { ExtensionError } from '#packages/common/errors/custom-errors';
+import {
+  CustomError,
+  ExtensionError,
+} from '#packages/common/errors/custom-errors';
 import { Keyboard, KeyboardKey } from '@repo/native';
 
 /** EXTENSION */
@@ -308,22 +311,36 @@ IPCMain.handle('workflow:import', (_, paths) => {
 
 /** BROWSER */
 IPCMain.handle('browser:get-active-tab', async (_, browserId) => {
-  const currentActiveTab = BrowserService.instance.getActiveTab();
-  if (!browserId) return currentActiveTab;
+  if (browserId) {
+    const tab = await BrowserService.instance.socket.emitToBrowserWithAck({
+      args: [],
+      browserId,
+      name: 'tabs:get-active',
+    });
+    if (isWSAckError(tab)) throw new Error(tab.errorMessage);
 
-  if (currentActiveTab?.browserId === browserId) return currentActiveTab;
+    return {
+      browserId,
+      url: tab.url,
+      tabId: tab.id,
+      $isError: false,
+      title: tab.title,
+    };
+  }
 
-  const tab = await BrowserService.instance.socket.emitToBrowserWithAck({
-    args: [],
-    browserId,
-    name: 'tabs:get-active',
-  });
-  if (isWSAckError(tab)) throw new Error(tab.errorMessage);
+  const browser = await BrowserService.instance.getFocused();
+  if (!browser) throw new CustomError("Couldn't find active browser");
 
-  return { ...tab, browserId };
+  return {
+    $isError: false,
+    url: browser.tab.url,
+    browserId: browser.id,
+    tabId: browser.tab.id,
+    title: browser.tab.title,
+  };
 });
 IPCMain.handle('browser:get-connected-browsers', () => {
-  return Promise.resolve(BrowserService.instance.getConnectedBrowser());
+  return Promise.resolve(BrowserService.instance.getConnectedBrowsers());
 });
 IPCMain.handle('browser:new-tab', async (_, browserId, url) => {
   const tab = await BrowserService.instance.socket.emitToBrowserWithAck({
@@ -333,7 +350,7 @@ IPCMain.handle('browser:new-tab', async (_, browserId, url) => {
   });
   if (isWSAckError(tab)) throw new Error(tab.errorMessage);
 
-  return { ...tab, browserId };
+  return { browserId, tabId: tab.id, title: tab.title, url: tab.url };
 });
 IPCMain.handle('browser:actions', async (_, { args, browserId, name }) => {
   const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({

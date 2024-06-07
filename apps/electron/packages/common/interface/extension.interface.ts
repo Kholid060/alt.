@@ -4,7 +4,6 @@ import type {
   EXTENSION_PERMISSIONS,
 } from '@repo/extension-core';
 import type { DatabaseExtensionCommandWithExtension } from '../../main/src/interface/database.interface';
-import type { BrowserExtensionTab } from '@repo/shared';
 
 export type ExtensionConfigType = (typeof EXTENSION_CONFIG_TYPE)[number];
 export type ExtensionPermissions = (typeof EXTENSION_PERMISSIONS)[number];
@@ -54,9 +53,12 @@ export type ExtensionCommandConfigValuePayload =
       type: 'extension' | 'command';
     };
 
-export type ExtensionBrowserTabContext =
-  | (BrowserExtensionTab & { browserId: string })
-  | null;
+export type ExtensionBrowserTabContext = {
+  url: string;
+  title: string;
+  tabId: number;
+  browserId: string;
+} | null;
 
 export interface ExtensionAPIMessagePayload {
   key: string;

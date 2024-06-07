@@ -1,4 +1,8 @@
-import { BrowserExtensionTab, BrowserInfo } from './browser.interface';
+import {
+  BrowserConnected,
+  BrowserExtensionTab,
+  BrowserInfo,
+} from './browser.interface';
 import {
   KeyboardKeyUpOptions,
   KeyboardKeyDownOptions,
@@ -25,9 +29,7 @@ export interface WSAckErrorResult {
 
 export type WSAckCallback<T> = (result: T | WSAckErrorResult) => void;
 
-export interface ExtensionWSClientToServerEvents {
-  'tabs:active': (tab: BrowserExtensionTab | null) => void;
-}
+export interface ExtensionWSClientToServerEvents {}
 
 export interface ExtensionBrowserTabDetail {
   tabId: number;
@@ -110,6 +112,10 @@ export interface ExtensionActiveTabActionWSEvents {
 export interface ExtensionWSServerToClientEvents
   extends ExtensionActiveTabActionWSEvents {
   'tabs:get-active': ExtensionWSAckHandler<[], BrowserExtensionTab>;
+  'browser:get-active': ExtensionWSAckHandler<
+    [filter: 'none' | 'focused-only'],
+    BrowserConnected | null
+  >;
   'tabs:create-new': ExtensionWSAckHandler<[url: string], BrowserExtensionTab>;
 }
 

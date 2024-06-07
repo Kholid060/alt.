@@ -10,7 +10,7 @@ import type {
 } from './extension.interface';
 import type {
   AllButLast,
-  BrowserExtensionTab,
+  BrowserConnected,
   BrowserInfo,
   BrowserType,
   ExtensionActiveTabActionWSEvents,
@@ -105,8 +105,9 @@ export interface IPCClipboardEvents {
 }
 
 export interface IPCBrowserEvents {
+  'browser:get-focused': () => BrowserConnected[];
+  'browser:get-connected-browsers': () => BrowserInfo[];
   'browser:get-active-tab': (browserId?: string) => ExtensionBrowserTabContext;
-  'browser:get-connected-browsers': () => (BrowserInfo & { active: boolean })[];
   'browser:new-tab': (
     browserId: string,
     url: string,
@@ -207,7 +208,6 @@ export type IPCEvents = IPCShellEvents &
 export interface IPCSendEventMainToRenderer {
   'shared-window:stop-execute-command': [runnerId: string];
   'window:visibility-change': [isHidden: boolean];
-  'browser:tabs:active': [BrowserExtensionTab | null];
   'app:update-route': [path: string, routeData?: unknown];
   'command-window:open-command-json-view': [
     executeCommandPayload: ExtensionCommandJSONViewData,

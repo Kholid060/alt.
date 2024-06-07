@@ -20,15 +20,11 @@ ExtensionIPCEvent.instance.on(
       throw new ExtensionError("Couldn't find active tab browser");
     }
 
-    const { browserId, id } = browserCtx;
+    const { browserId, tabId } = browserCtx;
     const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
       browserId,
       name: 'tabs:reload',
-      args: [
-        {
-          tabId: id,
-        },
-      ],
+      args: [{ tabId }],
     });
     if (isWSAckError(result)) {
       throw new ExtensionError(result.errorMessage);
@@ -185,17 +181,11 @@ ExtensionIPCEvent.instance.on(
       throw new ExtensionError("Couldn't find active tab browser");
     }
 
-    const { browserId, id } = browserCtx;
+    const { browserId, tabId } = browserCtx;
     const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
       browserId,
       name: 'tabs:element-exists',
-      args: [
-        {
-          tabId: id,
-        },
-        { selector },
-        multiple ?? false,
-      ],
+      args: [{ tabId }, { selector }, multiple ?? false],
     });
     if (isWSAckError(result)) {
       throw new ExtensionError(result.errorMessage);
@@ -212,7 +202,7 @@ ExtensionIPCEvent.instance.on(
       throw new ExtensionError("Couldn't find active tab browser");
     }
 
-    const { browserId, id } = browserCtx;
+    const { browserId, tabId } = browserCtx;
     const selectedElement = await WindowCommand.instance.tempHideWindow(
       async () => {
         const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck(
@@ -220,12 +210,7 @@ ExtensionIPCEvent.instance.on(
             browserId,
             timeout: 300_000, // 5 minutes
             name: 'tabs:select-element',
-            args: [
-              {
-                tabId: id,
-              },
-              options ?? {},
-            ],
+            args: [{ tabId }, options ?? {}],
           },
         );
         if (isWSAckError(result)) {
@@ -249,18 +234,12 @@ ExtensionIPCEvent.instance.on(
       throw new ExtensionError("Couldn't find active tab browser");
     }
 
-    const { browserId, id } = browserCtx;
+    const { browserId, tabId } = browserCtx;
     const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
       timeout,
       browserId,
       name: 'tabs:wait-for-selector',
-      args: [
-        {
-          tabId: id,
-        },
-        { selector },
-        { timeout, ...(options ?? {}) },
-      ],
+      args: [{ tabId }, { selector }, { timeout, ...(options ?? {}) }],
     });
     if (isWSAckError(result)) {
       throw new ExtensionError(result.errorMessage);

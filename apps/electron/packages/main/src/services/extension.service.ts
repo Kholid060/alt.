@@ -1,4 +1,7 @@
-import type { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
+import type {
+  ExtensionBrowserTabContext,
+  ExtensionCommandExecutePayload,
+} from '#packages/common/interface/extension.interface';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import ExtensionLoader from '../utils/extension/ExtensionLoader';
 import IPCMain from '../utils/ipc/IPCMain';
@@ -10,7 +13,6 @@ import WindowSharedProcess from '../window/shared-process-window';
 
 class ExtensionService {
   private static _instance: ExtensionService;
-
   static get instance() {
     return this._instance || (this._instance = new ExtensionService());
   }
@@ -19,6 +21,10 @@ class ExtensionService {
     string,
     PromiseWithResolvers<ExtensionAPI.runtime.command.LaunchResult>
   >();
+  private browserCtxCache: {
+    fetchedAt: number;
+    data: ExtensionBrowserTabContext;
+  } | null = null;
 
   constructor() {
     this.initIPCEventListener();
@@ -45,6 +51,27 @@ class ExtensionService {
     return resolver.promise;
   }
 
+  private async getBrowserCtx(): Promise<
+    ExtensionBrowserTabContext | undefined
+  > {
+    if (
+      this.browserCtxCache &&
+      Date.now() - this.browserCtxCache.fetchedAt <= 2500
+    ) {
+      return this.browserCtxCache.data;
+    }
+
+    const browser = await BrowserService.instance.getFocused();
+    if (!browser) return undefined;
+
+    return {
+      url: browser.tab.url,
+      tabId: browser.tab.id,
+      browserId: browser.id,
+      title: browser.tab.title,
+    };
+  }
+
   async executeCommand(
     executePayload: ExtensionCommandExecutePayload,
     filterCommandType?: ExtensionCommandType,
@@ -53,7 +80,7 @@ class ExtensionService {
       ...executePayload,
       browserCtx: Object.hasOwn(executePayload, 'browserCtx')
         ? executePayload.browserCtx
-        : BrowserService.instance.getActiveTab(),
+        : await this.getBrowserCtx(),
     };
     const { commandId, extensionId } = payload;
 
