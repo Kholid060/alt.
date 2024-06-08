@@ -6,11 +6,14 @@ import {
   eq,
   inArray,
   like,
+  lt,
   notInArray,
+  sql,
 } from 'drizzle-orm';
 import type {
   NewExtension,
   NewExtensionCommand,
+  NewExtensionError,
   SelectExtensionConfig,
   SelectExtensionStorage,
   SelectExtesionCommand,
@@ -22,6 +25,7 @@ import {
   extensionConfigs,
   extensionCreds,
   extensionCredOauthTokens,
+  extensionErrors,
 } from '/@/db/schema/extension.schema';
 import type { ExtensionCommand, ExtensionManifest } from '@repo/extension-core';
 import {
@@ -51,6 +55,7 @@ import type {
   DatabaseExtensionCredOauthTokenInsertPayload,
   DatabaseExtensionCredOauthTokenUpdatePayload,
   DatabaseExtensionConfigInsertPayload,
+  DatabaseExtensionErrorsListItem,
 } from '/@/interface/database.interface';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
@@ -63,6 +68,8 @@ import { safeStorage } from 'electron';
 import { nanoid } from 'nanoid';
 import type { ExtensionCredential } from '@repo/extension-core/src/client/manifest/manifest-credential';
 import type { SQLiteColumn } from 'drizzle-orm/sqlite-core';
+
+const MAX_EXT_ERROR_AGE_DAY = 30;
 
 class DBExtensionService {
   private cache: MemoryCache = new MemoryCache();
@@ -105,6 +112,12 @@ class DBExtensionService {
       with: {
         commands: {},
       },
+      extras: {
+        errorsCount:
+          sql<number>`(SELECT COUNT(*) FROM ${extensionErrors} WHERE ${extensionErrors.extensionId} = extensions.id)`.as(
+            'errors_count',
+          ),
+      },
       where: activeExtOnly
         ? (fields, operators) => {
             return operators.and(
@@ -140,6 +153,44 @@ class DBExtensionService {
     emitDBChanges({
       'database:get-extension': [extensionId],
       'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
+    });
+  }
+
+  async insertError({
+    title,
+    message,
+    extensionId,
+  }: Omit<NewExtensionError, 'id' | 'createdAt' | 'updatedAt'>) {
+    await this.database.insert(extensionErrors).values({
+      title,
+      message,
+      extensionId,
+      createdAt: new Date().toISOString(),
+    });
+
+    emitDBChanges({
+      'database:get-extension-errors-list': [extensionId],
+      'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
+    });
+  }
+
+  deleteOldErrors() {
+    const minDate = new Date(
+      new Date().setDate(new Date().getDate() - MAX_EXT_ERROR_AGE_DAY),
+    );
+    return this.database
+      .delete(extensionErrors)
+      .where(lt(extensionErrors.createdAt, minDate.toISOString()));
+  }
+
+  async deleteErrors(ids: number[]) {
+    await this.database
+      .delete(extensionErrors)
+      .where(inArray(extensionErrors.id, ids));
+
+    emitDBChanges({
+      'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
+      'database:get-extension-errors-list': [DATABASE_CHANGES_ALL_ARGS],
     });
   }
 
@@ -187,6 +238,22 @@ class DBExtensionService {
     });
 
     return extension as ExtensionManifest;
+  }
+
+  getErrorsList(
+    extensionId: string,
+  ): Promise<DatabaseExtensionErrorsListItem[]> {
+    return this.database.query.extensionErrors.findMany({
+      columns: {
+        id: true,
+        title: true,
+        message: true,
+        createdAt: true,
+      },
+      where(fields, operators) {
+        return operators.eq(fields.extensionId, extensionId);
+      },
+    });
   }
 
   async getCommand(

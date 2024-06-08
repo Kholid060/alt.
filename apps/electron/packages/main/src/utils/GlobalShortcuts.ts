@@ -1,10 +1,4 @@
-import { globalShortcut } from 'electron';
-import { GLOBAL_SHORTCUTS } from './constant';
-import { logger } from '../lib/log';
-import { CommandLaunchBy } from '@repo/extension';
-import DBService from '../services/database/database.service';
-import WindowCommand from '../window/command-window';
-import ExtensionService from '../services/extension.service';
+import { app, globalShortcut } from 'electron';
 
 type GlobalShortcutCallback = (shortcut: string, id?: string) => void;
 interface GlobalShortcutItem {
@@ -15,15 +9,11 @@ interface GlobalShortcutItem {
 
 class GlobalShortcut {
   private static _instance: GlobalShortcut | null = null;
-
   static get instance() {
-    if (!this._instance) {
-      this._instance = new GlobalShortcut();
-    }
-
-    return this._instance;
+    return this._instance || (this._instance = new GlobalShortcut());
   }
 
+  private registerQueue: GlobalShortcutItem[] = [];
   private shortcuts: Record<string, GlobalShortcutItem[]> = {};
 
   constructor() {}
@@ -35,18 +25,24 @@ class GlobalShortcut {
     items.forEach((item) => item.callback(keys, item.id));
   }
 
-  register({
-    id,
-    keys,
-    callback,
-  }: {
-    id?: string;
-    keys: string;
-    callback: GlobalShortcutCallback;
-  }) {
+  init() {
+    if (this.registerQueue.length === 0) return;
+
+    this.registerQueue.forEach((item) => this.register(item));
+    this.registerQueue = [];
+  }
+
+  register({ id, keys, callback }: GlobalShortcutItem) {
+    if (!app.isReady()) {
+      this.registerQueue.push({ id, keys, callback });
+      return;
+    }
+
     if (!this.shortcuts[keys]) this.shortcuts[keys] = [];
 
     this.shortcuts[keys].push({ callback, keys, id });
+    if (globalShortcut.isRegistered(keys)) return;
+
     globalShortcut.register(keys, () => {
       this.shortcutListener(keys);
     });
@@ -98,77 +94,6 @@ class GlobalShortcut {
         .flat()
         .find((item) => item.id == id) ?? null
     );
-  }
-}
-
-export class GlobalShortcutExtension {
-  static toggleShortcut(
-    extensionId: string,
-    commandId: string,
-    keys: string | null,
-  ) {
-    const shortcutId = `${extensionId}:${commandId}`;
-    GlobalShortcut.instance.unregisterById(shortcutId);
-
-    if (!keys) return;
-
-    GlobalShortcut.instance.register({
-      keys,
-      callback: async () => {
-        try {
-          await ExtensionService.instance.executeCommand({
-            commandId,
-            extensionId,
-            launchContext: {
-              args: {},
-              launchBy: CommandLaunchBy.USER,
-            },
-          });
-        } catch (error) {
-          logger(
-            'error',
-            ['globalShorcut', 'extension-command-shortcut'],
-            error,
-          );
-        }
-      },
-      id: shortcutId,
-    });
-  }
-
-  static async registerAllShortcuts() {
-    const commands =
-      await DBService.instance.db.query.extensionCommands.findMany({
-        columns: {
-          name: true,
-          shortcut: true,
-        },
-        with: {
-          extension: { columns: { id: true } },
-        },
-        where(fields, operators) {
-          return operators.isNotNull(fields.shortcut);
-        },
-      });
-    commands.map((command) => {
-      if (!command.extension) return;
-
-      this.toggleShortcut(command.extension.id, command.name, command.shortcut);
-    });
-  }
-}
-
-export async function registerGlobalShortcuts() {
-  try {
-    GlobalShortcut.instance.register({
-      keys: GLOBAL_SHORTCUTS.toggleCommandWindow,
-      callback: async () => {
-        await WindowCommand.instance.toggleWindow();
-      },
-    });
-    await GlobalShortcutExtension.registerAllShortcuts();
-  } catch (error) {
-    logger('error', ['globalShorcut', 'registerGlobalShortcuts'], error);
   }
 }
 

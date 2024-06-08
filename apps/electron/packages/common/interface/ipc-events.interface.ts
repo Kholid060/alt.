@@ -221,7 +221,7 @@ export interface IPCSendEventRendererToMain {
   'extension:stop-execute-command': [runnerId: string];
   'window:open-command': [path?: string, routeData?: unknown];
   'extension:finish-command-exec': [
-    runnerId: string,
+    detail: { runnerId: string; extensionId: string; title?: string },
     data: ExtensionAPI.runtime.command.LaunchResult,
   ];
   'window:destroy': [name: WindowNames];

@@ -113,10 +113,18 @@ class ExtensionCommandRunner {
           this.runners.size,
         );
 
-        IPCRenderer.send('extension:finish-command-exec', runnerId, {
-          success: false,
-          errorMessage: message,
-        });
+        IPCRenderer.send(
+          'extension:finish-command-exec',
+          {
+            runnerId,
+            extensionId: command.extension.id,
+            title: `Error on "${command.title}" command`,
+          },
+          {
+            success: false,
+            errorMessage: message,
+          },
+        );
       });
       commandRunner.once('finish', (reason, data) => {
         this.destroyRunningCommand(runnerId);
@@ -126,10 +134,17 @@ class ExtensionCommandRunner {
           this.runners.size,
         );
 
-        IPCRenderer.send('extension:finish-command-exec', runnerId, {
-          result: data,
-          success: true,
-        });
+        IPCRenderer.send(
+          'extension:finish-command-exec',
+          {
+            runnerId,
+            extensionId: command.extension.id,
+          },
+          {
+            result: data,
+            success: true,
+          },
+        );
       });
 
       if (commandRunner.onCommandWindowEvents) {

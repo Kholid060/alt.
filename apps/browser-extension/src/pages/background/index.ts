@@ -1,8 +1,8 @@
 import reloadOnUpdate from 'virtual:reload-on-update-in-background-script';
-import { initWebsocketService } from './service-init';
+import { initBackgroundService } from './service-init';
 
 reloadOnUpdate('pages/background');
 
-initWebsocketService();
+initBackgroundService();
 
 console.log('background loaded');

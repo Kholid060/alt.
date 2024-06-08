@@ -8,12 +8,13 @@ import CustomProtocol from './utils/custom-protocol/CustomProtocol';
 import { APP_DEEP_LINK } from '#packages/common/utils/constant/app.const';
 import path from 'node:path';
 import DeepLink from './utils/DeepLink';
-import { initDefaultWebsocketServer } from './services/websocket/websocket.service';
-import { registerGlobalShortcuts } from './utils/GlobalShortcuts';
+import WebsocketService from './services/websocket/websocket.service';
+import GlobalShortcut from './utils/GlobalShortcuts';
 import ExtensionLoader from './utils/extension/ExtensionLoader';
 import DBService from './services/database/database.service';
 import WorkflowService from './services/workflow.service';
 import WindowCommand from './window/command-window';
+import ExtensionService from './services/extension.service';
 
 app.commandLine.appendSwitch('wm-window-animations-disabled');
 
@@ -72,15 +73,16 @@ app
     await DBService.instance.initDB();
 
     CustomProtocol.registerProtocols();
-    initDefaultWebsocketServer();
+    WebsocketService.startDefaultServer();
 
     await Promise.all([
-      registerGlobalShortcuts(),
+      GlobalShortcut.instance.init(),
       WorkflowService.instance.trigger.registerAll(),
       ExtensionLoader.instance.loadExtensions(),
     ]);
 
-    WindowCommand.instance.restoreOrCreateWindow();
+    await ExtensionService.instance.registerAllShortcuts();
+    await WindowCommand.instance.restoreOrCreateWindow();
   })
   .catch((e) => console.error('Failed create window:', e));
 

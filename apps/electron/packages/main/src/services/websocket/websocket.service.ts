@@ -4,15 +4,16 @@ import ExtensionWSNamespace from './ws-namespaces/extensions.ws-namespace';
 import { WebSocketServer } from 'ws';
 import { debuglog } from 'util';
 
+const WEBSOCKET_PORT = 4567;
+
 class WebsocketService {
   private static _instance: WebsocketService | null = null;
-
   static get instance() {
-    if (!this._instance) {
-      this._instance = new WebsocketService();
-    }
+    return this._instance || (this._instance = new WebsocketService());
+  }
 
-    return this._instance;
+  static startDefaultServer() {
+    this.instance.startServer(WEBSOCKET_PORT);
   }
 
   private io: Server | null = null;
@@ -34,12 +35,6 @@ class WebsocketService {
 
     debuglog(`Websocket server starting on port ${port}`);
   }
-}
-
-export function initDefaultWebsocketServer() {
-  const PORT = 4567;
-
-  return WebsocketService.instance.startServer(PORT);
 }
 
 export default WebsocketService;

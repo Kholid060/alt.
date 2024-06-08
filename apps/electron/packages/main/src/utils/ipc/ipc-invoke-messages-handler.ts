@@ -4,7 +4,6 @@ import ExtensionLoader from '../extension/ExtensionLoader';
 import './ipc-extension-messages';
 import { BrowserWindow, clipboard, dialog, screen, shell } from 'electron';
 import IPCMain from './IPCMain';
-import { GlobalShortcutExtension } from '../GlobalShortcuts';
 import DBService from '/@/services/database/database.service';
 import { emitDBChanges } from '../database-utils';
 import WindowCommand from '../../window/command-window';
@@ -196,7 +195,7 @@ IPCMain.handle(
     );
 
     if (Object.hasOwn(value, 'shortcut')) {
-      GlobalShortcutExtension.toggleShortcut(
+      ExtensionService.instance.toggleShortcut(
         extensionId,
         commandId,
         value.shortcut ?? null,
@@ -252,6 +251,12 @@ IPCMain.handle('database:delete-workflow-history', (_, historyId) => {
 });
 IPCMain.handle('database:extension-command-exists', (_, ids) => {
   return DBService.instance.workflow.commandExist(ids);
+});
+IPCMain.handle('database:get-extension-errors-list', (_, extensionId) => {
+  return DBService.instance.extension.getErrorsList(extensionId);
+});
+IPCMain.handle('database:delete-extension-errors', (_, ids) => {
+  return DBService.instance.extension.deleteErrors(ids);
 });
 
 /** SHELL */

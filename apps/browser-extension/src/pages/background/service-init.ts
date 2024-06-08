@@ -1,8 +1,9 @@
 import BrowserService from '@root/src/service/browser.service';
 import WebsocketService from '@root/src/service/websocket.service';
 import Browser from 'webextension-polyfill';
+import BackgroundBrowserEventListener from './BackgroundBrowserEventListener';
 
-export async function initWebsocketService() {
+function initWebsocketService() {
   WebsocketService.instance.addListener('connect', () => {
     BrowserService.instance.startListener();
     Browser.action.setBadgeText({ text: ' ' });
@@ -15,4 +16,9 @@ export async function initWebsocketService() {
   });
 
   WebsocketService.instance.init();
+}
+
+export function initBackgroundService() {
+  initWebsocketService();
+  BackgroundBrowserEventListener.instance.startListeners();
 }

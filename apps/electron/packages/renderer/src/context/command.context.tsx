@@ -1,7 +1,6 @@
 import { createContext, useEffect, useRef } from 'react';
 import { useCommandPanelStore } from '../stores/command-panel.store';
 import preloadAPI from '../utils/preloadAPI';
-import { useCommandStore } from '../stores/command.store';
 import { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
 import { MESSAGE_PORT_CHANNEL_IDS } from '#packages/common/utils/constant/constant';
 import {
@@ -35,8 +34,6 @@ export function CommandCtxProvider({
   const clearAllPanel = useCommandPanelStore.use.clearAll();
   const addPanelStatus = useCommandPanelStore.use.addStatus();
 
-  const addExtensionError = useCommandStore.use.addExtensionError();
-
   const runnerMessagePort = useRef<
     MessagePortRenderer<MessagePortSharedCommandWindowEvents>
   >(new MessagePortRenderer());
@@ -63,13 +60,6 @@ export function CommandCtxProvider({
           case 'finish':
           case 'error': {
             const isError = detail.type === 'error';
-
-            if (isError) {
-              addExtensionError(detail.extensionId, {
-                content: detail.message,
-                title: `Error in "${detail.commandTitle}" command`,
-              });
-            }
 
             addPanelStatus({
               description: detail.message.slice(

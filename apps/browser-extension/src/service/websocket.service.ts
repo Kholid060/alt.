@@ -50,6 +50,12 @@ class WebsocketService extends EventEmitter<WSEvent> {
     });
   }
 
+  tryConnect() {
+    if (!this.socket || this.socket.connected) return;
+
+    this.socket.connect();
+  }
+
   emitEvent<T extends keyof ExtensionWSClientToServerEvents>(
     name: T,
     ...args: Parameters<ExtensionWSClientToServerEvents[T]>

@@ -5,6 +5,8 @@ import { fileURLToPath } from 'node:url';
 import { centerWindow } from '../utils/helper';
 import WindowBase, { WindowBaseState } from './WindowBase';
 import { sleep } from '@repo/shared';
+import GlobalShortcut from '../utils/GlobalShortcuts';
+import { GLOBAL_SHORTCUTS } from '../utils/constant';
 
 export const COMMNAND_WINDOW_BOUND = {
   width: 650,
@@ -58,6 +60,13 @@ class WindowCommand extends WindowBase {
   }
 
   private init() {
+    GlobalShortcut.instance.register({
+      keys: GLOBAL_SHORTCUTS.toggleCommandWindow,
+      callback: () => {
+        this.toggleWindow();
+      },
+    });
+
     this.hook('window:created', async (browserWindow) => {
       const frameFirstLoad = new Set<number>();
       const { mainFrame } = browserWindow.webContents;

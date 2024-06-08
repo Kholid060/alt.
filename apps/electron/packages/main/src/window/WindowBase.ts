@@ -129,6 +129,7 @@ class WindowBase extends EventEmitter<WindowBaseEvents> {
     const browserWindow = new BrowserWindow(this.options);
     this.window = browserWindow;
 
+    this._state = WindowBaseState.Hidden;
     this.webContentId = browserWindow.webContents.id;
 
     browserWindow.on('hide', () => {

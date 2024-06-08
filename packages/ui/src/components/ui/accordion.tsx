@@ -20,8 +20,10 @@ UiAccordionItem.displayName = 'UiAccordionItem';
 
 const UiAccordionTrigger = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger> & {
+    suffixSlot?: React.ReactNode;
+  }
+>(({ className, children, suffixSlot, ...props }, ref) => (
   <AccordionPrimitive.Header className="flex">
     <AccordionPrimitive.Trigger
       ref={ref}
@@ -33,6 +35,7 @@ const UiAccordionTrigger = React.forwardRef<
     >
       {children}
       <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
+      {suffixSlot}
     </AccordionPrimitive.Trigger>
   </AccordionPrimitive.Header>
 ));

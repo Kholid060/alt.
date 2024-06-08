@@ -73,6 +73,8 @@ function CommandList() {
     'commands',
   ]);
 
+  console.log(extensionQuery.data);
+
   const activeBrowserTab = useCommandStore.use.activeBrowserTab();
   const addPanelStatus = useCommandPanelStore.use.addStatus();
   const navigate = useCommandNavigate();

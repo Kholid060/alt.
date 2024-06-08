@@ -11,6 +11,7 @@ import type {
   SelectExtension,
   SelectExtensionConfig,
   SelectExtensionCredential,
+  SelectExtensionError,
   SelectExtesionCommand,
 } from '../db/schema/extension.schema';
 import type {
@@ -54,7 +55,7 @@ export type DatabaseExtensionListItem = Pick<
   | 'commands'
   | 'isError'
   | 'isDisabled'
->;
+> & { errorsCount: number };
 
 export type DatabaseExtensionUpdatePayload = Partial<
   Pick<DatabaseExtension, 'isDisabled'>
@@ -220,6 +221,11 @@ export interface DatabaseWorkflowHistoryListOptions {
 
 export type DatabaseExtensionCommandListFilter = 'user-script';
 
+export type DatabaseExtensionErrorsListItem = Pick<
+  SelectExtensionError,
+  'id' | 'message' | 'title' | 'createdAt'
+>;
+
 export interface DatabaseQueriesEvent {
   'database:get-command': (
     commandId: string | { commandId: string; extensionId: string },
@@ -257,6 +263,9 @@ export interface DatabaseQueriesEvent {
   'database:extension-command-exists': (
     ids: string[],
   ) => Record<string, boolean>;
+  'database:get-extension-errors-list': (
+    extensionId: string,
+  ) => DatabaseExtensionErrorsListItem[];
   'database:get-workflow-history-list': (
     options?: DatabaseWorkflowHistoryListOptions,
   ) => { count: number; items: DatabaseWorkflowHistory[] };
@@ -314,6 +323,7 @@ export interface DatabaseUpdateEvents {
 
 export interface DatabaseDeleteEvents {
   'database:delete-workflow': (workflowId: string) => void;
+  'database:delete-extension-errors': (id: number[]) => void;
   'database:delete-extension-command': (id: string | string[]) => void;
   'database:delete-extension-credential': (id: string | string[]) => void;
   'database:delete-workflow-history': (historyId: number | number[]) => void;

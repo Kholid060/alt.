@@ -15,6 +15,13 @@
       "when": 1717471372067,
       "tag": "0001_lying_eddie_brock",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1717826439645,
+      "tag": "0002_last_pretty_boy",
+      "breakpoints": true
     }
   ]
 }

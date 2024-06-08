@@ -10,6 +10,9 @@ import BrowserService from './browser.service';
 import DBService from './database/database.service';
 import type { ExtensionCommandType } from '@repo/extension-core';
 import WindowSharedProcess from '../window/shared-process-window';
+import { CommandLaunchBy } from '@repo/extension';
+import { logger } from '../lib/log';
+import GlobalShortcut from '../utils/GlobalShortcuts';
 
 class ExtensionService {
   private static _instance: ExtensionService;
@@ -27,15 +30,48 @@ class ExtensionService {
   } | null = null;
 
   constructor() {
-    this.initIPCEventListener();
+    this.init();
   }
 
-  private initIPCEventListener() {
-    IPCMain.on('extension:finish-command-exec', (_, runnerId, result) => {
-      const resolver = this.executionResolvers.get(runnerId);
-      if (!resolver) return;
+  private init() {
+    IPCMain.on(
+      'extension:finish-command-exec',
+      (_, { runnerId, extensionId, title }, result) => {
+        const resolver = this.executionResolvers.get(runnerId);
+        if (resolver) resolver.resolve(result);
 
-      resolver.resolve(result);
+        console.log('aa', result);
+
+        if (!result.success) {
+          DBService.instance.extension.insertError({
+            title,
+            extensionId,
+            message: result.errorMessage,
+          });
+        }
+      },
+    );
+    DBService.instance.extension.deleteOldErrors().catch(console.error);
+  }
+
+  async registerAllShortcuts() {
+    const commands =
+      await DBService.instance.db.query.extensionCommands.findMany({
+        columns: {
+          name: true,
+          shortcut: true,
+        },
+        with: {
+          extension: { columns: { id: true } },
+        },
+        where(fields, operators) {
+          return operators.isNotNull(fields.shortcut);
+        },
+      });
+    commands.map((command) => {
+      if (!command.extension) return;
+
+      this.toggleShortcut(command.extension.id, command.name, command.shortcut);
     });
   }
 
@@ -175,6 +211,32 @@ class ExtensionService {
       'shared-window:stop-execute-command',
       runnerId,
     );
+  }
+
+  toggleShortcut(extensionId: string, commandId: string, keys: string | null) {
+    const shortcutId = `${extensionId}:${commandId}`;
+    GlobalShortcut.instance.unregisterById(shortcutId);
+
+    if (!keys) return;
+
+    GlobalShortcut.instance.register({
+      keys,
+      callback: async () => {
+        try {
+          await ExtensionService.instance.executeCommand({
+            commandId,
+            extensionId,
+            launchContext: {
+              args: {},
+              launchBy: CommandLaunchBy.USER,
+            },
+          });
+        } catch (error) {
+          logger('error', ['ExtensionService', 'toggleShortcut'], error);
+        }
+      },
+      id: shortcutId,
+    });
   }
 }
 

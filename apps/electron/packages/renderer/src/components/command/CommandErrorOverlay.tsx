@@ -1,5 +1,8 @@
 import { useEffect } from 'react';
-import { useCommandStore } from '/@/stores/command.store';
+import {
+  CommandErrorOverlay as CommandErrorOverlayData,
+  useCommandStore,
+} from '/@/stores/command.store';
 import {
   UiAccordion,
   UiAccordionContent,
@@ -7,11 +10,30 @@ import {
   UiAccordionTrigger,
   UiButton,
 } from '@repo/ui';
-import { XIcon } from 'lucide-react';
+import { TrashIcon, XIcon } from 'lucide-react';
+import { useDatabaseQuery } from '/@/hooks/useDatabase';
+import preloadAPI from '/@/utils/preloadAPI';
 
-function CommandErrorOverlay() {
+function CommandErrorOverlayContent({
+  title,
+  errors,
+  extensionId,
+}: CommandErrorOverlayData) {
   const setCommandStore = useCommandStore.use.setState();
-  const errorOverlayData = useCommandStore.use.errorOverlay();
+  const errorsQuery = useDatabaseQuery('database:get-extension-errors-list', [
+    extensionId,
+  ]);
+
+  async function deleteError(errorId: number) {
+    try {
+      await preloadAPI.main.ipc.invokeWithError(
+        'database:delete-extension-errors',
+        [errorId],
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   useEffect(() => {
     const keydownListener = (event: KeyboardEvent) => {
@@ -23,18 +45,14 @@ function CommandErrorOverlay() {
       setCommandStore('errorOverlay', null);
     };
 
-    if (errorOverlayData) {
-      window.addEventListener('keydown', keydownListener, { capture: true });
-    } else {
-      window.removeEventListener('keydown', keydownListener, { capture: true });
-    }
+    window.addEventListener('keydown', keydownListener, { capture: true });
 
     return () => {
       window.removeEventListener('keydown', keydownListener, { capture: true });
     };
-  }, [errorOverlayData, setCommandStore]);
+  }, [setCommandStore]);
 
-  if (!errorOverlayData) return null;
+  if (!errorsQuery.data) return null;
 
   return (
     <div className="absolute top-0 left-0 h-full w-full z-50 bg-black/10 backdrop-blur-sm rounded-lg overflow-hidden">
@@ -47,17 +65,38 @@ function CommandErrorOverlay() {
           >
             <XIcon className="h-5 w-5" />
           </UiButton>
-          <p className="text-destructive-text">{errorOverlayData.title}</p>
+          <p className="text-destructive-text">{title}</p>
         </div>
         <UiAccordion type="multiple" className="mt-2">
-          {errorOverlayData.errors.map((error, index) => (
+          {[...errors, ...errorsQuery.data].map((error, index) => (
             <UiAccordionItem key={index} value={index.toString()}>
-              <UiAccordionTrigger className="text-sm py-3">
+              <UiAccordionTrigger
+                className="text-sm py-3"
+                suffixSlot={
+                  error.id >= 0 && (
+                    <>
+                      <hr className="w-px h-6 mx-4 bg-border" />
+                      <UiButton
+                        size="icon-sm"
+                        variant="ghost"
+                        className="mr-2"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          deleteError(error.id);
+                        }}
+                      >
+                        <TrashIcon className="h-5 w-5" />
+                      </UiButton>
+                    </>
+                  )
+                }
+              >
                 {error.title ||
-                  error.content.slice(0, error.content.indexOf('\n'))}
+                  error.message.slice(0, error.message.indexOf('\n'))}
+                <div className="flex-grow"></div>
               </UiAccordionTrigger>
               <UiAccordionContent className="whitespace-pre-wrap bg-background px-4 py-2 rounded-md font-mono text-muted-foreground">
-                {error.content}
+                {error.message}
               </UiAccordionContent>
             </UiAccordionItem>
           ))}
@@ -65,6 +104,15 @@ function CommandErrorOverlay() {
       </div>
     </div>
   );
+}
+
+function CommandErrorOverlay() {
+  const errorOverlayData = useCommandStore.use.errorOverlay();
+
+  if (!errorOverlayData) return null;
+
+  errorOverlayData.title;
+  return <CommandErrorOverlayContent {...errorOverlayData} />;
 }
 
 export default CommandErrorOverlay;

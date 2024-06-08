@@ -53,6 +53,7 @@ export type NewExtension = typeof extensions.$inferInsert;
 export type SelectExtension = typeof extensions.$inferSelect;
 
 export const extensionsRelations = relations(extensions, ({ many }) => ({
+  errors: many(extensionErrors),
   configs: many(extensionConfigs),
   storages: many(extensionStorages),
   commands: many(extensionCommands),
@@ -149,6 +150,30 @@ export const extensionsConfigRelations = relations(
   ({ one }) => ({
     extension: one(extensions, {
       fields: [extensionConfigs.extensionId],
+      references: [extensions.id],
+    }),
+  }),
+);
+
+export const extensionErrors = sqliteTable('extension_errors', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  title: text('title'),
+  extensionId: text('extension_id')
+    .notNull()
+    .references(() => extensions.id, { onDelete: 'cascade' }),
+  message: text('message').notNull(),
+  createdAt: text('created_at')
+    .notNull()
+    .default(sql`CURRENT_TIMESTAMP`),
+});
+export type NewExtensionError = typeof extensionErrors.$inferInsert;
+export type SelectExtensionError = typeof extensionErrors.$inferSelect;
+
+export const extensionErrorsRelations = relations(
+  extensionErrors,
+  ({ one }) => ({
+    extension: one(extensions, {
+      fields: [extensionErrors.extensionId],
       references: [extensions.id],
     }),
   }),

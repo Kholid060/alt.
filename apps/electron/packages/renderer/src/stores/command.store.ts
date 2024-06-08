@@ -2,10 +2,17 @@ import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import createStoreSelectors from '../utils/createStoreSelector';
 import { ExtensionBrowserTabContext } from '#packages/common/interface/extension.interface';
+import { DatabaseExtensionErrorsListItem } from '#packages/main/src/interface/database.interface';
 
 interface ExtensionCommandArgs {
   commandId: string;
   args: Record<string, unknown>;
+}
+
+export interface CommandErrorOverlay {
+  title: string;
+  extensionId: string;
+  errors: DatabaseExtensionErrorsListItem[];
 }
 
 interface CommandStoreState {
@@ -13,14 +20,8 @@ interface CommandStoreState {
   isWindowHidden: boolean;
   commandAliases: Set<string>;
   commandArgs: ExtensionCommandArgs;
+  errorOverlay: CommandErrorOverlay | null;
   activeBrowserTab: ExtensionBrowserTabContext | null;
-  extensionErrors: Record<string, CommandErrorOverlayData[]>;
-  errorOverlay: { title: string; errors: CommandErrorOverlayData[] } | null;
-}
-
-interface CommandErrorOverlayData {
-  title?: string;
-  content: string;
 }
 
 interface CommandStoreActions {
@@ -30,24 +31,16 @@ interface CommandStoreActions {
     data: Partial<ExtensionCommandArgs>,
     replace?: boolean,
   ) => void;
-  addExtensionError: (extId: string, error: CommandErrorOverlayData) => void;
   setState: <T extends keyof CommandStoreState>(
     name: T,
     value: CommandStoreState[T],
   ) => void;
-  showExtensionErrorOverlay(detail: {
-    title: string;
-    extensionId: string;
-    errors?: CommandErrorOverlayData[];
-  }): void;
+  showExtensionErrorOverlay(detail: CommandErrorOverlay): void;
 }
-
-const MAX_EXTENSION_ERROR_ITEMS = 20;
 
 const initialState: CommandStoreState = {
   query: '',
   errorOverlay: null,
-  extensionErrors: {},
   isWindowHidden: true,
   activeBrowserTab: null,
   commandAliases: new Set(),
@@ -66,27 +59,13 @@ const commandStore = create<CommandStore>()(
       set((state) => {
         state.errorOverlay = {
           title,
-          errors: [
-            ...(errors ?? []),
-            ...(state.extensionErrors[extensionId] ?? []),
-          ],
+          errors,
+          extensionId,
         };
       });
     },
     setCommandAliases(aliases) {
       set({ commandAliases: aliases });
-    },
-    addExtensionError(extId, error) {
-      set((state) => {
-        if (!state.extensionErrors[extId]) {
-          state.extensionErrors[extId] = [];
-        }
-        if (state.extensionErrors[extId].length >= MAX_EXTENSION_ERROR_ITEMS) {
-          state.extensionErrors[extId].pop();
-        }
-
-        state.extensionErrors[extId].unshift(error);
-      });
     },
     setCommandArgs(data, replace) {
       if (replace) {

@@ -12,6 +12,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { useUiListStore } from '@repo/ui/dist/context/list.context';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
+import { DatabaseExtensionErrorsListItem } from '#packages/main/src/interface/database.interface';
 
 function ListItemExtension({
   item,
@@ -22,13 +23,12 @@ function ListItemExtension({
   const [showExtensionErrorOverlay] = useCommandStore(
     useShallow((state) => [state.showExtensionErrorOverlay]),
   );
-  const hasError = useCommandStore((state) =>
-    Object.hasOwn(state.extensionErrors, item.metadata.extension.id),
-  );
   const addPanelStatus = useCommandPanelStore.use.addStatus();
 
   const uiListStore = useUiListStore();
   const navigate = useCommandNavigate();
+
+  const hasError = item.metadata.extension.errorsCount > 0;
 
   const { extension } = item.metadata;
 
@@ -77,11 +77,13 @@ function ListItemExtension({
     actions.push({
       icon: AlertTriangleIcon,
       onAction() {
-        const errors = [];
+        const errors: DatabaseExtensionErrorsListItem[] = [];
         if (extension.isError) {
           errors.push({
-            content: extension.errorMessage ?? '',
+            id: -1,
             title: 'Extension error',
+            createdAt: new Date().toISOString(),
+            message: extension.errorMessage ?? '',
           });
         }
 
