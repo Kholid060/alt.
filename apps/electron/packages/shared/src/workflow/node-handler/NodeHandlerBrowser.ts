@@ -5,6 +5,7 @@ import {
   isObject,
   isValidURL,
   parseJSON,
+  sleepWithRetry,
   type BrowserType,
 } from '@repo/shared';
 import type {
@@ -13,7 +14,7 @@ import type {
 } from './WorkflowNodeHandler';
 import WorkflowNodeHandler from './WorkflowNodeHandler';
 import { shell } from 'electron';
-import { getExactType, sleepWithRetry } from '/@/utils/helper';
+import { getExactType } from '/@/utils/helper';
 
 const browserName: Record<BrowserType, string> = {
   firefox: 'Firefox',

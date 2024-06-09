@@ -34,10 +34,20 @@ function authorizeCredential() {
   });
 }
 
+async function selectFile() {
+  await _extension.browser.activeTab.selectFile('input[type="file"]', [
+    {
+      contents: new Uint8Array([1]),
+      fileName: '',
+      lastModified: Date.now(), mimeType: 'text/plain'
+    },
+    filePath
+  ]);
+}
+
 export default async function CommandMain(context: CommandLaunchContext) {
   console.log(JSON.stringify(context));
   // await new Promise((r) => setTimeout(r, 4000));
-
 
   // await _extension.mainWindow.close();
 
@@ -48,11 +58,9 @@ export default async function CommandMain(context: CommandLaunchContext) {
   //   subtitle: 'Hello worldo!!!',
   // });
 
-  console.log(await _extension.browser.activeTab.getAttributes('textarea'));
-  console.log(await _extension.browser.activeTab.setAttributes('textarea', { hello: 'world' }));
-  console.log(await _extension.browser.activeTab.type('textarea', 'Hello!'));
+  await selectFile();
+
   // await authorizeCredential();
-  console.log(await _extension.runtime.config.getValues('command'));
   // await _extension.runtime.config.openConfigPage('command');
 
   // await _extension.storage.set('test', 'hello world');

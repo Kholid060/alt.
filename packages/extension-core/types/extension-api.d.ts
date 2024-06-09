@@ -3,12 +3,13 @@ import type { ExtensionManifest } from '../src/client/manifest';
 import type {
   USKeyboardKeys,
   KeyboardModifiersType,
+  BrowserGetHTMLOptions,
   KeyboardKeyUpOptionsType,
+  BrowserSelectFileOptions,
   KeyboardKeyDownOptionsType,
   KeyboardBrowserTypeOptions,
   BrowserWaitForSelectorOptions,
   ExtensionBrowserElementSelector,
-  BrowserGetHTMLOptions,
 } from '@repo/shared';
 
 type OmitFirstArg<F> = F extends (x: any, ...args: infer P) => infer R
@@ -242,6 +243,7 @@ declare namespace ExtensionAPI.browser {
     getHTML: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.getHTML>;
     mouseUp: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.mouseUp>;
     mouseDown: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.mouseDown>;
+    selectFile: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.selectFile>;
     getAttributes: OmitFirstArg<
       typeof ExtensionAPI.browser.activeTab.getAttributes
     >;
@@ -343,6 +345,12 @@ declare namespace ExtensionAPI.browser.activeTab {
     key: string,
     options?: ExtensionAPI.browser.KeyDownOptions &
       ExtensionAPI.browser.KeyUpOptions,
+  ): Promise<void>;
+
+  type SelectFileDetail = BrowserSelectFileOptions;
+  export function selectFile(
+    selector: ExtensionAPI.browser.ElementSelector,
+    files: (string | SelectFileDetail)[],
   ): Promise<void>;
 
   // @ext-api-value

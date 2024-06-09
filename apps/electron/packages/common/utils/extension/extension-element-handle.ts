@@ -14,6 +14,16 @@ export function extensionElementHandleFactory(
         elementIndex,
       });
     },
+    selectFile(...args) {
+      return sendMessage(
+        'browser.activeTab.selectFile',
+        {
+          selector,
+          elementIndex,
+        },
+        ...args,
+      );
+    },
     keyDown(...args) {
       return sendMessage(
         'browser.activeTab.keyDown',

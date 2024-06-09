@@ -190,16 +190,23 @@ export interface IPCCryptoEvents {
   ) => string;
 }
 
+export interface IPCDatabaseEvents extends DatabaseEvents {
+  'database:query': <T extends keyof DatabaseEvents>(
+    name: T,
+    ...args: Parameters<DatabaseEvents[T]>
+  ) => ReturnType<DatabaseEvents[T]>;
+}
+
 export type IPCEvents = IPCShellEvents &
   IPCAppEvents &
   IPCAppsEvents &
   IPCOAuthEvents &
-  DatabaseEvents &
   IPCDialogEvents &
   IPCCryptoEvents &
   IPCWindowEvents &
   IPCScreenEvents &
   IPCBrowserEvents &
+  IPCDatabaseEvents &
   IPCWorkflowEvents &
   IPCClipboardEvents &
   IPCExtensionEvents &

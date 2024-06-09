@@ -6,6 +6,7 @@ import { Socket } from 'socket.io-client';
 import TabService from './tab.service';
 import Browser from 'webextension-polyfill';
 import BrowserService from './browser.service';
+import BackgroundFileHandle from '../pages/background/BackgroundFileHandle';
 
 function wsAckHandler<T extends unknown[]>(
   fn: (...args: T) => Promise<void> | void,
@@ -281,6 +282,16 @@ export function websocketEventsListener(
         title: tab.title!,
         windowId: tab.windowId!,
       });
+    }),
+  );
+
+  io.on(
+    'tabs:select-file',
+    wsAckHandler(async (tab, selector, files, callback) => {
+      const fileId = BackgroundFileHandle.instance.addFiles(files);
+      await TabService.selectFile({ tabId: tab.tabId }, selector, fileId);
+
+      callback();
     }),
   );
 

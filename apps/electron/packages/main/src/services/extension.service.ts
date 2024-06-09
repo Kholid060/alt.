@@ -40,8 +40,6 @@ class ExtensionService {
         const resolver = this.executionResolvers.get(runnerId);
         if (resolver) resolver.resolve(result);
 
-        console.log('aa', result);
-
         if (!result.success) {
           DBService.instance.extension.insertError({
             title,

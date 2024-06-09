@@ -38,10 +38,14 @@ class RuntimeMessage {
     message: RuntimeEventPayload,
     sender: Browser.Runtime.MessageSender,
   ) {
+    if (typeof message === 'string' && message === 'injected') return true;
     if (!isObject(message) || !message.name) return;
 
     const listener = this.listeners.get(message.name);
-    if (!listener) throw new Error(`"${message.name}" doesn't have handler`);
+    if (!listener)
+      throw new Error(
+        `[RuntimeMessage] "${message.name}" doesn't have handler`,
+      );
 
     return await listener({ sender }, ...message.args);
   }

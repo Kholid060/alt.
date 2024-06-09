@@ -3,8 +3,10 @@ import QuerySelector from '@root/src/utils/QuerySelector';
 import RuntimeMessage from '@root/src/utils/RuntimeMessage';
 import KeyboardDriver from '@root/src/pages/content/driver/KeyboardDriver';
 import MouseDriver from '@root/src/pages/content/driver/MouseDriver';
-import ElementSelector from '../element-selector';
+import ElementSelector from '../ElementSelector';
 import { isElementVisible } from '@root/src/utils/elements-utils';
+import ContentFileHandle from '../ContentFileHandle';
+import { selectFile } from '../actions/selectFile';
 
 const CUSTOM_ERRORS = {
   ElNotFound: (selector: string) =>
@@ -368,5 +370,20 @@ RuntimeMessage.instance.onMessage(
     }
 
     return promise;
+  },
+);
+
+RuntimeMessage.instance.onMessage(
+  'element:select-file',
+  async (_, selector, fileId) => {
+    const element = await queryElement(selector);
+    if (!(element instanceof HTMLInputElement) || element.type !== 'file') {
+      throw new Error(
+        'Invalid element. The element must  be "<input type="file">"',
+      );
+    }
+
+    const files = await ContentFileHandle.instance.requestFile(fileId);
+    selectFile(element, files);
   },
 );

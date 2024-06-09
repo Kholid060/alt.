@@ -63,6 +63,10 @@ export interface RuntimeEvent {
     selector: ExtensionBrowserElementSelector,
     option?: ExtensionAPI.browser.WaitForSelectorOptions,
   ) => void;
+  'element:select-file': (
+    selector: ExtensionBrowserElementSelector,
+    fileId: string,
+  ) => void;
 }
 
 export interface RuntimeEventPayload {

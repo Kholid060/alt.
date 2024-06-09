@@ -35,8 +35,9 @@ export default defineConfig({
     emptyOutDir: !isDev,
     rollupOptions: {
       input: {
-        'content-script': resolve(pagesDir, 'content', 'index.ts'),
+        'content-iframe': resolve(pagesDir, 'content', 'iframe', 'index.ts'),
         background: resolve(pagesDir, 'background', 'index.ts'),
+        'content-script': resolve(pagesDir, 'content', 'index.ts'),
       },
       output: {
         entryFileNames: 'src/pages/[name]/index.js',

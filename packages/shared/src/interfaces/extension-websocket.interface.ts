@@ -22,6 +22,13 @@ export interface BrowserWaitForSelectorOptions {
   state?: 'attached' | 'detached' | 'visible' | 'hidden';
 }
 
+export interface BrowserSelectFileOptions {
+  fileName: string;
+  mimeType: string;
+  lastModified: number;
+  contents: ArrayBuffer;
+}
+
 export interface WSAckErrorResult {
   error: boolean;
   errorMessage: string;
@@ -63,6 +70,9 @@ export interface ExtensionActiveTabActionWSEvents {
   'tabs:mouse-down': ExtensionWSAckElementHandler;
   'tabs:type': ExtensionWSAckElementHandler<
     [text: string, options: Partial<KeyboardBrowserTypeOptions>]
+  >;
+  'tabs:select-file': ExtensionWSAckElementHandler<
+    [files: BrowserSelectFileOptions[]]
   >;
   'tabs:get-text': ExtensionWSAckElementHandler<
     [options: Partial<BrowserGetTextOptions>],

@@ -33,6 +33,8 @@ const manifest = {
         'assets/fonts/*.woff2',
         'icon-128.png',
         'icon-34.png',
+        '/content-iframe.html',
+        'src/pages/content-iframe/index.js',
       ],
       matches: ['*://*/*'],
     },

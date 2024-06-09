@@ -201,7 +201,7 @@ class TabService {
   }
 
   static async selectElement(
-    { tabId }: TabTarget,
+    { tabId, frameId = 0 }: TabTarget,
     options?: ExtensionAPI.browser.activeTab.SelectElementOptions,
   ) {
     await injectContentHandlerScript(tabId);
@@ -211,21 +211,37 @@ class TabService {
 
     return await RuntimeMessage.instance.sendMessageToTab({
       tabId,
-      name: 'element:select-element',
+      frameId,
       args: [options],
+      name: 'element:select-element',
     });
   }
 
   static async waitForSelector(
-    { tabId }: TabTarget,
+    { tabId, frameId = 0 }: TabTarget,
     selector: ExtensionBrowserElementSelector,
     options?: ExtensionAPI.browser.WaitForSelectorOptions,
   ) {
     await injectContentHandlerScript(tabId);
     return await RuntimeMessage.instance.sendMessageToTab({
       tabId,
-      name: 'element:wait-selector',
+      frameId,
       args: [selector, options],
+      name: 'element:wait-selector',
+    });
+  }
+
+  static async selectFile(
+    { tabId, frameId = 0 }: TabTarget,
+    selector: ExtensionBrowserElementSelector,
+    fileId: string,
+  ) {
+    await injectContentHandlerScript(tabId);
+    return await RuntimeMessage.instance.sendMessageToTab({
+      tabId,
+      frameId,
+      args: [selector, fileId],
+      name: 'element:select-file',
     });
   }
 }

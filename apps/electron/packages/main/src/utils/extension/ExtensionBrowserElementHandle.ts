@@ -18,6 +18,7 @@ const elementHandlerWSEventMap = {
   keyDown: 'tabs:key-down',
   mouseUp: 'tabs:mouse-up',
   mouseDown: 'tabs:mouse-down',
+  selectFile: 'tabs:select-file',
   getAttributes: 'tabs:get-attributes',
   setAttributes: 'tabs:set-attributes',
 } as const;

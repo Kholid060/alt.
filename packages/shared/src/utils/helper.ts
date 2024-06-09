@@ -154,3 +154,27 @@ export function generateRandomString(length = 12) {
 
   return result;
 }
+
+export function sleepWithRetry(
+  callback: () => boolean | Promise<boolean>,
+  ms = 1000,
+) {
+  const resolver = Promise.withResolvers<void>();
+
+  const resolvePromise = async () => {
+    try {
+      const result = await callback();
+      if (result) {
+        resolver.resolve();
+        return;
+      }
+
+      setTimeout(resolvePromise, ms);
+    } catch (error) {
+      resolver.reject(error);
+    }
+  };
+  resolvePromise();
+
+  return resolver.promise;
+}

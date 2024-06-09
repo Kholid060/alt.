@@ -99,6 +99,7 @@
     "immer": "^10.0.4",
     "lodash-es": "^4.17.21",
     "lucide-react": "^0.367.0",
+    "mime-types": "^2.1.35",
     "nanoid": "^5.0.6",
     "picomatch": "^4.0.2",
     "quickjs-emscripten": "^0.29.1",
