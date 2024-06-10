@@ -119,6 +119,7 @@ export type DatabaseWorkflowHistoryUpdatePayload = Partial<
     SelectWorkflowHistory,
     | 'duration'
     | 'startedAt'
+    | 'runnerId'
     | 'endedAt'
     | 'errorLocation'
     | 'errorMessage'

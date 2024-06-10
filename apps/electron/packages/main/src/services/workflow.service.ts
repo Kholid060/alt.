@@ -18,6 +18,9 @@ import { fromZodError } from 'zod-validation-error';
 import { logger } from '../lib/log';
 import type { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
 import WindowSharedProcess from '../window/shared-process-window';
+import IPCMain from '../utils/ipc/IPCMain';
+import TrayService from './tray.service';
+import { APP_NAME } from '#packages/common/utils/constant/app.const';
 
 class WorkflowTriggerService {
   constructor(private workflowService: WorkflowService) {}
@@ -114,9 +117,30 @@ class WorkflowService {
   }
 
   trigger: WorkflowTriggerService;
+  private _runningWorkflows = new Map<
+    string,
+    { workflowId: string; runnerId: string }
+  >();
 
   constructor() {
     this.trigger = new WorkflowTriggerService(this);
+    this.init();
+  }
+
+  private init() {
+    IPCMain.on('workflow:running-change', (_, type, detail) => {
+      if (type === 'running') {
+        this._runningWorkflows.set(detail.runnerId, detail);
+      } else {
+        this._runningWorkflows.delete(detail.runnerId);
+      }
+
+      const suffix =
+        this._runningWorkflows.size === 0
+          ? ''
+          : `(${this._runningWorkflows.size}) running workflows`;
+      TrayService.instance.setTooltip(`${APP_NAME} ${suffix}`);
+    });
   }
 
   get(workflowId: string) {

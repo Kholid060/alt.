@@ -15,6 +15,7 @@ import DBService from './services/database/database.service';
 import WorkflowService from './services/workflow.service';
 import WindowCommand from './window/command-window';
 import ExtensionService from './services/extension.service';
+import TrayService from './services/tray.service';
 
 app.commandLine.appendSwitch('wm-window-animations-disabled');
 
@@ -74,6 +75,7 @@ app
 
     CustomProtocol.registerProtocols();
     WebsocketService.startDefaultServer();
+    TrayService.instance.init();
 
     await Promise.all([
       GlobalShortcut.instance.init(),

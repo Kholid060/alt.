@@ -77,6 +77,7 @@ class WorkflowRunnerManager {
     const historyId = await IPCRenderer.invokeWithError(
       'database:insert-workflow-history',
       {
+        runnerId,
         workflowId: workflow.id,
         startedAt: new Date().toString(),
         status: WORKFLOW_HISTORY_STATUS.Running,
@@ -103,6 +104,11 @@ class WorkflowRunnerManager {
       try {
         debugLog(`Error on "${workflow.name}" workflow: ${message}`);
 
+        IPCRenderer.send('workflow:running-change', 'finish', {
+          runnerId,
+          workflowId: workflow.id,
+        });
+
         await updateWorkflowHistory(historyId, {
           errorMessage: message,
           errorLocation: location,
@@ -122,6 +128,11 @@ class WorkflowRunnerManager {
       try {
         debugLog(`Finish "${workflow.name}" execution: ${reason}`);
 
+        IPCRenderer.send('workflow:running-change', 'finish', {
+          runnerId,
+          workflowId: workflow.id,
+        });
+
         await updateWorkflowHistory(historyId, {
           startedAt: runner.startedAt,
           status: WORKFLOW_HISTORY_STATUS.Finish,
@@ -137,9 +148,12 @@ class WorkflowRunnerManager {
     });
 
     IdleTimer.instance.lock(IDLE_TIMER_KEY);
+    IPCRenderer.send('workflow:running-change', 'running', {
+      runnerId,
+      workflowId: workflow.id,
+    });
 
     runner.start();
-
     this.runners.set(runnerId, runner);
 
     return runner;

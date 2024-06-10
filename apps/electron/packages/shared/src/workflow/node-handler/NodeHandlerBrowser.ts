@@ -16,7 +16,6 @@ import WorkflowNodeHandler from './WorkflowNodeHandler';
 import { shell } from 'electron';
 import { getExactType } from '/@/utils/helper';
 import WorkflowFileHandle from '../utils/WorkflowFileHandle';
-import { isIPCEventError } from '#packages/common/utils/helper';
 
 const browserName: Record<BrowserType, string> = {
   firefox: 'Firefox',

@@ -65,6 +65,7 @@ export const workflowsHistory = sqliteTable('workflows_history', {
   endedAt: text('ended_at'),
   duration: integer('duration'),
   errorMessage: text('error_message'),
+  runnerId: text('runner_id').notNull(),
   errorLocation: text('error_location'),
   workflowId: text('workflow_id').notNull(),
   status: text('status').notNull().$type<WORKFLOW_HISTORY_STATUS>(),

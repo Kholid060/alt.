@@ -257,6 +257,16 @@ class WindowBase extends EventEmitter<WindowBaseEvents> {
     }
   }
 
+  restoreWindow() {
+    if (!this.window) return;
+
+    if (this.window.isMinimized()) {
+      this.window.restore();
+    }
+
+    this.window.focus();
+  }
+
   destroy() {
     this.window?.destroy();
 
@@ -295,13 +305,8 @@ class WindowBase extends EventEmitter<WindowBaseEvents> {
   }
 
   async restoreOrCreateWindow() {
-    const window = await this.createWindow();
-
-    if (window.isMinimized()) {
-      window.restore();
-    }
-
-    window.focus();
+    await this.createWindow();
+    this.restoreWindow();
   }
 }
 

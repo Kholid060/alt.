@@ -63,6 +63,7 @@ export interface UiListProps
   items: UiListItem[];
   selectedItem?: string;
   shouldFilter?: boolean;
+  noDataSlot?: React.ReactNode;
   disabledItemSelection?: boolean;
   onItemSelected?: (value: string) => void;
   customFilter?: (items: UiListItem[], query: string) => UiListItem[];
@@ -146,6 +147,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
     {
       items,
       search,
+      noDataSlot,
       renderItem,
       customFilter,
       onItemSelected,
@@ -406,6 +408,10 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
 
     return (
       <div ref={containerRef} {...props}>
+        {filteredItems.length === 0 &&
+          (noDataSlot || (
+            <p className="text-center text-muted-foreground my-4">No data</p>
+          ))}
         {filteredItems.map((item, index) => {
           if (typeof item === 'string') {
             return (

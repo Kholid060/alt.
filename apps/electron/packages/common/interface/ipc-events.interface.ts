@@ -238,6 +238,10 @@ export interface IPCSendEventRendererToMain {
     data: ExtensionAPI.runtime.command.LaunchResult,
   ];
   'window:destroy': [name: WindowNames];
+  'workflow:running-change': [
+    type: 'running' | 'finish',
+    detail: { workflowId: string; runnerId: string },
+  ];
   'app:show-notification': [
     options: ExtensionAPI.notifications.NotificationOptions,
   ];

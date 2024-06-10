@@ -6,7 +6,8 @@
     "buildResources": "buildResources"
   },
   "files": [
-    "packages/**/dist/**"
+    "packages/**/dist/**",
+    "buildResources/icon.png"
   ],
   "mac": {
     "target": [
