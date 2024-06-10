@@ -39,7 +39,7 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
     const fileExt = path.extname(commandId);
     const fileCommand = FILE_EXT_COMMAND_MAP[fileExt];
     if (!fileCommand) {
-      this.emit('error', `"${fileExt}" is not supported`);
+      this.emit('error', `"${fileExt}" script file is not supported`);
       return;
     }
 
@@ -47,6 +47,7 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
     if (!isCommandExists) {
       isCommandExists = Boolean(await which(fileCommand, { nothrow: true }));
       if (isCommandExists) existedCommandCache.add(fileCommand);
+      else throw new Error(`"${fileExt}" is not supported on this machine`);
     }
 
     const env = Object.fromEntries(

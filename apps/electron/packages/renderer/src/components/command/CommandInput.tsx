@@ -160,7 +160,7 @@ const CommandInputArguments = forwardRef<
 });
 CommandInputArguments.displayName = 'CommandInputArguments';
 
-const SEARCH_INPUT_PLACEHOLDER = 'Search extensions or commands...';
+const SEARCH_INPUT_PLACEHOLDER = 'Search...';
 const CommandInputTextField = forwardRef<
   HTMLInputElement,
   React.InputHTMLAttributes<HTMLInputElement> & {

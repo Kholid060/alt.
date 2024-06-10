@@ -19,6 +19,7 @@ const langs = {
 interface WorkflowUiCodeEditorProps
   extends React.HTMLAttributes<HTMLDivElement> {
   value?: string;
+  title?: string;
   placeholder?: string;
   hideHeader?: boolean;
   lang?: keyof typeof langs;
@@ -31,6 +32,7 @@ function WorkflowUiCodeEditor({
   lang = 'js',
   hideHeader,
   placeholder,
+  title = 'Code',
   onValueChange,
   ...props
 }: WorkflowUiCodeEditorProps) {
@@ -45,7 +47,7 @@ function WorkflowUiCodeEditor({
     >
       {!hideHeader && (
         <div className="px-2 h-9 border-b flex items-center">
-          <p className="font-semibold">Code</p>
+          <p className="font-semibold">{title}</p>
           <span className="text-xs text-muted-foreground ml-1">
             ({language.title})
           </span>
@@ -60,7 +62,7 @@ function WorkflowUiCodeEditor({
             <UiDialog.Content className="p-0 max-w-2xl">
               <UiDialog.Header className="px-4 pt-4">
                 <UiDialog.Title>
-                  Code
+                  {title}
                   <span className="text-sm text-muted-foreground ml-1.5">
                     ({language.title})
                   </span>
@@ -70,7 +72,7 @@ function WorkflowUiCodeEditor({
                 value={value}
                 className="text-sm min-h-72 border-t [&_.cm-gutters]:!bg-background"
                 style={{ maxHeight: 'calc(100vh - 10rem)' }}
-                placeholder="Your code here..."
+                placeholder={placeholder}
                 extensions={[language.module()]}
                 onChange={(value) => onValueChange?.(value)}
               />

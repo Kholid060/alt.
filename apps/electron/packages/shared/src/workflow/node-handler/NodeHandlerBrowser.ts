@@ -15,6 +15,8 @@ import type {
 import WorkflowNodeHandler from './WorkflowNodeHandler';
 import { shell } from 'electron';
 import { getExactType } from '/@/utils/helper';
+import WorkflowFileHandle from '../utils/WorkflowFileHandle';
+import { isIPCEventError } from '#packages/common/utils/helper';
 
 const browserName: Record<BrowserType, string> = {
   firefox: 'Firefox',
@@ -475,6 +477,62 @@ export class NodeHandlerElementAttributes extends WorkflowNodeHandler<WORKFLOW_N
     }
 
     return { value };
+  }
+
+  destroy() {}
+}
+
+export class NodeHandlerSelectFile extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.SELECT_FILE> {
+  constructor() {
+    super(WORKFLOW_NODE_TYPE.SELECT_FILE);
+  }
+
+  async execute({
+    node,
+    runner,
+  }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.SELECT_FILE>): Promise<WorkflowNodeHandlerExecuteReturn> {
+    const { browserId, tabId } = runner.browser.getContext();
+    if (browserId === null || tabId === null) {
+      throw new Error(
+        'Couldn\'t find an active tab. Use the "Browser Tab" node before using this node.',
+      );
+    }
+
+    const selector = node.data.selector.trim();
+    if (!selector) throw new Error('Element selector is empty');
+
+    let paths: string[] = [];
+    if (node.data.mode === 'json') {
+      const currentFiles = Array.isArray(node.data.jsonInput)
+        ? node.data.jsonInput
+        : parseJSON(node.data.jsonInput, node.data.jsonInput);
+      if (!Array.isArray(currentFiles)) {
+        throw new Error(
+          `Invalid JSON file paths type. Expected array of strings but got ${getExactType(currentFiles)}`,
+        );
+      }
+
+      paths = currentFiles;
+    } else if (node.data.mode === 'list') {
+      paths = node.data.files;
+    }
+
+    paths = paths.map((path) => {
+      if (!WorkflowFileHandle.isWorkflowFileHandle(path)) return path;
+
+      return path.path;
+    });
+
+    await IPCRenderer.invokeWithError('browser:select-files', {
+      paths,
+      tabId,
+      selector,
+      browserId,
+    });
+
+    return {
+      value: null,
+    };
   }
 
   destroy() {}

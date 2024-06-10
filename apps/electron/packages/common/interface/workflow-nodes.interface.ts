@@ -288,6 +288,16 @@ export type WorkflowNodeWaitSelector = WorkflowNodeBase<
   WORKFLOW_NODE_TYPE.WAIT_SELECTOR
 >;
 
+export type WorkflowNodeSelectFile = WorkflowNodeBase<
+  {
+    files: string[];
+    selector: string;
+    jsonInput: string;
+    mode: 'list' | 'json';
+  },
+  WORKFLOW_NODE_TYPE.SELECT_FILE
+>;
+
 export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoop;
   [WORKFLOW_NODE_TYPE.CODE]: WorkflowNodeCode;
@@ -297,6 +307,7 @@ export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.CLIPBOARD]: WorkflowNodeClipboard;
   [WORKFLOW_NODE_TYPE.DO_NOTHING]: WorkflowNodeDoNothing;
   [WORKFLOW_NODE_TYPE.BREAK_LOOP]: WorkflowNodeBreakLoop;
+  [WORKFLOW_NODE_TYPE.SELECT_FILE]: WorkflowNodeSelectFile;
   [WORKFLOW_NODE_TYPE.BROWSER_TAB]: WorkflowNodeBrowserTab;
   [WORKFLOW_NODE_TYPE.INSERT_DATA]: WorkflowNodeInsertData;
   [WORKFLOW_NODE_TYPE.USE_BROWSER]: WorkflowNodeUseBrowser;

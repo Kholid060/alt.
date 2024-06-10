@@ -112,6 +112,12 @@ export interface IPCBrowserEvents {
     browserId: string,
     url: string,
   ) => ExtensionBrowserTabContext;
+  'browser:select-files': (detail: {
+    tabId: number;
+    paths: string[];
+    selector: string;
+    browserId: string;
+  }) => void;
   'browser:actions': <
     T extends keyof ExtensionActiveTabActionWSEvents,
     P extends Parameters<ExtensionActiveTabActionWSEvents[T]>,

@@ -18,6 +18,7 @@ import {
   ExtensionError,
 } from '#packages/common/errors/custom-errors';
 import { Keyboard, KeyboardKey } from '@repo/native';
+import { getFileDetail } from '../getFileDetail';
 
 /** EXTENSION */
 IPCMain.handle('extension:import', async () => {
@@ -357,6 +358,22 @@ IPCMain.handle('browser:new-tab', async (_, browserId, url) => {
 
   return { browserId, tabId: tab.id, title: tab.title, url: tab.url };
 });
+IPCMain.handle(
+  'browser:select-files',
+  async (_, { browserId, paths, selector, tabId }) => {
+    const files = await Promise.all(paths.map(getFileDetail));
+    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
+      browserId,
+      name: 'tabs:select-file',
+      args: [{ tabId }, { selector }, files],
+    });
+    if (isWSAckError(result)) {
+      throw new ExtensionError(result.errorMessage);
+    }
+
+    return result;
+  },
+);
 IPCMain.handle('browser:actions', async (_, { args, browserId, name }) => {
   const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
     args,

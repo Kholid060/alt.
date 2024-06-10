@@ -12,6 +12,7 @@ export enum WORKFLOW_NODE_TYPE {
   USE_BROWSER = 'node-use-browser',
   FILE_SYSTEM = 'node-file-system',
   BROWSER_TAB = 'node-browser-tab',
+  SELECT_FILE = 'node-select-file',
   HTTP_REQUEST = 'node-http-request',
   NOTIFICATION = 'node-notification',
   BROWSER_MOUSE = 'node-browser-mouse',

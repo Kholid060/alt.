@@ -27,6 +27,7 @@ import {
   PilcrowIcon,
   LocateFixedIcon,
   BracketsIcon,
+  FileUpIcon,
 } from 'lucide-react';
 import type { WORKFLOW_NODE_GROUP } from './workflow.const';
 import { WORKFLOW_NODE_TYPE } from './workflow.const';
@@ -414,5 +415,22 @@ export const WORKFLOW_NODES: {
     handleTarget: ['default'],
     handleSource: ['default'],
     type: WORKFLOW_NODE_TYPE.ELEMENT_ATTRIBUTES,
+  },
+  [WORKFLOW_NODE_TYPE.SELECT_FILE]: {
+    title: 'Select File',
+    group: 'Browser',
+    icon: FileUpIcon,
+    subtitle: 'Browser',
+    defaultData: {
+      files: [''],
+      selector: '',
+      mode: 'list',
+      jsonInput: '',
+      isDisabled: false,
+      $nodeType: WORKFLOW_NODE_TYPE.SELECT_FILE,
+    },
+    handleTarget: ['default'],
+    handleSource: ['default'],
+    type: WORKFLOW_NODE_TYPE.SELECT_FILE,
   },
 } as const;

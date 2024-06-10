@@ -5,12 +5,9 @@ import {
   extensionBrowserElementHandle,
   isWSAckError,
 } from '../ExtensionBrowserElementHandle';
-import fs from 'fs-extra';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import WindowCommand from '../../../window/command-window';
-import type { BrowserSelectFileOptions } from '@repo/shared';
-import mime from 'mime-types';
-import path from 'path';
+import { getFileDetail } from '../../getFileDetail';
 
 const getElementSelector = (
   selector: ExtensionAPI.browser.ElementSelector,
@@ -185,13 +182,7 @@ ExtensionIPCEvent.instance.on(
       files.map(async (file) => {
         if (typeof file !== 'string') return file;
 
-        const buffer = await fs.readFile(file);
-        return {
-          contents: buffer,
-          fileName: path.basename(file),
-          mimeType: <string>mime.lookup(file),
-          lastModified: (await fs.stat(file)).mtime.getTime(),
-        } as BrowserSelectFileOptions;
+        return await getFileDetail(file);
       }),
     );
 
