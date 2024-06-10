@@ -124,10 +124,12 @@ class WorkflowService {
 
   constructor() {
     this.trigger = new WorkflowTriggerService(this);
-    this.init();
   }
 
-  private init() {
+  async init() {
+    await this.trigger.registerAll();
+    await DBService.instance.workflow.updateRunningWorkflows();
+
     IPCMain.on('workflow:running-change', (_, type, detail) => {
       if (type === 'running') {
         this._runningWorkflows.set(detail.runnerId, detail);
@@ -233,6 +235,17 @@ class WorkflowService {
       logger('error', ['WorkflowService', 'import'], error);
       throw error;
     }
+  }
+
+  stopRunningWorkflow(runnerId: string) {
+    return WindowSharedProcess.instance.sendMessage(
+      {
+        name: 'shared-window:stop-execute-workflow',
+        noThrow: true,
+        ensureWindow: false,
+      },
+      runnerId,
+    );
   }
 }
 

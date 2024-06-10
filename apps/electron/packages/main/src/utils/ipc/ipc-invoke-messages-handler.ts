@@ -48,11 +48,18 @@ IPCMain.handle('extension:reload', async (_, extId) => {
 IPCMain.handle('extension:execute-command', (_, payload) => {
   return ExtensionService.instance.executeCommand(payload);
 });
+IPCMain.handle('extension:stop-running-command', (_, runningId) => {
+  ExtensionService.instance.stopCommandExecution(runningId);
+  return Promise.resolve();
+});
 IPCMain.handle('extension:delete', (_, extId) => {
   return DBService.instance.extension.delete(extId);
 });
 IPCMain.handle('extension:is-config-inputted', (_, extensionId, commandId) => {
   return DBService.instance.extension.isConfigInputted(extensionId, commandId);
+});
+IPCMain.handle('extension:list-running-commands', () => {
+  return Promise.resolve(ExtensionService.instance.getRunningCommands());
 });
 IPCMain.handle(
   'extension:get-command-file-path',
@@ -204,6 +211,9 @@ IPCMain.handle(
     }
   },
 );
+IPCMain.handle('database:get-running-workflows', (_) => {
+  return DBService.instance.workflow.listRunningWorkflows();
+});
 IPCMain.handle('database:insert-extension-credential', (_, payload) => {
   return DBService.instance.extension.insertCredential(payload);
 });
@@ -298,6 +308,9 @@ IPCMain.handle(
 );
 
 /** WORKFLOW */
+IPCMain.handle('workflow:stop-running', (_, runnerId) => {
+  return WorkflowService.instance.stopRunningWorkflow(runnerId);
+});
 IPCMain.handle('workflow:execute', (_, payload) => {
   return WorkflowService.instance.execute(payload);
 });

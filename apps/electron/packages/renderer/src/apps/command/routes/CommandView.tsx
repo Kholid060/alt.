@@ -7,8 +7,14 @@ import {
   ExtensionCommandViewInitMessage,
 } from '#common/interface/extension.interface';
 import { BetterMessagePort } from '@repo/shared';
+import preloadAPI from '/@/utils/preloadAPI';
+import { isIPCEventError } from '#packages/common/utils/helper';
+import { useCommandPanelStore } from '/@/stores/command-panel.store';
+import { getExtIconURL } from '/@/utils/helper';
 
 function CommandView() {
+  const setHeader = useCommandPanelStore.use.setHeader();
+
   const navigate = useCommandNavigate();
   const activeRoute = useCommandRoute((state) => state.currentRoute);
 
@@ -17,6 +23,7 @@ function CommandView() {
 
   const commandCtx = useCommandCtx();
 
+  const [show, setShow] = useState(false);
   const [iframeKey, setIframeKey] = useState(0);
 
   function initPortListener(port: MessagePort) {
@@ -67,10 +74,37 @@ function CommandView() {
     };
   }, [commandCtx]);
   useEffect(() => {
-    if (!activeRoute?.data) {
+    const data = activeRoute?.data as ExtensionCommandExecutePayload;
+
+    if (!data) {
       navigate('');
+    } else {
+      setShow(true);
+      preloadAPI.main.ipc
+        .invoke('database:get-command', {
+          commandId: data.commandId,
+          extensionId: data.extensionId,
+        })
+        .then((data) => {
+          if (isIPCEventError(data) || !data) return;
+
+          setHeader({
+            icon: getExtIconURL(
+              data.icon || data.extension.icon,
+              data.extensionId,
+            ),
+            title: data.title,
+            subtitle: data.extension.title,
+          });
+        });
     }
+
+    return () => {
+      setHeader(null);
+    };
   }, [activeRoute]);
+
+  if (!show) return null;
 
   return (
     <iframe

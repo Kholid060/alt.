@@ -42,6 +42,13 @@ if (!isSingleInstance) {
   }
 }
 
+/**
+ * Open on start-up
+ */
+app.setLoginItemSettings({
+  openAtLogin: true,
+});
+
 app.on('second-instance', (_event, commandLine) => {
   const deepLink = commandLine ? commandLine.pop() : null;
   if (!deepLink || !deepLink.startsWith(APP_DEEP_LINK)) {
@@ -79,7 +86,7 @@ app
 
     await Promise.all([
       GlobalShortcut.instance.init(),
-      WorkflowService.instance.trigger.registerAll(),
+      WorkflowService.instance.init(),
       ExtensionLoader.instance.loadExtensions(),
     ]);
 

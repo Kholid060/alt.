@@ -6,6 +6,7 @@ import type {
   ExtensionCommandExecutePayload,
   ExtensionCommandExecutePayloadWithData,
   ExtensionCommandJSONViewData,
+  ExtensionCommandProcess,
   ExtensionCommandViewData,
 } from './extension.interface';
 import type {
@@ -154,11 +155,14 @@ export interface IPCExtensionEvents {
   'extension:execute-command': (
     payload: ExtensionCommandExecutePayload,
   ) => string | null;
+  'extension:stop-running-command': (runnerId: string) => void;
+  'extension:list-running-commands': () => ExtensionCommandProcess[];
 }
 
 export interface IPCWorkflowEvents {
   'workflow:export': (workflowId: string) => void;
   'workflow:import': (filePaths?: string[]) => void;
+  'workflow:stop-running': (runnerId: string) => void;
   'workflow:execute': (payload: WorkflowRunPayload) => string | null;
   'workflow:save': (
     workflowId: string,
@@ -219,7 +223,9 @@ export type IPCEvents = IPCShellEvents &
   IPCUserExtensionEvents;
 
 export interface IPCSendEventMainToRenderer {
+  'extension:running-commands-change': [items: ExtensionCommandProcess[]];
   'shared-window:stop-execute-command': [runnerId: string];
+  'shared-window:stop-execute-workflow': [runnerId: string];
   'window:visibility-change': [isHidden: boolean];
   'app:update-route': [path: string, routeData?: unknown];
   'command-window:open-command-json-view': [
@@ -233,8 +239,9 @@ export interface IPCSendEventMainToRenderer {
 export interface IPCSendEventRendererToMain {
   'extension:stop-execute-command': [runnerId: string];
   'window:open-command': [path?: string, routeData?: unknown];
-  'extension:finish-command-exec': [
-    detail: { runnerId: string; extensionId: string; title?: string },
+  'extension:command-exec-change': [
+    type: 'finish' | 'start',
+    detail: ExtensionCommandProcess,
     data: ExtensionAPI.runtime.command.LaunchResult,
   ];
   'window:destroy': [name: WindowNames];

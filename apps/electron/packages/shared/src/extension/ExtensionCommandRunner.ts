@@ -114,10 +114,13 @@ class ExtensionCommandRunner {
         );
 
         IPCRenderer.send(
-          'extension:finish-command-exec',
+          'extension:command-exec-change',
+          'finish',
           {
             runnerId,
             extensionId: command.extension.id,
+            extensionTitle: command.extension.title,
+            icon: command.icon || command.extension.icon,
             title: `Error on "${command.title}" command`,
           },
           {
@@ -135,10 +138,14 @@ class ExtensionCommandRunner {
         );
 
         IPCRenderer.send(
-          'extension:finish-command-exec',
+          'extension:command-exec-change',
+          'finish',
           {
             runnerId,
+            title: command.title,
             extensionId: command.extension.id,
+            extensionTitle: command.extension.title,
+            icon: command.icon || command.extension.icon,
           },
           {
             result: data,
@@ -155,6 +162,21 @@ class ExtensionCommandRunner {
       }
 
       this.runners.set(runnerId, commandRunner);
+      IPCRenderer.send(
+        'extension:command-exec-change',
+        'start',
+        {
+          runnerId,
+          title: command.title,
+          extensionId: command.extension.id,
+          extensionTitle: command.extension.title,
+          icon: command.icon || command.extension.icon,
+        },
+        {
+          result: null,
+          success: true,
+        },
+      );
 
       await commandRunner.start();
 

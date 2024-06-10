@@ -13,6 +13,10 @@ const router = createBrowserRouter(
       element: <DashboardApp />,
       children: [
         {
+          path: '',
+          element: <RouteExtension />,
+        },
+        {
           path: 'extensions',
           element: <RouteExtension />,
         },

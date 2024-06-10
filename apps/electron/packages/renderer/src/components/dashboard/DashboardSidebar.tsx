@@ -7,7 +7,6 @@ import {
   KeyRoundIcon,
   LucideIcon,
   SettingsIcon,
-  UserCog2Icon,
   WorkflowIcon,
 } from 'lucide-react';
 import { useDashboardStore } from '/@/stores/dashboard.store';
@@ -28,11 +27,6 @@ const navigationItems: { title: string; path: string; icon: LucideIcon }[] = [
     icon: HistoryIcon,
     path: '/workflow-history',
     title: 'Workflow history',
-  },
-  {
-    icon: UserCog2Icon,
-    path: '/accounts',
-    title: 'Accounts',
   },
   {
     icon: KeyRoundIcon,

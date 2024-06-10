@@ -10,6 +10,7 @@ import type {
   DatabaseWorkflowHistoryListOptions,
   DatabaseWorkflowHistoryUpdatePayload,
   DatabaseWorkflowInsertPayload,
+  DatabaseWorkflowRunning,
   DatabaseWorkflowUpdatePayload,
   DatabaseWorkfowListQueryOptions,
 } from '/@/interface/database.interface';
@@ -17,6 +18,7 @@ import { nanoid } from 'nanoid';
 import { emitDBChanges, withPagination } from '/@/utils/database-utils';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import type { SQLiteColumn } from 'drizzle-orm/sqlite-core';
+import { WORKFLOW_HISTORY_STATUS } from '#packages/common/utils/constant/workflow.const';
 
 class DBWorkflowService {
   constructor(private database: SQLiteDatabase) {}
@@ -172,6 +174,7 @@ class DBWorkflowService {
     status,
     endedAt,
     duration,
+    runnerId,
     startedAt,
     workflowId,
     errorMessage,
@@ -180,6 +183,7 @@ class DBWorkflowService {
     const result = await this.database.insert(workflowsHistory).values({
       status,
       duration,
+      runnerId,
       workflowId,
       errorMessage,
       errorLocation,
@@ -190,6 +194,7 @@ class DBWorkflowService {
     });
 
     emitDBChanges({
+      'database:get-running-workflows': [DATABASE_CHANGES_ALL_ARGS],
       'database:get-workflow-history-list': [DATABASE_CHANGES_ALL_ARGS],
     });
 
@@ -225,6 +230,7 @@ class DBWorkflowService {
 
     emitDBChanges({
       'database:get-workflow-history': [historyId],
+      'database:get-running-workflows': [DATABASE_CHANGES_ALL_ARGS],
       'database:get-workflow-history-list': [DATABASE_CHANGES_ALL_ARGS],
     });
   }
@@ -242,6 +248,7 @@ class DBWorkflowService {
         id: workflowsHistory.id,
         status: workflowsHistory.status,
         endedAt: workflowsHistory.endedAt,
+        runnerId: workflowsHistory.runnerId,
         duration: workflowsHistory.duration,
         startedAt: workflowsHistory.startedAt,
         workflowId: workflowsHistory.workflowId,
@@ -322,7 +329,38 @@ class DBWorkflowService {
 
     emitDBChanges({
       'database:get-workflow-history': [DATABASE_CHANGES_ALL_ARGS],
+      'database:get-running-workflows': [DATABASE_CHANGES_ALL_ARGS],
       'database:get-workflow-history-list': [DATABASE_CHANGES_ALL_ARGS],
+    });
+  }
+
+  updateRunningWorkflows() {
+    return this.database
+      .update(workflowsHistory)
+      .set({
+        endedAt: new Date().toISOString(),
+        status: WORKFLOW_HISTORY_STATUS.Finish,
+      })
+      .where(eq(workflowsHistory.status, WORKFLOW_HISTORY_STATUS.Running));
+  }
+
+  listRunningWorkflows(): Promise<DatabaseWorkflowRunning[]> {
+    return this.database.query.workflowsHistory.findMany({
+      columns: {
+        runnerId: true,
+        startedAt: true,
+      },
+      with: {
+        workflow: {
+          columns: {
+            name: true,
+            icon: true,
+          },
+        },
+      },
+      where(fields, operators) {
+        return operators.eq(fields.status, WORKFLOW_HISTORY_STATUS.Running);
+      },
     });
   }
 }

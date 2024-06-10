@@ -150,7 +150,6 @@ function RouteWorkflowHistory() {
         args: [
           { filter: search ? { name: search } : undefined, pagination, sort },
         ],
-        autoRefreshOnChange: false,
         onData(data) {
           setWorkflowHistory(data);
         },
@@ -242,7 +241,7 @@ function RouteWorkflowHistory() {
                   >
                     <p>{item.workflow.name}</p>
                     <p className="text-muted-foreground leading-tight">
-                      {item.workflow.description}
+                      {item.runnerId}
                     </p>
                   </Link>
                 </td>
@@ -255,6 +254,20 @@ function RouteWorkflowHistory() {
                 </td>
                 <td className="p-3">
                   <div className="flex items-center justify-end gap-3">
+                    {item.status === WORKFLOW_HISTORY_STATUS.Running && (
+                      <UiButton
+                        size="sm"
+                        variant="secondary"
+                        onClick={() =>
+                          preloadAPI.main.ipc.invoke(
+                            'workflow:stop-running',
+                            item.runnerId,
+                          )
+                        }
+                      >
+                        Stop
+                      </UiButton>
+                    )}
                     {item.errorMessage && (
                       <UiPopover>
                         <UiPopoverTrigger className="underline h-8">

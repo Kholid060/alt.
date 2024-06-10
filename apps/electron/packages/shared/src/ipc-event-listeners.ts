@@ -20,3 +20,7 @@ IPCRenderer.instance.handle(
 IPCRenderer.on('shared-window:stop-execute-command', (_, runnerId) => {
   ExtensionCommandRunner.instance.stop(runnerId);
 });
+
+IPCRenderer.on('shared-window:stop-execute-workflow', (_, runnerId) => {
+  WorkflowRunnerManager.instance.stop(runnerId);
+});

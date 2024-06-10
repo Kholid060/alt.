@@ -4,6 +4,7 @@ import CommandViewJSON from './routes/CommandViewJSON';
 import ConfigInput from './routes/ConfigInput';
 import CreateCommandScript from './routes/CreateCommandScript';
 import FallbackCommands from './routes/FallbackCommands';
+import RunningProcess from './routes/RunningProcess';
 import { CommandRoute } from '/@/interface/command-route.interface';
 
 export const commandAppRoutes = [
@@ -31,6 +32,11 @@ export const commandAppRoutes = [
     element: FallbackCommands,
     name: 'fallback-commands',
     path: '/fallback-commands',
+  },
+  {
+    element: RunningProcess,
+    name: 'running-process',
+    path: '/running-process',
   },
   {
     element: ConfigInput,

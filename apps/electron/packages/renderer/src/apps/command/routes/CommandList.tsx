@@ -16,9 +16,9 @@ import {
 import preloadAPI from '/@/utils/preloadAPI';
 import {
   BlocksIcon,
+  CpuIcon,
   FileCodeIcon,
   KeyRoundIcon,
-  LayoutDashboardIcon,
   SearchSlashIcon,
   SettingsIcon,
   WorkflowIcon,
@@ -45,9 +45,8 @@ export interface ListItemRenderDetail<
 
 const dashboardPageCommands: CommandListItemCommandBuiltIn[] = (
   [
-    { title: 'Dashboard Page', icon: LayoutDashboardIcon, path: '/dashboard' },
-    { title: 'Workflows Page', icon: WorkflowIcon, path: '/workflows' },
     { title: 'Extensions Page', icon: BlocksIcon, path: '/extensions' },
+    { title: 'Workflows Page', icon: WorkflowIcon, path: '/workflows' },
     { title: 'Credentials Page', icon: KeyRoundIcon, path: '/credentials' },
     { title: 'Settings Page', icon: SettingsIcon, path: '/settings' },
   ] as const
@@ -265,6 +264,19 @@ function CommandList() {
             description: 'Something went wrong',
           });
         }
+      },
+      metadata: {
+        type: 'builtin-command',
+      },
+    },
+    {
+      group: 'Commands',
+      title: 'Running process',
+      value: 'running-process',
+      subtitle: 'Utils',
+      icon: <UiList.Icon icon={CpuIcon} />,
+      onSelected() {
+        navigate('/running-process');
       },
       metadata: {
         type: 'builtin-command',

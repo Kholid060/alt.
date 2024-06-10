@@ -1,6 +1,7 @@
 import type {
   ExtensionBrowserTabContext,
   ExtensionCommandExecutePayload,
+  ExtensionCommandProcess,
 } from '#packages/common/interface/extension.interface';
 import type ExtensionAPI from '@repo/extension-core/types/extension-api';
 import ExtensionLoader from '../utils/extension/ExtensionLoader';
@@ -13,6 +14,7 @@ import WindowSharedProcess from '../window/shared-process-window';
 import { CommandLaunchBy } from '@repo/extension';
 import { logger } from '../lib/log';
 import GlobalShortcut from '../utils/GlobalShortcuts';
+import WindowsManager from '../window/WindowsManager';
 
 class ExtensionService {
   private static _instance: ExtensionService;
@@ -28,6 +30,7 @@ class ExtensionService {
     fetchedAt: number;
     data: ExtensionBrowserTabContext;
   } | null = null;
+  private runningCommands: Map<string, ExtensionCommandProcess> = new Map();
 
   constructor() {
     this.init();
@@ -35,21 +38,47 @@ class ExtensionService {
 
   private init() {
     IPCMain.on(
-      'extension:finish-command-exec',
-      (_, { runnerId, extensionId, title }, result) => {
-        const resolver = this.executionResolvers.get(runnerId);
-        if (resolver) resolver.resolve(result);
-
-        if (!result.success) {
-          DBService.instance.extension.insertError({
+      'extension:command-exec-change',
+      (
+        _,
+        type,
+        { runnerId, extensionId, title, extensionTitle, icon },
+        result,
+      ) => {
+        if (type === 'start') {
+          this.runningCommands.set(runnerId, {
+            icon,
             title,
+            runnerId,
             extensionId,
-            message: result.errorMessage,
+            extensionTitle,
           });
+        } else {
+          const resolver = this.executionResolvers.get(runnerId);
+          if (resolver) resolver.resolve(result);
+
+          if (!result.success) {
+            DBService.instance.extension.insertError({
+              title,
+              extensionId,
+              message: result.errorMessage,
+            });
+          }
+
+          this.runningCommands.delete(runnerId);
         }
+
+        WindowsManager.sendMessageToAllWindows({
+          name: 'extension:running-commands-change',
+          args: [this.getRunningCommands()],
+        });
       },
     );
     DBService.instance.extension.deleteOldErrors().catch(console.error);
+  }
+
+  getRunningCommands() {
+    return [...this.runningCommands.values()];
   }
 
   async registerAllShortcuts() {

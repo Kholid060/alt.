@@ -3,7 +3,7 @@ import { UiList, UiListItemAction } from '@repo/ui';
 import { ListItemRenderDetail } from '/@/apps/command/routes/CommandList';
 import preloadAPI from '/@/utils/preloadAPI';
 import { UiExtIcon } from '@repo/extension';
-import { EditIcon, LinkIcon } from 'lucide-react';
+import { EditIcon, LinkIcon, WorkflowIcon } from 'lucide-react';
 import DeepLinkURL from '#packages/common/utils/DeepLinkURL';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 
@@ -15,8 +15,7 @@ function ListItemWorkflow({
 }: ListItemRenderDetail<'workflow'>) {
   const addPanelStatus = useCommandPanelStore.use.addStatus();
 
-  const Icon =
-    UiExtIcon[item.icon as keyof typeof UiExtIcon] ?? UiExtIcon.Command;
+  const Icon = UiExtIcon[item.icon as keyof typeof UiExtIcon] ?? WorkflowIcon;
 
   const actions: UiListItemAction[] = [
     {

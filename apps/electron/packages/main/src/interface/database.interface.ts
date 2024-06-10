@@ -127,6 +127,11 @@ export type DatabaseWorkflowHistoryUpdatePayload = Partial<
   >
 >;
 
+export type DatabaseWorkflowRunning = Pick<
+  DatabaseWorkflowHistory,
+  'runnerId' | 'startedAt'
+> & { workflow: { name: string; icon: string | null } };
+
 export type DatabaseExtensionConfig = Omit<
   SelectExtensionConfig,
   'id' | 'encryptedValue'
@@ -270,6 +275,7 @@ export interface DatabaseQueriesEvent {
   'database:get-workflow-history-list': (
     options?: DatabaseWorkflowHistoryListOptions,
   ) => { count: number; items: DatabaseWorkflowHistory[] };
+  'database:get-running-workflows': () => DatabaseWorkflowRunning[];
 }
 
 export interface DatabaseInsertEvents {

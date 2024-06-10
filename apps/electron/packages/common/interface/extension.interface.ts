@@ -68,3 +68,11 @@ export interface ExtensionAPIMessagePayload {
   browserCtx: ExtensionBrowserTabContext;
   sender: Electron.IpcMainInvokeEvent | null;
 }
+
+export interface ExtensionCommandProcess {
+  icon: string;
+  title: string;
+  runnerId: string;
+  extensionId: string;
+  extensionTitle: string;
+}
