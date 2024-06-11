@@ -16,6 +16,7 @@ import WorkflowService from './services/workflow.service';
 import WindowCommand from './window/command-window';
 import ExtensionService from './services/extension.service';
 import TrayService from './services/tray.service';
+import AppSettingsService from './services/app-settings.service';
 
 app.commandLine.appendSwitch('wm-window-animations-disabled');
 
@@ -41,13 +42,6 @@ if (!isSingleInstance) {
     app.setAsDefaultProtocolClient(APP_DEEP_LINK, process.execPath);
   }
 }
-
-/**
- * Open on start-up
- */
-app.setLoginItemSettings({
-  openAtLogin: true,
-});
 
 app.on('second-instance', (_event, commandLine) => {
   const deepLink = commandLine ? commandLine.pop() : null;
@@ -83,6 +77,7 @@ app
     CustomProtocol.registerProtocols();
     WebsocketService.startDefaultServer();
     TrayService.instance.init();
+    AppSettingsService.init();
 
     await Promise.all([
       GlobalShortcut.instance.init(),

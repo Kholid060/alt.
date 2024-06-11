@@ -19,6 +19,10 @@ import {
 } from '#packages/common/errors/custom-errors';
 import { Keyboard, KeyboardKey } from '@repo/native';
 import { getFileDetail } from '../getFileDetail';
+import AppSettingsService from '/@/services/app-settings.service';
+import dayjs from 'dayjs';
+import BackupRestoreData from '../BackupRestoreData';
+import { APP_BACKUP_FILE_EXT } from '#packages/common/utils/constant/app.const';
 
 /** EXTENSION */
 IPCMain.handle('extension:import', async () => {
@@ -73,6 +77,31 @@ IPCMain.handle(
 /** APPS */
 IPCMain.handle('apps:get-list', () => InstalledApps.instance.getApps());
 IPCMain.handle('apps:get-browsers', () => InstalledApps.instance.getBrowsers());
+IPCMain.handle('app:set-settings', (_, settings) =>
+  Promise.resolve(AppSettingsService.set(settings)),
+);
+IPCMain.handle('app:get-settings', (_, key) =>
+  // @ts-expect-error expected!!
+  Promise.resolve(AppSettingsService.get(key)),
+);
+IPCMain.handle('app:backup-data', async ({ sender }) => {
+  const browserWindow = BrowserWindow.fromWebContents(sender);
+  const options: Electron.SaveDialogOptions = {
+    title: 'Backup data',
+    defaultPath: dayjs().format('YYYY-MM-DD HH:mm'),
+    filters: [
+      { extensions: [APP_BACKUP_FILE_EXT], name: 'alt. app backup file' },
+    ],
+  };
+  const dir = await (browserWindow
+    ? dialog.showSaveDialog(browserWindow, options)
+    : dialog.showSaveDialog(options));
+  if (dir.canceled) return false;
+
+  await BackupRestoreData.backup(dir.filePath);
+
+  return true;
+});
 
 /** DIALOG */
 IPCMain.handle('dialog:open', ({ sender }, options) => {

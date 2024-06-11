@@ -1,6 +1,6 @@
 import EventEmitter from 'eventemitter3';
 
-const TIMEOUT_MS = 600_000; // 10 minutes
+const DEFAULT_TIMEOUT_MS = 600_000; // 10 minutes
 
 interface Events {
   idle: () => void;
@@ -16,7 +16,7 @@ class IdleTimer extends EventEmitter<Events> {
     return this.keys.size > 0;
   }
 
-  start() {
+  start(timeoutMs = DEFAULT_TIMEOUT_MS) {
     if (this.isLocked) return;
     if (this.timeout) clearTimeout(this.timeout);
 
@@ -24,7 +24,7 @@ class IdleTimer extends EventEmitter<Events> {
       if (this.isLocked) return;
 
       this.emit('idle');
-    }, TIMEOUT_MS);
+    }, timeoutMs);
   }
 
   lock(key: string) {

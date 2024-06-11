@@ -29,6 +29,7 @@ import type { MessagePortChannelIds } from './message-port-events.interface';
 import type { WorkflowRunnerRunPayload } from './workflow-runner.interace';
 import type { ExtensionCredential } from '@repo/extension-core/src/client/manifest/manifest-credential';
 import type { WindowNames } from './window.interface';
+import type { AppSettings } from './app.interface';
 
 export interface IPCRendererInvokeEventPayload {
   name: string;
@@ -67,6 +68,12 @@ export interface IPCEventError {
 export interface IPCAppEvents {
   'app:open-devtools': () => void;
   'app:toggle-lock-window': () => void;
+  'app:get-settings': <T extends keyof AppSettings>(
+    keys?: T,
+  ) => T extends keyof AppSettings ? AppSettings[T] : AppSettings;
+  'app:set-settings': (settings: Partial<AppSettings>) => void;
+  'app:backup-data': () => boolean;
+  'app:restore-data': () => boolean;
 }
 
 export interface IPCWindowEvents {

@@ -5,6 +5,7 @@ import RouteWorkflow from './routes/RouteWorkflow';
 import RouteWorkflows from './routes/RouteWorkflows';
 import RouteWorkflowHistory from './routes/RouteWorkflowHistory';
 import RouteCredentials from './routes/RouteCredentials';
+import RouteSettings from './routes/RouteSettings';
 
 const router = createBrowserRouter(
   [
@@ -35,6 +36,10 @@ const router = createBrowserRouter(
         {
           path: '/credentials',
           element: <RouteCredentials />,
+        },
+        {
+          path: '/settings',
+          element: <RouteSettings />,
         },
       ],
     },

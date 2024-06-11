@@ -468,15 +468,33 @@ function ExtensionListTable({
           return;
         }
 
-        setRecordingData((prevValue) =>
-          prevValue
-            ? {
-                ...prevValue,
-                isDirty: true,
-                keys: KeyboardShortcutUtils.toElectronShortcut(value.keys),
-              }
-            : prevValue,
-        );
+        if (!recordingData) return;
+
+        const keys = KeyboardShortcutUtils.toElectronShortcut(value.keys);
+
+        preloadAPI.main.ipc
+          .invoke(
+            'database:update-extension-command',
+            recordingData.extensionId,
+            recordingData.commandId,
+            { shortcut: keys },
+          )
+          .then((result) => {
+            if (isIPCEventError(result)) {
+              setRecordingData((prevValue) =>
+                prevValue
+                  ? {
+                      ...prevValue,
+                      keys,
+                      isDirty: true,
+                    }
+                  : prevValue,
+              );
+              return;
+            }
+
+            setRecordingData(null);
+          });
       },
     });
 

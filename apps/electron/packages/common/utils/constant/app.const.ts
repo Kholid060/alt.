@@ -10,3 +10,5 @@ export const APP_DEEP_LINK_HOST = {
   workflow: 'workflows',
   extension: 'extensions',
 } as const;
+
+export const APP_BACKUP_FILE_EXT = 'altd';

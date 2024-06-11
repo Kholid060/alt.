@@ -90,7 +90,7 @@
     "dot-prop": "^8.0.2",
     "drizzle-orm": "^0.31.0",
     "electron-log": "^5.1.1",
-    "electron-store": "^8.1.0",
+    "electron-store": "8.2.0",
     "electron-updater": "6.1.7",
     "eventemitter3": "^5.0.1",
     "framer-motion": "^11.0.5",

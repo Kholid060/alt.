@@ -40,7 +40,7 @@ const CommandInputArguments = forwardRef<
 
   useEffect(() => {
     const clearArgs =
-      selectedCommand?.command?.arguments?.length &&
+      selectedCommand?.command.arguments?.length &&
       useCommandStore.getState().commandArgs.commandId;
     if (clearArgs) {
       setCommandArgs(
@@ -54,7 +54,7 @@ const CommandInputArguments = forwardRef<
 
     onArgumentsChange?.(
       selectedCommand?.command.title ?? null,
-      selectedCommand?.command?.arguments ?? [],
+      selectedCommand?.command.arguments ?? [],
     );
   }, [selectedCommand, onArgumentsChange]);
 

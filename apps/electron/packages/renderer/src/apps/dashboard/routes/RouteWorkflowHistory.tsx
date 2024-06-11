@@ -296,13 +296,12 @@ function RouteWorkflowHistory() {
           </tbody>
         </table>
       </div>
-      {workflowHistory.items.length >= 10 && (
-        <UiItemsPagination
-          pagination={pagination}
-          itemsCount={workflowHistory.count}
-          onPaginationChange={setPagination}
-        />
-      )}
+      <UiItemsPagination
+        autoHide
+        pagination={pagination}
+        itemsCount={workflowHistory.count}
+        onPaginationChange={setPagination}
+      />
     </div>
   );
 }

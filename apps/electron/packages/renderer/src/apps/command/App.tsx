@@ -22,10 +22,11 @@ import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { ExtensionBrowserTabContext } from '#packages/common/interface/extension.interface';
+import { debounce } from '@repo/shared';
 
 const routes = createCommandRoutes(commandAppRoutes);
 
-// @ts-expect-error ...
+// @ts-expect-error for later
 // eslint-disable-next-line
 const getBrowserTabCtx = (() => {
   let cache: { tab: ExtensionBrowserTabContext; fetchedAt: number } | null =
@@ -36,7 +37,7 @@ const getBrowserTabCtx = (() => {
     if (cache && cache.tab && Date.now() - cache.fetchedAt < 5000) {
       return Promise.resolve(cache.tab);
     }
-    if (isFetching) return Promise.reject('Fetching..');
+    if (isFetching) return Promise.reject('Fetching');
 
     isFetching = true;
 
@@ -79,7 +80,7 @@ function IdleListener({
 
     const offWindowVisibility = preloadAPI.main.ipc.on(
       'window:visibility-change',
-      (_, isHidden) => {
+      debounce((_, isHidden) => {
         if (!isHidden) {
           const inputEl = document.getElementById(
             'input-query',
@@ -94,11 +95,19 @@ function IdleListener({
           //   tabCtx && setCommandStoreState('activeBrowserTab', tabCtx);
           // });
         } else {
-          IdleTimer.instance.start();
+          preloadAPI.main.ipc
+            .invokeWithError('app:get-settings', 'clearStateAfter')
+            .then((result) => {
+              if (typeof result !== 'number') return;
+
+              console.log(result * 60 * 1000);
+              IdleTimer.instance.start(result * 60 * 1000);
+            })
+            .catch(console.error);
         }
 
         setCommandStoreState('isWindowHidden', isHidden);
-      },
+      }, 200),
     );
 
     return () => {
@@ -131,7 +140,9 @@ function App() {
     <UiTooltipProvider>
       <DatabaseProvider>
         <CommandRouteProvider routes={routes}>
-          <IdleListener onToggleHide={setHide} />
+          <IdleListener
+            onToggleHide={(value) => value !== hide && setHide(value)}
+          />
           {!hide && (
             <CommandCtxProvider>
               <AppEventListener />
