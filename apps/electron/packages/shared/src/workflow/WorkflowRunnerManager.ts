@@ -160,7 +160,6 @@ class WorkflowRunnerManager {
   }
 
   stop(runnerId: string) {
-    console.log(this.runners, this.runners.has(runnerId), runnerId);
     if (!this.runners.has(runnerId)) return;
 
     this.runners.get(runnerId)?.stop();

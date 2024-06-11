@@ -180,9 +180,21 @@ class ExtensionLoader {
                 ...mapManifestToDB.extension(extensionManifest.data),
               };
 
+              const ids: string[] = [];
               await DBService.instance.extension.upsertCommands(
-                extension.id,
-                extensionManifest.data.commands,
+                extensionManifest.data.commands.map((command) => {
+                  const id = `${extension.id}:${command.name}`;
+
+                  return {
+                    id,
+                    extensionId: extension.id,
+                    ...mapManifestToDB.command(command),
+                  };
+                }),
+                tx,
+              );
+              await DBService.instance.extension.deleteNotExistsCommand(
+                ids,
                 tx,
               );
 
@@ -321,10 +333,20 @@ class ExtensionLoader {
         ...mapManifestToDB.extension(extensionManifest.data),
       };
 
+      const ids: string[] = [];
       await DBService.instance.extension.upsertCommands(
-        extension.id,
-        extensionManifest.data.commands,
+        extensionManifest.data.commands.map((command) => {
+          const id = `${extension.id}:${command.name}`;
+
+          return {
+            id,
+            extensionId: extension.id,
+            ...mapManifestToDB.command(command),
+          };
+        }),
       );
+      await DBService.instance.extension.deleteNotExistsCommand(ids);
+
       this.extensionsManifestPath.set(extension.id, extension.path);
     }
 

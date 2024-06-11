@@ -78,7 +78,7 @@ class WorkflowTriggerService {
   }
 }
 
-const workflowFileSchema = z.object({
+export const workflowFileSchema = z.object({
   name: z.string().min(1),
   icon: z.string().min(1),
   nodes: z

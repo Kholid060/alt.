@@ -58,6 +58,9 @@ export class NodeHandlerExecuteWorkflow extends WorkflowNodeHandler<WORKFLOW_NOD
         `Couldn't find workflow with "${node.data.workflowId}" id`,
       );
     }
+    if (workflow.isDisabled) {
+      throw new Error('Workflow is disabled');
+    }
 
     const triggerNode = workflow.nodes.find(
       (node) => node.type === WORKFLOW_NODE_TYPE.TRIGGER_EXECUTE_WORKFLOW,

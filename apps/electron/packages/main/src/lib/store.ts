@@ -10,7 +10,7 @@ Store.initRenderer();
 
 export const store = new Store<ElectronStore>({
   encryptionKey: Buffer.from(
-    import.meta.env.VITE_STORE_KEY || 'some-random-string',
+    import.meta.env.VITE_SECRET_DATA_KEY || 'some-random-string',
   ),
   schema: {
     settings: {
@@ -19,8 +19,9 @@ export const store = new Store<ElectronStore>({
       properties: {
         startup: { type: 'boolean', default: false },
         clearStateAfter: { type: 'number', default: 10 },
+        upsertRestoreDuplicate: { type: 'boolean', default: true },
       },
-      required: ['startup', 'clearStateAfter'],
+      required: ['startup', 'clearStateAfter', 'upsertRestoreDuplicate'],
     },
     windowBounds: {
       type: 'object',

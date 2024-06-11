@@ -1,7 +1,16 @@
 import { AppSettings } from '#packages/common/interface/app.interface';
-import { UiButton, UiSelect, UiSwitch, useToast } from '@repo/ui';
+import {
+  UiButton,
+  UiLabel,
+  UiPopover,
+  UiPopoverContent,
+  UiPopoverTrigger,
+  UiSelect,
+  UiSwitch,
+  useToast,
+} from '@repo/ui';
 import clsx from 'clsx';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import {
@@ -9,13 +18,16 @@ import {
   HardDriveDownloadIcon,
   HardDriveUploadIcon,
   Loader2Icon,
+  SettingsIcon,
   SquarePowerIcon,
 } from 'lucide-react';
 
-type SettingsSection = React.FC<{
-  settings: AppSettings;
-  onUpdateSetting(settings: Partial<AppSettings>): void;
-}>;
+type SettingsSection<T extends object = object> = React.FC<
+  {
+    settings: AppSettings;
+    onUpdateSetting(settings: Partial<AppSettings>): void;
+  } & T
+>;
 
 const SettingGeneral: SettingsSection = ({ settings, onUpdateSetting }) => {
   return (
@@ -72,7 +84,11 @@ const SettingGeneral: SettingsSection = ({ settings, onUpdateSetting }) => {
   );
 };
 
-const SettingBackupData: SettingsSection = () => {
+const SettingBackupData: SettingsSection<{ onRestore?(): void }> = ({
+  onUpdateSetting,
+  onRestore,
+  settings,
+}) => {
   const { toast } = useToast();
 
   const [loading, setLoading] = useState<'restore' | 'backup' | null>(null);
@@ -94,6 +110,39 @@ const SettingBackupData: SettingsSection = () => {
 
       toast({
         title: 'Data is successfully backed up',
+      });
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: 'destructive',
+        title: 'Something went wrong!',
+      });
+    } finally {
+      setLoading(null);
+    }
+  }
+  async function restoreData() {
+    try {
+      setLoading('restore');
+
+      const result = await preloadAPI.main.ipc.invoke(
+        'app:restore-data',
+        settings.upsertRestoreDuplicate,
+      );
+      if (isIPCEventError(result)) {
+        toast({
+          title: 'Error!',
+          variant: 'destructive',
+          description: result.message,
+        });
+        return;
+      }
+      if (!result) return;
+
+      onRestore?.();
+
+      toast({
+        title: 'Data is successfully restored',
       });
     } catch (error) {
       console.error(error);
@@ -139,16 +188,50 @@ const SettingBackupData: SettingsSection = () => {
               )}
             </UiButton>
           </li>
-          <li className="flex items-center gap-4 pt-4">
+          <li className="flex items-center pt-4">
             <HardDriveUploadIcon />
-            <div className="flex-1">
+            <div className="flex-1 ml-4">
               <p className="leading-tight">Restore</p>
               <p className="text-sm text-muted-foreground leading-tight">
                 Restore your backed-up data
               </p>
             </div>
-            <UiButton size="sm" variant="secondary" disabled={!!loading}>
+            <UiPopover>
+              <UiPopoverTrigger asChild>
+                <UiButton size="icon-sm" variant="secondary">
+                  <SettingsIcon className="size-5" />
+                </UiButton>
+              </UiPopoverTrigger>
+              <UiPopoverContent className="text-sm w-64">
+                <p className="font-semibold">Restore settings</p>
+                <div className="mt-4 flex items-center">
+                  <UiLabel htmlFor="upsert-restore" className="flex-1">
+                    Update if duplicate
+                  </UiLabel>
+                  <UiSwitch
+                    id="upsert-restore"
+                    size="sm"
+                    checked={settings.upsertRestoreDuplicate}
+                    onCheckedChange={(value) =>
+                      onUpdateSetting({ upsertRestoreDuplicate: value })
+                    }
+                  />
+                </div>
+              </UiPopoverContent>
+            </UiPopover>
+            <UiButton
+              size="sm"
+              variant="secondary"
+              className="ml-2 relative"
+              disabled={!!loading}
+              onClick={restoreData}
+            >
               Restore data
+              {loading === 'restore' && (
+                <div className="absolute h-full w-full flex items-center cursor-default justify-center rounded-md bg-inherit bg-secondary">
+                  <Loader2Icon className="animate-spin" />
+                </div>
+              )}
             </UiButton>
           </li>
         </ul>
@@ -213,6 +296,15 @@ function RouteSettings() {
 
   const [settings, setSettings] = useState<AppSettings | null>(null);
 
+  const fetchSettings = useCallback(() => {
+    preloadAPI.main.ipc
+      .invokeWithError('app:get-settings')
+      .then((appSettings) => {
+        setSettings(appSettings as unknown as AppSettings);
+      })
+      .catch(console.error);
+  }, []);
+
   async function updateSettings(newSettings: Partial<AppSettings>) {
     if (!settings) return;
 
@@ -221,7 +313,6 @@ function RouteSettings() {
         ...settings,
         ...newSettings,
       };
-      console.log(updatedSettings);
 
       const result = await preloadAPI.main.ipc.invoke(
         'app:set-settings',
@@ -247,13 +338,8 @@ function RouteSettings() {
   }
 
   useEffect(() => {
-    preloadAPI.main.ipc
-      .invokeWithError('app:get-settings')
-      .then((appSettings) => {
-        setSettings(appSettings as unknown as AppSettings);
-      })
-      .catch(console.error);
-  }, []);
+    fetchSettings();
+  }, [fetchSettings]);
 
   if (!settings) return null;
 
@@ -271,6 +357,7 @@ function RouteSettings() {
           />
           <SettingBackupData
             settings={settings}
+            onRestore={() => fetchSettings()}
             onUpdateSetting={updateSettings}
           />
         </div>

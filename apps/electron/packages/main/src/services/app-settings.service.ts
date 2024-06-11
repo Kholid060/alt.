@@ -5,6 +5,7 @@ import { store } from '../lib/store';
 const defaultSettings: AppSettings = {
   startup: true,
   clearStateAfter: 10,
+  upsertRestoreDuplicate: true,
 };
 
 class AppSettingsService {

@@ -88,7 +88,7 @@ IPCMain.handle('app:backup-data', async ({ sender }) => {
   const browserWindow = BrowserWindow.fromWebContents(sender);
   const options: Electron.SaveDialogOptions = {
     title: 'Backup data',
-    defaultPath: dayjs().format('YYYY-MM-DD HH:mm'),
+    defaultPath: dayjs().format('YYYY-MM-DD HHmm'),
     filters: [
       { extensions: [APP_BACKUP_FILE_EXT], name: 'alt. app backup file' },
     ],
@@ -99,6 +99,23 @@ IPCMain.handle('app:backup-data', async ({ sender }) => {
   if (dir.canceled) return false;
 
   await BackupRestoreData.backup(dir.filePath);
+
+  return true;
+});
+IPCMain.handle('app:restore-data', async ({ sender }) => {
+  const browserWindow = BrowserWindow.fromWebContents(sender);
+  const options: Electron.OpenDialogOptions = {
+    title: 'Restore backup data',
+    filters: [
+      { extensions: [APP_BACKUP_FILE_EXT], name: 'alt. app backup file' },
+    ],
+  };
+  const dir = await (browserWindow
+    ? dialog.showOpenDialog(browserWindow, options)
+    : dialog.showOpenDialog(options));
+  if (dir.canceled) return false;
+
+  await BackupRestoreData.restore(dir.filePaths[0]);
 
   return true;
 });
@@ -214,7 +231,7 @@ IPCMain.handle('database:get-command-list', (_, filter) => {
   return DBService.instance.extension.getCommands(filter);
 });
 IPCMain.handle('database:insert-extension-command', (_, data) => {
-  return DBService.instance.extension.insertCommand(data);
+  return DBService.instance.extension.insertCommand([data]);
 });
 IPCMain.handle('database:get-extension-config', (_, configId) => {
   return DBService.instance.extension.getConfig(configId);

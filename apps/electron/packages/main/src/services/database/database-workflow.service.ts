@@ -12,10 +12,15 @@ import type {
   DatabaseWorkflowInsertPayload,
   DatabaseWorkflowRunning,
   DatabaseWorkflowUpdatePayload,
+  DatabaseWorkflowUpsertPayload,
   DatabaseWorkfowListQueryOptions,
 } from '/@/interface/database.interface';
 import { nanoid } from 'nanoid';
-import { emitDBChanges, withPagination } from '/@/utils/database-utils';
+import {
+  buildConflictUpdateColumns,
+  emitDBChanges,
+  withPagination,
+} from '/@/utils/database-utils';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import type { SQLiteColumn } from 'drizzle-orm/sqlite-core';
 import { WORKFLOW_HISTORY_STATUS } from '#packages/common/utils/constant/workflow.const';
@@ -98,6 +103,26 @@ class DBWorkflowService {
     });
 
     return workflowId;
+  }
+
+  async upsert(workflowsData: DatabaseWorkflowUpsertPayload[]) {
+    await this.database
+      .insert(workflows)
+      .values(workflowsData)
+      .onConflictDoUpdate({
+        target: workflows.id,
+        set: {
+          ...buildConflictUpdateColumns(workflows, [
+            'name',
+            'icon',
+            'nodes',
+            'edges',
+            'viewport',
+            'description',
+          ]),
+          updatedAt: new Date().toISOString(),
+        },
+      });
   }
 
   async update(
@@ -360,6 +385,23 @@ class DBWorkflowService {
       },
       where(fields, operators) {
         return operators.eq(fields.status, WORKFLOW_HISTORY_STATUS.Running);
+      },
+    });
+  }
+
+  getBackupData() {
+    return this.database.query.workflows.findMany({
+      columns: {
+        id: true,
+        name: true,
+        icon: true,
+        edges: true,
+        nodes: true,
+        viewport: true,
+        settings: true,
+        variables: true,
+        isDisabled: true,
+        description: true,
       },
     });
   }

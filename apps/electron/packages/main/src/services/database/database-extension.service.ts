@@ -27,11 +27,10 @@ import {
   extensionCredOauthTokens,
   extensionErrors,
 } from '/@/db/schema/extension.schema';
-import type { ExtensionCommand, ExtensionManifest } from '@repo/extension-core';
+import type { ExtensionManifest } from '@repo/extension-core';
 import {
   buildConflictUpdateColumns,
   emitDBChanges,
-  mapManifestToDB,
   withPagination,
 } from '/@/utils/database-utils';
 import type {
@@ -323,85 +322,64 @@ class DBExtensionService {
   }
 
   async upsertCommands(
-    extensionId: string,
-    commands: ExtensionCommand[],
+    commands: NewExtensionCommand[],
     tx?: Parameters<Parameters<typeof this.database.transaction>[0]>[0],
   ) {
     const db = tx || this.database;
-
-    const insertCommandsPayload: NewExtensionCommand[] = commands.map(
-      (command) => ({
-        id: `${extensionId}:${command.name}`,
-        extensionId,
-        ...mapManifestToDB.command(command),
-      }),
-    );
-
     await db
       .insert(commandsSchema)
-      .values(insertCommandsPayload)
+      .values(commands)
       .onConflictDoUpdate({
         target: commandsSchema.id,
         set: buildConflictUpdateColumns(
           commandsSchema,
-          Object.keys(
-            insertCommandsPayload[0],
-          ) as (keyof NewExtensionCommand)[],
+          Object.keys(commands[0]) as (keyof NewExtensionCommand)[],
         ),
       });
-
-    await db.delete(commandsSchema).where(
-      and(
-        eq(commandsSchema.extensionId, extensionId),
-        notInArray(
-          commandsSchema.id,
-          insertCommandsPayload.map((command) => command.id),
-        ),
-      ),
-    );
   }
 
-  async insertCommand({
-    name,
-    type,
-    icon,
-    path,
-    title,
-    config,
-    context,
-    shortcut,
-    subtitle,
-    isDisabled,
-    isFallback,
-    extensionId,
-    description,
-    arguments: commandArgs,
-  }: DatabaseExtensionCommandInsertPayload) {
-    const id = `${extensionId}:${name}`;
-    await this.database.insert(extensionCommands).values({
-      id,
-      name,
-      type,
-      icon,
-      path,
-      title,
-      config,
-      context,
-      shortcut,
-      subtitle,
-      isDisabled,
-      isFallback,
-      extensionId,
-      description,
-      arguments: commandArgs,
-    });
+  async insertCommand(commands: DatabaseExtensionCommandInsertPayload[]) {
+    await this.database.insert(extensionCommands).values(
+      commands.map(
+        ({
+          name,
+          type,
+          icon,
+          path,
+          title,
+          config,
+          context,
+          shortcut,
+          subtitle,
+          isDisabled,
+          isFallback,
+          extensionId,
+          description,
+          arguments: commandArgs,
+        }) => ({
+          id: `${extensionId}:${name}`,
+          name,
+          type,
+          icon,
+          path,
+          title,
+          config,
+          context,
+          shortcut,
+          subtitle,
+          isDisabled,
+          isFallback,
+          extensionId,
+          description,
+          arguments: commandArgs,
+        }),
+      ),
+    );
 
     emitDBChanges({
       'database:get-command-list': [DATABASE_CHANGES_ALL_ARGS],
       'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
     });
-
-    return id;
   }
 
   async configExists(configId: string) {
@@ -1026,6 +1004,16 @@ class DBExtensionService {
       .where(notInArray(extensionCreds.id, notExistsCreds));
   }
 
+  async deleteNotExistsCommand(
+    ids: string[],
+    tx?: Parameters<Parameters<typeof this.database.transaction>[0]>[0],
+  ) {
+    const db = tx || this.database;
+    await db
+      .delete(commandsSchema)
+      .where(and(notInArray(commandsSchema.id, ids)));
+  }
+
   async insertCredentialOauthToken({
     scope,
     tokenType,
@@ -1147,6 +1135,34 @@ class DBExtensionService {
     await this.database
       .delete(extensionCredOauthTokens)
       .where(eq(extensionCredOauthTokens, credential.oauthToken.id));
+  }
+
+  getBackupData() {
+    return this.database.query.extensions.findMany({
+      columns: {
+        id: true,
+        isDisabled: true,
+      },
+      with: {
+        commands: {
+          columns: {
+            id: true,
+            name: true,
+            path: true,
+            type: true,
+            alias: true,
+            title: true,
+            shortcut: true,
+            isFallback: true,
+            isDisabled: true,
+            extensionId: true,
+          },
+        },
+      },
+      where(fields, operators) {
+        return operators.eq(fields.isLocal, false);
+      },
+    });
   }
 }
 

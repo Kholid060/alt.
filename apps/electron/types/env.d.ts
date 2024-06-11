@@ -19,7 +19,7 @@ interface ImportMetaEnv {
   /** Current app version */
   readonly VITE_APP_VERSION: string;
 
-  readonly VITE_STORE_KEY: string;
+  readonly VITE_SECRET_DATA_KEY: string;
 }
 
 interface ImportMeta {

@@ -9,6 +9,7 @@ import type {
   IPCMainSendEvent,
 } from '#packages/common/interface/ipc-events.interface';
 import { ipcMain } from 'electron';
+import { logger } from '/@/lib/log';
 
 class IPCMain {
   static handle<T extends keyof IPCEvents, P extends Parameters<IPCEvents[T]>>(
@@ -31,6 +32,8 @@ class IPCMain {
             message: (error as Error).message,
           };
         }
+
+        logger('error', ['IPCMainHandle', name], error);
 
         throw error;
       }

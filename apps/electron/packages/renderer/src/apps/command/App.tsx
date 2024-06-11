@@ -100,7 +100,6 @@ function IdleListener({
             .then((result) => {
               if (typeof result !== 'number') return;
 
-              console.log(result * 60 * 1000);
               IdleTimer.instance.start(result * 60 * 1000);
             })
             .catch(console.error);

@@ -106,6 +106,11 @@ export type DatabaseWorkflowInsertPayload = Omit<
   'id' | 'createdAt' | 'updatedAt'
 >;
 
+export type DatabaseWorkflowUpsertPayload = Omit<
+  NewWorkflow,
+  'createdAt' | 'updatedAt'
+>;
+
 export type DatabaseWorkflowUpdatePayload = Partial<
   Omit<SelectWorkflow, 'id' | 'createdAt' | 'updatedAt'>
 >;
@@ -290,7 +295,7 @@ export interface DatabaseInsertEvents {
   ) => void;
   'database:insert-extension-command': (
     command: DatabaseExtensionCommandInsertPayload,
-  ) => string;
+  ) => void;
   'database:insert-extension-credential': (
     credential: DatabaseExtensionCredentialInsertPayload,
   ) => string;

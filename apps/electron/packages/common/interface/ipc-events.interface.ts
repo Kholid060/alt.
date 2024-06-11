@@ -73,7 +73,7 @@ export interface IPCAppEvents {
   ) => T extends keyof AppSettings ? AppSettings[T] : AppSettings;
   'app:set-settings': (settings: Partial<AppSettings>) => void;
   'app:backup-data': () => boolean;
-  'app:restore-data': () => boolean;
+  'app:restore-data': (upsertDuplicate?: boolean) => boolean;
 }
 
 export interface IPCWindowEvents {
