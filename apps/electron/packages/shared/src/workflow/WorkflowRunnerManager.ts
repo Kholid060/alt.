@@ -71,6 +71,7 @@ class WorkflowRunnerManager {
     workflow,
     onFinish,
     startNodeId,
+    ...rest
   }: WorkflowRunnerExecuteOptions) {
     const runnerId = nanoid(5);
 
@@ -99,6 +100,7 @@ class WorkflowRunnerManager {
       nodeHandlers,
       id: runnerId,
       parentWorkflow: parent,
+      ...rest,
     });
     runner.once('error', async ({ message, location }) => {
       try {
@@ -145,6 +147,16 @@ class WorkflowRunnerManager {
         runner.destroy();
         this.runners.delete(runnerId);
       }
+    });
+    runner.on('node:execute-finish', ({ id, type }, execResult) => {
+      IPCRenderer.send('shared-process:workflow-events', {
+        'node:execute-finish': [{ id, type }, execResult.value],
+      });
+    });
+    runner.on('node:execute-error', ({ id, type }, message) => {
+      IPCRenderer.send('shared-process:workflow-events', {
+        'node:execute-error': [{ id, type }, message],
+      });
     });
 
     IdleTimer.instance.lock(IDLE_TIMER_KEY);

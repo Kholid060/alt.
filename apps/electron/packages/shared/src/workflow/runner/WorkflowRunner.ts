@@ -5,7 +5,10 @@ import {
   WORKFLOW_MANUAL_TRIGGER_ID,
   WORKFLOW_NODE_TYPE,
 } from '#packages/common/utils/constant/workflow.const';
-import type { WorkflowEdge } from '#packages/common/interface/workflow.interface';
+import type {
+  WorkflowEdge,
+  WorkflowEmitEvents,
+} from '#packages/common/interface/workflow.interface';
 import type WorkflowNodeHandler from '../node-handler/WorkflowNodeHandler';
 import type { DatabaseWorkflowDetail } from '#packages/main/src/interface/database.interface';
 import { WorkflowRunnerNodeError } from './workflow-runner-errors';
@@ -39,6 +42,11 @@ export interface WorkflowRunnerOptions extends WorkflowRunnerRunPayload {
 export interface WorkflowRunnerEvents {
   finish: (reason: WorkflowRunnerFinishReason) => void;
   error: (error: { message: string; location?: string }) => void;
+  'node:execute-finish': (
+    node: WorkflowNodes,
+    result: WorkflowNodeHandlerExecuteReturn,
+  ) => void;
+  'node:execute-error': (node: WorkflowNodes, message: string) => void;
 }
 
 export enum WorkflowRunnerState {
@@ -138,34 +146,45 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   private nodeHandlers: NodeHandlersObj;
   private nodesIdxMap: Map<string, number>;
   private nodeExecutionQueue: string[] = [];
+  private emitEvents: Record<keyof WorkflowEmitEvents, boolean>;
 
   id: string;
   startedAt: string;
   stepCount: number = 0;
+  readonly maxStep: number;
   state: WorkflowRunnerState;
-  workflow: DatabaseWorkflowDetail;
+  readonly workflow: DatabaseWorkflowDetail;
   connectionsMap: Record<string, NodeConnectionMap> = {};
 
-  browser: WorkflowRunnerBrowser;
-  sandbox: WorkflowRunnerSandbox;
-  dataStorage: WorkflowRunnerData;
+  readonly browser: WorkflowRunnerBrowser;
+  readonly sandbox: WorkflowRunnerSandbox;
+  readonly dataStorage: WorkflowRunnerData;
 
   readonly parentWorkflow: WorkflowRunnerParent | null;
 
   constructor({
     id,
     workflow,
+    emitEvents,
     startNodeId,
     nodeHandlers,
     parentWorkflow,
+    maxStep = Infinity,
   }: WorkflowRunnerOptions) {
     super();
 
     this.id = id;
+    this.maxStep = maxStep;
     this.workflow = workflow;
     this.startNodeId = startNodeId;
     this.nodeHandlers = nodeHandlers;
     this.parentWorkflow = parentWorkflow ?? null;
+
+    this.emitEvents = {
+      'node:execute-finish': false,
+      'node:execute-error': false,
+      ...emitEvents,
+    };
 
     this.state = WorkflowRunnerState.Idle;
     this.startedAt = new Date().toString();
@@ -333,6 +352,12 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     try {
       if (this.state !== WorkflowRunnerState.Running) return;
 
+      if (this.stepCount >= this.maxStep) {
+        this.state = WorkflowRunnerState.Finish;
+        this.emit('finish', WorkflowRunnerFinishReason.Done);
+        return;
+      }
+
       if (node.id === prevExec?.node.id) {
         this.state = WorkflowRunnerState.Error;
         this.emit('error', {
@@ -378,6 +403,9 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
             node.data.$outputVarMode,
           );
         }
+        if (this.emitEvents['node:execute-finish']) {
+          this.emit('node:execute-finish', node, execResult);
+        }
       }
 
       this.dataStorage.nodeData.set('prevNode', {
@@ -406,10 +434,15 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
       ) {
         this.state = WorkflowRunnerState.Error;
 
+        const message = (<Error>error).message;
         const currentNode = this.dataStorage.nodeData.get('currentNode');
 
+        if (this.emitEvents['node:execute-error']) {
+          this.emit('node:execute-error', node, message);
+        }
+
         this.emit('error', {
-          message: (<Error>error).message,
+          message,
           location: currentNode
             ? `${currentNode.type}:${currentNode.id}`
             : undefined,
@@ -452,6 +485,10 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
           prevExec ? { node: prevExec.node, value: prevExec.value } : undefined,
         );
         return;
+      }
+
+      if (this.emitEvents['node:execute-error']) {
+        this.emit('node:execute-error', node, (<Error>error).message);
       }
 
       this.state = WorkflowRunnerState.Error;

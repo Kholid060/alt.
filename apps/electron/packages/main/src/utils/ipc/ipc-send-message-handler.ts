@@ -65,3 +65,14 @@ IPCMain.on('window:destroy', (_, name) => {
   const window = WindowsManager.getWindow(name);
   window.destroy();
 });
+
+IPCMain.on('shared-process:workflow-events', (_, events) => {
+  WindowDashboard.instance.sendMessage(
+    {
+      noThrow: true,
+      ensureWindow: false,
+      name: 'shared-process:workflow-events',
+    },
+    events,
+  );
+});

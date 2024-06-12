@@ -4,6 +4,7 @@ import {
   WorkflowClipboardData,
   WorkflowEdge,
   WorkflowNewNode,
+  WorkflowRunPayload,
 } from '#packages/common/interface/workflow.interface';
 import {
   WORKFLOW_ELEMENT_FORMAT,
@@ -107,7 +108,13 @@ export function useWorkflowEditor() {
 
     deleteElements({ nodes, edges });
   }
-  function runCurrentWorkflow(startNodeId?: string) {
+  function runCurrentWorkflow({
+    maxStep,
+    emitEvents,
+    startNodeId,
+  }: Partial<
+    Pick<WorkflowRunPayload, 'maxStep' | 'emitEvents' | 'startNodeId'>
+  > = {}) {
     const { workflow } = useWorkflowEditorStore.getState();
     if (!workflow) return;
 
@@ -125,6 +132,8 @@ export function useWorkflowEditor() {
 
     preloadAPI.main.ipc
       .invoke('workflow:execute', {
+        maxStep,
+        emitEvents,
         id: workflow.id,
         startNodeId:
           startNodeId || (manualTriggerNode?.id ?? WORKFLOW_MANUAL_TRIGGER_ID),

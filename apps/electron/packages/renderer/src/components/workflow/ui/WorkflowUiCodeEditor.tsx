@@ -20,6 +20,7 @@ interface WorkflowUiCodeEditorProps
   extends React.HTMLAttributes<HTMLDivElement> {
   value?: string;
   title?: string;
+  readOnly?: boolean;
   placeholder?: string;
   hideHeader?: boolean;
   lang?: keyof typeof langs;
@@ -28,6 +29,7 @@ interface WorkflowUiCodeEditorProps
 
 function WorkflowUiCodeEditor({
   value,
+  readOnly,
   className,
   lang = 'js',
   hideHeader,
@@ -42,7 +44,7 @@ function WorkflowUiCodeEditor({
 
   return (
     <div
-      className={cn('rounded-lg overflow-hidden bg-card border', className)}
+      className={cn('rounded-md overflow-hidden bg-card border', className)}
       {...props}
     >
       {!hideHeader && (
@@ -70,6 +72,7 @@ function WorkflowUiCodeEditor({
               </UiDialog.Header>
               <UiCodeEditor
                 value={value}
+                readOnly={readOnly}
                 className="text-sm min-h-72 border-t [&_.cm-gutters]:!bg-background"
                 style={{ maxHeight: 'calc(100vh - 10rem)' }}
                 placeholder={placeholder}
@@ -84,8 +87,9 @@ function WorkflowUiCodeEditor({
         <UiCodeEditor
           theme="dark"
           value={value}
+          readOnly={readOnly}
           className="text-xs max-h-96 [&_.cm-scroller]:min-h-52 overflow-auto w-full [&_.cm-gutters]:!bg-card"
-          extensions={[javascript()]}
+          extensions={[language.module()]}
           onChange={(value) => onValueChange?.(value)}
           placeholder={placeholder || 'Your code here...'}
         />

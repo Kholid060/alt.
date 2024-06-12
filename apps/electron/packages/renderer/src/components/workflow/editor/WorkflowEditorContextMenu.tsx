@@ -235,7 +235,9 @@ function ContextMenuNode() {
   return (
     <>
       <UiContextMenuItem onClick={editCurrentNode}>Edit</UiContextMenuItem>
-      <UiContextMenuItem onClick={() => runCurrentWorkflow(contextMenu.nodeId)}>
+      <UiContextMenuItem
+        onClick={() => runCurrentWorkflow({ startNodeId: contextMenu.nodeId })}
+      >
         Run workflow from here
       </UiContextMenuItem>
       <UiContextMenuSeparator />

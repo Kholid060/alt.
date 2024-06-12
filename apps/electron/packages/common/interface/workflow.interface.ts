@@ -22,9 +22,22 @@ export interface WorkflowClipboardData {
   nodes: WorkflowNodes[];
 }
 
+export interface WorkflowEmitEvents {
+  'node:execute-finish': [
+    node: { id: string; type: WORKFLOW_NODE_TYPE },
+    value: unknown,
+  ];
+  'node:execute-error': [
+    node: { id: string; type: WORKFLOW_NODE_TYPE },
+    message: string,
+  ];
+}
+
 export interface WorkflowRunPayload {
   id: string;
+  maxStep?: number;
   startNodeId: typeof WORKFLOW_MANUAL_TRIGGER_ID | string;
+  emitEvents?: Partial<Record<keyof WorkflowEmitEvents, boolean>>;
 }
 
 export interface WorkflowSettings {}

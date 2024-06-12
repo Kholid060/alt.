@@ -23,7 +23,10 @@ import type {
   DatabaseExtension,
   DatabaseWorkflowUpdatePayload,
 } from '../../main/src/interface/database.interface';
-import type { WorkflowRunPayload } from './workflow.interface';
+import type {
+  WorkflowEmitEvents,
+  WorkflowRunPayload,
+} from './workflow.interface';
 import type Electron from 'electron';
 import type { MessagePortChannelIds } from './message-port-events.interface';
 import type { WorkflowRunnerRunPayload } from './workflow-runner.interace';
@@ -273,6 +276,7 @@ export interface IPCSendEventRendererToRenderer {
       executeCommandPayload?: ExtensionCommandExecutePayload;
     },
   ];
+  'shared-process:workflow-events': [events: Partial<WorkflowEmitEvents>];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   'database:changes': [Record<any, any[]>];
 }

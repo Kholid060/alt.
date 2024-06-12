@@ -176,7 +176,7 @@ function NodeToolbarMenu({
       </NodeToolbarButton>
       <NodeToolbarButton
         title="Run workflow from here"
-        onClick={() => runCurrentWorkflow(nodeId)}
+        onClick={() => runCurrentWorkflow({ startNodeId: nodeId })}
       >
         <PlayIcon size="18px" />
       </NodeToolbarButton>
