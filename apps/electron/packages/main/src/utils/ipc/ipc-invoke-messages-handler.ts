@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import InstalledApps from '../InstalledApps';
 import ExtensionLoader from '../extension/ExtensionLoader';
 import './ipc-extension-messages';
-import { BrowserWindow, clipboard, dialog, screen, shell } from 'electron';
+import { BrowserWindow, app, clipboard, dialog, screen, shell } from 'electron';
 import IPCMain from './IPCMain';
 import DBService from '/@/services/database/database.service';
 import { emitDBChanges } from '../database-utils';
@@ -21,6 +21,7 @@ import { Keyboard, KeyboardKey } from '@repo/native';
 import { getFileDetail } from '../getFileDetail';
 import AppSettingsService from '/@/services/app-settings.service';
 import dayjs from 'dayjs';
+import os from 'os';
 import BackupRestoreData from '../BackupRestoreData';
 import { APP_BACKUP_FILE_EXT } from '#packages/common/utils/constant/app.const';
 
@@ -118,6 +119,13 @@ IPCMain.handle('app:restore-data', async ({ sender }) => {
   await BackupRestoreData.restore(dir.filePaths[0]);
 
   return true;
+});
+IPCMain.handle('app:versions', () => {
+  return Promise.resolve({
+    $isError: false,
+    app: app.getVersion(),
+    os: `${process.platform}@${os.release()}`,
+  });
 });
 
 /** DIALOG */

@@ -158,7 +158,7 @@ const SettingBackupData: SettingsSection<{ onRestore?(): void }> = ({
   return (
     <section
       className="border rounded-lg settings-section"
-      aria-label="general"
+      aria-label="backup-data"
     >
       <div className="px-4 pt-4">
         <h3 className="font-semibold">Backup Data</h3>
@@ -249,11 +249,30 @@ function SettingsSidebar() {
 
   const [activeSetting, setActiveSetting] = useState('general');
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (!entry.isIntersecting) return;
-      setActiveSetting(entry.target.getAttribute('aria-label') ?? '');
+  function navigateToSection(name: string) {
+    const sectionEl = document.querySelector(`[aria-label="${name}"]`);
+    if (!sectionEl) return;
+
+    sectionEl.scrollIntoView({
+      behavior: 'smooth',
     });
+  }
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        let id: string | null = null;
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting || id) return;
+          id = entry.target.getAttribute('aria-label') ?? '';
+        });
+
+        if (id) setActiveSetting(id);
+      },
+      {
+        threshold: 0.25,
+      },
+    );
 
     const sections = document.querySelectorAll('.settings-section');
     sections.forEach((element) => {
@@ -281,6 +300,7 @@ function SettingsSidebar() {
                   'bg-secondary/70 text-foreground',
               )}
               ref={(ref) => ref && (buttonsRef.current[section.id] = ref)}
+              onClick={() => navigateToSection(section.id)}
             >
               {section.name}
             </button>

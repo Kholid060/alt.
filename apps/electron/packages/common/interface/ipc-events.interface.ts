@@ -29,7 +29,7 @@ import type { MessagePortChannelIds } from './message-port-events.interface';
 import type { WorkflowRunnerRunPayload } from './workflow-runner.interace';
 import type { ExtensionCredential } from '@repo/extension-core/src/client/manifest/manifest-credential';
 import type { WindowNames } from './window.interface';
-import type { AppSettings } from './app.interface';
+import type { AppSettings, AppVersions } from './app.interface';
 
 export interface IPCRendererInvokeEventPayload {
   name: string;
@@ -74,6 +74,7 @@ export interface IPCAppEvents {
   'app:set-settings': (settings: Partial<AppSettings>) => void;
   'app:backup-data': () => boolean;
   'app:restore-data': (upsertDuplicate?: boolean) => boolean;
+  'app:versions': () => AppVersions;
 }
 
 export interface IPCWindowEvents {

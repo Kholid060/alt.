@@ -19,3 +19,8 @@ export type AppBackupWorkflowData = Pick<
   | 'isDisabled'
   | 'description'
 >;
+
+export interface AppVersions {
+  os: string;
+  app: string;
+}
