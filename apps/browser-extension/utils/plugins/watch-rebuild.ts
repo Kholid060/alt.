@@ -3,7 +3,9 @@ import { WebSocket } from 'ws';
 import MessageInterpreter from '../reload/interpreter';
 import { LOCAL_RELOAD_SOCKET_URL } from '../reload/constant';
 
-export default function watchRebuild(config: { afterWriteBundle: () => void }): PluginOption {
+export default function watchRebuild(config: {
+  afterWriteBundle: () => void;
+}): PluginOption {
   const ws = new WebSocket(LOCAL_RELOAD_SOCKET_URL);
   return {
     name: 'watch-rebuild',

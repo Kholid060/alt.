@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: 'Inter';
+  --font-mono: 'DM Mono';
+}
+
+@layer base {
+  html {
+    background-color: var(--background);
+  }
+  body {
+    color: theme('colors.foreground');
+  }
+  * {
+    border-color: rgb(var(--border));
+  }
+}
+
+@layer utilities {
+  /* Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+}

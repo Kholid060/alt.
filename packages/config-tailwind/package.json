@@ -1,6 +1,6 @@
 {
   "name": "@alt-dot/tailwind-config",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "private": true,
   "exports": {
     ".": "./tailwind.config.js"
