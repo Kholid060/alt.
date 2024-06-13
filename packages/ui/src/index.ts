@@ -135,6 +135,7 @@ export {
   UiAlertDescription,
 } from './components/ui/alert';
 export { UiCheckbox } from './components/ui/checkbox';
+export { UiLogo } from './components/ui/logo';
 
 export { DialogProvider, useDialog } from './context/dialog.context';
 export type { DialogConfirmOptions } from './context/dialog.context';

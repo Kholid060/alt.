@@ -1,20 +1,25 @@
 import { createBrowserRouter } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import StorePage from './pages/StorePage';
-import AuthPage from './pages/AuthPage';
+import AuthPage from './pages/auth/AuthPage';
+import AuthRedirectPage from './pages/auth/redirect/AuthRedirect';
 
 const router = createBrowserRouter([
   {
-    path: "/",
+    path: '/',
     element: <LandingPage />,
   },
   {
-    path: "/store",
+    path: '/store',
     element: <StorePage />,
   },
   {
-    path: "/auth",
+    path: '/auth',
     element: <AuthPage />,
+  },
+  {
+    path: '/oauth/redirect',
+    element: <AuthRedirectPage />,
   },
 ]);
 
