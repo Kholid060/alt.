@@ -19,8 +19,8 @@
     "build": "cliaa build"
   },
   "devDependencies": {
-    "@repo/extension": "workspace:*",
-    "@repo/extension-core": "workspace:*",
+    "@alt-dot/extension": "workspace:*",
+    "@alt-dot/extension-core": "workspace:*",
     "typescript": "^5.4.3"
   },
   "dependencies": {

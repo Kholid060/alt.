@@ -4,7 +4,7 @@ import type {
   ExtensionBrowserTabContext,
 } from '#packages/common/interface/extension.interface';
 import { isIPCEventError } from '#packages/common/utils/helper';
-import { isObject } from '@repo/shared';
+import { isObject } from '@alt-dot/shared';
 
 class ExtensionWorkerMessagePort {
   private messages: Map<

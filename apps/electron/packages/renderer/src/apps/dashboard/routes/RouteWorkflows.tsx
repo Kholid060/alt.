@@ -35,14 +35,14 @@ import {
   UiSelect,
   UiSwitch,
   useToast,
-} from '@repo/ui';
-import { UiExtIcon } from '@repo/extension';
+} from '@alt-dot/ui';
+import { UiExtIcon } from '@alt-dot/extension';
 import { useCallback, useEffect, useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '/@/utils/helper';
 import { arrayObjSorter } from '#packages/common/utils/helper';
 import { LOCALSTORAGE_KEYS } from '../../../utils/constant/constant';
-import { parseJSON } from '@repo/shared';
+import { parseJSON } from '@alt-dot/shared';
 import dayjs from '/@/lib/dayjs';
 import clsx from 'clsx';
 import { Link, useNavigate } from 'react-router-dom';

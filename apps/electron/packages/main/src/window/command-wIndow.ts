@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { centerWindow } from '../utils/helper';
 import WindowBase, { WindowBaseState } from './WindowBase';
-import { sleep } from '@repo/shared';
+import { sleep } from '@alt-dot/shared';
 import GlobalShortcut from '../utils/GlobalShortcuts';
 import { GLOBAL_SHORTCUTS } from '../utils/constant';
 

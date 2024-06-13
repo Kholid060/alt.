@@ -6,7 +6,7 @@ import {
   UiSelect,
   UiSwitch,
   UiTextarea,
-} from '@repo/ui';
+} from '@alt-dot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';

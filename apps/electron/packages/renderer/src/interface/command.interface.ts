@@ -6,8 +6,8 @@ import {
   DatabaseExtensionCommand,
   DatabaseExtensionListItem,
 } from '#packages/main/src/interface/database.interface';
-import { ExtensionCommand, ExtensionManifest } from '@repo/extension-core';
-import { UiListItem } from '@repo/ui';
+import { ExtensionCommand, ExtensionManifest } from '@alt-dot/extension-core';
+import { UiListItem } from '@alt-dot/ui';
 
 export interface CommandListItemCommandBuiltIn extends UiListItem {
   metadata: {

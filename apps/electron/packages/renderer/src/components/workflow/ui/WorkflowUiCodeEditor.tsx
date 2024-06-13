@@ -1,6 +1,6 @@
 import { json } from '@codemirror/lang-json';
 import { javascript } from '@codemirror/lang-javascript';
-import { UiDialog, cn } from '@repo/ui';
+import { UiDialog, cn } from '@alt-dot/ui';
 import { ExpandIcon } from 'lucide-react';
 import { useState } from 'react';
 import UiCodeEditor from '../../ui/UiCodeEditor';

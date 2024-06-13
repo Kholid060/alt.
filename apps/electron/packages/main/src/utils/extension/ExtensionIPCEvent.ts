@@ -6,7 +6,7 @@ import type {
 import { isExtHasApiPermission } from '#packages/common/utils/check-ext-permission';
 import ExtensionMessagePortHandler from './ExtensionMessagePortHandler';
 import { logger } from '/@/lib/log';
-import type { ExtensionManifest } from '@repo/extension-core';
+import type { ExtensionManifest } from '@alt-dot/extension-core';
 import IPCMain from '../ipc/IPCMain';
 import DBService from '/@/services/database/database.service';
 import type { ExtensionAPIMessagePayload } from '#packages/common/interface/extension.interface';

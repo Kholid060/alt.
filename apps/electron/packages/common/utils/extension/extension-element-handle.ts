@@ -1,5 +1,5 @@
-import type ExtensionAPI from '@repo/extension-core/types/extension-api';
-import type { EventMapEmit } from '@repo/shared';
+import type ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
+import type { EventMapEmit } from '@alt-dot/shared';
 import type { IPCUserExtensionEventsMap } from '../../interface/ipc-events.interface';
 
 export function extensionElementHandleFactory(

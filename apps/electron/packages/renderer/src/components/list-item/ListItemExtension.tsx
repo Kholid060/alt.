@@ -1,4 +1,4 @@
-import { UiList, UiListItemAction } from '@repo/ui';
+import { UiList, UiListItemAction } from '@alt-dot/ui';
 import { ListItemRenderDetail } from '../../apps/command/routes/CommandList';
 import {
   RotateCcwIcon,
@@ -10,7 +10,7 @@ import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandStore } from '/@/stores/command.store';
 import { useShallow } from 'zustand/react/shallow';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
-import { useUiListStore } from '@repo/ui/dist/context/list.context';
+import { useUiListStore } from '@alt-dot/ui/dist/context/list.context';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import { DatabaseExtensionErrorsListItem } from '#packages/main/src/interface/database.interface';
 

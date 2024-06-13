@@ -1,4 +1,4 @@
-import { UiInput, UiToggleGroup, UiToggleGroupItem, useToast } from '@repo/ui';
+import { UiInput, UiToggleGroup, UiToggleGroupItem, useToast } from '@alt-dot/ui';
 import { useState } from 'react';
 import { SearchIcon } from 'lucide-react';
 import ExtensionListTable from '/@/components/extension/ExtensionListTable';

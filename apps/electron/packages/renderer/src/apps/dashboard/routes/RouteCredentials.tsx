@@ -34,13 +34,13 @@ import {
   UiTooltip,
   useDialog,
   useToast,
-} from '@repo/ui';
+} from '@alt-dot/ui';
 import {
   UiListProvider,
   useUiListStore,
-} from '@repo/ui/dist/context/list.context';
+} from '@alt-dot/ui/dist/context/list.context';
 import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
-import { ExtensionCredential } from '@repo/extension-core/src/client/manifest/manifest-credential';
+import { ExtensionCredential } from '@alt-dot/extension-core/src/client/manifest/manifest-credential';
 import CredentialDetail from '/@/components/credential/CredentialDetail';
 import UiItemsPagination from '/@/components/ui/UiItemsPagination';
 import { ArrayValues } from 'type-fest';

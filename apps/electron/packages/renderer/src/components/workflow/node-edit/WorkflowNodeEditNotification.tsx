@@ -1,5 +1,5 @@
 import { WorkflowNodeNotification } from '#packages/common/interface/workflow-nodes.interface';
-import { UiInput, UiSwitch } from '@repo/ui';
+import { UiInput, UiSwitch } from '@alt-dot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';

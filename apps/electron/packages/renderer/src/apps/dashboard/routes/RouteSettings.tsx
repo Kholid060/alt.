@@ -8,7 +8,7 @@ import {
   UiSelect,
   UiSwitch,
   useToast,
-} from '@repo/ui';
+} from '@alt-dot/ui';
 import clsx from 'clsx';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';

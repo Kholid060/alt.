@@ -1,5 +1,5 @@
-import { useUiListStore } from '@repo/ui/dist/context/list.context';
-import { BetterMessagePortSync } from '@repo/shared';
+import { useUiListStore } from '@alt-dot/ui/dist/context/list.context';
+import { BetterMessagePortSync } from '@alt-dot/shared';
 import { createContext, useEffect, useState } from 'react';
 import {
   ExtensionMessagePortCallback,

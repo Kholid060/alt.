@@ -16,7 +16,7 @@ import { nanoid } from 'nanoid/non-secure';
 import EventEmitter from 'eventemitter3';
 import { shell } from 'electron';
 import { logger } from '../lib/log';
-import type { ExtensionCredential } from '@repo/extension-core/src/client/manifest/manifest-credential';
+import type { ExtensionCredential } from '@alt-dot/extension-core/src/client/manifest/manifest-credential';
 
 const SERVER_TIMEOUT_MS = 300_000; // 5 Minutes
 const OAUTH_CALLBACK_PATHNAME = new URL(OAUTH_CALLBACK_URL).pathname;

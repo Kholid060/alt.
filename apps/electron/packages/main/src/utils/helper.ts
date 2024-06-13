@@ -1,4 +1,4 @@
-import type { ExtensionConfig } from '@repo/extension-core';
+import type { ExtensionConfig } from '@alt-dot/extension-core';
 import type { BrowserWindow, Display } from 'electron';
 
 export function getExtensionConfigDefaultValue(config: ExtensionConfig[]): {

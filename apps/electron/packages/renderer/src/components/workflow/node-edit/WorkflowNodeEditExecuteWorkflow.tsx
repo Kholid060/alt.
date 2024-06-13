@@ -1,5 +1,5 @@
 import { WorkflowNodeExecuteWorkflow } from '#packages/common/interface/workflow-nodes.interface';
-import { UiInput, UiList, UiListItem, UiTextarea } from '@repo/ui';
+import { UiInput, UiList, UiListItem, UiTextarea } from '@alt-dot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
@@ -9,7 +9,7 @@ import { useEffect, useMemo } from 'react';
 import {
   UiListProvider,
   useUiListStore,
-} from '@repo/ui/dist/context/list.context';
+} from '@alt-dot/ui/dist/context/list.context';
 
 function WorkflowCombobox({
   data,

@@ -1,4 +1,4 @@
-import { BrowserSelectFileOptions } from '@repo/shared';
+import { BrowserSelectFileOptions } from '@alt-dot/shared';
 
 export interface ContentIframeEvents {
   'file:request': (fileId: string) => Promise<BrowserSelectFileOptions[]>;

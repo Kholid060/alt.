@@ -1,4 +1,4 @@
-import type { BrowserExtensionTab, BrowserInfo } from '@repo/shared';
+import type { BrowserExtensionTab, BrowserInfo } from '@alt-dot/shared';
 
 interface ServerPortEventSender {
   tabId?: number;

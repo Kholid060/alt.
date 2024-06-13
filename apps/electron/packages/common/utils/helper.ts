@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ExtensionConfig } from '@repo/extension-core';
-import { isObject } from '@repo/shared';
+import type { ExtensionConfig } from '@alt-dot/extension-core';
+import { isObject } from '@alt-dot/shared';
 import type { IPCEventError } from '../interface/ipc-events.interface';
 
 export function requireInputConfig(config?: ExtensionConfig[]) {

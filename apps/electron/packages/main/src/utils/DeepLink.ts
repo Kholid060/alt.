@@ -1,8 +1,8 @@
 import { dialog } from 'electron';
 import { logger } from '../lib/log';
-import type { ExtensionCommandArgument } from '@repo/extension-core';
-import { parseJSON } from '@repo/shared';
-import { CommandLaunchBy } from '@repo/extension';
+import type { ExtensionCommandArgument } from '@alt-dot/extension-core';
+import { parseJSON } from '@alt-dot/shared';
+import { CommandLaunchBy } from '@alt-dot/extension';
 import type { APP_DEEP_LINK_HOST } from '#packages/common/utils/constant/app.const';
 import { APP_DEEP_LINK } from '#packages/common/utils/constant/app.const';
 import DBService from '../services/database/database.service';

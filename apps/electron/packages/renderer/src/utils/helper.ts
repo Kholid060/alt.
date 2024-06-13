@@ -1,6 +1,6 @@
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
 import { IPCEventError } from '#packages/common/interface/ipc-events.interface';
-import { isObject } from '@repo/shared';
+import { isObject } from '@alt-dot/shared';
 
 export function extPathParser(path: string) {
   const [_, ext, extId, commandId] = path.split('/');

@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ExtensionMessagePortEvent } from '@repo/extension';
+import type { ExtensionMessagePortEvent } from '@alt-dot/extension';
 import {
   CUSTOM_SCHEME,
   PRELOAD_API_KEY,
 } from '#common/utils/constant/constant';
 import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
 import { contextBridge } from 'electron';
-import type { BetterMessagePortSync, EventMapEmit } from '@repo/shared';
-import { BetterMessagePort } from '@repo/shared';
+import type { BetterMessagePortSync, EventMapEmit } from '@alt-dot/shared';
+import { BetterMessagePort } from '@alt-dot/shared';
 import { createExtensionAPI } from '#common/utils/extension/extension-api-factory';
 import IPCRenderer from '#common/utils/IPCRenderer';
 import type {

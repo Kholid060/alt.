@@ -1,5 +1,5 @@
 {
-  "name": "@repo/extension",
+  "name": "@alt-dot/extension",
   "version": "0.0.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -13,15 +13,15 @@
     "cliaa": "../extension-core/bin/cli.js"
   },
   "dependencies": {
-    "@repo/extension-core": "workspace:*",
-    "@repo/shared": "workspace:*",
-    "@repo/ui": "workspace:*",
+    "@alt-dot/extension-core": "workspace:*",
+    "@alt-dot/shared": "workspace:*",
+    "@alt-dot/ui": "workspace:*",
     "lucide-react": "^0.341.0",
     "react": "^18.2.0"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
+    "@alt-dot/eslint-config": "workspace:*",
+    "@alt-dot/typescript-config": "workspace:*",
     "@types/react": "^18.2.65",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "eslint": "^8.57.0",

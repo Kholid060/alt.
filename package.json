@@ -5,12 +5,12 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "dev:app": "turbo dev --filter=electron --filter=\"@repo/*\"",
+    "dev:app": "turbo dev --filter=electron --filter=\"@alt-dot/*\"",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "prepare": "husky"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
+    "@alt-dot/eslint-config": "workspace:*",
     "eslint": "^8.56.0",
     "nano-staged": "^0.8.0",
     "prettier": "^3.1.1",

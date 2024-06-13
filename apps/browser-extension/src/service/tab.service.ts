@@ -6,8 +6,8 @@ import {
   BrowserGetTextOptions,
   ExtensionBrowserElementSelector,
   KeyboardBrowserTypeOptions,
-} from '@repo/shared';
-import type ExtensionAPI from '@repo/extension-core/types/extension-api';
+} from '@alt-dot/shared';
+import type ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
 
 interface TabTarget {
   tabId: number;

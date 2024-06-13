@@ -9,7 +9,7 @@ import {
   ToggleRightIcon,
 } from 'lucide-react';
 import clsx from 'clsx';
-import { UiLabel, UiTooltip, cn } from '@repo/ui';
+import { UiLabel, UiTooltip, cn } from '@alt-dot/ui';
 
 export function WorkflowUiExpressionInput({
   value,

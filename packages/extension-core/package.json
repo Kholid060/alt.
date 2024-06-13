@@ -1,5 +1,5 @@
 {
-  "name": "@repo/extension-core",
+  "name": "@alt-dot/extension-core",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
@@ -16,8 +16,8 @@
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",
   "dependencies": {
+    "@alt-dot/shared": "workspace:*",
     "@radix-ui/react-primitive": "^1.0.3",
-    "@repo/shared": "workspace:*",
     "browser-extension-url-match": "^1.0.0",
     "dot-prop": "^8.0.2",
     "globby": "^14.0.1",
@@ -27,8 +27,8 @@
     "zod-to-json-schema": "^3.22.4"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
+    "@alt-dot/eslint-config": "workspace:*",
+    "@alt-dot/typescript-config": "workspace:*",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^20.11.19",
     "@types/tmp": "^0.2.6",

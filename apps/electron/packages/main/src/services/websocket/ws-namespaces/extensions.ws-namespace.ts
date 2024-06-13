@@ -7,7 +7,7 @@ import type {
   ExtensionWSClientToServerEvents,
   ExtensionWSInterServerEvents,
   ExtensionWSServerToClientEvents,
-} from '@repo/shared';
+} from '@alt-dot/shared';
 import type { Namespace, Server } from 'socket.io';
 import type { AllButLast, Last } from 'socket.io/dist/typed-events';
 import { z } from 'zod';

@@ -37,7 +37,7 @@ const config = {
       output: {
         entryFileNames: '[name].js',
       },
-      external: ['@repo/native'],
+      external: ['@alt-dot/native'],
     },
     emptyOutDir: true,
     reportCompressedSize: false,

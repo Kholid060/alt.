@@ -8,5 +8,5 @@
  *
  */
 
-import('@repo/shared');
+import('@alt-dot/shared');
 import('@root/src/pages/content/runtime-events/element.runtime-events');

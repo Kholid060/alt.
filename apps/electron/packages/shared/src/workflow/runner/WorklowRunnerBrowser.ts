@@ -10,7 +10,7 @@ import type {
   AllButFirstOrLast,
   ExtensionActiveTabActionWSEvents,
   WSAckErrorResult,
-} from '@repo/shared';
+} from '@alt-dot/shared';
 
 export type WorkflowRunnerBrowserContext = SetNullable<
   NonNullable<ExtensionBrowserTabContext>,

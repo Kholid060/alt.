@@ -1,5 +1,5 @@
 import { WorkflowNodeUseBrowser } from '#packages/common/interface/workflow-nodes.interface';
-import { UiSelect, UiSwitch } from '@repo/ui';
+import { UiSelect, UiSwitch } from '@alt-dot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';

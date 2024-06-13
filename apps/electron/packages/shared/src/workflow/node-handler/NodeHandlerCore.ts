@@ -1,7 +1,7 @@
 import IPCRenderer from '#packages/common/utils/IPCRenderer';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
 import { isIPCEventError } from '#packages/common/utils/helper';
-import type ExtensionAPI from '@repo/extension-core/types/extension-api';
+import type ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
 import type {
   WorkflowNodeHandlerExecute,
   WorkflowNodeHandlerExecuteReturn,

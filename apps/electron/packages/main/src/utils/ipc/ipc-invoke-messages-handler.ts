@@ -17,7 +17,7 @@ import {
   CustomError,
   ExtensionError,
 } from '#packages/common/errors/custom-errors';
-import { Keyboard, KeyboardKey } from '@repo/native';
+import { Keyboard, KeyboardKey } from '@alt-dot/native';
 import { getFileDetail } from '../getFileDetail';
 import AppSettingsService from '/@/services/app-settings.service';
 import dayjs from 'dayjs';

@@ -1,5 +1,5 @@
 {
-  "extends": "@repo/typescript-config/base.json",
+  "extends": "@alt-dot/typescript-config/base.json",
   "include": ["."],
   "compilerOptions": {
     "lib": ["ESNext"],

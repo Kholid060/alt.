@@ -1,7 +1,7 @@
 import { safeStorage } from 'electron';
 import { extensionStorages } from '/@/db/schema/extension.schema';
-import { parseJSON } from '@repo/shared';
-import type ExtensionAPI from '@repo/extension-core/types/extension-api';
+import { parseJSON } from '@alt-dot/shared';
+import type ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
 import { and, eq, inArray } from 'drizzle-orm';
 import ExtensionIPCEvent from '../ExtensionIPCEvent';
 import DBService from '/@/services/database/database.service';

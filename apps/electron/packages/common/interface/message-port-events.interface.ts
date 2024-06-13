@@ -1,7 +1,7 @@
 import type {
   CommandJSONViews,
   ExtensionMessagePortEvent,
-} from '@repo/extension';
+} from '@alt-dot/extension';
 import type { MESSAGE_PORT_CHANNEL_IDS } from '../utils/constant/constant';
 
 export type MessagePortChannelIds =

@@ -1,8 +1,8 @@
 import path from 'path';
 import fs from 'fs-extra';
 import crypto from 'node:crypto';
-import type { ExtensionManifest } from '@repo/extension-core';
-import { ExtensionManifestSchema } from '@repo/extension-core';
+import type { ExtensionManifest } from '@alt-dot/extension-core';
+import { ExtensionManifestSchema } from '@alt-dot/extension-core';
 import validateSemver from 'semver/functions/valid';
 import gtSemver from 'semver/functions/gt';
 import { ErrorLogger, loggerBuilder } from '/@/lib/log';

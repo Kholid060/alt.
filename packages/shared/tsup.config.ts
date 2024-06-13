@@ -9,6 +9,6 @@ export default defineConfig((options) => ({
   entry: ['./src/index.ts'],
   minify: !options.watch,
   external: ['react', 'react/jsx-runtime', 'react-dom'],
-  noExternal: ['@repo/ui', 'lucide-react'],
+  noExternal: ['@alt-dot/ui', 'lucide-react'],
   ...options,
 }));

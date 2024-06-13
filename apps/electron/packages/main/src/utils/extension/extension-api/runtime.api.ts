@@ -1,8 +1,8 @@
-import { CommandLaunchBy } from '@repo/extension';
+import { CommandLaunchBy } from '@alt-dot/extension';
 import ExtensionIPCEvent from '../ExtensionIPCEvent';
 import DBService from '/@/services/database/database.service';
 import ExtensionService from '/@/services/extension.service';
-import { isObject } from '@repo/shared';
+import { isObject } from '@alt-dot/shared';
 import { ExtensionError } from '#packages/common/errors/custom-errors';
 import { z } from 'zod';
 import WindowCommand from '../../../window/command-window';

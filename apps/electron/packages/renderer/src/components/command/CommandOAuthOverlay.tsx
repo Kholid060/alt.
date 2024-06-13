@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
-import { ExtensionCredential } from '@repo/extension-core/src/client/manifest/manifest-credential';
+import { ExtensionCredential } from '@alt-dot/extension-core/src/client/manifest/manifest-credential';
 import { ArrowLeftIcon } from 'lucide-react';
 import UiExtensionIcon from '../ui/UiExtensionIcon';
-import { UiButton } from '@repo/ui';
+import { UiButton } from '@alt-dot/ui';
 
 type ExtensionCredentialDetail = ExtensionCredential & {
   commandId: string;

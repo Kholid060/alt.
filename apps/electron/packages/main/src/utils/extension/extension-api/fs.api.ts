@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import type ExtensionAPI from '@repo/extension-core/types/extension-api';
+import type ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
 import ExtensionIPCEvent from '../ExtensionIPCEvent';
 
 const getWriteContent = (

@@ -1,8 +1,8 @@
 import { ExtensionError } from '#packages/common/errors/custom-errors';
-import type { AllButLast, WSAckErrorResult } from '@repo/shared';
-import { isObject, type ExtensionWSServerToClientEvents } from '@repo/shared';
+import type { AllButLast, WSAckErrorResult } from '@alt-dot/shared';
+import { isObject, type ExtensionWSServerToClientEvents } from '@alt-dot/shared';
 import ExtensionWSNamespace from '/@/services/websocket/ws-namespaces/extensions.ws-namespace';
-import type { AllButFirstOrLast, Last } from '@repo/shared';
+import type { AllButFirstOrLast, Last } from '@alt-dot/shared';
 import type { ExtensionBrowserTabContext } from '#packages/common/interface/extension.interface';
 
 type ElementHandlerWSEventMap = typeof elementHandlerWSEventMap;

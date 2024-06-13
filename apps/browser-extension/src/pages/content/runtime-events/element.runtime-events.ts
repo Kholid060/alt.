@@ -1,4 +1,4 @@
-import { ExtensionBrowserElementSelector, sleep } from '@repo/shared';
+import { ExtensionBrowserElementSelector, sleep } from '@alt-dot/shared';
 import QuerySelector from '@root/src/utils/QuerySelector';
 import RuntimeMessage from '@root/src/utils/RuntimeMessage';
 import KeyboardDriver from '@root/src/pages/content/driver/KeyboardDriver';

@@ -1,6 +1,6 @@
 import { WorkflowNodesMap } from '#packages/common/interface/workflow-nodes.interface';
 import { WORKFLOW_NODE_GROUP } from '#packages/common/utils/constant/workflow.const';
-import { UiListItem } from '@repo/ui';
+import { UiListItem } from '@alt-dot/ui';
 import { SetRequired } from 'type-fest';
 
 export enum WorkflowEditorContextMenuType {

@@ -1,5 +1,5 @@
 import { WorkflowNodeCommand } from '#packages/common/interface/workflow-nodes.interface';
-import { UiInput, UiList, UiSelect, UiSwitch } from '@repo/ui';
+import { UiInput, UiList, UiSelect, UiSwitch } from '@alt-dot/ui';
 import UiExtensionIcon from '../../ui/UiExtensionIcon';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor/workflow-editor.store';
 import { ChevronDown } from 'lucide-react';

@@ -2,7 +2,7 @@ import type {
   ExtensionConfig,
   ExtensionConfigType,
   ExtensionManifest,
-} from '@repo/extension-core';
+} from '@alt-dot/extension-core';
 import type {
   NewExtensionCommand,
   NewExtensionConfig,
@@ -20,7 +20,7 @@ import type {
   SelectWorkflow,
   SelectWorkflowHistory,
 } from '../db/schema/workflow.schema';
-import type { ExtensionCredential } from '@repo/extension-core/src/client/manifest/manifest-credential';
+import type { ExtensionCredential } from '@alt-dot/extension-core/src/client/manifest/manifest-credential';
 
 export type DatabaseExtensionCommand = SelectExtesionCommand;
 

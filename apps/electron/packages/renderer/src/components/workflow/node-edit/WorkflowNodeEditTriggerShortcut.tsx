@@ -1,5 +1,5 @@
 import { WorkflowNodeTriggerShortcut } from '#packages/common/interface/workflow-nodes.interface';
-import { UiButton } from '@repo/ui';
+import { UiButton } from '@alt-dot/ui';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor/workflow-editor.store';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';

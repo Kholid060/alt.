@@ -10,7 +10,7 @@ import type {
   KeyboardBrowserTypeOptions,
   BrowserWaitForSelectorOptions,
   ExtensionBrowserElementSelector,
-} from '@repo/shared';
+} from '@alt-dot/shared';
 
 type OmitFirstArg<F> = F extends (x: any, ...args: infer P) => infer R
   ? (...args: P) => R

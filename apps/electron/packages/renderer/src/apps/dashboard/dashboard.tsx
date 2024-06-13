@@ -1,12 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import '@repo/ui/dist/theme.css';
+import '@alt-dot/ui/dist/theme.css';
 import '/@/assets/css/style.css';
 import '/@/assets/css/fonts.css';
 import '/@/assets/css/workflow-editor-style.css';
 import { RouterProvider } from 'react-router-dom';
 import router from './routes';
-import { DialogProvider, UiToaster, UiTooltipProvider } from '@repo/ui';
+import { DialogProvider, UiToaster, UiTooltipProvider } from '@alt-dot/ui';
 import { HotkeysProvider } from 'react-hotkeys-hook';
 import { DatabaseProvider } from '/@/context/database.context';
 

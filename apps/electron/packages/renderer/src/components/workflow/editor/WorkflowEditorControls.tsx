@@ -1,4 +1,4 @@
-import { UiButton, UiKbd, UiTooltip } from '@repo/ui';
+import { UiButton, UiKbd, UiTooltip } from '@alt-dot/ui';
 import {
   MaximizeIcon,
   MinusIcon,

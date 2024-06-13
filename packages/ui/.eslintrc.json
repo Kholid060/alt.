@@ -2,7 +2,7 @@
 {
   "root": true,
   "ignorePatterns": [".eslintrc.cjs"],
-  "extends": ["@repo/eslint-config/react.js"],
+  "extends": ["@alt-dot/eslint-config/react.js"],
   "parserOptions": {
     "project": true
   }

@@ -1,4 +1,4 @@
-import { UiImage } from '@repo/ui';
+import { UiImage } from '@alt-dot/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { commandIcons } from '#common/utils/command-icons';
 import { Loader2Icon } from 'lucide-react';

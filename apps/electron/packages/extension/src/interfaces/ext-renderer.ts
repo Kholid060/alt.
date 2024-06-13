@@ -1,6 +1,6 @@
-import type { CommandLaunchContext } from '@repo/extension';
-import type { ExtensionMessagePortEvent } from '@repo/extension/dist/interfaces/message-events';
-import type { BetterMessagePortSync } from '@repo/shared';
+import type { CommandLaunchContext } from '@alt-dot/extension';
+import type { ExtensionMessagePortEvent } from '@alt-dot/extension/dist/interfaces/message-events';
+import type { BetterMessagePortSync } from '@alt-dot/shared';
 
 export type ExtensionRenderer<K extends unknown[] = []> = (
   detail: {

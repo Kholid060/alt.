@@ -7,7 +7,7 @@ import {
   parseJSON,
   sleepWithRetry,
   type BrowserType,
-} from '@repo/shared';
+} from '@alt-dot/shared';
 import type {
   WorkflowNodeHandlerExecute,
   WorkflowNodeHandlerExecuteReturn,

@@ -1,4 +1,4 @@
-import type { BrowserConnected, BrowserInfo } from '@repo/shared';
+import type { BrowserConnected, BrowserInfo } from '@alt-dot/shared';
 import { isWSAckError } from '../utils/extension/ExtensionBrowserElementHandle';
 import ExtensionWSNamespace from './websocket/ws-namespaces/extensions.ws-namespace';
 

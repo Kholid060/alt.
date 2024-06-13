@@ -1,6 +1,6 @@
 import UAParser from 'ua-parser-js';
 import browserInfoStorage from '../shared/storages/browser-info.storage';
-import { BrowserInfo, BrowserType } from '@repo/shared';
+import { BrowserInfo, BrowserType } from '@alt-dot/shared';
 
 let cache: BrowserInfo | null = null;
 

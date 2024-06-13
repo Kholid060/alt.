@@ -8,7 +8,7 @@ import {
   UiFormLabel,
   UiFormMessage,
   UiInput,
-} from '@repo/ui';
+} from '@alt-dot/ui';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import preloadAPI from '/@/utils/preloadAPI';
@@ -19,7 +19,7 @@ import { isIPCEventError } from '#packages/common/utils/helper';
 import UiSelectIcon from '/@/components/ui/UiSelectIcon';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { UiExtIcon } from '@repo/extension';
+import { UiExtIcon } from '@alt-dot/extension';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
 
 const newCommandScriptSchema = z.object({

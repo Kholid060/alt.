@@ -9,7 +9,7 @@ import {
   UiAccordionItem,
   UiAccordionTrigger,
   UiButton,
-} from '@repo/ui';
+} from '@alt-dot/ui';
 import { TrashIcon, XIcon } from 'lucide-react';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import preloadAPI from '/@/utils/preloadAPI';

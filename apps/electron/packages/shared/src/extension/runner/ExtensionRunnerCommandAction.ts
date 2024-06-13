@@ -3,8 +3,8 @@ import type { ExtensionRunnerProcessConstructor } from './ExtensionRunnerProcess
 import ExtensionRunnerProcess, {
   ExtensionRunnerProcessFinishReason,
 } from './ExtensionRunnerProcess';
-import type { BetterMessagePayload } from '@repo/shared';
-import { isObject } from '@repo/shared';
+import type { BetterMessagePayload } from '@alt-dot/shared';
+import { isObject } from '@alt-dot/shared';
 import IPCRenderer from '#packages/common/utils/IPCRenderer';
 import type { ExtensionCommandWorkerInitMessage } from '/@/interface/extension.interface';
 

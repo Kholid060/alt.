@@ -1,4 +1,4 @@
-import { UiButton, UiTooltip } from '@repo/ui';
+import { UiButton, UiTooltip } from '@alt-dot/ui';
 import { GripHorizontalIcon, AppWindowIcon, LockIcon } from 'lucide-react';
 import preloadAPI from '/@/utils/preloadAPI';
 

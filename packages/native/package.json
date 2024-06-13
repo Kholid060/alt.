@@ -1,5 +1,5 @@
 {
-  "name": "@repo/native",
+  "name": "@alt-dot/native",
   "version": "0.0.0",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -19,9 +19,9 @@
   },
   "type": "module",
   "devDependencies": {
+    "@alt-dot/eslint-config": "workspace:*",
+    "@alt-dot/typescript-config": "workspace:*",
     "@neon-rs/cli": "0.1.73",
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^20.14.2",
     "@typescript-eslint/eslint-plugin": "^7.12.0",

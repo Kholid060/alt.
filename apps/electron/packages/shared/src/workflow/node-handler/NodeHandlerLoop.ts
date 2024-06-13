@@ -1,5 +1,5 @@
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
-import { isObject } from '@repo/shared';
+import { isObject } from '@alt-dot/shared';
 import type {
   WorkflowNodeHandlerExecute,
   WorkflowNodeHandlerExecuteReturn,

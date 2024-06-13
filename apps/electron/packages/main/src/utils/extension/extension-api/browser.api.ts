@@ -5,7 +5,7 @@ import {
   extensionBrowserElementHandle,
   isWSAckError,
 } from '../ExtensionBrowserElementHandle';
-import type ExtensionAPI from '@repo/extension-core/types/extension-api';
+import type ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
 import WindowCommand from '../../../window/command-window';
 import { getFileDetail } from '../../getFileDetail';
 

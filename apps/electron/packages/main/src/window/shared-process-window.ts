@@ -3,7 +3,7 @@ import type { BrowserWindow } from 'electron';
 import { fileURLToPath } from 'node:url';
 import WindowBase from './WindowBase';
 import path from 'node:path';
-import { sleep } from '@repo/shared';
+import { sleep } from '@alt-dot/shared';
 
 const BASE_DIR = fileURLToPath(new URL('./../../shared/dist', import.meta.url));
 

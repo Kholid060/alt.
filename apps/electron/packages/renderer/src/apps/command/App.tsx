@@ -1,9 +1,9 @@
-import { UiTooltipProvider } from '@repo/ui';
+import { UiTooltipProvider } from '@alt-dot/ui';
 import CommandHeader from '/@/components/command/CommandHeader';
 import CommandFooter from '/@/components/command/CommandFooter';
 import CommandContent from '/@/components/command/CommandContent';
 import { CommandCtxProvider } from '/@/context/command.context';
-import { UiListProvider } from '@repo/ui/dist/context/list.context';
+import { UiListProvider } from '@alt-dot/ui/dist/context/list.context';
 import {
   CommandRouteProvider,
   createCommandRoutes,
@@ -22,7 +22,7 @@ import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { ExtensionBrowserTabContext } from '#packages/common/interface/extension.interface';
-import { debounce } from '@repo/shared';
+import { debounce } from '@alt-dot/shared';
 
 const routes = createCommandRoutes(commandAppRoutes);
 

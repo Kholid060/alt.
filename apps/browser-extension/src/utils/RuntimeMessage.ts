@@ -3,7 +3,7 @@ import {
   RuntimeEvent,
   RuntimeEventPayload,
 } from '../interface/runtime-event.interface';
-import { isObject } from '@repo/shared';
+import { isObject } from '@alt-dot/shared';
 
 export type RuntimeEventListener<T extends keyof RuntimeEvent> = (
   ...args: [

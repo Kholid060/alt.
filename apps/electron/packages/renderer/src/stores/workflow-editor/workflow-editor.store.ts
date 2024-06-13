@@ -23,7 +23,7 @@ import {
   DatabaseWorkflowDetail,
   DatabaseWorkflowUpdatePayload,
 } from '#packages/main/src/interface/database.interface';
-import { createDebounce } from '@repo/shared';
+import { createDebounce } from '@alt-dot/shared';
 import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
 import {
   UndoRedoStoreSlice,

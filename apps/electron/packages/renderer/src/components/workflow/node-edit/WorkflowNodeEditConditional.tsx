@@ -2,7 +2,7 @@ import {
   WorkflowNodeConditionPath,
   WorkflowNodeConditional,
 } from '#packages/common/interface/workflow-nodes.interface';
-import { UiButton, UiDialog } from '@repo/ui';
+import { UiButton, UiDialog } from '@alt-dot/ui';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import { PencilIcon, SignpostIcon, TrashIcon } from 'lucide-react';

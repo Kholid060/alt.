@@ -1,11 +1,11 @@
-import { UiExtIcon } from '@repo/extension';
+import { UiExtIcon } from '@alt-dot/extension';
 import {
   UiPopover,
   UiTooltip,
   UiPopoverTrigger,
   UiButton,
   UiPopoverContent,
-} from '@repo/ui';
+} from '@alt-dot/ui';
 import clsx from 'clsx';
 
 interface UiSelectIconProps extends React.HTMLAttributes<HTMLButtonElement> {

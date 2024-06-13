@@ -26,6 +26,205 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@alt-dot/eslint-config@workspace:*, @alt-dot/eslint-config@workspace:packages/config-eslint":
+  version: 0.0.0-use.local
+  resolution: "@alt-dot/eslint-config@workspace:packages/config-eslint"
+  dependencies:
+    "@typescript-eslint/eslint-plugin": "npm:^6.17.0"
+    "@typescript-eslint/parser": "npm:^7.2.0"
+    eslint-config-prettier: "npm:^9.1.0"
+    eslint-plugin-jsx-a11y: "npm:^6.8.0"
+    eslint-plugin-react: "npm:^7.34.0"
+    typescript: "npm:^5.4.2"
+  languageName: unknown
+  linkType: soft
+
+"@alt-dot/extension-core@workspace:*, @alt-dot/extension-core@workspace:packages/extension-core":
+  version: 0.0.0-use.local
+  resolution: "@alt-dot/extension-core@workspace:packages/extension-core"
+  dependencies:
+    "@alt-dot/eslint-config": "workspace:*"
+    "@alt-dot/shared": "workspace:*"
+    "@alt-dot/typescript-config": "workspace:*"
+    "@radix-ui/react-primitive": "npm:^1.0.3"
+    "@types/fs-extra": "npm:^11.0.4"
+    "@types/node": "npm:^20.11.19"
+    "@types/tmp": "npm:^0.2.6"
+    "@typescript-eslint/eslint-plugin": "npm:^7.2.0"
+    browser-extension-url-match: "npm:^1.0.0"
+    chalk: "npm:^5.3.0"
+    commander: "npm:^12.0.0"
+    dot-prop: "npm:^8.0.2"
+    eslint: "npm:^8.56.0"
+    eslint-config-prettier: "npm:^9.1.0"
+    eslint-plugin-prettier: "npm:^5.1.3"
+    fs-extra: "npm:^11.2.0"
+    glob: "npm:^10.3.10"
+    globby: "npm:^14.0.1"
+    image-size: "npm:^1.1.1"
+    prettier: "npm:^3.2.5"
+    semver: "npm:^7.6.0"
+    tempy: "npm:^3.1.0"
+    tmp: "npm:^0.2.2"
+    ts-morph: "npm:^21.0.1"
+    tsup: "npm:^8.0.2"
+    tsx: "npm:^4.7.1"
+    type-fest: "npm:^4.10.3"
+    typescript: "npm:^5.4.2"
+    vite: "npm:^5.1.4"
+    zod: "npm:^3.22.4"
+    zod-to-json-schema: "npm:^3.22.4"
+    zod-validation-error: "npm:^3.0.2"
+  bin:
+    cliaa: ./bin/cli.js
+  languageName: unknown
+  linkType: soft
+
+"@alt-dot/extension@workspace:*, @alt-dot/extension@workspace:packages/extension":
+  version: 0.0.0-use.local
+  resolution: "@alt-dot/extension@workspace:packages/extension"
+  dependencies:
+    "@alt-dot/eslint-config": "workspace:*"
+    "@alt-dot/extension-core": "workspace:*"
+    "@alt-dot/shared": "workspace:*"
+    "@alt-dot/typescript-config": "workspace:*"
+    "@alt-dot/ui": "workspace:*"
+    "@types/react": "npm:^18.2.65"
+    "@typescript-eslint/eslint-plugin": "npm:^7.2.0"
+    eslint: "npm:^8.57.0"
+    eslint-config-prettier: "npm:^9.1.0"
+    eslint-plugin-jsx-a11y: "npm:^6.8.0"
+    eslint-plugin-prettier: "npm:^5.1.3"
+    eslint-plugin-react: "npm:^7.33.2"
+    eslint-plugin-react-hooks: "npm:^4.6.0"
+    globby: "npm:^14.0.1"
+    lucide-react: "npm:^0.341.0"
+    prettier: "npm:^3.2.5"
+    react: "npm:^18.2.0"
+    tsup: "npm:^8.0.2"
+    tsx: "npm:^4.7.1"
+    vite: "npm:^5.1.4"
+    vite-plugin-dts: "npm:^3.7.3"
+  bin:
+    cliaa: ../extension-core/bin/cli.js
+  languageName: unknown
+  linkType: soft
+
+"@alt-dot/native@workspace:*, @alt-dot/native@workspace:packages/native":
+  version: 0.0.0-use.local
+  resolution: "@alt-dot/native@workspace:packages/native"
+  dependencies:
+    "@alt-dot/eslint-config": "workspace:*"
+    "@alt-dot/typescript-config": "workspace:*"
+    "@neon-rs/cli": "npm:0.1.73"
+    "@types/fs-extra": "npm:^11.0.4"
+    "@types/node": "npm:^20.14.2"
+    "@typescript-eslint/eslint-plugin": "npm:^7.12.0"
+    eslint: "npm:^8.57.0"
+    eslint-config-prettier: "npm:^9.1.0"
+    eslint-plugin-jsx-a11y: "npm:^6.8.0"
+    eslint-plugin-prettier: "npm:^5.1.3"
+    eslint-plugin-react: "npm:^7.33.2"
+    eslint-plugin-react-hooks: "npm:^4.6.0"
+    fs-extra: "npm:^11.2.0"
+    tsup: "npm:^8.1.0"
+    typescript: "npm:^5.4.5"
+  languageName: unknown
+  linkType: soft
+
+"@alt-dot/shared@workspace:*, @alt-dot/shared@workspace:packages/shared":
+  version: 0.0.0-use.local
+  resolution: "@alt-dot/shared@workspace:packages/shared"
+  dependencies:
+    "@alt-dot/eslint-config": "workspace:*"
+    "@alt-dot/typescript-config": "workspace:*"
+    "@typescript-eslint/eslint-plugin": "npm:^7.4.0"
+    eslint: "npm:^8.56.0"
+    eslint-config-prettier: "npm:^9.1.0"
+    eslint-plugin-prettier: "npm:^5.1.3"
+    eventemitter3: "npm:^5.0.1"
+    prettier: "npm:^3.2.5"
+    tsup: "npm:^8.0.2"
+    typescript: "npm:^5.4.2"
+    zod: "npm:^3.22.4"
+  languageName: unknown
+  linkType: soft
+
+"@alt-dot/tailwind-config@workspace:*, @alt-dot/tailwind-config@workspace:packages/config-tailwind":
+  version: 0.0.0-use.local
+  resolution: "@alt-dot/tailwind-config@workspace:packages/config-tailwind"
+  dependencies:
+    "@alt-dot/typescript-config": "workspace:*"
+    "@radix-ui/colors": "npm:^3.0.0"
+    "@types/node": "npm:^20.12.12"
+    tailwindcss: "npm:^3.4.1"
+    tailwindcss-animate: "npm:^1.0.7"
+    windy-radix-palette: "npm:^2.0.0-beta.7"
+  languageName: unknown
+  linkType: soft
+
+"@alt-dot/typescript-config@workspace:*, @alt-dot/typescript-config@workspace:packages/config-typescript":
+  version: 0.0.0-use.local
+  resolution: "@alt-dot/typescript-config@workspace:packages/config-typescript"
+  languageName: unknown
+  linkType: soft
+
+"@alt-dot/ui@workspace:*, @alt-dot/ui@workspace:packages/ui":
+  version: 0.0.0-use.local
+  resolution: "@alt-dot/ui@workspace:packages/ui"
+  dependencies:
+    "@alt-dot/eslint-config": "workspace:*"
+    "@alt-dot/shared": "workspace:*"
+    "@alt-dot/typescript-config": "workspace:*"
+    "@hookform/resolvers": "npm:^3.3.4"
+    "@radix-ui/react-accordion": "npm:^1.1.2"
+    "@radix-ui/react-alert-dialog": "npm:^1.0.5"
+    "@radix-ui/react-avatar": "npm:^1.0.4"
+    "@radix-ui/react-checkbox": "npm:^1.0.4"
+    "@radix-ui/react-context-menu": "npm:^2.1.5"
+    "@radix-ui/react-dialog": "npm:^1.0.5"
+    "@radix-ui/react-dropdown-menu": "npm:^2.0.6"
+    "@radix-ui/react-label": "npm:^2.0.2"
+    "@radix-ui/react-popover": "npm:^1.0.7"
+    "@radix-ui/react-scroll-area": "npm:^1.0.5"
+    "@radix-ui/react-select": "npm:^2.0.0"
+    "@radix-ui/react-slot": "npm:^1.0.2"
+    "@radix-ui/react-switch": "npm:^1.0.3"
+    "@radix-ui/react-tabs": "npm:^1.0.4"
+    "@radix-ui/react-toast": "npm:^1.1.5"
+    "@radix-ui/react-toggle": "npm:^1.0.3"
+    "@radix-ui/react-toggle-group": "npm:^1.0.4"
+    "@radix-ui/react-tooltip": "npm:^1.0.7"
+    "@types/react": "npm:^18.2.46"
+    "@typescript-eslint/eslint-plugin": "npm:^7.2.0"
+    autoprefixer: "npm:^10.4.16"
+    class-variance-authority: "npm:^0.7.0"
+    clsx: "npm:^2.1.0"
+    cmdk: "npm:^0.2.1"
+    eslint: "npm:^8.56.0"
+    eslint-config-prettier: "npm:^9.1.0"
+    eslint-plugin-jsx-a11y: "npm:^6.8.0"
+    eslint-plugin-prettier: "npm:^5.1.3"
+    eslint-plugin-react: "npm:^7.33.2"
+    eslint-plugin-react-hooks: "npm:^4.6.0"
+    fuzzysort: "npm:^2.0.4"
+    lucide-react: "npm:^0.330.0"
+    match-sorter: "npm:^6.3.4"
+    next-themes: "npm:^0.2.1"
+    prettier: "npm:^3.2.5"
+    react: "npm:^18.2.0"
+    react-dom: "npm:^18.2.0"
+    react-hook-form: "npm:^7.51.1"
+    sonner: "npm:^1.4.3"
+    tailwind-merge: "npm:^2.2.1"
+    tsup: "npm:^8.0.2"
+    type-fest: "npm:^4.13.0"
+    typescript: "npm:^5.3.3"
+    zod: "npm:^3.22.4"
+    zustand: "npm:^4.5.1"
+  languageName: unknown
+  linkType: soft
+
 "@ampproject/remapping@npm:^2.2.0":
   version: 2.3.0
   resolution: "@ampproject/remapping@npm:2.3.0"
@@ -3726,205 +3925,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@repo/eslint-config@workspace:*, @repo/eslint-config@workspace:packages/config-eslint":
-  version: 0.0.0-use.local
-  resolution: "@repo/eslint-config@workspace:packages/config-eslint"
-  dependencies:
-    "@typescript-eslint/eslint-plugin": "npm:^6.17.0"
-    "@typescript-eslint/parser": "npm:^7.2.0"
-    eslint-config-prettier: "npm:^9.1.0"
-    eslint-plugin-jsx-a11y: "npm:^6.8.0"
-    eslint-plugin-react: "npm:^7.34.0"
-    typescript: "npm:^5.4.2"
-  languageName: unknown
-  linkType: soft
-
-"@repo/extension-core@workspace:*, @repo/extension-core@workspace:packages/extension-core":
-  version: 0.0.0-use.local
-  resolution: "@repo/extension-core@workspace:packages/extension-core"
-  dependencies:
-    "@radix-ui/react-primitive": "npm:^1.0.3"
-    "@repo/eslint-config": "workspace:*"
-    "@repo/shared": "workspace:*"
-    "@repo/typescript-config": "workspace:*"
-    "@types/fs-extra": "npm:^11.0.4"
-    "@types/node": "npm:^20.11.19"
-    "@types/tmp": "npm:^0.2.6"
-    "@typescript-eslint/eslint-plugin": "npm:^7.2.0"
-    browser-extension-url-match: "npm:^1.0.0"
-    chalk: "npm:^5.3.0"
-    commander: "npm:^12.0.0"
-    dot-prop: "npm:^8.0.2"
-    eslint: "npm:^8.56.0"
-    eslint-config-prettier: "npm:^9.1.0"
-    eslint-plugin-prettier: "npm:^5.1.3"
-    fs-extra: "npm:^11.2.0"
-    glob: "npm:^10.3.10"
-    globby: "npm:^14.0.1"
-    image-size: "npm:^1.1.1"
-    prettier: "npm:^3.2.5"
-    semver: "npm:^7.6.0"
-    tempy: "npm:^3.1.0"
-    tmp: "npm:^0.2.2"
-    ts-morph: "npm:^21.0.1"
-    tsup: "npm:^8.0.2"
-    tsx: "npm:^4.7.1"
-    type-fest: "npm:^4.10.3"
-    typescript: "npm:^5.4.2"
-    vite: "npm:^5.1.4"
-    zod: "npm:^3.22.4"
-    zod-to-json-schema: "npm:^3.22.4"
-    zod-validation-error: "npm:^3.0.2"
-  bin:
-    cliaa: ./bin/cli.js
-  languageName: unknown
-  linkType: soft
-
-"@repo/extension@workspace:*, @repo/extension@workspace:packages/extension":
-  version: 0.0.0-use.local
-  resolution: "@repo/extension@workspace:packages/extension"
-  dependencies:
-    "@repo/eslint-config": "workspace:*"
-    "@repo/extension-core": "workspace:*"
-    "@repo/shared": "workspace:*"
-    "@repo/typescript-config": "workspace:*"
-    "@repo/ui": "workspace:*"
-    "@types/react": "npm:^18.2.65"
-    "@typescript-eslint/eslint-plugin": "npm:^7.2.0"
-    eslint: "npm:^8.57.0"
-    eslint-config-prettier: "npm:^9.1.0"
-    eslint-plugin-jsx-a11y: "npm:^6.8.0"
-    eslint-plugin-prettier: "npm:^5.1.3"
-    eslint-plugin-react: "npm:^7.33.2"
-    eslint-plugin-react-hooks: "npm:^4.6.0"
-    globby: "npm:^14.0.1"
-    lucide-react: "npm:^0.341.0"
-    prettier: "npm:^3.2.5"
-    react: "npm:^18.2.0"
-    tsup: "npm:^8.0.2"
-    tsx: "npm:^4.7.1"
-    vite: "npm:^5.1.4"
-    vite-plugin-dts: "npm:^3.7.3"
-  bin:
-    cliaa: ../extension-core/bin/cli.js
-  languageName: unknown
-  linkType: soft
-
-"@repo/native@workspace:*, @repo/native@workspace:packages/native":
-  version: 0.0.0-use.local
-  resolution: "@repo/native@workspace:packages/native"
-  dependencies:
-    "@neon-rs/cli": "npm:0.1.73"
-    "@repo/eslint-config": "workspace:*"
-    "@repo/typescript-config": "workspace:*"
-    "@types/fs-extra": "npm:^11.0.4"
-    "@types/node": "npm:^20.14.2"
-    "@typescript-eslint/eslint-plugin": "npm:^7.12.0"
-    eslint: "npm:^8.57.0"
-    eslint-config-prettier: "npm:^9.1.0"
-    eslint-plugin-jsx-a11y: "npm:^6.8.0"
-    eslint-plugin-prettier: "npm:^5.1.3"
-    eslint-plugin-react: "npm:^7.33.2"
-    eslint-plugin-react-hooks: "npm:^4.6.0"
-    fs-extra: "npm:^11.2.0"
-    tsup: "npm:^8.1.0"
-    typescript: "npm:^5.4.5"
-  languageName: unknown
-  linkType: soft
-
-"@repo/shared@workspace:*, @repo/shared@workspace:packages/shared":
-  version: 0.0.0-use.local
-  resolution: "@repo/shared@workspace:packages/shared"
-  dependencies:
-    "@repo/eslint-config": "workspace:*"
-    "@repo/typescript-config": "workspace:*"
-    "@typescript-eslint/eslint-plugin": "npm:^7.4.0"
-    eslint: "npm:^8.56.0"
-    eslint-config-prettier: "npm:^9.1.0"
-    eslint-plugin-prettier: "npm:^5.1.3"
-    eventemitter3: "npm:^5.0.1"
-    prettier: "npm:^3.2.5"
-    tsup: "npm:^8.0.2"
-    typescript: "npm:^5.4.2"
-    zod: "npm:^3.22.4"
-  languageName: unknown
-  linkType: soft
-
-"@repo/tailwind-config@workspace:*, @repo/tailwind-config@workspace:packages/config-tailwind":
-  version: 0.0.0-use.local
-  resolution: "@repo/tailwind-config@workspace:packages/config-tailwind"
-  dependencies:
-    "@radix-ui/colors": "npm:^3.0.0"
-    "@repo/typescript-config": "workspace:*"
-    "@types/node": "npm:^20.12.12"
-    tailwindcss: "npm:^3.4.1"
-    tailwindcss-animate: "npm:^1.0.7"
-    windy-radix-palette: "npm:^2.0.0-beta.7"
-  languageName: unknown
-  linkType: soft
-
-"@repo/typescript-config@workspace:*, @repo/typescript-config@workspace:packages/config-typescript":
-  version: 0.0.0-use.local
-  resolution: "@repo/typescript-config@workspace:packages/config-typescript"
-  languageName: unknown
-  linkType: soft
-
-"@repo/ui@workspace:*, @repo/ui@workspace:packages/ui":
-  version: 0.0.0-use.local
-  resolution: "@repo/ui@workspace:packages/ui"
-  dependencies:
-    "@hookform/resolvers": "npm:^3.3.4"
-    "@radix-ui/react-accordion": "npm:^1.1.2"
-    "@radix-ui/react-alert-dialog": "npm:^1.0.5"
-    "@radix-ui/react-avatar": "npm:^1.0.4"
-    "@radix-ui/react-checkbox": "npm:^1.0.4"
-    "@radix-ui/react-context-menu": "npm:^2.1.5"
-    "@radix-ui/react-dialog": "npm:^1.0.5"
-    "@radix-ui/react-dropdown-menu": "npm:^2.0.6"
-    "@radix-ui/react-label": "npm:^2.0.2"
-    "@radix-ui/react-popover": "npm:^1.0.7"
-    "@radix-ui/react-scroll-area": "npm:^1.0.5"
-    "@radix-ui/react-select": "npm:^2.0.0"
-    "@radix-ui/react-slot": "npm:^1.0.2"
-    "@radix-ui/react-switch": "npm:^1.0.3"
-    "@radix-ui/react-tabs": "npm:^1.0.4"
-    "@radix-ui/react-toast": "npm:^1.1.5"
-    "@radix-ui/react-toggle": "npm:^1.0.3"
-    "@radix-ui/react-toggle-group": "npm:^1.0.4"
-    "@radix-ui/react-tooltip": "npm:^1.0.7"
-    "@repo/eslint-config": "workspace:*"
-    "@repo/shared": "workspace:*"
-    "@repo/typescript-config": "workspace:*"
-    "@types/react": "npm:^18.2.46"
-    "@typescript-eslint/eslint-plugin": "npm:^7.2.0"
-    autoprefixer: "npm:^10.4.16"
-    class-variance-authority: "npm:^0.7.0"
-    clsx: "npm:^2.1.0"
-    cmdk: "npm:^0.2.1"
-    eslint: "npm:^8.56.0"
-    eslint-config-prettier: "npm:^9.1.0"
-    eslint-plugin-jsx-a11y: "npm:^6.8.0"
-    eslint-plugin-prettier: "npm:^5.1.3"
-    eslint-plugin-react: "npm:^7.33.2"
-    eslint-plugin-react-hooks: "npm:^4.6.0"
-    fuzzysort: "npm:^2.0.4"
-    lucide-react: "npm:^0.330.0"
-    match-sorter: "npm:^6.3.4"
-    next-themes: "npm:^0.2.1"
-    prettier: "npm:^3.2.5"
-    react: "npm:^18.2.0"
-    react-dom: "npm:^18.2.0"
-    react-hook-form: "npm:^7.51.1"
-    sonner: "npm:^1.4.3"
-    tailwind-merge: "npm:^2.2.1"
-    tsup: "npm:^8.0.2"
-    type-fest: "npm:^4.13.0"
-    typescript: "npm:^5.3.3"
-    zod: "npm:^3.22.4"
-    zustand: "npm:^4.5.1"
-  languageName: unknown
-  linkType: soft
-
 "@rollup/plugin-inject@npm:^5.0.5":
   version: 5.0.5
   resolution: "@rollup/plugin-inject@npm:5.0.5"
@@ -6340,7 +6340,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "alt.@workspace:."
   dependencies:
-    "@repo/eslint-config": "workspace:*"
+    "@alt-dot/eslint-config": "workspace:*"
     eslint: "npm:^8.56.0"
     nano-staged: "npm:^0.8.0"
     prettier: "npm:^3.1.1"
@@ -7003,13 +7003,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "browser-extension@workspace:apps/browser-extension"
   dependencies:
+    "@alt-dot/eslint-config": "workspace:*"
+    "@alt-dot/extension-core": "workspace:*"
+    "@alt-dot/shared": "workspace:*"
+    "@alt-dot/typescript-config": "workspace:*"
     "@commitlint/cli": "npm:18.4.4"
     "@commitlint/config-conventional": "npm:18.1.0"
     "@medv/finder": "npm:^3.2.0"
-    "@repo/eslint-config": "workspace:*"
-    "@repo/extension-core": "workspace:*"
-    "@repo/shared": "workspace:*"
-    "@repo/typescript-config": "workspace:*"
     "@rollup/plugin-sucrase": "npm:^5.0.2"
     "@rollup/plugin-typescript": "npm:11.1.6"
     "@testing-library/react": "npm:14.0.0"
@@ -7609,8 +7609,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "clipboard-extension@workspace:examples/clipboard-extension"
   dependencies:
-    "@repo/extension": "workspace:*"
-    "@repo/extension-core": "workspace:*"
+    "@alt-dot/extension": "workspace:*"
+    "@alt-dot/extension-core": "workspace:*"
     "@types/react": "npm:^18.2.66"
     dayjs: "npm:^1.11.10"
     mathjs: "npm:^12.4.1"
@@ -8973,19 +8973,19 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "electron@workspace:apps/electron"
   dependencies:
+    "@alt-dot/eslint-config": "workspace:*"
+    "@alt-dot/extension": "workspace:*"
+    "@alt-dot/extension-core": "workspace:*"
+    "@alt-dot/native": "workspace:*"
+    "@alt-dot/shared": "workspace:*"
+    "@alt-dot/tailwind-config": "workspace:*"
+    "@alt-dot/typescript-config": "workspace:*"
+    "@alt-dot/ui": "workspace:*"
     "@codemirror/lang-javascript": "npm:^6.2.2"
     "@codemirror/lang-json": "npm:^6.0.1"
     "@electron-forge/cli": "npm:^7.4.0"
     "@electron/rebuild": "npm:^3.6.0"
     "@hookform/resolvers": "npm:^3.3.4"
-    "@repo/eslint-config": "workspace:*"
-    "@repo/extension": "workspace:*"
-    "@repo/extension-core": "workspace:*"
-    "@repo/native": "workspace:*"
-    "@repo/shared": "workspace:*"
-    "@repo/tailwind-config": "workspace:*"
-    "@repo/typescript-config": "workspace:*"
-    "@repo/ui": "workspace:*"
     "@types/better-sqlite3": "npm:^7.6.9"
     "@types/lodash-es": "npm:^4.17.12"
     "@types/mime-types": "npm:^2.1.4"
@@ -16703,8 +16703,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "testing-extension@workspace:examples/test-extension"
   dependencies:
-    "@repo/extension": "workspace:*"
-    "@repo/extension-core": "workspace:*"
+    "@alt-dot/extension": "workspace:*"
+    "@alt-dot/extension-core": "workspace:*"
     dayjs: "npm:^1.11.10"
     react: "npm:^18.2.0"
     typescript: "npm:^5.4.3"

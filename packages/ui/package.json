@@ -1,6 +1,6 @@
 {
-  "name": "@repo/ui",
-  "version": "0.0.0",
+  "name": "@alt-dot/ui",
+  "version": "0.0.1",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "sideEffects": false,
@@ -12,8 +12,8 @@
     "clean": "rm -rf .turbo &&  rm -rf dist"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
-    "@repo/typescript-config": "workspace:*",
+    "@alt-dot/eslint-config": "workspace:*",
+    "@alt-dot/typescript-config": "workspace:*",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
@@ -27,6 +27,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@alt-dot/shared": "workspace:*",
     "@hookform/resolvers": "^3.3.4",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-alert-dialog": "^1.0.5",
@@ -46,7 +47,6 @@
     "@radix-ui/react-toggle": "^1.0.3",
     "@radix-ui/react-toggle-group": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.0.7",
-    "@repo/shared": "workspace:*",
     "@types/react": "^18.2.46",
     "autoprefixer": "^10.4.16",
     "class-variance-authority": "^0.7.0",

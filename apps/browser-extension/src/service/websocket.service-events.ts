@@ -1,7 +1,7 @@
 import {
   ExtensionWSServerToClientEvents,
   ExtensionWSClientToServerEvents,
-} from '@repo/shared';
+} from '@alt-dot/shared';
 import { Socket } from 'socket.io-client';
 import TabService from './tab.service';
 import Browser from 'webextension-polyfill';

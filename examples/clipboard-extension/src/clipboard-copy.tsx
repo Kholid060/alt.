@@ -1,4 +1,4 @@
-import { CommandLaunchContext } from '@repo/extension';
+import { CommandLaunchContext } from '@alt-dot/extension';
 
 const filePath = 'D:\\test.txt';
 

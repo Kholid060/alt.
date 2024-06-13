@@ -1,4 +1,4 @@
-import { sleep } from '@repo/shared';
+import { sleep } from '@alt-dot/shared';
 import ExtensionIPCEvent from '../ExtensionIPCEvent';
 import WindowCommand from '../../../window/command-window';
 

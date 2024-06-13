@@ -27,7 +27,7 @@ import {
   extensionCredOauthTokens,
   extensionErrors,
 } from '/@/db/schema/extension.schema';
-import type { ExtensionManifest } from '@repo/extension-core';
+import type { ExtensionManifest } from '@alt-dot/extension-core';
 import {
   buildConflictUpdateColumns,
   emitDBChanges,
@@ -59,13 +59,13 @@ import type {
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
 import type { SQLiteDatabase } from './database.service';
-import { MemoryCache, parseJSON } from '@repo/shared';
+import { MemoryCache, parseJSON } from '@alt-dot/shared';
 import { ExtensionError } from '#packages/common/errors/custom-errors';
 import { getExtensionConfigDefaultValue } from '/@/utils/helper';
 import type { ExtensionCommandConfigValuePayload } from '#packages/common/interface/extension.interface';
 import { safeStorage } from 'electron';
 import { nanoid } from 'nanoid';
-import type { ExtensionCredential } from '@repo/extension-core/src/client/manifest/manifest-credential';
+import type { ExtensionCredential } from '@alt-dot/extension-core/src/client/manifest/manifest-credential';
 import type { SQLiteColumn } from 'drizzle-orm/sqlite-core';
 
 const MAX_EXT_ERROR_AGE_DAY = 30;

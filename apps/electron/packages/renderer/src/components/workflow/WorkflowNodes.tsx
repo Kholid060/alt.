@@ -8,7 +8,7 @@ import {
   useUpdateNodeInternals,
 } from 'reactflow';
 import { WorkflowNodeErroHandlerAction } from '#common/interface/workflow.interface';
-import { UiList, UiTooltip } from '@repo/ui';
+import { UiList, UiTooltip } from '@alt-dot/ui';
 import UiExtensionIcon from '../ui/UiExtensionIcon';
 import type * as NodesType from '#packages/common/interface/workflow-nodes.interface';
 import { WORKFLOW_NODES } from '#common/utils/constant/workflow-nodes.const';

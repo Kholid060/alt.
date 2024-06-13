@@ -9,9 +9,9 @@ import type {
   WorkflowNodeHandlerExecuteReturn,
 } from './WorkflowNodeHandler';
 import ExtensionCommandRunner from '/@/extension/ExtensionCommandRunner';
-import { CommandLaunchBy } from '@repo/extension';
+import { CommandLaunchBy } from '@alt-dot/extension';
 import type { ExtensionCommandExecutePayloadWithData } from '#packages/common/interface/extension.interface';
-import type { ExtensionCommandArgument } from '@repo/extension-core';
+import type { ExtensionCommandArgument } from '@alt-dot/extension-core';
 import type { WorkflowRunnerBrowserContext } from '../runner/WorklowRunnerBrowser';
 
 type CommandDataWithPath = DatabaseExtensionCommandWithExtension & {

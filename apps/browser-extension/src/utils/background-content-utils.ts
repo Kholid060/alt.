@@ -1,4 +1,4 @@
-import { sleep, sleepWithRetry } from '@repo/shared';
+import { sleep, sleepWithRetry } from '@alt-dot/shared';
 import Browser from 'webextension-polyfill';
 
 async function isContentScriptInjected(tabId: number, frameId?: number) {

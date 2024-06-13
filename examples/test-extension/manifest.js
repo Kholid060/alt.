@@ -2,7 +2,7 @@ import packageJSON from './package.json' with { type: 'json' };
 
 const { author, name, description, version } = packageJSON;
 
-/** @type {import('@repo/extension').Manifest} */
+/** @type {import('@alt-dot/extension').Manifest} */
 export default {
   name,
   author,

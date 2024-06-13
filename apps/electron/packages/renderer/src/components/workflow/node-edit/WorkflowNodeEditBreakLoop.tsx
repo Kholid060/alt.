@@ -1,5 +1,5 @@
 import { WorkflowNodeBreakLoop } from '#packages/common/interface/workflow-nodes.interface';
-import { UiInput } from '@repo/ui';
+import { UiInput } from '@alt-dot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';

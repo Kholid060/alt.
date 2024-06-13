@@ -9,8 +9,8 @@ import {
 } from '#common/utils/message-port-renderer';
 import { MessagePortSharedCommandWindowEvents } from '#packages/common/interface/message-port-events.interface';
 import { debugLog } from '#packages/common/utils/helper';
-import { BetterMessagePortSync } from '@repo/shared';
-import { ExtensionMessagePortEvent } from '@repo/extension';
+import { BetterMessagePortSync } from '@alt-dot/shared';
+import { ExtensionMessagePortEvent } from '@alt-dot/extension';
 
 type CommandViewMessagePort = BetterMessagePortSync<ExtensionMessagePortEvent>;
 

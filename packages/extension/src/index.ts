@@ -1,10 +1,10 @@
-import { ExtensionManifest } from '@repo/extension-core/dist/index';
-import ExtensionAPI from '@repo/extension-core/types/extension-api';
+import { ExtensionManifest } from '@alt-dot/extension-core/dist/index';
+import ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
 
 type Manifest = Omit<ExtensionManifest, '$apiVersion'>;
 
-export { UiImage, UiList, UiInput, UiSelect, UiSwitch } from '@repo/ui';
-export type { UiListItem, UiListProps, UiListRef } from '@repo/ui';
+export { UiImage, UiList, UiInput, UiSelect, UiSwitch } from '@alt-dot/ui';
+export type { UiListItem, UiListProps, UiListRef } from '@alt-dot/ui';
 
 export { ExtIcon as UiExtIcon } from './components/ext-icon';
 

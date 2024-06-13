@@ -3,15 +3,15 @@ import type {
   ExtensionCommandExecutePayload,
   ExtensionCommandProcess,
 } from '#packages/common/interface/extension.interface';
-import type ExtensionAPI from '@repo/extension-core/types/extension-api';
+import type ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
 import ExtensionLoader from '../utils/extension/ExtensionLoader';
 import IPCMain from '../utils/ipc/IPCMain';
 import WindowCommand from '../window/command-window';
 import BrowserService from './browser.service';
 import DBService from './database/database.service';
-import type { ExtensionCommandType } from '@repo/extension-core';
+import type { ExtensionCommandType } from '@alt-dot/extension-core';
 import WindowSharedProcess from '../window/shared-process-window';
-import { CommandLaunchBy } from '@repo/extension';
+import { CommandLaunchBy } from '@alt-dot/extension';
 import { logger } from '../lib/log';
 import GlobalShortcut from '../utils/GlobalShortcuts';
 import WindowsManager from '../window/WindowsManager';

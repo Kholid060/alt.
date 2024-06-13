@@ -1,5 +1,5 @@
-import { BetterMessagePort, sleep } from '@repo/shared';
-import type { BetterMessagePortAsync } from '@repo/shared';
+import { BetterMessagePort, sleep } from '@alt-dot/shared';
+import type { BetterMessagePortAsync } from '@alt-dot/shared';
 import { ContentIframeEvents } from '@root/src/interface/content-iframe.interface';
 import Browser from 'webextension-polyfill';
 

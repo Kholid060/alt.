@@ -1,4 +1,4 @@
-import { CommandActions } from '@repo/extension';
+import { CommandActions } from '@alt-dot/extension';
 import {
   CopyIcon,
   GlobeIcon,

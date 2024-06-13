@@ -2,7 +2,7 @@ import type {
   KeyboardShortcutModifier,
   KeyboardShortcut,
   KeyboardShortcutKeys,
-} from '@repo/shared';
+} from '@alt-dot/shared';
 
 const VALID_SHORTCUT_KEYS_REGEX = /[0-9A-Za-z!-/~`{[\]|;:,.?=+<>\\()*$%^&,@_#]/;
 const ELECTRON_SHORTCUT_MOD_MAP: Record<KeyboardShortcutModifier, string> = {

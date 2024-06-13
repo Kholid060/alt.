@@ -2,7 +2,7 @@ import { Socket, io } from 'socket.io-client';
 import type {
   ExtensionWSClientToServerEvents,
   ExtensionWSServerToClientEvents,
-} from '@repo/shared';
+} from '@alt-dot/shared';
 import getBrowserInfo from '../utils/getBrowserInfo';
 import { websocketEventsListener } from './websocket.service-events';
 import EventEmitter from 'eventemitter3';

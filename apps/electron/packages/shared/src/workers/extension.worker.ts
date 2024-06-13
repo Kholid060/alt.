@@ -6,9 +6,9 @@ import type {
   CommandJSONViews,
   CommandLaunchContext,
   CommandViewJSONLaunchContext,
-} from '@repo/extension';
-import type { BetterMessagePortSync, EventMapEmit } from '@repo/shared';
-import { BetterMessagePort } from '@repo/shared';
+} from '@alt-dot/extension';
+import type { BetterMessagePortSync, EventMapEmit } from '@alt-dot/shared';
+import { BetterMessagePort } from '@alt-dot/shared';
 import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
 import type {
   ExtensionBrowserTabContext,

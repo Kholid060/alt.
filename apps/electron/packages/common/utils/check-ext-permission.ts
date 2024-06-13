@@ -1,5 +1,5 @@
-import type { EXTENSION_PERMISSIONS } from '@repo/extension-core';
-import type ExtensionAPI from '@repo/extension-core/types/extension-api';
+import type { EXTENSION_PERMISSIONS } from '@alt-dot/extension-core';
+import type ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
 import type { NestedKeyOf } from '../interface/utils.interface';
 import type { IPCUserExtensionCustomEventsMap } from '../interface/ipc-events.interface';
 

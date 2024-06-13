@@ -1,4 +1,4 @@
-import { isObject } from '@repo/shared';
+import { isObject } from '@alt-dot/shared';
 import { debugLog } from '#common/utils/helper';
 import type { ExtensionMessageHandler } from './ExtensionIPCEvent';
 import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';

@@ -1,12 +1,12 @@
-import { UiList, UiListItem } from '@repo/ui';
+import { UiList, UiListItem } from '@alt-dot/ui';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import { CpuIcon, WorkflowIcon } from 'lucide-react';
 import { useCommandPanelHeader } from '/@/hooks/useCommandPanelHeader';
 import { useEffect, useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '#packages/common/utils/helper';
-import { useUiListStore } from '@repo/ui/dist/context/list.context';
-import { UiExtIcon } from '@repo/extension';
+import { useUiListStore } from '@alt-dot/ui/dist/context/list.context';
+import { UiExtIcon } from '@alt-dot/extension';
 import { ExtensionCommandProcess } from '#packages/common/interface/extension.interface';
 import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
 import { SetRequired } from 'type-fest';

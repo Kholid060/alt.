@@ -1,8 +1,8 @@
-import type { CommandLaunchContext } from '@repo/extension';
+import type { CommandLaunchContext } from '@alt-dot/extension';
 import type {
   EXTENSION_CONFIG_TYPE,
   EXTENSION_PERMISSIONS,
-} from '@repo/extension-core';
+} from '@alt-dot/extension-core';
 import type { DatabaseExtensionCommandWithExtension } from '../../main/src/interface/database.interface';
 
 export type ExtensionConfigType = (typeof EXTENSION_CONFIG_TYPE)[number];

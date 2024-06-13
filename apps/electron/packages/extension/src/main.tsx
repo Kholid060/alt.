@@ -1,6 +1,6 @@
 import extViewRenderer from './utils/extViewRenderer';
-import { BetterMessagePort } from '@repo/shared';
-import type { ExtensionMessagePortEvent } from '@repo/extension/dist/interfaces/message-events';
+import { BetterMessagePort } from '@alt-dot/shared';
+import type { ExtensionMessagePortEvent } from '@alt-dot/extension/dist/interfaces/message-events';
 import type { ExtensionCommandViewInitMessage } from '#common/interface/extension.interface';
 
 async function onMessage({

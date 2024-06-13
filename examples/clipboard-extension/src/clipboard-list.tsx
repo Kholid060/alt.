@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { ChangeEvent, useEffect, useState } from 'react';
-import { UiList, commandRenderer, Extension, UiImage, UiInput, UiListItem, UiExtIcon } from '@repo/extension';
+import { UiList, commandRenderer, Extension, UiImage, UiInput, UiListItem, UiExtIcon } from '@alt-dot/extension';
 import ItemList from './components/ItemList';
 
 function CommandMain() {

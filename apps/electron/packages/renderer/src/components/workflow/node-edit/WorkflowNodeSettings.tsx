@@ -9,7 +9,7 @@ import {
   UiSwitch,
   UiTextarea,
   UiTooltip,
-} from '@repo/ui';
+} from '@alt-dot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import {
   WorkflowNodeErrorHandler as WorkflowNodeErrorHandlerType,

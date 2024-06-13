@@ -14,7 +14,7 @@ import {
   UiPopoverTrigger,
   UiSelect,
   useToast,
-} from '@repo/ui';
+} from '@alt-dot/ui';
 import {
   ArrowDownAzIcon,
   ArrowUpAzIcon,

@@ -11,7 +11,7 @@ import {
   UiTooltip,
   useDialog,
   useToast,
-} from '@repo/ui';
+} from '@alt-dot/ui';
 import {
   ChevronLeftIcon,
   CopyIcon,
@@ -30,7 +30,7 @@ import {
   useSearchParams,
 } from 'react-router-dom';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
-import { UiExtIcon } from '@repo/extension';
+import { UiExtIcon } from '@alt-dot/extension';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { DatabaseWorkflowUpdatePayload } from '#packages/main/src/interface/database.interface';

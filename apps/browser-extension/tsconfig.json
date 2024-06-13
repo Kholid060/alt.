@@ -10,6 +10,6 @@
       "virtual:reload-on-update-in-view": ["./src/global.d.ts"]
     }
   },
-  "extends": ["@repo/typescript-config/vite.json"],
+  "extends": ["@alt-dot/typescript-config/vite.json"],
   "include": ["src", "utils", "vite.config.ts", "node_modules/@types"]
 }

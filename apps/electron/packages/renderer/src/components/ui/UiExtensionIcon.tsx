@@ -1,6 +1,6 @@
 import { commandIcons } from '#common/utils/command-icons';
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
-import { UiImage } from '@repo/ui';
+import { UiImage } from '@alt-dot/ui';
 import { LucideIcon } from 'lucide-react';
 
 const iconPrefix = 'icon:';

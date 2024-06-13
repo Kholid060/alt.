@@ -2,7 +2,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import { Suspense, lazy, memo } from 'react';
 import { XIcon } from 'lucide-react';
-import { UiSkeleton } from '@repo/ui';
+import { UiSkeleton } from '@alt-dot/ui';
 import kebabCase from 'lodash-es/kebabCase';
 import WorkflowNodeLayoutEdit from '../node-edit/WorkflowNodeLayoutEdit';
 import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';

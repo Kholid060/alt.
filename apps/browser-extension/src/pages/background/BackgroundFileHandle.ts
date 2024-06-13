@@ -3,7 +3,7 @@ import {
   BetterMessagePortSend,
   BrowserSelectFileOptions,
   isObject,
-} from '@repo/shared';
+} from '@alt-dot/shared';
 import { nanoid } from 'nanoid';
 
 class BackgroundFileHandle {

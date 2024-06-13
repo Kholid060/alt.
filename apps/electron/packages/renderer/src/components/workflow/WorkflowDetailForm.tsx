@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { UiExtIcon } from '@repo/extension';
+import { UiExtIcon } from '@alt-dot/extension';
 import {
   UiForm,
   UiFormField,
@@ -9,7 +9,7 @@ import {
   UiInput,
   UiFormMessage,
   UiTextarea,
-} from '@repo/ui';
+} from '@alt-dot/ui';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import UiSelectIcon from '../ui/UiSelectIcon';

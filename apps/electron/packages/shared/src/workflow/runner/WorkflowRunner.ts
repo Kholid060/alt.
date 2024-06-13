@@ -13,7 +13,7 @@ import type WorkflowNodeHandler from '../node-handler/WorkflowNodeHandler';
 import type { DatabaseWorkflowDetail } from '#packages/main/src/interface/database.interface';
 import { WorkflowRunnerNodeError } from './workflow-runner-errors';
 import { debugLog } from '#packages/common/utils/helper';
-import { sleep } from '@repo/shared';
+import { sleep } from '@alt-dot/shared';
 import WorkflowRunnerData from './WorkflowRunnerData';
 import type { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
 import type { WorkflowNodeHandlerExecuteReturn } from '../node-handler/WorkflowNodeHandler';

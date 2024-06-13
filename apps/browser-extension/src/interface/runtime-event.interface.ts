@@ -1,10 +1,10 @@
-import type ExtensionAPI from '@repo/extension-core/types/extension-api';
+import type ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
 import {
   BrowserGetHTMLOptions,
   BrowserGetTextOptions,
   ExtensionBrowserElementSelector,
   KeyboardBrowserTypeOptions,
-} from '@repo/shared';
+} from '@alt-dot/shared';
 import Browser from 'webextension-polyfill';
 
 export interface RuntimeEvent {

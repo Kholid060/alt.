@@ -1,8 +1,8 @@
 import { ExtensionError } from '#packages/common/errors/custom-errors';
-import type ExtensionAPI from '@repo/extension-core/types/extension-api';
+import type ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
 import type { NativeImage } from 'electron';
 import { clipboard, nativeImage } from 'electron';
-import { Keyboard, KeyboardKey } from '@repo/native';
+import { Keyboard, KeyboardKey } from '@alt-dot/native';
 import ExtensionIPCEvent from '../ExtensionIPCEvent';
 import WindowCommand from '/@/window/command-window';
 

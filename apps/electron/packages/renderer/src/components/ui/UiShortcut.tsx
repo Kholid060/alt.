@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { UiKbd } from '@repo/ui';
+import { UiKbd } from '@alt-dot/ui';
 import { COMMAND_MOD_NAME_MAP } from '../../utils/constant/constant';
 import clsx from 'clsx';
 

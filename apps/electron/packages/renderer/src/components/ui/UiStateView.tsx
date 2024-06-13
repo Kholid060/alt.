@@ -1,6 +1,6 @@
 import { LucideIcon, PackageOpenIcon, TriangleAlertIcon } from 'lucide-react';
 import clsx from 'clsx';
-import { UiButton } from '@repo/ui';
+import { UiButton } from '@alt-dot/ui';
 
 type UiStateViewType = 'error' | 'empty';
 

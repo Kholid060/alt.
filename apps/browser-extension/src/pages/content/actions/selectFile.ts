@@ -1,4 +1,4 @@
-import { BrowserSelectFileOptions } from '@repo/shared';
+import { BrowserSelectFileOptions } from '@alt-dot/shared';
 
 export function selectFile(
   element: HTMLInputElement,

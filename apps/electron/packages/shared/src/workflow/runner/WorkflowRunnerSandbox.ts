@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { isObject } from '@repo/shared';
+import { isObject } from '@alt-dot/shared';
 import { getProperty, setProperty } from 'dot-prop';
 import type { QuickJSContext, QuickJSRuntime } from 'quickjs-emscripten';
 import { Scope, getQuickJS } from 'quickjs-emscripten';

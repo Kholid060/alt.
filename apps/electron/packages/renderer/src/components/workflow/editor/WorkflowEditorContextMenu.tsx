@@ -7,7 +7,7 @@ import {
   UiContextMenuSeparator,
   UiContextMenuShortcut,
   UiContextMenuTrigger,
-} from '@repo/ui';
+} from '@alt-dot/ui';
 import {
   WorkflowEditorOnEvent,
   WorkflowEditorContextMenuEventPayload,

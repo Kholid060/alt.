@@ -1,8 +1,8 @@
 import { WORKFLOW_MANUAL_TRIGGER_ID } from '#packages/common/utils/constant/workflow.const';
-import { UiList, UiListItemAction } from '@repo/ui';
+import { UiList, UiListItemAction } from '@alt-dot/ui';
 import { ListItemRenderDetail } from '/@/apps/command/routes/CommandList';
 import preloadAPI from '/@/utils/preloadAPI';
-import { UiExtIcon } from '@repo/extension';
+import { UiExtIcon } from '@alt-dot/extension';
 import { EditIcon, LinkIcon, WorkflowIcon } from 'lucide-react';
 import DeepLinkURL from '#packages/common/utils/DeepLinkURL';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';

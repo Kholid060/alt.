@@ -7,7 +7,7 @@
   },
   "plugins": ["drizzle"],
   "extends": [
-    "@repo/eslint-config/base.js"
+    "@alt-dot/eslint-config/base.js"
   ],
   "ignorePatterns": ["node_modules/**", "**/dist/**"],
   "rules": {

@@ -9,7 +9,7 @@ import {
   UiSelect,
   UiLabel,
   UiButton,
-} from '@repo/ui';
+} from '@alt-dot/ui';
 import WorkflowNodeSettings from './WorkflowNodeSettings';
 import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
 import { WORKFLOW_NODES } from '#common/utils/constant/workflow-nodes.const';

@@ -6,12 +6,12 @@ import {
   UiSelect,
   UiSwitch,
   UiTextarea,
-} from '@repo/ui';
+} from '@alt-dot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
-import { KeyboardModifiers, USKeyboard, USKeyboardKeys } from '@repo/shared';
+import { KeyboardModifiers, USKeyboard, USKeyboardKeys } from '@alt-dot/shared';
 import { IS_MAC_OS } from '/@/utils/constant/constant';
 
 const mouseActions: {
