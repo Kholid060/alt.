@@ -22,5 +22,9 @@
     "apps/*",
     "packages/*",
     "examples/*"
-  ]
+  ],
+  "dependencies": {
+    "@hookform/resolvers": "^3.6.0",
+    "react-hook-form": "^7.51.5"
+  }
 }

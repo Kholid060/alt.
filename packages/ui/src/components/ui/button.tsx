@@ -3,6 +3,7 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 import { cn } from '@/utils/cn';
+import { Loader2Icon } from 'lucide-react';
 
 const uiButtonVariants = cva(
   'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
@@ -38,17 +39,40 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof uiButtonVariants> {
   asChild?: boolean;
+  isLoading?: boolean;
 }
 
 const UiButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  (
+    {
+      className,
+      isLoading,
+      variant,
+      size,
+      children,
+      asChild = false,
+      ...props
+    },
+    ref,
+  ) => {
     const Comp = asChild ? Slot : 'button';
+
     return (
       <Comp
-        className={cn(uiButtonVariants({ variant, size, className }))}
+        className={cn(
+          uiButtonVariants({ variant, size, className }),
+          isLoading && !asChild && 'relative cursor-not-allowed',
+        )}
         ref={ref}
         {...props}
-      />
+      >
+        {children}
+        {!asChild && isLoading && (
+          <div className="absolute h-full w-full flex items-center cursor-default justify-center rounded-md bg-inherit bg-secondary">
+            <Loader2Icon className="animate-spin" />
+          </div>
+        )}
+      </Comp>
     );
   },
 );
