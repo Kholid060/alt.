@@ -26,13 +26,14 @@ const extensionAPIGetIconURL = (): Pick<
     `${CUSTOM_SCHEME.fileIcon}://${APP_ICON_DIR_PREFIX}/${appId}`,
 });
 
-function extensionAPISearchPanelEvent(
+function extensionAPISearchPanel(
   messagePort: CreateExtensionAPI['messagePort'],
 ): Pick<
   ExtensionAPIValues,
   | 'ui.searchPanel.onChanged'
   | 'ui.searchPanel.onKeydown'
   | 'ui.searchPanel.clearValue'
+  | 'ui.searchPanel.updatePlaceholder'
 > {
   const createEventListener = (
     key: 'extension:query-change' | 'extension:keydown-event',
@@ -54,6 +55,12 @@ function extensionAPISearchPanelEvent(
     'ui.searchPanel.onKeydown': createEventListener('extension:keydown-event'),
     'ui.searchPanel.clearValue': () => {
       messagePort.sendMessage('extension:query-clear-value');
+    },
+    'ui.searchPanel.updatePlaceholder': (placeholder) => {
+      messagePort.sendMessage(
+        'extension:query-update-placeholder',
+        placeholder,
+      );
     },
   };
 }
@@ -132,7 +139,7 @@ export function createExtensionAPI({
       values: {
         ...extensionAPIGetIconURL(),
         ...extensionAPIUiToast(messagePort),
-        ...extensionAPISearchPanelEvent(messagePort),
+        ...extensionAPISearchPanel(messagePort),
         ...extensionAPIBrowser(sendMessage),
         'browser.activeTab.get': () =>
           Promise.resolve(

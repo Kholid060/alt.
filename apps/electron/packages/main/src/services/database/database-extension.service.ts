@@ -252,6 +252,9 @@ class DBExtensionService {
       where(fields, operators) {
         return operators.eq(fields.extensionId, extensionId);
       },
+      orderBy(fields, operators) {
+        return operators.desc(fields.createdAt);
+      },
     });
   }
 
@@ -1008,6 +1011,8 @@ class DBExtensionService {
     ids: string[],
     tx?: Parameters<Parameters<typeof this.database.transaction>[0]>[0],
   ) {
+    if (ids.length === 0) return;
+
     const db = tx || this.database;
     await db
       .delete(commandsSchema)

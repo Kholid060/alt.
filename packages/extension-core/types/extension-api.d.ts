@@ -212,6 +212,9 @@ declare namespace ExtensionAPI.ui.searchPanel {
   };
 
   // @ext-api-value
+  export function updatePlaceholder(placeholder: string): void;
+
+  // @ext-api-value
   export function clearValue(): void;
 }
 

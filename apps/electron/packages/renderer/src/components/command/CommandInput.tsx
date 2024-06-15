@@ -366,9 +366,17 @@ function CommandInput() {
         uiListStore.setState('search', '');
       },
     );
+    const offUpdatePlaceholderListener = messagePort.event.on(
+      'extension:query-update-placeholder',
+      (placeholder) => {
+        if (!inputRef.current) return;
+        inputRef.current.placeholder = placeholder;
+      },
+    );
 
     return () => {
       offListener();
+      offUpdatePlaceholderListener();
     };
   }, [uiListStore, commandCtx.runnerMessagePort]);
 
