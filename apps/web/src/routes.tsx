@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { Outlet, createBrowserRouter } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import StorePage from './pages/StorePage';
 import AuthPage from './pages/auth/AuthPage';
@@ -7,6 +7,8 @@ import SettingsLayout from './pages/settings/SettingsLayout';
 import { AuthGuard, NoAuthGuard } from './components/auth/AuthGuard';
 import SettingsProfilePage from './pages/settings/SettingsProfilePage';
 import App from './App';
+import ExtensionsPage from './pages/extensions/ExtensionsPage';
+import ExtensionsNewPage from './pages/extensions/ExtensionsNewPage';
 
 const router = createBrowserRouter([
   {
@@ -22,20 +24,26 @@ const router = createBrowserRouter([
         element: <StorePage />,
       },
       {
-        path: '/auth',
-        element: (
-          <NoAuthGuard>
-            <AuthPage />
-          </NoAuthGuard>
-        ),
+        path: 'auth',
+        element: <NoAuthGuard element={AuthPage} />,
       },
       {
-        path: '/settings',
-        element: (
-          <AuthGuard>
-            <SettingsLayout />
-          </AuthGuard>
-        ),
+        path: 'devconsole',
+        element: <AuthGuard element={Outlet} />,
+        children: [
+          {
+            path: 'extensions',
+            element: <ExtensionsPage />,
+          },
+          {
+            path: 'extensions/new',
+            element: <ExtensionsNewPage />,
+          },
+        ],
+      },
+      {
+        path: 'settings',
+        element: <AuthGuard element={SettingsLayout} />,
         children: [
           {
             path: 'profile',

@@ -58,7 +58,9 @@ export default async function CommandMain(context: CommandLaunchContext) {
   //   subtitle: 'Hello worldo!!!',
   // });
 
-  await selectFile();
+  _extension.ui.searchPanel.updatePlaceholder('Placeholder...');
+
+  // await selectFile();
 
   // await authorizeCredential();
   // await _extension.runtime.config.openConfigPage('command');

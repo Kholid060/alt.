@@ -1,7 +1,6 @@
 {
   "name": "@alt-dot/extension-core",
-  "version": "0.0.0",
-  "license": "MIT",
+  "version": "0.0.1",
   "scripts": {
     "build": "yarn build:ext-api && tsup",
     "dev": "yarn build:ext-api && tsup --watch",
@@ -9,7 +8,7 @@
     "lint": "eslint . --ext js,mjs,cjs,ts,mts,cts,tsx"
   },
   "bin": {
-    "cliaa": "./bin/cli.js"
+    "altdot": "./bin/cli.js"
   },
   "type": "module",
   "main": "./dist/index.cjs",

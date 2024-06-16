@@ -10,7 +10,7 @@
     "lint": "eslint . --ext js,mjs,cjs,ts,mts,cts,tsx"
   },
   "bin": {
-    "cliaa": "../extension-core/bin/cli.js"
+    "altdot": "../extension-core/bin/cli.js"
   },
   "dependencies": {
     "@alt-dot/extension-core": "workspace:*",

@@ -4,6 +4,7 @@ import { createStoreSelectors } from '@/utils/store-utils';
 import { create } from 'zustand';
 
 interface UserStoreState {
+  state: 'fetching' | 'idle';
   profile: null | UserProfile;
 }
 interface UserStoreActions {
@@ -17,6 +18,7 @@ export type ProfileStore = UserStoreState & UserStoreActions;
 
 const initialData: UserStoreState = {
   profile: null,
+  state: 'fetching',
 };
 
 const useUserStoreBase = create<ProfileStore>((set, get) => ({
@@ -31,10 +33,15 @@ const useUserStoreBase = create<ProfileStore>((set, get) => ({
     set({ profile: { ...currentProfile, ...profile } });
   },
   async fetchProfile() {
-    const profile = await APIService.instance.getProfile();
-    set({ profile });
+    try {
+      const profile = await APIService.instance.getProfile();
+      set({ profile, state: 'idle' });
 
-    return profile;
+      return profile;
+    } catch (error) {
+      set({ state: 'idle' });
+      throw error;
+    }
   },
   $reset() {
     set({ ...initialData });

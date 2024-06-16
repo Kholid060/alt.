@@ -6,7 +6,12 @@ function hasNoUsername(profile: UserProfile) {
   return !profile.username && window.location.pathname !== '/settings/profile';
 }
 
-export function AuthGuard({ children }: { children: React.ReactNode }) {
+export function AuthGuard({
+  element: Element,
+  ...props
+}: {
+  element: React.FC;
+}) {
   const profile = useUserStore.use.profile();
 
   if (!profile) {
@@ -24,13 +29,18 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     return <Navigate to="/settings/profile?username=true" />;
   }
 
-  return children;
+  return <Element {...props} />;
 }
 
-export function NoAuthGuard({ children }: { children: React.ReactNode }) {
+export function NoAuthGuard({
+  element: Element,
+  ...props
+}: {
+  element: React.FC;
+}) {
   const profile = useUserStore.use.profile();
 
-  if (!profile) return children;
+  if (!profile) return <Element {...props} />;
   if (hasNoUsername(profile)) {
     return <Navigate to="/settings/profile?username=true" />;
   }

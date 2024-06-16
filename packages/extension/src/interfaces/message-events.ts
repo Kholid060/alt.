@@ -19,6 +19,7 @@ export interface ExtensionMessagePortEvent {
   ];
   'extension:query-clear-value': [];
   'extension:hide-toast': [toastId: string];
+  'extension:query-update-placeholder': [placeholder: string];
   'extension:finish-execute': [ExtensionExecutionFinishReason, string?];
 }
 

@@ -6,6 +6,9 @@ import { useUserStore } from './stores/user.store';
 import AppHeader from './components/app/AppHeader';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { UiToaster } from '@alt-dot/ui';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 function App() {
   const navigate = useNavigate();
@@ -27,19 +30,20 @@ function App() {
         setInitiated(true);
       }
     };
+    console.log(SupabaseService.instance);
     const stateChange = SupabaseService.instance.client.auth.onAuthStateChange(
       (event, session) => {
         switch (event) {
           case 'INITIAL_SESSION': {
-            APIService.instance.setSession(session);
+            APIService.instance.$setSession(session);
             fetchUserProfile(session);
             break;
           }
           case 'TOKEN_REFRESHED':
-            APIService.instance.setSession(session);
+            APIService.instance.$setSession(session);
             break;
           case 'SIGNED_OUT':
-            APIService.instance.setSession(null);
+            APIService.instance.$setSession(null);
             navigate('/', { replace: true });
             useUserStore.getState().setProfile(null);
             break;
@@ -53,11 +57,11 @@ function App() {
   }, [navigate]);
 
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <AppHeader />
       <UiToaster />
       {initiated && <Outlet />}
-    </>
+    </QueryClientProvider>
   );
 }
 

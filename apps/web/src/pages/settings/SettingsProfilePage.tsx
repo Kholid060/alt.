@@ -7,6 +7,7 @@ import {
   UiAvatarFallback,
   UiAvatarImage,
   UiButton,
+  UiButtonLoader,
   UiForm,
   UiFormControl,
   UiFormField,
@@ -22,7 +23,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useSearchParams } from 'react-router-dom';
-import APIService, { APIError } from '@/services/api.service';
+import APIService from '@/services/api.service';
+import { FetchError } from '@/utils/afetch';
 
 const profileSchema = z.object({
   name: z
@@ -59,8 +61,10 @@ function SettingsProfilePage() {
     try {
       const updatedProfile = await APIService.instance.updateProfile(values);
       updateProfile(updatedProfile);
+
+      form.reset(values);
     } catch (error) {
-      if (error instanceof APIError && error.data.statusCode === 422) {
+      if (error instanceof FetchError && error.data.statusCode === 422) {
         form.setError('username', {
           message: 'This username has been taken already',
         });
@@ -147,13 +151,13 @@ function SettingsProfilePage() {
             >
               Cancel
             </UiButton>
-            <UiButton
+            <UiButtonLoader
               type="submit"
               disabled={!form.formState.isDirty}
               isLoading={form.formState.isSubmitting}
             >
               Save changes
-            </UiButton>
+            </UiButtonLoader>
           </div>
         </form>
       </UiForm>

@@ -112,6 +112,7 @@ class ManifestUtils {
     this.seenExtIcon.clear();
 
     const extManifest = manifest.data;
+    extManifest.$apiVersion = (await this.getPackageJSON()).$apiVersion;
 
     await this.validateIcon(extManifest.icon);
     await Promise.all(

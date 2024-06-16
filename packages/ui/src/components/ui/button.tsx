@@ -39,10 +39,27 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof uiButtonVariants> {
   asChild?: boolean;
-  isLoading?: boolean;
 }
 
 const UiButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : 'button';
+
+    return (
+      <Comp
+        className={cn(uiButtonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      ></Comp>
+    );
+  },
+);
+UiButton.displayName = 'UiButton';
+
+const UiButtonLoader = React.forwardRef<
+  HTMLButtonElement,
+  ButtonProps & { isLoading?: boolean }
+>(
   (
     {
       className,
@@ -76,6 +93,6 @@ const UiButton = React.forwardRef<HTMLButtonElement, ButtonProps>(
     );
   },
 );
-UiButton.displayName = 'UiButton';
+UiButtonLoader.displayName = 'UiButtonLoader';
 
-export { UiButton, uiButtonVariants };
+export { UiButton, UiButtonLoader, uiButtonVariants };

@@ -1,5 +1,9 @@
 export type { ButtonProps } from './components/ui/button';
-export { UiButton, uiButtonVariants } from './components/ui/button';
+export {
+  UiButton,
+  UiButtonLoader,
+  uiButtonVariants,
+} from './components/ui/button';
 export { UiDialog } from './components/ui/dialog';
 export { UiScrollArea, UiScrollBar } from './components/ui/scroll-area';
 export { UiImage } from './components/ui/image';
@@ -136,6 +140,16 @@ export {
 } from './components/ui/alert';
 export { UiCheckbox } from './components/ui/checkbox';
 export { UiLogo } from './components/ui/logo';
+export { UiCodeEditor } from './components/ui/code-editor';
+export {
+  UiBreadcrumb,
+  UiBreadcrumbList,
+  UiBreadcrumbItem,
+  UiBreadcrumbLink,
+  UiBreadcrumbPage,
+  UiBreadcrumbSeparator,
+  UiBreadcrumbEllipsis,
+} from './components/ui/breadcrumb';
 
 export { DialogProvider, useDialog } from './context/dialog.context';
 export type { DialogConfirmOptions } from './context/dialog.context';
