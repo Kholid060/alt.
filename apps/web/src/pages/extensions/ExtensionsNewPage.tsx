@@ -1,6 +1,5 @@
 import GithubAPIService from '@/services/api/github-api.service';
-import { afetch } from '@/utils/afetch';
-import { UiExtIcon } from '@alt-dot/extension';
+import { FetchError, afetch } from '@/utils/afetch';
 import { ExtensionManifest } from '@alt-dot/extension-core';
 import { isObject } from '@alt-dot/shared';
 import {
@@ -11,13 +10,13 @@ import {
   UiBreadcrumbPage,
   UiBreadcrumbSeparator,
   UiButton,
+  UiButtonLoader,
   UiDropdownMenu,
   UiDropdownMenuContent,
   UiDropdownMenuItem,
   UiDropdownMenuLabel,
   UiDropdownMenuSeparator,
   UiDropdownMenuTrigger,
-  UiImage,
   UiInput,
   UiLabel,
   UiSkeleton,
@@ -25,58 +24,42 @@ import {
   UiTabsContent,
   UiTabsList,
   UiTabsTrigger,
+  useDialog,
+  useToast,
 } from '@alt-dot/ui';
 import { useQuery } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
-import { Link, Location, Navigate, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import {
+  Link,
+  Location,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from 'react-router-dom';
 import { z } from 'zod';
 import Markdown from 'markdown-to-jsx';
 import { FileIcon, PlusIcon, XCircleIcon } from 'lucide-react';
 import UiHighlight from '@/components/ui/UiHighlight';
 import { EXTENSION_CATEGORIES } from '@/utils/constant';
+import { ExtensionNewProvider } from '@/context/extension-new.context';
+import {
+  useExtensionNewCtx,
+  useExtensionNewStore,
+} from '@/hooks/useExtensionNewStore';
+import { useShallow } from 'zustand/react/shallow';
+import APIService from '@/services/api.service';
+import ExtensionIcon from '@/components/extension/ExtensionIcon';
 
-const extensionNewPayload = z.object({
-  manifest: z.custom<ExtensionManifest>((data) => isObject(data)),
-  repo: z.object({
-    url: z.string(),
-    name: z.string(),
-    owner: z.string(),
-    branch: z.string(),
-  }),
-});
-export type ExtensionNewPayload = z.infer<typeof extensionNewPayload>;
-
-function ExtensionIcon({
-  iconUrl,
-  manifest,
-}: ExtensionNewPayload & { iconUrl: string }) {
-  if (manifest.icon.startsWith('icon:')) {
-    const Icon =
-      UiExtIcon[manifest.icon.split(':')[1] as keyof typeof UiExtIcon] ??
-      UiExtIcon.Command;
-
-    return (
-      <div className="p-2 rounded-lg border bg-card border-border/40 text-muted-foreground">
-        <Icon className="size-8" />
-      </div>
-    );
-  }
-
-  return (
-    <UiImage src={iconUrl} className="size-9" alt={`${manifest.title} icon`} />
+function ExtensionReadme() {
+  const [repo, getAssetURL] = useExtensionNewStore(
+    useShallow((state) => [state.repo, state.getAssetURL]),
   );
-}
-
-function ExtensionReadme({
-  repo,
-  readmeUrl,
-}: ExtensionNewPayload & { readmeUrl: string }) {
   const query = useQuery({
     refetchOnMount: false,
     refetchInterval: false,
     queryKey: ['assets', repo.owner, repo.name],
     queryFn: () =>
-      afetch<string>(readmeUrl, {
+      afetch<string>(getAssetURL('/README.md'), {
         responseType: 'text',
         headers: { 'Content-Type': 'text/plain' },
       }),
@@ -121,10 +104,17 @@ function ExtensionReadme({
 }
 
 const BANNER_NAME_REGEX = /banner-[0-9]*.png/;
-function ExtensionDetail({
-  repo,
-  assetBaseURL,
-}: ExtensionNewPayload & { assetBaseURL: string }) {
+function ExtensionDetail() {
+  const [repo, baseAssetURL, banners, categories, updateState] =
+    useExtensionNewStore(
+      useShallow((state) => [
+        state.repo,
+        state.baseAssetURL,
+        state.banners,
+        state.categories,
+        state.updateState,
+      ]),
+    );
   const query = useQuery({
     refetchOnMount: false,
     refetchInterval: false,
@@ -133,20 +123,21 @@ function ExtensionDetail({
       GithubAPIService.instance.getRepoContents(repo.owner, repo.name, 'dist'),
   });
 
-  const [categories, setCategories] = useState<string[]>([]);
-
-  const banners = useMemo(
-    () =>
-      Array.isArray(query.data)
-        ? query.data
-            .filter(
-              (item) =>
-                item.type === 'file' && BANNER_NAME_REGEX.test(item.name),
-            )
-            .slice(0, 10)
-        : [],
-    [query.data],
-  );
+  useEffect(() => {
+    const bannersFiles = Array.isArray(query.data)
+      ? query.data
+          .filter(
+            (item) => item.type === 'file' && BANNER_NAME_REGEX.test(item.name),
+          )
+          .slice(0, 10)
+      : [];
+    if (bannersFiles.length > 0) {
+      updateState(
+        'banners',
+        bannersFiles.map((file) => `${baseAssetURL}/${file.path}`),
+      );
+    }
+  }, [query.data, baseAssetURL, updateState]);
 
   return (
     <div className="md:grid grid-cols-12 items-start max-w-3xl gap-x-4 gap-y-8">
@@ -178,13 +169,13 @@ function ExtensionDetail({
         ) : (
           banners.map((banner) => (
             <div
-              key={banner.name}
+              key={banner}
               className="aspect-video h-20 w-full rounded-md border-2 bg-card overflow-hidden"
             >
               <img
-                alt={banner.name}
+                alt={banner}
+                src={banner}
                 className="object-cover object-center w-full h-full"
-                src={`${assetBaseURL}/${banner.path}`}
               />
             </div>
           ))
@@ -197,13 +188,16 @@ function ExtensionDetail({
         {categories.map((category) => (
           <span
             key={category}
-            className="py-1.5 px-3 rounded-full border text-sm inline-flex items-center"
+            className="py-1.5 px-3 cursor-default rounded-full border text-sm inline-flex items-center"
           >
             {category}
             <XCircleIcon
-              className="text-muted-foreground size-5 ml-2 cursor-pointer"
+              className="text-muted-foreground size-5 ml-2 -mr-1 cursor-pointer"
               onClick={() =>
-                setCategories(categories.filter((item) => item !== category))
+                updateState(
+                  'categories',
+                  categories.filter((item) => item !== category),
+                )
               }
             />
           </span>
@@ -222,7 +216,9 @@ function ExtensionDetail({
               categories.includes(item) ? null : (
                 <UiDropdownMenuItem
                   key={item}
-                  onClick={() => setCategories([...categories, item])}
+                  onClick={() =>
+                    updateState('categories', [...categories, item])
+                  }
                 >
                   {item}
                 </UiDropdownMenuItem>
@@ -235,9 +231,9 @@ function ExtensionDetail({
   );
 }
 
-function ExtensionManifestView({
-  manifest,
-}: Pick<ExtensionNewPayload, 'manifest'>) {
+function ExtensionManifestView() {
+  const manifest = useExtensionNewStore((state) => state.manifest);
+
   return (
     <div className="whitespace-pre-wrap rounded-lg border bg-card p-4 text-sm">
       <UiHighlight code={JSON.stringify(manifest, null, 4)} />
@@ -245,97 +241,162 @@ function ExtensionManifestView({
   );
 }
 
-function ExtensionsPage() {
-  const location = useLocation() as Location<{
-    sourceUrl: string;
-    branchName: string;
-    manifest: ExtensionManifest;
-  }>;
-
-  const state = useMemo(
-    () => extensionNewPayload.safeParse(location.state),
-    [location.state],
+function ExtensionsNewHeader() {
+  const [manifest, repo, getAssetURL] = useExtensionNewStore(
+    useShallow((state) => [state.manifest, state.repo, state.getAssetURL]),
   );
 
-  if (!state.success) {
-    return <Navigate to="/devconsole/extensions" replace />;
+  const dialog = useDialog();
+  const { toast } = useToast();
+  const navigate = useNavigate();
+  const newExtStoreCtx = useExtensionNewCtx();
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function submitExtension() {
+    try {
+      setIsSubmitting(true);
+      const confirmed = await dialog.confirm({
+        okText: 'Submit',
+        title: 'Submit extension',
+        body: 'Submit the extension for review. The extension will be published once it is approved',
+      });
+      if (!confirmed) return;
+
+      const { banners, categories } = newExtStoreCtx.getState();
+      const result = await APIService.instance.createExtension({
+        banners,
+        categories,
+        name: manifest.name,
+        sourceUrl: repo.url,
+        title: manifest.title,
+        iconUrl: manifest.icon.startsWith('icon:')
+          ? manifest.icon
+          : getAssetURL(`/dist/icon/${manifest.icon}.png`),
+        version: manifest.version,
+        apiVersion: manifest.$apiVersion,
+        description: manifest.description,
+        commands: manifest.commands.map((command) => ({
+          name: command.name,
+          title: command.title,
+          description: command.description ?? '',
+        })),
+      });
+
+      navigate(`/devconsole/extensions/${result.extensionId}`);
+    } catch (error) {
+      console.error(error);
+
+      let message = 'Something went wrong!';
+      if (FetchError.isFetchError(error)) {
+        message =
+          error.status === 404
+            ? 'Couldn\'t find the extension "manifest.json" file'
+            : error.message || error.statusText;
+      }
+      toast({
+        description: message,
+        variant: 'destructive',
+        title: 'Error when submitting extension',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
-  const { manifest, repo } = state.data;
-  const getAssetURL = GithubAPIService.getRawURL(
-    `${repo.owner}/${repo.name}/${repo.branch}`,
-    true,
-  );
-
-  console.log(manifest, repo);
-
-  const extensionIcon = (
-    <ExtensionIcon
-      repo={repo}
-      manifest={manifest}
-      iconUrl={getAssetURL(`/dist/icon/${manifest.icon}.png`)}
-    />
-  );
-
   return (
-    <div className="pt-28 container">
-      <UiBreadcrumb>
-        <UiBreadcrumbList>
-          <UiBreadcrumbItem>
-            <UiBreadcrumbLink asChild>
-              <Link to="/devconsole/extensions">Manage extensions</Link>
-            </UiBreadcrumbLink>
-          </UiBreadcrumbItem>
-          <UiBreadcrumbSeparator />
-          <UiBreadcrumbItem>
-            <UiBreadcrumbPage>New extension</UiBreadcrumbPage>
-          </UiBreadcrumbItem>
-        </UiBreadcrumbList>
-      </UiBreadcrumb>
-      <div className="flex items-center mt-8">
-        {extensionIcon}
-        <div className="ml-4 flex-grow">
-          <h2 className="text-2xl font-semibold cursor-default leading-tight">
-            {manifest.title}
-          </h2>
-          <p className="text-sm text-muted-foreground leading-tight line-clamp-1">
-            {manifest.description}
-          </p>
-        </div>
-        <UiButton className="ml-4">Submit</UiButton>
+    <div className="flex items-center mt-8">
+      <ExtensionIcon
+        icon={manifest.icon}
+        title={manifest.title}
+        svgClass="size-8"
+        imageClass="size-9"
+        iconUrl={getAssetURL(`/dist/icon/${manifest.icon}.png`)}
+      />
+      <div className="ml-4 flex-grow">
+        <h2 className="text-2xl font-semibold cursor-default leading-tight">
+          {manifest.title}
+        </h2>
+        <p className="text-sm text-muted-foreground leading-tight line-clamp-1">
+          {manifest.description}
+        </p>
       </div>
-      <UiTabs className="mt-4 pb-24" variant="line" defaultValue="detail">
-        <UiTabsList>
-          <UiTabsTrigger value="detail" className="min-w-24">
-            Detail
-          </UiTabsTrigger>
-          <UiTabsTrigger value="manifest" className="min-w-24">
-            Manifest
-          </UiTabsTrigger>
-          <UiTabsTrigger value="readme" className="min-w-24">
-            Readme
-          </UiTabsTrigger>
-        </UiTabsList>
-        <UiTabsContent value="detail" className="pt-4">
-          <ExtensionDetail
-            manifest={manifest}
-            repo={repo}
-            assetBaseURL={getAssetURL('')}
-          />
-        </UiTabsContent>
-        <UiTabsContent value="manifest" className="pt-4">
-          <ExtensionManifestView manifest={manifest} />
-        </UiTabsContent>
-        <UiTabsContent value="readme" className="pt-4">
-          <ExtensionReadme
-            repo={repo}
-            manifest={manifest}
-            readmeUrl={getAssetURL('/README.md')}
-          />
-        </UiTabsContent>
-      </UiTabs>
+      <UiButtonLoader
+        className="ml-4"
+        isLoading={isSubmitting}
+        onClick={submitExtension}
+      >
+        Submit
+      </UiButtonLoader>
     </div>
   );
 }
 
-export default ExtensionsPage;
+const extensionNewPayload = z.object({
+  manifest: z.custom<ExtensionManifest>((data) => isObject(data)),
+  repo: z.object({
+    url: z.string(),
+    name: z.string(),
+    owner: z.string(),
+    branch: z.string(),
+  }),
+});
+export type ExtensionNewPayload = z.infer<typeof extensionNewPayload>;
+
+function ExtensionsNewPage() {
+  const location = useLocation() as Location<ExtensionNewPayload>;
+  const payload = extensionNewPayload.safeParse(location.state);
+
+  if (!payload.success) {
+    return <Navigate to="/devconsole/extensions" replace />;
+  }
+
+  const baseAssetUrl = GithubAPIService.getRawURL(
+    `${payload.data.repo.owner}/${payload.data.repo.name}/${payload.data.repo.branch}`,
+  );
+
+  return (
+    <ExtensionNewProvider {...{ ...payload.data, baseAssetURL: baseAssetUrl }}>
+      <div className="pt-28 container">
+        <UiBreadcrumb>
+          <UiBreadcrumbList>
+            <UiBreadcrumbItem>
+              <UiBreadcrumbLink asChild>
+                <Link to="/devconsole/extensions">Manage extensions</Link>
+              </UiBreadcrumbLink>
+            </UiBreadcrumbItem>
+            <UiBreadcrumbSeparator />
+            <UiBreadcrumbItem>
+              <UiBreadcrumbPage>New extension</UiBreadcrumbPage>
+            </UiBreadcrumbItem>
+          </UiBreadcrumbList>
+        </UiBreadcrumb>
+        <ExtensionsNewHeader />
+        <UiTabs className="mt-4 pb-24" variant="line" defaultValue="detail">
+          <UiTabsList>
+            <UiTabsTrigger value="detail" className="min-w-24">
+              Detail
+            </UiTabsTrigger>
+            <UiTabsTrigger value="manifest" className="min-w-24">
+              Manifest
+            </UiTabsTrigger>
+            <UiTabsTrigger value="readme" className="min-w-24">
+              Readme
+            </UiTabsTrigger>
+          </UiTabsList>
+          <UiTabsContent value="detail" className="pt-4">
+            <ExtensionDetail />
+          </UiTabsContent>
+          <UiTabsContent value="manifest" className="pt-4">
+            <ExtensionManifestView />
+          </UiTabsContent>
+          <UiTabsContent value="readme" className="pt-4">
+            <ExtensionReadme />
+          </UiTabsContent>
+        </UiTabs>
+      </div>
+    </ExtensionNewProvider>
+  );
+}
+
+export default ExtensionsNewPage;

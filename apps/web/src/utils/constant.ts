@@ -1,5 +1,7 @@
 export const EXTENSION_CATEGORIES = [
+  'Applications',
   'Automation',
-  'Productivity',
   'Developer Tools',
+  'Productivity',
+  'Web',
 ] as const;

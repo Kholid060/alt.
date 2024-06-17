@@ -39,6 +39,10 @@ const router = createBrowserRouter([
             path: 'extensions/new',
             element: <ExtensionsNewPage />,
           },
+          {
+            path: 'extensions/:name',
+            element: <ExtensionsNewPage />,
+          },
         ],
       },
       {

@@ -31,8 +31,9 @@ export class FetchError extends Error {
   }
 }
 
-interface ARequestInit extends RequestInit {
+export interface ARequestInit extends RequestInit {
   auth?: string;
+  headers?: Record<string, string>;
   responseType?: 'json' | 'blob' | 'formData' | 'text';
 }
 
@@ -47,7 +48,7 @@ export async function afetch<T = unknown>(
     init &&
     init.method !== 'GET' &&
     !(init.body instanceof FormData) &&
-    !request.headers.has('content-type')
+    !init.headers?.['Content-Type']
   ) {
     request.headers.set('Content-Type', 'application/json');
   }

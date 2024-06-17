@@ -1,6 +1,11 @@
 import { Session } from '@supabase/supabase-js';
 import { UserProfile } from '@/interface/user.interface';
-import { FetchError, afetch } from '@/utils/afetch';
+import { ARequestInit, FetchError, afetch } from '@/utils/afetch';
+import {
+  ExtensionCreatePayload,
+  Extension,
+  ExtensionUserListItem,
+} from '@/interface/extension.interface';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -21,7 +26,7 @@ class APIService {
 
   async authorizeFetch<T = unknown>(
     path: string,
-    init: RequestInit & { isPublic?: boolean } = {},
+    init: ARequestInit & { isPublic?: boolean } = {},
   ): Promise<T> {
     if (!this.session && !init?.isPublic) throw new Error('Unauthorized');
 
@@ -48,6 +53,27 @@ class APIService {
       method: 'PATCH',
       body: JSON.stringify(profile),
     });
+  }
+
+  createExtension(extensionPayload: ExtensionCreatePayload) {
+    return this.authorizeFetch<{ extensionId: string }>('/me/extensions', {
+      method: 'POST',
+      body: JSON.stringify(extensionPayload),
+    });
+  }
+
+  listMeExtensions() {
+    return this.authorizeFetch<ExtensionUserListItem[]>('/me/extensions');
+  }
+
+  getMeExtension(id: string) {
+    return this.authorizeFetch<Extension>(`/me/extensions/${id}`);
+  }
+
+  meExtensionExists(name: string) {
+    return this.authorizeFetch<{ isExists: boolean }>(
+      `/me/extensions?name=${name}`,
+    ).then((result) => result.isExists);
   }
 }
 

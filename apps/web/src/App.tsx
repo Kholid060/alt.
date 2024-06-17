@@ -5,7 +5,7 @@ import { Session } from '@supabase/supabase-js';
 import { useUserStore } from './stores/user.store';
 import AppHeader from './components/app/AppHeader';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { UiToaster } from '@alt-dot/ui';
+import { DialogProvider, UiToaster } from '@alt-dot/ui';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const queryClient = new QueryClient();
@@ -30,9 +30,10 @@ function App() {
         setInitiated(true);
       }
     };
-    console.log(SupabaseService.instance);
+
     const stateChange = SupabaseService.instance.client.auth.onAuthStateChange(
       (event, session) => {
+        console.log(event);
         switch (event) {
           case 'INITIAL_SESSION': {
             APIService.instance.$setSession(session);
@@ -58,9 +59,11 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AppHeader />
-      <UiToaster />
-      {initiated && <Outlet />}
+      <DialogProvider>
+        <AppHeader />
+        <UiToaster />
+        {initiated && <Outlet />}
+      </DialogProvider>
     </QueryClientProvider>
   );
 }
