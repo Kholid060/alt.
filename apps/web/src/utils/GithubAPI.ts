@@ -1,4 +1,4 @@
-import { afetch } from '@/utils/afetch';
+import { ARequestInit, afetch } from '@/utils/afetch';
 
 const GITHUB_API_BASE_URL = 'https://api.github.com';
 const GITHUB_RAW_BASE_URL = 'https://raw.githubusercontent.com/';
@@ -16,8 +16,8 @@ export interface GithubRepoContent {
   download_url: string;
 }
 
-class GithubAPIService {
-  static instance = new GithubAPIService();
+class GithubAPI {
+  static instance = new GithubAPI();
 
   static getRawURL(path: string, isBase?: false): string;
   static getRawURL(path: string, isBase: true): (path: string) => string;
@@ -32,7 +32,7 @@ class GithubAPIService {
     return `${GITHUB_RAW_BASE_URL}${path}`;
   }
 
-  fetch<T = unknown>(path: string, init?: RequestInit) {
+  fetch<T = unknown>(path: string, init?: ARequestInit) {
     return afetch<T>(`${GITHUB_API_BASE_URL}${path}`, init);
   }
 
@@ -43,4 +43,4 @@ class GithubAPIService {
   }
 }
 
-export default GithubAPIService;
+export default GithubAPI;

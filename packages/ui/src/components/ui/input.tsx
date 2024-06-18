@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { cn } from '@/utils/cn';
 import { VariantProps, cva } from 'class-variance-authority';
+import clsx from 'clsx';
 
 const uiUiInputVariants = cva('', {
   variants: {
@@ -18,6 +19,7 @@ const uiUiInputVariants = cva('', {
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement>,
     VariantProps<typeof uiUiInputVariants> {
+  wrapperClass?: string;
   prefixIcon?: JSX.Element;
   suffixIcon?: JSX.Element;
   onValueChange?: (value: string) => void;
@@ -31,6 +33,7 @@ const UiInput = React.forwardRef<HTMLInputElement, InputProps>(
       className,
       prefixIcon,
       suffixIcon,
+      wrapperClass,
       onChange,
       onValueChange,
       ...props
@@ -39,7 +42,7 @@ const UiInput = React.forwardRef<HTMLInputElement, InputProps>(
   ) => {
     if (prefixIcon || suffixIcon) {
       return (
-        <div className="relative inline-block h-10">
+        <div className={clsx('relative inline-block h-10', wrapperClass)}>
           {prefixIcon && (
             <span className="absolute left-3 top-1/2 -translate-y-1/2 transform text-muted-foreground">
               {prefixIcon}

@@ -1,28 +1,25 @@
 import { Session } from '@supabase/supabase-js';
-import { UserProfile } from '@/interface/user.interface';
 import { ARequestInit, FetchError, afetch } from '@/utils/afetch';
-import {
-  ExtensionCreatePayload,
-  Extension,
-  ExtensionUserListItem,
-} from '@/interface/extension.interface';
+import APIMeNamespace from './api/api-me.namespace';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 class APIService {
   static instance = new APIService();
 
-  private session: Session | null = null;
-
-  constructor() {}
-
-  static getErrorMessage(error: unknown) {
-    if (error instanceof FetchError) {
-      return error.data.message || error.data.error || error.statusText;
+  static getErrorMessage(error: unknown, byStatus?: Record<number, string>) {
+    if (!FetchError.isFetchError(error)) {
+      return 'Something went wrong!';
     }
 
-    return 'Something went wrong!';
+    if (byStatus && byStatus[error.status]) return byStatus[error.status];
+
+    return error.data.message || error.data.error || error.statusText;
   }
+
+  private session: Session | null = null;
+
+  me = new APIMeNamespace(this);
 
   async authorizeFetch<T = unknown>(
     path: string,
@@ -42,38 +39,6 @@ class APIService {
 
   $getSession() {
     return this.session;
-  }
-
-  getProfile() {
-    return this.authorizeFetch<UserProfile | null>('/me');
-  }
-
-  updateProfile(profile: Partial<Pick<UserProfile, 'name' | 'username'>>) {
-    return this.authorizeFetch<UserProfile>('/me', {
-      method: 'PATCH',
-      body: JSON.stringify(profile),
-    });
-  }
-
-  createExtension(extensionPayload: ExtensionCreatePayload) {
-    return this.authorizeFetch<{ extensionId: string }>('/me/extensions', {
-      method: 'POST',
-      body: JSON.stringify(extensionPayload),
-    });
-  }
-
-  listMeExtensions() {
-    return this.authorizeFetch<ExtensionUserListItem[]>('/me/extensions');
-  }
-
-  getMeExtension(id: string) {
-    return this.authorizeFetch<Extension>(`/me/extensions/${id}`);
-  }
-
-  meExtensionExists(name: string) {
-    return this.authorizeFetch<{ isExists: boolean }>(
-      `/me/extensions?name=${name}`,
-    ).then((result) => result.isExists);
   }
 }
 

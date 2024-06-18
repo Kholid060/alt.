@@ -15,7 +15,7 @@ import {
   UiSkeleton,
 } from '@alt-dot/ui';
 import {
-  BlocksIcon,
+  CodeIcon,
   LogInIcon,
   LogOutIcon,
   SettingsIcon,
@@ -77,8 +77,8 @@ function AppHeader() {
                     )}
                     <UiDropdownMenuItem asChild>
                       <Link to="/devconsole/extensions">
-                        <BlocksIcon className="size-4 mr-2" />
-                        Manage extensions
+                        <CodeIcon className="size-4 mr-2" />
+                        Developer dashboard
                       </Link>
                     </UiDropdownMenuItem>
                   </UiDropdownMenuGroup>

@@ -1,10 +1,24 @@
+import {
+  EXTENSION_CATEGORIES,
+  EXTENSION_PERMISSIONS,
+  ExtensionCommandType,
+} from '@alt-dot/extension-core';
+
 export interface ExtensionCommand {
   name: string;
   title: string;
-  description: string;
+  description?: string;
+  type: ExtensionCommandType;
 }
 
 export type ExtensionStatus = 'in-review' | 'rejected' | 'published';
+export type ExtensionCategories = (typeof EXTENSION_CATEGORIES)[number];
+export type ExtensionPermissions = (typeof EXTENSION_PERMISSIONS)[number];
+
+export interface ExtensionEntry {
+  status: ExtensionStatus;
+  rejectReason: string | null;
+}
 
 export interface Extension {
   id: string;
@@ -18,12 +32,12 @@ export interface Extension {
   updatedAt: string;
   apiVersion: string;
   description: string;
-  categories: string[];
   isPublished: boolean;
-  rejectReason: string;
   downloadCount: number;
-  status: ExtensionStatus;
+  entry: ExtensionEntry | null;
   commands: ExtensionCommand[];
+  categories: ExtensionCategories[];
+  permissions?: ExtensionPermissions[];
 }
 
 export type ExtensionCreatePayload = Pick<
@@ -37,6 +51,7 @@ export type ExtensionCreatePayload = Pick<
   | 'sourceUrl'
   | 'apiVersion'
   | 'categories'
+  | 'permissions'
   | 'description'
 >;
 
@@ -44,7 +59,6 @@ export type ExtensionListItem = Pick<
   Extension,
   | 'id'
   | 'title'
-  | 'status'
   | 'iconUrl'
   | 'version'
   | 'createdAt'
@@ -52,5 +66,19 @@ export type ExtensionListItem = Pick<
   | 'downloadCount'
 >;
 
+export type ExtensionDetail = ExtensionListItem &
+  Pick<
+    Extension,
+    | 'banners'
+    | 'commands'
+    | 'sourceUrl'
+    | 'categories'
+    | 'permissions'
+    | 'description'
+  >;
+
 export type ExtensionUserListItem = ExtensionListItem &
-  Pick<Extension, 'isPublished'>;
+  Pick<Extension, 'entry'>;
+
+export type ExtensionUserDetail = ExtensionDetail &
+  Pick<Extension, 'entry' | 'isPublished'>;

@@ -100,40 +100,42 @@ async function buildCommands(watch = false) {
     ],
   };
 
-  const buildResult = await build(config);
-  if ('close' in buildResult) {
-    watcher = buildResult;
-    watcher.on('change', async (id, change) => {
-      if (change.event !== 'update') return;
+  if (Object.keys(commands).length > 0) {
+    const buildResult = await build(config);
+    if ('close' in buildResult) {
+      watcher = buildResult;
+      watcher.on('change', async (id, change) => {
+        if (change.event !== 'update') return;
 
-      if (id === packageJSONPath) {
-        const currentManifest = await manifestUtils.getExtensionManifest();
-        const newCommands = new Set(
-          currentManifest.commands.map((command) => command.name),
-        );
+        if (id === packageJSONPath) {
+          const currentManifest = await manifestUtils.getExtensionManifest();
+          const newCommands = new Set(
+            currentManifest.commands.map((command) => command.name),
+          );
 
-        let restartWatch = newCommands.size !== commandIds.size;
-        if (!restartWatch) {
-          restartWatch = [...commandIds].every((id) => newCommands.has(id));
+          let restartWatch = newCommands.size !== commandIds.size;
+          if (!restartWatch) {
+            restartWatch = [...commandIds].every((id) => newCommands.has(id));
+          }
+
+          await manifestUtils.writeManifestFile(currentManifest);
+
+          if (!restartWatch) return;
+
+          console.log('Restart watcher');
+
+          watcher?.close();
+          buildExtension(watch);
+          return;
         }
 
-        await manifestUtils.writeManifestFile(currentManifest);
-
-        if (!restartWatch) return;
-
-        console.log('Restart watcher');
-
-        watcher?.close();
-        buildExtension(watch);
-        return;
-      }
-
-      if (scriptsPath.has(id)) {
-        const scriptFilename = path.basename(id);
-        console.log(`Updating "${scriptFilename}" script`);
-        await fs.copy(id, path.join(OUT_DIR, scriptFilename));
-      }
-    });
+        if (scriptsPath.has(id)) {
+          const scriptFilename = path.basename(id);
+          console.log(`Updating "${scriptFilename}" script`);
+          await fs.copy(id, path.join(OUT_DIR, scriptFilename));
+        }
+      });
+    }
   }
 
   await copyScripts();

@@ -3,6 +3,16 @@ import { ExtensionCredentialSchema } from './manifest-credential';
 
 export const URL_FRIENDLY_REGEX = /^[a-zA-Z0-9_-]*$/;
 
+export const EXTENSION_CATEGORIES = [
+  'Applications',
+  'Automation',
+  'Developer Tools',
+  'Productivity',
+  'Scripts',
+  'Web',
+  'Other',
+] as const;
+
 export const EXTENSION_PERMISSIONS = [
   'fs',
   'shell',
@@ -141,11 +151,20 @@ export const ExtensionManifestSchema = z.object({
   description: z.string().min(12).max(128),
   commands: ExtensionCommandSchema.array().min(1),
   config: ExtensionConfigSchema.array().optional(),
+  categories: z
+    .enum(EXTENSION_CATEGORIES)
+    .array()
+    .min(1, {
+      message: `Extension must have at least one category.\nAvailable categories: ${EXTENSION_CATEGORIES.join(',')}`,
+    }),
   credentials: ExtensionCredentialSchema.array().optional(),
   permissions: z.enum(EXTENSION_PERMISSIONS).array().optional(),
   name: z
     .string()
-    .regex(URL_FRIENDLY_REGEX)
+    .regex(URL_FRIENDLY_REGEX, {
+      message:
+        'The name must be URL-friendly. It can only contain letters, numbers, and _- characters',
+    })
     .describe('The name must be URL friendly'),
 });
 

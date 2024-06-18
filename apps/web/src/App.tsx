@@ -44,9 +44,7 @@ function App() {
             APIService.instance.$setSession(session);
             break;
           case 'SIGNED_OUT':
-            APIService.instance.$setSession(null);
-            navigate('/', { replace: true });
-            useUserStore.getState().setProfile(null);
+            window.location.href = '/';
             break;
         }
       },

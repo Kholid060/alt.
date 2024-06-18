@@ -92,14 +92,16 @@ class ManifestUtils {
 
   async getExtensionManifest(): Promise<ExtensionManifest> {
     const manifestFile = await this.resolveExtensionManifest();
-
-    const manifest = await ExtensionManifestSchema.safeParseAsync(manifestFile);
+    const manifest = await ExtensionManifestSchema.merge(
+      z.object({
+        $apiVersion: z.string().optional(),
+      }),
+    ).safeParseAsync(manifestFile);
     if (!manifest.success) {
       throw logger.error(
         fromZodError(manifest.error, {
-          prefix: '',
-          includePath: true,
-          prefixSeparator: '',
+          prefixSeparator: ': ',
+          prefix: chalk.red('manifest validation'),
         }).toString(),
       );
     }
@@ -109,21 +111,20 @@ class ManifestUtils {
       );
     }
 
+    manifest.data.$apiVersion = (await this.getPackageJSON()).$apiVersion;
+
     this.seenExtIcon.clear();
 
-    const extManifest = manifest.data;
-    extManifest.$apiVersion = (await this.getPackageJSON()).$apiVersion;
-
-    await this.validateIcon(extManifest.icon);
+    await this.validateIcon(manifest.data.icon);
     await Promise.all(
-      extManifest.commands.map((command) => {
+      manifest.data.commands.map((command) => {
         if (!command.icon) return Promise.resolve();
 
         return this.validateIcon(command.icon);
       }),
     );
 
-    return extManifest;
+    return manifest.data as ExtensionManifest;
   }
 
   writeManifestFile(manifest: ExtensionManifest) {

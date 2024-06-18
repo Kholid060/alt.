@@ -59,7 +59,7 @@ function SettingsProfilePage() {
 
   async function onSubmit(values: ProfileSchema) {
     try {
-      const updatedProfile = await APIService.instance.updateProfile(values);
+      const updatedProfile = await APIService.instance.me.update(values);
       updateProfile(updatedProfile);
 
       form.reset(values);

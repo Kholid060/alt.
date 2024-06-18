@@ -1,29 +1,34 @@
 {
-  "name": "Script extension",
-  "author": "Ahmad Kholid",
-  "version": "0.0.0",
+  "name": "script_extension",
+  "author": "kholid060",
+  "version": "0.0.1",
   "description": "script extension example",
-  "title": "Clipboard",
+  "title": "Script extensions",
   "icon": "icon:Code2",
   "extensionType": "default",
+  "categories": ["Scripts"],
   "commands": [
     {
       "icon": "icon:Terminal",
       "name": "bash.sh",
       "title": "Bash script",
+	  "type": "script",
       "arguments": [
         {
           "name": "text",
+		  "title": "Text",
           "placeholder": "Text here",
           "type": "input:text"
         },
         {
           "name": "number-args",
+		  "title": "Number",
           "placeholder": "Number here",
           "type": "input:number"
         },
         {
           "name": "select",
+		  "title": "Select",
           "placeholder": "Select",
           "type": "select",
           "options": [
@@ -42,9 +47,11 @@
     {
       "name": "python.py",
       "title": "Python script",
+	  "type": "script",
       "arguments": [
         {
           "name": "password",
+		  "title": "Password?",
           "placeholder": "Password here",
           "type": "input:password"
         }
@@ -53,8 +60,10 @@
     {
       "name": "javascript.js",
       "title": "JS script",
+	  "type": "script",
       "arguments": [
         {
+		  "title": "Password?",
           "name": "password",
           "placeholder": "Password here",
           "type": "input:password"

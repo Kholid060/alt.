@@ -1,0 +1,10 @@
+{
+  "name": "scripts-extension",
+  "packageManager": "yarn@4.1.1",
+  "scripts": {
+    "build": "altdot build"
+  },
+  "dependencies": {
+    "@alt-dot/extension": "workspace:^"
+  }
+}

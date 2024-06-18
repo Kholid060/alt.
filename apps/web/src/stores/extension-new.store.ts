@@ -10,7 +10,6 @@ export interface ExtensionNewRepo {
 
 export interface ExtensionNewStoreState {
   banners: string[];
-  categories: string[];
   baseAssetURL: string;
   repo: ExtensionNewRepo;
   manifest: ExtensionManifest;
@@ -39,7 +38,6 @@ export const createExtensionNewStore = (props: ExtensionNewStoreProps) => {
   return createStore<ExtensionNewStoreValue>((set, get) => ({
     ...props,
     banners: [],
-    categories: [],
     getAssetURL(path) {
       return `${get().baseAssetURL}${path}`;
     },

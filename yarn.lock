@@ -80,7 +80,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@alt-dot/extension@workspace:*, @alt-dot/extension@workspace:packages/extension":
+"@alt-dot/extension@workspace:*, @alt-dot/extension@workspace:^, @alt-dot/extension@workspace:packages/extension":
   version: 0.0.0-use.local
   resolution: "@alt-dot/extension@workspace:packages/extension"
   dependencies:
@@ -16670,6 +16670,14 @@ __metadata:
   checksum: 10c0/b777f7ca0115e6d93e126ac490dbd82642d14983b3079f58f35519d992fa46260be7d6e6cede433a92db70306310c6f5f06e144f0e40c484199e09c1f7be53dd
   languageName: node
   linkType: hard
+
+"scripts-extension@workspace:examples/scripts-extension":
+  version: 0.0.0-use.local
+  resolution: "scripts-extension@workspace:examples/scripts-extension"
+  dependencies:
+    "@alt-dot/extension": "workspace:^"
+  languageName: unknown
+  linkType: soft
 
 "scule@npm:^1.1.1":
   version: 1.3.0

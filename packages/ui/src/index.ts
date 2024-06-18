@@ -22,6 +22,7 @@ export { UiTooltip, UiTooltipProvider } from './components/ui/tooltip';
 export { UiToaster } from './components/ui/toaster';
 export {
   UiPopover,
+  UiPopoverClose,
   UiPopoverContent,
   UiPopoverTrigger,
 } from './components/ui/popover';
