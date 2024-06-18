@@ -76,7 +76,7 @@
     "typescript": "^5.4.5",
     "vite": "5.0.12",
     "vitest": "^1.2.2",
-    "ws": "^8.16.0"
+    "ws": "^8.17.1"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
