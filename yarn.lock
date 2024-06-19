@@ -19345,6 +19345,7 @@ __metadata:
     react-router-dom: "npm:^6.23.1"
     tailwindcss: "npm:^3.4.4"
     typescript: "npm:^5.2.2"
+    usehooks-ts: "npm:^3.1.0"
     vite: "npm:^5.2.0"
     wretch: "npm:^2.9.0"
     zod: "npm:^3.23.8"

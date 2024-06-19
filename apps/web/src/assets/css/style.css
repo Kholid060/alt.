@@ -29,4 +29,16 @@
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
   }
+
+  .active-item-indicator::before {
+    content: '';
+    top: 50%;
+    left: 0px;
+    width: 4px;
+    height: 75%;
+    position: absolute;
+    border-radius: 888px;
+    transform: translateY(-50%);
+    background-color: theme('colors.primary.DEFAULT');
+  }
 }

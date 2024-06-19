@@ -1,6 +1,5 @@
 import { createBrowserRouter, redirect } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
-import StorePage from './pages/StorePage';
 import AuthPage from './pages/auth/AuthPage';
 import AuthRedirectPage from './pages/auth/redirect/AuthRedirect';
 import SettingsLayout from './pages/settings/SettingsLayout';
@@ -12,6 +11,9 @@ import DevConsoleExtensionsNewPage from './pages/devconsole/extensions/Extension
 import DevConsoleLayout from './pages/devconsole/DevConsoleLayout';
 import DevConsoleWorkflowsPage from './pages/devconsole/workflows/WorkflowsPage';
 import DevConsoleExtensionsDetailPage from './pages/devconsole/extensions/ExtensionsDetailPage';
+import StoreLayout from './pages/store/StoreLayout';
+import StoreExtensionsPage from './pages/store/StoreExtensionsPage';
+import StoreWorkflowsPage from './pages/store/StoreWorkflowsPage';
 
 const router = createBrowserRouter([
   {
@@ -24,7 +26,23 @@ const router = createBrowserRouter([
       },
       {
         path: 'store',
-        element: <StorePage />,
+        element: <StoreLayout />,
+        children: [
+          {
+            path: '',
+            loader() {
+              return redirect('extensions');
+            },
+          },
+          {
+            path: 'extensions',
+            element: <StoreExtensionsPage />,
+          },
+          {
+            path: 'workflows',
+            element: <StoreWorkflowsPage />,
+          },
+        ],
       },
       {
         path: 'auth',

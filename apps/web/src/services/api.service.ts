@@ -1,6 +1,7 @@
 import { Session } from '@supabase/supabase-js';
 import { ARequestInit, FetchError, afetch } from '@/utils/afetch';
 import APIMeNamespace from './api/api-me.namespace';
+import APIStoreNamespace from './api/api-store.namespace';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -20,6 +21,7 @@ class APIService {
   private session: Session | null = null;
 
   me = new APIMeNamespace(this);
+  store = new APIStoreNamespace(this);
 
   async authorizeFetch<T = unknown>(
     path: string,

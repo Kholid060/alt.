@@ -21,7 +21,7 @@ import {
   SettingsIcon,
   UserRoundIcon,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { useShallow } from 'zustand/react/shallow';
 
 function AppHeader() {
@@ -39,8 +39,8 @@ function AppHeader() {
             </Link>
           </div>
           <div className="col-span-8 text-center">
-            <UiButton variant="ghost" size="sm">
-              Store
+            <UiButton variant="ghost" size="sm" asChild>
+              <NavLink to="/store">Store</NavLink>
             </UiButton>
           </div>
           <div className="col-span-2 flex justify-end items-center">

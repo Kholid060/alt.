@@ -3,6 +3,7 @@ import {
   EXTENSION_PERMISSIONS,
   ExtensionCommandType,
 } from '@alt-dot/extension-core';
+import { UserProfile } from './user.interface';
 
 export interface ExtensionCommand {
   name: string;
@@ -19,6 +20,11 @@ export interface ExtensionEntry {
   status: ExtensionStatus;
   rejectReason: string | null;
 }
+
+export type ExtensionOwner = Pick<
+  UserProfile,
+  'avatarUrl' | 'name' | 'username'
+>;
 
 export interface Extension {
   id: string;
@@ -58,11 +64,13 @@ export type ExtensionCreatePayload = Pick<
 export type ExtensionListItem = Pick<
   Extension,
   | 'id'
+  | 'name'
   | 'title'
   | 'iconUrl'
   | 'version'
   | 'createdAt'
   | 'updatedAt'
+  | 'description'
   | 'downloadCount'
 >;
 
@@ -76,6 +84,11 @@ export type ExtensionDetail = ExtensionListItem &
     | 'permissions'
     | 'description'
   >;
+
+export type ExtensionStoreListItem = ExtensionListItem &
+  Pick<Extension, 'commands'> & {
+    owner: ExtensionOwner;
+  };
 
 export type ExtensionUserListItem = ExtensionListItem &
   Pick<Extension, 'entry'>;
