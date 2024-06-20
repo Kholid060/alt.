@@ -16,7 +16,6 @@ import {
   useDialog,
   useToast,
 } from '@alt-dot/ui';
-import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import {
   Link,
@@ -40,41 +39,21 @@ import {
   ExtensionDetailMarkdownAsset,
 } from '@/components/extension/ExtensionDetail';
 
-const BANNER_NAME_REGEX = /banner-[0-9]*.png/;
 function ExtensionDetailTab() {
-  const [repo, baseAssetURL, banners, manifest, updateState] =
-    useExtensionNewStore(
-      useShallow((state) => [
-        state.repo,
-        state.baseAssetURL,
-        state.banners,
-        state.manifest,
-        state.updateState,
-      ]),
-    );
-  const query = useQuery({
-    refetchOnMount: false,
-    refetchInterval: false,
-    queryKey: ['contents-dist', repo.owner, repo.name],
-    queryFn: () =>
-      GithubAPI.instance.getRepoContents(repo.owner, repo.name, 'dist'),
-  });
+  const [repo, banners, manifest, updateState] = useExtensionNewStore(
+    useShallow((state) => [
+      state.repo,
+      state.banners,
+      state.manifest,
+      state.updateState,
+    ]),
+  );
 
   useEffect(() => {
-    const bannersFiles = Array.isArray(query.data)
-      ? query.data
-          .filter(
-            (item) => item.type === 'file' && BANNER_NAME_REGEX.test(item.name),
-          )
-          .slice(0, 10)
-      : [];
-    if (bannersFiles.length > 0) {
-      updateState(
-        'banners',
-        bannersFiles.map((file) => `${baseAssetURL}/${file.path}`),
-      );
-    }
-  }, [query.data, baseAssetURL, updateState]);
+    GithubAPI.instance
+      .getExtBanners(repo.owner, repo.name)
+      .then((result) => updateState('banners', result));
+  }, []);
 
   return (
     <ExtensionDetail
@@ -114,6 +93,7 @@ function ExtensionsNewHeader() {
         name: manifest.name,
         sourceUrl: repo.url,
         title: manifest.title,
+        relativePath: `/${repo.branch}`,
         categories: manifest.categories,
         permissions: manifest.permissions,
         iconUrl: manifest.icon.startsWith('icon:')

@@ -46,7 +46,7 @@ function ExtensionCard({ extension }: { extension: ExtensionStoreListItem }) {
       <UiCardFooter className="items-end p-4 pt-0 text-sm text-muted-foreground">
         <div className="flex-grow">
           <Link
-            to={'/u/username'}
+            to={`/u/${extension.owner.username}`}
             className="hover:text-foreground transition-colors line-clamp-1"
           >
             <UiAvatar className="size-5 inline-block align-middle">

@@ -1,5 +1,7 @@
 import { UserProfile } from '@/interface/user.interface';
 import { useUserStore } from '@/stores/user.store';
+import { UserRole } from '@/utils/constant';
+import { PageError } from '@/utils/custom-error';
 import { Navigate } from 'react-router-dom';
 
 function hasNoUsername(profile: UserProfile) {
@@ -7,13 +9,14 @@ function hasNoUsername(profile: UserProfile) {
 }
 
 export function AuthGuard({
+  role,
   element: Element,
   ...props
 }: {
+  role?: UserRole;
   element: React.FC;
 }) {
   const profile = useUserStore.use.profile();
-
   if (!profile) {
     return (
       <Navigate
@@ -24,6 +27,7 @@ export function AuthGuard({
       />
     );
   }
+  if (role && profile.role !== role) throw new PageError(404, {});
 
   if (hasNoUsername(profile)) {
     return <Navigate to="/settings/profile?username=true" />;

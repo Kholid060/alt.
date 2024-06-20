@@ -5,7 +5,7 @@ import AuthRedirectPage from './pages/auth/redirect/AuthRedirect';
 import SettingsLayout from './pages/settings/SettingsLayout';
 import { AuthGuard, NoAuthGuard } from './components/auth/AuthGuard';
 import SettingsProfilePage from './pages/settings/SettingsProfilePage';
-import App from './App';
+import App, { AppErrorBoundary, appLoader } from './App';
 import DevConsoleExtensionsPage from './pages/devconsole/extensions/ExtensionsPage';
 import DevConsoleExtensionsNewPage from './pages/devconsole/extensions/ExtensionsNewPage';
 import DevConsoleLayout from './pages/devconsole/DevConsoleLayout';
@@ -14,11 +14,15 @@ import DevConsoleExtensionsDetailPage from './pages/devconsole/extensions/Extens
 import StoreLayout from './pages/store/StoreLayout';
 import StoreExtensionsPage from './pages/store/StoreExtensionsPage';
 import StoreWorkflowsPage from './pages/store/StoreWorkflowsPage';
+import AdminPage from './pages/AdminPage';
+import { UserRole } from './utils/constant';
 
 const router = createBrowserRouter([
   {
     path: '/',
     element: <App />,
+    loader: appLoader,
+    errorElement: <AppErrorBoundary />,
     children: [
       {
         path: '',
@@ -75,6 +79,10 @@ const router = createBrowserRouter([
             element: <DevConsoleWorkflowsPage />,
           },
         ],
+      },
+      {
+        path: 'admin/dashboard',
+        element: <AuthGuard element={AdminPage} role={UserRole.Admin} />,
       },
       {
         path: 'settings',

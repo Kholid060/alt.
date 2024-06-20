@@ -38,6 +38,7 @@ export interface Extension {
   updatedAt: string;
   apiVersion: string;
   description: string;
+  relativePath: string;
   isPublished: boolean;
   downloadCount: number;
   entry: ExtensionEntry | null;
@@ -59,6 +60,7 @@ export type ExtensionCreatePayload = Pick<
   | 'categories'
   | 'permissions'
   | 'description'
+  | 'relativePath'
 >;
 
 export type ExtensionListItem = Pick<
@@ -83,6 +85,7 @@ export type ExtensionDetail = ExtensionListItem &
     | 'categories'
     | 'permissions'
     | 'description'
+    | 'relativePath'
   >;
 
 export type ExtensionStoreListItem = ExtensionListItem &

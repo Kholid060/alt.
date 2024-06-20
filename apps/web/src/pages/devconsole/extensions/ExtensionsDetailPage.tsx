@@ -8,9 +8,9 @@ import {
   ExtensionUserDetail,
   ExtensionStatus as ExtensionStatusType,
 } from '@/interface/extension.interface';
-import NotFoundPage from '@/pages/NotFoundPage';
 import APIService from '@/services/api.service';
 import GithubAPI from '@/utils/GithubAPI';
+import { PageError } from '@/utils/custom-error';
 import {
   UiBreadcrumb,
   UiBreadcrumbList,
@@ -278,7 +278,7 @@ function DevConsoleExtensionsDetailPage() {
     select(data) {
       return {
         ...data,
-        baseAssetURL: new URL(data.sourceUrl).pathname + '/main',
+        baseAssetURL: new URL(data.sourceUrl).pathname + data.relativePath,
       };
     },
     queryFn: () => APIService.instance.me.getExtension(params.id!),
@@ -306,7 +306,12 @@ function DevConsoleExtensionsDetailPage() {
 
   if (query.isError) {
     const isNotFound = 'status' in query.error && query.error.status === 404;
-    if (isNotFound) return <NotFoundPage className="pt-32 mx-auto" />;
+    if (isNotFound) {
+      throw new PageError(404, {
+        btnText: 'Back to Dashboard',
+        path: '/devconsole/extensions',
+      });
+    }
 
     return (
       <div className="flex flex-col place-items-center mt-12 max-w-md mx-auto text-center pt-28 container">

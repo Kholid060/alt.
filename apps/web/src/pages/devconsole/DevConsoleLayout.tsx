@@ -67,7 +67,7 @@ function NewExtension({ onClose }: { onClose?: () => void }) {
       if (!manifest.success) {
         toast({
           variant: 'destructive',
-          title: 'Error when validate the extension manifest',
+          title: 'Invalid manifest.json file',
         });
         console.dir(manifest.error);
         return;

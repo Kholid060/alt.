@@ -1,4 +1,5 @@
 import { ARequestInit, afetch } from '@/utils/afetch';
+import { EXT_BANNER_NAME_REGEX } from './constant';
 
 const GITHUB_API_BASE_URL = 'https://api.github.com';
 const GITHUB_RAW_BASE_URL = 'https://raw.githubusercontent.com/';
@@ -40,6 +41,20 @@ class GithubAPI {
     return this.fetch<GithubRepoContent | GithubRepoContent[]>(
       `/repos/${owner}/${repo}/contents/${path}`,
     );
+  }
+
+  async getExtBanners(owner: string, repo: string) {
+    const files = await this.getRepoContents(owner, repo, 'asset').then(
+      (result) => (Array.isArray(result) ? result : [result]),
+    );
+    const banners: string[] = [];
+    for (const file of files) {
+      if (file.type === 'file' && EXT_BANNER_NAME_REGEX.test(file.name)) {
+        banners.push(file.download_url);
+      }
+    }
+
+    return banners;
   }
 }
 

@@ -1,5 +1,6 @@
 import SupabaseService from '@/services/supabase.service';
 import { useUserStore } from '@/stores/user.store';
+import { UserRole } from '@/utils/constant';
 import {
   UiAvatar,
   UiAvatarFallback,
@@ -12,22 +13,19 @@ import {
   UiDropdownMenuSeparator,
   UiDropdownMenuTrigger,
   UiLogo,
-  UiSkeleton,
 } from '@alt-dot/ui';
 import {
   CodeIcon,
   LogInIcon,
   LogOutIcon,
   SettingsIcon,
+  UserRoundCogIcon,
   UserRoundIcon,
 } from 'lucide-react';
 import { Link, NavLink } from 'react-router-dom';
-import { useShallow } from 'zustand/react/shallow';
 
 function AppHeader() {
-  const [profile, userState] = useUserStore(
-    useShallow((state) => [state.profile, state.state]),
-  );
+  const profile = useUserStore.use.profile();
 
   return (
     <header className="fixed top-0 left-0 w-full z-50">
@@ -81,6 +79,14 @@ function AppHeader() {
                         Developer dashboard
                       </Link>
                     </UiDropdownMenuItem>
+                    {profile.role === UserRole.Admin && (
+                      <UiDropdownMenuItem asChild>
+                        <Link to="/admin/dashboard">
+                          <UserRoundCogIcon className="size-4 mr-2" />
+                          Admin dashboard
+                        </Link>
+                      </UiDropdownMenuItem>
+                    )}
                   </UiDropdownMenuGroup>
                   <UiDropdownMenuSeparator />
                   <UiDropdownMenuGroup>
@@ -103,8 +109,6 @@ function AppHeader() {
                   </UiDropdownMenuItem>
                 </UiDropdownMenuContent>
               </UiDropdownMenu>
-            ) : userState === 'fetching' ? (
-              <UiSkeleton className="size-9 rounded-full border" />
             ) : (
               <Link to="/auth">
                 <UiButton size="sm" variant="secondary">

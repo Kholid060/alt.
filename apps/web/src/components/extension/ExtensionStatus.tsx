@@ -2,6 +2,7 @@ import type { ExtensionStatus as ExtensionStatusType } from '@/interface/extensi
 import { UiPopover, UiPopoverContent, UiPopoverTrigger } from '@alt-dot/ui';
 import clsx from 'clsx';
 import { FileTextIcon } from 'lucide-react';
+import UiMarkdown from '../ui/UiMarkdown';
 
 const statusData: Record<ExtensionStatusType, { class: string; name: string }> =
   {
@@ -50,9 +51,10 @@ function ExtensionStatus({
         </UiPopoverTrigger>
         <UiPopoverContent>
           <h4 className="font-medium leading-none">Rejected reason</h4>
-          <div className="bg-background mt-4 rounded-md p-3 whitespace-pre-wrap">
-            {rejectReason}
-          </div>
+          <UiMarkdown
+            markdown={rejectReason}
+            className="bg-background mt-4 rounded-md p-3 prose-sm"
+          />
         </UiPopoverContent>
       </UiPopover>
     );

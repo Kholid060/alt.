@@ -2,12 +2,12 @@ import { Session } from '@supabase/supabase-js';
 import { ARequestInit, FetchError, afetch } from '@/utils/afetch';
 import APIMeNamespace from './api/api-me.namespace';
 import APIStoreNamespace from './api/api-store.namespace';
+import APIAdminNamespace from './api/api-admin.namespace';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 class APIService {
   static instance = new APIService();
-
   static getErrorMessage(error: unknown, byStatus?: Record<number, string>) {
     if (!FetchError.isFetchError(error)) {
       return 'Something went wrong!';
@@ -22,6 +22,7 @@ class APIService {
 
   me = new APIMeNamespace(this);
   store = new APIStoreNamespace(this);
+  admin = new APIAdminNamespace(this);
 
   async authorizeFetch<T = unknown>(
     path: string,

@@ -1,26 +1,24 @@
 import { UserProfile } from '@/interface/user.interface';
-import APIService from '@/services/api.service';
 import { createStoreSelectors } from '@/utils/store-utils';
 import { create } from 'zustand';
 
 interface UserStoreState {
-  profileFetched: boolean;
-  state: 'fetching' | 'idle';
   profile: null | UserProfile;
 }
 interface UserStoreActions {
   $reset(): void;
-  fetchProfile(): Promise<UserProfile | null>;
   setProfile(profile: UserProfile | null): void;
   updateProfile(profile: Partial<UserProfile>): void;
+  setState<T extends keyof UserStoreState>(
+    key: T,
+    value: UserStoreState[T],
+  ): void;
 }
 
 export type ProfileStore = UserStoreState & UserStoreActions;
 
 const initialData: UserStoreState = {
   profile: null,
-  state: 'fetching',
-  profileFetched: false,
 };
 
 const useUserStoreBase = create<ProfileStore>((set, get) => ({
@@ -28,25 +26,14 @@ const useUserStoreBase = create<ProfileStore>((set, get) => ({
   setProfile(profile) {
     set({ profile });
   },
+  setState(key, value) {
+    set({ [key]: value });
+  },
   updateProfile(profile) {
     const currentProfile = get().profile;
     if (!currentProfile) return;
 
     set({ profile: { ...currentProfile, ...profile } });
-  },
-  async fetchProfile() {
-    try {
-      const state = get();
-      if (state.profileFetched) return state.profile;
-
-      const profile = await APIService.instance.me.get();
-      set({ profile, state: 'idle', profileFetched: true });
-
-      return profile;
-    } catch (error) {
-      set({ state: 'idle', profileFetched: true });
-      throw error;
-    }
   },
   $reset() {
     set({ ...initialData });
