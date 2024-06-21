@@ -1,4 +1,5 @@
 import { ExtensionDetailIcon } from '@/components/extension/ExtensionDetail';
+import { APIRouteLoaderFunc } from '@/interface/api.interface';
 import {
   ExtensionCategories,
   ExtensionStoreListItem,
@@ -17,26 +18,64 @@ import {
   UiSkeleton,
 } from '@alt-dot/ui';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { CpuIcon, DownloadIcon, StoreIcon, UserRoundIcon } from 'lucide-react';
+import {
+  CpuIcon,
+  DownloadIcon,
+  ShareIcon,
+  StoreIcon,
+  UserRoundIcon,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 
 const numberFormatter = new Intl.NumberFormat();
+
+function queryData(searchParams: URLSearchParams, page: number) {
+  return {
+    queryKey: [
+      'store-extensions',
+      {
+        q: searchParams.get('q'),
+        sortBy: searchParams.get('sortBy'),
+        category: searchParams.get('category'),
+      },
+      page,
+    ],
+    queryFn: () =>
+      APIService.instance.store.listExtensions({
+        q: searchParams.get('q') ?? undefined,
+        category: searchParams.get('category') as ExtensionCategories,
+        sortBy:
+          (searchParams.get('sortBy') as StoreQueryOptions['sortBy']) ??
+          undefined,
+      }),
+  };
+}
 
 function ExtensionCard({ extension }: { extension: ExtensionStoreListItem }) {
   return (
     <UiCard className="flex flex-col">
       <UiCardHeader className="flex-row space-y-0 flex-1 items-center p-4 justify-between">
         <ExtensionDetailIcon
-          imageClass="h-full w-full size-12 rounded-md object-cover object-center border"
+          imageClass="size-10 aspect-square rounded-md object-cover object-center"
           icon={extension.iconUrl}
           iconUrl={extension.iconUrl}
           title={`${extension.title} icon`}
         />
-        <UiButton variant="secondary">Install</UiButton>
+        <button
+          className="md:hidden"
+          onClick={() =>
+            navigator.share({ url: `${extension.name}/${extension.id}` })
+          }
+        >
+          <ShareIcon className="size-5" />
+        </button>
+        <UiButton variant="secondary" className="hidden md:inline-block">
+          Install
+        </UiButton>
       </UiCardHeader>
       <UiCardContent className="p-4 pt-0">
-        <Link to={`${extension.id}/${extension.name}`}>
+        <Link to={`${extension.name}/${extension.id}`}>
           <p className="font-semibold line-clamp-1">{extension.title}</p>
           <p className="text-muted-foreground leading-tight line-clamp-2 text-sm">
             {extension.description}
@@ -60,14 +99,14 @@ function ExtensionCard({ extension }: { extension: ExtensionStoreListItem }) {
             <span className="align-middle ml-1.5">{extension.owner.name}</span>
           </Link>
         </div>
-        <span title="Command counts" className="hidden md:block flex-shrink-0">
+        <span title="Commands count" className="hidden md:block flex-shrink-0">
           <CpuIcon className="size-5 inline-block align-middle" />
           <span className="ml-1 align-middle">{extension.commands.length}</span>
         </span>
-        <span title="Download counts" className="ml-2 lg:ml-3 flex-shrink-0">
+        <span title="Downloads count" className="ml-2 lg:ml-3 flex-shrink-0">
           <DownloadIcon className="size-5 align-middle inline-block" />
           <span className="ml-1 align-middle">
-            {numberFormatter.format(extension.downloadCount * 1000)}
+            {numberFormatter.format(extension.downloadCount)}
           </span>
         </span>
       </UiCardFooter>
@@ -83,24 +122,8 @@ function StoreExtensionsPage() {
     refetchOnMount: false,
     refetchInterval: false,
     refetchOnWindowFocus: false,
-    queryKey: [
-      'store-extensions',
-      {
-        q: searchParams.get('q'),
-        sortBy: searchParams.get('sortBy'),
-        category: searchParams.get('category'),
-      },
-      page,
-    ],
     placeholderData: keepPreviousData,
-    queryFn: () =>
-      APIService.instance.store.listExtensions({
-        q: searchParams.get('q') ?? undefined,
-        category: searchParams.get('category') as ExtensionCategories,
-        sortBy:
-          (searchParams.get('sortBy') as StoreQueryOptions['sortBy']) ??
-          undefined,
-      }),
+    ...queryData(searchParams, page),
   });
 
   return (
@@ -146,5 +169,14 @@ function StoreExtensionsPage() {
     </div>
   );
 }
+
+export const storeExtensionsPageLoader: APIRouteLoaderFunc =
+  (queryClient) =>
+  async ({ request }) => {
+    const { searchParams } = new URL(request.url);
+    await queryClient.prefetchQuery(queryData(searchParams, 1));
+
+    return null;
+  };
 
 export default StoreExtensionsPage;

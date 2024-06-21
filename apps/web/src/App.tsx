@@ -2,19 +2,9 @@ import { useEffect } from 'react';
 import SupabaseService from './services/supabase.service';
 import APIService from './services/api.service';
 import AppHeader from './components/app/AppHeader';
-import {
-  Outlet,
-  isRouteErrorResponse,
-  useNavigate,
-  useRouteError,
-} from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { DialogProvider, UiToaster } from '@alt-dot/ui';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useUserStore } from './stores/user.store';
-import { PageError } from './utils/custom-error';
-import { ErrorNotFoundPage, ErrorPage } from './pages/ErrorPage';
-
-const queryClient = new QueryClient();
 
 function App() {
   const navigate = useNavigate();
@@ -41,33 +31,12 @@ function App() {
   }, [navigate]);
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <DialogProvider>
-        <AppHeader />
-        <UiToaster />
-        <Outlet />
-      </DialogProvider>
-    </QueryClientProvider>
+    <DialogProvider>
+      <AppHeader />
+      <UiToaster />
+      <Outlet />
+    </DialogProvider>
   );
-}
-
-export function AppErrorBoundary() {
-  const error = useRouteError();
-
-  let page = <ErrorPage />;
-  if (
-    PageError.isPageError(error, 404) ||
-    (isRouteErrorResponse(error) && error.status === 404)
-  ) {
-    page = (
-      <ErrorNotFoundPage
-        btnPath={error.data.path}
-        btnText={error.data.btnText}
-      />
-    );
-  }
-
-  return <div className="h-screen w-screen py-12">{page}</div>;
 }
 
 export async function appLoader() {

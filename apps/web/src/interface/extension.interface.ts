@@ -41,6 +41,7 @@ export interface Extension {
   relativePath: string;
   isPublished: boolean;
   downloadCount: number;
+  owner: ExtensionOwner;
   entry: ExtensionEntry | null;
   commands: ExtensionCommand[];
   categories: ExtensionCategories[];
@@ -92,6 +93,24 @@ export type ExtensionStoreListItem = ExtensionListItem &
   Pick<Extension, 'commands'> & {
     owner: ExtensionOwner;
   };
+
+export type ExtensionStoreDetail = Pick<
+  Extension,
+  | 'name'
+  | 'title'
+  | 'owner'
+  | 'version'
+  | 'banners'
+  | 'iconUrl'
+  | 'commands'
+  | 'updatedAt'
+  | 'sourceUrl'
+  | 'categories'
+  | 'description'
+  | 'permissions'
+  | 'relativePath'
+  | 'downloadCount'
+> & { baseAssetURL: string };
 
 export type ExtensionUserListItem = ExtensionListItem &
   Pick<Extension, 'entry'>;

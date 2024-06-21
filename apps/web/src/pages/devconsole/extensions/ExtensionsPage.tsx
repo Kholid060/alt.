@@ -76,6 +76,7 @@ function ExtensionsList() {
         <Link className="flex items-center" to={item.id}>
           <ExtensionDetailIcon
             className="size-5"
+            imageClass="h-[38px] w-[38px]"
             title={item.title}
             icon={item.iconUrl}
             iconUrl={item.iconUrl}

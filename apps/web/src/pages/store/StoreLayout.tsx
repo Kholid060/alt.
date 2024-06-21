@@ -23,7 +23,12 @@ import {
   XIcon,
 } from 'lucide-react';
 import { useState } from 'react';
-import { NavLink, Outlet, useSearchParams } from 'react-router-dom';
+import {
+  NavLink,
+  Outlet,
+  useLocation,
+  useSearchParams,
+} from 'react-router-dom';
 import { useDebounceCallback } from 'usehooks-ts';
 
 const storeTypes = [
@@ -165,9 +170,19 @@ function StoreFilter() {
   );
 }
 
+const rootPath = storeTypes.map(({ path }) => path);
 function StoreLayout() {
+  const location = useLocation();
+  if (!rootPath.includes(location.pathname)) {
+    return (
+      <main className="pt-36 pb-28 container">
+        <Outlet />
+      </main>
+    );
+  }
+
   return (
-    <main className="pt-36 container">
+    <main className="pt-36 pb-28 container">
       <h2 className="text-3xl font-semibold cursor-default leading-tight -mt-0.5">
         Store
       </h2>

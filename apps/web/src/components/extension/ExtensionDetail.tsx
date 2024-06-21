@@ -1,12 +1,12 @@
 import { Extension } from '@/interface/extension.interface';
 import { afetch } from '@/utils/afetch';
 import { UiExtIcon } from '@alt-dot/extension';
-import { ExtensionCommandType } from '@alt-dot/extension-core';
 import { UiButton, UiImage, UiInput, UiLabel, UiSkeleton } from '@alt-dot/ui';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { ExternalLinkIcon, FileIcon } from 'lucide-react';
 import UiMarkdown from '../ui/UiMarkdown';
+import { EXTENSION_COMMAND_TYPE_NAME } from '@/utils/constant';
 
 export function ExtensionDetailIcon({
   icon,
@@ -145,12 +145,6 @@ export function ExtensionDetailMarkdownAsset({
   return <UiMarkdown markdown={query.data ?? ''} />;
 }
 
-const commandTypeNames: Record<ExtensionCommandType, string> = {
-  view: 'View',
-  action: 'Action',
-  script: 'Script',
-  'view:json': 'View JSON',
-};
 export function ExtensionDetail({
   banners,
   commands,
@@ -230,7 +224,7 @@ export function ExtensionDetail({
         {commands.map((command) => (
           <li key={command.name}>
             <span className="px-2 py-0.5 border rounded-full text-xs">
-              {commandTypeNames[command.type]}
+              {EXTENSION_COMMAND_TYPE_NAME[command.type]}
             </span>
             <div className="inline-block align-top ml-2 mt-px">
               <p>{command.title}</p>

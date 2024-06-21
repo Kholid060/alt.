@@ -1,5 +1,6 @@
 import {
   ExtensionCategories,
+  ExtensionStoreDetail,
   ExtensionStoreListItem,
 } from '@/interface/extension.interface';
 import APIService from '../api.service';
@@ -26,7 +27,14 @@ class APIStoreNamespace {
       count: number;
       isLast: boolean;
       items: ExtensionStoreListItem[];
-    }>(`/store/extensions?${searhParams.toString()}`);
+    }>(`/store/extensions?${searhParams.toString()}`, { isPublic: true });
+  }
+
+  getExtension(extensionId: string) {
+    return this.api.authorizeFetch<ExtensionStoreDetail>(
+      `/store/extensions/${extensionId}`,
+      { isPublic: true },
+    );
   }
 }
 

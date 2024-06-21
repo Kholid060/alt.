@@ -23,13 +23,15 @@ function ErrorPageBase({
 }
 
 export function ErrorNotFoundPage({
+  message,
   className,
-  btnText = 'Back to home',
   btnPath = '/',
+  btnText = 'Back to home',
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & {
   btnText?: string;
   btnPath?: string;
+  message?: string;
 }) {
   return (
     <ErrorPageBase {...props}>
@@ -37,6 +39,7 @@ export function ErrorNotFoundPage({
       <h3 className="font-semibold text-lg">
         Looks like this page doesn&apos;t exist
       </h3>
+      <p className="text-muted-foreground">{message}</p>
       <UiButton variant="secondary" className="mt-8 min-w-40" asChild>
         <Link to={btnPath}>{btnText}</Link>
       </UiButton>
@@ -49,7 +52,9 @@ export function ErrorPage(props: React.HTMLAttributes<HTMLDivElement>) {
     <ErrorPageBase {...props}>
       <img alt="error illustration" src={bugFixingSvg} className="h-96" />
       <h3 className="font-semibold text-lg">Something went wrong!</h3>
-      <p>An error occurred when trying to load this page</p>
+      <p className="text-muted-foreground">
+        An error occurred when trying to load this page
+      </p>
       <UiButton variant="secondary" className="mt-8 min-w-40" asChild>
         <Link to="/">Back to home</Link>
       </UiButton>
