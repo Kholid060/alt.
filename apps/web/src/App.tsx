@@ -5,6 +5,7 @@ import AppHeader from './components/app/AppHeader';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { DialogProvider, UiToaster } from '@alt-dot/ui';
 import { useUserStore } from './stores/user.store';
+import AppLoadingIndicator from './components/app/AppLoadingIndicator';
 
 function App() {
   const navigate = useNavigate();
@@ -35,6 +36,7 @@ function App() {
       <AppHeader />
       <UiToaster />
       <Outlet />
+      <AppLoadingIndicator />
     </DialogProvider>
   );
 }
