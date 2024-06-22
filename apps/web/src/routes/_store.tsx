@@ -7,20 +7,20 @@ import { EXTENSION_CATEGORIES } from '@alt-dot/extension-core';
 import {
   UiButton,
   cn,
-  UiToggleGroup,
-  UiToggleGroupItem,
   UiInput,
+  UiTabs,
+  UiTabsList,
+  UiTabsTrigger,
 } from '@alt-dot/ui';
 import {
-  Link,
   Outlet,
   createFileRoute,
+  useLocation,
   useNavigate,
 } from '@tanstack/react-router';
 import clsx from 'clsx';
 import {
   BlocksIcon,
-  WorkflowIcon,
   LucideIcon,
   GlobeIcon,
   BotIcon,
@@ -31,6 +31,8 @@ import {
   XIcon,
   MenuIcon,
   SearchIcon,
+  ClockIcon,
+  DownloadIcon,
 } from 'lucide-react';
 import { useState } from 'react';
 import { useDebounceCallback } from 'usehooks-ts';
@@ -41,8 +43,16 @@ export const Route = createFileRoute('/_store')({
 });
 
 const storeTypes = [
-  { name: 'Extensions', icon: BlocksIcon, path: '/store/extensions' },
-  { name: 'Workflows', icon: WorkflowIcon, path: '/store/workflows' },
+  { name: 'Extensions', path: '/store/extensions' },
+  { name: 'Workflows', path: '/store/workflows' },
+];
+const storeSorts: {
+  name: string;
+  icon: LucideIcon;
+  id: StoreQueryValidation['sortBy'];
+}[] = [
+  { name: 'Recently added', icon: ClockIcon, id: 'recently-added' },
+  { name: 'Downloads count', icon: DownloadIcon, id: 'most-installed' },
 ];
 
 const categoriesIcons: Record<ExtensionCategories, LucideIcon> = {
@@ -76,24 +86,33 @@ function StoreSidbear() {
           show ? 'block' : 'hidden lg:block',
         )}
       >
-        <ul className="space-y-1">
-          {storeTypes.map((item) => (
-            <li key={item.path}>
-              <Link
-                to={item.path}
-                activeProps={{
-                  className: 'active-item-indicator bg-card',
-                }}
-                inactiveProps={{
-                  className: 'text-muted-foreground',
-                }}
-                className="flex items-center px-4 h-10 rounded-md hover:bg-card relative"
-              >
-                <item.icon className="mr-4 size-5" /> {item.name}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <div>
+          <p className="font-semibold text-sm text-muted-foreground flex-1">
+            Sort by
+          </p>
+          <ul className="text-muted-foreground space-y-1 mt-2">
+            {storeSorts.map((sort) => (
+              <li key={sort.id}>
+                <button
+                  className={clsx(
+                    'flex items-center px-4 h-10 rounded-md hover:bg-card relative w-full',
+                    search.sortBy === sort.id &&
+                      'active-item-indicator bg-card text-foreground',
+                  )}
+                  onClick={() => {
+                    navigate({
+                      replace: true,
+                      search: (prev) => ({ ...prev, sortBy: sort.id }),
+                    });
+                  }}
+                >
+                  <sort.icon className="size-5 mr-4" />
+                  {sort.name}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
         <div className="flex items-center mt-4">
           <p className="font-semibold text-sm text-muted-foreground flex-1">
             Categories
@@ -149,6 +168,7 @@ function StoreSidbear() {
 }
 
 function StoreFilter() {
+  const location = useLocation();
   const searchParams = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
 
@@ -161,27 +181,24 @@ function StoreFilter() {
 
   return (
     <div className="flex items-center flex-col-reverse md:flex-row gap-2 mb-8">
-      <UiToggleGroup
-        type="single"
-        className="text-muted-foreground w-full md:w-auto"
-        value={searchParams.sortBy}
+      <UiTabs
+        value={location.pathname}
         onValueChange={(value) => {
           navigate({
+            to: value,
             replace: true,
-            search: (prev) => ({
-              ...prev,
-              sortBy: value as StoreQueryValidation['sortBy'],
-            }),
+            search: location.search,
           });
         }}
       >
-        <UiToggleGroupItem value="recently-added" defaultChecked>
-          Recently added
-        </UiToggleGroupItem>
-        <UiToggleGroupItem value="most-installed">
-          Most installed
-        </UiToggleGroupItem>
-      </UiToggleGroup>
+        <UiTabsList>
+          {storeTypes.map((item) => (
+            <UiTabsTrigger key={item.path} value={item.path}>
+              {item.name}
+            </UiTabsTrigger>
+          ))}
+        </UiTabsList>
+      </UiTabs>
       <div className="flex-grow"></div>
       <UiInput
         type="search"

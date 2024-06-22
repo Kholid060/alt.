@@ -1,10 +1,9 @@
 import { dialog } from 'electron';
 import { logger } from '../lib/log';
 import type { ExtensionCommandArgument } from '@alt-dot/extension-core';
-import { parseJSON } from '@alt-dot/shared';
+import { APP_DEEP_LINK_SCHEME, parseJSON } from '@alt-dot/shared';
 import { CommandLaunchBy } from '@alt-dot/extension';
 import type { APP_DEEP_LINK_HOST } from '#packages/common/utils/constant/app.const';
-import { APP_DEEP_LINK } from '#packages/common/utils/constant/app.const';
 import DBService from '../services/database/database.service';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { WORKFLOW_MANUAL_TRIGGER_ID } from '#packages/common/utils/constant/workflow.const';
@@ -150,7 +149,7 @@ class DeepLinkHandler {
 
 class DeepLink {
   static getURL(hostname: DeepLinkHost, path?: string) {
-    return `${APP_DEEP_LINK}://${hostname}/${path || ''}`;
+    return `${APP_DEEP_LINK_SCHEME}://${hostname}/${path || ''}`;
   }
 
   static async handler(url: string) {

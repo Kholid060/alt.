@@ -26,6 +26,7 @@ import { Link, createFileRoute, redirect } from '@tanstack/react-router';
 import githubLogoWhiteSvg from '@/assets/logo/github-white.svg';
 import { UserRoundIcon, ShareIcon } from 'lucide-react';
 import dayjs from '@/lib/dayjs';
+import { useNativeApp } from '@/hooks/useNativeApp';
 
 function queryData(extensionId: string) {
   return {
@@ -84,11 +85,13 @@ function ExtensionPageHeader({
 }: {
   extension: ExtensionStoreDetail;
 }) {
+  const { installExtension } = useNativeApp();
+
   return (
     <div className="flex items-start md:items-center flex-col md:flex-row">
       <ExtensionDetailIcon
         svgClass="size-16"
-        imageClass="h-[82px] w-[82px]"
+        imageClass="h-[82px] w-[82px] rounded-lg"
         title={extension.title}
         icon={extension.iconUrl}
         iconUrl={extension.iconUrl}
@@ -116,7 +119,12 @@ function ExtensionPageHeader({
         </div>
       </div>
       <div className="flex items-center w-full max-w-md md:w-auto mt-4">
-        <UiButton className="flex-1 md:flex-auto">Install extension</UiButton>
+        <UiButton
+          className="flex-1 md:flex-auto"
+          onClick={() => installExtension(extension.id)}
+        >
+          Install extension
+        </UiButton>
         <UiButton
           size="icon"
           variant="secondary"

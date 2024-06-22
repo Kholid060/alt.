@@ -8,7 +8,9 @@ import { StoreQueryValidation } from '@/validation/store-query.validation';
 class APIStoreNamespace {
   constructor(private api: APIService) {}
 
-  listExtensions(options: Partial<StoreQueryValidation> = {}) {
+  listExtensions(
+    options: Partial<StoreQueryValidation & { nextCursor?: string }> = {},
+  ) {
     const searhParams = new URLSearchParams();
     for (const key in options) {
       const value = options[key as keyof StoreQueryValidation];
@@ -16,9 +18,7 @@ class APIStoreNamespace {
     }
 
     return this.api.authorizeFetch<{
-      page: number;
-      count: number;
-      isLast: boolean;
+      nextCursor: string;
       items: ExtensionStoreListItem[];
     }>(`/store/extensions?${searhParams.toString()}`, { isPublic: true });
   }

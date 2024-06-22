@@ -3,8 +3,7 @@ import { Server } from 'socket.io';
 import ExtensionWSNamespace from './ws-namespaces/extensions.ws-namespace';
 import { WebSocketServer } from 'ws';
 import { debuglog } from 'util';
-
-const WEBSOCKET_PORT = 4567;
+import { APP_WEBSOCKET_PORT } from '@alt-dot/shared';
 
 class WebsocketService {
   private static _instance: WebsocketService | null = null;
@@ -13,7 +12,7 @@ class WebsocketService {
   }
 
   static startDefaultServer() {
-    this.instance.startServer(WEBSOCKET_PORT);
+    this.instance.startServer(APP_WEBSOCKET_PORT);
   }
 
   private io: Server | null = null;

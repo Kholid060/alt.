@@ -96,6 +96,7 @@ export type ExtensionStoreListItem = ExtensionListItem &
 
 export type ExtensionStoreDetail = Pick<
   Extension,
+  | 'id'
   | 'name'
   | 'title'
   | 'owner'

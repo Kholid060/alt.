@@ -5,7 +5,6 @@ import './utils/ipc/ipc-invoke-messages-handler';
 import { platform } from 'node:process';
 import updater from 'electron-updater';
 import CustomProtocol from './utils/custom-protocol/CustomProtocol';
-import { APP_DEEP_LINK } from '#packages/common/utils/constant/app.const';
 import path from 'node:path';
 import DeepLink from './utils/DeepLink';
 import WebsocketService from './services/websocket/websocket.service';
@@ -17,6 +16,7 @@ import WindowCommand from './window/command-window';
 import ExtensionService from './services/extension.service';
 import TrayService from './services/tray.service';
 import AppSettingsService from './services/app-settings.service';
+import { APP_DEEP_LINK_SCHEME } from '@alt-dot/shared';
 
 app.commandLine.appendSwitch('wm-window-animations-disabled');
 
@@ -34,18 +34,18 @@ if (!isSingleInstance) {
   // Register deep link
   if (process.defaultApp) {
     if (process.argv.length >= 2) {
-      app.setAsDefaultProtocolClient(APP_DEEP_LINK, process.execPath, [
+      app.setAsDefaultProtocolClient(APP_DEEP_LINK_SCHEME, process.execPath, [
         path.resolve(process.argv[2]),
       ]);
     }
   } else {
-    app.setAsDefaultProtocolClient(APP_DEEP_LINK, process.execPath);
+    app.setAsDefaultProtocolClient(APP_DEEP_LINK_SCHEME, process.execPath);
   }
 }
 
 app.on('second-instance', (_event, commandLine) => {
   const deepLink = commandLine ? commandLine.pop() : null;
-  if (!deepLink || !deepLink.startsWith(APP_DEEP_LINK)) {
+  if (!deepLink || !deepLink.startsWith(APP_DEEP_LINK_SCHEME)) {
     return;
   }
 

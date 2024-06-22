@@ -21,6 +21,7 @@ import { Route as OauthRedirectImport } from './routes/oauth/redirect'
 import { Route as AdminDashboardIndexImport } from './routes/admin/dashboard/index'
 import { Route as DevconsoleExtensionsNewImport } from './routes/devconsole/extensions/new'
 import { Route as DevconsoleExtensionsExtensionIdImport } from './routes/devconsole/extensions/$extensionId'
+import { Route as StoreStoreWorkflowsImport } from './routes/_store/store/workflows'
 import { Route as StoreStoreExtensionsImport } from './routes/_store/store/extensions'
 import { Route as SettingsSettingsProfileImport } from './routes/_settings/settings/profile'
 import { Route as DevconsoleDevconsoleExtensionsImport } from './routes/_devconsole/devconsole/extensions'
@@ -78,6 +79,11 @@ const DevconsoleExtensionsExtensionIdRoute =
     path: '/devconsole/extensions/$extensionId',
     getParentRoute: () => rootRoute,
   } as any)
+
+const StoreStoreWorkflowsRoute = StoreStoreWorkflowsImport.update({
+  path: '/store/workflows',
+  getParentRoute: () => StoreRoute,
+} as any)
 
 const StoreStoreExtensionsRoute = StoreStoreExtensionsImport.update({
   path: '/store/extensions',
@@ -175,6 +181,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StoreStoreExtensionsImport
       parentRoute: typeof StoreImport
     }
+    '/_store/store/workflows': {
+      id: '/_store/store/workflows'
+      path: '/store/workflows'
+      fullPath: '/store/workflows'
+      preLoaderRoute: typeof StoreStoreWorkflowsImport
+      parentRoute: typeof StoreImport
+    }
     '/devconsole/extensions/$extensionId': {
       id: '/devconsole/extensions/$extensionId'
       path: '/devconsole/extensions/$extensionId'
@@ -214,7 +227,10 @@ export const routeTree = rootRoute.addChildren({
     DevconsoleDevconsoleExtensionsRoute,
   }),
   SettingsRoute: SettingsRoute.addChildren({ SettingsSettingsProfileRoute }),
-  StoreRoute: StoreRoute.addChildren({ StoreStoreExtensionsRoute }),
+  StoreRoute: StoreRoute.addChildren({
+    StoreStoreExtensionsRoute,
+    StoreStoreWorkflowsRoute,
+  }),
   OauthRedirectRoute,
   AuthIndexRoute,
   StoreIndexRoute,
@@ -263,7 +279,8 @@ export const routeTree = rootRoute.addChildren({
     "/_store": {
       "filePath": "_store.tsx",
       "children": [
-        "/_store/store/extensions"
+        "/_store/store/extensions",
+        "/_store/store/workflows"
       ]
     },
     "/oauth/redirect": {
@@ -285,6 +302,10 @@ export const routeTree = rootRoute.addChildren({
     },
     "/_store/store/extensions": {
       "filePath": "_store/store/extensions.tsx",
+      "parent": "/_store"
+    },
+    "/_store/store/workflows": {
+      "filePath": "_store/store/workflows.tsx",
       "parent": "/_store"
     },
     "/devconsole/extensions/$extensionId": {

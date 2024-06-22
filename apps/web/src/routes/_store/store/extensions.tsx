@@ -1,4 +1,5 @@
 import { ExtensionDetailIcon } from '@/components/extension/ExtensionDetail';
+import { useNativeApp } from '@/hooks/useNativeApp';
 import { ExtensionStoreListItem } from '@/interface/extension.interface';
 import APIService from '@/services/api.service';
 import { StoreQueryValidation } from '@/validation/store-query.validation';
@@ -12,8 +13,13 @@ import {
   UiCardContent,
   UiCardFooter,
   UiCardHeader,
+  UiButtonLoader,
 } from '@alt-dot/ui';
-import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import {
+  infiniteQueryOptions,
+  keepPreviousData,
+  useInfiniteQuery,
+} from '@tanstack/react-query';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import {
   CpuIcon,
@@ -22,19 +28,27 @@ import {
   StoreIcon,
   UserRoundIcon,
 } from 'lucide-react';
-import { useState } from 'react';
+import { Fragment } from 'react';
 
-function queryData(search: StoreQueryValidation, page: number) {
-  return {
-    queryKey: ['store-extensions', search, page],
-    queryFn: () => APIService.instance.store.listExtensions(search),
-  };
+function queryData(search: StoreQueryValidation) {
+  return infiniteQueryOptions<
+    Awaited<ReturnType<typeof APIService.instance.store.listExtensions>>
+  >({
+    initialPageParam: null,
+    queryKey: ['store-extensions', search],
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    queryFn: ({ pageParam }) =>
+      APIService.instance.store.listExtensions({
+        ...search,
+        nextCursor: (pageParam as string) ?? undefined,
+      }),
+  });
 }
 
 export const Route = createFileRoute('/_store/store/extensions')({
   loaderDeps: ({ search }) => search,
   async loader({ context, deps }) {
-    await context.queryClient.prefetchQuery(queryData(deps, 1));
+    await context.queryClient.prefetchInfiniteQuery(queryData(deps));
   },
   staleTime: Infinity,
   component: StoreExtensionsPage,
@@ -42,6 +56,8 @@ export const Route = createFileRoute('/_store/store/extensions')({
 
 const numberFormatter = new Intl.NumberFormat();
 function ExtensionCard({ extension }: { extension: ExtensionStoreListItem }) {
+  const { installExtension } = useNativeApp();
+
   return (
     <UiCard className="flex flex-col">
       <UiCardHeader className="flex-row space-y-0 flex-1 items-center p-4 justify-between">
@@ -59,7 +75,11 @@ function ExtensionCard({ extension }: { extension: ExtensionStoreListItem }) {
         >
           <ShareIcon className="size-5" />
         </button>
-        <UiButton variant="secondary" className="hidden md:inline-block">
+        <UiButton
+          variant="secondary"
+          className="hidden md:inline-block"
+          onClick={() => installExtension(extension.id)}
+        >
           Install
         </UiButton>
       </UiCardHeader>
@@ -106,14 +126,12 @@ function ExtensionCard({ extension }: { extension: ExtensionStoreListItem }) {
 function StoreExtensionsPage() {
   const searchParams = Route.useSearch();
 
-  const [page, _setPage] = useState(1);
-
-  const query = useQuery({
+  const query = useInfiniteQuery({
     refetchOnMount: false,
     refetchInterval: false,
     refetchOnWindowFocus: false,
     placeholderData: keepPreviousData,
-    ...queryData(searchParams, page),
+    ...queryData(searchParams),
   });
 
   return (
@@ -146,14 +164,29 @@ function StoreExtensionsPage() {
         </div>
       ) : (
         <>
-          {query.data.items.length === 0 && (
+          {query.data.pages.map((group, index) => (
+            <Fragment key={index}>
+              {group.items.map((extension) => (
+                <ExtensionCard extension={extension} key={extension.id} />
+              ))}
+            </Fragment>
+          ))}
+          {query.data.pages.length === 0 && (
             <p className="text-center col-span-full py-4 text-muted-foreground">
               No data
             </p>
           )}
-          {query.data.items.map((extension) => (
-            <ExtensionCard extension={extension} key={extension.id} />
-          ))}
+          {query.hasNextPage && (
+            <div className="col-span-full pt-4 text-center">
+              <UiButtonLoader
+                isLoading={query.isFetching || query.isFetchingNextPage}
+                onClick={() => query.fetchNextPage()}
+                className="min-w-40"
+              >
+                Load more
+              </UiButtonLoader>
+            </div>
+          )}
         </>
       )}
     </div>

@@ -16,6 +16,10 @@ export {
   SHORTCUT_MODIFIER,
   SHORTCUT_KEY_DISPLAY_MAP,
 } from './utils/constant/shortcut.const';
+export {
+  APP_WEBSOCKET_PORT,
+  APP_DEEP_LINK_SCHEME,
+} from './utils/constant/constant';
 
 export { USKeyboard } from './utils/UsKeyboardLayout';
 export type {
