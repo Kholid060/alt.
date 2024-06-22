@@ -14,6 +14,7 @@ import {
   UiDropdownMenuTrigger,
   UiLogo,
 } from '@alt-dot/ui';
+import { Link } from '@tanstack/react-router';
 import {
   CodeIcon,
   LogInIcon,
@@ -22,7 +23,6 @@ import {
   UserRoundCogIcon,
   UserRoundIcon,
 } from 'lucide-react';
-import { Link, NavLink } from 'react-router-dom';
 
 function AppHeader() {
   const profile = useUserStore.use.profile();
@@ -38,7 +38,7 @@ function AppHeader() {
           </div>
           <div className="col-span-8 text-center">
             <UiButton variant="ghost" size="sm" asChild>
-              <NavLink to="/store">Store</NavLink>
+              <Link to="/store">Store</Link>
             </UiButton>
           </div>
           <div className="col-span-2 flex justify-end items-center">

@@ -1,25 +1,21 @@
-import { ErrorPage, ErrorNotFoundPage } from '@/pages/ErrorPage';
+import { ErrorPage, ErrorNotFoundPage } from '@/components/ErrorPage';
+import { FetchError } from '@/utils/afetch';
 import { PageError } from '@/utils/custom-error';
-import { useRouteError, isRouteErrorResponse } from 'react-router-dom';
+import { ErrorRouteComponent } from '@tanstack/react-router';
 
 function getError(error: unknown) {
   if (error instanceof Error) {
     return `${error.message}\n${error.stack}`;
   }
-  if (isRouteErrorResponse(error)) {
-    return `${error.status} ${error.statusText}\n\n${error.data}`;
-  }
 
   return JSON.stringify(error, null, 2);
 }
 
-export function AppErrorBoundary() {
-  const error = useRouteError();
-
+const AppErrorBoundary: ErrorRouteComponent = ({ error }) => {
   let page = <ErrorPage />;
   if (
     PageError.isPageError(error, 404) ||
-    (isRouteErrorResponse(error) && error.status === 404)
+    (FetchError.isFetchError(error) && error.status === 404)
   ) {
     page = <ErrorNotFoundPage {...error.data} />;
   }
@@ -34,6 +30,6 @@ export function AppErrorBoundary() {
       )}
     </div>
   );
-}
+};
 
 export default AppErrorBoundary;

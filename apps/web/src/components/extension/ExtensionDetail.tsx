@@ -63,8 +63,8 @@ export function ExtensionDetailHeader({
         icon={icon}
         title={title}
         iconUrl={iconUrl}
-        svgClass="size-8"
-        imageClass="size-9"
+        svgClass="size-11"
+        imageClass="size-12"
       />
       <div className="md:ml-4 flex-grow">
         <h2 className="text-2xl font-semibold cursor-default leading-tight">

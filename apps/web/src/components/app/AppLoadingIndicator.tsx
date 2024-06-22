@@ -1,15 +1,16 @@
+import { UiSkeleton } from '@alt-dot/ui';
 import { useIsFetching } from '@tanstack/react-query';
-import { useNavigation } from 'react-router-dom';
+import { useRouter } from '@tanstack/react-router';
 
 /**
  * https://mui.com/material-ui/react-progress/#linear-indeterminate
  */
 
 function AppLoadingIndicator() {
-  const { state } = useNavigation();
+  const router = useRouter();
   const isFetching = useIsFetching();
 
-  const isLoading = state === 'loading' || isFetching > 0;
+  const isLoading = isFetching || router.state.isLoading;
 
   return (
     <div
@@ -42,6 +43,20 @@ function AppLoadingIndicator() {
         }}
         className="bg-primary/60 h-full left-0 top-0 bottom-0 absolute"
       />
+    </div>
+  );
+}
+
+export function AppLoadingPlaceholder() {
+  return (
+    <div className="container">
+      <UiSkeleton className="h-12 mt-4" />
+      <UiSkeleton className="h-8 mt-24 max-w-sm" />
+      <div className="flex flex-col md:flex-row mt-4 gap-4">
+        <UiSkeleton className="h-48 w-full md:w-64" />
+        <UiSkeleton className="h-48 flex-1" />
+      </div>
+      <UiSkeleton className="h-64 w-full mt-4" />
     </div>
   );
 }

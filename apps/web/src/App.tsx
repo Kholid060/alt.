@@ -1,60 +1,79 @@
-import { useEffect } from 'react';
-import SupabaseService from './services/supabase.service';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createRouter, RouterProvider } from '@tanstack/react-router';
+import AppErrorBoundary from './components/app/AppErrorBoundary';
+import { routeTree } from './routeTree.gen';
+import { useEffect, useState } from 'react';
+import { AppLoadingPlaceholder } from './components/app/AppLoadingIndicator';
 import APIService from './services/api.service';
-import AppHeader from './components/app/AppHeader';
-import { Outlet, useNavigate } from 'react-router-dom';
-import { DialogProvider, UiToaster } from '@alt-dot/ui';
+import SupabaseService from './services/supabase.service';
 import { useUserStore } from './stores/user.store';
-import AppLoadingIndicator from './components/app/AppLoadingIndicator';
+import { UserProfile } from './interface/user.interface';
+import { ErrorNotFoundPage } from './components/ErrorPage';
 
-function App() {
-  const navigate = useNavigate();
+const router = createRouter({
+  routeTree,
+  defaultPreloadStaleTime: 0,
+  defaultErrorComponent: AppErrorBoundary,
+  defaultNotFoundComponent: () => (
+    <div className="mt-24">
+      <ErrorNotFoundPage />
+    </div>
+  ),
+});
 
-  useEffect(() => {
-    const stateChange = SupabaseService.instance.client.auth.onAuthStateChange(
-      (event, session) => {
-        console.log(event);
-        switch (event) {
-          case 'INITIAL_SESSION':
-          case 'TOKEN_REFRESHED':
-            APIService.instance.$setSession(session);
-            break;
-          case 'SIGNED_OUT':
-            window.location.href = '/';
-            break;
-        }
-      },
-    );
-
-    return () => {
-      stateChange.data.subscription.unsubscribe();
-    };
-  }, [navigate]);
-
-  return (
-    <DialogProvider>
-      <AppHeader />
-      <UiToaster />
-      <Outlet />
-      <AppLoadingIndicator />
-    </DialogProvider>
-  );
+// Register the router instance for type safety
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router;
+  }
 }
 
-export async function appLoader() {
-  try {
-    const session = await SupabaseService.instance.client.auth.getSession();
-    if (!session.data.session) return null;
+const queryClient = new QueryClient();
 
-    APIService.instance.$setSession(session.data.session);
-    const profile = await APIService.instance.me.get();
-    useUserStore.getState().setProfile(profile);
+function App() {
+  const [profile, setProfile] = useState<{
+    isFetched: boolean;
+    data: UserProfile | null;
+  }>({ isFetched: false, data: null });
 
-    return profile;
-  } catch (error) {
-    console.error(error);
-    return null;
+  useEffect(() => {
+    const fetchProfile = async () => {
+      let userProfile: UserProfile | null = null;
+
+      try {
+        const session = await SupabaseService.instance.client.auth.getSession();
+        if (!session.data.session) return;
+
+        APIService.instance.$setSession(session.data.session);
+
+        userProfile = await APIService.instance.me.get();
+        useUserStore.getState().setProfile(userProfile);
+      } catch (error) {
+        if (import.meta.env.DEV) {
+          console.error(error);
+        }
+      } finally {
+        setProfile({
+          isFetched: true,
+          data: userProfile,
+        });
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  if (!profile.isFetched) {
+    return <AppLoadingPlaceholder />;
   }
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider
+        router={router}
+        context={{ queryClient, userProfile: profile.data }}
+      />
+    </QueryClientProvider>
+  );
 }
 
 export default App;

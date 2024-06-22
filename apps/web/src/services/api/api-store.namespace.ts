@@ -1,24 +1,17 @@
 import {
-  ExtensionCategories,
   ExtensionStoreDetail,
   ExtensionStoreListItem,
 } from '@/interface/extension.interface';
 import APIService from '../api.service';
-
-export interface StoreQueryOptions {
-  q: string;
-  page: string;
-  category: ExtensionCategories;
-  sortBy: 'recently-added' | 'most-installed';
-}
+import { StoreQueryValidation } from '@/validation/store-query.validation';
 
 class APIStoreNamespace {
   constructor(private api: APIService) {}
 
-  listExtensions(options: Partial<StoreQueryOptions> = {}) {
+  listExtensions(options: Partial<StoreQueryValidation> = {}) {
     const searhParams = new URLSearchParams();
     for (const key in options) {
-      const value = options[key as keyof StoreQueryOptions];
+      const value = options[key as keyof StoreQueryValidation];
       if (value) searhParams.set(key, value);
     }
 

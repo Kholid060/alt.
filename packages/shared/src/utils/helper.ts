@@ -155,11 +155,11 @@ export function generateRandomString(length = 12) {
   return result;
 }
 
-export function promiseWithResolver<T = void>() {
-  if ('withResolvers' in Promise) {
-    return Promise.withResolvers<T>();
-  }
-
+export function promiseWithResolver<T = void>(): {
+  promise: Promise<T>;
+  resolve: (value: T | PromiseLike<T>) => void;
+  reject: (reason?: any) => void;
+} {
   let reject: (reason?: any) => void = () => {};
   let resolve: (value: T | PromiseLike<T>) => void = () => {};
   const promise = new window.Promise<T>((res, rej) => {
