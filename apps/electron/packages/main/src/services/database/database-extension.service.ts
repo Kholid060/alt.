@@ -155,6 +155,19 @@ class DBExtensionService {
     });
   }
 
+  async exists(extensionId: string) {
+    const extension = await this.database.query.extensions.findFirst({
+      columns: {
+        id: true,
+      },
+      where(fields, operators) {
+        return operators.eq(fields.id, extensionId);
+      },
+    });
+
+    return Boolean(extension);
+  }
+
   async insertError({
     title,
     message,
@@ -235,8 +248,13 @@ class DBExtensionService {
         commands: {},
       },
     });
+    if (!extension) return null;
 
-    return extension as ExtensionManifest;
+    return {
+      ...extension,
+      categories: [],
+      $apiVersion: '',
+    } as ExtensionManifest;
   }
 
   getErrorsList(

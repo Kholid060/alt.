@@ -17,8 +17,15 @@ import ExtensionService from './services/extension.service';
 import TrayService from './services/tray.service';
 import AppSettingsService from './services/app-settings.service';
 import { APP_DEEP_LINK_SCHEME } from '@alt-dot/shared';
+import API from '#common/utils/API';
 
+/**
+ * Fix flashes when toggle the command window
+ * https://github.com/electron/electron/issues/22691#issuecomment-599608331
+ */
 app.commandLine.appendSwitch('wm-window-animations-disabled');
+
+API.extensions.$setApiKey(import.meta.env.VITE_API_KEY);
 
 Menu.setApplicationMenu(null);
 CustomProtocol.registerPrivileged();
@@ -85,7 +92,7 @@ app
       ExtensionLoader.instance.loadExtensions(),
     ]);
 
-    await ExtensionService.instance.registerAllShortcuts();
+    await ExtensionService.instance.init();
     await WindowCommand.instance.restoreOrCreateWindow();
   })
   .catch((e) => console.error('Failed create window:', e));

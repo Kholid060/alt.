@@ -3,6 +3,7 @@ import { createStoreSelectors } from '@/utils/store-utils';
 import { create } from 'zustand';
 
 interface UserStoreState {
+  profileFetched: boolean;
   profile: null | UserProfile;
 }
 interface UserStoreActions {
@@ -19,12 +20,13 @@ export type ProfileStore = UserStoreState & UserStoreActions;
 
 const initialData: UserStoreState = {
   profile: null,
+  profileFetched: false,
 };
 
 const useUserStoreBase = create<ProfileStore>((set, get) => ({
   ...initialData,
   setProfile(profile) {
-    set({ profile });
+    set({ profile, profileFetched: true });
   },
   setState(key, value) {
     set({ [key]: value });

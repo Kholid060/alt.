@@ -31,6 +31,7 @@ import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import ListItemWorkflow from '/@/components/list-item/ListItemWorkflow';
 import ListItemExtension from '/@/components/list-item/ListItemExtension';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
+import { isIPCEventError } from '#packages/common/utils/helper';
 
 const QUERY_PREFIX = {
   EXT: 'ext:',
@@ -241,7 +242,7 @@ function CommandList() {
           const result = await preloadAPI.main.ipc.invoke('extension:import');
           if (!result) return;
 
-          if ('$isError' in result) {
+          if (isIPCEventError(result)) {
             await preloadAPI.main.ipc.invoke('dialog:message-box', {
               type: 'error',
               message: `Error when trying to import extension:\n\n${result.message}`,

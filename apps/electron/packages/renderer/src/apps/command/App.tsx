@@ -23,6 +23,7 @@ import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { ExtensionBrowserTabContext } from '#packages/common/interface/extension.interface';
 import { debounce } from '@alt-dot/shared';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const routes = createCommandRoutes(commandAppRoutes);
 
@@ -118,6 +119,8 @@ function IdleListener({
   return null;
 }
 
+const queryClient = new QueryClient();
+
 function App() {
   const [hide, setHide] = useState(false);
 
@@ -136,32 +139,34 @@ function App() {
   }, []);
 
   return (
-    <UiTooltipProvider>
-      <DatabaseProvider>
-        <CommandRouteProvider routes={routes}>
-          <IdleListener
-            onToggleHide={(value) => value !== hide && setHide(value)}
-          />
-          {!hide && (
-            <CommandCtxProvider>
-              <AppEventListener />
-              <div className="p-0.5">
-                <UiListProvider>
-                  <AppDevtools />
-                  <div className="bg-background border rounded-lg w-full z-10 relative">
-                    <CommandHeader />
-                    <CommandContent />
-                    <CommandErrorOverlay />
-                    <CommandOAuthOverlay />
-                  </div>
-                </UiListProvider>
-                <CommandFooter />
-              </div>
-            </CommandCtxProvider>
-          )}
-        </CommandRouteProvider>
-      </DatabaseProvider>
-    </UiTooltipProvider>
+    <QueryClientProvider client={queryClient}>
+      <UiTooltipProvider>
+        <DatabaseProvider>
+          <CommandRouteProvider routes={routes}>
+            <IdleListener
+              onToggleHide={(value) => value !== hide && setHide(value)}
+            />
+            {!hide && (
+              <CommandCtxProvider>
+                <AppEventListener />
+                <div className="p-0.5">
+                  <UiListProvider>
+                    <AppDevtools />
+                    <div className="bg-background border rounded-lg w-full z-10 relative">
+                      <CommandHeader />
+                      <CommandContent />
+                      <CommandErrorOverlay />
+                      <CommandOAuthOverlay />
+                    </div>
+                  </UiListProvider>
+                  <CommandFooter />
+                </div>
+              </CommandCtxProvider>
+            )}
+          </CommandRouteProvider>
+        </DatabaseProvider>
+      </UiTooltipProvider>
+    </QueryClientProvider>
   );
 }
 

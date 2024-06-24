@@ -1,5 +1,5 @@
 import { Extension } from '@/interface/extension.interface';
-import { afetch } from '@/utils/afetch';
+import { afetch } from '@alt-dot/shared';
 import { UiExtIcon } from '@alt-dot/extension';
 import { UiButton, UiImage, UiInput, UiLabel, UiSkeleton } from '@alt-dot/ui';
 import { useQuery } from '@tanstack/react-query';
@@ -36,7 +36,12 @@ export function ExtensionDetailIcon({
   }
 
   return (
-    <UiImage src={iconUrl} className={clsx(imageClass)} alt={`${title} icon`} />
+    <UiImage
+      src={iconUrl}
+      className={clsx(imageClass)}
+      alt={`${title} icon`}
+      loading="lazy"
+    />
   );
 }
 

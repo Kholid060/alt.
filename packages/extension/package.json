@@ -9,9 +9,6 @@
     "dev": "tsup --watch",
     "lint": "eslint . --ext js,mjs,cjs,ts,mts,cts,tsx"
   },
-  "bin": {
-    "altdot": "../extension-core/bin/cli.js"
-  },
   "dependencies": {
     "@alt-dot/extension-core": "workspace:*",
     "@alt-dot/shared": "workspace:*",

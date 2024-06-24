@@ -190,6 +190,7 @@ function StoreFilter() {
             search: location.search,
           });
         }}
+        className="w-full md:w-auto"
       >
         <UiTabsList>
           {storeTypes.map((item) => (

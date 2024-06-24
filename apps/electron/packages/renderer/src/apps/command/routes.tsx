@@ -5,6 +5,7 @@ import ConfigInput from './routes/ConfigInput';
 import CreateCommandScript from './routes/CreateCommandScript';
 import FallbackCommands from './routes/FallbackCommands';
 import RunningProcess from './routes/RunningProcess';
+import StoreExtensionsInstall from './routes/StoreExtensionsInstall';
 import { CommandRoute } from '/@/interface/command-route.interface';
 
 export const commandAppRoutes = [
@@ -12,6 +13,11 @@ export const commandAppRoutes = [
     path: '',
     name: 'home',
     element: CommandList,
+  },
+  {
+    name: 'store-extension-install',
+    element: StoreExtensionsInstall,
+    path: '/store/extensions/:extensionId/install',
   },
   {
     element: CommandView,

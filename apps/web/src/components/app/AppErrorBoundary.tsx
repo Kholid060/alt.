@@ -1,6 +1,6 @@
 import { ErrorPage, ErrorNotFoundPage } from '@/components/ErrorPage';
-import { FetchError } from '@/utils/afetch';
 import { PageError } from '@/utils/custom-error';
+import { FetchError } from '@alt-dot/shared';
 import { ErrorRouteComponent } from '@tanstack/react-router';
 
 function getError(error: unknown) {

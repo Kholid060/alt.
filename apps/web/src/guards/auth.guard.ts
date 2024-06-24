@@ -1,18 +1,18 @@
 import { AppRouteGuardFunc } from '@/interface/app.interface';
 import { UserProfile } from '@/interface/user.interface';
-import { redirect } from '@tanstack/react-router';
+import { ParsedLocation, redirect } from '@tanstack/react-router';
 
-function hasNoUsername(profile: UserProfile) {
-  return !profile.username && window.location.pathname !== '/settings/profile';
+function hasNoUsername(profile: UserProfile, location: ParsedLocation) {
+  return !profile.username && location.pathname !== '/settings/profile';
 }
 
-export const authGuard: AppRouteGuardFunc = ({ context }) => {
+export const authGuard: AppRouteGuardFunc = ({ context, location }) => {
   if (!context.userProfile) {
     throw redirect({
       to: '/auth',
     });
   }
-  if (hasNoUsername(context.userProfile)) {
+  if (hasNoUsername(context.userProfile, location)) {
     throw redirect({
       to: '/settings/profile',
       search: {
@@ -22,10 +22,10 @@ export const authGuard: AppRouteGuardFunc = ({ context }) => {
   }
 };
 
-export const noAuthGuard: AppRouteGuardFunc = ({ context }) => {
+export const noAuthGuard: AppRouteGuardFunc = ({ context, location }) => {
   if (!context.userProfile) return true;
 
-  if (hasNoUsername(context.userProfile)) {
+  if (hasNoUsername(context.userProfile, location)) {
     throw redirect({
       to: '/settings/profile',
       search: {

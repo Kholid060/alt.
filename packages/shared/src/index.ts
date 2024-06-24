@@ -11,22 +11,22 @@ export type {
   BetterMessagePortResult,
   BetterMessagePortOptions,
 } from './utils/BetterMessagePort';
-export {
-  SHORTCUT_KEYS,
-  SHORTCUT_MODIFIER,
-  SHORTCUT_KEY_DISPLAY_MAP,
-} from './utils/constant/shortcut.const';
-export {
-  APP_WEBSOCKET_PORT,
-  APP_DEEP_LINK_SCHEME,
-} from './utils/constant/constant';
 
+export * from './utils/constant/constant';
+export * from './utils/constant/shortcut.const';
+export * from './utils/constant/extension.const';
+
+export { FetchError, afetch } from './utils/afetch';
+export type { ARequestInit } from './utils/afetch';
 export { USKeyboard } from './utils/UsKeyboardLayout';
 export type {
   USKeyboardKeys,
   USKeyboardDetail,
 } from './utils/UsKeyboardLayout';
 
+export { default as API } from './api';
+
+export type * from './interfaces/api.interface';
 export type * from './interfaces/utils.interface';
 export type * from './interfaces/browser.interface';
 export type * from './interfaces/keyboard.interface';

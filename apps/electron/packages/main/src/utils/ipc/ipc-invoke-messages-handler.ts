@@ -57,8 +57,11 @@ IPCMain.handle('extension:stop-running-command', (_, runningId) => {
   ExtensionService.instance.stopCommandExecution(runningId);
   return Promise.resolve();
 });
+IPCMain.handle('extension:install', (_, extId) => {
+  return ExtensionLoader.instance.installExtension(extId);
+});
 IPCMain.handle('extension:delete', (_, extId) => {
-  return DBService.instance.extension.delete(extId);
+  return ExtensionLoader.instance.uninstallExtension(extId);
 });
 IPCMain.handle('extension:is-config-inputted', (_, extensionId, commandId) => {
   return DBService.instance.extension.isConfigInputted(extensionId, commandId);
@@ -176,9 +179,10 @@ IPCMain.handle('app:toggle-lock-window', ({ sender }) => {
   const browserWindow = BrowserWindow.fromWebContents(sender);
   if (!browserWindow) return Promise.resolve();
 
-  const isLocked = !browserWindow.isResizable();
+  const isLocked = !browserWindow.isAlwaysOnTop();
   browserWindow.setResizable(isLocked);
   browserWindow.setSkipTaskbar(!isLocked);
+  browserWindow.setAlwaysOnTop(isLocked, 'modal-panel');
 
   return Promise.resolve();
 });
@@ -219,6 +223,9 @@ IPCMain.handle('database:insert-workflow', (_, data) => {
 
 IPCMain.handle('database:get-extension', (_, extensionId) => {
   return DBService.instance.extension.get(extensionId);
+});
+IPCMain.handle('database:get-extension-exists', (_, extensionId) => {
+  return DBService.instance.extension.exists(extensionId);
 });
 IPCMain.handle('database:get-extension-creds', () => {
   return DBService.instance.extension.getCredentials();

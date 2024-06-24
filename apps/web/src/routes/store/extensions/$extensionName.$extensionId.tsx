@@ -151,10 +151,11 @@ function ExtensionPageBanner({
         {extension.banners.map((banner, index) => (
           <div
             key={banner}
-            className="flex-shrink-0 aspect-video h-64 rounded-lg overflow-hidden snap-start"
+            className="flex-shrink-0 aspect-video h-64 rounded-lg overflow-hidden snap-start relative"
           >
             <img
               src={banner}
+              loading="lazy"
               alt={`${extension.title} banner ${index + 1}`}
               className="object-cover object-center h-full w-full"
             />

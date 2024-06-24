@@ -10,7 +10,7 @@ export default {
   description,
   title: 'Clipboard',
   icon: 'icon:Clipboard',
-  categories: [],
+  categories: ['Applications'],
   credentials: [
     {
       providerId: 'google-drive',

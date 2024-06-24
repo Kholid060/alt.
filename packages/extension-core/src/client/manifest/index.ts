@@ -1,61 +1,18 @@
 import { z } from 'zod';
 import { ExtensionCredentialSchema } from './manifest-credential';
+import {
+  EXTENSION_CATEGORIES,
+  EXTENSION_CONFIG_TYPE,
+  EXTENSION_PERMISSIONS,
+  EXTENSION_COMMAND_TYPE,
+  EXTENSION_COMMAND_ARGUMENT_TYPE,
+  ExtensionConfigType,
+  ExtensionPermissions,
+  ExtensionCommandType,
+  ExtensionCommandArgumentType,
+} from '@alt-dot/shared';
 
-export const URL_FRIENDLY_REGEX = /^[a-zA-Z0-9_-]*$/;
-
-export const EXTENSION_CATEGORIES = [
-  'Applications',
-  'Automation',
-  'Developer Tools',
-  'Productivity',
-  'Scripts',
-  'Web',
-  'Other',
-] as const;
-
-export const EXTENSION_PERMISSIONS = [
-  'fs',
-  'shell',
-  'sqlite',
-  'storage',
-  'fs.read',
-  'fs.write',
-  'clipboard',
-  'notifications',
-  'installed-apps',
-  'browser.activeTab',
-] as const;
-
-export const EXTENSION_COMMAND_TYPE = [
-  'view',
-  'action',
-  'script',
-  'view:json',
-] as const;
-export type ExtensionCommandType = (typeof EXTENSION_COMMAND_TYPE)[number];
-
-export const EXTENSION_COMMAND_CONTEXT = ['all'] as const;
-
-export const EXTENSION_COMMAND_ARGUMENT_TYPE = [
-  'toggle',
-  'select',
-  'input:text',
-  'input:number',
-  'input:password',
-] as const;
-export type ExtensionCommandArgumentType =
-  (typeof EXTENSION_COMMAND_ARGUMENT_TYPE)[number];
-
-export const EXTENSION_CONFIG_TYPE = [
-  'select',
-  'toggle',
-  'input:text',
-  'input:file',
-  'input:number',
-  'input:password',
-  'input:directory',
-] as const;
-export type ExtensionConfigType = (typeof EXTENSION_CONFIG_TYPE)[number];
+const URL_FRIENDLY_REGEX = /^[a-zA-Z0-9_-]*$/;
 
 const ExtensionCommandArgumentBaseSchema = z.object({
   name: z.string().min(1).max(32),
@@ -119,6 +76,7 @@ export const ExtensionConfigSchema = z.discriminatedUnion('type', [
     }),
   ),
 ]);
+export type ExtensionConfig = z.infer<typeof ExtensionConfigSchema>;
 
 export const ExtensionCommandSchema = z.object({
   name: z.string().min(1),
@@ -141,6 +99,7 @@ export const ExtensionCommandSchema = z.object({
     .array()
     .optional(),
 });
+export type ExtensionCommand = z.infer<typeof ExtensionCommandSchema>;
 
 export const ExtensionManifestSchema = z.object({
   icon: z.string().min(1),
@@ -156,7 +115,8 @@ export const ExtensionManifestSchema = z.object({
     .array()
     .min(1, {
       message: `Extension must have at least one category.\nAvailable categories: ${EXTENSION_CATEGORIES.join(',')}`,
-    }),
+    })
+    .transform((data) => [...new Set(data)]),
   credentials: ExtensionCredentialSchema.array().optional(),
   permissions: z.enum(EXTENSION_PERMISSIONS).array().optional(),
   name: z
@@ -167,13 +127,23 @@ export const ExtensionManifestSchema = z.object({
     })
     .describe('The name must be URL friendly'),
 });
+export type ExtensionManifest = z.infer<typeof ExtensionManifestSchema>;
 
 export type ExtensionCommandArgument = z.infer<
   typeof ExtensionCommandArgumentSchema
 >;
 
-export type ExtensionCommand = z.infer<typeof ExtensionCommandSchema>;
-
-export type ExtensionManifest = z.infer<typeof ExtensionManifestSchema>;
-
-export type ExtensionConfig = z.infer<typeof ExtensionConfigSchema>;
+export type {
+  ExtensionConfigType,
+  ExtensionPermissions,
+  ExtensionCommandType,
+  ExtensionCommandArgumentType,
+};
+export {
+  URL_FRIENDLY_REGEX,
+  EXTENSION_CATEGORIES,
+  EXTENSION_CONFIG_TYPE,
+  EXTENSION_PERMISSIONS,
+  EXTENSION_COMMAND_TYPE,
+  EXTENSION_COMMAND_ARGUMENT_TYPE,
+};

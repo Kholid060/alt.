@@ -1,28 +1,28 @@
 import {
-  ExtensionCreatePayload,
-  ExtensionUserListItem,
-  ExtensionUserDetail,
-  ExtensionEntry,
-} from '@/interface/extension.interface';
-import { UserProfile } from '@/interface/user.interface';
-import APIService from '../api.service';
-import { APISuccessResult } from '@/interface/api.interface';
+  ApiUserProfile,
+  ApiExtensionEntry,
+  APISuccessResult,
+  ApiExtensionUserDetail,
+  ApiExtensionUserListItem,
+  ApiExtensionCreatePayload,
+} from '../../interfaces/api.interface';
+import API from '../index';
 
 class APIMeNamespace {
-  constructor(private api: APIService) {}
+  constructor(private api: API) {}
 
   get() {
-    return this.api.authorizeFetch<UserProfile | null>('/me');
+    return this.api.authorizeFetch<ApiUserProfile | null>('/me');
   }
 
-  update(profile: Partial<Pick<UserProfile, 'name' | 'username'>>) {
-    return this.api.authorizeFetch<UserProfile>('/me', {
+  update(profile: Partial<Pick<ApiUserProfile, 'name' | 'username'>>) {
+    return this.api.authorizeFetch<ApiUserProfile>('/me', {
       method: 'PATCH',
       body: JSON.stringify(profile),
     });
   }
 
-  createExtension(extensionPayload: ExtensionCreatePayload) {
+  createExtension(extensionPayload: ApiExtensionCreatePayload) {
     return this.api.authorizeFetch<APISuccessResult<{ extensionId: string }>>(
       '/me/extensions',
       {
@@ -33,21 +33,24 @@ class APIMeNamespace {
   }
 
   createEntry(extensionId: string, reason: string) {
-    return this.api.authorizeFetch<APISuccessResult<{ data: ExtensionEntry }>>(
-      `/me/extensions/${extensionId}/entry`,
-      {
-        method: 'POST',
-        body: JSON.stringify({ reason }),
-      },
-    );
+    return this.api.authorizeFetch<
+      APISuccessResult<{ data: ApiExtensionEntry }>
+    >(`/me/extensions/${extensionId}/entry`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    });
   }
 
   listExtensions() {
-    return this.api.authorizeFetch<ExtensionUserListItem[]>('/me/extensions');
+    return this.api.authorizeFetch<ApiExtensionUserListItem[]>(
+      '/me/extensions',
+    );
   }
 
   getExtension(id: string) {
-    return this.api.authorizeFetch<ExtensionUserDetail>(`/me/extensions/${id}`);
+    return this.api.authorizeFetch<ApiExtensionUserDetail>(
+      `/me/extensions/${id}`,
+    );
   }
 
   deleteExtensionEntry(extensionId: string) {
@@ -65,7 +68,7 @@ class APIMeNamespace {
   }
 
   resubmitEntry(extensionId: string) {
-    return this.api.authorizeFetch<APISuccessResult<ExtensionEntry>>(
+    return this.api.authorizeFetch<APISuccessResult<ApiExtensionEntry>>(
       `/me/extensions/${extensionId}/entry/resubmit`,
       { method: 'POST' },
     );

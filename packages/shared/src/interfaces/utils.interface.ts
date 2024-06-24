@@ -44,3 +44,7 @@ export type EventMapEmit<Event> = <T extends keyof Event, K extends Event[T]>(
   name: T,
   ...args: K extends FunctionType ? Parameters<K> : K extends any[] ? K : [K]
 ) => K extends FunctionType ? ReturnType<K> : void;
+
+export type ArrayUnion<
+  T extends [string, ...string[]] | readonly [string, ...string[]],
+> = T[number];

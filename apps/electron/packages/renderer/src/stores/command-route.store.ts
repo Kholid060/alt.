@@ -9,7 +9,7 @@ interface CommandRouteProps {
 }
 
 export interface CommandRouteState extends CommandRouteProps {
-  currentRoute: CommandRouteActive | null;
+  currentRoute: CommandRouteActive;
 }
 
 export interface CommandRouteActions {
@@ -56,6 +56,8 @@ export const createCommandRouteStore = (
 
         break;
       }
+
+      if (!currentRoute) throw new Error('Route not found');
 
       set({ currentRoute });
     },

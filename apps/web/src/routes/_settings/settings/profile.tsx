@@ -1,6 +1,6 @@
 import APIService from '@/services/api.service';
 import { useUserStore } from '@/stores/user.store';
-import { FetchError } from '@/utils/afetch';
+import { FetchError } from '@alt-dot/shared';
 import {
   useToast,
   UiAlert,

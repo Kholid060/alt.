@@ -18,10 +18,6 @@ export class PageError<T extends keyof PageErrorData> extends Error {
     error: unknown,
     status?: T,
   ): error is PageError<T> {
-    console.dir(error);
-    console.log(
-      error instanceof Error && '$type' in error && error.$type === 'PageError',
-    );
     if (
       error instanceof Error &&
       '$type' in error &&

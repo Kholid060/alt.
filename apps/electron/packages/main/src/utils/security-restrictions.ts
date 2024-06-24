@@ -30,8 +30,9 @@ const ALLOWED_ORIGINS_AND_PERMISSIONS = new Map<string, Set<Permission>>(
  *   href="https://github.com/"
  * >
  */
-const ALLOWED_EXTERNAL_ORIGINS = new Set<`https://${string}`>([
+const ALLOWED_EXTERNAL_ORIGINS = new Set<string>([
   'https://github.com',
+  import.meta.env.VITE_WEB_BASE_URL,
 ]);
 
 app.on('web-contents-created', (_, contents) => {
@@ -92,7 +93,7 @@ app.on('web-contents-created', (_, contents) => {
   contents.setWindowOpenHandler(({ url }) => {
     const { origin } = new URL(url);
 
-    if (ALLOWED_EXTERNAL_ORIGINS.has(origin as `https://${string}`)) {
+    if (ALLOWED_EXTERNAL_ORIGINS.has(origin)) {
       // Open url in default browser.
       shell.openExternal(url).catch(console.error);
     } else if (import.meta.env.DEV) {

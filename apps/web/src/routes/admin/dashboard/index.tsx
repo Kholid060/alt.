@@ -4,13 +4,15 @@ import UiMarkdown from '@/components/ui/UiMarkdown';
 import { authGuard } from '@/guards/auth.guard';
 import { AdminExtensionListItem } from '@/interface/admin.interface';
 import APIService from '@/services/api.service';
-import { AdminSetExtentionEntryPayload } from '@/services/api/api-admin.namespace';
 import GithubAPI from '@/utils/GithubAPI';
-import { afetch } from '@/utils/afetch';
 import { EXT_BANNER_NAME_REGEX, UserRole } from '@/utils/constant';
 import { routeBeforeLoadPipe } from '@/utils/route-utils';
 import { ExtensionManifestSchema } from '@alt-dot/extension-core';
-import { parseJSON } from '@alt-dot/shared';
+import {
+  ApiAdminSetExtentionEntryPayload,
+  afetch,
+  parseJSON,
+} from '@alt-dot/shared';
 import {
   useToast,
   UiDialog,
@@ -63,7 +65,7 @@ export const Route = createFileRoute('/admin/dashboard/')({
 });
 
 type ApproveExtPayload = Extract<
-  AdminSetExtentionEntryPayload,
+  ApiAdminSetExtentionEntryPayload,
   { type: 'approved' }
 >['extension'];
 
@@ -298,7 +300,9 @@ function ExtensionListItem({
 
   const [state, setState] = useState<'approve' | 'reject' | null>(null);
 
-  async function setExtensionRequest(payload: AdminSetExtentionEntryPayload) {
+  async function setExtensionRequest(
+    payload: ApiAdminSetExtentionEntryPayload,
+  ) {
     try {
       if (!item.entry) return;
 

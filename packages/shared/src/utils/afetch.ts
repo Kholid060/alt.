@@ -1,3 +1,14 @@
+const fetchErrorData = {
+  401: {
+    status: 401,
+    statusText: 'Unauthorized',
+  },
+  404: {
+    status: 404,
+    statusText: 'Not Found',
+  },
+};
+
 interface ApiErrorData {
   error: string;
   message: string;
@@ -26,6 +37,24 @@ export class FetchError extends Error {
     this.statusText = statusText;
   }
 
+  static fromStatusCode(
+    statusCode: keyof typeof fetchErrorData,
+    { error, message }: { error?: string; message?: string } = {},
+  ) {
+    const data = fetchErrorData[statusCode] ?? fetchErrorData[404];
+
+    return new FetchError({
+      data: {
+        error: error ?? '',
+        statusCode: data.status,
+        message: message ?? data.statusText,
+      },
+      status: data.status,
+      message: data.statusText,
+      statusText: data.statusText,
+    });
+  }
+
   static isFetchError(error: unknown): error is FetchError {
     return error instanceof FetchError;
   }
@@ -34,7 +63,7 @@ export class FetchError extends Error {
 export interface ARequestInit extends RequestInit {
   auth?: string;
   headers?: Record<string, string>;
-  responseType?: 'json' | 'blob' | 'formData' | 'text';
+  responseType?: 'json' | 'blob' | 'formData' | 'text' | 'arrayBuffer';
 }
 
 export async function afetch<T = unknown>(

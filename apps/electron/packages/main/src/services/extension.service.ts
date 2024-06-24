@@ -32,11 +32,9 @@ class ExtensionService {
   } | null = null;
   private runningCommands: Map<string, ExtensionCommandProcess> = new Map();
 
-  constructor() {
-    this.init();
-  }
+  constructor() {}
 
-  private init() {
+  async init() {
     IPCMain.on(
       'extension:command-exec-change',
       (
@@ -74,14 +72,16 @@ class ExtensionService {
         });
       },
     );
-    DBService.instance.extension.deleteOldErrors().catch(console.error);
+
+    await DBService.instance.extension.deleteOldErrors().catch(console.error);
+    await this.registerAllShortcuts();
   }
 
   getRunningCommands() {
     return [...this.runningCommands.values()];
   }
 
-  async registerAllShortcuts() {
+  private async registerAllShortcuts() {
     const commands =
       await DBService.instance.db.query.extensionCommands.findMany({
         columns: {
@@ -196,7 +196,6 @@ class ExtensionService {
           executeCommandPayload,
         );
 
-        // check if command window is closed
         await WindowCommand.instance.toggleWindow(true);
         await WindowCommand.instance.sendMessage(
           'command-window:open-command-json-view',

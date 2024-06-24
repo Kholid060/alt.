@@ -52,6 +52,7 @@ async function buildCommands(watch = false) {
         }
       : undefined,
     build: {
+      minify: watch ? false : 'esbuild',
       outDir: OUT_DIR,
       sourcemap: watch ? 'inline' : false,
       watch: watch

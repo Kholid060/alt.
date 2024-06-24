@@ -137,7 +137,14 @@ function ExtensionDetailCard({
           ) : builtInExtensionIds.includes(extensionId) ? (
             'Built-in extesion'
           ) : (
-            'Marketplace'
+            <a
+              href={`${import.meta.env.VITE_WEB_BASE_URL}/store/extensions/${extension.data.id}`}
+              target="_blank"
+              rel="noreferrer"
+              className="underline"
+            >
+              Store
+            </a>
           )}
         </div>
       </div>

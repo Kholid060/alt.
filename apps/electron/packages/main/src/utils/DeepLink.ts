@@ -10,6 +10,7 @@ import { WORKFLOW_MANUAL_TRIGGER_ID } from '#packages/common/utils/constant/work
 import ExtensionService from '../services/extension.service';
 import WorkflowService from '../services/workflow.service';
 import StoreService from '../services/store.service';
+import WindowCommand from '../window/command-window';
 
 function convertArgValue(argument: ExtensionCommandArgument, value: string) {
   let convertedValue: unknown = value;
@@ -142,8 +143,13 @@ class DeepLinkHandler {
     const [_, type, itemId] = pathname.split('/');
     if (!itemId) return;
 
-    if (type === 'extensions') StoreService.installExtension(itemId);
-    else if (type === 'workflows') StoreService.installWorkflow(itemId);
+    if (type === 'extensions') {
+      await WindowCommand.instance.toggleWindow(true);
+      await WindowCommand.instance.sendMessage(
+        { ensureWindow: true, name: 'app:update-route' },
+        `/store/extensions/${itemId}/install`,
+      );
+    } else if (type === 'workflows') StoreService.installWorkflow(itemId);
   }
 }
 
@@ -164,6 +170,8 @@ class DeepLink {
           DeepLinkHandler.launchWorkflow(urlObj);
           break;
         case 'store':
+          DeepLinkHandler.storeHandler(urlObj);
+          break;
       }
     } catch (error) {
       logger('error', ['deepLinkHandler'], (error as Error).message);

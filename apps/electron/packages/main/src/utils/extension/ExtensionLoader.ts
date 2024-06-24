@@ -5,7 +5,7 @@ import type { ExtensionManifest } from '@alt-dot/extension-core';
 import { ExtensionManifestSchema } from '@alt-dot/extension-core';
 import validateSemver from 'semver/functions/valid';
 import gtSemver from 'semver/functions/gt';
-import { ErrorLogger, loggerBuilder } from '/@/lib/log';
+import { ErrorLogger, logger, loggerBuilder } from '/@/lib/log';
 import { EXTENSION_FOLDER } from '../constant';
 import {
   ExtensionError,
@@ -22,6 +22,11 @@ import type { DatabaseExtension } from '/@/interface/database.interface';
 import DBService from '/@/services/database/database.service';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
 import { eq } from 'drizzle-orm';
+import API from '#packages/common/utils/API';
+import { afetch } from '@alt-dot/shared';
+import originalFs from 'original-fs';
+import GlobalShortcut from '../GlobalShortcuts';
+import AdmZip from 'adm-zip';
 
 const validatorLogger = loggerBuilder(['ExtensionLoader', 'manifestValidator']);
 
@@ -250,6 +255,10 @@ class ExtensionLoader {
 
   async importExtension(
     manifestPath: string,
+    {
+      extensionId,
+      isLocal = true,
+    }: { extensionId?: string; isLocal?: boolean } = {},
   ): Promise<DatabaseExtension | null> {
     const normalizeManifestPath = path.normalize(path.dirname(manifestPath));
 
@@ -266,11 +275,13 @@ class ExtensionLoader {
       throw new ValidationError(manifest.message);
     }
 
-    const id = crypto
-      .createHash('sha256')
-      .update(normalizeManifestPath)
-      .digest('hex')
-      .slice(0, 24);
+    const id =
+      extensionId ||
+      crypto
+        .createHash('sha256')
+        .update(normalizeManifestPath)
+        .digest('hex')
+        .slice(0, 24);
     const insertCommands: NewExtensionCommand[] = manifest.data.commands.map(
       (command) => ({
         id: `${id}:${command.name}`,
@@ -281,7 +292,7 @@ class ExtensionLoader {
     const extension = await DBService.instance.extension.insert(
       {
         id,
-        isLocal: true,
+        isLocal,
         isDisabled: false,
         path: normalizeManifestPath,
         ...mapManifestToDB.extension(manifest.data),
@@ -299,6 +310,7 @@ class ExtensionLoader {
         id: true,
         path: true,
         version: true,
+        isLocal: true,
         updatedAt: true,
       },
       where(fields, operators) {
@@ -309,6 +321,7 @@ class ExtensionLoader {
       },
     });
     if (!extension) throw new ExtensionError("Couldn't find extension");
+    if (!extension.isLocal) return false;
 
     const manifestFilePath = path.join(extension.path, 'manifest.json');
     const extensionManifest = await extractExtManifest(manifestFilePath);
@@ -321,11 +334,10 @@ class ExtensionLoader {
         : null,
     };
 
-    const lastUpdatedDb = new Date(extension.updatedAt);
     const manifestFileStats = fs.statSync(manifestFilePath);
     if (
       !extensionManifest.isError &&
-      (manifestFileStats.mtime > lastUpdatedDb ||
+      (manifestFileStats.mtime > new Date(extension.updatedAt) ||
         gtSemver(extensionManifest.data.version, extension.version))
     ) {
       updateExtensionPayload = {
@@ -356,6 +368,73 @@ class ExtensionLoader {
       .where(eq(extensionsSchema.id, extension.id));
 
     return true;
+  }
+
+  async uninstallExtension(extensionId: string) {
+    const commands =
+      await DBService.instance.db.query.extensionCommands.findMany({
+        columns: {
+          id: true,
+          name: true,
+          shortcut: true,
+        },
+        where(fields, operators) {
+          return operators.and(
+            operators.eq(fields.extensionId, extensionId),
+            operators.isNotNull(fields.shortcut),
+          );
+        },
+      });
+    commands.forEach((command) => {
+      GlobalShortcut.instance.unregisterById(command.id);
+    });
+
+    await DBService.instance.extension.delete(extensionId);
+  }
+
+  async installExtension(extensionId: string) {
+    try {
+      const extensionExists =
+        await DBService.instance.extension.exists(extensionId);
+      if (extensionExists) return null;
+
+      const extension =
+        await API.extensions.getDownloadExtensionUrl(extensionId);
+      const data = await afetch<ArrayBuffer>(extension.downloadUrl, {
+        responseType: 'arrayBuffer',
+      });
+
+      const admZip = new AdmZip(Buffer.from(data), { fs: originalFs });
+
+      const manifestFile = admZip.getEntry('manifest.json');
+      if (!manifestFile || manifestFile.isDirectory) {
+        throw new Error('Manifest file not found');
+      }
+
+      const extDir = path.join(EXTENSION_FOLDER, extensionId);
+      await fs.emptyDir(extDir);
+      await fs.ensureDir(extDir);
+
+      await new Promise<void>((resolve, reject) => {
+        admZip.extractAllToAsync(extDir, true, true, (error) => {
+          if (error) return reject(error);
+
+          resolve();
+        });
+      });
+
+      return await this.importExtension(path.join(extDir, 'manifest.json'), {
+        extensionId,
+        isLocal: false,
+      });
+    } catch (error) {
+      logger(
+        'error',
+        ['ExtensionService', 'install', `id:${extensionId}`],
+        error,
+      );
+      throw error;
+    }
   }
 }
 

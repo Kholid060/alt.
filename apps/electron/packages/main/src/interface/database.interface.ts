@@ -238,6 +238,7 @@ export type DatabaseExtensionErrorsListItem = Pick<
 >;
 
 export interface DatabaseQueriesEvent {
+  'database:get-extension-exists': (extensionId: string) => boolean;
   'database:get-command': (
     commandId: string | { commandId: string; extensionId: string },
   ) => DatabaseExtensionCommandWithExtension | null;

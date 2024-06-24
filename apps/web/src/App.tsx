@@ -2,13 +2,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import AppErrorBoundary from './components/app/AppErrorBoundary';
 import { routeTree } from './routeTree.gen';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { AppLoadingPlaceholder } from './components/app/AppLoadingIndicator';
 import APIService from './services/api.service';
 import SupabaseService from './services/supabase.service';
 import { useUserStore } from './stores/user.store';
 import { UserProfile } from './interface/user.interface';
 import { ErrorNotFoundPage } from './components/ErrorPage';
+import { useShallow } from 'zustand/react/shallow';
 
 const router = createRouter({
   routeTree,
@@ -31,10 +32,9 @@ declare module '@tanstack/react-router' {
 const queryClient = new QueryClient();
 
 function App() {
-  const [profile, setProfile] = useState<{
-    isFetched: boolean;
-    data: UserProfile | null;
-  }>({ isFetched: false, data: null });
+  const [profile, profileFetched] = useUserStore(
+    useShallow((state) => [state.profile, state.profileFetched]),
+  );
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -44,33 +44,27 @@ function App() {
         const session = await SupabaseService.instance.client.auth.getSession();
         if (!session.data.session) return;
 
-        APIService.instance.$setSession(session.data.session);
+        APIService.instance.$setAccessToken(session.data.session.access_token);
 
         userProfile = await APIService.instance.me.get();
-        useUserStore.getState().setProfile(userProfile);
       } catch (error) {
         if (import.meta.env.DEV) {
           console.error(error);
         }
       } finally {
-        setProfile({
-          isFetched: true,
-          data: userProfile,
-        });
+        useUserStore.getState().setProfile(userProfile);
       }
     };
     fetchProfile();
   }, []);
 
-  if (!profile.isFetched) {
-    return <AppLoadingPlaceholder />;
-  }
+  if (!profileFetched) return <AppLoadingPlaceholder />;
 
   return (
     <QueryClientProvider client={queryClient}>
       <RouterProvider
         router={router}
-        context={{ queryClient, userProfile: profile.data }}
+        context={{ queryClient, userProfile: profile }}
       />
     </QueryClientProvider>
   );

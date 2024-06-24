@@ -55,7 +55,11 @@ function AppHeader() {
                     </UiAvatarFallback>
                   </UiAvatar>
                 </UiDropdownMenuTrigger>
-                <UiDropdownMenuContent className="w-56" align="end">
+                <UiDropdownMenuContent
+                  className="w-56"
+                  align="end"
+                  style={{ zIndex: 150 }}
+                >
                   <div className="text-sm mb-2 px-3  pt-1">
                     <p className="line-clamp-1 font-semibold leading-tight">
                       {profile.name}
