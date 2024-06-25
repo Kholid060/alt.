@@ -1,3 +1,4 @@
+import type { SQL } from 'drizzle-orm';
 import {
   and,
   asc,
@@ -55,6 +56,7 @@ import type {
   DatabaseExtensionCredOauthTokenUpdatePayload,
   DatabaseExtensionConfigInsertPayload,
   DatabaseExtensionErrorsListItem,
+  DatabaseExtensionListFilter,
 } from '/@/interface/database.interface';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
@@ -93,17 +95,19 @@ class DBExtensionService {
   }
 
   async list(
-    activeExtOnly: boolean = false,
+    filter?: DatabaseExtensionListFilter,
   ): Promise<DatabaseExtensionListItem[]> {
     const extensionsDbData = await this.database.query.extensions.findMany({
       columns: {
         id: true,
+        path: true,
         icon: true,
         title: true,
         config: true,
         version: true,
         isError: true,
         isLocal: true,
+        updatedAt: true,
         isDisabled: true,
         description: true,
         errorMessage: true,
@@ -117,14 +121,28 @@ class DBExtensionService {
             'errors_count',
           ),
       },
-      where: activeExtOnly
-        ? (fields, operators) => {
-            return operators.and(
-              operators.eq(fields.isDisabled, false),
-              operators.eq(fields.isError, false),
-            );
-          }
-        : undefined,
+      where: (fields, operators) => {
+        const filters: SQL<unknown>[] = [];
+
+        if (filter?.activeOnly) {
+          filters.push(
+            operators.eq(fields.isDisabled, false),
+            operators.eq(fields.isError, false),
+          );
+        }
+        if (filter?.excludeBuiltIn) {
+          filters.push(
+            operators.notInArray(
+              fields.id,
+              Object.values(EXTENSION_BUILT_IN_ID),
+            ),
+          );
+        }
+
+        if (filters.length === 0) return;
+
+        return operators.and(...filters);
+      },
     });
 
     return extensionsDbData;
@@ -1026,6 +1044,7 @@ class DBExtensionService {
   }
 
   async deleteNotExistsCommand(
+    extensionId: string,
     ids: string[],
     tx?: Parameters<Parameters<typeof this.database.transaction>[0]>[0],
   ) {
@@ -1034,7 +1053,12 @@ class DBExtensionService {
     const db = tx || this.database;
     await db
       .delete(commandsSchema)
-      .where(and(notInArray(commandsSchema.id, ids)));
+      .where(
+        and(
+          notInArray(commandsSchema.id, ids),
+          eq(commandsSchema.extensionId, extensionId),
+        ),
+      );
   }
 
   async insertCredentialOauthToken({

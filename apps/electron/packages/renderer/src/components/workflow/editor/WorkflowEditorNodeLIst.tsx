@@ -72,7 +72,7 @@ export function WorkflowEditorNodeList({
   onSelectItem?: (node: WorkflowNewNode) => void;
 }) {
   const extensionsQuery = useDatabaseQuery('database:get-extension-list', [
-    true,
+    { activeOnly: true },
   ]);
 
   const categoryContainerRef = useRef<HTMLDivElement>(null);

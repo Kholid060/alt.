@@ -47,9 +47,6 @@ function queryData(search: StoreQueryValidation) {
 
 export const Route = createFileRoute('/_store/store/extensions')({
   loaderDeps: ({ search }) => search,
-  onLeave(route) {
-    console.log(route);
-  },
   async loader({ context, deps }) {
     await context.queryClient.prefetchInfiniteQuery(queryData(deps));
   },

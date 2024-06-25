@@ -9,11 +9,21 @@ class APIExtensionsNamespace {
     this.apiKey = apiKey;
   }
 
-  getDownloadExtensionUrl(extensionId: string) {
+  getDownloadFileUrl(extensionId: string) {
     return this.api.authorizeFetch<{ downloadUrl: string }>(
       `/extensions/${extensionId}/download`,
       { authToken: this.apiKey },
     );
+  }
+
+  checkUpdate(extensions: { extensionId: string; version: string }[]) {
+    return this.api.authorizeFetch<
+      { id: string; fileUrl: string; version: string; apiVersion: string }[]
+    >('/extensions/check-update', {
+      method: 'POST',
+      authToken: this.apiKey,
+      body: JSON.stringify(extensions),
+    });
   }
 }
 

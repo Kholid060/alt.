@@ -24,6 +24,7 @@ import dayjs from 'dayjs';
 import os from 'os';
 import BackupRestoreData from '../BackupRestoreData';
 import { APP_BACKUP_FILE_EXT } from '#packages/common/utils/constant/app.const';
+import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 
 /** EXTENSION */
 IPCMain.handle('extension:import', async () => {
@@ -47,7 +48,7 @@ IPCMain.handle('extension:reload', async (_, extId) => {
   await ExtensionLoader.instance.reloadExtension(extId);
   emitDBChanges({
     'database:get-extension': [extId],
-    'database:get-extension-list': [],
+    'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
   });
 });
 IPCMain.handle('extension:execute-command', (_, payload) => {

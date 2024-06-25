@@ -51,7 +51,9 @@ export type DatabaseExtensionListItem = Pick<
   | 'icon'
   | 'config'
   | 'errorMessage'
+  | 'updatedAt'
   | 'id'
+  | 'path'
   | 'commands'
   | 'isError'
   | 'isDisabled'
@@ -237,6 +239,11 @@ export type DatabaseExtensionErrorsListItem = Pick<
   'id' | 'message' | 'title' | 'createdAt'
 >;
 
+export interface DatabaseExtensionListFilter {
+  activeOnly?: boolean;
+  excludeBuiltIn?: boolean;
+}
+
 export interface DatabaseQueriesEvent {
   'database:get-extension-exists': (extensionId: string) => boolean;
   'database:get-command': (
@@ -254,7 +261,7 @@ export interface DatabaseQueriesEvent {
     maskSecret?: boolean,
   ) => DatabaseExtensionCredentialsValueDetail | null;
   'database:get-extension-list': (
-    activeExtOnly?: boolean,
+    filter?: DatabaseExtensionListFilter,
   ) => DatabaseExtensionListItem[];
   'database:get-workflow-list': (
     options?: DatabaseWorkfowListQueryOptions,

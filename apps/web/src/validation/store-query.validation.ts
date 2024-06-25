@@ -6,6 +6,6 @@ export const storeQueryValidation = z.object({
   category: z.enum(EXTENSION_CATEGORIES).optional(),
   sortBy: z
     .enum(['recently-added', 'most-installed'])
-    .default('most-installed'),
+    .default('recently-added'),
 });
 export type StoreQueryValidation = z.infer<typeof storeQueryValidation>;

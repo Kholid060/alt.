@@ -8,7 +8,7 @@ export default {
   author,
   version,
   description,
-  title: 'Clipboard',
+  title: 'Clipboard Hello',
   icon: 'icon:Clipboard',
   categories: ['Applications'],
   credentials: [
@@ -46,12 +46,12 @@ export default {
     { name: 'number', type: 'input:number', title: 'Input number', placeholder: 'Number placeholder', required: true },
   ],
   commands: [
-    {
-      name: 'calculcate',
-      title: 'Calculate',
-      type: 'view:json',
-      icon: 'icon:Calculator'
-    },
+    // {
+    //   name: 'calculcate',
+    //   title: 'Calculate',
+    //   type: 'view:json',
+    //   icon: 'icon:Calculator'
+    // },
     {
       icon: 'clipboard',
       name: 'clipboard-copy',

@@ -1,17 +1,13 @@
 import path from 'path';
 import fs from 'fs-extra';
 import crypto from 'node:crypto';
-import type { ExtensionManifest } from '@alt-dot/extension-core';
-import { ExtensionManifestSchema } from '@alt-dot/extension-core';
-import validateSemver from 'semver/functions/valid';
 import gtSemver from 'semver/functions/gt';
-import { ErrorLogger, logger, loggerBuilder } from '/@/lib/log';
+import { ErrorLogger, logger } from '/@/lib/log';
 import { EXTENSION_FOLDER } from '../constant';
 import {
   ExtensionError,
   ValidationError,
 } from '#packages/common/errors/custom-errors';
-import { fromZodError } from 'zod-validation-error';
 import type {
   NewExtension,
   NewExtensionCommand,
@@ -20,101 +16,13 @@ import { extensions as extensionsSchema } from '/@/db/schema/extension.schema';
 import { mapManifestToDB } from '../database-utils';
 import type { DatabaseExtension } from '/@/interface/database.interface';
 import DBService from '/@/services/database/database.service';
-import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
 import { eq } from 'drizzle-orm';
 import API from '#packages/common/utils/API';
 import { afetch } from '@alt-dot/shared';
 import originalFs from 'original-fs';
 import GlobalShortcut from '../GlobalShortcuts';
 import AdmZip from 'adm-zip';
-
-const validatorLogger = loggerBuilder(['ExtensionLoader', 'manifestValidator']);
-
-type ExtractedData<T> =
-  | { isError: true; message: string }
-  | { isError: false; data: T };
-
-async function readExtensionManifest(
-  manifestPath: string,
-): Promise<ExtractedData<ExtensionManifest>> {
-  if (!fs.existsSync(manifestPath)) {
-    return {
-      isError: true,
-      message:
-        'Could not load the extension manifest. Check if the extension manifest.json file exists.',
-    };
-  }
-
-  const manifestJSON = await fs.readJSON(manifestPath, { throws: false });
-  if (!manifestJSON) {
-    const errorMessage =
-      "Couldn't parse the extension manifest file.\nPlease check the manifest file format. It needs to be a valid JSON";
-    validatorLogger('error', errorMessage);
-
-    return {
-      isError: true,
-      message: errorMessage,
-    };
-  }
-
-  return {
-    isError: false,
-    data: manifestJSON,
-  };
-}
-async function extractExtManifest(
-  manifestPath: string,
-): Promise<ExtractedData<ExtensionManifest>> {
-  const manifestJSON = await readExtensionManifest(manifestPath);
-  if (manifestJSON.isError) return manifestJSON;
-
-  const manifest = await ExtensionManifestSchema.safeParseAsync(
-    manifestJSON.data,
-  );
-
-  const extDir = path.dirname(manifestPath);
-  const extDirname = extDir.split('/').pop()!;
-
-  if (!manifest.success) {
-    validatorLogger(
-      'error',
-      `${extDirname}: ${JSON.stringify(manifest.error.format())}`,
-    );
-    return {
-      isError: true,
-      message: fromZodError(manifest.error, { prefix: 'Manifest Error' })
-        .message,
-    };
-  }
-
-  if (!validateSemver(manifest.data.version)) {
-    const errorMessage = `"${manifest.data.version}" is invalid version`;
-    validatorLogger('error', `${extDirname}: ${errorMessage}`);
-
-    return {
-      isError: true,
-      message: `Manifest Error: ${errorMessage}`,
-    };
-  }
-
-  // Check commands file
-  const commands = manifest.data.commands.filter((command) => {
-    let filename = `${command.name}.js`;
-    if (command.type === 'script') {
-      filename = command.name;
-    }
-
-    return fs.existsSync(path.join(extDir, filename));
-  });
-
-  return {
-    isError: false,
-    data: {
-      ...manifest.data,
-      commands,
-    },
-  };
-}
+import ExtensionUtils from './ExtensionUtils';
 
 class ExtensionLoader {
   private static _instance: ExtensionLoader | null = null;
@@ -136,24 +44,14 @@ class ExtensionLoader {
   @ErrorLogger('ExtensionLoader', 'loadExtensions')
   async loadExtensions() {
     await DBService.instance.db.transaction(async (tx) => {
-      const extensions = await tx.query.extensions.findMany({
-        columns: {
-          id: true,
-          path: true,
-          isLocal: true,
-          isError: true,
-          version: true,
-          updatedAt: true,
-        },
-        where(fields, operators) {
-          return operators.notInArray(
-            fields.id,
-            Object.values(EXTENSION_BUILT_IN_ID),
-          );
-        },
-      });
+      const extensions = await DBService.instance.extension.list.apply(
+        { database: tx },
+        [{ excludeBuiltIn: true }],
+      );
 
-      await Promise.all(
+      const storeExtensions: { extensionId: string; version: string }[] = [];
+
+      await Promise.allSettled(
         extensions.map(async (extension) => {
           this.extensionsManifestPath.set(extension.id, extension.path);
 
@@ -162,9 +60,10 @@ class ExtensionLoader {
               extension.path,
               'manifest.json',
             );
-            const extensionManifest = await extractExtManifest(
-              extensionManifestPath,
-            );
+            const extensionManifest =
+              await ExtensionUtils.extractManifestFromPath(
+                extensionManifestPath,
+              );
 
             let updateExtensionPayload: Partial<NewExtension> = {
               isError: extensionManifest.isError,
@@ -199,6 +98,7 @@ class ExtensionLoader {
                 tx,
               );
               await DBService.instance.extension.deleteNotExistsCommand(
+                extension.id,
                 ids,
                 tx,
               );
@@ -218,7 +118,75 @@ class ExtensionLoader {
             return;
           }
 
-          // check update from server?
+          storeExtensions.push({
+            extensionId: extension.id,
+            version: extension.version,
+          });
+        }),
+      );
+
+      if (storeExtensions.length === 0) return;
+
+      const updateExtension = await API.extensions.checkUpdate(storeExtensions);
+      await Promise.allSettled(
+        updateExtension.map(async (extension) => {
+          const data = await afetch<ArrayBuffer>(extension.fileUrl, {
+            responseType: 'arrayBuffer',
+          });
+          const admZip = new AdmZip(Buffer.from(data), { fs: originalFs });
+
+          const manifestFile = admZip.getEntry('manifest.json');
+          if (!manifestFile || manifestFile.isDirectory) {
+            throw new Error('Manifest file not found');
+          }
+
+          const manifest = await ExtensionUtils.extractManifest(
+            manifestFile.getData().toString(),
+          );
+          if (manifest.isError) throw manifest.message;
+
+          const updateExtensionPayload: Partial<NewExtension> =
+            mapManifestToDB.extension(manifest.data);
+
+          const ids: string[] = [];
+          await DBService.instance.extension.upsertCommands(
+            manifest.data.commands.map((command) => {
+              const id = `${extension.id}:${command.name}`;
+
+              return {
+                id,
+                extensionId: extension.id,
+                ...mapManifestToDB.command(command),
+              };
+            }),
+            tx,
+          );
+          await DBService.instance.extension.deleteNotExistsCommand(
+            extension.id,
+            ids,
+            tx,
+          );
+          await DBService.instance.extension.deleteNotExistsCreds(
+            extension.id,
+            manifest.data.credentials || [],
+            tx,
+          );
+          await tx
+            .update(extensionsSchema)
+            .set(updateExtensionPayload)
+            .where(eq(extensionsSchema.id, extension.id));
+
+          const extDir = path.join(EXTENSION_FOLDER, extension.id);
+          await fs.emptyDir(extDir);
+          await fs.ensureDir(extDir);
+
+          await new Promise<void>((resolve, reject) => {
+            admZip.extractAllToAsync(extDir, true, true, (error) => {
+              if (error) return reject(error);
+
+              resolve();
+            });
+          });
         }),
       );
     });
@@ -270,7 +238,7 @@ class ExtensionLoader {
 
     if (isAlreadyAdded) return null;
 
-    const manifest = await extractExtManifest(manifestPath);
+    const manifest = await ExtensionUtils.extractManifestFromPath(manifestPath);
     if (manifest.isError) {
       throw new ValidationError(manifest.message);
     }
@@ -324,7 +292,8 @@ class ExtensionLoader {
     if (!extension.isLocal) return false;
 
     const manifestFilePath = path.join(extension.path, 'manifest.json');
-    const extensionManifest = await extractExtManifest(manifestFilePath);
+    const extensionManifest =
+      await ExtensionUtils.extractManifestFromPath(manifestFilePath);
 
     let updateExtensionPayload: Partial<NewExtension> = {
       updatedAt: new Date().toISOString(),
@@ -357,7 +326,7 @@ class ExtensionLoader {
           };
         }),
       );
-      await DBService.instance.extension.deleteNotExistsCommand(ids);
+      await DBService.instance.extension.deleteNotExistsCommand(extId, ids);
 
       this.extensionsManifestPath.set(extension.id, extension.path);
     }
@@ -398,8 +367,7 @@ class ExtensionLoader {
         await DBService.instance.extension.exists(extensionId);
       if (extensionExists) return null;
 
-      const extension =
-        await API.extensions.getDownloadExtensionUrl(extensionId);
+      const extension = await API.extensions.getDownloadFileUrl(extensionId);
       const data = await afetch<ArrayBuffer>(extension.downloadUrl, {
         responseType: 'arrayBuffer',
       });
