@@ -1,4 +1,5 @@
 import { Menu, app } from 'electron';
+import './main';
 import './utils/security-restrictions';
 import './utils/ipc/ipc-send-message-handler';
 import './utils/ipc/ipc-invoke-messages-handler';
@@ -10,7 +11,7 @@ import DeepLink from './utils/DeepLink';
 import WebsocketService from './services/websocket/websocket.service';
 import GlobalShortcut from './utils/GlobalShortcuts';
 import ExtensionLoader from './utils/extension/ExtensionLoader';
-import DBService from './services/database/database.service';
+import DatabaseService from './services/database/database.service';
 import WorkflowService from './services/workflow.service';
 import WindowCommand from './window/command-window';
 import ExtensionService from './services/extension.service';
@@ -79,21 +80,21 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(async () => {
-    await DBService.instance.initDB();
+    await DatabaseService.instance.initDB();
 
     CustomProtocol.registerProtocols();
-    WebsocketService.startDefaultServer();
+    // WebsocketService.startDefaultServer();
     TrayService.instance.init();
     AppSettingsService.init();
 
     await Promise.all([
       GlobalShortcut.instance.init(),
       WorkflowService.instance.init(),
-      ExtensionLoader.instance.loadExtensions(),
+      // ExtensionLoader.instance.loadExtensions(),
     ]);
 
     await ExtensionService.instance.init();
-    await WindowCommand.instance.restoreOrCreateWindow();
+    // await WindowCommand.instance.restoreOrCreateWindow();
   })
   .catch((e) => console.error('Failed create window:', e));
 

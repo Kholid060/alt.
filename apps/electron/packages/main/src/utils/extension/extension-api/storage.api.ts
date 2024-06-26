@@ -4,7 +4,7 @@ import { parseJSON } from '@alt-dot/shared';
 import type ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
 import { and, eq, inArray } from 'drizzle-orm';
 import ExtensionIPCEvent from '../ExtensionIPCEvent';
-import DBService from '/@/services/database/database.service';
+import DatabaseService from '/@/services/database/database.service';
 
 const decryptStorageValue = (value: Buffer) => {
   const decryptedValue = safeStorage.decryptString(value);
@@ -21,7 +21,7 @@ type ResultType = Record<string, ExtensionAPI.storage.Values>;
 
 ExtensionIPCEvent.instance.on('storage.get', async ({ extensionId }, keys) => {
   if (typeof keys === 'string') {
-    const result = await DBService.instance.extension.getStorage(
+    const result = await DatabaseService.instance.extension.getStorage(
       keys,
       extensionId,
     );
@@ -30,7 +30,7 @@ ExtensionIPCEvent.instance.on('storage.get', async ({ extensionId }, keys) => {
     return { [keys]: decryptStorageValue(result.value) };
   }
 
-  const queryResult = await DBService.instance.extension.getStorage(
+  const queryResult = await DatabaseService.instance.extension.getStorage(
     keys,
     extensionId,
   );
@@ -50,7 +50,7 @@ ExtensionIPCEvent.instance.on(
       typeof value === 'string' ? value : JSON.stringify(value),
     );
 
-    await DBService.instance.db.insert(extensionStorages).values({
+    await DatabaseService.instance.db.insert(extensionStorages).values({
       key,
       value: encryptedValue,
       extensionId: extensionId,
@@ -61,7 +61,7 @@ ExtensionIPCEvent.instance.on(
 ExtensionIPCEvent.instance.on(
   'storage.remove',
   async ({ extensionId }, key) => {
-    await DBService.instance.db
+    await DatabaseService.instance.db
       .delete(extensionStorages)
       .where(
         and(
@@ -76,7 +76,7 @@ ExtensionIPCEvent.instance.on(
 
 ExtensionIPCEvent.instance.on('storage.getAll', async ({ extensionId }) => {
   const queryResult =
-    await DBService.instance.extension.storageList(extensionId);
+    await DatabaseService.instance.extension.storageList(extensionId);
   const result = queryResult.reduce<ResultType>((acc, { key, value }) => {
     acc[key] = decryptStorageValue(value);
 
@@ -87,7 +87,7 @@ ExtensionIPCEvent.instance.on('storage.getAll', async ({ extensionId }) => {
 });
 
 ExtensionIPCEvent.instance.on('storage.clear', async ({ extensionId }) => {
-  await DBService.instance.db
+  await DatabaseService.instance.db
     .delete(extensionStorages)
     .where(eq(extensionStorages.extensionId, extensionId));
 });

@@ -7,11 +7,12 @@
   },
   "plugins": ["drizzle"],
   "extends": [
-    "@alt-dot/eslint-config/base.js"
+    "@alt-dot/eslint-config/base.js",
+    "plugin:drizzle/recommended"
   ],
   "ignorePatterns": ["node_modules/**", "**/dist/**"],
   "rules": {
     "@typescript-eslint/no-var-requires": "off",
-    "@typescript-eslint/consistent-type-imports": "error"
+    "@typescript-eslint/consistent-type-imports": "off"
   }
 }

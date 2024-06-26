@@ -19,11 +19,11 @@ export type SQLiteDatabaseSchema = typeof extensionsSchema &
   typeof workflowsSchema;
 export type SQLiteDatabase = BetterSQLite3Database<SQLiteDatabaseSchema>;
 
-class DBService {
-  private static _instance: DBService | null = null;
+class DatabaseService {
+  private static _instance: DatabaseService | null = null;
 
   static get instance() {
-    if (!this._instance) this._instance = new DBService();
+    if (!this._instance) this._instance = new DatabaseService();
 
     return this._instance;
   }
@@ -78,4 +78,4 @@ class DBService {
   }
 }
 
-export default DBService;
+export default DatabaseService;

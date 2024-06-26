@@ -8,7 +8,7 @@ import ExtensionLoader from '../utils/extension/ExtensionLoader';
 import IPCMain from '../utils/ipc/IPCMain';
 import WindowCommand from '../window/command-window';
 import BrowserService from './browser.service';
-import DBService from './database/database.service';
+import DatabaseService from './database/database.service';
 import type { ExtensionCommandType } from '@alt-dot/extension-core';
 import WindowSharedProcess from '../window/shared-process-window';
 import { CommandLaunchBy } from '@alt-dot/extension';
@@ -56,7 +56,7 @@ class ExtensionService {
           if (resolver) resolver.resolve(result);
 
           if (!result.success) {
-            DBService.instance.extension.insertError({
+            DatabaseService.instance.extension.insertError({
               title,
               extensionId,
               message: result.errorMessage,
@@ -73,7 +73,7 @@ class ExtensionService {
       },
     );
 
-    await DBService.instance.extension.deleteOldErrors().catch(console.error);
+    await DatabaseService.instance.extension.deleteOldErrors().catch(console.error);
     await this.registerAllShortcuts();
   }
 
@@ -83,7 +83,7 @@ class ExtensionService {
 
   private async registerAllShortcuts() {
     const commands =
-      await DBService.instance.db.query.extensionCommands.findMany({
+      await DatabaseService.instance.db.query.extensionCommands.findMany({
         columns: {
           name: true,
           shortcut: true,
@@ -147,7 +147,7 @@ class ExtensionService {
     };
     const { commandId, extensionId } = payload;
 
-    const command = await DBService.instance.extension.getCommand({
+    const command = await DatabaseService.instance.extension.getCommand({
       commandId,
       extensionId,
     });
@@ -168,7 +168,7 @@ class ExtensionService {
       ExtensionLoader.instance.getPath(extensionId, 'base', commandId);
     if (!commandFilePath) throw new Error("Coudln't find command file");
 
-    const commandConfig = await DBService.instance.extension.isConfigInputted(
+    const commandConfig = await DatabaseService.instance.extension.isConfigInputted(
       extensionId,
       commandId,
     );
@@ -198,7 +198,7 @@ class ExtensionService {
 
         await WindowCommand.instance.toggleWindow(true);
         await WindowCommand.instance.sendMessage(
-          'command-window:open-command-json-view',
+          'command-command-window:open-json-view',
           {
             ...payload,
             runnerId,
@@ -218,7 +218,7 @@ class ExtensionService {
         );
       case 'view':
         WindowCommand.instance.toggleWindow(true);
-        WindowCommand.instance.sendMessage('command-window:open-command-view', {
+        WindowCommand.instance.sendMessage('command-command-window:open-view', {
           ...payload,
           title: command.title,
           subtitle: command.extension.title,

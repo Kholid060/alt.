@@ -9,6 +9,10 @@
     "strict": true,
     "isolatedModules": true,
     "types": ["node"],
+    "declaration": true,
+    "strictBindCallApply": false,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "baseUrl": ".",
     "paths": {

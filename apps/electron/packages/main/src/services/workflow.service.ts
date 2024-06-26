@@ -4,7 +4,7 @@ import type {
   DatabaseWorkflowUpdatePayload,
 } from '../interface/database.interface';
 import GlobalShortcut from '../utils/GlobalShortcuts';
-import DBService from './database/database.service';
+import DatabaseService from './database/database.service';
 import { KeyboardShortcutUtils } from '#common/utils/KeyboardShortcutUtils';
 import type {
   WorkflowEdge,
@@ -28,7 +28,7 @@ class WorkflowTriggerService {
   async register(workflowId: string | DatabaseWorkflowDetail) {
     const workflow =
       typeof workflowId === 'string'
-        ? await DBService.instance.workflow.get(workflowId)
+        ? await DatabaseService.instance.workflow.get(workflowId)
         : workflowId;
     if (!workflow) throw new Error('Workflow not found');
 
@@ -62,7 +62,7 @@ class WorkflowTriggerService {
   async reRegisterTriggers(workflowId: string | DatabaseWorkflowDetail) {
     const workflow =
       typeof workflowId === 'string'
-        ? await DBService.instance.workflow.get(workflowId)
+        ? await DatabaseService.instance.workflow.get(workflowId)
         : workflowId;
     if (!workflow) throw new Error('Workflow not found');
 
@@ -71,7 +71,7 @@ class WorkflowTriggerService {
   }
 
   async registerAll() {
-    const workflows = await DBService.instance.workflow.getAll();
+    const workflows = await DatabaseService.instance.workflow.getAll();
     await Promise.allSettled(
       workflows.map(async (workflow) => this.register(workflow)),
     );
@@ -128,7 +128,7 @@ class WorkflowService {
 
   async init() {
     await this.trigger.registerAll();
-    await DBService.instance.workflow.updateRunningWorkflows();
+    await DatabaseService.instance.workflow.updateRunningWorkflows();
 
     IPCMain.on('workflow:running-change', (_, type, detail) => {
       if (type === 'running') {
@@ -146,15 +146,15 @@ class WorkflowService {
   }
 
   get(workflowId: string) {
-    return DBService.instance.workflow.get(workflowId);
+    return DatabaseService.instance.workflow.get(workflowId);
   }
 
   async execute(payload: WorkflowRunPayload) {
-    const workflow = await DBService.instance.workflow.get(payload.id);
+    const workflow = await DatabaseService.instance.workflow.get(payload.id);
     if (!workflow) throw new Error("Couldn't find workflow");
     if (workflow.isDisabled) return null;
 
-    DBService.instance.workflow.incExecuteCount(payload.id);
+    DatabaseService.instance.workflow.incExecuteCount(payload.id);
 
     return WindowSharedProcess.instance.invoke(
       { name: 'shared-window:execute-workflow', ensureWindow: true },
@@ -166,12 +166,12 @@ class WorkflowService {
   }
 
   updateWorkflow(workflowId: string, payload: DatabaseWorkflowUpdatePayload) {
-    return DBService.instance.workflow.update(workflowId, payload);
+    return DatabaseService.instance.workflow.update(workflowId, payload);
   }
 
   async export(workflowId: string, window?: Electron.BrowserWindow) {
     const workflow =
-      await DBService.instance.workflow.getExportValue(workflowId);
+      await DatabaseService.instance.workflow.getExportValue(workflowId);
     if (!workflow) throw new Error("Couldn't find workflow");
 
     const options: Electron.SaveDialogOptions = {
@@ -226,7 +226,7 @@ class WorkflowService {
             edges: WorkflowEdge[];
             nodes: WorkflowNodes[];
           };
-          await DBService.instance.workflow.insert(
+          await DatabaseService.instance.workflow.insert(
             workflow.data as WorkflowFileType,
           );
         }),

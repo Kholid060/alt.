@@ -1,9 +1,9 @@
 {
   "extends": "./base.json",
   "compilerOptions": {
-    "target": "ESNext",
+    "target": "esnext",
     "useDefineForClassFields": true,
-    "module": "ESNext",
+    "module": "esnext",
     "lib": ["ESNext", "DOM"],
     "sourceMap": true,
     "resolveJsonModule": true,

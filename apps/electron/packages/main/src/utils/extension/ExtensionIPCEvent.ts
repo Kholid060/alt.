@@ -8,7 +8,7 @@ import ExtensionMessagePortHandler from './ExtensionMessagePortHandler';
 import { logger } from '/@/lib/log';
 import type { ExtensionManifest } from '@alt-dot/extension-core';
 import IPCMain from '../ipc/IPCMain';
-import DBService from '/@/services/database/database.service';
+import DatabaseService from '/@/services/database/database.service';
 import type { ExtensionAPIMessagePayload } from '#packages/common/interface/extension.interface';
 import type { ZodTuple, ZodTypeAny } from 'zod';
 import { z } from 'zod';
@@ -97,7 +97,7 @@ class ExtensionIPCEvent {
     }
 
     const extensionManifest =
-      await DBService.instance.extension.getManifest(extensionId);
+      await DatabaseService.instance.extension.getManifest(extensionId);
     if (!extensionManifest) return null;
 
     this.extensionCache.set(extensionId, {

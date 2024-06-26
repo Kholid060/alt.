@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import fs from 'fs-extra';
-import DBService from '../services/database/database.service';
+import DatabaseService from '../services/database/database.service';
 import path from 'path';
 import { APP_BACKUP_FILE_EXT } from '#packages/common/utils/constant/app.const';
 import { CustomError } from '#packages/common/errors/custom-errors';
@@ -98,13 +98,13 @@ async function restoreWorkflows(
   if (!workflows?.length) return;
 
   if (upsert) {
-    await DBService.instance.workflow.upsert(
+    await DatabaseService.instance.workflow.upsert(
       workflows as DatabaseWorkflowUpsertPayload[],
     );
     return;
   }
 
-  await DBService.instance.workflow.insert(
+  await DatabaseService.instance.workflow.insert(
     workflows as unknown as DatabaseWorkflowInsertPayload[],
   );
 }
@@ -112,10 +112,10 @@ async function restoreWorkflows(
 async function restoreExtensions(extensions: BackupData['extensions']) {
   if (!extensions?.length) return;
 
-  await DBService.instance.db.transaction(async (tx) => {
+  await DatabaseService.instance.db.transaction(async (tx) => {
     for (const extension of extensions) {
       if (extension.id === EXTENSION_BUILT_IN_ID.userScript) {
-        await DBService.instance.extension.upsertCommands(
+        await DatabaseService.instance.extension.upsertCommands(
           extension.commands,
           tx,
         );
@@ -134,8 +134,8 @@ class BackupRestoreData {
     }
 
     const [workflows, extensions] = await Promise.all([
-      DBService.instance.workflow.getBackupData(),
-      DBService.instance.extension.getBackupData(),
+      DatabaseService.instance.workflow.getBackupData(),
+      DatabaseService.instance.extension.getBackupData(),
     ]);
     const data = encrypt(
       JSON.stringify({
@@ -175,10 +175,10 @@ class BackupRestoreData {
       if (data.data.workflows?.length) {
         promises.push(
           upsertDuplicate
-            ? DBService.instance.workflow.upsert(
+            ? DatabaseService.instance.workflow.upsert(
                 data.data.workflows as DatabaseWorkflowUpsertPayload[],
               )
-            : DBService.instance.workflow.insert(
+            : DatabaseService.instance.workflow.insert(
                 data.data
                   .workflows as unknown as DatabaseWorkflowInsertPayload[],
               ),

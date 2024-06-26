@@ -1,0 +1,209 @@
+import { Injectable } from '@nestjs/common';
+import path from 'path';
+import crypto from 'node:crypto';
+import { DBService } from '../db/db.service';
+import ExtensionUtils from '../utils/extension/ExtensionUtils';
+import {
+  ExtensionError,
+  ValidationError,
+} from '#packages/common/errors/custom-errors';
+import { mapManifestToDB } from '../utils/database-utils';
+import { extensionCommands, extensions } from '../db/schema/extension.schema';
+import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
+import { ExtensionUpdaterService } from '../extension-updater/extension-updater.service';
+import { GlobalShortcutService } from '../global-shortcut/global-shortcut.service';
+import { eq } from 'drizzle-orm';
+import { APIService } from '../api/api.service';
+import { afetch } from '@alt-dot/shared';
+import fs from 'fs-extra';
+import AdmZip from 'adm-zip';
+import originalFs from 'original-fs';
+import { EXTENSION_FOLDER } from '../utils/constant';
+import { LoggerService } from '../logger/logger.service';
+import { DatabaseExtension } from '../interface/database.interface';
+
+@Injectable()
+export class ExtensionLoaderService {
+  constructor(
+    private dbService: DBService,
+    private logger: LoggerService,
+    private apiService: APIService,
+    private globalShortcut: GlobalShortcutService,
+    private extensionUpdater: ExtensionUpdaterService,
+  ) {}
+
+  async importExtension(
+    manifestPath: string,
+    {
+      extensionId,
+      isLocal = true,
+    }: { extensionId?: string; isLocal?: boolean } = {},
+  ): Promise<DatabaseExtension | null> {
+    const normalizeManifestPath = path.normalize(path.dirname(manifestPath));
+    const findExtension = await this.dbService.db.query.extensions.findFirst({
+      columns: {
+        id: true,
+      },
+      where(fields, operators) {
+        if (extensionId) operators.eq(fields.id, extensionId);
+
+        return operators.eq(fields.path, normalizeManifestPath);
+      },
+    });
+    if (findExtension) return null;
+
+    const manifest = await ExtensionUtils.extractManifestFromPath(manifestPath);
+    if (manifest.isError) {
+      throw new ValidationError(manifest.message);
+    }
+
+    const id =
+      extensionId ||
+      crypto
+        .createHash('sha256')
+        .update(normalizeManifestPath)
+        .digest('hex')
+        .slice(0, 24);
+
+    const result = await this.dbService.db.transaction(async (tx) => {
+      const extension = await tx
+        .insert(extensions)
+        .values({
+          id,
+          isLocal,
+          isDisabled: false,
+          ...mapManifestToDB.extension(manifest.data),
+          path: extensionId ? '' : normalizeManifestPath,
+        })
+        .returning();
+      const commands = await tx
+        .insert(extensionCommands)
+        .values(
+          manifest.data.commands.map((command) => ({
+            id: `${id}:${command.name}`,
+            extensionId: id,
+            ...mapManifestToDB.command(command),
+          })),
+        )
+        .returning();
+
+      return { ...extension[0], commands };
+    });
+
+    this.dbService.emitChanges({
+      'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
+    });
+
+    return result;
+  }
+
+  async reloadExtension(extId: string): Promise<boolean> {
+    const extension = await this.dbService.db.query.extensions.findFirst({
+      columns: {
+        id: true,
+        path: true,
+        name: true,
+        version: true,
+        isLocal: true,
+        updatedAt: true,
+      },
+      where(fields, operators) {
+        return operators.and(
+          operators.eq(fields.id, extId),
+          operators.eq(fields.isLocal, true),
+        );
+      },
+    });
+    if (!extension) throw new ExtensionError("Couldn't find extension");
+    if (!extension.isLocal) return false;
+
+    const isUpdated = await this.extensionUpdater.updateExtension(extension);
+    if (!isUpdated) return false;
+
+    this.dbService.emitChanges({
+      'database:get-extension': [extId],
+      'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
+    });
+
+    return true;
+  }
+
+  async uninstallExtension(extensionId: string) {
+    const commands = await this.dbService.db.query.extensionCommands.findMany({
+      columns: {
+        id: true,
+        name: true,
+        shortcut: true,
+      },
+      where(fields, operators) {
+        return operators.and(
+          operators.eq(fields.extensionId, extensionId),
+          operators.isNotNull(fields.shortcut),
+        );
+      },
+    });
+    commands.forEach((command) => {
+      this.globalShortcut.unregisterById(command.id);
+    });
+
+    await this.dbService.db
+      .delete(extensions)
+      .where(eq(extensions.id, extensionId));
+    this.dbService.emitChanges({
+      'database:get-extension': [extensionId],
+      'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
+    });
+  }
+
+  async installExtension(
+    extensionId: string,
+  ): Promise<DatabaseExtension | null> {
+    try {
+      const findExtension = await this.dbService.db.query.extensions.findFirst({
+        columns: {
+          id: true,
+        },
+        where(fields, operators) {
+          return operators.eq(fields.id, extensionId);
+        },
+      });
+      if (findExtension) return null;
+
+      const extension =
+        await this.apiService.extensions.getDownloadFileUrl(extensionId);
+      const data = await afetch<ArrayBuffer>(extension.downloadUrl, {
+        responseType: 'arrayBuffer',
+      });
+
+      const admZip = new AdmZip(Buffer.from(data), { fs: originalFs });
+
+      const manifestFile = admZip.getEntry('manifest.json');
+      if (!manifestFile || manifestFile.isDirectory) {
+        throw new Error('Manifest file not found');
+      }
+
+      const extDir = path.join(EXTENSION_FOLDER, extensionId);
+      await fs.emptyDir(extDir);
+      await fs.ensureDir(extDir);
+
+      await new Promise<void>((resolve, reject) => {
+        admZip.extractAllToAsync(extDir, true, true, (error) => {
+          if (error) return reject(error);
+
+          resolve();
+        });
+      });
+
+      return await this.importExtension(path.join(extDir, 'manifest.json'), {
+        extensionId,
+        isLocal: false,
+      });
+    } catch (error) {
+      this.logger.error(
+        ['ExtensionService', 'install', `id:${extensionId}`],
+        error,
+      );
+      throw error;
+    }
+  }
+}

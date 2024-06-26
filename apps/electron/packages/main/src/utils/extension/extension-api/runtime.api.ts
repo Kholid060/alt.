@@ -1,6 +1,6 @@
 import { CommandLaunchBy } from '@alt-dot/extension';
 import ExtensionIPCEvent from '../ExtensionIPCEvent';
-import DBService from '/@/services/database/database.service';
+import DatabaseService from '/@/services/database/database.service';
 import ExtensionService from '/@/services/extension.service';
 import { isObject } from '@alt-dot/shared';
 import { ExtensionError } from '#packages/common/errors/custom-errors';
@@ -18,7 +18,7 @@ ExtensionIPCEvent.instance.on(
     const configId =
       type === 'command' ? `${extensionId}:${commandId}` : extensionId;
     const configValues =
-      await DBService.instance.extension.getConfigValue(configId);
+      await DatabaseService.instance.extension.getConfigValue(configId);
 
     return configValues?.value ?? {};
   },
@@ -97,7 +97,7 @@ ExtensionIPCEvent.instance.on(
 ExtensionIPCEvent.instance.on(
   'runtime.command.updateDetail',
   async ({ extensionId, commandId }, { subtitle }) => {
-    await DBService.instance.extension.updateCommand(extensionId, commandId, {
+    await DatabaseService.instance.extension.updateCommand(extensionId, commandId, {
       customSubtitle: subtitle,
     });
   },

@@ -24,7 +24,7 @@ function AppEventListener() {
       },
     );
     const offOpenCommandJSONViewPage = preloadAPI.main.ipc.on(
-      'command-window:open-command-json-view',
+      'command-command-window:open-json-view',
       (_, payload) => {
         const { extensionId, commandId } = payload;
         navigate(`/extensions/${extensionId}/${commandId}/view-json`, {
@@ -33,7 +33,7 @@ function AppEventListener() {
       },
     );
     const offOpenCommandViewPage = preloadAPI.main.ipc.on(
-      'command-window:open-command-view',
+      'command-command-window:open-view',
       (_, payload) => {
         const { extensionId, commandId } = payload;
         navigate(`/extensions/${extensionId}/${commandId}/view`, {

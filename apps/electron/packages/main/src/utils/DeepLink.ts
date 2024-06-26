@@ -4,12 +4,11 @@ import type { ExtensionCommandArgument } from '@alt-dot/extension-core';
 import { APP_DEEP_LINK_SCHEME, parseJSON } from '@alt-dot/shared';
 import { CommandLaunchBy } from '@alt-dot/extension';
 import type { APP_DEEP_LINK_HOST } from '#packages/common/utils/constant/app.const';
-import DBService from '../services/database/database.service';
+import DatabaseService from '../services/database/database.service';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { WORKFLOW_MANUAL_TRIGGER_ID } from '#packages/common/utils/constant/workflow.const';
 import ExtensionService from '../services/extension.service';
 import WorkflowService from '../services/workflow.service';
-import StoreService from '../services/store.service';
 import WindowCommand from '../window/command-window';
 
 function convertArgValue(argument: ExtensionCommandArgument, value: string) {
@@ -34,7 +33,7 @@ class DeepLinkHandler {
   static async launchExtensionCommand({ pathname, searchParams }: URL) {
     const [_, extensionId, commandId] = pathname.split('/');
 
-    const command = await DBService.instance.extension.getCommand({
+    const command = await DatabaseService.instance.extension.getCommand({
       commandId,
       extensionId,
     });
@@ -51,7 +50,7 @@ class DeepLinkHandler {
       if (response === 0) return;
 
       if (response === 2) {
-        await DBService.instance.extension.updateCommand(
+        await DatabaseService.instance.extension.updateCommand(
           extensionId,
           commandId,
           {
@@ -113,7 +112,7 @@ class DeepLinkHandler {
 
   static async launchWorkflow({ pathname }: URL) {
     const [_, workflowId] = pathname.split('/');
-    const workflow = await DBService.instance.workflow.get(workflowId);
+    const workflow = await DatabaseService.instance.workflow.get(workflowId);
     if (!workflow || isIPCEventError(workflow) || workflow.isDisabled) return;
 
     if (!workflow.dismissAlert) {
@@ -127,7 +126,7 @@ class DeepLinkHandler {
       if (response === 0) return;
 
       if (response === 2) {
-        await DBService.instance.workflow.update(workflowId, {
+        await DatabaseService.instance.workflow.update(workflowId, {
           dismissAlert: true,
         });
       }
@@ -149,7 +148,9 @@ class DeepLinkHandler {
         { ensureWindow: true, name: 'app:update-route' },
         `/store/extensions/${itemId}/install`,
       );
-    } else if (type === 'workflows') StoreService.installWorkflow(itemId);
+    } else if (type === 'workflows') {
+      // TODO: install workflow
+    }
   }
 }
 

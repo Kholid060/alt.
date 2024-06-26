@@ -4,8 +4,7 @@ import ExtensionLoader from '../extension/ExtensionLoader';
 import './ipc-extension-messages';
 import { BrowserWindow, app, clipboard, dialog, screen, shell } from 'electron';
 import IPCMain from './IPCMain';
-import DBService from '/@/services/database/database.service';
-import { emitDBChanges } from '../database-utils';
+import DatabaseService from '/@/services/database/database.service';
 import WindowCommand from '../../window/command-window';
 import BrowserService from '/@/services/browser.service';
 import WorkflowService from '/@/services/workflow.service';
@@ -24,33 +23,8 @@ import dayjs from 'dayjs';
 import os from 'os';
 import BackupRestoreData from '../BackupRestoreData';
 import { APP_BACKUP_FILE_EXT } from '#packages/common/utils/constant/app.const';
-import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 
 /** EXTENSION */
-IPCMain.handle('extension:import', async () => {
-  const {
-    canceled,
-    filePaths: [manifestPath],
-  } = await dialog.showOpenDialog({
-    buttonLabel: 'Import',
-    properties: ['openFile'],
-    title: 'Import Extension',
-    filters: [{ extensions: ['json'], name: 'Extension manifest' }],
-  });
-  if (canceled || !manifestPath) return null;
-
-  const extensionData =
-    await ExtensionLoader.instance.importExtension(manifestPath);
-
-  return extensionData;
-});
-IPCMain.handle('extension:reload', async (_, extId) => {
-  await ExtensionLoader.instance.reloadExtension(extId);
-  emitDBChanges({
-    'database:get-extension': [extId],
-    'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
-  });
-});
 IPCMain.handle('extension:execute-command', (_, payload) => {
   return ExtensionService.instance.executeCommand(payload);
 });
@@ -58,14 +32,8 @@ IPCMain.handle('extension:stop-running-command', (_, runningId) => {
   ExtensionService.instance.stopCommandExecution(runningId);
   return Promise.resolve();
 });
-IPCMain.handle('extension:install', (_, extId) => {
-  return ExtensionLoader.instance.installExtension(extId);
-});
-IPCMain.handle('extension:delete', (_, extId) => {
-  return ExtensionLoader.instance.uninstallExtension(extId);
-});
 IPCMain.handle('extension:is-config-inputted', (_, extensionId, commandId) => {
-  return DBService.instance.extension.isConfigInputted(extensionId, commandId);
+  return DatabaseService.instance.extension.isConfigInputted(extensionId, commandId);
 });
 IPCMain.handle('extension:list-running-commands', () => {
   return Promise.resolve(ExtensionService.instance.getRunningCommands());
@@ -196,10 +164,10 @@ IPCMain.handle('command-window:show', () => {
 
 /** DATABASE */
 IPCMain.handle('database:get-workflow-list', (_, option) => {
-  return DBService.instance.workflow.list(option);
+  return DatabaseService.instance.workflow.list(option);
 });
 IPCMain.handle('database:get-workflow', (_, workflowId) => {
-  return DBService.instance.workflow.get(workflowId);
+  return DatabaseService.instance.workflow.get(workflowId);
 });
 IPCMain.handle(
   'database:update-workflow',
@@ -209,56 +177,56 @@ IPCMain.handle(
     data,
     options = { ignoreModified: false, omitDBChanges: false },
   ) => {
-    return DBService.instance.workflow.update(workflowId, data, {
+    return DatabaseService.instance.workflow.update(workflowId, data, {
       ignoreModified: options.ignoreModified,
       excludeEmit: options.omitDBChanges ? [sender.id] : undefined,
     });
   },
 );
 IPCMain.handle('database:delete-workflow', (_, workflowId) => {
-  return DBService.instance.workflow.delete(workflowId);
+  return DatabaseService.instance.workflow.delete(workflowId);
 });
 IPCMain.handle('database:insert-workflow', (_, data) => {
-  return DBService.instance.workflow.insert(data);
+  return DatabaseService.instance.workflow.insert(data);
 });
 
 IPCMain.handle('database:get-extension', (_, extensionId) => {
-  return DBService.instance.extension.get(extensionId);
+  return DatabaseService.instance.extension.get(extensionId);
 });
 IPCMain.handle('database:get-extension-exists', (_, extensionId) => {
-  return DBService.instance.extension.exists(extensionId);
+  return DatabaseService.instance.extension.exists(extensionId);
 });
 IPCMain.handle('database:get-extension-creds', () => {
-  return DBService.instance.extension.getCredentials();
+  return DatabaseService.instance.extension.getCredentials();
 });
 IPCMain.handle('database:get-extension-list', (_, activeExtOnly) => {
-  return DBService.instance.extension.list(activeExtOnly);
+  return DatabaseService.instance.extension.list(activeExtOnly);
 });
 IPCMain.handle('database:get-extension-manifest', (_, extensionId) => {
-  return DBService.instance.extension.getManifest(extensionId);
+  return DatabaseService.instance.extension.getManifest(extensionId);
 });
 IPCMain.handle('database:update-extension', async (_, extensionId, data) => {
-  await DBService.instance.extension.update(extensionId, data);
+  await DatabaseService.instance.extension.update(extensionId, data);
 });
 IPCMain.handle('database:get-command', (_, query) => {
-  return DBService.instance.extension.getCommand(query);
+  return DatabaseService.instance.extension.getCommand(query);
 });
 IPCMain.handle('database:get-command-list', (_, filter) => {
-  return DBService.instance.extension.getCommands(filter);
+  return DatabaseService.instance.extension.getCommands(filter);
 });
 IPCMain.handle('database:insert-extension-command', (_, data) => {
-  return DBService.instance.extension.insertCommand([data]);
+  return DatabaseService.instance.extension.insertCommand([data]);
 });
 IPCMain.handle('database:get-extension-config', (_, configId) => {
-  return DBService.instance.extension.getConfig(configId);
+  return DatabaseService.instance.extension.getConfig(configId);
 });
 IPCMain.handle('database:delete-extension-command', (_, id) => {
-  return DBService.instance.extension.deleteCommand(id);
+  return DatabaseService.instance.extension.deleteCommand(id);
 });
 IPCMain.handle(
   'database:update-extension-command',
   async (_, extensionId, commandId, value) => {
-    await DBService.instance.extension.updateCommand(
+    await DatabaseService.instance.extension.updateCommand(
       extensionId,
       commandId,
       value,
@@ -274,62 +242,62 @@ IPCMain.handle(
   },
 );
 IPCMain.handle('database:get-running-workflows', (_) => {
-  return DBService.instance.workflow.listRunningWorkflows();
+  return DatabaseService.instance.workflow.listRunningWorkflows();
 });
 IPCMain.handle('database:insert-extension-credential', (_, payload) => {
-  return DBService.instance.extension.insertCredential(payload);
+  return DatabaseService.instance.extension.insertCredential(payload);
 });
 IPCMain.handle(
   'database:update-extension-credential',
   (_, credentialId, payload) => {
-    return DBService.instance.extension.updateCredential(credentialId, payload);
+    return DatabaseService.instance.extension.updateCredential(credentialId, payload);
   },
 );
 IPCMain.handle('database:get-extension-creds-value', (_, options) => {
-  return DBService.instance.extension.getCredentialValueList(options);
+  return DatabaseService.instance.extension.getCredentialValueList(options);
 });
 IPCMain.handle(
   'database:get-extension-creds-value-detail',
   (_, credentialId, maskSecret) => {
-    return DBService.instance.extension.getCredentialValueDetail(
+    return DatabaseService.instance.extension.getCredentialValueDetail(
       credentialId,
       maskSecret,
     );
   },
 );
 IPCMain.handle('database:delete-extension-credential', (_, id) => {
-  return DBService.instance.extension.deleteCredentials(id);
+  return DatabaseService.instance.extension.deleteCredentials(id);
 });
 
 IPCMain.handle('database:insert-extension-config', (_, config) => {
-  return DBService.instance.extension.insertConfig(config);
+  return DatabaseService.instance.extension.insertConfig(config);
 });
 IPCMain.handle('database:update-extension-config', (_, configId, data) => {
-  return DBService.instance.extension.updateConfig(configId, data);
+  return DatabaseService.instance.extension.updateConfig(configId, data);
 });
 IPCMain.handle('database:get-workflow-history', (_, historyId) => {
-  return DBService.instance.workflow.getHistory(historyId);
+  return DatabaseService.instance.workflow.getHistory(historyId);
 });
 IPCMain.handle('database:get-workflow-history-list', (_, options) => {
-  return DBService.instance.workflow.listHistory(options);
+  return DatabaseService.instance.workflow.listHistory(options);
 });
 IPCMain.handle('database:insert-workflow-history', (_, payload) => {
-  return DBService.instance.workflow.insertHistory(payload);
+  return DatabaseService.instance.workflow.insertHistory(payload);
 });
 IPCMain.handle('database:update-workflow-history', (_, historyId, payload) => {
-  return DBService.instance.workflow.updateHistory(historyId, payload);
+  return DatabaseService.instance.workflow.updateHistory(historyId, payload);
 });
 IPCMain.handle('database:delete-workflow-history', (_, historyId) => {
-  return DBService.instance.workflow.deleteHistory(historyId);
+  return DatabaseService.instance.workflow.deleteHistory(historyId);
 });
 IPCMain.handle('database:extension-command-exists', (_, ids) => {
-  return DBService.instance.workflow.commandExist(ids);
+  return DatabaseService.instance.workflow.commandExist(ids);
 });
 IPCMain.handle('database:get-extension-errors-list', (_, extensionId) => {
-  return DBService.instance.extension.getErrorsList(extensionId);
+  return DatabaseService.instance.extension.getErrorsList(extensionId);
 });
 IPCMain.handle('database:delete-extension-errors', (_, ids) => {
-  return DBService.instance.extension.deleteErrors(ids);
+  return DatabaseService.instance.extension.deleteErrors(ids);
 });
 
 /** SHELL */

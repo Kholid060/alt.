@@ -239,7 +239,20 @@ function CommandList() {
       icon: <UiList.Icon icon={BlocksIcon} />,
       async onSelected() {
         try {
-          const result = await preloadAPI.main.ipc.invoke('extension:import');
+          const {
+            filePaths: [manifestPath],
+          } = await preloadAPI.main.ipc.invokeWithError('dialog:open', {
+            buttonLabel: 'Import',
+            properties: ['openFile'],
+            title: 'Import Extension',
+            filters: [{ extensions: ['json'], name: 'Extension manifest' }],
+          });
+          if (!manifestPath) return;
+
+          const result = await preloadAPI.main.ipc.invoke(
+            'extension:import',
+            manifestPath,
+          );
           if (!result) return;
 
           if (isIPCEventError(result)) {

@@ -1,6 +1,6 @@
 import { ExtensionError } from '#packages/common/errors/custom-errors';
 import ExtensionIPCEvent from '../ExtensionIPCEvent';
-import DBService from '/@/services/database/database.service';
+import DatabaseService from '/@/services/database/database.service';
 import OauthService from '/@/services/oauth.service';
 import WindowCommand from '../../../window/command-window';
 
@@ -17,7 +17,7 @@ ExtensionIPCEvent.instance.on(
     }
 
     const credentialValue =
-      await DBService.instance.extension.getCredentialValue({
+      await DatabaseService.instance.extension.getCredentialValue({
         extensionId,
         providerId: credentialProvider.providerId,
       });
@@ -74,7 +74,7 @@ ExtensionIPCEvent.instance.on(
   'oauth.getTokens',
   async ({ extensionId }, providerId) => {
     const token =
-      await DBService.instance.extension.getCredentialValueWithToken({
+      await DatabaseService.instance.extension.getCredentialValueWithToken({
         extensionId,
         providerId,
       });
@@ -97,7 +97,7 @@ ExtensionIPCEvent.instance.on(
 ExtensionIPCEvent.instance.on(
   'oauth.removeTokens',
   ({ extensionId }, providerId) => {
-    return DBService.instance.extension.deleteCredentialOAuthToken({
+    return DatabaseService.instance.extension.deleteCredentialOAuthToken({
       extensionId,
       providerId,
     });

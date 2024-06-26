@@ -33,19 +33,19 @@ class GlobalShortcut {
   }
 
   register({ id, keys, callback }: GlobalShortcutItem) {
-    if (!app.isReady()) {
-      this.registerQueue.push({ id, keys, callback });
-      return;
-    }
+    // if (!app.isReady()) {
+    //   this.registerQueue.push({ id, keys, callback });
+    //   return;
+    // }
 
-    if (!this.shortcuts[keys]) this.shortcuts[keys] = [];
+    // if (!this.shortcuts[keys]) this.shortcuts[keys] = [];
 
-    this.shortcuts[keys].push({ callback, keys, id });
-    if (globalShortcut.isRegistered(keys)) return;
+    // this.shortcuts[keys].push({ callback, keys, id });
+    // if (globalShortcut.isRegistered(keys)) return;
 
-    globalShortcut.register(keys, () => {
-      this.shortcutListener(keys);
-    });
+    // globalShortcut.register(keys, () => {
+    //   this.shortcutListener(keys);
+    // });
   }
 
   unregister(keys: string, ids?: string[]) {

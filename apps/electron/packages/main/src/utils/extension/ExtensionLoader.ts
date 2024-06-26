@@ -15,7 +15,7 @@ import type {
 import { extensions as extensionsSchema } from '/@/db/schema/extension.schema';
 import { mapManifestToDB } from '../database-utils';
 import type { DatabaseExtension } from '/@/interface/database.interface';
-import DBService from '/@/services/database/database.service';
+import DatabaseService from '/@/services/database/database.service';
 import { eq } from 'drizzle-orm';
 import API from '#packages/common/utils/API';
 import { afetch } from '@alt-dot/shared';
@@ -43,8 +43,8 @@ class ExtensionLoader {
 
   @ErrorLogger('ExtensionLoader', 'loadExtensions')
   async loadExtensions() {
-    await DBService.instance.db.transaction(async (tx) => {
-      const extensions = await DBService.instance.extension.list.apply(
+    await DatabaseService.instance.db.transaction(async (tx) => {
+      const extensions = await DatabaseService.instance.extension.list.apply(
         { database: tx },
         [{ excludeBuiltIn: true }],
       );
@@ -85,7 +85,7 @@ class ExtensionLoader {
               };
 
               const ids: string[] = [];
-              await DBService.instance.extension.upsertCommands(
+              await DatabaseService.instance.extension.upsertCommands(
                 extensionManifest.data.commands.map((command) => {
                   const id = `${extension.id}:${command.name}`;
 
@@ -97,13 +97,13 @@ class ExtensionLoader {
                 }),
                 tx,
               );
-              await DBService.instance.extension.deleteNotExistsCommand(
+              await DatabaseService.instance.extension.deleteNotExistsCommand(
                 extension.id,
                 ids,
                 tx,
               );
 
-              await DBService.instance.extension.deleteNotExistsCreds(
+              await DatabaseService.instance.extension.deleteNotExistsCreds(
                 extension.id,
                 extensionManifest.data.credentials || [],
                 tx,
@@ -118,10 +118,10 @@ class ExtensionLoader {
             return;
           }
 
-          storeExtensions.push({
-            extensionId: extension.id,
-            version: extension.version,
-          });
+          // storeExtensions.push({
+          //   extensionId: extension.id,
+          //   version: extension.version,
+          // });
         }),
       );
 
@@ -149,7 +149,7 @@ class ExtensionLoader {
             mapManifestToDB.extension(manifest.data);
 
           const ids: string[] = [];
-          await DBService.instance.extension.upsertCommands(
+          await DatabaseService.instance.extension.upsertCommands(
             manifest.data.commands.map((command) => {
               const id = `${extension.id}:${command.name}`;
 
@@ -161,12 +161,12 @@ class ExtensionLoader {
             }),
             tx,
           );
-          await DBService.instance.extension.deleteNotExistsCommand(
+          await DatabaseService.instance.extension.deleteNotExistsCommand(
             extension.id,
             ids,
             tx,
           );
-          await DBService.instance.extension.deleteNotExistsCreds(
+          await DatabaseService.instance.extension.deleteNotExistsCreds(
             extension.id,
             manifest.data.credentials || [],
             tx,
@@ -257,7 +257,7 @@ class ExtensionLoader {
         ...mapManifestToDB.command(command),
       }),
     );
-    const extension = await DBService.instance.extension.insert(
+    const extension = await DatabaseService.instance.extension.insert(
       {
         id,
         isLocal,
@@ -273,21 +273,22 @@ class ExtensionLoader {
   }
 
   async reloadExtension(extId: string): Promise<boolean> {
-    const extension = await DBService.instance.db.query.extensions.findFirst({
-      columns: {
-        id: true,
-        path: true,
-        version: true,
-        isLocal: true,
-        updatedAt: true,
-      },
-      where(fields, operators) {
-        return operators.and(
-          operators.eq(fields.id, extId),
-          operators.eq(fields.isLocal, true),
-        );
-      },
-    });
+    const extension =
+      await DatabaseService.instance.db.query.extensions.findFirst({
+        columns: {
+          id: true,
+          path: true,
+          version: true,
+          isLocal: true,
+          updatedAt: true,
+        },
+        where(fields, operators) {
+          return operators.and(
+            operators.eq(fields.id, extId),
+            operators.eq(fields.isLocal, true),
+          );
+        },
+      });
     if (!extension) throw new ExtensionError("Couldn't find extension");
     if (!extension.isLocal) return false;
 
@@ -315,7 +316,7 @@ class ExtensionLoader {
       };
 
       const ids: string[] = [];
-      await DBService.instance.extension.upsertCommands(
+      await DatabaseService.instance.extension.upsertCommands(
         extensionManifest.data.commands.map((command) => {
           const id = `${extension.id}:${command.name}`;
 
@@ -326,12 +327,15 @@ class ExtensionLoader {
           };
         }),
       );
-      await DBService.instance.extension.deleteNotExistsCommand(extId, ids);
+      await DatabaseService.instance.extension.deleteNotExistsCommand(
+        extId,
+        ids,
+      );
 
       this.extensionsManifestPath.set(extension.id, extension.path);
     }
 
-    await DBService.instance.db
+    await DatabaseService.instance.db
       .update(extensionsSchema)
       .set(updateExtensionPayload)
       .where(eq(extensionsSchema.id, extension.id));
@@ -341,7 +345,7 @@ class ExtensionLoader {
 
   async uninstallExtension(extensionId: string) {
     const commands =
-      await DBService.instance.db.query.extensionCommands.findMany({
+      await DatabaseService.instance.db.query.extensionCommands.findMany({
         columns: {
           id: true,
           name: true,
@@ -358,13 +362,13 @@ class ExtensionLoader {
       GlobalShortcut.instance.unregisterById(command.id);
     });
 
-    await DBService.instance.extension.delete(extensionId);
+    await DatabaseService.instance.extension.delete(extensionId);
   }
 
   async installExtension(extensionId: string) {
     try {
       const extensionExists =
-        await DBService.instance.extension.exists(extensionId);
+        await DatabaseService.instance.extension.exists(extensionId);
       if (extensionExists) return null;
 
       const extension = await API.extensions.getDownloadFileUrl(extensionId);

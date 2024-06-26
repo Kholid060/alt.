@@ -158,7 +158,7 @@ export interface IPCExtensionEvents {
   'extension:delete': (extId: string) => void;
   'extension:reload': (extId: string) => void;
   'extension:install': (extId: string) => DatabaseExtension | null;
-  'extension:import': () => DatabaseExtension | null;
+  'extension:import': (manifestPath: string) => DatabaseExtension | null;
   'extension:init-message-port': () => MessagePort;
   'extension:get-command-file-path': (
     extensionId: string,
@@ -240,17 +240,17 @@ export interface IPCSendEventMainToRenderer {
   'shared-window:stop-execute-workflow': [runnerId: string];
   'window:visibility-change': [isHidden: boolean];
   'app:update-route': [path: string, routeData?: unknown];
-  'command-window:open-command-json-view': [
+  'command-command-window:open-json-view': [
     executeCommandPayload: ExtensionCommandJSONViewData,
   ];
-  'command-window:open-command-view': [
+  'command-command-window:open-view': [
     executeCommandPayload: ExtensionCommandViewData,
   ];
 }
 
 export interface IPCSendEventRendererToMain {
   'extension:stop-execute-command': [runnerId: string];
-  'window:open-command': [path?: string, routeData?: unknown];
+  'command-window:open': [path?: string, routeData?: unknown];
   'extension:command-exec-change': [
     type: 'finish' | 'start',
     detail: ExtensionCommandProcess,
@@ -321,3 +321,10 @@ export type IPCRendererInvokeEvent = IPCInvokeEventMainToRenderer & {
     },
   ) => Promise<boolean>;
 };
+
+export type IPCSendPayload<T extends keyof IPCMainSendEvent> =
+  IPCMainSendEvent[T];
+
+export type IPCInvokePayload<T extends keyof IPCEvents> = Parameters<
+  IPCEvents[T]
+>;

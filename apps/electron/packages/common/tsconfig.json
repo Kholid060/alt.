@@ -10,6 +10,7 @@
     "isolatedModules": true,
     "types": ["node", "vite/client"],
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "baseUrl": ".",
     "paths": {
       "/@/*": ["./src/*"],

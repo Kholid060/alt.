@@ -4,7 +4,7 @@ import {
 } from '#packages/common/utils/constant/constant';
 import type { IncomingMessage, Server, ServerResponse } from 'node:http';
 import { createServer } from 'node:http';
-import DBService from './database/database.service';
+import DatabaseService from './database/database.service';
 import { debugLog } from '#packages/common/utils/helper';
 import {
   CustomError,
@@ -241,11 +241,11 @@ class OauthService {
         };
 
         if (authSession.provider.credential.oauthTokenId) {
-          await DBService.instance.extension.updateCredentialOauthToken(
+          await DatabaseService.instance.extension.updateCredentialOauthToken(
             payload,
           );
         } else {
-          await DBService.instance.extension.insertCredentialOauthToken(
+          await DatabaseService.instance.extension.insertCredentialOauthToken(
             payload,
           );
         }
@@ -269,7 +269,7 @@ class OauthService {
     credentialId: string | { providerId: string; extensionId: string },
   ) {
     const credential =
-      await DBService.instance.extension.getCredentialValueDetail(credentialId);
+      await DatabaseService.instance.extension.getCredentialValueDetail(credentialId);
     if (!credential) {
       throw new CustomError(
         "Couldn't find the credential. Make sure the credential has been inputted",
@@ -334,7 +334,7 @@ class OauthService {
     }
 
     const oauthToken =
-      await DBService.instance.extension.getCredentialOAuthToken(
+      await DatabaseService.instance.extension.getCredentialOAuthToken(
         oauthProvider.credential.oauthTokenId,
       );
     if (!oauthToken?.refreshToken) {
@@ -345,7 +345,7 @@ class OauthService {
       oauthToken.refreshToken,
     );
 
-    await DBService.instance.extension.updateCredentialOauthToken({
+    await DatabaseService.instance.extension.updateCredentialOauthToken({
       scope: token.scope,
       tokenType: token.token_type,
       accessToken: token.access_token,
