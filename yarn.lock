@@ -3072,6 +3072,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nestjs/cache-manager@npm:^2.2.2":
+  version: 2.2.2
+  resolution: "@nestjs/cache-manager@npm:2.2.2"
+  peerDependencies:
+    "@nestjs/common": ^9.0.0 || ^10.0.0
+    "@nestjs/core": ^9.0.0 || ^10.0.0
+    cache-manager: <=5
+    rxjs: ^7.0.0
+  checksum: 10c0/03c1049bcf875e60e88eb9578e5e59290aa61747e5fcd418e7c23c1cb251597c2b0dbe0ec5f4b3b567beb8bd41fb507a4738c9c677a7925d2f712ae2628cf481
+  languageName: node
+  linkType: hard
+
 "@nestjs/common@npm:^10.3.9":
   version: 10.3.9
   resolution: "@nestjs/common@npm:10.3.9"
@@ -3118,6 +3130,18 @@ __metadata:
     "@nestjs/websockets":
       optional: true
   checksum: 10c0/2e9834eaf412edd1fcbfa9e9d1c4876f5011547c31a2699afc4193ae37231b700625acf4f1e0a9766b1ed89ad9d176a496ca0387bfc424242cc91b164cb356e5
+  languageName: node
+  linkType: hard
+
+"@nestjs/event-emitter@npm:^2.0.4":
+  version: 2.0.4
+  resolution: "@nestjs/event-emitter@npm:2.0.4"
+  dependencies:
+    eventemitter2: "npm:6.4.9"
+  peerDependencies:
+    "@nestjs/common": ^8.0.0 || ^9.0.0 || ^10.0.0
+    "@nestjs/core": ^8.0.0 || ^9.0.0 || ^10.0.0
+  checksum: 10c0/14fb3053a94870ff7931dbfcb47e1456860e846700ceaa88f6f2e932e7dddc0d77187019da4a51053d95a247f629faf3dba262754d24abb02a66414094fff6b9
   languageName: node
   linkType: hard
 
@@ -8563,6 +8587,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cache-manager@npm:^5.6.1":
+  version: 5.6.1
+  resolution: "cache-manager@npm:5.6.1"
+  dependencies:
+    eventemitter3: "npm:^5.0.1"
+    lodash.clonedeep: "npm:^4.5.0"
+    lru-cache: "npm:^10.2.2"
+    promise-coalesce: "npm:^1.1.2"
+  checksum: 10c0/31e8818ee1e64fbc69dc18d0cf7f55cf760d83f3a9fc7ee4feb12041274bea9e9d4883097d83df3fefad2b780a141ae36e47f87e78da3ec3ce6ffe512b2989b1
+  languageName: node
+  linkType: hard
+
 "cacheable-lookup@npm:^5.0.3":
   version: 5.0.4
   resolution: "cacheable-lookup@npm:5.0.4"
@@ -10201,6 +10237,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"drizzle-zod@npm:^0.5.1":
+  version: 0.5.1
+  resolution: "drizzle-zod@npm:0.5.1"
+  peerDependencies:
+    drizzle-orm: ">=0.23.13"
+    zod: "*"
+  checksum: 10c0/3015d195c9e52686afcfbe458386371f1c4eff0c426ff92cb9b28d1ac899bedd95aeefe13c2cb8d71d5355f0c90029c21c0bf15562958b3f3d4024e6e20d5cba
+  languageName: node
+  linkType: hard
+
 "eastasianwidth@npm:^0.2.0":
   version: 0.2.0
   resolution: "eastasianwidth@npm:0.2.0"
@@ -10326,8 +10372,10 @@ __metadata:
     "@electron-forge/cli": "npm:^7.4.0"
     "@electron/rebuild": "npm:^3.6.0"
     "@hookform/resolvers": "npm:^3.3.4"
+    "@nestjs/cache-manager": "npm:^2.2.2"
     "@nestjs/common": "npm:^10.3.9"
     "@nestjs/core": "npm:^10.3.9"
+    "@nestjs/event-emitter": "npm:^2.0.4"
     "@nestjs/microservices": "npm:^10.3.9"
     "@nestjs/platform-socket.io": "npm:^10.3.9"
     "@nestjs/websockets": "npm:^10.3.9"
@@ -10352,12 +10400,14 @@ __metadata:
     adm-zip: "npm:^0.5.14"
     autoprefixer: "npm:^10.4.19"
     better-sqlite3: "npm:^10.0.0"
+    cache-manager: "npm:^5.6.1"
     clsx: "npm:^2.1.0"
     cross-env: "npm:7.0.3"
     dayjs: "npm:^1.11.10"
     dot-prop: "npm:^8.0.2"
     drizzle-kit: "npm:^0.22.1"
     drizzle-orm: "npm:^0.31.0"
+    drizzle-zod: "npm:^0.5.1"
     electron: "npm:^30.0.9"
     electron-builder: "npm:^24.13.3"
     electron-log: "npm:^5.1.1"
@@ -11745,6 +11795,13 @@ __metadata:
   version: 2.0.3
   resolution: "esutils@npm:2.0.3"
   checksum: 10c0/9a2fe69a41bfdade834ba7c42de4723c97ec776e40656919c62cbd13607c45e127a003f05f724a1ea55e5029a4cf2de444b13009f2af71271e42d93a637137c7
+  languageName: node
+  linkType: hard
+
+"eventemitter2@npm:6.4.9":
+  version: 6.4.9
+  resolution: "eventemitter2@npm:6.4.9"
+  checksum: 10c0/b2adf7d9f1544aa2d95ee271b0621acaf1e309d85ebcef1244fb0ebc7ab0afa6ffd5e371535d0981bc46195ad67fd6ff57a8d1db030584dee69aa5e371a27ea7
   languageName: node
   linkType: hard
 
@@ -14155,6 +14212,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash.clonedeep@npm:^4.5.0":
+  version: 4.5.0
+  resolution: "lodash.clonedeep@npm:4.5.0"
+  checksum: 10c0/2caf0e4808f319d761d2939ee0642fa6867a4bbf2cfce43276698828380756b99d4c4fa226d881655e6ac298dd453fe12a5ec8ba49861777759494c534936985
+  languageName: node
+  linkType: hard
+
 "lodash.debounce@npm:^4.0.8":
   version: 4.0.8
   resolution: "lodash.debounce@npm:4.0.8"
@@ -14345,6 +14409,13 @@ __metadata:
   version: 10.2.0
   resolution: "lru-cache@npm:10.2.0"
   checksum: 10c0/c9847612aa2daaef102d30542a8d6d9b2c2bb36581c1bf0dc3ebf5e5f3352c772a749e604afae2e46873b930a9e9523743faac4e5b937c576ab29196774712ee
+  languageName: node
+  linkType: hard
+
+"lru-cache@npm:^10.2.2":
+  version: 10.2.2
+  resolution: "lru-cache@npm:10.2.2"
+  checksum: 10c0/402d31094335851220d0b00985084288136136992979d0e015f0f1697e15d1c86052d7d53ae86b614e5b058425606efffc6969a31a091085d7a2b80a8a1e26d6
   languageName: node
   linkType: hard
 
@@ -16660,6 +16731,13 @@ __metadata:
   version: 2.0.3
   resolution: "progress@npm:2.0.3"
   checksum: 10c0/1697e07cb1068055dbe9fe858d242368ff5d2073639e652b75a7eb1f2a1a8d4afd404d719de23c7b48481a6aa0040686310e2dac2f53d776daa2176d3f96369c
+  languageName: node
+  linkType: hard
+
+"promise-coalesce@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "promise-coalesce@npm:1.1.2"
+  checksum: 10c0/9bcdc954a645b30ccb094ae76e36212af2ee7ecc6b9fc67634d7d4f490d082c1efc39590737d957a32f6df93e7c5f51ca232549095e9e2d7291c0482d1bb1557
   languageName: node
   linkType: hard
 

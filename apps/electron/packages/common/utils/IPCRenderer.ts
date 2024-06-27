@@ -75,6 +75,7 @@ class IPCRenderer {
     this.invokeHandlers.set(name, callback);
 
     return () => {
+      // eslint-disable-next-line drizzle/enforce-delete-with-where
       this.invokeHandlers.delete(name);
     };
   }

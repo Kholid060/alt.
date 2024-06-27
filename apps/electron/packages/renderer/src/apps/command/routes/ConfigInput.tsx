@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { UseFormReturn, useForm } from 'react-hook-form';
-import { ExtensionConfig } from '@alt-dot/extension-core';
+import { ExtensionConfig, ExtensionConfigType } from '@alt-dot/extension-core';
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
 import {
   UiButton,
@@ -23,16 +23,15 @@ import { ExtensionCommandExecutePayload } from '#packages/common/interface/exten
 import { getExtIconURL, isIPCEventError } from '/@/utils/helper';
 import { useDatabase } from '/@/hooks/useDatabase';
 import {
-  DatabaseExtensionConfigValue,
-  DatabaseExtensionConfigWithSchema,
-} from '#packages/main/src/interface/database.interface';
+  ExtensionConfigValue,
+  ExtensionConfigWithSchemaModel,
+} from '#packages/main/src/extension/extension-config/extension-config.interface';
 
-type ConfigComponent<
-  T extends ExtensionConfig['type'] = ExtensionConfig['type'],
-> = React.FC<{
-  form: UseFormReturn;
-  config: Extract<ExtensionConfig, { type: T }>;
-}>;
+type ConfigComponent<T extends ExtensionConfigType = ExtensionConfigType> =
+  React.FC<{
+    form: UseFormReturn;
+    config: Extract<ExtensionConfig, { type: T }>;
+  }>;
 
 const ConfigInputDirectory: ConfigComponent = ({ config, form }) => {
   const addPanelStatus = useCommandPanelStore.use.addStatus();
@@ -297,7 +296,7 @@ function ConfigInput({
   executeCommandPayload,
 }: {
   configId: string;
-  data: DatabaseExtensionConfigWithSchema;
+  data: ExtensionConfigWithSchemaModel;
   executeCommandPayload?: ExtensionCommandExecutePayload;
 }) {
   const addPanelStatus = useCommandPanelStore.use.addStatus();
@@ -339,19 +338,20 @@ function ConfigInput({
       const dataTypeMap = new Map(
         data.config.map((config) => [config.name, config.type]),
       );
-      const valuesWithType = Object.keys(
-        values,
-      ).reduce<DatabaseExtensionConfigValue>((acc, key) => {
-        const type = dataTypeMap.get(key);
-        if (type) {
-          acc[key] = {
-            type,
-            value: values[key],
-          };
-        }
+      const valuesWithType = Object.keys(values).reduce<ExtensionConfigValue>(
+        (acc, key) => {
+          const type = dataTypeMap.get(key);
+          if (type) {
+            acc[key] = {
+              type,
+              value: values[key],
+            };
+          }
 
-        return acc;
-      }, {});
+          return acc;
+        },
+        {},
+      );
 
       if (alreadyHasValue.current) {
         result = await preloadAPI.main.ipc.invoke(
@@ -461,7 +461,7 @@ function ConfigInputRoute() {
 
   const [config, setConfig] = useState<{
     id: string;
-    data: DatabaseExtensionConfigWithSchema;
+    data: ExtensionConfigWithSchemaModel;
   } | null>(null);
 
   useEffect(() => {

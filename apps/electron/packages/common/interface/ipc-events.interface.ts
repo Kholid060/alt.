@@ -2,7 +2,7 @@ import type { FlatActionExtensionAPI } from '@alt-dot/extension-core/dist/flat-e
 import type ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
 import type {
   ExtensionBrowserTabContext,
-  ExtensionCommandConfigValuePayload,
+  ExtensionNeedConfigInput,
   ExtensionCommandExecutePayload,
   ExtensionCommandExecutePayloadWithData,
   ExtensionCommandJSONViewData,
@@ -154,7 +154,7 @@ export interface IPCExtensionEvents {
   'extension:is-config-inputted': (
     extensionId: string,
     commandId?: string,
-  ) => ExtensionCommandConfigValuePayload;
+  ) => ExtensionNeedConfigInput;
   'extension:delete': (extId: string) => void;
   'extension:reload': (extId: string) => void;
   'extension:install': (extId: string) => DatabaseExtension | null;
@@ -250,7 +250,6 @@ export interface IPCSendEventMainToRenderer {
 
 export interface IPCSendEventRendererToMain {
   'extension:stop-execute-command': [runnerId: string];
-  'command-window:open': [path?: string, routeData?: unknown];
   'extension:command-exec-change': [
     type: 'finish' | 'start',
     detail: ExtensionCommandProcess,
@@ -327,4 +326,8 @@ export type IPCSendPayload<T extends keyof IPCMainSendEvent> =
 
 export type IPCInvokePayload<T extends keyof IPCEvents> = Parameters<
   IPCEvents[T]
+>;
+
+export type IPCInvokeReturn<T extends keyof IPCEvents> = Promise<
+  ReturnType<IPCEvents[T]>
 >;

@@ -35,4 +35,15 @@ export class ExtensionLoaderController {
   ) {
     return this.extensionLoader.reloadExtension(extensionId);
   }
+
+  @IPCInvoke('extension:get-command-file-path')
+  getCommandFilePath(
+    @Payload()
+    [
+      extensionId,
+      commandId,
+    ]: IPCInvokePayload<'extension:get-command-file-path'>,
+  ) {
+    return this.extensionLoader.getPath(extensionId, 'base', commandId);
+  }
 }

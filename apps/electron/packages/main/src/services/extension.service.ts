@@ -249,7 +249,7 @@ class ExtensionService {
       keys,
       callback: async () => {
         try {
-          await ExtensionService.instance.executeCommand({
+          await this.executeCommand({
             commandId,
             extensionId,
             launchContext: {

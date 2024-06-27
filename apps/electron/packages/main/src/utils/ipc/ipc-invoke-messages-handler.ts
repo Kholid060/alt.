@@ -1,51 +1,19 @@
 import crypto from 'crypto';
 import InstalledApps from '../InstalledApps';
-import ExtensionLoader from '../extension/ExtensionLoader';
 import './ipc-extension-messages';
 import { BrowserWindow, app, clipboard, dialog, screen, shell } from 'electron';
 import IPCMain from './IPCMain';
 import DatabaseService from '/@/services/database/database.service';
 import WindowCommand from '../../window/command-window';
-import BrowserService from '/@/services/browser.service';
 import WorkflowService from '/@/services/workflow.service';
-import { isWSAckError } from '../extension/ExtensionBrowserElementHandle';
 import ExtensionService from '/@/services/extension.service';
 import OauthService from '/@/services/oauth.service';
-import ExtensionWSNamespace from '/@/services/websocket/ws-namespaces/extensions.ws-namespace';
-import {
-  CustomError,
-  ExtensionError,
-} from '#packages/common/errors/custom-errors';
 import { Keyboard, KeyboardKey } from '@alt-dot/native';
-import { getFileDetail } from '../getFileDetail';
 import AppSettingsService from '/@/services/app-settings.service';
 import dayjs from 'dayjs';
 import os from 'os';
 import BackupRestoreData from '../BackupRestoreData';
 import { APP_BACKUP_FILE_EXT } from '#packages/common/utils/constant/app.const';
-
-/** EXTENSION */
-IPCMain.handle('extension:execute-command', (_, payload) => {
-  return ExtensionService.instance.executeCommand(payload);
-});
-IPCMain.handle('extension:stop-running-command', (_, runningId) => {
-  ExtensionService.instance.stopCommandExecution(runningId);
-  return Promise.resolve();
-});
-IPCMain.handle('extension:is-config-inputted', (_, extensionId, commandId) => {
-  return DatabaseService.instance.extension.isConfigInputted(extensionId, commandId);
-});
-IPCMain.handle('extension:list-running-commands', () => {
-  return Promise.resolve(ExtensionService.instance.getRunningCommands());
-});
-IPCMain.handle(
-  'extension:get-command-file-path',
-  (_, extensionId, commandId) => {
-    return Promise.resolve(
-      ExtensionLoader.instance.getPath(extensionId, 'base', commandId),
-    );
-  },
-);
 
 /** APPS */
 IPCMain.handle('apps:get-list', () => InstalledApps.instance.getApps());
@@ -155,12 +123,6 @@ IPCMain.handle('app:toggle-lock-window', ({ sender }) => {
 
   return Promise.resolve();
 });
-IPCMain.handle('command-window:close', () => {
-  return WindowCommand.instance.toggleWindow(false);
-});
-IPCMain.handle('command-window:show', () => {
-  return WindowCommand.instance.toggleWindow(true);
-});
 
 /** DATABASE */
 IPCMain.handle('database:get-workflow-list', (_, option) => {
@@ -190,35 +152,8 @@ IPCMain.handle('database:insert-workflow', (_, data) => {
   return DatabaseService.instance.workflow.insert(data);
 });
 
-IPCMain.handle('database:get-extension', (_, extensionId) => {
-  return DatabaseService.instance.extension.get(extensionId);
-});
-IPCMain.handle('database:get-extension-exists', (_, extensionId) => {
-  return DatabaseService.instance.extension.exists(extensionId);
-});
 IPCMain.handle('database:get-extension-creds', () => {
   return DatabaseService.instance.extension.getCredentials();
-});
-IPCMain.handle('database:get-extension-list', (_, activeExtOnly) => {
-  return DatabaseService.instance.extension.list(activeExtOnly);
-});
-IPCMain.handle('database:get-extension-manifest', (_, extensionId) => {
-  return DatabaseService.instance.extension.getManifest(extensionId);
-});
-IPCMain.handle('database:update-extension', async (_, extensionId, data) => {
-  await DatabaseService.instance.extension.update(extensionId, data);
-});
-IPCMain.handle('database:get-command', (_, query) => {
-  return DatabaseService.instance.extension.getCommand(query);
-});
-IPCMain.handle('database:get-command-list', (_, filter) => {
-  return DatabaseService.instance.extension.getCommands(filter);
-});
-IPCMain.handle('database:insert-extension-command', (_, data) => {
-  return DatabaseService.instance.extension.insertCommand([data]);
-});
-IPCMain.handle('database:get-extension-config', (_, configId) => {
-  return DatabaseService.instance.extension.getConfig(configId);
 });
 IPCMain.handle('database:delete-extension-command', (_, id) => {
   return DatabaseService.instance.extension.deleteCommand(id);
@@ -269,12 +204,6 @@ IPCMain.handle('database:delete-extension-credential', (_, id) => {
   return DatabaseService.instance.extension.deleteCredentials(id);
 });
 
-IPCMain.handle('database:insert-extension-config', (_, config) => {
-  return DatabaseService.instance.extension.insertConfig(config);
-});
-IPCMain.handle('database:update-extension-config', (_, configId, data) => {
-  return DatabaseService.instance.extension.updateConfig(configId, data);
-});
 IPCMain.handle('database:get-workflow-history', (_, historyId) => {
   return DatabaseService.instance.workflow.getHistory(historyId);
 });
@@ -356,78 +285,6 @@ IPCMain.handle('workflow:export', ({ sender }, workflowId) => {
 });
 IPCMain.handle('workflow:import', (_, paths) => {
   return WorkflowService.instance.import(paths);
-});
-
-/** BROWSER */
-IPCMain.handle('browser:get-active-tab', async (_, browserId) => {
-  if (browserId) {
-    const tab = await BrowserService.instance.socket.emitToBrowserWithAck({
-      args: [],
-      browserId,
-      name: 'tabs:get-active',
-    });
-    if (isWSAckError(tab)) throw new Error(tab.errorMessage);
-
-    return {
-      browserId,
-      url: tab.url,
-      tabId: tab.id,
-      $isError: false,
-      title: tab.title,
-    };
-  }
-
-  const browser = await BrowserService.instance.getFocused();
-  if (!browser) throw new CustomError("Couldn't find active browser");
-
-  return {
-    $isError: false,
-    url: browser.tab.url,
-    browserId: browser.id,
-    tabId: browser.tab.id,
-    title: browser.tab.title,
-  };
-});
-IPCMain.handle('browser:get-connected-browsers', () => {
-  return Promise.resolve(BrowserService.instance.getConnectedBrowsers());
-});
-IPCMain.handle('browser:new-tab', async (_, browserId, url) => {
-  const tab = await BrowserService.instance.socket.emitToBrowserWithAck({
-    browserId,
-    args: [url],
-    name: 'tabs:create-new',
-  });
-  if (isWSAckError(tab)) throw new Error(tab.errorMessage);
-
-  return { browserId, tabId: tab.id, title: tab.title, url: tab.url };
-});
-IPCMain.handle(
-  'browser:select-files',
-  async (_, { browserId, paths, selector, tabId }) => {
-    const files = await Promise.all(paths.map(getFileDetail));
-    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
-      browserId,
-      name: 'tabs:select-file',
-      args: [{ tabId }, { selector }, files],
-    });
-    if (isWSAckError(result)) {
-      throw new ExtensionError(result.errorMessage);
-    }
-
-    return result;
-  },
-);
-IPCMain.handle('browser:actions', async (_, { args, browserId, name }) => {
-  const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
-    args,
-    name,
-    browserId,
-  });
-  if (isWSAckError(result)) {
-    throw new ExtensionError(result.errorMessage);
-  }
-
-  return result;
 });
 
 /** CRYPTO */

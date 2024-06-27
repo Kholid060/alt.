@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { BrowserWindowService } from './browser-window.service';
-import { IPCSend } from '../common/decorators/ipc.decorator';
+import { IPCInvoke, IPCSend } from '../common/decorators/ipc.decorator';
 import { Payload } from '@nestjs/microservices';
 import type { IPCSendPayload } from '#packages/common/interface/ipc-events.interface';
 import { WindowCommandService } from './service/window-command.service';
@@ -19,11 +19,18 @@ export class BrowserWindowController {
     await this.browserWindow.open('dashboard', routePath);
   }
 
-  @IPCSend('command-window:open')
-  async openCommandWindow(
-    @Payload() [routePath]: IPCSendPayload<'command-window:open'>,
-  ) {
-    await this.browserWindow.open('command', routePath);
+  @IPCInvoke('command-window:show')
+  async openCommandWindow() {
+    const commandWindow = await this.browserWindow.get('command');
+    await commandWindow.toggleWindow(true);
+  }
+
+  @IPCInvoke('command-window:close')
+  async closeCommandWindow() {
+    const commandWindow = await this.browserWindow.get('command', {
+      autoCreate: false,
+    });
+    await commandWindow.toggleWindow(false);
   }
 
   @IPCSend('command-window:input-config')

@@ -48,14 +48,16 @@ export class BrowserWindowService implements OnAppReady {
   async get<T extends WindowNames>(
     name: T,
     { autoCreate = true }: { autoCreate?: boolean } = {},
-  ) {
+  ): Promise<BrowserWindowMap[T]> {
     if (!Object.hasOwn(browserWindowMap, name)) {
       throw new Error('Invalid window name');
     }
 
-    let browserWindow = this.windows.get(name);
-    if (!browserWindow && autoCreate) {
-      browserWindow = new browserWindowMap[name]();
+    let browserWindow = this.windows.get(name) as BrowserWindowMap[T];
+    if (browserWindow) return browserWindow;
+
+    if (autoCreate) {
+      browserWindow = new browserWindowMap[name]() as BrowserWindowMap[T];
       await browserWindow.createWindow();
 
       this.windows.set(name, browserWindow);
@@ -63,7 +65,7 @@ export class BrowserWindowService implements OnAppReady {
       throw new Error(`Can't access "${name}" window before created`);
     }
 
-    return browserWindow as BrowserWindowMap[T];
+    return browserWindow;
   }
 
   async destroy(name: WindowNames) {

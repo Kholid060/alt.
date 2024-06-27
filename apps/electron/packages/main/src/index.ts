@@ -29,7 +29,7 @@ app.commandLine.appendSwitch('wm-window-animations-disabled');
 API.extensions.$setApiKey(import.meta.env.VITE_API_KEY);
 
 Menu.setApplicationMenu(null);
-CustomProtocol.registerPrivileged();
+// CustomProtocol.registerPrivileged();
 
 /**
  * Prevent electron from running multiple instances.
@@ -82,9 +82,9 @@ app
   .then(async () => {
     await DatabaseService.instance.initDB();
 
-    CustomProtocol.registerProtocols();
+    // CustomProtocol.registerProtocols();
     // WebsocketService.startDefaultServer();
-    TrayService.instance.init();
+    // TrayService.instance.init();
     AppSettingsService.init();
 
     await Promise.all([
@@ -93,7 +93,7 @@ app
       // ExtensionLoader.instance.loadExtensions(),
     ]);
 
-    await ExtensionService.instance.init();
+    // await ExtensionService.instance.init();
     // await WindowCommand.instance.restoreOrCreateWindow();
   })
   .catch((e) => console.error('Failed create window:', e));

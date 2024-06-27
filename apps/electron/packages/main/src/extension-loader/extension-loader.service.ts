@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import path from 'path';
 import crypto from 'node:crypto';
 import { DBService } from '../db/db.service';
@@ -21,6 +21,8 @@ import originalFs from 'original-fs';
 import { EXTENSION_FOLDER } from '../utils/constant';
 import { LoggerService } from '../logger/logger.service';
 import { DatabaseExtension } from '../interface/database.interface';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 
 @Injectable()
 export class ExtensionLoaderService {
@@ -30,7 +32,43 @@ export class ExtensionLoaderService {
     private apiService: APIService,
     private globalShortcut: GlobalShortcutService,
     private extensionUpdater: ExtensionUpdaterService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
+
+  getPath(
+    extensionId: string,
+    type: 'base' | 'icon' | 'libs',
+    ...paths: string[]
+  ) {
+    return this.cacheManager.wrap(
+      `ext-path:${extensionId}/${type}/${paths.join('/')}`,
+      async () => {
+        const extension = await this.dbService.db.query.extensions.findFirst({
+          columns: { path: true, isLocal: true },
+          where(fields, operators) {
+            return operators.eq(fields.id, extensionId);
+          },
+        });
+        if (!extension) return null;
+
+        let basePath = extension.isLocal
+          ? extension.path
+          : path.join(EXTENSION_FOLDER, extensionId);
+        switch (type) {
+          case 'base':
+            break;
+          case 'icon':
+            basePath += '/icon';
+            break;
+          case 'libs':
+            basePath += '/@libs';
+            break;
+        }
+
+        return basePath + `${paths.length === 0 ? '' : `/${paths.join('/')}`}`;
+      },
+    );
+  }
 
   async importExtension(
     manifestPath: string,

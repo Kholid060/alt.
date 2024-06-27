@@ -52,6 +52,13 @@ class ElectronNest {
   }
 
   private async callAppReadyHooks() {
+    if (
+      'server' in this.app &&
+      this.app.server instanceof ElectronIPCTransporter
+    ) {
+      this.app.server.onAppReady();
+    }
+
     const modules = this.getModulesToTriggerHooksOn();
     for (const module of modules) {
       await callOnAppReadyHook(module);

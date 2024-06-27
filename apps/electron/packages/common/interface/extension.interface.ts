@@ -46,12 +46,7 @@ export interface ExtensionCommandExecutePayloadWithData
   command: DatabaseExtensionCommandWithExtension;
 }
 
-export type ExtensionCommandConfigValuePayload =
-  | { requireInput: false }
-  | {
-      requireInput: true;
-      type: 'extension' | 'command';
-    };
+export type ExtensionNeedConfigInput = 'extension' | 'command' | false;
 
 export type ExtensionBrowserTabContext = {
   url: string;

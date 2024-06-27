@@ -1,9 +1,9 @@
 import type { CredentialType } from '#common/interface/credential.interface';
 import type {
-  EXTENSION_PERMISSIONS,
   ExtensionCommand,
   ExtensionCommandArgument,
   ExtensionConfig,
+  ExtensionPermissions,
 } from '@alt-dot/extension-core';
 import type { ExtensionCredential } from '@alt-dot/extension-core/src/client/manifest/manifest-credential';
 import { relations, sql } from 'drizzle-orm';
@@ -27,7 +27,7 @@ export const extensions = sqliteTable('extensions', {
   errorMessage: text('error_message'),
   description: text('description').notNull(),
   permissions: text('permissions', { mode: 'json' }).$type<
-    (typeof EXTENSION_PERMISSIONS)[number][]
+    ExtensionPermissions[]
   >(),
   config: text('config', { mode: 'json' }).$type<ExtensionConfig[]>(),
   credentials: text('credentials', {
@@ -89,7 +89,7 @@ export const extensionCommands = sqliteTable('extension_commands', {
   dismissAlert: integer('dismiss_alert', { mode: 'boolean' }),
 });
 export type NewExtensionCommand = typeof extensionCommands.$inferInsert;
-export type SelectExtesionCommand = typeof extensionCommands.$inferSelect;
+export type SelectExtensionCommand = typeof extensionCommands.$inferSelect;
 
 export const commandsRelations = relations(extensionCommands, ({ one }) => ({
   extension: one(extensions, {

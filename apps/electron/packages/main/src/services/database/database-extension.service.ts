@@ -17,7 +17,7 @@ import type {
   NewExtensionError,
   SelectExtensionConfig,
   SelectExtensionStorage,
-  SelectExtesionCommand,
+  SelectExtensionCommand,
 } from '/@/db/schema/extension.schema';
 import {
   extensions,
@@ -64,7 +64,7 @@ import type { SQLiteDatabase } from './database.service';
 import { MemoryCache, parseJSON } from '@alt-dot/shared';
 import { ExtensionError } from '#packages/common/errors/custom-errors';
 import { getExtensionConfigDefaultValue } from '/@/utils/helper';
-import type { ExtensionCommandConfigValuePayload } from '#packages/common/interface/extension.interface';
+import type { ExtensionNeedConfigInput } from '#packages/common/interface/extension.interface';
 import { safeStorage } from 'electron';
 import { nanoid } from 'nanoid';
 import type { ExtensionCredential } from '@alt-dot/extension-core/src/client/manifest/manifest-credential';
@@ -607,7 +607,7 @@ class DBExtensionService {
       dismissAlert,
       customSubtitle,
     }: DatabaseExtensionCommandUpdatePayload &
-      Partial<Pick<SelectExtesionCommand, 'dismissAlert'>>,
+      Partial<Pick<SelectExtensionCommand, 'dismissAlert'>>,
   ) {
     await this.database
       .update(extensionCommands)
@@ -650,7 +650,7 @@ class DBExtensionService {
   async isConfigInputted(
     extensionId: string,
     commandId?: string,
-  ): Promise<ExtensionCommandConfigValuePayload> {
+  ): Promise<ExtensionNeedConfigInput> {
     const configId = commandId ? `${extensionId}:${commandId}` : extensionId;
     const commandConfigCacheId = `config-inputted:${configId}`;
     if (this.cache.has(commandConfigCacheId)) {

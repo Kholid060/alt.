@@ -12,7 +12,7 @@ import type {
   SelectExtensionConfig,
   SelectExtensionCredential,
   SelectExtensionError,
-  SelectExtesionCommand,
+  SelectExtensionCommand,
 } from '../db/schema/extension.schema';
 import type {
   NewWorkflow,
@@ -21,8 +21,15 @@ import type {
   SelectWorkflowHistory,
 } from '../db/schema/workflow.schema';
 import type { ExtensionCredential } from '@alt-dot/extension-core/src/client/manifest/manifest-credential';
+import { UpdateExtensionDto } from '../extension/dto/extension.dto';
+import {
+  ExtensionConfigInsertPayload,
+  ExtensionConfigUpdatePayload,
+  ExtensionConfigWithSchemaModel,
+} from '../extension/extension-config/extension-config.interface';
+import { ExtensionCommandListFilter, ExtensionCommandListItemModel, ExtensionCommandModel } from '../extension/extension-command/extension-command.interface';
 
-export type DatabaseExtensionCommand = SelectExtesionCommand;
+export type DatabaseExtensionCommand = SelectExtensionCommand;
 
 export interface DatabaseExtensionCommandWithExtension
   extends DatabaseExtensionCommand {
@@ -248,10 +255,10 @@ export interface DatabaseQueriesEvent {
   'database:get-extension-exists': (extensionId: string) => boolean;
   'database:get-command': (
     commandId: string | { commandId: string; extensionId: string },
-  ) => DatabaseExtensionCommandWithExtension | null;
+  ) => ExtensionCommandModel | null;
   'database:get-extension-config': (
     query: DatabaseGetExtensionConfig,
-  ) => null | DatabaseExtensionConfigWithSchema;
+  ) => null | ExtensionConfigWithSchemaModel;
   'database:get-extension-creds': () => DatabaseExtensionCredentials;
   'database:get-extension-creds-value': (
     options?: DatabaseExtensionCredentialsValueListOptions,
@@ -262,7 +269,7 @@ export interface DatabaseQueriesEvent {
   ) => DatabaseExtensionCredentialsValueDetail | null;
   'database:get-extension-list': (
     filter?: DatabaseExtensionListFilter,
-  ) => DatabaseExtensionListItem[];
+  ) => ExtensionCommandListItemModel[];
   'database:get-workflow-list': (
     options?: DatabaseWorkfowListQueryOptions,
   ) => DatabaseWorkflow[];
@@ -270,8 +277,8 @@ export interface DatabaseQueriesEvent {
     workflowId: string,
   ) => DatabaseWorkflowDetail | null;
   'database:get-command-list': (
-    filter?: DatabaseExtensionCommandListFilter,
-  ) => SelectExtesionCommand[];
+    filter?: ExtensionCommandListFilter,
+  ) => SelectExtensionCommand[];
   'database:get-extension': (extensionId: string) => DatabaseExtension | null;
   'database:get-extension-manifest': (
     extensionId: string,
@@ -299,7 +306,7 @@ export interface DatabaseInsertEvents {
     history: DatabaseWorkflowHistoryInsertPayload,
   ) => number;
   'database:insert-extension-config': (
-    config: DatabaseExtensionConfigInsertPayload,
+    config: ExtensionConfigInsertPayload,
   ) => void;
   'database:insert-extension-command': (
     command: DatabaseExtensionCommandInsertPayload,
@@ -312,7 +319,7 @@ export interface DatabaseInsertEvents {
 export interface DatabaseUpdateEvents {
   'database:update-extension-config': (
     configId: string,
-    data: DatabaseExtensionConfigUpdatePayload,
+    data: ExtensionConfigUpdatePayload,
   ) => void;
   'database:update-workflow': (
     workflowId: string,
@@ -324,7 +331,7 @@ export interface DatabaseUpdateEvents {
   ) => void;
   'database:update-extension': (
     extensionId: string,
-    data: DatabaseExtensionUpdatePayload,
+    data: UpdateExtensionDto,
   ) => void;
   'database:update-workflow-history': (
     historyId: number,

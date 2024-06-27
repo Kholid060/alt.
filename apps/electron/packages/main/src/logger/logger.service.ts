@@ -8,4 +8,12 @@ export class LoggerService extends ElectronLogger {
     if (!import.meta.env.DEV) return;
     this[level](...args);
   }
+
+  async wrap(location: string[], func: () => unknown) {
+    try {
+      await func();
+    } catch (error) {
+      this.error(location, error);
+    }
+  }
 }

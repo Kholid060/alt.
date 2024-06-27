@@ -1,6 +1,5 @@
 import {
   APP_WEBSOCKET_PORT,
-  BrowserConnected,
   BrowserInfo,
   BrowserType,
   ExtensionSocketData,
@@ -18,7 +17,6 @@ import {
 import { BrowserExtensionService } from './browser-extension.service';
 import { z } from 'zod';
 
-const BROWSER_EMIT_TIMEOUT_MS = 60_000;
 const BROWSER_TYPE = [
   'edge',
   'chrome',
@@ -46,8 +44,6 @@ export type ExtensionNamespace = Namespace<
   ExtensionSocketData
 >;
 
-export type ExtensionConnectedBrowser = BrowserConnected & { socketId: string };
-
 @WebSocketGateway(APP_WEBSOCKET_PORT, { namespace: '/extensions' })
 export class BrowserExtensionGateway
   implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect
@@ -71,7 +67,10 @@ export class BrowserExtensionGateway
     }
 
     client.data.browserInfo = connectedBrowser.data;
-    this.browserExtension.addConnectedBrowser(connectedBrowser.data);
+    this.browserExtension.addConnectedBrowser({
+      ...connectedBrowser.data,
+      socketId: client.id,
+    });
   }
 
   handleDisconnect(client: BrowserExtensionSocket) {

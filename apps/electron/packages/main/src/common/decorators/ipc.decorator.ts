@@ -6,9 +6,9 @@ import { applyDecorators } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
 
 export function IPCInvoke(channel: keyof IPCEvents) {
-  return applyDecorators(MessagePattern(channel, { type: 'invoke' }));
+  return applyDecorators(MessagePattern(channel, { type: 'ipc:invoke' }));
 }
 
 export function IPCSend(channel: keyof IPCMainSendEvent) {
-  return applyDecorators(MessagePattern(channel, { type: 'send' }));
+  return applyDecorators(MessagePattern(channel, { type: 'ipc:send' }));
 }

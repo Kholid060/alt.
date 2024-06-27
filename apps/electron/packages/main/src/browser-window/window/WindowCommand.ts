@@ -124,8 +124,9 @@ class WindowCommand extends WindowBase {
 
   async toggleWindow(showWindow?: boolean) {
     let browserWindow = this.window;
-    if (!browserWindow && showWindow) {
-      browserWindow = await this.createWindow();
+    if (!browserWindow) {
+      if (showWindow) browserWindow = await this.createWindow();
+      else return;
     }
 
     const isHidden = this.state === WindowBaseState.Hidden;
