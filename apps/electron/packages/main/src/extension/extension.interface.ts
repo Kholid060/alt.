@@ -32,3 +32,8 @@ export interface ExtensionListFilterPayload {
   activeOnly?: boolean;
   excludeBuiltIn?: boolean;
 }
+
+export type ExtensionWithCredListItemModel = Pick<
+  SelectExtension,
+  'id' | 'title' | 'credentials'
+>;

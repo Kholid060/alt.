@@ -782,7 +782,7 @@ class DBExtensionService {
     });
 
     emitDBChanges({
-      'database:get-extension-creds-value': [DATABASE_CHANGES_ALL_ARGS],
+      'database:get-extension-credential-list': [DATABASE_CHANGES_ALL_ARGS],
     });
 
     return id;
@@ -814,8 +814,8 @@ class DBExtensionService {
       .where(eq(extensionCreds.id, credentialId));
 
     emitDBChanges({
-      'database:get-extension-creds-value-detail': [credentialId],
-      'database:get-extension-creds-value': [DATABASE_CHANGES_ALL_ARGS],
+      'database:get-extension-credential-list-detail': [credentialId],
+      'database:get-extension-credential-list': [DATABASE_CHANGES_ALL_ARGS],
     });
   }
 
@@ -1007,8 +1007,8 @@ class DBExtensionService {
       .where(inArray(extensionCreds.id, idsArr));
 
     emitDBChanges({
-      'database:get-extension-creds-value': [DATABASE_CHANGES_ALL_ARGS],
-      'database:get-extension-creds-value-detail': [DATABASE_CHANGES_ALL_ARGS],
+      'database:get-extension-credential-list': [DATABASE_CHANGES_ALL_ARGS],
+      'database:get-extension-credential-list-detail': [DATABASE_CHANGES_ALL_ARGS],
     });
   }
 
@@ -1085,8 +1085,8 @@ class DBExtensionService {
     });
 
     emitDBChanges({
-      'database:get-extension-creds-value': [DATABASE_CHANGES_ALL_ARGS],
-      'database:get-extension-creds-value-detail': [DATABASE_CHANGES_ALL_ARGS],
+      'database:get-extension-credential-list': [DATABASE_CHANGES_ALL_ARGS],
+      'database:get-extension-credential-list-detail': [DATABASE_CHANGES_ALL_ARGS],
     });
 
     return result.lastInsertRowid;
@@ -1117,8 +1117,8 @@ class DBExtensionService {
     });
 
     emitDBChanges({
-      'database:get-extension-creds-value': [DATABASE_CHANGES_ALL_ARGS],
-      'database:get-extension-creds-value-detail': [DATABASE_CHANGES_ALL_ARGS],
+      'database:get-extension-credential-list': [DATABASE_CHANGES_ALL_ARGS],
+      'database:get-extension-credential-list-detail': [DATABASE_CHANGES_ALL_ARGS],
     });
 
     return result.lastInsertRowid;

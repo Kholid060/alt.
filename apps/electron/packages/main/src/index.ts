@@ -80,7 +80,7 @@ app.on('window-all-closed', () => {
 app
   .whenReady()
   .then(async () => {
-    await DatabaseService.instance.initDB();
+    // await DatabaseService.instance.initDB();
 
     // CustomProtocol.registerProtocols();
     // WebsocketService.startDefaultServer();

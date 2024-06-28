@@ -23,6 +23,7 @@ import { LoggerService } from '../logger/logger.service';
 import { DatabaseExtension } from '../interface/database.interface';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
+import { ExtensionSqliteService } from '../extension/extension-sqlite/extension-sqlite.service';
 
 @Injectable()
 export class ExtensionLoaderService {
@@ -31,6 +32,7 @@ export class ExtensionLoaderService {
     private logger: LoggerService,
     private apiService: APIService,
     private globalShortcut: GlobalShortcutService,
+    private extensionSqlite: ExtensionSqliteService,
     private extensionUpdater: ExtensionUpdaterService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
@@ -180,9 +182,14 @@ export class ExtensionLoaderService {
         );
       },
     });
+
+    // unregister command shortcut
     commands.forEach((command) => {
       this.globalShortcut.unregisterById(command.id);
     });
+
+    // delete the extension database
+    this.extensionSqlite.deleteDB(extensionId);
 
     await this.dbService.db
       .delete(extensions)

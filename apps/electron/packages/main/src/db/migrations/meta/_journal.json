@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1717387735132,
-      "tag": "0000_pale_nekra",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1717471372067,
-      "tag": "0001_lying_eddie_brock",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1717826439645,
-      "tag": "0002_last_pretty_boy",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1717993870227,
-      "tag": "0003_dapper_albert_cleary",
+      "when": 1719574423787,
+      "tag": "0000_vengeful_rage",
       "breakpoints": true
     }
   ]

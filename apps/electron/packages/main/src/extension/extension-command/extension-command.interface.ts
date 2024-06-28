@@ -23,3 +23,15 @@ export interface ExtensionCommandListFilter {
 export type ExtensionCommandListItemModel = SelectExtensionCommand;
 
 export type ExtensionCommandInsertPayload = Omit<NewExtensionCommand, 'id'>;
+
+export type ExtensionCommandUpdatePayload = Partial<
+  Pick<
+    ExtensionCommandModel,
+    | 'alias'
+    | 'shortcut'
+    | 'subtitle'
+    | 'isFallback'
+    | 'isDisabled'
+    | 'customSubtitle'
+  >
+>;

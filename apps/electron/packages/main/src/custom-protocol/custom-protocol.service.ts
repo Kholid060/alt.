@@ -3,10 +3,10 @@ import { APP_ICON_DIR_PREFIX } from '#packages/common/utils/constant/app.const';
 import { CUSTOM_SCHEME } from '#packages/common/utils/constant/constant';
 import { Injectable } from '@nestjs/common';
 import { app, net } from 'electron';
-import InstalledApps from '../utils/InstalledApps';
 import { createErrorResponse } from '../utils/custom-protocol/CustomProtocol';
 import { ExtensionLoaderService } from '../extension-loader/extension-loader.service';
 import { fileURLToPath } from 'url';
+import { InstalledAppsService } from '../installed-apps/installed-apps.service';
 
 const extensionFilePath = fileURLToPath(
   new URL('./../../extension/dist/', import.meta.url),
@@ -16,14 +16,17 @@ const devServer = import.meta.env.DEV && import.meta.env.VITE_DEV_SERVER_URL;
 
 @Injectable()
 export class CustomProtocolService {
-  constructor(private extensionLoader: ExtensionLoaderService) {}
+  constructor(
+    private installedApps: InstalledAppsService,
+    private extensionLoader: ExtensionLoaderService,
+  ) {}
 
   async handleFileIconProtocol(req: GlobalRequest) {
     const filePath = req.url.slice(`${CUSTOM_SCHEME.fileIcon}://`.length);
 
     if (filePath.startsWith(APP_ICON_DIR_PREFIX)) {
       const appId = filePath.slice(APP_ICON_DIR_PREFIX.length + 1);
-      const appIcon = await InstalledApps.instance.getAppIcon(appId);
+      const appIcon = await this.installedApps.getAppIcon(appId);
       if (appIcon) return new Response(appIcon.toPNG());
     } else if (!fs.existsSync(filePath)) {
       const fileIcon = await app.getFileIcon(filePath, { size: 'normal' });

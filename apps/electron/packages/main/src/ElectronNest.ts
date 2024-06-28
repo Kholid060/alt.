@@ -1,7 +1,7 @@
 import { NestContainer, NestFactory } from '@nestjs/core';
 import { Module } from '@nestjs/core/injector/module';
 import { MicroserviceOptions } from '@nestjs/microservices';
-import ElectronIPCTransporter from './utils/ElectronIPCTranspoter';
+import ElectronTransporter from './utils/ElectronTranspoter';
 import { INestMicroservice } from '@nestjs/common';
 import { app as electronApp } from 'electron';
 import { callOnAppReadyHook } from './common/hooks/on-app-ready.hook';
@@ -19,7 +19,7 @@ class ElectronNest {
       moduleCls,
       {
         ...options,
-        strategy: new ElectronIPCTransporter(),
+        strategy: new ElectronTransporter(),
       },
     );
 
@@ -54,7 +54,7 @@ class ElectronNest {
   private async callAppReadyHooks() {
     if (
       'server' in this.app &&
-      this.app.server instanceof ElectronIPCTransporter
+      this.app.server instanceof ElectronTransporter
     ) {
       this.app.server.onAppReady();
     }

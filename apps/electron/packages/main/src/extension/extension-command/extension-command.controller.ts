@@ -34,4 +34,35 @@ export class ExtensionCommandController {
   ): IPCInvokeReturn<'database:insert-extension-command'> {
     await this.extensionCommand.insertCommands([payload]);
   }
+
+  @IPCInvoke('database:update-extension-command')
+  async updateCommand(
+    @Payload()
+    [
+      extensionId,
+      commandId,
+      payload,
+    ]: IPCInvokePayload<'database:update-extension-command'>,
+  ): IPCInvokeReturn<'database:update-extension-command'> {
+    await this.extensionCommand.updateCommand(
+      { commandId, extensionId },
+      payload,
+    );
+  }
+
+  @IPCInvoke('database:delete-extension-command')
+  async deleteCommand(
+    @Payload()
+    [id]: IPCInvokePayload<'database:delete-extension-command'>,
+  ): IPCInvokeReturn<'database:delete-extension-command'> {
+    await this.extensionCommand.deleteCommand(id);
+  }
+
+  @IPCInvoke('database:extension-command-exists')
+  async commandExists(
+    @Payload()
+    [ids]: IPCInvokePayload<'database:extension-command-exists'>,
+  ): IPCInvokeReturn<'database:extension-command-exists'> {
+    return this.extensionCommand.existsArr(ids);
+  }
 }

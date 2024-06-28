@@ -21,13 +21,30 @@ import type {
   SelectWorkflowHistory,
 } from '../db/schema/workflow.schema';
 import type { ExtensionCredential } from '@alt-dot/extension-core/src/client/manifest/manifest-credential';
-import { UpdateExtensionDto } from '../extension/dto/extension.dto';
 import {
   ExtensionConfigInsertPayload,
   ExtensionConfigUpdatePayload,
   ExtensionConfigWithSchemaModel,
 } from '../extension/extension-config/extension-config.interface';
-import { ExtensionCommandListFilter, ExtensionCommandListItemModel, ExtensionCommandModel } from '../extension/extension-command/extension-command.interface';
+import {
+  ExtensionCommandListFilter,
+  ExtensionCommandModel,
+} from '../extension/extension-command/extension-command.interface';
+import {
+  ExtensionListFilterPayload,
+  ExtensionListItemModel,
+  ExtensionUpdatePayload,
+  ExtensionWithCredListItemModel,
+} from '../extension/extension.interface';
+import {
+  ExtensionCredentialInsertPayload,
+  ExtensionCredentialUpdatePayload,
+  ExtensionCredentialListPaginationModel,
+  ExtensionListPaginationPayload,
+  ExtensionCredentialDetailModel,
+} from '../extension/extension-credential/extension-credential.interface';
+import { ExtensionErrorListItemModel } from '../extension/extension-error/extension-error.interface';
+import { WorkflowDetailModel } from '../workflow/workflow.interface';
 
 export type DatabaseExtensionCommand = SelectExtensionCommand;
 
@@ -259,23 +276,21 @@ export interface DatabaseQueriesEvent {
   'database:get-extension-config': (
     query: DatabaseGetExtensionConfig,
   ) => null | ExtensionConfigWithSchemaModel;
-  'database:get-extension-creds': () => DatabaseExtensionCredentials;
-  'database:get-extension-creds-value': (
-    options?: DatabaseExtensionCredentialsValueListOptions,
-  ) => { count: number; items: DatabaseExtensionCredentialsValueList };
-  'database:get-extension-creds-value-detail': (
+  'database:get-extension-creds': () => ExtensionWithCredListItemModel[];
+  'database:get-extension-credential-list': (
+    options?: ExtensionListPaginationPayload,
+  ) => ExtensionCredentialListPaginationModel;
+  'database:get-extension-credential-list-detail': (
     credentialId: string,
     maskSecret?: boolean,
-  ) => DatabaseExtensionCredentialsValueDetail | null;
+  ) => ExtensionCredentialDetailModel | null;
   'database:get-extension-list': (
-    filter?: DatabaseExtensionListFilter,
-  ) => ExtensionCommandListItemModel[];
+    filter?: ExtensionListFilterPayload,
+  ) => ExtensionListItemModel[];
   'database:get-workflow-list': (
     options?: DatabaseWorkfowListQueryOptions,
   ) => DatabaseWorkflow[];
-  'database:get-workflow': (
-    workflowId: string,
-  ) => DatabaseWorkflowDetail | null;
+  'database:get-workflow': (workflowId: string) => WorkflowDetailModel | null;
   'database:get-command-list': (
     filter?: ExtensionCommandListFilter,
   ) => SelectExtensionCommand[];
@@ -291,7 +306,7 @@ export interface DatabaseQueriesEvent {
   ) => Record<string, boolean>;
   'database:get-extension-errors-list': (
     extensionId: string,
-  ) => DatabaseExtensionErrorsListItem[];
+  ) => ExtensionErrorListItemModel[];
   'database:get-workflow-history-list': (
     options?: DatabaseWorkflowHistoryListOptions,
   ) => { count: number; items: DatabaseWorkflowHistory[] };
@@ -312,7 +327,7 @@ export interface DatabaseInsertEvents {
     command: DatabaseExtensionCommandInsertPayload,
   ) => void;
   'database:insert-extension-credential': (
-    credential: DatabaseExtensionCredentialInsertPayload,
+    credential: ExtensionCredentialInsertPayload,
   ) => string;
 }
 
@@ -331,7 +346,7 @@ export interface DatabaseUpdateEvents {
   ) => void;
   'database:update-extension': (
     extensionId: string,
-    data: UpdateExtensionDto,
+    data: ExtensionUpdatePayload,
   ) => void;
   'database:update-workflow-history': (
     historyId: number,
@@ -344,15 +359,15 @@ export interface DatabaseUpdateEvents {
   ) => void;
   'database:update-extension-credential': (
     credentialId: string,
-    data: DatabaseExtensionCredentialUpdatePayload,
+    data: ExtensionCredentialUpdatePayload,
   ) => void;
 }
 
 export interface DatabaseDeleteEvents {
   'database:delete-workflow': (workflowId: string) => void;
+  'database:delete-extension-command': (id: string) => void;
   'database:delete-extension-errors': (id: number[]) => void;
-  'database:delete-extension-command': (id: string | string[]) => void;
-  'database:delete-extension-credential': (id: string | string[]) => void;
+  'database:delete-extension-credential': (id: string) => void;
   'database:delete-workflow-history': (historyId: number | number[]) => void;
 }
 

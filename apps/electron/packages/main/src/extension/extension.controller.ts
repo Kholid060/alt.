@@ -1,17 +1,16 @@
 import { Controller } from '@nestjs/common';
 import { ExtensionQueryService, ExtensionService } from './extension.service';
-import { IPCInvoke } from '../common/decorators/ipc.decorator';
+import { IPCInvoke, IPCSend } from '../common/decorators/ipc.decorator';
 import { Payload } from '@nestjs/microservices';
 import type {
   IPCInvokePayload,
   IPCInvokeReturn,
+  IPCSendPayload,
 } from '#packages/common/interface/ipc-events.interface';
-import { DBService } from '../db/db.service';
 
 @Controller()
 export class ExtensionController {
   constructor(
-    private dbService: DBService,
     private extensionService: ExtensionService,
     private extensionQuery: ExtensionQueryService,
   ) {}
@@ -21,6 +20,13 @@ export class ExtensionController {
     @Payload() [payload]: IPCInvokePayload<'extension:execute-command'>,
   ) {
     return this.extensionService.executeCommand(payload);
+  }
+
+  @IPCSend('extension:command-exec-change')
+  onExecutionChange(
+    @Payload() payload: IPCSendPayload<'extension:command-exec-change'>,
+  ) {
+    return this.extensionService.handleExecutionChange(...payload);
   }
 
   @IPCInvoke('extension:stop-running-command')
@@ -71,5 +77,10 @@ export class ExtensionController {
     [extensionId]: IPCInvokePayload<'database:get-extension-manifest'>,
   ): IPCInvokeReturn<'database:get-extension-manifest'> {
     return this.extensionQuery.getManifest(extensionId);
+  }
+
+  @IPCInvoke('database:get-extension-creds')
+  async listExtensionWithCreds(): IPCInvokeReturn<'database:get-extension-creds'> {
+    return this.extensionQuery.listCredentials();
   }
 }

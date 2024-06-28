@@ -16,6 +16,9 @@ import { ExtensionConfigModule } from './extension/extension-config/extension-co
 import { CustomProtocolModule } from './custom-protocol/custom-protocol.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TrayMenuModule } from './tray-menu/tray-menu.module';
+import { InstalledAppsModule } from './installed-apps/installed-apps.module';
+import { OAuthModule } from './oauth/oauth.module';
+import { WorkflowModule } from './workflow/workflow.module';
 
 @Module({
   providers: [AppService],
@@ -25,15 +28,18 @@ import { TrayMenuModule } from './tray-menu/tray-menu.module';
       isGlobal: true,
     }),
     EventEmitterModule.forRoot({
-      ignoreErrors: false,
+      delimiter: ':',
     }),
     DBModule,
     APIModule,
     StoreModule,
+    OAuthModule,
     LoggerModule,
     TrayMenuModule,
+    WorkflowModule,
     ExtensionModule,
     BrowserWindowModule,
+    InstalledAppsModule,
     CustomProtocolModule,
     GlobalShortcutModule,
     ExtensionLoaderModule,

@@ -1,4 +1,4 @@
-import type { Edge } from 'reactflow';
+import type * as ReactFlow from 'reactflow';
 import type { SetOptional } from 'type-fest';
 import type { WorkflowNodes } from './workflow-nodes.interface';
 import type {
@@ -8,7 +8,7 @@ import type {
 
 export type WorkflowNodeErroHandlerAction = 'continue' | 'stop' | 'fallback';
 
-export type WorkflowEdge = Edge;
+export type WorkflowEdge = ReactFlow.Edge;
 
 export type WorkflowGetNode<T extends WORKFLOW_NODE_TYPE> = Extract<
   WorkflowNodes,
@@ -18,7 +18,7 @@ export type WorkflowGetNode<T extends WORKFLOW_NODE_TYPE> = Extract<
 export type WorkflowNewNode = SetOptional<WorkflowNodes, 'id'>;
 
 export interface WorkflowClipboardData {
-  edges: Edge[];
+  edges: ReactFlow.Edge[];
   nodes: WorkflowNodes[];
 }
 

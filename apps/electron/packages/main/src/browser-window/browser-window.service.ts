@@ -8,6 +8,7 @@ import WindowCommand from './window/WindowCommand';
 import { OnAppReady } from '../common/hooks/on-app-ready.hook';
 import { GlobalShortcutService } from '../global-shortcut/global-shortcut.service';
 import { GLOBAL_SHORTCUTS } from '../utils/constant';
+import { BrowserWindow, WebContents } from 'electron';
 
 interface BrowserWindowMap {
   command: WindowCommand;
@@ -47,13 +48,28 @@ export class BrowserWindowService implements OnAppReady {
 
   async get<T extends WindowNames>(
     name: T,
-    { autoCreate = true }: { autoCreate?: boolean } = {},
+    options?: { autoCreate: false; noThrow?: false },
+  ): Promise<BrowserWindowMap[T]>;
+  async get<T extends WindowNames>(
+    name: T,
+    options?: { autoCreate: true; noThrow?: true },
+  ): Promise<BrowserWindowMap[T]>;
+  async get<T extends WindowNames>(
+    name: T,
+    options?: { autoCreate: false; noThrow: true },
+  ): Promise<BrowserWindowMap[T] | null>;
+  async get<T extends WindowNames>(
+    name: T,
+    {
+      noThrow = false,
+      autoCreate = true,
+    }: { autoCreate?: boolean; noThrow?: boolean } = {},
   ): Promise<BrowserWindowMap[T]> {
     if (!Object.hasOwn(browserWindowMap, name)) {
       throw new Error('Invalid window name');
     }
 
-    let browserWindow = this.windows.get(name) as BrowserWindowMap[T];
+    let browserWindow = (this.windows.get(name) as BrowserWindowMap[T]) ?? null;
     if (browserWindow) return browserWindow;
 
     if (autoCreate) {
@@ -61,7 +77,7 @@ export class BrowserWindowService implements OnAppReady {
       await browserWindow.createWindow();
 
       this.windows.set(name, browserWindow);
-    } else {
+    } else if (!noThrow) {
       throw new Error(`Can't access "${name}" window before created`);
     }
 
@@ -79,6 +95,19 @@ export class BrowserWindowService implements OnAppReady {
     const browserWindow = await this.get(name);
     await browserWindow.restoreOrCreateWindow();
     if (routePath) browserWindow.sendMessage('app:update-route', routePath);
+  }
+
+  toggleLock(window: BrowserWindow | WebContents) {
+    const browserWindow =
+      window instanceof BrowserWindow
+        ? window
+        : BrowserWindow.fromWebContents(window);
+    if (!browserWindow) return Promise.resolve();
+
+    const isLocked = !browserWindow.isAlwaysOnTop();
+    browserWindow.setResizable(isLocked);
+    browserWindow.setSkipTaskbar(!isLocked);
+    browserWindow.setAlwaysOnTop(isLocked, 'modal-panel');
   }
 
   sendMessageToAllWindows<T extends keyof IPCRendererSendEvent>({

@@ -67,7 +67,7 @@ class ExtensionIPCEvent {
       this._onExtensionMessage,
     );
 
-    this._initMessageListener();
+    // this._initMessageListener();
   }
 
   private _initMessageListener() {
@@ -75,13 +75,13 @@ class ExtensionIPCEvent {
       this._onExtensionMessage({ ...payload, sender }),
     );
     IPCMain.on(
-      'message-port:delete:shared-extension<=>main',
+      'extension:delete-execution-message-port',
       (_, { extPortId }) => {
         this.extensionMessagePort.deletePort(extPortId);
       },
     );
     IPCMain.on(
-      'message-port:shared-extension<=>main',
+      'extension:execution-message-port',
       ({ ports: [port] }, { extPortId }) => {
         if (!port) return;
 

@@ -24,6 +24,7 @@ CREATE TABLE `extension_configs` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`extension_id` text NOT NULL,
 	`config_id` text NOT NULL,
+	`encrypted_value` blob,
 	`value` text NOT NULL,
 	FOREIGN KEY (`extension_id`) REFERENCES `extensions`(`id`) ON UPDATE no action ON DELETE cascade
 );
@@ -53,8 +54,17 @@ CREATE TABLE `extension_credentials` (
 	FOREIGN KEY (`extension_id`) REFERENCES `extensions`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
-CREATE TABLE `extension_storages` (
+CREATE TABLE `extension_errors` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`title` text,
+	`extension_id` text NOT NULL,
+	`message` text NOT NULL,
+	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	FOREIGN KEY (`extension_id`) REFERENCES `extensions`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
+CREATE TABLE `extension_storages` (
+	`id` text PRIMARY KEY NOT NULL,
 	`created_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	`updated_at` text DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	`extension_id` text NOT NULL,
@@ -107,11 +117,16 @@ CREATE TABLE `workflows_history` (
 	`ended_at` text,
 	`duration` integer,
 	`error_message` text,
+	`runner_id` text NOT NULL,
 	`error_location` text,
 	`workflow_id` text NOT NULL,
-	`status` text NOT NULL
+	`status` text NOT NULL,
+	FOREIGN KEY (`workflow_id`) REFERENCES `workflows`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `extension_commands_shortcut_unique` ON `extension_commands` (`shortcut`);--> statement-breakpoint
 CREATE UNIQUE INDEX `extension_configs_config_id_unique` ON `extension_configs` (`config_id`);--> statement-breakpoint
-CREATE UNIQUE INDEX `config_id_idx` ON `extension_configs` (`config_id`);
+CREATE UNIQUE INDEX `config_id_idx` ON `extension_configs` (`config_id`);--> statement-breakpoint
+CREATE INDEX `extension_oauth_credential_idx` ON `extension_credential_oauth_tokens` (`credential_id`);--> statement-breakpoint
+CREATE INDEX `storage_key_idx` ON `extension_storages` (`key`);--> statement-breakpoint
+CREATE INDEX `storage_extension_id_idx` ON `extension_storages` (`extension_id`);

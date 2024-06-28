@@ -31,7 +31,7 @@ function AppDevtools() {
           size="icon"
           variant="secondary"
           onClick={() => {
-            preloadAPI.main.ipc.invoke('app:toggle-lock-window');
+            preloadAPI.main.ipc.invoke('window:toggle-lock');
           }}
         >
           <LockIcon className="h-5 w-5" />

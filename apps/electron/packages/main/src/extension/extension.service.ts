@@ -20,11 +20,12 @@ import { ExtensionLoaderService } from '../extension-loader/extension-loader.ser
 import { ExtensionCommandType } from '@alt-dot/shared';
 import { ExtensionConfigService } from './extension-config/extension-config.service';
 import { BrowserExtensionService } from '../browser-extension/browser-extension.service';
-import { UpdateExtensionDto } from './dto/extension.dto';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
 import {
   ExtensionListFilterPayload,
   ExtensionListItemModel,
+  ExtensionUpdatePayload,
+  ExtensionWithCredListItemModel,
 } from './extension.interface';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import { ExtensionManifest } from '@alt-dot/extension-core';
@@ -321,7 +322,7 @@ export class ExtensionQueryService {
       .then((result) => Boolean(result));
   }
 
-  async update(extensionId: string, value: UpdateExtensionDto) {
+  async update(extensionId: string, value: ExtensionUpdatePayload) {
     const result = await this.dbService.db
       .update(extensions)
       .set(value)
@@ -384,6 +385,19 @@ export class ExtensionQueryService {
         if (filters.length === 0) return;
 
         return operators.and(...filters);
+      },
+    });
+  }
+
+  listCredentials(): Promise<ExtensionWithCredListItemModel[]> {
+    return this.dbService.db.query.extensions.findMany({
+      columns: {
+        id: true,
+        title: true,
+        credentials: true,
+      },
+      where(fields, operators) {
+        return operators.isNotNull(fields.credentials);
       },
     });
   }

@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { BrowserWindowService } from './browser-window.service';
 import { IPCInvoke, IPCSend } from '../common/decorators/ipc.decorator';
-import { Payload } from '@nestjs/microservices';
+import { Ctx, Payload } from '@nestjs/microservices';
 import type { IPCSendPayload } from '#packages/common/interface/ipc-events.interface';
 import { WindowCommandService } from './service/window-command.service';
 
@@ -43,5 +43,10 @@ export class BrowserWindowController {
   @IPCSend('window:destroy')
   async destroyWindow(@Payload() [name]: IPCSendPayload<'window:destroy'>) {
     await this.browserWindow.destroy(name);
+  }
+
+  @IPCSend('window:toggle-lock')
+  async toggleLockWindow(@Ctx() event: Electron.IpcMainEvent) {
+    await this.browserWindow.toggleLock(event.sender);
   }
 }

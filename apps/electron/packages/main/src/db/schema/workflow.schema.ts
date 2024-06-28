@@ -4,13 +4,10 @@ import type {
   WorkflowSettings,
   WorkflowVariable,
 } from '#common/interface/workflow.interface';
-import type { Viewport } from 'reactflow';
+import type * as ReactFlow from 'reactflow';
 import { relations, sql } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
-import type {
-  WorkflowNodeTrigger,
-  WorkflowNodes,
-} from '#common/interface/workflow-nodes.interface';
+import type * as Workflow from '#common/interface/workflow-nodes.interface';
 import type { WORKFLOW_HISTORY_STATUS } from '#common/utils/constant/workflow.const';
 
 export const workflows = sqliteTable('workflows', {
@@ -23,8 +20,8 @@ export const workflows = sqliteTable('workflows', {
   nodes: text('nodes', { mode: 'json' })
     .notNull()
     .default(sql`(json_array())`)
-    .$type<WorkflowNodes[]>(),
-  viewport: text('viewport', { mode: 'json' }).$type<Viewport>(),
+    .$type<Workflow.WorkflowNodes[]>(),
+  viewport: text('viewport', { mode: 'json' }).$type<ReactFlow.Viewport>(),
   edges: text('edges', { mode: 'json' })
     .notNull()
     .default(sql`(json_array())`)
@@ -32,7 +29,7 @@ export const workflows = sqliteTable('workflows', {
   triggers: text('triggers', { mode: 'json' })
     .notNull()
     .default(sql`(json_array())`)
-    .$type<WorkflowNodeTrigger[]>(),
+    .$type<[]>(),
   isDisabled: integer('is_disabled', { mode: 'boolean' })
     .notNull()
     .$default(() => false),
@@ -67,7 +64,9 @@ export const workflowsHistory = sqliteTable('workflows_history', {
   errorMessage: text('error_message'),
   runnerId: text('runner_id').notNull(),
   errorLocation: text('error_location'),
-  workflowId: text('workflow_id').notNull(),
+  workflowId: text('workflow_id')
+    .notNull()
+    .references(() => workflows.id, { onDelete: 'cascade' }),
   status: text('status').notNull().$type<WORKFLOW_HISTORY_STATUS>(),
 });
 export type NewWorkflowHistory = typeof workflowsHistory.$inferInsert;

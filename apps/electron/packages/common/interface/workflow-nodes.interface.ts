@@ -2,9 +2,10 @@ import type { SetRequired } from 'type-fest';
 import type { WorkflowNodeErroHandlerAction } from './workflow.interface';
 import type { ExtensionCommandArgument } from '@alt-dot/extension-core';
 import type { WORKFLOW_NODE_TYPE } from '../utils/constant/workflow.const';
-import type { Node } from 'reactflow';
+import type * as ReactFlow from 'reactflow';
 import type ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
 import type { KeyboardShortcut, BrowserType } from '@alt-dot/shared';
+export type { internalsSymbol } from 'reactflow/dist/esm/index';
 
 export type WorkflowNodeHandleSource = 'default' | 'error-fallback';
 
@@ -41,7 +42,7 @@ export interface WorkflowNodeBaseData<T extends WORKFLOW_NODE_TYPE> {
 export type WorkflowNodeBase<
   T = unknown,
   P extends WORKFLOW_NODE_TYPE = WORKFLOW_NODE_TYPE,
-> = SetRequired<Node<T & WorkflowNodeBaseData<P>, P>, 'type'>;
+> = SetRequired<ReactFlow.Node<T & WorkflowNodeBaseData<P>, P>, 'type'>;
 
 export type WorkflowNodeCommand = WorkflowNodeBase<
   {

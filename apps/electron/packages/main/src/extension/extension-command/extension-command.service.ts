@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Operators } from 'drizzle-orm';
+import { Operators, getOperators } from 'drizzle-orm';
 import { extensionCommands } from '/@/db/schema/extension.schema';
 import { DBService } from '/@/db/db.service';
 import {
@@ -7,6 +7,7 @@ import {
   ExtensionCommandListItemModel,
   ExtensionCommandModel,
   ExtensionCommandInsertPayload,
+  ExtensionCommandUpdatePayload,
 } from './extension-command.interface';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 
@@ -106,6 +107,76 @@ export class ExtensionCommandService {
       'database:get-command-list': [DATABASE_CHANGES_ALL_ARGS],
       'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
     });
+
+    return result;
+  }
+
+  async updateCommand(
+    id: FindByIdParam,
+    {
+      alias,
+      subtitle,
+      shortcut,
+      isFallback,
+      isDisabled,
+      customSubtitle,
+    }: ExtensionCommandUpdatePayload,
+  ) {
+    const result = await this.dbService.db
+      .update(extensionCommands)
+      .set({
+        alias,
+        shortcut,
+        subtitle,
+        isFallback,
+        isDisabled,
+        customSubtitle,
+      })
+      .where(findByIdQuery(id)(extensionCommands, getOperators()))
+      .returning();
+
+    const { extensionId, name: commandId } = result[0];
+    this.dbService.emitChanges({
+      'database:get-extension': [extensionId],
+      'database:get-command': [{ commandId, extensionId }],
+      'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
+    });
+
+    return result;
+  }
+
+  async deleteCommand(id: FindByIdParam) {
+    const result = await this.dbService.db
+      .delete(extensionCommands)
+      .where(findByIdQuery(id)(extensionCommands, getOperators()));
+
+    this.dbService.emitChanges({
+      'database:get-extension': [DATABASE_CHANGES_ALL_ARGS],
+      'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
+    });
+
+    return result;
+  }
+
+  async existsArr(ids: FindByIdParam[]) {
+    const stringIds = ids.map((id) =>
+      typeof id === 'string' ? id : `${id.extensionId}:${id.commandId}`,
+    );
+    const queryResult =
+      await this.dbService.db.query.extensionCommands.findMany({
+        columns: {
+          id: true,
+        },
+        where(fields, operators) {
+          return operators.inArray(fields.id, stringIds);
+        },
+      });
+
+    const commandIds = new Set(queryResult.map((item) => item.id));
+    const result = stringIds.reduce<Record<string, boolean>>((acc, curr) => {
+      acc[curr] = commandIds.has(curr);
+      return acc;
+    }, {});
 
     return result;
   }

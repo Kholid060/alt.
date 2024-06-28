@@ -45,7 +45,7 @@ async function getOpenedBrowser(
 async function findBrowser(
   preferBrowser: WorkflowNodeUseBrowser['data']['preferBrowser'],
 ) {
-  const browserApps = await IPCRenderer.invokeWithError('apps:get-browsers');
+  const browserApps = await IPCRenderer.invokeWithError('installed-apps:get-browsers');
 
   if (preferBrowser === 'any') {
     const browser =

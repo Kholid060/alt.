@@ -165,7 +165,7 @@ function EditCredential({
 }) {
   const [open, setOpen] = useState(true);
 
-  const data = useDatabaseQuery('database:get-extension-creds-value-detail', [
+  const data = useDatabaseQuery('database:get-extension-credential-list-detail', [
     credential.id,
     true,
   ]);
@@ -439,7 +439,7 @@ function RouteCredentials() {
             filter: { name: search.trim() || undefined },
           },
         ],
-        name: 'database:get-extension-creds-value',
+        name: 'database:get-extension-credential-list',
         onData(data) {
           setCredentials({
             ...data,

@@ -63,7 +63,7 @@ class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
 
     // Message port for accessing Extension APIs
     IPCRenderer.postMessage(
-      'message-port:shared-extension<=>main',
+      'extension:execution-message-port',
       { extPortId: this.id },
       [this.mainMessageChannel.port2],
     );
@@ -117,7 +117,7 @@ class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
     this.worker?.terminate();
     this.worker = null;
 
-    IPCRenderer.postMessage('message-port:delete:shared-extension<=>main', {
+    IPCRenderer.postMessage('extension:delete-execution-message-port', {
       extPortId: this.id,
     });
 

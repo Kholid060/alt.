@@ -70,7 +70,6 @@ export interface IPCEventError {
 
 export interface IPCAppEvents {
   'app:open-devtools': () => void;
-  'app:toggle-lock-window': () => void;
   'app:get-settings': <T extends keyof AppSettings>(
     keys?: T,
   ) => T extends keyof AppSettings ? AppSettings[T] : AppSettings;
@@ -104,8 +103,8 @@ export interface BrowserApp {
   type: BrowserType;
 }
 export interface IPCAppsEvents {
-  'apps:get-browsers': () => BrowserApp[];
-  'apps:get-list': () => ExtensionAPI.shell.installedApps.AppDetail[];
+  'installed-apps:get-browsers': () => BrowserApp[];
+  'installed-apps:get-list': () => ExtensionAPI.shell.installedApps.AppDetail[];
 }
 
 export interface IPCClipboardEvents {
@@ -249,6 +248,7 @@ export interface IPCSendEventMainToRenderer {
 }
 
 export interface IPCSendEventRendererToMain {
+  'window:toggle-lock': () => void;
   'extension:stop-execute-command': [runnerId: string];
   'extension:command-exec-change': [
     type: 'finish' | 'start',
@@ -282,8 +282,8 @@ export interface IPCSendEventRendererToRenderer {
 }
 
 export interface IPCPostEventRendererToMain {
-  'message-port:shared-extension<=>main': [{ extPortId: string }];
-  'message-port:delete:shared-extension<=>main': [{ extPortId: string }];
+  'extension:execution-message-port': [{ extPortId: string }];
+  'extension:delete-execution-message-port': [{ extPortId: string }];
   'message-port:port-bridge': [channelId: MessagePortChannelIds];
 }
 

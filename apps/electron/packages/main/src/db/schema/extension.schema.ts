@@ -13,6 +13,7 @@ import {
   sqliteTable,
   blob,
   uniqueIndex,
+  index,
 } from 'drizzle-orm/sqlite-core';
 import { nanoid } from 'nanoid';
 
@@ -98,20 +99,30 @@ export const commandsRelations = relations(extensionCommands, ({ one }) => ({
   }),
 }));
 
-export const extensionStorages = sqliteTable('extension_storages', {
-  id: integer('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-  createdAt: text('created_at')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP`),
-  updatedAt: text('updated_at')
-    .notNull()
-    .default(sql`CURRENT_TIMESTAMP`),
-  extensionId: text('extension_id')
-    .notNull()
-    .references(() => extensions.id, { onDelete: 'cascade' }),
-  key: text('key').notNull(),
-  value: blob('value', { mode: 'buffer' }).notNull(),
-});
+export const extensionStorages = sqliteTable(
+  'extension_storages',
+  {
+    // extensionId:key
+    id: text('id').notNull().primaryKey(),
+    createdAt: text('created_at')
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: text('updated_at')
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    extensionId: text('extension_id')
+      .notNull()
+      .references(() => extensions.id, { onDelete: 'cascade' }),
+    key: text('key').notNull(),
+    value: blob('value', { mode: 'buffer' }).notNull(),
+  },
+  (table) => ({
+    storageKeyIdx: index('storage_key_idx').on(table.key),
+    storageExtensionIdIdx: index('storage_extension_id_idx').on(
+      table.extensionId,
+    ),
+  }),
+);
 export type NewExtensionStorage = typeof extensionStorages.$inferInsert;
 export type SelectExtensionStorage = typeof extensionStorages.$inferSelect;
 
@@ -230,6 +241,11 @@ export const extensionCredOauthTokens = sqliteTable(
     refreshToken: blob('refresh_token', { mode: 'buffer' }),
     accessToken: blob('access_token', { mode: 'buffer' }).notNull(),
   },
+  (table) => ({
+    extensionOauthCredentialIdx: index('extension_oauth_credential_idx').on(
+      table.credentialId,
+    ),
+  }),
 );
 export type NewExtensionCredentialOauthTokens =
   typeof extensionCredOauthTokens.$inferInsert;
