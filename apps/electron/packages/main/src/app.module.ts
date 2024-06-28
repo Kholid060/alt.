@@ -19,6 +19,7 @@ import { TrayMenuModule } from './tray-menu/tray-menu.module';
 import { InstalledAppsModule } from './installed-apps/installed-apps.module';
 import { OAuthModule } from './oauth/oauth.module';
 import { WorkflowModule } from './workflow/workflow.module';
+import { WorkflowHistoryModule } from './workflow/workflow-history/workflow-history.module';
 
 @Module({
   providers: [AppService],
@@ -43,6 +44,7 @@ import { WorkflowModule } from './workflow/workflow.module';
     CustomProtocolModule,
     GlobalShortcutModule,
     ExtensionLoaderModule,
+    WorkflowHistoryModule,
     ExtensionConfigModule,
     ExtensionUpdaterModule,
     BrowserExtensionModule,

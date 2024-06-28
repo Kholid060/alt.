@@ -254,7 +254,6 @@ class DBWorkflowService {
       .where(eq(workflowsHistory.id, historyId));
 
     emitDBChanges({
-      'database:get-workflow-history': [historyId],
       'database:get-running-workflows': [DATABASE_CHANGES_ALL_ARGS],
       'database:get-workflow-history-list': [DATABASE_CHANGES_ALL_ARGS],
     });
@@ -353,7 +352,6 @@ class DBWorkflowService {
       );
 
     emitDBChanges({
-      'database:get-workflow-history': [DATABASE_CHANGES_ALL_ARGS],
       'database:get-running-workflows': [DATABASE_CHANGES_ALL_ARGS],
       'database:get-workflow-history-list': [DATABASE_CHANGES_ALL_ARGS],
     });

@@ -37,4 +37,20 @@ export class WorkflowController {
     const [value] = await this.workflowQuery.insert(payload);
     return value.id;
   }
+
+  @IPCInvoke('database:update-workflow')
+  async updateWorkflow(
+    @Payload()
+    [workflowId, payload]: IPCInvokePayload<'database:update-workflow'>,
+  ): IPCInvokeReturn<'database:update-workflow'> {
+    await this.workflowQuery.update(workflowId, payload);
+  }
+
+  @IPCInvoke('database:get-workflow-list')
+  async listWorkflow(
+    @Payload()
+    [filter]: IPCInvokePayload<'database:get-workflow-list'>,
+  ): IPCInvokeReturn<'database:get-workflow-list'> {
+    return this.workflowQuery.listWorkflow(filter);
+  }
 }

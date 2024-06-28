@@ -95,44 +95,6 @@ IPCMain.handle('clipboard:has-buffer', (_, contentType) => {
   return Promise.resolve(clipboard.has(contentType));
 });
 
-/** DATABASE */
-IPCMain.handle('database:get-workflow-list', (_, option) => {
-  return DatabaseService.instance.workflow.list(option);
-});
-IPCMain.handle(
-  'database:update-workflow',
-  (
-    { sender },
-    workflowId,
-    data,
-    options = { ignoreModified: false, omitDBChanges: false },
-  ) => {
-    return DatabaseService.instance.workflow.update(workflowId, data, {
-      ignoreModified: options.ignoreModified,
-      excludeEmit: options.omitDBChanges ? [sender.id] : undefined,
-    });
-  },
-);
-IPCMain.handle('database:get-running-workflows', (_) => {
-  return DatabaseService.instance.workflow.listRunningWorkflows();
-});
-
-IPCMain.handle('database:get-workflow-history', (_, historyId) => {
-  return DatabaseService.instance.workflow.getHistory(historyId);
-});
-IPCMain.handle('database:get-workflow-history-list', (_, options) => {
-  return DatabaseService.instance.workflow.listHistory(options);
-});
-IPCMain.handle('database:insert-workflow-history', (_, payload) => {
-  return DatabaseService.instance.workflow.insertHistory(payload);
-});
-IPCMain.handle('database:update-workflow-history', (_, historyId, payload) => {
-  return DatabaseService.instance.workflow.updateHistory(historyId, payload);
-});
-IPCMain.handle('database:delete-workflow-history', (_, historyId) => {
-  return DatabaseService.instance.workflow.deleteHistory(historyId);
-});
-
 /** SHELL */
 IPCMain.handle('shell:open-in-folder', (_, filePath) => {
   shell.showItemInFolder(filePath);

@@ -27,8 +27,10 @@ import {
   ExtensionConfigWithSchemaModel,
 } from '../extension/extension-config/extension-config.interface';
 import {
+  ExtensionCommandInsertPayload,
   ExtensionCommandListFilter,
   ExtensionCommandModel,
+  ExtensionCommandUpdatePayload,
 } from '../extension/extension-command/extension-command.interface';
 import {
   ExtensionListFilterPayload,
@@ -44,7 +46,20 @@ import {
   ExtensionCredentialDetailModel,
 } from '../extension/extension-credential/extension-credential.interface';
 import { ExtensionErrorListItemModel } from '../extension/extension-error/extension-error.interface';
-import { WorkflowDetailModel } from '../workflow/workflow.interface';
+import {
+  WorkflowDetailModel,
+  WorkflowInsertPayload,
+  WorkflowListFilter,
+  WorkflowListItemModel,
+  WorkflowUpdatePayload,
+} from '../workflow/workflow.interface';
+import {
+  WorkflowHistoryInsertPayload,
+  WorkflowHistoryListPaginationFilter,
+  WorkflowHistoryListPaginationModel,
+  WorkflowHistoryRunningItemModel,
+  WorkflowHistoryUpdatePayload,
+} from '../workflow/workflow-history/workflow-history.interface';
 
 export type DatabaseExtensionCommand = SelectExtensionCommand;
 
@@ -288,8 +303,8 @@ export interface DatabaseQueriesEvent {
     filter?: ExtensionListFilterPayload,
   ) => ExtensionListItemModel[];
   'database:get-workflow-list': (
-    options?: DatabaseWorkfowListQueryOptions,
-  ) => DatabaseWorkflow[];
+    options?: WorkflowListFilter,
+  ) => WorkflowListItemModel[];
   'database:get-workflow': (workflowId: string) => WorkflowDetailModel | null;
   'database:get-command-list': (
     filter?: ExtensionCommandListFilter,
@@ -298,9 +313,6 @@ export interface DatabaseQueriesEvent {
   'database:get-extension-manifest': (
     extensionId: string,
   ) => ExtensionManifest | null;
-  'database:get-workflow-history': (
-    historyId: number,
-  ) => DatabaseWorkflowHistory | null;
   'database:extension-command-exists': (
     ids: string[],
   ) => Record<string, boolean>;
@@ -308,23 +320,21 @@ export interface DatabaseQueriesEvent {
     extensionId: string,
   ) => ExtensionErrorListItemModel[];
   'database:get-workflow-history-list': (
-    options?: DatabaseWorkflowHistoryListOptions,
-  ) => { count: number; items: DatabaseWorkflowHistory[] };
-  'database:get-running-workflows': () => DatabaseWorkflowRunning[];
+    filter?: WorkflowHistoryListPaginationFilter,
+  ) => WorkflowHistoryListPaginationModel;
+  'database:get-running-workflows': () => WorkflowHistoryRunningItemModel[];
 }
 
 export interface DatabaseInsertEvents {
-  'database:insert-workflow': (
-    workflow: DatabaseWorkflowInsertPayload,
-  ) => string;
+  'database:insert-workflow': (workflow: WorkflowInsertPayload) => string;
   'database:insert-workflow-history': (
-    history: DatabaseWorkflowHistoryInsertPayload,
+    history: WorkflowHistoryInsertPayload,
   ) => number;
   'database:insert-extension-config': (
     config: ExtensionConfigInsertPayload,
   ) => void;
   'database:insert-extension-command': (
-    command: DatabaseExtensionCommandInsertPayload,
+    command: ExtensionCommandInsertPayload,
   ) => void;
   'database:insert-extension-credential': (
     credential: ExtensionCredentialInsertPayload,
@@ -338,11 +348,7 @@ export interface DatabaseUpdateEvents {
   ) => void;
   'database:update-workflow': (
     workflowId: string,
-    data: DatabaseWorkflowUpdatePayload,
-    options?: Partial<{
-      omitDBChanges: boolean;
-      ignoreModified: boolean;
-    }>,
+    data: WorkflowUpdatePayload,
   ) => void;
   'database:update-extension': (
     extensionId: string,
@@ -350,12 +356,12 @@ export interface DatabaseUpdateEvents {
   ) => void;
   'database:update-workflow-history': (
     historyId: number,
-    data: DatabaseWorkflowHistoryUpdatePayload,
+    data: WorkflowHistoryUpdatePayload,
   ) => void;
   'database:update-extension-command': (
     extensionId: string,
     commandId: string,
-    data: DatabaseExtensionCommandUpdatePayload,
+    data: ExtensionCommandUpdatePayload,
   ) => void;
   'database:update-extension-credential': (
     credentialId: string,
