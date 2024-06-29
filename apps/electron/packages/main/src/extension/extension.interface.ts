@@ -37,3 +37,7 @@ export type ExtensionWithCredListItemModel = Pick<
   SelectExtension,
   'id' | 'title' | 'credentials'
 >;
+
+export type ExtensionWithCommandsModel = SelectExtension & {
+  commands: SelectExtensionCommand[];
+};

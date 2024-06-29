@@ -1,3 +1,4 @@
+/* eslint-disable drizzle/enforce-delete-with-where */
 import type ExtensionRunnerProcess from './runner/ExtensionRunnerProcess';
 import type { ExtensionCommandExecutePayloadWithData } from '#packages/common/interface/extension.interface';
 import IPCRenderer from '#common/utils/IPCRenderer';
@@ -43,8 +44,11 @@ class ExtensionCommandRunner {
 
     debugLog('Sending MessagePort to Command window');
     IPCRenderer.postMessage(
-      'message-port:port-bridge',
-      MESSAGE_PORT_CHANNEL_IDS.sharedWithCommand,
+      'app:message-port-bridge',
+      {
+        channelId: MESSAGE_PORT_CHANNEL_IDS.sharedWithCommand,
+        options: { ensureWindow: false, noThrow: false },
+      },
       [port1],
     );
 

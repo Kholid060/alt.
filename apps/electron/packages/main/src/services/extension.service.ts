@@ -73,7 +73,9 @@ class ExtensionService {
       },
     );
 
-    await DatabaseService.instance.extension.deleteOldErrors().catch(console.error);
+    await DatabaseService.instance.extension
+      .deleteOldErrors()
+      .catch(console.error);
     await this.registerAllShortcuts();
   }
 
@@ -168,10 +170,11 @@ class ExtensionService {
       ExtensionLoader.instance.getPath(extensionId, 'base', commandId);
     if (!commandFilePath) throw new Error("Coudln't find command file");
 
-    const commandConfig = await DatabaseService.instance.extension.isConfigInputted(
-      extensionId,
-      commandId,
-    );
+    const commandConfig =
+      await DatabaseService.instance.extension.isConfigInputted(
+        extensionId,
+        commandId,
+      );
     if (commandConfig.requireInput) {
       await WindowCommand.instance.sendMessage('command-window:input-config', {
         commandId,

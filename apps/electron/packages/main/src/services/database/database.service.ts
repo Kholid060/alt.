@@ -18,6 +18,9 @@ const dbPath = path.join(DATABASE_FOLDER, 'extensions.db');
 export type SQLiteDatabaseSchema = typeof extensionsSchema &
   typeof workflowsSchema;
 export type SQLiteDatabase = BetterSQLite3Database<SQLiteDatabaseSchema>;
+export type SQLiteDatabaseTx = Parameters<
+  Parameters<BetterSQLite3Database<SQLiteDatabaseSchema>['transaction']>[0]
+>[0];
 
 class DatabaseService {
   private static _instance: DatabaseService | null = null;

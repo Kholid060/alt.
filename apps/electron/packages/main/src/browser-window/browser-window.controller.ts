@@ -49,4 +49,33 @@ export class BrowserWindowController {
   async toggleLockWindow(@Ctx() event: Electron.IpcMainEvent) {
     await this.browserWindow.toggleLock(event.sender);
   }
+
+  @IPCSend('data:changes')
+  async emitDataChanges(
+    @Ctx() { sender }: Electron.IpcMainEvent,
+    @Payload() [...args]: IPCSendPayload<'data:changes'>,
+  ) {
+    this.browserWindow.sendMessageToAllWindows({
+      args,
+      name: 'data:changes',
+      excludeWindow: [sender.id],
+    });
+  }
+
+  @IPCSend('shared-process:workflow-events')
+  async sharedProcessWorkflowEvents(
+    @Payload() [events]: IPCSendPayload<'shared-process:workflow-events'>,
+  ) {
+    const dashboardWindow = await this.browserWindow.get('dashboard', {
+      autoCreate: false,
+    });
+    await dashboardWindow.sendMessage(
+      {
+        noThrow: true,
+        ensureWindow: false,
+        name: 'shared-process:workflow-events',
+      },
+      events,
+    );
+  }
 }

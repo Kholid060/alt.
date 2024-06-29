@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DBService } from '../db/db.service';
 import { OnAppReady } from '../common/hooks/on-app-ready.hook';
-import { SQL, eq, lt, sql } from 'drizzle-orm';
-import { extensionErrors, extensions } from '../db/schema/extension.schema';
+import { lt } from 'drizzle-orm';
+import { extensionErrors } from '../db/schema/extension.schema';
 import { CommandLaunchBy } from '@alt-dot/extension';
 import { GlobalShortcutService } from '../global-shortcut/global-shortcut.service';
 import { LoggerService } from '../logger/logger.service';
@@ -20,15 +20,6 @@ import { ExtensionLoaderService } from '../extension-loader/extension-loader.ser
 import { ExtensionCommandType } from '@alt-dot/shared';
 import { ExtensionConfigService } from './extension-config/extension-config.service';
 import { BrowserExtensionService } from '../browser-extension/browser-extension.service';
-import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
-import {
-  ExtensionListFilterPayload,
-  ExtensionListItemModel,
-  ExtensionUpdatePayload,
-  ExtensionWithCredListItemModel,
-} from './extension.interface';
-import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
-import { ExtensionManifest } from '@alt-dot/extension-core';
 
 const MAX_EXT_ERROR_AGE_DAY = 30;
 
@@ -293,134 +284,5 @@ export class ExtensionService implements OnAppReady {
       'shared-window:stop-execute-command',
       runnerId,
     );
-  }
-}
-
-@Injectable()
-export class ExtensionQueryService {
-  constructor(private dbService: DBService) {}
-
-  async get(extensionId: string) {
-    const extension = await this.dbService.db.query.extensions.findFirst({
-      with: { commands: {} },
-      where(fields, operators) {
-        return operators.eq(fields.id, extensionId);
-      },
-    });
-
-    return extension ?? null;
-  }
-
-  exists(extensionId: string): Promise<boolean> {
-    return this.dbService.db.query.extensions
-      .findFirst({
-        columns: { id: true },
-        where(fields, operators) {
-          return operators.eq(fields.id, extensionId);
-        },
-      })
-      .then((result) => Boolean(result));
-  }
-
-  async update(extensionId: string, value: ExtensionUpdatePayload) {
-    const result = await this.dbService.db
-      .update(extensions)
-      .set(value)
-      .where(eq(extensions.id, extensionId))
-      .returning();
-
-    this.dbService.emitChanges({
-      'database:get-extension': [extensionId],
-      'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
-    });
-
-    return result;
-  }
-
-  list(
-    filter: ExtensionListFilterPayload = {},
-  ): Promise<ExtensionListItemModel[]> {
-    return this.dbService.db.query.extensions.findMany({
-      columns: {
-        id: true,
-        path: true,
-        icon: true,
-        title: true,
-        config: true,
-        version: true,
-        isError: true,
-        isLocal: true,
-        updatedAt: true,
-        isDisabled: true,
-        description: true,
-        errorMessage: true,
-      },
-      with: {
-        commands: {},
-      },
-      extras: {
-        errorsCount:
-          sql<number>`(SELECT COUNT(*) FROM ${extensionErrors} WHERE ${extensionErrors.extensionId} = extensions.id)`.as(
-            'errors_count',
-          ),
-      },
-      where: (fields, operators) => {
-        const filters: SQL<unknown>[] = [];
-
-        if (filter?.activeOnly) {
-          filters.push(
-            operators.eq(fields.isDisabled, false),
-            operators.eq(fields.isError, false),
-          );
-        }
-        if (filter?.excludeBuiltIn) {
-          filters.push(
-            operators.notInArray(
-              fields.id,
-              Object.values(EXTENSION_BUILT_IN_ID),
-            ),
-          );
-        }
-
-        if (filters.length === 0) return;
-
-        return operators.and(...filters);
-      },
-    });
-  }
-
-  listCredentials(): Promise<ExtensionWithCredListItemModel[]> {
-    return this.dbService.db.query.extensions.findMany({
-      columns: {
-        id: true,
-        title: true,
-        credentials: true,
-      },
-      where(fields, operators) {
-        return operators.isNotNull(fields.credentials);
-      },
-    });
-  }
-
-  async getManifest(extensionId: string): Promise<ExtensionManifest | null> {
-    const extension = await this.dbService.db.query.extensions.findFirst({
-      where(fields, operators) {
-        return operators.and(
-          operators.eq(fields.isError, false),
-          operators.eq(fields.id, extensionId),
-          operators.eq(fields.isDisabled, false),
-        );
-      },
-      with: {
-        commands: {},
-      },
-    });
-    if (!extension) return null;
-
-    return {
-      ...extension,
-      categories: [],
-      $apiVersion: '',
-    } as ExtensionManifest;
   }
 }

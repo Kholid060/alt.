@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DBService } from '../db/db.service';
 import { workflows } from '../db/schema/workflow.schema';
-import { asc, desc, eq } from 'drizzle-orm';
+import { asc, desc, eq, sql } from 'drizzle-orm';
 import {
   WorkflowInsertPayload,
   WorkflowListFilter,
@@ -102,6 +102,15 @@ export class WorkflowQueryService {
     return result;
   }
 
+  listWorkflowTriggers() {
+    return this.dbService.db.query.workflows.findMany({
+      columns: {
+        id: true,
+        triggers: true,
+      },
+    });
+  }
+
   listWorkflow(
     filter: WorkflowListFilter = {},
   ): Promise<WorkflowListItemModel[]> {
@@ -143,5 +152,34 @@ export class WorkflowQueryService {
     }
 
     return query.execute();
+  }
+
+  incrementExecuteCount(workflowId: string, incBy = 1) {
+    return this.dbService.db
+      .update(workflows)
+      .set({
+        executeCount: sql`${workflows.executeCount} + ${incBy}`,
+      })
+      .where(eq(workflows.id, workflowId));
+  }
+
+  async getExportData(workflowId: string) {
+    const result = await this.dbService.db.query.workflows.findFirst({
+      columns: {
+        icon: true,
+        name: true,
+        nodes: true,
+        edges: true,
+        settings: true,
+        viewport: true,
+        variables: true,
+        description: true,
+      },
+      where(fields, operators) {
+        return operators.eq(fields.id, workflowId);
+      },
+    });
+
+    return result ?? null;
   }
 }

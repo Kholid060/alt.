@@ -8,12 +8,12 @@ import ExtensionMessagePortHandler from './utils/ExtensionMessagePortHandler';
 import { isExtHasApiPermission } from '#packages/common/utils/check-ext-permission';
 import { CustomError } from '#packages/common/errors/custom-errors';
 import { LoggerService } from '/@/logger/logger.service';
-import { ExtensionQueryService } from '../extension.service';
 import type { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MessagePortMain } from 'electron';
 import { ExtensionApiEvent } from './events/extension-api.event';
+import { ExtensionQueryService } from '../extension-query.service';
 
 export type ExtensionMessagePortMessageHandler = <
   T extends keyof IPCUserExtensionEventsMap,

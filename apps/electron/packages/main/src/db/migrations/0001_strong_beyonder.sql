@@ -1,0 +1,1 @@
+ALTER TABLE `workflows` ADD `is_pinned` integer DEFAULT false;

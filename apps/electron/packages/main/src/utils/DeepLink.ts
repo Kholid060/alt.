@@ -8,7 +8,7 @@ import DatabaseService from '../services/database/database.service';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { WORKFLOW_MANUAL_TRIGGER_ID } from '#packages/common/utils/constant/workflow.const';
 import ExtensionService from '../services/extension.service';
-import WorkflowService from '../services/workflow.service';
+import WorkflowService2 from '../services/workflow.service';
 import WindowCommand from '../window/command-window';
 
 function convertArgValue(argument: ExtensionCommandArgument, value: string) {
@@ -132,7 +132,7 @@ class DeepLinkHandler {
       }
     }
 
-    await WorkflowService.instance.execute({
+    await WorkflowService2.instance.execute({
       id: workflow.id,
       startNodeId: WORKFLOW_MANUAL_TRIGGER_ID,
     });

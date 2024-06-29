@@ -8,6 +8,13 @@
       "when": 1719574423787,
       "tag": "0000_vengeful_rage",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1719629281521,
+      "tag": "0001_strong_beyonder",
+      "breakpoints": true
     }
   ]
 }

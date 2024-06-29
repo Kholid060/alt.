@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { ExtensionQueryService, ExtensionService } from './extension.service';
+import { ExtensionService } from './extension.service';
 import { IPCInvoke, IPCSend } from '../common/decorators/ipc.decorator';
 import { Payload } from '@nestjs/microservices';
 import type {
@@ -7,6 +7,7 @@ import type {
   IPCInvokeReturn,
   IPCSendPayload,
 } from '#packages/common/interface/ipc-events.interface';
+import { ExtensionQueryService } from './extension-query.service';
 
 @Controller()
 export class ExtensionController {
@@ -82,5 +83,12 @@ export class ExtensionController {
   @IPCInvoke('database:get-extension-creds')
   async listExtensionWithCreds(): IPCInvokeReturn<'database:get-extension-creds'> {
     return this.extensionQuery.listCredentials();
+  }
+
+  @IPCSend('extension:stop-execute-command')
+  stopCommandExecution(
+    @Payload() [runnerId]: IPCSendPayload<'extension:stop-execute-command'>,
+  ) {
+    this.extensionService.stopCommandExecution(runnerId);
   }
 }

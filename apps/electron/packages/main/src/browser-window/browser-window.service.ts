@@ -72,11 +72,11 @@ export class BrowserWindowService implements OnAppReady {
     let browserWindow = (this.windows.get(name) as BrowserWindowMap[T]) ?? null;
     if (browserWindow) return browserWindow;
 
-    if (autoCreate) {
-      browserWindow = new browserWindowMap[name]() as BrowserWindowMap[T];
-      await browserWindow.createWindow();
+    browserWindow = new browserWindowMap[name]() as BrowserWindowMap[T];
+    this.windows.set(name, browserWindow);
 
-      this.windows.set(name, browserWindow);
+    if (autoCreate) {
+      await browserWindow.createWindow();
     } else if (!noThrow) {
       throw new Error(`Can't access "${name}" window before created`);
     }

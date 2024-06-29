@@ -15,7 +15,6 @@ import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension
 import { EXTENSION_COMMAND_TYPE } from '@alt-dot/extension-core';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import { emitDBChanges } from './database-utils';
-import AppSettingsService from '../services/app-settings.service';
 
 const EXT_NAME = `.${APP_BACKUP_FILE_EXT}`;
 
@@ -141,7 +140,7 @@ class BackupRestoreData {
       JSON.stringify({
         workflows,
         extensions,
-        settings: AppSettingsService.get(),
+        // settings: AppSettingsService.get(),
       }),
     );
 
@@ -190,7 +189,7 @@ class BackupRestoreData {
         restoreExtensions(data.data.extensions),
       ]);
 
-      AppSettingsService.set(data.data.settings);
+      // AppSettingsService.set(data.data.settings);
 
       emitDBChanges({
         'database:get-command': [DATABASE_CHANGES_ALL_ARGS],

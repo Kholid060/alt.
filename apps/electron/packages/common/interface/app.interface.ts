@@ -24,3 +24,8 @@ export interface AppVersions {
   os: string;
   app: string;
 }
+
+export interface AppMessagePortBridgeOptions {
+  noThrow?: boolean;
+  ensureWindow?: boolean;
+}

@@ -21,8 +21,11 @@ interface ImportMetaEnv {
 
   readonly VITE_WEB_BASE_URL: string;
   readonly VITE_API_BASE_URL: string;
-  readonly VITE_API_KEY: string;
-  readonly VITE_SECRET_DATA_KEY: string;
+}
+
+interface AppEnv extends ImportMetaEnv {
+  readonly API_KEY: string;
+  readonly SECRET_DATA_KEY: string;
 }
 
 interface ImportMeta {

@@ -20,7 +20,7 @@ export const workflows = sqliteTable('workflows', {
   nodes: text('nodes', { mode: 'json' })
     .notNull()
     .default(sql`(json_array())`)
-    .$type<Workflow.WorkflowNodes[]>(),
+    .$type<(Workflow.WorkflowNodes | ReactFlow.Node)[]>(),
   viewport: text('viewport', { mode: 'json' }).$type<ReactFlow.Viewport>(),
   edges: text('edges', { mode: 'json' })
     .notNull()
@@ -29,7 +29,7 @@ export const workflows = sqliteTable('workflows', {
   triggers: text('triggers', { mode: 'json' })
     .notNull()
     .default(sql`(json_array())`)
-    .$type<[]>(),
+    .$type<(Workflow.WorkflowNodes | ReactFlow.Edge)[]>(),
   isDisabled: integer('is_disabled', { mode: 'boolean' })
     .notNull()
     .$default(() => false),

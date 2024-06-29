@@ -20,10 +20,10 @@ import AdmZip from 'adm-zip';
 import originalFs from 'original-fs';
 import { EXTENSION_FOLDER } from '../utils/constant';
 import { LoggerService } from '../logger/logger.service';
-import { DatabaseExtension } from '../interface/database.interface';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
 import { ExtensionSqliteService } from '../extension/extension-sqlite/extension-sqlite.service';
+import { ExtensionWithCommandsModel } from '../extension/extension.interface';
 
 @Injectable()
 export class ExtensionLoaderService {
@@ -78,7 +78,7 @@ export class ExtensionLoaderService {
       extensionId,
       isLocal = true,
     }: { extensionId?: string; isLocal?: boolean } = {},
-  ): Promise<DatabaseExtension | null> {
+  ): Promise<ExtensionWithCommandsModel | null> {
     const normalizeManifestPath = path.normalize(path.dirname(manifestPath));
     const findExtension = await this.dbService.db.query.extensions.findFirst({
       columns: {
@@ -202,16 +202,19 @@ export class ExtensionLoaderService {
 
   async installExtension(
     extensionId: string,
-  ): Promise<DatabaseExtension | null> {
+    hasValidated = false,
+  ): Promise<ExtensionWithCommandsModel | null> {
     try {
-      const findExtension = await this.dbService.db.query.extensions.findFirst({
-        columns: {
-          id: true,
-        },
-        where(fields, operators) {
-          return operators.eq(fields.id, extensionId);
-        },
-      });
+      const findExtension = hasValidated
+        ? false
+        : await this.dbService.db.query.extensions.findFirst({
+            columns: {
+              id: true,
+            },
+            where(fields, operators) {
+              return operators.eq(fields.id, extensionId);
+            },
+          });
       if (findExtension) return null;
 
       const extension =

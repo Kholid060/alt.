@@ -62,6 +62,7 @@ export const extensionsRelations = relations(extensions, ({ many }) => ({
 }));
 
 export const extensionCommands = sqliteTable('extension_commands', {
+  // extensionId:commandName
   id: text('id').primaryKey(),
   shortcut: text('shortcut').unique(),
   icon: text('icon'),

@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import fs from 'fs-extra';
 import eqSemver from 'semver/functions/eq';
 import { OnAppReady } from '../common/hooks/on-app-ready.hook';
-import { StoreService } from '../store/store.service';
 import { DBService } from '../db/db.service';
 import { LoggerService } from '../logger/logger.service';
 import path from 'path';
@@ -19,6 +18,7 @@ import {
 } from './interfaces/extension-updater.interface';
 import { ExtensionUpdater } from './utils/extension-updater';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
+import { AppStoreService } from '../app/app-store/app-store.service';
 
 @Injectable()
 export class ExtensionUpdaterService implements OnAppReady {
@@ -26,13 +26,11 @@ export class ExtensionUpdaterService implements OnAppReady {
     private dbService: DBService,
     private logger: LoggerService,
     private apiService: APIService,
-    private storeService: StoreService,
+    private appStore: AppStoreService,
   ) {}
 
   async onAppReady() {
-    const lastCheckUpdate = this.storeService.store.get(
-      'lastCheckExtensionUpdate',
-    );
+    const lastCheckUpdate = this.appStore.get('lastCheckExtensionUpdate');
     const checkUpdate =
       !lastCheckUpdate ||
       new Date(lastCheckUpdate).getDate() !== new Date().getDate();
@@ -90,10 +88,7 @@ export class ExtensionUpdaterService implements OnAppReady {
       );
     });
 
-    this.storeService.store.set(
-      'lastCheckExtensionUpdate',
-      new Date().toString(),
-    );
+    this.appStore.set('lastCheckExtensionUpdate', new Date().toString());
 
     this.logger.info('Finish updating extensions');
   }

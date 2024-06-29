@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ExtensionController } from './extension.controller';
 import { ExtensionConfigModule } from './extension-config/extension-config.module';
-import { ExtensionQueryService, ExtensionService } from './extension.service';
+import { ExtensionService } from './extension.service';
 import { ExtensionLoaderModule } from '../extension-loader/extension-loader.module';
 import { BrowserExtensionModule } from '../browser-extension/browser-extension.module';
 import { ExtensionCommandModule } from './extension-command/extension-command.module';
@@ -22,6 +22,7 @@ import { ExtensionStorageApiListener } from './extension-execution-event/listene
 import { OAuthModule } from '../oauth/oauth.module';
 import { ExtensionAuthTokenService } from './extension-auth-token/extension-auth-token.service';
 import { ExtensionStorageService } from './extension-storage/extension-storage.service';
+import { ExtensionQueryService } from './extension-query.service';
 
 const extensionApiListeners = [
   ExtensionFSApiListener,
@@ -37,7 +38,7 @@ const extensionApiListeners = [
 ];
 
 @Module({
-  exports: [ExtensionService, ExtensionSqliteModule],
+  exports: [ExtensionService, ExtensionSqliteModule, ExtensionQueryService],
   controllers: [ExtensionController],
   providers: [
     ExtensionService,

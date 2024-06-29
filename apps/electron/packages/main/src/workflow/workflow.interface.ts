@@ -26,3 +26,8 @@ export interface WorkflowListFilter {
   isPinned?: boolean;
   sort?: { by: 'executeCount' | 'updatedAt'; asc: boolean };
 }
+
+export type WorkflowUpsertPayload = Omit<
+  NewWorkflow,
+  'createdAt' | 'updatedAt'
+>;

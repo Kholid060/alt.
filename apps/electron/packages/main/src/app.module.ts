@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { CacheModule } from '@nestjs/cache-manager';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
-import { StoreModule } from './store/store.module';
 import { ExtensionUpdaterModule } from './extension-updater/extension-updater.module';
 import { DBModule } from './db/db.module';
 import { LoggerModule } from './logger/logger.module';
@@ -20,6 +19,21 @@ import { InstalledAppsModule } from './installed-apps/installed-apps.module';
 import { OAuthModule } from './oauth/oauth.module';
 import { WorkflowModule } from './workflow/workflow.module';
 import { WorkflowHistoryModule } from './workflow/workflow-history/workflow-history.module';
+import { ConfigModule } from '@nestjs/config';
+import { z } from 'zod';
+import { AppBackupModule } from './app/app-backup/app-backup.module';
+import { AppStoreModule } from './app/app-store/app-store.module';
+import { AppCryptoModule } from './app/app-crypto/app-crypto.module';
+import { ElectronApiModule } from './electron-api/electron-api.module';
+import { DeepLinkModule } from './deep-link/deep-link.module';
+
+const envVarsSchema = z.object({
+  API_KEY: z.string().min(1),
+  SECRET_DATA_KEY: z.string().min(32),
+  VITE_DEV_SERVER_URL: z.string().optional(),
+  VITE_WEB_BASE_URL: z.string().url().min(1),
+  VITE_API_BASE_URL: z.string().url().min(1),
+});
 
 @Module({
   providers: [AppService],
@@ -31,14 +45,22 @@ import { WorkflowHistoryModule } from './workflow/workflow-history/workflow-hist
     EventEmitterModule.forRoot({
       delimiter: ':',
     }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validate: envVarsSchema.parse,
+    }),
+    AppStoreModule,
+    AppCryptoModule,
+    AppBackupModule,
     DBModule,
     APIModule,
-    StoreModule,
     OAuthModule,
     LoggerModule,
     TrayMenuModule,
     WorkflowModule,
+    DeepLinkModule,
     ExtensionModule,
+    ElectronApiModule,
     BrowserWindowModule,
     InstalledAppsModule,
     CustomProtocolModule,

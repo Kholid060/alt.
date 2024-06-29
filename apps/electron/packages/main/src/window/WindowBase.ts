@@ -1,6 +1,5 @@
 import { BrowserWindow } from 'electron';
 import { screen } from 'electron';
-import { store } from '../lib/store';
 import { EventEmitter } from 'eventemitter3';
 import type { WindowNames } from '#packages/common/interface/window.interface';
 import type {
@@ -275,33 +274,6 @@ class WindowBase extends EventEmitter<WindowBaseEvents> {
     this.window = null;
     this.webContentId = -1;
     this._state = WindowBaseState.Closed;
-  }
-
-  saveWindowBounds(bounds: Electron.Rectangle) {
-    store.set(`windowBounds.${this.windowId}`, bounds);
-  }
-
-  getWindowBounds() {
-    const bounds = store.get(
-      `windowBounds.${this.windowId}`,
-      null,
-    ) as Electron.Rectangle | null;
-    if (!bounds) return null;
-
-    const display = screen.getDisplayNearestPoint({
-      x: bounds.x,
-      y: bounds.y,
-    });
-
-    if (
-      !(bounds.x > display.bounds.x && bounds.x < display.size.width) ||
-      !(bounds.y > display.bounds.y && bounds.y < display.size.height)
-    ) {
-      bounds.x = display.bounds.x;
-      bounds.y = display.bounds.y;
-    }
-
-    return bounds;
   }
 
   async restoreOrCreateWindow() {

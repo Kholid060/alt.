@@ -1,22 +1,11 @@
 import { Menu, app } from 'electron';
-import './main';
 import './utils/security-restrictions';
 import './utils/ipc/ipc-send-message-handler';
 import './utils/ipc/ipc-invoke-messages-handler';
 import { platform } from 'node:process';
 import updater from 'electron-updater';
-import CustomProtocol from './utils/custom-protocol/CustomProtocol';
 import path from 'node:path';
 import DeepLink from './utils/DeepLink';
-import WebsocketService from './services/websocket/websocket.service';
-import GlobalShortcut from './utils/GlobalShortcuts';
-import ExtensionLoader from './utils/extension/ExtensionLoader';
-import DatabaseService from './services/database/database.service';
-import WorkflowService from './services/workflow.service';
-import WindowCommand from './window/command-window';
-import ExtensionService from './services/extension.service';
-import TrayService from './services/tray.service';
-import AppSettingsService from './services/app-settings.service';
 import { APP_DEEP_LINK_SCHEME } from '@alt-dot/shared';
 import API from '#common/utils/API';
 
@@ -57,7 +46,7 @@ app.on('second-instance', (_event, commandLine) => {
     return;
   }
 
-  DeepLink.handler(deepLink);
+  // DeepLink.handler(deepLink);
 });
 
 /**
@@ -74,6 +63,8 @@ app.on('window-all-closed', () => {
   }
 });
 
+import './main';
+
 /**
  * Create the application window when the background process is ready.
  */
@@ -85,11 +76,11 @@ app
     // CustomProtocol.registerProtocols();
     // WebsocketService.startDefaultServer();
     // TrayService.instance.init();
-    AppSettingsService.init();
+    // AppSettingsService.init();
 
     await Promise.all([
-      GlobalShortcut.instance.init(),
-      WorkflowService.instance.init(),
+      // GlobalShortcut.instance.init(),
+      // WorkflowService2.instance.init(),
       // ExtensionLoader.instance.loadExtensions(),
     ]);
 

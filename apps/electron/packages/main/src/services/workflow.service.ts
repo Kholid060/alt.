@@ -22,8 +22,8 @@ import IPCMain from '../utils/ipc/IPCMain';
 import TrayService from './tray.service';
 import { APP_NAME } from '#packages/common/utils/constant/app.const';
 
-class WorkflowTriggerService {
-  constructor(private workflowService: WorkflowService) {}
+class WorkflowTriggerService2 {
+  constructor(private workflowService: WorkflowService2) {}
 
   async register(workflowId: string | DatabaseWorkflowDetail) {
     const workflow =
@@ -109,21 +109,21 @@ export const workflowFileSchema = z.object({
   description: z.string().default('').optional(),
 });
 
-class WorkflowService {
-  private static _instance: WorkflowService;
+class WorkflowService2 {
+  private static _instance: WorkflowService2;
 
   static get instance() {
-    return this._instance || (this._instance = new WorkflowService());
+    return this._instance || (this._instance = new WorkflowService2());
   }
 
-  trigger: WorkflowTriggerService;
+  trigger: WorkflowTriggerService2;
   private _runningWorkflows = new Map<
     string,
     { workflowId: string; runnerId: string }
   >();
 
   constructor() {
-    this.trigger = new WorkflowTriggerService(this);
+    this.trigger = new WorkflowTriggerService2(this);
   }
 
   async init() {
@@ -249,4 +249,4 @@ class WorkflowService {
   }
 }
 
-export default WorkflowService;
+export default WorkflowService2;

@@ -134,7 +134,7 @@ export class NodeHandlerNotification extends WorkflowNodeHandler<WORKFLOW_NODE_T
   async execute({
     node,
   }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.NOTIFICATION>): Promise<WorkflowNodeHandlerExecuteReturn> {
-    IPCRenderer.send('app:show-notification', node.data);
+    IPCRenderer.send('notification:show', node.data);
 
     return {
       value: null,

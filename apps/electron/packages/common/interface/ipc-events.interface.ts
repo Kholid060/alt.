@@ -32,7 +32,15 @@ import type { MessagePortChannelIds } from './message-port-events.interface';
 import type { WorkflowRunnerRunPayload } from './workflow-runner.interace';
 import type { ExtensionCredential } from '@alt-dot/extension-core/src/client/manifest/manifest-credential';
 import type { WindowNames } from './window.interface';
-import type { AppSettings, AppVersions } from './app.interface';
+import type {
+  AppMessagePortBridgeOptions,
+  AppSettings,
+  AppVersions,
+} from './app.interface';
+import type {
+  AppCryptoCreateHashAlgorithm,
+  AppCryptoCreateHashOptions,
+} from '../../main/src/app/app-crypto/app-crypto.interface';
 
 export interface IPCRendererInvokeEventPayload {
   name: string;
@@ -82,13 +90,6 @@ export interface IPCAppEvents {
 export interface IPCWindowEvents {
   'command-window:show': () => void;
   'command-window:close': () => void;
-}
-
-export interface IPCScreenEvents {
-  'screen:get-cursor-position': (relativeToWindow?: boolean) => {
-    x: number;
-    y: number;
-  };
 }
 
 export interface IPCShellEvents {
@@ -202,12 +203,9 @@ export interface IPCDialogEvents {
 
 export interface IPCCryptoEvents {
   'crypto:create-hash': (
-    algorithm: 'sha256' | 'shake256',
+    algorithm: AppCryptoCreateHashAlgorithm,
     data: string,
-    options?: {
-      outputLength?: number;
-      digest?: 'hex' | 'base64' | 'base64url';
-    },
+    options?: AppCryptoCreateHashOptions,
   ) => string;
 }
 
@@ -225,7 +223,6 @@ export type IPCEvents = IPCShellEvents &
   IPCDialogEvents &
   IPCCryptoEvents &
   IPCWindowEvents &
-  IPCScreenEvents &
   IPCBrowserEvents &
   IPCDatabaseEvents &
   IPCWorkflowEvents &
@@ -260,7 +257,7 @@ export interface IPCSendEventRendererToMain {
     type: 'running' | 'finish',
     detail: { workflowId: string; runnerId: string },
   ];
-  'app:show-notification': [
+  'notification:show': [
     options: ExtensionAPI.notifications.NotificationOptions,
   ];
 }
@@ -284,7 +281,9 @@ export interface IPCSendEventRendererToRenderer {
 export interface IPCPostEventRendererToMain {
   'extension:execution-message-port': [{ extPortId: string }];
   'extension:delete-execution-message-port': [{ extPortId: string }];
-  'message-port:port-bridge': [channelId: MessagePortChannelIds];
+  'app:message-port-bridge': [
+    { channelId: MessagePortChannelIds; options?: AppMessagePortBridgeOptions },
+  ];
 }
 
 export interface IPCPostMessageEventMainToRenderer {
