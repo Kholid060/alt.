@@ -187,8 +187,6 @@ __metadata:
     "@radix-ui/react-tooltip": "npm:^1.0.7"
     "@types/react": "npm:^18.2.46"
     "@typescript-eslint/eslint-plugin": "npm:^7.2.0"
-    "@uiw/codemirror-theme-tokyo-night": "npm:^4.22.2"
-    "@uiw/react-codemirror": "npm:^4.22.2"
     autoprefixer: "npm:^10.4.16"
     class-variance-authority: "npm:^0.7.0"
     clsx: "npm:^2.1.0"
@@ -7050,44 +7048,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@uiw/codemirror-extensions-basic-setup@npm:4.22.2":
-  version: 4.22.2
-  resolution: "@uiw/codemirror-extensions-basic-setup@npm:4.22.2"
-  dependencies:
-    "@codemirror/autocomplete": "npm:^6.0.0"
-    "@codemirror/commands": "npm:^6.0.0"
-    "@codemirror/language": "npm:^6.0.0"
-    "@codemirror/lint": "npm:^6.0.0"
-    "@codemirror/search": "npm:^6.0.0"
-    "@codemirror/state": "npm:^6.0.0"
-    "@codemirror/view": "npm:^6.0.0"
-  peerDependencies:
-    "@codemirror/autocomplete": ">=6.0.0"
-    "@codemirror/commands": ">=6.0.0"
-    "@codemirror/language": ">=6.0.0"
-    "@codemirror/lint": ">=6.0.0"
-    "@codemirror/search": ">=6.0.0"
-    "@codemirror/state": ">=6.0.0"
-    "@codemirror/view": ">=6.0.0"
-  checksum: 10c0/b51614ba0489fca517b98ecfef4fb789b7b24313b0e70d23286a27f2a989818f102a89e80991b3b33277fde65ea2456f248f3eab35443c9cd1fc706e428936c4
-  languageName: node
-  linkType: hard
-
 "@uiw/codemirror-theme-tokyo-night@npm:^4.22.0":
   version: 4.22.0
   resolution: "@uiw/codemirror-theme-tokyo-night@npm:4.22.0"
   dependencies:
     "@uiw/codemirror-themes": "npm:4.22.0"
   checksum: 10c0/9f956f08934899e325e851dca3e6026bae3d4b805df14f95f44428af30d8fdaca40865e4ebf4a4807e814094c2ca38456830346b4f1637ee005f4fe7469d2a51
-  languageName: node
-  linkType: hard
-
-"@uiw/codemirror-theme-tokyo-night@npm:^4.22.2":
-  version: 4.22.2
-  resolution: "@uiw/codemirror-theme-tokyo-night@npm:4.22.2"
-  dependencies:
-    "@uiw/codemirror-themes": "npm:4.22.2"
-  checksum: 10c0/f4efef4ba4d6bd80d7b8e7523629e047f88549dedd693a55b7f1c4db5358188fbe81d5ef6f4be34ae47f439148962c3dc9bd3d3e99456c91e2d137f0389f7b26
   languageName: node
   linkType: hard
 
@@ -7103,21 +7069,6 @@ __metadata:
     "@codemirror/state": ">=6.0.0"
     "@codemirror/view": ">=6.0.0"
   checksum: 10c0/b1e60960ec0694379a1a4786ace3640effd572b2c15baf29dd0e2fe168430a83bf036885bf290117c223223f875e34ca529f753a1f103517672bbe04158ca9e4
-  languageName: node
-  linkType: hard
-
-"@uiw/codemirror-themes@npm:4.22.2":
-  version: 4.22.2
-  resolution: "@uiw/codemirror-themes@npm:4.22.2"
-  dependencies:
-    "@codemirror/language": "npm:^6.0.0"
-    "@codemirror/state": "npm:^6.0.0"
-    "@codemirror/view": "npm:^6.0.0"
-  peerDependencies:
-    "@codemirror/language": ">=6.0.0"
-    "@codemirror/state": ">=6.0.0"
-    "@codemirror/view": ">=6.0.0"
-  checksum: 10c0/e9cfc7bad0b0c00db242d2765bdf9c55b77d95e0304d8379f1784ec1165602e59905036c142c0c9b5d7ad9fb8a53985e6964db43c4570b634068e4f820f3a355
   languageName: node
   linkType: hard
 
@@ -7140,28 +7091,6 @@ __metadata:
     react: ">=16.8.0"
     react-dom: ">=16.8.0"
   checksum: 10c0/3188fab2246ad30fd88d4428c6fb7a0b03fd5575d877bb82d0d7644cbe1d02fa8ade8cf08ca7e5a37077a259993c1dfd8e57a1ddd0aa4c674531fddd0d9638d9
-  languageName: node
-  linkType: hard
-
-"@uiw/react-codemirror@npm:^4.22.2":
-  version: 4.22.2
-  resolution: "@uiw/react-codemirror@npm:4.22.2"
-  dependencies:
-    "@babel/runtime": "npm:^7.18.6"
-    "@codemirror/commands": "npm:^6.1.0"
-    "@codemirror/state": "npm:^6.1.1"
-    "@codemirror/theme-one-dark": "npm:^6.0.0"
-    "@uiw/codemirror-extensions-basic-setup": "npm:4.22.2"
-    codemirror: "npm:^6.0.0"
-  peerDependencies:
-    "@babel/runtime": ">=7.11.0"
-    "@codemirror/state": ">=6.0.0"
-    "@codemirror/theme-one-dark": ">=6.0.0"
-    "@codemirror/view": ">=6.0.0"
-    codemirror: ">=6.0.0"
-    react: ">=16.8.0"
-    react-dom: ">=16.8.0"
-  checksum: 10c0/de4903d2c4789c3a3872c46e69a6cde37e4abf3b96e602ff4f96f9b01e6951b1c06ce1e0ef3061395fc6ebc733bf5da924d4dd85b7e153a7eb015b8c5e46d533
   languageName: node
   linkType: hard
 

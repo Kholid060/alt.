@@ -1,3 +1,4 @@
+/* eslint-disable drizzle/enforce-delete-with-where */
 import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
 import type {
   ExtensionAPIMessagePayload,

@@ -3,7 +3,13 @@ import { UiList, UiListItemAction } from '@alt-dot/ui';
 import { ListItemRenderDetail } from '/@/apps/command/routes/CommandList';
 import preloadAPI from '/@/utils/preloadAPI';
 import { UiExtIcon } from '@alt-dot/extension';
-import { EditIcon, LinkIcon, WorkflowIcon } from 'lucide-react';
+import {
+  EditIcon,
+  LinkIcon,
+  PinIcon,
+  PinOffIcon,
+  WorkflowIcon,
+} from 'lucide-react';
 import DeepLinkURL from '#packages/common/utils/DeepLinkURL';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 
@@ -51,6 +57,20 @@ function ListItemWorkflow({
       icon: LinkIcon,
       title: 'Copy Deep Link',
       value: 'copy-deeplink',
+    },
+    {
+      onAction() {
+        preloadAPI.main.ipc.invoke(
+          'database:update-workflow',
+          item.metadata.workflowId,
+          {
+            isPinned: !item.metadata.isPinned,
+          },
+        );
+      },
+      value: 'unpin-workflow',
+      icon: item.metadata.isPinned ? PinOffIcon : PinIcon,
+      title: item.metadata.isPinned ? 'Unpin workflow' : 'Pin workflow',
     },
   ];
 

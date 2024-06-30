@@ -69,9 +69,28 @@ const builtInExtensionIds: string[] = Object.values(EXTENSION_BUILT_IN_ID);
 
 function CommandList() {
   const extensionQuery = useDatabaseQuery('database:get-extension-list', []);
-  const workflowQuery = useDatabaseQuery('database:get-workflow-list', [
-    { limit: 10, isPinned: true, sort: { by: 'executeCount', asc: false } },
-  ]);
+  const workflowQuery = useDatabaseQuery(
+    'database:get-workflow-list',
+    [{ limit: 10, isPinned: true, sort: { by: 'executeCount', asc: false } }],
+    {
+      transform(data): CommandListItemWorkflow[] {
+        return data.map((workflow) => {
+          return {
+            group: 'Workflows',
+            icon: workflow.icon,
+            title: workflow.name,
+            subtitle: 'Workflow',
+            value: `workflow:${workflow.id}`,
+            metadata: {
+              isPinned: true,
+              type: 'workflow',
+              workflowId: workflow.id,
+            },
+          };
+        });
+      },
+    },
+  );
 
   // const activeBrowserTab = useCommandStore.use.activeBrowserTab();
   const addPanelStatus = useCommandPanelStore.use.addStatus();
@@ -115,24 +134,6 @@ function CommandList() {
 
     return result;
   }, []);
-
-  const workflowCommands = useMemo<CommandListItemWorkflow[]>(() => {
-    if (workflowQuery.state !== 'idle') return [];
-
-    return workflowQuery.data.map((workflow) => {
-      return {
-        group: 'Workflows',
-        icon: workflow.icon,
-        title: workflow.name,
-        subtitle: 'Workflow',
-        value: `workflow:${workflow.id}`,
-        metadata: {
-          type: 'workflow',
-          workflowId: workflow.id,
-        },
-      };
-    });
-  }, [workflowQuery]);
   const extensionCommands = useMemo(() => {
     const commandItems: CommandListItemCommand[] = [];
     const suggestionItems: CommandListItemCommand[] = [];
@@ -233,6 +234,20 @@ function CommandList() {
   const builtInCommands: CommandListItemCommandBuiltIn[] = [
     {
       group: 'Commands',
+      title: 'Workflows List',
+      value: 'workflows-page',
+      subtitle: 'Utils',
+      icon: <UiList.Icon icon={WorkflowIcon} />,
+      onSelected() {
+        navigate('/workflows');
+      },
+      metadata: {
+        isFallback: true,
+        type: 'builtin-command',
+      },
+    },
+    {
+      group: 'Commands',
       title: 'Import Extension',
       value: 'import-extension',
       subtitle: 'Utils',
@@ -285,7 +300,7 @@ function CommandList() {
     },
     {
       group: 'Commands',
-      title: 'Running process',
+      title: 'Running Process',
       value: 'running-process',
       subtitle: 'Utils',
       icon: <UiList.Icon icon={CpuIcon} />,
@@ -345,7 +360,7 @@ function CommandList() {
         ...extensionCommands.commandItems,
         ...builtInCommands,
         ...extensionCommands.extensionItems,
-        ...workflowCommands,
+        ...(workflowQuery.data ?? []),
         ...dashboardPageCommands,
       ]}
       customFilter={customListFilter}

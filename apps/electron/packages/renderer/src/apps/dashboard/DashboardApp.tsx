@@ -1,7 +1,27 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import DashboardSidebar from '/@/components/dashboard/DashboardSidebar';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import DashboardAppEventListener from '/@/components/dashboard/DashboardAppEventListener';
+import preloadAPI from '/@/utils/preloadAPI';
+
+function AppEventListener() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const offAppUpdateRoute = preloadAPI.main.ipc.on(
+      'app:update-route',
+      (_, path, routeData) => {
+        navigate(path, { state: routeData });
+      },
+    );
+
+    return () => {
+      offAppUpdateRoute();
+    };
+  }, [navigate]);
+
+  return null;
+}
 
 function DashboardApp() {
   const appContainerRef = useRef<HTMLDivElement>(null);
@@ -18,6 +38,7 @@ function DashboardApp() {
       <div ref={appContainerRef}>
         <Outlet />
       </div>
+      <AppEventListener />
       <DashboardAppEventListener />
     </>
   );

@@ -70,6 +70,7 @@ export class WorkflowQueryService {
       nodes,
       settings,
       triggers,
+      isPinned,
       viewport,
       variables,
       isDisabled,
@@ -86,6 +87,7 @@ export class WorkflowQueryService {
         settings,
         triggers,
         viewport,
+        isPinned,
         variables,
         isDisabled,
         description,
@@ -119,6 +121,7 @@ export class WorkflowQueryService {
         id: workflows.id,
         icon: workflows.icon,
         name: workflows.name,
+        isPinned: workflows.isPinned,
         createdAt: workflows.createdAt,
         updatedAt: workflows.updatedAt,
         isDisabled: workflows.isDisabled,
@@ -136,6 +139,9 @@ export class WorkflowQueryService {
           break;
         case 'updatedAt':
           sortColumn = workflows.updatedAt;
+          break;
+        case 'isPinned':
+          sortColumn = workflows.isPinned;
           break;
       }
 

@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { DBService } from '../db/db.service';
 import { OnAppReady } from '../common/hooks/on-app-ready.hook';
 import { lt } from 'drizzle-orm';
-import { extensionErrors } from '../db/schema/extension.schema';
+import { extensionErrors, extensions } from '../db/schema/extension.schema';
 import { CommandLaunchBy } from '@alt-dot/extension';
 import { GlobalShortcutService } from '../global-shortcut/global-shortcut.service';
 import { LoggerService } from '../logger/logger.service';
@@ -20,6 +20,7 @@ import { ExtensionLoaderService } from '../extension-loader/extension-loader.ser
 import { ExtensionCommandType } from '@alt-dot/shared';
 import { ExtensionConfigService } from './extension-config/extension-config.service';
 import { BrowserExtensionService } from '../browser-extension/browser-extension.service';
+import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
 
 const MAX_EXT_ERROR_AGE_DAY = 30;
 
@@ -43,6 +44,21 @@ export class ExtensionService implements OnAppReady {
   ) {}
 
   async onAppReady() {
+    // Built-in extension
+    await this.dbService.db
+      .insert(extensions)
+      .values({
+        path: '',
+        author: 'user',
+        description: '',
+        version: '0.0.0',
+        icon: 'icon:FileCode',
+        title: 'User Scripts',
+        id: EXTENSION_BUILT_IN_ID.userScript,
+        name: EXTENSION_BUILT_IN_ID.userScript,
+      })
+      .onConflictDoNothing({ target: extensions.id });
+
     // Register extension command shortcuts
     const commands = await this.dbService.db.query.extensionCommands.findMany({
       columns: {

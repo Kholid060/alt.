@@ -433,7 +433,7 @@ function RouteWorkflow() {
       hideSidebar(false);
       useWorkflowEditorStore.getState().$reset();
     };
-  }, [workflowId, navigate]);
+  }, [workflowId, navigate, queryDatabase, hideSidebar, setWorkflow]);
 
   return (
     <WorkflowEditorProvider>

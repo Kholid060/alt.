@@ -6,7 +6,7 @@ import { Menu, app } from 'electron';
 import { APP_DEEP_LINK_SCHEME, debounce } from '@alt-dot/shared';
 import path from 'path';
 import updater from 'electron-updater';
-import './utils/security-restrictions';
+import './common/utils/security-restrictions';
 
 async function bootstrap() {
   /**

@@ -4,6 +4,8 @@ import {
   ArrowUpAzIcon,
   EllipsisVerticalIcon,
   LucideProps,
+  PinIcon,
+  PinOffIcon,
   PlusIcon,
   SearchIcon,
 } from 'lucide-react';
@@ -22,6 +24,7 @@ import {
   UiCard,
   UiCardContent,
   UiCardFooter,
+  UiCardHeader,
   UiDialog,
   UiDropdownMenu,
   UiDropdownMenuContent,
@@ -31,6 +34,7 @@ import {
   UiInput,
   UiSelect,
   UiSwitch,
+  UiTooltip,
   useToast,
 } from '@alt-dot/ui';
 import { UiExtIcon } from '@alt-dot/extension';
@@ -159,7 +163,7 @@ function WorkflowCards({ workflows }: { workflows: WorkflowListItemModel[] }) {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-6 xl:grid-cols-3">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6 xl:grid-cols-4">
       {workflows.map((workflow) => (
         <UiCard
           key={workflow.id}
@@ -168,16 +172,37 @@ function WorkflowCards({ workflows }: { workflows: WorkflowListItemModel[] }) {
             workflow.isDisabled && 'opacity-80 text-muted-foreground',
           )}
         >
-          <Link to={`/workflows/${workflow.id}`}>
+          <UiCardHeader className="p-4 flex-row items-center pb-2">
+            <div className="h-10 w-10 border border-border/50 rounded-md bg-background/50 inline-flex justify-center items-center">
+              <WorkflowIcon icon={workflow.icon ?? ''} className="h-5 w-5" />
+            </div>
+            <div className="flex-grow"></div>
+            <UiTooltip
+              label={workflow.isPinned ? 'Unpin workflow' : 'Pin workflow'}
+            >
+              <UiButton
+                size="icon-sm"
+                variant="ghost"
+                className="text-muted-foreground hover:text-foreground"
+                onClick={() =>
+                  updateWorkflow(workflow.id, { isPinned: !workflow.isPinned })
+                }
+              >
+                {workflow.isPinned ? (
+                  <PinIcon className="size-5 fill-inherit" />
+                ) : (
+                  <PinOffIcon className="size-5 " />
+                )}
+              </UiButton>
+            </UiTooltip>
+          </UiCardHeader>
+          <Link to={`/workflows/${workflow.id}`} className="flex-grow">
             <UiCardContent
               className={clsx(
-                'px-4 pt-4 flex-grow flex items-start gap-2',
+                'px-4 flex-grow flex items-start gap-2',
                 !workflow.description && 'items-center',
               )}
             >
-              <div className="h-10 w-10 border border-border/50 rounded-md bg-background/50 inline-flex justify-center items-center">
-                <WorkflowIcon icon={workflow.icon ?? ''} className="h-5 w-5" />
-              </div>
               <div className="flex-grow">
                 <p className="line-clamp-2">{workflow.name}</p>
                 <p className="line-clamp-2 text-muted-foreground text-sm leading-tight">
@@ -331,7 +356,9 @@ function WorkflowCreateDialog() {
 type WorkflowSortBy = 'name' | 'updatedAt' | 'createdAt';
 type WorkflowSort = { asc: boolean; by: WorkflowSortBy };
 function RouteWorkflows() {
-  const workflowsQuery = useDatabaseQuery('database:get-workflow-list', []);
+  const workflowsQuery = useDatabaseQuery('database:get-workflow-list', [
+    { sort: { by: 'isPinned', asc: true } },
+  ]);
 
   const { toast } = useToast();
 

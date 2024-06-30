@@ -48,8 +48,6 @@
     "@radix-ui/react-toggle-group": "^1.0.4",
     "@radix-ui/react-tooltip": "^1.0.7",
     "@types/react": "^18.2.46",
-    "@uiw/codemirror-theme-tokyo-night": "^4.22.2",
-    "@uiw/react-codemirror": "^4.22.2",
     "autoprefixer": "^10.4.16",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",

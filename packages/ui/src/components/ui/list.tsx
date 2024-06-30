@@ -171,8 +171,8 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
           : uiListItemsFilter(itemList, query);
       }
 
-      const groupedItems: (UiListItem | [string, UiListItem[]])[] = [];
       const groupIndexMap = new Map<string, number>();
+      const groupedItems: (UiListItem | [string, UiListItem[]])[] = [];
 
       for (const item of itemList) {
         if (!item.group) {
@@ -349,7 +349,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
           setSelectedItem(prevItem);
         },
       };
-    }, [filteredItems]);
+    }, [filteredItems, onItemSelected]);
 
     useImperativeHandle(ref, () => ({ controller, el: containerRef }), [
       controller,
@@ -393,7 +393,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
       return () => {
         listStore.setController(null);
       };
-    }, [filteredItems, disabledItemSelection]);
+    }, [filteredItems, disabledItemSelection, controller]);
     useEffect(() => {
       return () => {
         listStore.setSelectedItem({

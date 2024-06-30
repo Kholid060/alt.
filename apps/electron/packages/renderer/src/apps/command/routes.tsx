@@ -1,6 +1,7 @@
 import CommandList from './routes/CommandList';
 import CommandView from './routes/CommandView';
 import CommandViewJSON from './routes/CommandViewJSON';
+import CommandWorkflowsList from './routes/CommandWorkflowsList';
 import ConfigInput from './routes/ConfigInput';
 import CreateCommandScript from './routes/CreateCommandScript';
 import FallbackCommands from './routes/FallbackCommands';
@@ -23,6 +24,11 @@ export const commandAppRoutes = [
     element: CommandView,
     name: 'extension-command-view',
     path: '/extensions/:extensionId/:commandId/view',
+  },
+  {
+    element: CommandWorkflowsList,
+    name: 'workflows-list-pagae',
+    path: '/workflows',
   },
   {
     element: CommandViewJSON,

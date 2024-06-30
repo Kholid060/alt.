@@ -18,13 +18,14 @@ export type WorkflowListItemModel = Pick<
   | 'description'
   | 'name'
   | 'isDisabled'
+  | 'isPinned'
   | 'updatedAt'
   | 'createdAt'
 >;
 export interface WorkflowListFilter {
   limit?: number;
   isPinned?: boolean;
-  sort?: { by: 'executeCount' | 'updatedAt'; asc: boolean };
+  sort?: { by: 'executeCount' | 'updatedAt' | 'isPinned'; asc: boolean };
 }
 
 export type WorkflowUpsertPayload = Omit<

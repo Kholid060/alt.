@@ -339,7 +339,7 @@ function WorkflowEditorContextMenu() {
       workflowEditorEvent.off('context-menu:open', onOpenContextMenu);
       workflowEditorEvent.off('context-menu:close', onCloseContextMenu);
     };
-  }, [workflowEditorEvent]);
+  }, [unselectAll, workflowEditorEvent]);
 
   let contextMenuContent: React.ReactNode = null;
   switch (contextMenu?.type) {

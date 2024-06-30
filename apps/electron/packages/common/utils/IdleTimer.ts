@@ -1,3 +1,4 @@
+/* eslint-disable drizzle/enforce-delete-with-where */
 import EventEmitter from 'eventemitter3';
 
 const DEFAULT_TIMEOUT_MS = 600_000; // 10 minutes

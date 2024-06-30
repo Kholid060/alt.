@@ -133,7 +133,7 @@ function FallbackCommands() {
     return () => {
       setPanelHeader(null);
     };
-  }, [setPanelHeader]);
+  }, [listStore, setPanelHeader]);
 
   return (
     <UiList

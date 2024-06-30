@@ -9,6 +9,7 @@ import { UiListItem } from '@alt-dot/ui';
 
 export interface CommandListItemCommandBuiltIn extends UiListItem {
   metadata: {
+    isFallback?: boolean;
     type: 'builtin-command';
   };
 }
@@ -16,6 +17,7 @@ export interface CommandListItemCommandBuiltIn extends UiListItem {
 export interface CommandListItemWorkflow extends UiListItem {
   metadata: {
     type: 'workflow';
+    isPinned?: boolean;
     workflowId: string;
   };
 }
