@@ -10,7 +10,6 @@ import type {
   WorkflowEmitEvents,
 } from '#packages/common/interface/workflow.interface';
 import type WorkflowNodeHandler from '../node-handler/WorkflowNodeHandler';
-import type { DatabaseWorkflowDetail } from '#packages/main/src/interface/database.interface';
 import { WorkflowRunnerNodeError } from './workflow-runner-errors';
 import { debugLog } from '#packages/common/utils/helper';
 import { sleep } from '@alt-dot/shared';
@@ -22,6 +21,8 @@ import { clipboard } from 'electron';
 import { nanoid } from 'nanoid';
 import { validateTypes } from '/@/utils/helper';
 import WorkflowRunnerBrowser from './WorklowRunnerBrowser';
+import { WorkflowDetailModel } from '#packages/main/src/workflow/workflow.interface';
+import { Edge, Node } from 'reactflow';
 
 export type NodeHandlersObj = Record<
   WORKFLOW_NODE_TYPE,
@@ -78,7 +79,10 @@ function extractHandleType(handle: string) {
 
   return handles[0];
 }
-function getNodeConnectionsMap(nodes: WorkflowNodes[], edges: WorkflowEdge[]) {
+function getNodeConnectionsMap(
+  nodes: (WorkflowNodes | Node)[],
+  edges: (WorkflowEdge | Edge)[],
+) {
   const connectionMap: Record<string, NodeConnectionMap> = {};
   const nodePositions = new Map(nodes.map((node) => [node.id, node.position]));
 
@@ -153,7 +157,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   stepCount: number = 0;
   readonly maxStep: number;
   state: WorkflowRunnerState;
-  readonly workflow: DatabaseWorkflowDetail;
+  readonly workflow: WorkflowDetailModel;
   connectionsMap: Record<string, NodeConnectionMap> = {};
 
   readonly browser: WorkflowRunnerBrowser;
@@ -242,7 +246,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     this.state = WorkflowRunnerState.Running;
 
     this.startedAt = new Date().toString();
-    this.executeNode(startNode);
+    this.executeNode(startNode as WorkflowNodes);
   }
 
   stop() {
@@ -255,7 +259,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
 
     const nodeIndex = this.nodesIdxMap.get(nodeId)!;
 
-    return this.workflow.nodes[nodeIndex] ?? null;
+    return (this.workflow.nodes[nodeIndex] as WorkflowNodes) ?? null;
   }
 
   private async evaluateNodeExpression(node: WorkflowNodes) {

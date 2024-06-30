@@ -2,7 +2,7 @@ import {
   NewExtensionCommand,
   SelectExtension,
   SelectExtensionCommand,
-} from '/@/db/schema/extension.schema';
+} from '../../db/schema/extension.schema';
 
 export interface ExtensionCommandModel extends SelectExtensionCommand {
   extension: Pick<

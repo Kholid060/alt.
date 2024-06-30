@@ -2,7 +2,7 @@ import {
   NewExtension,
   SelectExtension,
   SelectExtensionCommand,
-} from '/@/db/schema/extension.schema';
+} from '../db/schema/extension.schema';
 
 export type ExtensionInsertPayload = NewExtension;
 

@@ -12,7 +12,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { useUiListStore } from '@alt-dot/ui/dist/context/list.context';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
-import { DatabaseExtensionErrorsListItem } from '#packages/main/src/interface/database.interface';
+import { ExtensionErrorListItemModel } from '#packages/main/src/extension/extension-error/extension-error.interface';
 
 function ListItemExtension({
   item,
@@ -77,11 +77,12 @@ function ListItemExtension({
     actions.push({
       icon: AlertTriangleIcon,
       onAction() {
-        const errors: DatabaseExtensionErrorsListItem[] = [];
+        const errors: ExtensionErrorListItemModel[] = [];
         if (extension.isError) {
           errors.push({
             id: -1,
             title: 'Extension error',
+            extensionId: extension.id,
             createdAt: new Date().toISOString(),
             message: extension.errorMessage ?? '',
           });

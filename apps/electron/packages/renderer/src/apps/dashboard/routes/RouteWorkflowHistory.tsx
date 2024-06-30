@@ -1,9 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useDatabase } from '/@/hooks/useDatabase';
-import {
-  DatabaseWorkflowHistory,
-  DatabaseWorkflowHistoryListOptions,
-} from '#packages/main/src/interface/database.interface';
 import { useDebounceValue } from 'usehooks-ts';
 import {
   UiBadge,
@@ -32,6 +28,10 @@ import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { WORKFLOW_NODES } from '#packages/common/utils/constant/workflow-nodes.const';
 import UiItemsPagination from '/@/components/ui/UiItemsPagination';
+import {
+  WorkflowHistoryListPaginationFilter,
+  WorkflowHistoryModel,
+} from '#packages/main/src/workflow/workflow-history/workflow-history.interface';
 
 function WorkflowHistoryStatusBadge({
   status,
@@ -71,9 +71,9 @@ function formatDuration(duration: number) {
   return `${Math.round(duration / 1000 / 60)} minutes`;
 }
 
-type HistorySort = Required<DatabaseWorkflowHistoryListOptions>['sort'];
+type HistorySort = Required<WorkflowHistoryListPaginationFilter>['sort'];
 
-function WorkflowHistoryError({ item }: { item: DatabaseWorkflowHistory }) {
+function WorkflowHistoryError({ item }: { item: WorkflowHistoryModel }) {
   let nodeId = '';
   let nodeName = '';
 
@@ -112,7 +112,7 @@ function RouteWorkflowHistory() {
   const [search, setSearch] = useDebounceValue('', 500);
   const [workflowHistory, setWorkflowHistory] = useState<{
     count: number;
-    items: DatabaseWorkflowHistory[];
+    items: WorkflowHistoryModel[];
   }>({ count: 0, items: [] });
   const [pagination, setPagination] = useState({
     page: 1,

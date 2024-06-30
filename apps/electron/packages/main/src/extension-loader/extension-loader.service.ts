@@ -2,12 +2,12 @@ import { Inject, Injectable } from '@nestjs/common';
 import path from 'path';
 import crypto from 'node:crypto';
 import { DBService } from '../db/db.service';
-import ExtensionUtils from '../utils/extension/ExtensionUtils';
+import ExtensionUtils from '../common/utils/ExtensionUtils';
 import {
   ExtensionError,
   ValidationError,
 } from '#packages/common/errors/custom-errors';
-import { mapManifestToDB } from '../utils/database-utils';
+import { mapManifestToDB } from '/@/common/utils/database-utils';
 import { extensionCommands, extensions } from '../db/schema/extension.schema';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import { ExtensionUpdaterService } from '../extension-updater/extension-updater.service';
@@ -18,7 +18,7 @@ import { afetch } from '@alt-dot/shared';
 import fs from 'fs-extra';
 import AdmZip from 'adm-zip';
 import originalFs from 'original-fs';
-import { EXTENSION_FOLDER } from '../utils/constant';
+import { EXTENSION_FOLDER } from '/@/common/utils/constant';
 import { LoggerService } from '../logger/logger.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';

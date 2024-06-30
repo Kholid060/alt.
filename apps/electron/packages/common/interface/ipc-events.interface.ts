@@ -18,11 +18,7 @@ import type {
   Last,
   WSAckErrorResult,
 } from '@alt-dot/shared';
-import type {
-  DatabaseEvents,
-  DatabaseExtension,
-  DatabaseWorkflowUpdatePayload,
-} from '../../main/src/interface/database.interface';
+import type { DatabaseEvents } from '../../main/src/interface/database.interface';
 import type {
   WorkflowEmitEvents,
   WorkflowRunPayload,
@@ -41,6 +37,8 @@ import type {
   AppCryptoCreateHashAlgorithm,
   AppCryptoCreateHashOptions,
 } from '../../main/src/app/app-crypto/app-crypto.interface';
+import { ExtensionWithCommandsModel } from '../../main/src/extension/extension.interface';
+import { WorkflowUpdatePayload } from '../../main/src/workflow/workflow.interface';
 
 export interface IPCRendererInvokeEventPayload {
   name: string;
@@ -157,8 +155,10 @@ export interface IPCExtensionEvents {
   ) => ExtensionNeedConfigInput;
   'extension:delete': (extId: string) => void;
   'extension:reload': (extId: string) => void;
-  'extension:install': (extId: string) => DatabaseExtension | null;
-  'extension:import': (manifestPath: string) => DatabaseExtension | null;
+  'extension:install': (extId: string) => ExtensionWithCommandsModel | null;
+  'extension:import': (
+    manifestPath: string,
+  ) => ExtensionWithCommandsModel | null;
   'extension:init-message-port': () => MessagePort;
   'extension:get-command-file-path': (
     extensionId: string,
@@ -176,10 +176,7 @@ export interface IPCWorkflowEvents {
   'workflow:import': (filePaths?: string[]) => void;
   'workflow:stop-running': (runnerId: string) => void;
   'workflow:execute': (payload: WorkflowRunPayload) => string | null;
-  'workflow:save': (
-    workflowId: string,
-    payload: DatabaseWorkflowUpdatePayload,
-  ) => void;
+  'workflow:save': (workflowId: string, payload: WorkflowUpdatePayload) => void;
 }
 
 export interface IPCUserExtensionEvents {
@@ -245,7 +242,7 @@ export interface IPCSendEventMainToRenderer {
 }
 
 export interface IPCSendEventRendererToMain {
-  'window:toggle-lock': () => void;
+  'window:toggle-lock': [];
   'extension:stop-execute-command': [runnerId: string];
   'extension:command-exec-change': [
     type: 'finish' | 'start',

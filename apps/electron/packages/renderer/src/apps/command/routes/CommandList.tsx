@@ -70,7 +70,7 @@ const builtInExtensionIds: string[] = Object.values(EXTENSION_BUILT_IN_ID);
 function CommandList() {
   const extensionQuery = useDatabaseQuery('database:get-extension-list', []);
   const workflowQuery = useDatabaseQuery('database:get-workflow-list', [
-    'commands',
+    { limit: 10, isPinned: true, sort: { by: 'executeCount', asc: false } },
   ]);
 
   // const activeBrowserTab = useCommandStore.use.activeBrowserTab();

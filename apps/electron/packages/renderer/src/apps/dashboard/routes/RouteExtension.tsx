@@ -9,11 +9,11 @@ import { SearchIcon } from 'lucide-react';
 import ExtensionListTable from '/@/components/extension/ExtensionListTable';
 import ExtensionDetailCard from '/@/components/extension/ExtensionDetailCard';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
-import type {
-  DatabaseExtensionListItem,
-  DatabaseExtensionUpdatePayload,
-} from '#packages/main/src/interface/database.interface';
 import preloadAPI from '/@/utils/preloadAPI';
+import {
+  ExtensionListItemModel,
+  ExtensionUpdatePayload,
+} from '#packages/main/src/extension/extension.interface';
 
 type FilterTypes = 'all' | 'commands' | 'extensions' | 'scripts';
 
@@ -36,7 +36,7 @@ function RouteExtension() {
 
   async function updateExtension(
     extensionId: string,
-    data: DatabaseExtensionUpdatePayload,
+    data: ExtensionUpdatePayload,
   ) {
     try {
       await preloadAPI.main.ipc.invoke(
@@ -55,7 +55,7 @@ function RouteExtension() {
   }
 
   const filteredExtensions = (extensionQuery.data ?? []).reduce<
-    DatabaseExtensionListItem[]
+    ExtensionListItemModel[]
   >((acc, extension) => {
     const searchStr = search.toLowerCase();
     const filteredCommands = extension.isError

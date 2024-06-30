@@ -7,8 +7,8 @@ import {
 } from '@alt-dot/shared';
 import { Injectable } from '@nestjs/common';
 import type { ExtensionNamespace } from './browser-extension.gateway';
-import { isWSAckError } from '../utils/extension/ExtensionBrowserElementHandle';
 import { CustomError } from '#packages/common/errors/custom-errors';
+import { isWSAckError } from '../common/utils/helper';
 
 type ExtensionBrowserInfo = BrowserInfo & { socketId: string };
 

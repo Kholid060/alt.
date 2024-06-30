@@ -32,17 +32,19 @@ import {
 } from 'lucide-react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '/@/utils/helper';
-import {
-  DatabaseExtensionCommand,
-  DatabaseExtensionListItem,
-  DatabaseExtensionCommandUpdatePayload,
-  DatabaseExtensionUpdatePayload,
-} from '#packages/main/src/interface/database.interface';
 import CommandShortcut from '../ui/UiShortcut';
 import { KeyboardShortcutUtils } from '#common/utils/KeyboardShortcutUtils';
 import UiShortcut from '../ui/UiShortcut';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
 import DeepLinkURL from '#packages/common/utils/DeepLinkURL';
+import {
+  ExtensionCommandListItemModel,
+  ExtensionCommandUpdatePayload,
+} from '#packages/main/src/extension/extension-command/extension-command.interface';
+import {
+  ExtensionListItemModel,
+  ExtensionUpdatePayload,
+} from '#packages/main/src/extension/extension.interface';
 
 interface RecordingShortcutData {
   keys: string;
@@ -66,14 +68,14 @@ function ExtensionCommandList({
   extensionId: string;
   extensionDisabled: boolean;
   extensionIcon: React.ReactNode;
-  commands: DatabaseExtensionCommand[];
+  commands: ExtensionCommandListItemModel[];
   recordingData: RecordingShortcutData | null;
   onToggleRecordingShortcut?: (commandId: string) => void;
   onUpdateCommand?: (
     commandId: string,
-    payload: DatabaseExtensionCommandUpdatePayload,
+    payload: ExtensionCommandUpdatePayload,
   ) => void;
-  onDeleteCommand?: (command: DatabaseExtensionCommand) => void;
+  onDeleteCommand?: (command: ExtensionCommandListItemModel) => void;
 }) {
   const { toast } = useToast();
 
@@ -279,12 +281,12 @@ function ExtensionCommandList({
 
 interface ExtensionListTableProps
   extends React.TableHTMLAttributes<HTMLTableElement> {
-  extensions: DatabaseExtensionListItem[];
+  extensions: ExtensionListItemModel[];
   onReloadExtension?: (extensionId: string) => void;
   onExtensionSelected?: (extensionId: string) => void;
   onUpdateExtension?: (
     extensionId: string,
-    data: DatabaseExtensionUpdatePayload,
+    data: ExtensionUpdatePayload,
   ) => void;
 }
 function ExtensionListTable({
@@ -341,7 +343,7 @@ function ExtensionListTable({
   async function updateCommand(
     extensionId: string,
     commandId: string,
-    data: DatabaseExtensionCommandUpdatePayload,
+    data: ExtensionCommandUpdatePayload,
   ) {
     try {
       const result = await preloadAPI.main.ipc.invoke(
@@ -366,7 +368,7 @@ function ExtensionListTable({
       });
     }
   }
-  async function deleteCommand(command: DatabaseExtensionCommand) {
+  async function deleteCommand(command: ExtensionCommandListItemModel) {
     try {
       const isConfirmed = await dialog.confirm({
         title: 'Delete script?',
@@ -424,7 +426,7 @@ function ExtensionListTable({
       });
     }
   }
-  async function deleteExtension(extension: DatabaseExtensionListItem) {
+  async function deleteExtension(extension: ExtensionListItemModel) {
     try {
       const isConfirmed = await dialog.confirm({
         title: 'Delete extension?',

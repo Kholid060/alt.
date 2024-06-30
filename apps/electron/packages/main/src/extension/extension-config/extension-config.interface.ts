@@ -1,5 +1,5 @@
 import { ExtensionConfigType } from '@alt-dot/shared';
-import { SelectExtensionConfig } from '/@/db/schema/extension.schema';
+import { SelectExtensionConfig } from '../../db/schema/extension.schema';
 import { ExtensionConfig } from '@alt-dot/extension-core';
 
 export type ExtensionConfigValue = Record<
@@ -28,4 +28,10 @@ export interface ExtensionConfigWithSchemaModel
   extensionIcon: string;
   extensionTitle: string;
   config: ExtensionConfig[];
+}
+
+export interface ExtensionConfigGetPayload {
+  configId: string;
+  commandId?: string;
+  extensionId: string;
 }

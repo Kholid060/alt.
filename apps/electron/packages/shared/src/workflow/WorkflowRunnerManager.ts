@@ -1,3 +1,4 @@
+/* eslint-disable drizzle/enforce-delete-with-where */
 import type { WorkflowRunnerRunPayload } from '#packages/common/interface/workflow-runner.interace';
 import { nanoid } from 'nanoid';
 import type {
@@ -8,11 +9,11 @@ import type {
 import WorkflowRunner from './runner/WorkflowRunner';
 import * as nodeHandlersClasses from './node-handler';
 import { debugLog } from '#packages/common/utils/helper';
-import type { DatabaseWorkflowHistoryUpdatePayload } from '#packages/main/src/interface/database.interface';
 import { WORKFLOW_HISTORY_STATUS } from '#packages/common/utils/constant/workflow.const';
 import IPCRenderer from '#packages/common/utils/IPCRenderer';
 import type { SetRequired } from 'type-fest';
 import IdleTimer from '#packages/common/utils/IdleTimer';
+import { WorkflowHistoryUpdatePayload } from '#packages/main/src/workflow/workflow-history/workflow-history.interface';
 
 const IDLE_TIMER_KEY = 'workflow-manager';
 
@@ -23,10 +24,10 @@ async function updateWorkflowHistory(
     startedAt,
     errorMessage,
     errorLocation,
-  }: SetRequired<DatabaseWorkflowHistoryUpdatePayload, 'startedAt'>,
+  }: SetRequired<WorkflowHistoryUpdatePayload, 'startedAt'>,
 ) {
   const finishDate = new Date();
-  const workflowHistory: DatabaseWorkflowHistoryUpdatePayload = {
+  const workflowHistory: WorkflowHistoryUpdatePayload = {
     status,
     startedAt,
     errorMessage,

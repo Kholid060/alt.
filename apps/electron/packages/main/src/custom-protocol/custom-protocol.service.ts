@@ -3,10 +3,10 @@ import { APP_ICON_DIR_PREFIX } from '#packages/common/utils/constant/app.const';
 import { CUSTOM_SCHEME } from '#packages/common/utils/constant/constant';
 import { Injectable } from '@nestjs/common';
 import { app, net } from 'electron';
-import { createErrorResponse } from '../utils/custom-protocol/CustomProtocol';
 import { ExtensionLoaderService } from '../extension-loader/extension-loader.service';
 import { fileURLToPath } from 'url';
 import { InstalledAppsService } from '../installed-apps/installed-apps.service';
+import { createErrorResponse } from './utils/custom-protocol-utils';
 
 const extensionFilePath = fileURLToPath(
   new URL('./../../extension/dist/', import.meta.url),

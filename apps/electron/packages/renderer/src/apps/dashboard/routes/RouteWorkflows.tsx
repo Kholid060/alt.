@@ -1,7 +1,4 @@
-import {
-  DatabaseWorkflow,
-  DatabaseUpdateEvents,
-} from '#packages/main/src/interface/database.interface';
+import { DatabaseUpdateEvents } from '#packages/main/src/interface/database.interface';
 import {
   ArrowDownAzIcon,
   ArrowUpAzIcon,
@@ -51,6 +48,7 @@ import { WORKFLOW_MANUAL_TRIGGER_ID } from '#packages/common/utils/constant/work
 import WorkflowDetailForm, {
   NewWorkflowSchema,
 } from '/@/components/workflow/WorkflowDetailForm';
+import { WorkflowListItemModel } from '#packages/main/src/workflow/workflow.interface';
 
 type IconsName = keyof typeof UiExtIcon;
 
@@ -59,7 +57,7 @@ function WorkflowIcon({ icon, ...props }: { icon: string } & LucideProps) {
 
   return <Icon {...props} />;
 }
-function WorkflowCards({ workflows }: { workflows: DatabaseWorkflow[] }) {
+function WorkflowCards({ workflows }: { workflows: WorkflowListItemModel[] }) {
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -196,13 +194,9 @@ function WorkflowCards({ workflows }: { workflows: DatabaseWorkflow[] }) {
               checked={!workflow.isDisabled}
               size="sm"
               onCheckedChange={() =>
-                updateWorkflow(
-                  workflow.id,
-                  {
-                    isDisabled: !workflow.isDisabled,
-                  },
-                  { ignoreModified: true },
-                )
+                updateWorkflow(workflow.id, {
+                  isDisabled: !workflow.isDisabled,
+                })
               }
             />
             <UiDropdownMenu>

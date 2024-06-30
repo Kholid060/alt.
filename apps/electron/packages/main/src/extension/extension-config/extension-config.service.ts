@@ -5,7 +5,7 @@ import {
   ExtensionError,
 } from '#packages/common/errors/custom-errors';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { getExtensionConfigDefaultValue } from '/@/utils/helper';
+import { getExtensionConfigDefaultValue } from '/@/common/utils/helper';
 import { ExtensionNeedConfigInput } from '#packages/common/interface/extension.interface';
 import { safeStorage } from 'electron';
 import { DBService } from '/@/db/db.service';
@@ -16,6 +16,7 @@ import {
 import { parseJSON } from '@alt-dot/shared';
 import { eq } from 'drizzle-orm';
 import {
+  ExtensionConfigGetPayload,
   ExtensionConfigInsertPayload,
   ExtensionConfigModel,
   ExtensionConfigUpdatePayload,
@@ -150,11 +151,7 @@ export class ExtensionConfigService {
     configId,
     commandId,
     extensionId,
-  }: {
-    configId: string;
-    commandId?: string;
-    extensionId: string;
-  }): Promise<ExtensionConfigWithSchemaModel | null> {
+  }: ExtensionConfigGetPayload): Promise<ExtensionConfigWithSchemaModel | null> {
     if (commandId) {
       const command = await this.dbService.db.query.extensionCommands.findFirst(
         {

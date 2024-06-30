@@ -226,7 +226,7 @@ function ContextMenuNode() {
     const node = workflow.nodes.find((item) => item.id === contextMenu.nodeId);
     if (!node) return;
 
-    setEditNode(node);
+    setEditNode(node as WorkflowNodes);
   }
   function copyNodeId() {
     preloadAPI.main.ipc.invoke('clipboard:copy', contextMenu.nodeId);

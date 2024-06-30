@@ -13,9 +13,9 @@ import {
 import {
   buildConflictUpdateColumns,
   mapManifestToDB,
-} from '/@/utils/database-utils';
+} from '/@/common/utils/database-utils';
 import path from 'path';
-import { EXTENSION_FOLDER } from '/@/utils/constant';
+import { EXTENSION_FOLDER } from '/@/common/utils/constant';
 
 export class ExtensionUpdater {
   constructor(

@@ -2,10 +2,8 @@ import {
   ExtensionBrowserTabContext,
   ExtensionCommandExecutePayload,
 } from '#packages/common/interface/extension.interface';
-import {
-  DatabaseExtensionCommand,
-  DatabaseExtensionListItem,
-} from '#packages/main/src/interface/database.interface';
+import { SelectExtensionCommand } from '#packages/main/src/db/schema/extension.schema';
+import { ExtensionListItemModel } from '#packages/main/src/extension/extension.interface';
 import { ExtensionCommand, ExtensionManifest } from '@alt-dot/extension-core';
 import { UiListItem } from '@alt-dot/ui';
 
@@ -28,8 +26,8 @@ export interface CommandListItemCommand extends UiListItem {
     commandIcon: string;
     isFallback: boolean;
     fallbackStr?: string;
-    command: DatabaseExtensionCommand;
-    extension: DatabaseExtensionListItem;
+    command: SelectExtensionCommand;
+    extension: ExtensionListItemModel;
     browserCtx?: ExtensionBrowserTabContext;
   };
 }
@@ -37,7 +35,7 @@ export interface CommandListItemCommand extends UiListItem {
 export interface CommandListItemExtension extends UiListItem {
   metadata: {
     type: 'extension';
-    extension: DatabaseExtensionListItem;
+    extension: ExtensionListItemModel;
   };
 }
 

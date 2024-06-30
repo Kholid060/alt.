@@ -29,7 +29,7 @@ export const workflows = sqliteTable('workflows', {
   triggers: text('triggers', { mode: 'json' })
     .notNull()
     .default(sql`(json_array())`)
-    .$type<(Workflow.WorkflowNodes | ReactFlow.Edge)[]>(),
+    .$type<(Workflow.WorkflowNodes | ReactFlow.Node)[]>(),
   isDisabled: integer('is_disabled', { mode: 'boolean' })
     .notNull()
     .$default(() => false),

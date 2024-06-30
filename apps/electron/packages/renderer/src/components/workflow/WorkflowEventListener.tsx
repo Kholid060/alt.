@@ -54,14 +54,9 @@ function WokflowViewportChangesListener() {
     return () => {
       if (!workflowId || !viewportData.current) return;
 
-      preloadAPI.main.ipc.invoke(
-        'database:update-workflow',
-        workflowId,
-        {
-          viewport: viewportData.current,
-        },
-        { ignoreModified: true },
-      );
+      preloadAPI.main.ipc.invoke('database:update-workflow', workflowId, {
+        viewport: viewportData.current,
+      });
     };
   });
 

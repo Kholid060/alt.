@@ -33,7 +33,6 @@ import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow
 import { UiExtIcon } from '@alt-dot/extension';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 import { isIPCEventError } from '#packages/common/utils/helper';
-import { DatabaseWorkflowUpdatePayload } from '#packages/main/src/interface/database.interface';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { nanoid } from 'nanoid/non-secure';
@@ -42,6 +41,7 @@ import UiShortcut from '../../ui/UiShortcut';
 import { useHotkeys } from 'react-hotkeys-hook';
 import DeepLinkURL from '#packages/common/utils/DeepLinkURL';
 import WorkflowDetailForm from '../WorkflowDetailForm';
+import { WorkflowUpdatePayload } from '#packages/main/src/workflow/workflow.interface';
 
 function WorkflowInformation() {
   const workflow = useWorkflowEditorStore.use.workflow();
@@ -323,9 +323,9 @@ function WorkflowSaveButton() {
         return;
       }
 
-      const payload: DatabaseWorkflowUpdatePayload = {};
+      const payload: WorkflowUpdatePayload = {};
       changes.forEach((key) => {
-        //@ts-expect-error ...
+        // @ts-expect-error it's correct type
         payload[key] = workflow[key];
       });
 

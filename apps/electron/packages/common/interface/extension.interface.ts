@@ -3,7 +3,7 @@ import type {
   EXTENSION_CONFIG_TYPE,
   EXTENSION_PERMISSIONS,
 } from '@alt-dot/extension-core';
-import type { DatabaseExtensionCommandWithExtension } from '../../main/src/interface/database.interface';
+import { ExtensionCommandModel } from '../../main/src/extension/extension-command/extension-command.interface';
 
 export type ExtensionConfigType = (typeof EXTENSION_CONFIG_TYPE)[number];
 export type ExtensionPermissions = (typeof EXTENSION_PERMISSIONS)[number];
@@ -43,7 +43,7 @@ export interface ExtensionCommandJSONViewData extends ExtensionCommandViewData {
 export interface ExtensionCommandExecutePayloadWithData
   extends ExtensionCommandExecutePayload {
   commandFilePath: string;
-  command: DatabaseExtensionCommandWithExtension;
+  command: ExtensionCommandModel;
 }
 
 export type ExtensionNeedConfigInput = 'extension' | 'command' | false;

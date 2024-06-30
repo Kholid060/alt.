@@ -1,9 +1,9 @@
+/* eslint-disable drizzle/enforce-delete-with-where */
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
 import WorkflowNodeHandler from './WorkflowNodeHandler';
 import IPCRenderer from '#packages/common/utils/IPCRenderer';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { WorkflowRunnerNodeError } from '../runner/workflow-runner-errors';
-import type { DatabaseExtensionCommandWithExtension } from '#packages/main/src/interface/database.interface';
 import type {
   WorkflowNodeHandlerExecute,
   WorkflowNodeHandlerExecuteReturn,
@@ -13,8 +13,9 @@ import { CommandLaunchBy } from '@alt-dot/extension';
 import type { ExtensionCommandExecutePayloadWithData } from '#packages/common/interface/extension.interface';
 import type { ExtensionCommandArgument } from '@alt-dot/extension-core';
 import type { WorkflowRunnerBrowserContext } from '../runner/WorklowRunnerBrowser';
+import { ExtensionCommandModel } from '#packages/main/src/extension/extension-command/extension-command.interface';
 
-type CommandDataWithPath = DatabaseExtensionCommandWithExtension & {
+type CommandDataWithPath = ExtensionCommandModel & {
   filePath: string;
 };
 
@@ -157,7 +158,7 @@ export class NodeHandlerCommand extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.C
       if (isIPCEventError(commandConfig)) {
         throw new WorkflowRunnerNodeError(commandConfig.message);
       }
-      if (commandConfig.requireInput) {
+      if (typeof commandConfig === 'string') {
         throw new WorkflowRunnerNodeError(
           'Missing config! Input the command config before using this command.',
         );

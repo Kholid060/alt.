@@ -1,34 +1,36 @@
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { AppModule } from './app.module';
+import ElectronLogger from './common/utils/ElectronLogger';
+import ElectronNest from './ElectronNest';
 import { Menu, app } from 'electron';
-import './utils/security-restrictions';
-import './utils/ipc/ipc-send-message-handler';
-import './utils/ipc/ipc-invoke-messages-handler';
-import { platform } from 'node:process';
+import { APP_DEEP_LINK_SCHEME, debounce } from '@alt-dot/shared';
+import path from 'path';
 import updater from 'electron-updater';
-import path from 'node:path';
-import DeepLink from './utils/DeepLink';
-import { APP_DEEP_LINK_SCHEME } from '@alt-dot/shared';
-import API from '#common/utils/API';
+import './utils/security-restrictions';
 
-/**
- * Fix flashes when toggle the command window
- * https://github.com/electron/electron/issues/22691#issuecomment-599608331
- */
-app.commandLine.appendSwitch('wm-window-animations-disabled');
+async function bootstrap() {
+  /**
+   * Fix flashes when toggle the command window
+   * https://github.com/electron/electron/issues/22691#issuecomment-599608331
+   */
+  app.commandLine.appendSwitch('wm-window-animations-disabled');
 
-API.extensions.$setApiKey(import.meta.env.VITE_API_KEY);
+  Menu.setApplicationMenu(null);
 
-Menu.setApplicationMenu(null);
-// CustomProtocol.registerPrivileged();
+  /**
+   * Prevent electron from running multiple instances.
+   */
+  const isSingleInstance = app.requestSingleInstanceLock();
+  console.log(isSingleInstance);
+  if (!isSingleInstance) {
+    app.quit();
+    process.exit(0);
+    return;
+  }
 
-/**
- * Prevent electron from running multiple instances.
- */
-const isSingleInstance = app.requestSingleInstanceLock();
-if (!isSingleInstance) {
-  app.quit();
-  process.exit(0);
-} else {
-  // Register deep link
+  /**
+   * Register Deep Link
+   */
   if (process.defaultApp) {
     if (process.argv.length >= 2) {
       app.setAsDefaultProtocolClient(APP_DEEP_LINK_SCHEME, process.execPath, [
@@ -38,56 +40,59 @@ if (!isSingleInstance) {
   } else {
     app.setAsDefaultProtocolClient(APP_DEEP_LINK_SCHEME, process.execPath);
   }
+
+  /**
+   * Disable Hardware Acceleration to save more system resources.
+   */
+  app.disableHardwareAcceleration();
+
+  /**
+   * Shout down background process if all windows was closed
+   */
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+      app.quit();
+    }
+  });
+
+  /**
+   * Start app
+   */
+  const electronNest = await ElectronNest.createApp(AppModule, {
+    logger: new ElectronLogger(),
+  });
+  const eventEmitter = electronNest.app.get(EventEmitter2);
+  app.on(
+    'second-instance',
+    // the event called twice for some reason 🤔
+    debounce((_event, commandLine) => {
+      const deepLink = commandLine ? commandLine.pop() : null;
+      if (!deepLink || !deepLink.startsWith(APP_DEEP_LINK_SCHEME)) {
+        return;
+      }
+
+      eventEmitter.emit('deep-link', deepLink);
+    }, 50),
+  );
+  await electronNest.init();
+
+  /**
+   * Check for app updates, install it in background and notify user that new version was installed.
+   * No reason run this in non-production build.
+   * @see https://www.electron.build/auto-update.html#quick-setup-guide
+   *
+   * Note: It may throw "ENOENT: no such file app-update.yml"
+   * if you compile production app without publishing it to distribution server.
+   * Like `npm run compile` does. It's ok 😅
+   */
+  if (import.meta.env.PROD) {
+    app
+      .whenReady()
+      .then(() => updater.autoUpdater.checkForUpdatesAndNotify())
+      .catch((e) => console.error('Failed check and install updates:', e));
+  }
 }
-
-app.on('second-instance', (_event, commandLine) => {
-  const deepLink = commandLine ? commandLine.pop() : null;
-  if (!deepLink || !deepLink.startsWith(APP_DEEP_LINK_SCHEME)) {
-    return;
-  }
-
-  // DeepLink.handler(deepLink);
-});
-
-/**
- * Disable Hardware Acceleration to save more system resources.
- */
-app.disableHardwareAcceleration();
-
-/**
- * Shout down background process if all windows was closed
- */
-app.on('window-all-closed', () => {
-  if (platform !== 'darwin') {
-    app.quit();
-  }
-});
-
-import './main';
-
-/**
- * Create the application window when the background process is ready.
- */
-app
-  .whenReady()
-  .then(async () => {
-    // await DatabaseService.instance.initDB();
-
-    // CustomProtocol.registerProtocols();
-    // WebsocketService.startDefaultServer();
-    // TrayService.instance.init();
-    // AppSettingsService.init();
-
-    await Promise.all([
-      // GlobalShortcut.instance.init(),
-      // WorkflowService2.instance.init(),
-      // ExtensionLoader.instance.loadExtensions(),
-    ]);
-
-    // await ExtensionService.instance.init();
-    // await WindowCommand.instance.restoreOrCreateWindow();
-  })
-  .catch((e) => console.error('Failed create window:', e));
+bootstrap();
 
 /**
  * Install Vue.js or any other extension in development mode only.
@@ -110,19 +115,3 @@ app
 //     })
 //     .catch(e => console.error('Failed install extension:', e));
 // }
-
-/**
- * Check for app updates, install it in background and notify user that new version was installed.
- * No reason run this in non-production build.
- * @see https://www.electron.build/auto-update.html#quick-setup-guide
- *
- * Note: It may throw "ENOENT: no such file app-update.yml"
- * if you compile production app without publishing it to distribution server.
- * Like `npm run compile` does. It's ok 😅
- */
-if (import.meta.env.PROD) {
-  app
-    .whenReady()
-    .then(() => updater.autoUpdater.checkForUpdatesAndNotify())
-    .catch((e) => console.error('Failed check and install updates:', e));
-}

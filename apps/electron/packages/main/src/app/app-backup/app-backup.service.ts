@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { DBService } from '../../db/db.service';
+import { DBService, SQLiteDatabaseTx } from '../../db/db.service';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
 import { AppCryptoService } from '../app-crypto/app-crypto.service';
 import dayjs from 'dayjs';
@@ -17,8 +17,7 @@ import { LoggerService } from '../../logger/logger.service';
 import { CustomError } from '#packages/common/errors/custom-errors';
 import { fromZodError } from 'zod-validation-error';
 import { workflows } from '../../db/schema/workflow.schema';
-import { buildConflictUpdateColumns } from '/@/utils/database-utils';
-import { SQLiteDatabaseTx } from '../../services/database/database.service';
+import { buildConflictUpdateColumns } from '/@/common/utils/database-utils';
 import { extensionCommands } from '../../db/schema/extension.schema';
 import { eq } from 'drizzle-orm';
 import { ExtensionLoaderService } from '../../extension-loader/extension-loader.service';

@@ -1,12 +1,15 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import OAuthServer from './utils/OAuthServer';
 import { LoggerService } from '../logger/logger.service';
-import OAuth2Provider, { OAuth2Response } from './utils/OAuth2Provider';
+import OAuth2Provider from './utils/OAuth2Provider';
 import { ExtensionAuthTokenService } from '../extension/extension-auth-token/extension-auth-token.service';
 import { CustomError } from '#packages/common/errors/custom-errors';
 import { nanoid } from 'nanoid/non-secure';
 import { ExtensionCredentialService } from '../extension/extension-credential/extension-credential.service';
-import { OAuth2CredentialValueSchema } from './oauth.validation';
+import {
+  OAuth2CredentialValueSchema,
+  OAuth2Response,
+} from './oauth.validation';
 import { fromZodError } from 'zod-validation-error';
 import { OAUTH_CALLBACK_URL } from '#packages/common/utils/constant/constant';
 

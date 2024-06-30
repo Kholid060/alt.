@@ -9,20 +9,20 @@ import { BetterSQLite3Database, drizzle } from 'drizzle-orm/better-sqlite3';
 import { migrate } from 'drizzle-orm/better-sqlite3/migrator';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { DATABASE_FOLDER } from '../utils/constant';
 import * as workflowsSchema from '/@/db/schema/workflow.schema';
 import * as extensionsSchema from '/@/db/schema/extension.schema';
 import { debugLog } from '#packages/common/utils/helper';
 import { DatabaseQueriesEvent } from '../interface/database.interface';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import { BrowserWindow } from 'electron';
+import { DATABASE_FOLDER } from '../common/utils/constant';
 
 const DB_PATH = path.join(DATABASE_FOLDER, 'extensions.db');
 
 export type SQLiteDatabaseSchema = typeof extensionsSchema &
   typeof workflowsSchema;
 export type SQLiteDatabase = BetterSQLite3Database<SQLiteDatabaseSchema>;
-export type SQLiteDatabaseTX = Parameters<
+export type SQLiteDatabaseTx = Parameters<
   Parameters<SQLiteDatabase['transaction']>[0]
 >[0];
 

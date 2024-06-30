@@ -9,7 +9,7 @@ import {
   extensionStorages,
 } from '/@/db/schema/extension.schema';
 import { SetRequired } from 'type-fest';
-import { conflictUpdateAllExcept } from '/@/utils/database-utils';
+import { conflictUpdateAllExcept } from '/@/common/utils/database-utils';
 import { and, eq, inArray } from 'drizzle-orm';
 
 const mapStorageValue = <

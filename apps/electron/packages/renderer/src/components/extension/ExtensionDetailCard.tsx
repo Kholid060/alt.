@@ -5,12 +5,12 @@ import UiExtensionIcon from '../ui/UiExtensionIcon';
 import { UiList } from '@alt-dot/ui';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import { ExtensionPermissions } from '#packages/common/interface/extension.interface';
-import { DatabaseExtensionCommand } from '#packages/main/src/interface/database.interface';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
+import { SelectExtensionCommand } from '#packages/main/src/db/schema/extension.schema';
 
 function getPermissionsDescription(
   permissions: ExtensionPermissions[],
-  commands: DatabaseExtensionCommand[],
+  commands: SelectExtensionCommand[],
 ) {
   const descriptions = new Set<string>();
 

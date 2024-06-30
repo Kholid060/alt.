@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { BrowserExtensionService } from './browser-extension.service';
-import { isWSAckError } from '../utils/extension/ExtensionBrowserElementHandle';
 import { ExtensionBrowserTabContext } from '#packages/common/interface/extension.interface';
 import { IPCInvokePayload } from '#packages/common/interface/ipc-events.interface';
-import { getFileDetail } from '../utils/getFileDetail';
 import { CustomError } from '#packages/common/errors/custom-errors';
+import { getFileDetail } from '../common/utils/getFileDetail';
+import { isWSAckError } from '../common/utils/helper';
 
 @Injectable()
 export class BrowserExtensionActionService {

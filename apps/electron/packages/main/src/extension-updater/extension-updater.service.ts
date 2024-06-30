@@ -5,7 +5,7 @@ import { OnAppReady } from '../common/hooks/on-app-ready.hook';
 import { DBService } from '../db/db.service';
 import { LoggerService } from '../logger/logger.service';
 import path from 'path';
-import ExtensionUtils from '../utils/extension/ExtensionUtils';
+import ExtensionUtils from '../common/utils/ExtensionUtils';
 import { APIService } from '../api/api.service';
 import { afetch } from '@alt-dot/shared';
 import AdmZip from 'adm-zip';
@@ -19,6 +19,7 @@ import {
 import { ExtensionUpdater } from './utils/extension-updater';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
 import { AppStoreService } from '../app/app-store/app-store.service';
+import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 
 @Injectable()
 export class ExtensionUpdaterService implements OnAppReady {
@@ -29,7 +30,12 @@ export class ExtensionUpdaterService implements OnAppReady {
     private appStore: AppStoreService,
   ) {}
 
-  async onAppReady() {
+  onAppReady() {
+    // to prevent blocking the startup process
+    this.checkUpdate();
+  }
+
+  private async checkUpdate() {
     const lastCheckUpdate = this.appStore.get('lastCheckExtensionUpdate');
     const checkUpdate =
       !lastCheckUpdate ||
@@ -86,6 +92,13 @@ export class ExtensionUpdaterService implements OnAppReady {
           return updater.startUpdate();
         }),
       );
+
+      if (updateLocalExts.length > 0 || updateStoreExts.length > 0) {
+        this.dbService.emitChanges({
+          'database:get-extension': [DATABASE_CHANGES_ALL_ARGS],
+          'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
+        });
+      }
     });
 
     this.appStore.set('lastCheckExtensionUpdate', new Date().toString());

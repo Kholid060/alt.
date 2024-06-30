@@ -8,11 +8,7 @@ import type { SQLiteSelect, SQLiteTable } from 'drizzle-orm/sqlite-core';
 import type {
   NewExtension,
   NewExtensionCommand,
-} from '../db/schema/extension.schema';
-import type { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
-import type { DatabaseQueriesEvent } from '../interface/database.interface';
-import WindowsManager from '../window/WindowsManager';
-import type { WindowNames } from '#packages/common/interface/window.interface';
+} from '/@/db/schema/extension.schema';
 
 export function buildConflictUpdateColumns<
   T extends SQLiteTable,
@@ -77,21 +73,6 @@ export const mapManifestToDB = {
     };
   },
 };
-
-export function emitDBChanges(
-  changes: {
-    [T in keyof Partial<DatabaseQueriesEvent>]:
-      | [typeof DATABASE_CHANGES_ALL_ARGS]
-      | Parameters<DatabaseQueriesEvent[T]>;
-  },
-  excludeWindow?: (WindowNames | number)[],
-) {
-  WindowsManager.sendMessageToAllWindows({
-    excludeWindow,
-    args: [changes],
-    name: { name: 'database:changes', noThrow: true },
-  });
-}
 
 export function withPagination<T extends SQLiteSelect>(
   qb: T,

@@ -2,7 +2,7 @@ import {
   NewExtensionCredential,
   SelectExtension,
   SelectExtensionCredential,
-} from '/@/db/schema/extension.schema';
+} from '../../db/schema/extension.schema';
 
 export type ExtensionCredentialModel = SelectExtensionCredential;
 

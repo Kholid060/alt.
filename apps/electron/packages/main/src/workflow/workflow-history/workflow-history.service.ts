@@ -4,14 +4,14 @@ import {
   WorkflowHistoryInsertPayload,
   WorkflowHistoryListPaginationFilter,
   WorkflowHistoryListPaginationModel,
+  WorkflowHistoryModel,
   WorkflowHistoryRunningItemModel,
   WorkflowHistoryUpdatePayload,
 } from './workflow-history.interface';
 import { eq, like, asc, desc, count, inArray } from 'drizzle-orm';
 import { SQLiteColumn } from 'drizzle-orm/sqlite-core';
 import { workflowsHistory, workflows } from '/@/db/schema/workflow.schema';
-import { DatabaseWorkflowHistory } from '/@/interface/database.interface';
-import { withPagination } from '/@/utils/database-utils';
+import { withPagination } from '/@/common/utils/database-utils';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import { WORKFLOW_HISTORY_STATUS } from '#packages/common/utils/constant/workflow.const';
 
@@ -67,7 +67,7 @@ export class WorkflowHistoryService {
       query = withPagination(query, pagination.page, pagination.pageSize);
     }
 
-    const items = (await query.execute()) as DatabaseWorkflowHistory[];
+    const items = (await query.execute()) as WorkflowHistoryModel[];
     const historyLength = filter
       ? items.length
       : (

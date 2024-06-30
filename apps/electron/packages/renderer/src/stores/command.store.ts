@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import createStoreSelectors from '../utils/createStoreSelector';
 import { ExtensionBrowserTabContext } from '#packages/common/interface/extension.interface';
-import { DatabaseExtensionErrorsListItem } from '#packages/main/src/interface/database.interface';
+import { ExtensionErrorListItemModel } from '#packages/main/src/extension/extension-error/extension-error.interface';
 
 interface ExtensionCommandArgs {
   commandId: string;
@@ -12,7 +12,7 @@ interface ExtensionCommandArgs {
 export interface CommandErrorOverlay {
   title: string;
   extensionId: string;
-  errors: DatabaseExtensionErrorsListItem[];
+  errors: ExtensionErrorListItemModel[];
 }
 
 interface CommandStoreState {

@@ -1,14 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { WindowMessageName } from '../window/WindowBase';
-import { WindowBaseState } from './window/WindowBase';
+import { WindowBaseState, WindowMessageName } from './window/WindowBase';
 import { IPCRendererSendEvent } from '#packages/common/interface/ipc-events.interface';
 import WindowDashboard from './window/WindowDashboard';
 import WindowSharedProcess from './window/WindowSharedProcess';
 import WindowCommand from './window/WindowCommand';
 import { OnAppReady } from '../common/hooks/on-app-ready.hook';
 import { GlobalShortcutService } from '../global-shortcut/global-shortcut.service';
-import { GLOBAL_SHORTCUTS } from '../utils/constant';
 import { BrowserWindow, WebContents } from 'electron';
+import { GLOBAL_SHORTCUTS } from '../common/utils/constant';
 
 interface BrowserWindowMap {
   command: WindowCommand;

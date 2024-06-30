@@ -26,6 +26,7 @@ import { AppStoreModule } from './app/app-store/app-store.module';
 import { AppCryptoModule } from './app/app-crypto/app-crypto.module';
 import { ElectronApiModule } from './electron-api/electron-api.module';
 import { DeepLinkModule } from './deep-link/deep-link.module';
+import { app } from 'electron';
 
 const envVarsSchema = z.object({
   API_KEY: z.string().min(1),
@@ -47,7 +48,12 @@ const envVarsSchema = z.object({
     }),
     ConfigModule.forRoot({
       isGlobal: true,
-      validate: envVarsSchema.parse,
+      validate: (config) => {
+        const isSingleInstance = app.requestSingleInstanceLock();
+        if (!isSingleInstance) return {};
+
+        return envVarsSchema.parse(config);
+      },
     }),
     AppStoreModule,
     AppCryptoModule,

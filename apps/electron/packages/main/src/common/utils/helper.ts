@@ -1,4 +1,5 @@
 import type { ExtensionConfig } from '@alt-dot/extension-core';
+import { WSAckErrorResult, isObject } from '@alt-dot/shared';
 import type { BrowserWindow, Display } from 'electron';
 
 export function getExtensionConfigDefaultValue(config: ExtensionConfig[]): {
@@ -44,4 +45,8 @@ export function centerWindow(
     x: Math.floor(windowXPos - (offsetX ?? 0)),
     y: Math.floor(windowYPos - (offsetY ?? 0)),
   });
+}
+
+export function isWSAckError(result: unknown): result is WSAckErrorResult {
+  return Boolean(result) && isObject(result) && 'error' in result;
 }

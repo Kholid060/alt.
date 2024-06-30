@@ -19,23 +19,23 @@ import {
   WorkflowNewNode,
 } from '#common/interface/workflow.interface';
 import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
-import {
-  DatabaseWorkflowDetail,
-  DatabaseWorkflowUpdatePayload,
-} from '#packages/main/src/interface/database.interface';
 import { createDebounce } from '@alt-dot/shared';
 import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
 import {
   UndoRedoStoreSlice,
   createUndoRedoStoreSlice,
 } from './undo-redo.store-slice';
+import {
+  WorkflowDetailModel,
+  WorkflowUpdatePayload,
+} from '#packages/main/src/workflow/workflow.interface';
 
 export interface WorkflowEditorStoreState {
   selection: WorkflowElement;
   enableWorkflowSaveBtn: boolean;
   editNode: WorkflowNodes | null;
-  workflow: DatabaseWorkflowDetail | null;
-  workflowChanges: Set<keyof DatabaseWorkflowUpdatePayload>;
+  workflow: WorkflowDetailModel | null;
+  workflowChanges: Set<keyof WorkflowUpdatePayload>;
 }
 
 export interface WorkflowEditorStoreActions {
@@ -46,15 +46,15 @@ export interface WorkflowEditorStoreActions {
   setEditNode(node: WorkflowNodes | null): void;
   setSelection(selection: WorkflowElement): void;
   toggleSaveWorkflowBtn: (enable: boolean) => void;
-  setWorkflow: (workflow: DatabaseWorkflowDetail) => void;
+  setWorkflow: (workflow: WorkflowDetailModel) => void;
   deleteEdgeBy: (by: 'id' | 'source' | 'sourceHandle', ids: string[]) => void;
   updateEditNode<T extends WorkflowNodes = WorkflowNodes>(
     node: Partial<T['data']>,
   ): void;
   updateWorkflow: (
     data:
-      | DatabaseWorkflowUpdatePayload
-      | ((workflow: DatabaseWorkflowDetail) => DatabaseWorkflowUpdatePayload),
+      | WorkflowUpdatePayload
+      | ((workflow: WorkflowDetailModel) => WorkflowUpdatePayload),
     saveChanges?: boolean,
   ) => void;
   updateEdge: (edgeId: string | Edge, connection: Connection) => boolean;
@@ -188,9 +188,7 @@ const workflowEditorStore = create(
       if (!currentWorkflow) throw new Error("Workflow hasn't been initialized");
 
       const newData = typeof data === 'function' ? data(currentWorkflow) : data;
-      const keys = Object.keys(
-        newData,
-      ) as (keyof DatabaseWorkflowUpdatePayload)[];
+      const keys = Object.keys(newData) as (keyof WorkflowUpdatePayload)[];
 
       if (keys.length === 0) return;
 

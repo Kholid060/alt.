@@ -30,12 +30,18 @@ export class WorkflowService implements OnAppReady {
     private globalShortcut: GlobalShortcutService,
   ) {}
 
-  async onAppReady() {
-    // register workflows trigger
+  onAppReady() {
+    this.registerAllWorkflowsTriggers();
+  }
+
+  private async registerAllWorkflowsTriggers() {
     const workflows = await this.workflowQuery.listWorkflowTriggers();
     await Promise.allSettled(
       workflows.map(async (workflow) =>
-        this.registerTriggers(workflow.id, workflow.triggers),
+        this.registerTriggers(
+          workflow.id,
+          workflow.triggers as WorkflowNodes[],
+        ),
       ),
     );
   }
@@ -184,7 +190,7 @@ export class WorkflowService implements OnAppReady {
 
     if (payload.triggers) {
       this.unregisterTriggers(workflowId);
-      this.registerTriggers(workflowId, payload.triggers);
+      this.registerTriggers(workflowId, payload.triggers as WorkflowNodes[]);
     }
   }
 }

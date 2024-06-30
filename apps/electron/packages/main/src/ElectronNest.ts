@@ -1,11 +1,11 @@
 import { NestContainer, NestFactory } from '@nestjs/core';
 import { Module } from '@nestjs/core/injector/module';
 import { MicroserviceOptions } from '@nestjs/microservices';
-import ElectronTransporter from './utils/ElectronTranspoter';
 import { INestMicroservice } from '@nestjs/common';
 import { app as electronApp } from 'electron';
 import { callOnAppReadyHook } from './common/hooks/on-app-ready.hook';
 import { NestApplicationContextOptions } from '@nestjs/common/interfaces/nest-application-context-options.interface';
+import ElectronTransporter from './common/utils/ElectronTranspoter';
 
 type ElectronNestOptions = Omit<MicroserviceOptions, 'strategy'> &
   NestApplicationContextOptions;

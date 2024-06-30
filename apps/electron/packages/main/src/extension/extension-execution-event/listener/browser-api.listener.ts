@@ -3,7 +3,6 @@ import { BrowserExtensionService } from '/@/browser-extension/browser-extension.
 import { OnExtensionAPI } from '/@/common/decorators/extension.decorator';
 import { ExtensionApiEvent } from '../events/extension-api.event';
 import { CustomError } from '#packages/common/errors/custom-errors';
-import { isWSAckError } from '/@/utils/extension/ExtensionBrowserElementHandle';
 import ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
 import { ExtensionBrowserTabContext } from '#packages/common/interface/extension.interface';
 import {
@@ -13,9 +12,9 @@ import {
   Last,
   WSAckErrorResult,
 } from '@alt-dot/shared';
-import ExtensionWSNamespace from '/@/services/websocket/ws-namespaces/extensions.ws-namespace';
-import { getFileDetail } from '/@/utils/getFileDetail';
+import { getFileDetail } from '/@/common/utils/getFileDetail';
 import { BrowserWindowService } from '/@/browser-window/browser-window.service';
+import { isWSAckError } from '/@/common/utils/helper';
 
 const elementHandlerWSEventMap = {
   type: 'tabs:type',
@@ -61,7 +60,7 @@ export class ExtensionBrowserApiListener {
       throw new CustomError("Couldn't find active tab browser");
     }
 
-    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
+    const result = await this.browserExtension.emitToBrowserWithAck({
       browserId: browserCtx.browserId,
       name: elementHandlerWSEventMap[name],
       args: [{ tabId: browserCtx.tabId }, ...args] as unknown as AllButLast<P>,
@@ -264,7 +263,7 @@ export class ExtensionBrowserApiListener {
     }
 
     const { browserId, tabId } = browserCtx;
-    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
+    const result = await this.browserExtension.emitToBrowserWithAck({
       browserId,
       name: 'tabs:element-exists',
       args: [{ tabId }, { selector }, multiple ?? false],
@@ -288,7 +287,7 @@ export class ExtensionBrowserApiListener {
     }
 
     const { browserId, tabId } = browserCtx;
-    const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
+    const result = await this.browserExtension.emitToBrowserWithAck({
       timeout,
       browserId,
       name: 'tabs:wait-for-selector',
@@ -309,7 +308,7 @@ export class ExtensionBrowserApiListener {
     }
 
     const selectFile = async () => {
-      const result = await ExtensionWSNamespace.instance.emitToBrowserWithAck({
+      const result = await this.browserExtension.emitToBrowserWithAck({
         browserId,
         timeout: 300_000, // 5 minutes
         name: 'tabs:select-element',

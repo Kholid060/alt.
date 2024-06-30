@@ -18,7 +18,7 @@ import { safeStorage } from 'electron';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import { nanoid } from 'nanoid';
 import { SQLiteColumn } from 'drizzle-orm/sqlite-core';
-import { withPagination } from '/@/utils/database-utils';
+import { withPagination } from '/@/common/utils/database-utils';
 import { parseJSON } from '@alt-dot/shared';
 
 @Injectable()

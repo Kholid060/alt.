@@ -2,7 +2,7 @@ import {
   NewWorkflowHistory,
   SelectWorkflow,
   SelectWorkflowHistory,
-} from '/@/db/schema/workflow.schema';
+} from '../../db/schema/workflow.schema';
 
 export type WorkflowHistoryModel = SelectWorkflowHistory & {
   workflow: Pick<SelectWorkflow, 'name' | 'description'>;

@@ -1,9 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useDatabase, useDatabaseQuery } from '/@/hooks/useDatabase';
-import {
-  DatabaseExtensionCredentialsValueList,
-  DatabaseExtensionCredentialsValueListOptions,
-} from '#packages/main/src/interface/database.interface';
 import { useDebounceValue } from 'usehooks-ts';
 import {
   ArrowDownAzIcon,
@@ -43,10 +39,13 @@ import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
 import { ExtensionCredential } from '@alt-dot/extension-core/src/client/manifest/manifest-credential';
 import CredentialDetail from '/@/components/credential/CredentialDetail';
 import UiItemsPagination from '/@/components/ui/UiItemsPagination';
-import { ArrayValues } from 'type-fest';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import dayjs from '/@/lib/dayjs';
+import {
+  ExtensionCredentialListPaginationItemModel,
+  ExtensionListPaginationPayload,
+} from '#packages/main/src/extension/extension-credential/extension-credential.interface';
 
 type CredentialProviders = Record<
   string,
@@ -161,14 +160,14 @@ function EditCredential({
 }: {
   onClose?(): void;
   providers: CredentialProviders;
-  credential: ExtensionCredentialListItem;
+  credential: ExtensionCredentialListPaginationItemModel;
 }) {
   const [open, setOpen] = useState(true);
 
-  const data = useDatabaseQuery('database:get-extension-credential-list-detail', [
-    credential.id,
-    true,
-  ]);
+  const data = useDatabaseQuery(
+    'database:get-extension-credential-list-detail',
+    [credential.id, true],
+  );
   const provider =
     providers[credential.extension.id].items[credential.providerId];
 
@@ -198,8 +197,6 @@ function EditCredential({
   );
 }
 
-type ExtensionCredentialListItem =
-  ArrayValues<DatabaseExtensionCredentialsValueList>;
 function CredentialCard({
   onEdit,
   onDelete,
@@ -208,10 +205,10 @@ function CredentialCard({
   credential,
 }: {
   providers: CredentialProviders;
-  credential: ExtensionCredentialListItem;
-  onEdit?(item: ExtensionCredentialListItem): void;
-  onDelete?(item: ExtensionCredentialListItem): void;
-  onConnect?(item: ExtensionCredentialListItem): void;
+  credential: ExtensionCredentialListPaginationItemModel;
+  onEdit?(item: ExtensionCredentialListPaginationItemModel): void;
+  onDelete?(item: ExtensionCredentialListPaginationItemModel): void;
+  onConnect?(item: ExtensionCredentialListPaginationItemModel): void;
 }) {
   const provider =
     providers[credential.extension.id].items[credential.providerId];
@@ -308,7 +305,7 @@ function CredentialCard({
 }
 
 type CredentialSort = Required<
-  Required<DatabaseExtensionCredentialsValueListOptions>['sort']
+  Required<ExtensionListPaginationPayload>['sort']
 >;
 function RouteCredentials() {
   const dialog = useDialog();
@@ -318,10 +315,10 @@ function RouteCredentials() {
   const [credentials, setCredentials] = useState<{
     count: number;
     isFetched: boolean;
-    items: DatabaseExtensionCredentialsValueList;
+    items: ExtensionCredentialListPaginationItemModel[];
   }>({ count: 0, items: [], isFetched: false });
   const [editCredential, setEditCredential] =
-    useState<ExtensionCredentialListItem | null>(null);
+    useState<ExtensionCredentialListPaginationItemModel | null>(null);
 
   const [search, setSearch] = useDebounceValue('', 250);
   const [pagination, setPagination] = useState({
@@ -373,7 +370,9 @@ function RouteCredentials() {
     return providers;
   }, [credentialProvidersQuery.data, credentials]);
 
-  async function onDeleteCredential(credential: ExtensionCredentialListItem) {
+  async function onDeleteCredential(
+    credential: ExtensionCredentialListPaginationItemModel,
+  ) {
     try {
       const isConfirmed = await dialog.confirm({
         title: 'Delete credential',
@@ -407,7 +406,9 @@ function RouteCredentials() {
       });
     }
   }
-  async function onConnectCredential(credential: ExtensionCredentialListItem) {
+  async function onConnectCredential(
+    credential: ExtensionCredentialListPaginationItemModel,
+  ) {
     try {
       const result = await preloadAPI.main.ipc.invoke(
         'oauth:connect-account',

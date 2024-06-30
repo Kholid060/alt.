@@ -1,8 +1,8 @@
 import type { ExtensionCommandExecutePayload } from '#common/interface/extension.interface';
-import type { DatabaseExtensionCommandWithExtension } from '#packages/main/src/interface/database.interface';
 import { EventEmitter } from 'eventemitter3';
 import type ExtensionCommandRunner from '../ExtensionCommandRunner';
 import type { BetterMessagePayload } from '@alt-dot/shared';
+import { ExtensionCommandModel } from '#packages/main/src/extension/extension-command/extension-command.interface';
 
 export enum ExtensionRunnerProcessFinishReason {
   Done = 'done',
@@ -21,15 +21,15 @@ export interface ExtensionRunnerProcessConstructor {
   id: string;
   commandFilePath: string;
   runner: ExtensionCommandRunner;
+  command: ExtensionCommandModel;
   payload: ExtensionCommandExecutePayload;
-  command: DatabaseExtensionCommandWithExtension;
 }
 
 abstract class ExtensionRunnerProcess extends EventEmitter<ExtensionRunnerProcessEvents> {
   commandFilePath: string;
   runner: ExtensionCommandRunner;
+  command: ExtensionCommandModel;
   payload: ExtensionCommandExecutePayload;
-  command: DatabaseExtensionCommandWithExtension;
 
   abstract id: string;
 

@@ -65,9 +65,7 @@ function WorkflowNodeEditDelay() {
   const updateEditNode = useWorkflowEditorStore.use.updateEditNode();
   const workflowId = useWorkflowEditorStore((state) => state.workflow?.id);
 
-  const workflows = useDatabaseQuery('database:get-workflow-list', [
-    'commands',
-  ]);
+  const workflows = useDatabaseQuery('database:get-workflow-list', []);
   const filteredWorkflows = useMemo<UiListItem[]>(() => {
     if (!workflowId || !workflows.data) return [];
 
