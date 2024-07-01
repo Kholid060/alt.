@@ -42,6 +42,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import DeepLinkURL from '#packages/common/utils/DeepLinkURL';
 import WorkflowDetailForm from '../WorkflowDetailForm';
 import { WorkflowUpdatePayload } from '#packages/main/src/workflow/workflow.interface';
+import { WORKFLOW_NODE_TRIGGERS } from '#packages/common/utils/constant/workflow.const';
 
 function WorkflowInformation() {
   const workflow = useWorkflowEditorStore.use.workflow();
@@ -273,8 +274,6 @@ function WorkflowVariableModal() {
 function WorkflowSaveButton() {
   const enableWorkflowSaveBtn =
     useWorkflowEditorStore.use.enableWorkflowSaveBtn();
-  const toggleSaveWorkflowBtn =
-    useWorkflowEditorStore.use.toggleSaveWorkflowBtn();
 
   const [_searchParams, setSearchParams] = useSearchParams();
 
@@ -313,13 +312,13 @@ function WorkflowSaveButton() {
 
   const saveWorkflow = useCallback(async () => {
     try {
-      const { workflow } = useWorkflowEditorStore.getState();
+      const { workflow, isTriggerChanged } = useWorkflowEditorStore.getState();
       if (!workflow) return;
 
       const { workflowChanges: changes, clearWorkflowChanges } =
         useWorkflowEditorStore.getState();
       if (changes.size === 0) {
-        toggleSaveWorkflowBtn(false);
+        useWorkflowEditorStore.getState().toggleSaveWorkflowBtn(false);
         return;
       }
 
@@ -328,6 +327,12 @@ function WorkflowSaveButton() {
         // @ts-expect-error it's correct type
         payload[key] = workflow[key];
       });
+
+      if (isTriggerChanged) {
+        payload.triggers = workflow.nodes.filter(
+          (node) => node.type && WORKFLOW_NODE_TRIGGERS.includes(node.type),
+        );
+      }
 
       const result = await preloadAPI.main.ipc.invoke(
         'workflow:save',
@@ -345,12 +350,15 @@ function WorkflowSaveButton() {
         return;
       }
 
-      toggleSaveWorkflowBtn(false);
+      useWorkflowEditorStore.setState({
+        isTriggerChanged: false,
+      });
+      useWorkflowEditorStore.getState().toggleSaveWorkflowBtn(false);
     } catch (error) {
       console.error(error);
       toast({ variant: 'destructive', title: 'Something went wrong' });
     }
-  }, []);
+  }, [toast]);
 
   useHotkeys('mod+s', saveWorkflow, []);
 

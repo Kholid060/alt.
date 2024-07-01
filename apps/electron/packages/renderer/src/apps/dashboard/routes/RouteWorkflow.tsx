@@ -38,7 +38,10 @@ import { WorkflowEditorProvider } from '/@/context/workflow-editor.context';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 import { WorkflowEditorContextMenuType } from '/@/interface/workflow-editor.interface';
 import WorkflowEditorContextMenu from '/@/components/workflow/editor/WorkflowEditorContextMenu';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
+import {
+  WORKFLOW_NODE_TRIGGERS,
+  WORKFLOW_NODE_TYPE,
+} from '#packages/common/utils/constant/workflow.const';
 import WorkflowEdgeDefault from '/@/components/workflow/edge/WorkflowEdgeDefault';
 import {
   WorkflowNodeBasic,
@@ -109,9 +112,9 @@ function WorkflowEditor() {
     viewport,
     addEdges,
     updateEdge,
-    deleteEdgeBy,
     addCommands,
     setEditNode,
+    deleteEdgeBy,
     setSelection,
     applyElementChanges,
   } = useWorkflowEditorStore(useShallow(selector));
@@ -246,6 +249,13 @@ function WorkflowEditor() {
   const onNodesDelete: OnNodesDelete = useCallback(
     (nodes) => {
       addCommands([{ type: 'node-removed', nodes: nodes as WorkflowNodes[] }]);
+
+      const triggerDeleted = nodes.some(
+        (node) => node.type && WORKFLOW_NODE_TRIGGERS.includes(node.type),
+      );
+      if (triggerDeleted) {
+        useWorkflowEditorStore.setState({ isTriggerChanged: true });
+      }
 
       const { editNode } = useWorkflowEditorStore.getState();
       const closeEditNodePanel =

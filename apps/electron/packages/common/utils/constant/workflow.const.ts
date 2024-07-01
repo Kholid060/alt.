@@ -38,6 +38,12 @@ export const WORKFLOW_NODE_GROUP = [
   'Scripts',
 ] as const;
 
+export const WORKFLOW_NODE_TRIGGERS: string[] = [
+  WORKFLOW_NODE_TYPE.TRIGGER,
+  WORKFLOW_NODE_TYPE.TRIGGER_SHORTCUT,
+  WORKFLOW_NODE_TYPE.TRIGGER_EXECUTE_WORKFLOW,
+] as const;
+
 export enum WORKFLOW_HISTORY_STATUS {
   Error = 'error',
   Stop = 'stopped',

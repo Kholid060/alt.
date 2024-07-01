@@ -18,7 +18,10 @@ import {
   WorkflowElement,
   WorkflowNewNode,
 } from '#common/interface/workflow.interface';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
+import {
+  WORKFLOW_NODE_TRIGGERS,
+  WORKFLOW_NODE_TYPE,
+} from '#packages/common/utils/constant/workflow.const';
 import { createDebounce } from '@alt-dot/shared';
 import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
 import {
@@ -31,6 +34,8 @@ import {
 } from '#packages/main/src/workflow/workflow.interface';
 
 export interface WorkflowEditorStoreState {
+  isEditNodeDirty: boolean;
+  isTriggerChanged: boolean;
   selection: WorkflowElement;
   enableWorkflowSaveBtn: boolean;
   editNode: WorkflowNodes | null;
@@ -75,6 +80,8 @@ export type WorkflowEditorStore = WorkflowEditorStoreState &
 const initialState: WorkflowEditorStoreState = {
   workflow: null,
   editNode: null,
+  isEditNodeDirty: false,
+  isTriggerChanged: false,
   workflowChanges: new Set(),
   enableWorkflowSaveBtn: false,
   selection: { edges: [], nodes: [] },
@@ -116,13 +123,13 @@ const workflowEditorStore = create(
     setEditNode(node) {
       if (get().editNode?.id === node?.id) return;
 
-      set({ editNode: structuredClone(node) });
+      set({ editNode: structuredClone(node), isEditNodeDirty: false });
     },
     setSelection(selection) {
       set({ selection });
     },
     updateEditNode(nodeData) {
-      const currentNode = get().editNode;
+      const { editNode: currentNode, isTriggerChanged } = get();
       if (!currentNode) return;
 
       const node = {
@@ -132,6 +139,10 @@ const workflowEditorStore = create(
 
       set({
         editNode: node,
+        isEditNodeDirty: true,
+        isTriggerChanged:
+          isTriggerChanged ||
+          WORKFLOW_NODE_TRIGGERS.includes(node.data.$nodeType),
       });
 
       updateWorkflowNodeDebounce(() => {
@@ -223,7 +234,14 @@ const workflowEditorStore = create(
     addNodes(nodes) {
       if (nodes.length <= 0) return;
 
-      get().updateWorkflow((workflow) => {
+      const {
+        updateWorkflow,
+        addCommands,
+        isTriggerChanged: isTriggerChangedVal,
+      } = get();
+      let isTriggerChanged = isTriggerChangedVal;
+
+      updateWorkflow((workflow) => {
         const oldNodes = workflow.nodes;
 
         const noDuplicateNodes: Partial<Record<WORKFLOW_NODE_TYPE, boolean>> = {
@@ -232,6 +250,10 @@ const workflowEditorStore = create(
         };
 
         const newNodes = nodes.reduce<WorkflowNodes[]>((acc, node) => {
+          if (!isTriggerChanged && WORKFLOW_NODE_TRIGGERS.includes(node.type)) {
+            isTriggerChanged = true;
+          }
+
           if (
             Object.hasOwn(noDuplicateNodes, node.type) &&
             !noDuplicateNodes[node.type]
@@ -252,12 +274,14 @@ const workflowEditorStore = create(
 
         if (newNodes.length === 0) return {};
 
-        get().addCommands([{ type: 'node-added', nodes: newNodes }]);
+        addCommands([{ type: 'node-added', nodes: newNodes }]);
 
         return {
           nodes: [...oldNodes, ...newNodes],
         };
       });
+
+      if (isTriggerChanged) set({ isTriggerChanged });
     },
     addEdges(connections) {
       if (connections.length <= 0) return;

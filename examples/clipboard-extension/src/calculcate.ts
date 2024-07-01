@@ -1,5 +1,5 @@
 import { CommandViewJSONRenderer } from '@alt-dot/extension';
-import { evaluate } from 'mathjs';
+// import { evaluate } from 'mathjs';
 
 const CommandMain: CommandViewJSONRenderer = ({ updateView }) => {
   console.log('hello world CLEAR');
@@ -8,7 +8,8 @@ const CommandMain: CommandViewJSONRenderer = ({ updateView }) => {
     if (!value.trim()) return;
     console.log('changed', value);
     try {
-      const result = evaluate(value);
+      // const result = evaluate(value);
+      const result = 'hello world';
       updateView({
         type: 'list',
         shouldFilter: false,

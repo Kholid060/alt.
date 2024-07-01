@@ -163,7 +163,7 @@ function WorkflowCards({ workflows }: { workflows: WorkflowListItemModel[] }) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6 xl:grid-cols-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6 2xl:grid-cols-4">
       {workflows.map((workflow) => (
         <UiCard
           key={workflow.id}

@@ -45,6 +45,10 @@ async function selectFile() {
   ]);
 }
 
+async function selectElement() {
+  _extension.browser.activeTab.selectElement({ filter: {  } })
+}
+
 export default async function CommandMain(context: CommandLaunchContext) {
   console.log(JSON.stringify(context));
   // await new Promise((r) => setTimeout(r, 4000));

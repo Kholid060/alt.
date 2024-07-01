@@ -22,7 +22,7 @@ import { ExtensionConfigService } from './extension-config/extension-config.serv
 import { BrowserExtensionService } from '../browser-extension/browser-extension.service';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
 
-const MAX_EXT_ERROR_AGE_DAY = 30;
+const MAX_EXT_ERROR_AGE_DAY = 3;
 
 @Injectable()
 export class ExtensionService implements OnAppReady {
