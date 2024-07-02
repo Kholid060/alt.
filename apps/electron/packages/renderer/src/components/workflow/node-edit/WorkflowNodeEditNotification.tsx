@@ -1,9 +1,9 @@
-import { WorkflowNodeNotification } from '#packages/common/interface/workflow-nodes.interface';
+import { WorkflowNodeNotification } from '@alt-dot/workflow';
 import { UiInput, UiSwitch } from '@alt-dot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
+import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
 
 const fields: { id: 'title' | 'subtitle' | 'body'; name: string }[] = [
   { id: 'title', name: 'Title' },

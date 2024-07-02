@@ -21,7 +21,6 @@ async function bootstrap() {
    * Prevent electron from running multiple instances.
    */
   const isSingleInstance = app.requestSingleInstanceLock();
-  console.log(isSingleInstance);
   if (!isSingleInstance) {
     app.quit();
     process.exit(0);

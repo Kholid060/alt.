@@ -1,4 +1,4 @@
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
+import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
 import type {
   WorkflowNodeHandlerExecute,
   WorkflowNodeHandlerExecuteReturn,

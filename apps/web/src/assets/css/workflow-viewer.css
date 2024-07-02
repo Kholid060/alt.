@@ -1,0 +1,66 @@
+@import 'reactflow/dist/style.css';
+
+.react-flow__handle {
+  width: theme(spacing.3);
+  height: theme(spacing.3);
+
+  &.is-relative {
+    position: relative;
+    transform: translate(0, 0);
+  }
+
+  &-left {
+    left: -6px;
+    border: none;
+    height: theme(spacing.8);
+    border-radius: theme(borderRadius.sm);
+    background-color: theme(colors.primary.DEFAULT);
+  }
+  &-right {
+    right: -7px;
+    width: theme(spacing.4);
+    height: theme(spacing.4);
+    border-radius: theme(borderRadius.full);
+    background-color: theme(colors.background);
+    border: theme(borderWidth.2) solid theme(borderColor.primary.DEFAULT);
+  }
+}
+
+.react-flow__node {
+  min-height: 64px;
+
+  &.selected > div {
+    @apply border-primary/60;
+  }
+}
+
+.react-flow__node-default {
+  padding: 0 !important;
+  width: auto !important;
+  color: inherit !important;
+  border-width: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  font-size: inherit !important;
+  text-align: inherit !important;
+  border-color: unset !important;
+  border-style: inherit !important;
+  background-color: transparent !important;
+}
+
+.react-flow__edge {
+  &-path {
+    stroke-width: theme(spacing[0.5]);
+    stroke: theme(borderColor.border);
+  }
+
+  &.selected, &:hover {
+    .react-flow__edge-path {
+      stroke: theme(colors.primary.DEFAULT);
+    }
+  }
+}
+
+.cm-editor {
+  height: 100%;
+}

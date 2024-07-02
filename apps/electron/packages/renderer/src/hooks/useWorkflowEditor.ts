@@ -9,7 +9,6 @@ import {
 import {
   WORKFLOW_ELEMENT_FORMAT,
   WORKFLOW_MANUAL_TRIGGER_ID,
-  WORKFLOW_NODE_TYPE,
 } from '#packages/common/utils/constant/workflow.const';
 import { parseJSON } from '@alt-dot/shared';
 import { nanoid } from 'nanoid';
@@ -19,7 +18,7 @@ import preloadAPI from '../utils/preloadAPI';
 import { useWorkflowEditorStore } from '../stores/workflow-editor/workflow-editor.store';
 import { useShallow } from 'zustand/react/shallow';
 import { useToast } from '@alt-dot/ui';
-import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
+import { WORKFLOW_NODE_TYPE, WorkflowNodes } from '@alt-dot/workflow';
 
 export function useWorkflowEditor() {
   const storeApi = useStoreApi();

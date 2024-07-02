@@ -1,5 +1,6 @@
 import { ExtensionDetailIcon } from '@/components/extension/ExtensionDetail';
 import ExtensionStatus from '@/components/extension/ExtensionStatus';
+import UiCodeEditor from '@/components/ui/UiCodeEditor';
 import UiMarkdown from '@/components/ui/UiMarkdown';
 import { authGuard } from '@/guards/auth.guard';
 import { AdminExtensionListItem } from '@/interface/admin.interface';
@@ -17,7 +18,6 @@ import {
   useToast,
   UiDialog,
   UiLabel,
-  UiCodeEditor,
   UiInput,
   UiButton,
   UiToggle,

@@ -7,13 +7,20 @@ import {
   FieldPath,
   FieldValues,
   FormProvider,
+  FormProviderProps,
   useFormContext,
 } from 'react-hook-form';
 
 import { cn } from '@/utils/cn';
 import { UiLabel } from '@/components/ui/label';
 
-const UiForm = FormProvider;
+const UiForm = <
+  TFieldValues extends FieldValues,
+  TContext = unknown,
+  TTransformedValues extends FieldValues | undefined = undefined,
+>(
+  props: FormProviderProps<TFieldValues, TContext, TTransformedValues>,
+) => <FormProvider {...props} />;
 
 type UiFormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
@@ -72,13 +79,19 @@ const UiFormItemContext = React.createContext<UiFormItemContextValue>(
 
 const UiFormItem = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => {
+  React.HTMLAttributes<HTMLDivElement> & { noContainer?: boolean }
+>(({ className, children, noContainer, ...props }, ref) => {
   const id = React.useId();
 
   return (
     <UiFormItemContext.Provider value={{ id }}>
-      <div ref={ref} className={cn('space-y-2', className)} {...props} />
+      {noContainer ? (
+        children
+      ) : (
+        <div ref={ref} className={cn('space-y-2', className)} {...props}>
+          {children}
+        </div>
+      )}
     </UiFormItemContext.Provider>
   );
 });

@@ -1,7 +1,8 @@
 import { Socket, io } from 'socket.io-client';
-import type {
-  ExtensionWSClientToServerEvents,
-  ExtensionWSServerToClientEvents,
+import {
+  APP_WEBSOCKET_PORT,
+  type ExtensionWSClientToServerEvents,
+  type ExtensionWSServerToClientEvents,
 } from '@alt-dot/shared';
 import getBrowserInfo from '../utils/getBrowserInfo';
 import { websocketEventsListener } from './websocket.service-events';
@@ -35,7 +36,7 @@ class WebsocketService extends EventEmitter<WSEvent> {
 
     const browserInfo = await getBrowserInfo();
 
-    this.socket = io('ws://localhost:4567/extensions', {
+    this.socket = io(`ws://localhost:${APP_WEBSOCKET_PORT}/extensions`, {
       auth: { browserInfo },
       transports: ['websocket'],
     });

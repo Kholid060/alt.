@@ -19,11 +19,14 @@ import { Route as StoreIndexImport } from './routes/store/index'
 import { Route as AuthIndexImport } from './routes/auth/index'
 import { Route as OauthRedirectImport } from './routes/oauth/redirect'
 import { Route as AdminDashboardIndexImport } from './routes/admin/dashboard/index'
+import { Route as DevconsoleWorkflowsNewImport } from './routes/devconsole/workflows/new'
+import { Route as DevconsoleWorkflowsWorkflowIdImport } from './routes/devconsole/workflows/$workflowId'
 import { Route as DevconsoleExtensionsNewImport } from './routes/devconsole/extensions/new'
 import { Route as DevconsoleExtensionsExtensionIdImport } from './routes/devconsole/extensions/$extensionId'
 import { Route as StoreStoreWorkflowsImport } from './routes/_store/store/workflows'
 import { Route as StoreStoreExtensionsImport } from './routes/_store/store/extensions'
 import { Route as SettingsSettingsProfileImport } from './routes/_settings/settings/profile'
+import { Route as DevconsoleDevconsoleWorkflowsImport } from './routes/_devconsole/devconsole/workflows'
 import { Route as DevconsoleDevconsoleExtensionsImport } from './routes/_devconsole/devconsole/extensions'
 import { Route as StoreExtensionsExtensionNameExtensionIdImport } from './routes/store/extensions/$extensionName.$extensionId'
 
@@ -69,6 +72,17 @@ const AdminDashboardIndexRoute = AdminDashboardIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const DevconsoleWorkflowsNewRoute = DevconsoleWorkflowsNewImport.update({
+  path: '/devconsole/workflows/new',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const DevconsoleWorkflowsWorkflowIdRoute =
+  DevconsoleWorkflowsWorkflowIdImport.update({
+    path: '/devconsole/workflows/$workflowId',
+    getParentRoute: () => rootRoute,
+  } as any)
+
 const DevconsoleExtensionsNewRoute = DevconsoleExtensionsNewImport.update({
   path: '/devconsole/extensions/new',
   getParentRoute: () => rootRoute,
@@ -94,6 +108,12 @@ const SettingsSettingsProfileRoute = SettingsSettingsProfileImport.update({
   path: '/settings/profile',
   getParentRoute: () => SettingsRoute,
 } as any)
+
+const DevconsoleDevconsoleWorkflowsRoute =
+  DevconsoleDevconsoleWorkflowsImport.update({
+    path: '/devconsole/workflows',
+    getParentRoute: () => DevconsoleRoute,
+  } as any)
 
 const DevconsoleDevconsoleExtensionsRoute =
   DevconsoleDevconsoleExtensionsImport.update({
@@ -167,6 +187,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevconsoleDevconsoleExtensionsImport
       parentRoute: typeof DevconsoleImport
     }
+    '/_devconsole/devconsole/workflows': {
+      id: '/_devconsole/devconsole/workflows'
+      path: '/devconsole/workflows'
+      fullPath: '/devconsole/workflows'
+      preLoaderRoute: typeof DevconsoleDevconsoleWorkflowsImport
+      parentRoute: typeof DevconsoleImport
+    }
     '/_settings/settings/profile': {
       id: '/_settings/settings/profile'
       path: '/settings/profile'
@@ -202,6 +229,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevconsoleExtensionsNewImport
       parentRoute: typeof rootRoute
     }
+    '/devconsole/workflows/$workflowId': {
+      id: '/devconsole/workflows/$workflowId'
+      path: '/devconsole/workflows/$workflowId'
+      fullPath: '/devconsole/workflows/$workflowId'
+      preLoaderRoute: typeof DevconsoleWorkflowsWorkflowIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/devconsole/workflows/new': {
+      id: '/devconsole/workflows/new'
+      path: '/devconsole/workflows/new'
+      fullPath: '/devconsole/workflows/new'
+      preLoaderRoute: typeof DevconsoleWorkflowsNewImport
+      parentRoute: typeof rootRoute
+    }
     '/admin/dashboard/': {
       id: '/admin/dashboard/'
       path: '/admin/dashboard'
@@ -225,6 +266,7 @@ export const routeTree = rootRoute.addChildren({
   IndexRoute,
   DevconsoleRoute: DevconsoleRoute.addChildren({
     DevconsoleDevconsoleExtensionsRoute,
+    DevconsoleDevconsoleWorkflowsRoute,
   }),
   SettingsRoute: SettingsRoute.addChildren({ SettingsSettingsProfileRoute }),
   StoreRoute: StoreRoute.addChildren({
@@ -236,6 +278,8 @@ export const routeTree = rootRoute.addChildren({
   StoreIndexRoute,
   DevconsoleExtensionsExtensionIdRoute,
   DevconsoleExtensionsNewRoute,
+  DevconsoleWorkflowsWorkflowIdRoute,
+  DevconsoleWorkflowsNewRoute,
   AdminDashboardIndexRoute,
   StoreExtensionsExtensionNameExtensionIdRoute,
 })
@@ -257,6 +301,8 @@ export const routeTree = rootRoute.addChildren({
         "/store/",
         "/devconsole/extensions/$extensionId",
         "/devconsole/extensions/new",
+        "/devconsole/workflows/$workflowId",
+        "/devconsole/workflows/new",
         "/admin/dashboard/",
         "/store/extensions/$extensionName/$extensionId"
       ]
@@ -267,7 +313,8 @@ export const routeTree = rootRoute.addChildren({
     "/_devconsole": {
       "filePath": "_devconsole.tsx",
       "children": [
-        "/_devconsole/devconsole/extensions"
+        "/_devconsole/devconsole/extensions",
+        "/_devconsole/devconsole/workflows"
       ]
     },
     "/_settings": {
@@ -296,6 +343,10 @@ export const routeTree = rootRoute.addChildren({
       "filePath": "_devconsole/devconsole/extensions.tsx",
       "parent": "/_devconsole"
     },
+    "/_devconsole/devconsole/workflows": {
+      "filePath": "_devconsole/devconsole/workflows.tsx",
+      "parent": "/_devconsole"
+    },
     "/_settings/settings/profile": {
       "filePath": "_settings/settings/profile.tsx",
       "parent": "/_settings"
@@ -313,6 +364,12 @@ export const routeTree = rootRoute.addChildren({
     },
     "/devconsole/extensions/new": {
       "filePath": "devconsole/extensions/new.tsx"
+    },
+    "/devconsole/workflows/$workflowId": {
+      "filePath": "devconsole/workflows/$workflowId.tsx"
+    },
+    "/devconsole/workflows/new": {
+      "filePath": "devconsole/workflows/new.tsx"
     },
     "/admin/dashboard/": {
       "filePath": "admin/dashboard/index.tsx"

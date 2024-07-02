@@ -1,7 +1,7 @@
 import {
   WorkflowNodeInsertData,
   WorkflowNodeInsertDataItem,
-} from '#packages/common/interface/workflow-nodes.interface';
+} from '@alt-dot/workflow';
 import {
   UiButton,
   UiInput,
@@ -14,7 +14,7 @@ import {
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
+import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
 import { nanoid } from 'nanoid/non-secure';
 import { EllipsisVerticalIcon, PlusIcon } from 'lucide-react';
 

@@ -1,4 +1,4 @@
-import { WorkflowNodeBrowserKeyboard } from '#packages/common/interface/workflow-nodes.interface';
+import { WorkflowNodeBrowserKeyboard } from '@alt-dot/workflow';
 import {
   UiCheckbox,
   UiInput,
@@ -10,7 +10,7 @@ import {
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
+import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
 import { KeyboardModifiers, USKeyboard, USKeyboardKeys } from '@alt-dot/shared';
 import { IS_MAC_OS } from '/@/utils/constant/constant';
 

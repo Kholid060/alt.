@@ -27,6 +27,7 @@ import { AppCryptoModule } from './app/app-crypto/app-crypto.module';
 import { ElectronApiModule } from './electron-api/electron-api.module';
 import { DeepLinkModule } from './deep-link/deep-link.module';
 import { app } from 'electron';
+import { WebAppModule } from './web-app/web-app.module';
 
 const envVarsSchema = z.object({
   API_KEY: z.string().min(1),
@@ -34,6 +35,10 @@ const envVarsSchema = z.object({
   VITE_DEV_SERVER_URL: z.string().optional(),
   VITE_WEB_BASE_URL: z.string().url().min(1),
   VITE_API_BASE_URL: z.string().url().min(1),
+  WS_ALLOWED_ORIGIN: z
+    .string()
+    .min(1)
+    .transform((value) => value.split(',').map((str) => str.trim())),
 });
 
 @Module({
@@ -62,6 +67,7 @@ const envVarsSchema = z.object({
     APIModule,
     OAuthModule,
     LoggerModule,
+    WebAppModule,
     TrayMenuModule,
     WorkflowModule,
     DeepLinkModule,

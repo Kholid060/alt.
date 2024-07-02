@@ -1,4 +1,4 @@
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
+import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
 import { NodeHandlerNoOp } from './WorkflowNodeHandler';
 
 export class NodeHandlerTrigger extends NodeHandlerNoOp<WORKFLOW_NODE_TYPE.TRIGGER> {

@@ -1,5 +1,5 @@
+import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
 import { z } from 'zod';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
 
 export const workflowFileValidation = z.object({
   name: z.string().min(1),

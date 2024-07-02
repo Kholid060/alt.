@@ -11,14 +11,14 @@ import {
   UiButton,
 } from '@alt-dot/ui';
 import WorkflowNodeSettings from './WorkflowNodeSettings';
-import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
-import { WORKFLOW_NODES } from '#common/utils/constant/workflow-nodes.const';
+import { WorkflowNodes } from '@alt-dot/workflow';
+import { WORKFLOW_NODES } from '@alt-dot/workflow';
 import { useEffect, useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 import WorkflowUiCodeEditor from '../ui/WorkflowUiCodeEditor';
 import { Edge, Node, getIncomers } from 'reactflow';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor/workflow-editor.store';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
+import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 import { Loader2Icon, TriangleAlertIcon } from 'lucide-react';
 

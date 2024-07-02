@@ -1,10 +1,11 @@
 import type * as ReactFlow from 'reactflow';
 import type { SetOptional } from 'type-fest';
-import type { WorkflowNodes } from './workflow-nodes.interface';
-import type {
+import type { WORKFLOW_MANUAL_TRIGGER_ID } from '../utils/constant/workflow.const';
+import {
   WORKFLOW_NODE_TYPE,
-  WORKFLOW_MANUAL_TRIGGER_ID,
-} from '../utils/constant/workflow.const';
+  WorkflowEdges,
+  WorkflowNodes,
+} from '@alt-dot/workflow';
 
 export type WorkflowNodeErroHandlerAction = 'continue' | 'stop' | 'fallback';
 
@@ -18,7 +19,7 @@ export type WorkflowGetNode<T extends WORKFLOW_NODE_TYPE> = Extract<
 export type WorkflowNewNode = SetOptional<WorkflowNodes, 'id'>;
 
 export interface WorkflowClipboardData {
-  edges: ReactFlow.Edge[];
+  edges: WorkflowEdges[];
   nodes: WorkflowNodes[];
 }
 

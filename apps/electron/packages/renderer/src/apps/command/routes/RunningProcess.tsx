@@ -6,11 +6,11 @@ import { useEffect, useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { useUiListStore } from '@alt-dot/ui/dist/context/list.context';
-import { UiExtIcon } from '@alt-dot/extension';
 import { ExtensionCommandProcess } from '#packages/common/interface/extension.interface';
 import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
 import { SetRequired } from 'type-fest';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
+import { commandIcons } from '#packages/common/utils/command-icons';
 
 type UiListItemProcess = SetRequired<
   UiListItem<'command' | 'workflow'>,
@@ -38,7 +38,7 @@ function RunningProcess() {
         icon: (
           <UiList.Icon
             icon={
-              UiExtIcon[item.workflow.icon as keyof typeof UiExtIcon] ??
+              commandIcons[item.workflow.icon as keyof typeof commandIcons] ??
               WorkflowIcon
             }
           />

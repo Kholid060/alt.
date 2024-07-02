@@ -1,8 +1,10 @@
-import type { WorkflowVariableMode } from '#packages/common/interface/workflow-nodes.interface';
-import type { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
 import { isObject } from '@alt-dot/shared';
 import type WorkflowRunner from './WorkflowRunner';
 import WorkflowFileHandle from '../utils/WorkflowFileHandle';
+import {
+  WORKFLOW_NODE_TYPE,
+  WorkflowVariableMode,
+} from '@alt-dot/workflow';
 
 interface WorkflowRunnerLoopData {
   index: number;

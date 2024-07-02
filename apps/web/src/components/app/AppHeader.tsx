@@ -28,7 +28,7 @@ function AppHeader() {
   const profile = useUserStore.use.profile();
 
   return (
-    <header className="fixed top-0 left-0 w-full z-[100]">
+    <header className="fixed top-0 left-0 w-full z-[49]">
       <div className="container">
         <nav className="h-14 mt-4 mx-auto border rounded-md px-4 items-center grid grid-cols-12 bg-background/70 backdrop-blur-sm">
           <div className="col-span-2">

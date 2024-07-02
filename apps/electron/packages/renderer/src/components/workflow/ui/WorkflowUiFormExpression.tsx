@@ -1,7 +1,7 @@
 import {
   WorkflowNodeExpressionData,
   WorkflowNodeExpressionRecords,
-} from '#packages/common/interface/workflow-nodes.interface';
+} from '@alt-dot/workflow';
 import {
   FunctionSquareIcon,
   InfoIcon,

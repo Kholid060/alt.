@@ -15,7 +15,7 @@ import {
   WorkflowNodeErrorHandler as WorkflowNodeErrorHandlerType,
   WorkflowNodes,
   WorkflowVariableMode,
-} from '#packages/common/interface/workflow-nodes.interface';
+} from '@alt-dot/workflow';
 import React from 'react';
 import { EllipsisVerticalIcon, InfoIcon } from 'lucide-react';
 

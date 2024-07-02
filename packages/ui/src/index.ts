@@ -141,6 +141,7 @@ export {
 } from './components/ui/alert';
 export { UiCheckbox } from './components/ui/checkbox';
 export { UiLogo } from './components/ui/logo';
+export { UiIcons } from './components/ui/icons';
 export {
   UiBreadcrumb,
   UiBreadcrumbList,

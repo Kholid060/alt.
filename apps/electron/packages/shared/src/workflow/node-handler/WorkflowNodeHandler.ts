@@ -1,8 +1,8 @@
-import type {
+import {
+  WORKFLOW_NODE_TYPE,
   WorkflowNodes,
   WorkflowNodesMap,
-} from '#packages/common/interface/workflow-nodes.interface';
-import type { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
+} from '@alt-dot/workflow';
 import type WorkflowRunner from '../runner/WorkflowRunner';
 import type { WorkflowRunnerPrevNodeExecution } from '../runner/WorkflowRunner';
 import type { PossibleTypes } from '/@/interface/common.interface';

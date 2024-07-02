@@ -19,8 +19,8 @@ import { isIPCEventError } from '#packages/common/utils/helper';
 import UiSelectIcon from '/@/components/ui/UiSelectIcon';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { UiExtIcon } from '@alt-dot/extension';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
+import { commandIcons } from '#packages/common/utils/command-icons';
 
 const newCommandScriptSchema = z.object({
   icon: z.string(),
@@ -134,7 +134,7 @@ function CreateCommandScript() {
     return () => {
       clearAll();
     };
-  }, []);
+  }, [clearAll, setPanelHeader]);
 
   return (
     <div className="py-4 px-6">
@@ -182,8 +182,8 @@ function CreateCommandScript() {
                   control={form.control}
                   render={({ field }) => {
                     const Icon =
-                      UiExtIcon[field.value as keyof typeof UiExtIcon] ??
-                      UiExtIcon.Command;
+                      commandIcons[field.value as keyof typeof commandIcons] ??
+                      commandIcons.Command;
 
                     return <Icon className="h-5 w-5" />;
                   }}

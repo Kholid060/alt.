@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { UiExtIcon } from '@alt-dot/extension';
 import {
   UiForm,
   UiFormField,
@@ -13,6 +12,7 @@ import {
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import UiSelectIcon from '../ui/UiSelectIcon';
+import { commandIcons } from '#packages/common/utils/command-icons';
 
 const newWorkflowSchema = z.object({
   description: z
@@ -58,8 +58,8 @@ function WorkflowDetailForm({
                 control={form.control}
                 render={({ field }) => {
                   const Icon =
-                    UiExtIcon[field.value as keyof typeof UiExtIcon] ??
-                    UiExtIcon.Command;
+                    commandIcons[field.value as keyof typeof commandIcons] ??
+                    commandIcons.Command;
                   return <Icon className="h-5 w-5" />;
                 }}
               />

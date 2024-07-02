@@ -8,6 +8,6 @@ export class DeepLinkListener {
 
   @OnEvent('deep-link')
   handleDeepLink(url: string) {
-    console.log('deeplink', url);
+    this.deepLink.urlHandler(url);
   }
 }

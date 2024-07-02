@@ -48,3 +48,9 @@ export type EventMapEmit<Event> = <T extends keyof Event, K extends Event[T]>(
 export type ArrayUnion<
   T extends [string, ...string[]] | readonly [string, ...string[]],
 > = T[number];
+
+export type PromiseWithResolver<T> = {
+  promise: Promise<T>;
+  resolve: (value: T | PromiseLike<T>) => void;
+  reject: (reason?: any) => void;
+};

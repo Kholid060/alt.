@@ -1,4 +1,4 @@
-import { UiExtIcon } from '@alt-dot/extension';
+import { commandIcons } from '#packages/common/utils/command-icons';
 import {
   UiPopover,
   UiTooltip,
@@ -24,7 +24,8 @@ function UiSelectIcon({
   onValueChange,
   ...props
 }: UiSelectIconProps) {
-  const Icon = UiExtIcon[value as keyof typeof UiExtIcon] ?? UiExtIcon.Command;
+  const Icon =
+    commandIcons[value as keyof typeof commandIcons] ?? commandIcons.Command;
 
   return (
     <UiPopover modal>
@@ -38,7 +39,7 @@ function UiSelectIcon({
       <UiPopoverContent className="h-80 w-72 overflow-auto" side={side}>
         <p>Icons</p>
         <div className="grid grid-cols-5 gap-1 mt-2 text-muted-foreground">
-          {Object.entries(UiExtIcon).map(([name, Icon]) => (
+          {Object.entries(commandIcons).map(([name, Icon]) => (
             <button
               key={name}
               title={name}

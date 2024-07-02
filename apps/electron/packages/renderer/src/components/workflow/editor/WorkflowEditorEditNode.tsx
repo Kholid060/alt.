@@ -5,7 +5,7 @@ import { XIcon } from 'lucide-react';
 import { UiSkeleton } from '@alt-dot/ui';
 import kebabCase from 'lodash-es/kebabCase';
 import WorkflowNodeLayoutEdit from '../node-edit/WorkflowNodeLayoutEdit';
-import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
+import { WorkflowNodes } from '@alt-dot/workflow';
 
 const editComponents = Object.fromEntries(
   Object.entries(import.meta.glob('../node-edit/WorkflowNodeEdit*.tsx')).map(

@@ -1,9 +1,9 @@
-import { WorkflowNodeSelectFile } from '#packages/common/interface/workflow-nodes.interface';
+import { WorkflowNodeSelectFile } from '@alt-dot/workflow';
 import { UiButton, UiInput, UiLabel, UiSwitch } from '@alt-dot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
+import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
 import { TrashIcon } from 'lucide-react';
 import WorkflowUiCodeEditor from '../ui/WorkflowUiCodeEditor';
 

@@ -16,7 +16,7 @@ import { parseJSON } from '@alt-dot/shared';
 import { LoggerService } from '../../logger/logger.service';
 import { CustomError } from '#packages/common/errors/custom-errors';
 import { fromZodError } from 'zod-validation-error';
-import { workflows } from '../../db/schema/workflow.schema';
+import { NewWorkflow, workflows } from '../../db/schema/workflow.schema';
 import { buildConflictUpdateColumns } from '/@/common/utils/database-utils';
 import { extensionCommands } from '../../db/schema/extension.schema';
 import { eq } from 'drizzle-orm';
@@ -95,7 +95,7 @@ export class AppBackupService {
     if (upsert) {
       await db
         .insert(workflows)
-        .values(workflowsData)
+        .values(workflowsData as NewWorkflow[])
         .onConflictDoUpdate({
           target: workflows.id,
           set: {
@@ -113,7 +113,7 @@ export class AppBackupService {
       return;
     }
 
-    await db.insert(workflows).values(workflowsData);
+    await db.insert(workflows).values(workflowsData as NewWorkflow[]);
   }
 
   private async restoreExtensionsBackupData(

@@ -2,7 +2,6 @@ import { WORKFLOW_MANUAL_TRIGGER_ID } from '#packages/common/utils/constant/work
 import { UiList, UiListItemAction } from '@alt-dot/ui';
 import { ListItemRenderDetail } from '/@/apps/command/routes/CommandList';
 import preloadAPI from '/@/utils/preloadAPI';
-import { UiExtIcon } from '@alt-dot/extension';
 import {
   EditIcon,
   LinkIcon,
@@ -12,6 +11,7 @@ import {
 } from 'lucide-react';
 import DeepLinkURL from '#packages/common/utils/DeepLinkURL';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
+import { commandIcons } from '#packages/common/utils/command-icons';
 
 function ListItemWorkflow({
   item,
@@ -21,7 +21,8 @@ function ListItemWorkflow({
 }: ListItemRenderDetail<'workflow'>) {
   const addPanelStatus = useCommandPanelStore.use.addStatus();
 
-  const Icon = UiExtIcon[item.icon as keyof typeof UiExtIcon] ?? WorkflowIcon;
+  const Icon =
+    commandIcons[item.icon as keyof typeof commandIcons] ?? WorkflowIcon;
 
   const actions: UiListItemAction[] = [
     {

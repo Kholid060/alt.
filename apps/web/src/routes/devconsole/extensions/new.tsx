@@ -40,9 +40,6 @@ import { useShallow } from 'zustand/react/shallow';
 
 export const Route = createFileRoute('/devconsole/extensions/new')({
   component: DevConsoleExtensionsNewPage,
-  staticData: {
-    halo: true,
-  },
   async loader({ location }) {
     const payload = await extensionNewPayload.safeParseAsync(location.state);
     if (!payload.success) {

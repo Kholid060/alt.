@@ -1,5 +1,5 @@
+/* eslint-disable drizzle/enforce-delete-with-where */
 import IPCRenderer from '#packages/common/utils/IPCRenderer';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import type ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
 import type {
@@ -11,6 +11,7 @@ import { NodeInvalidType } from '/@/utils/custom-errors';
 import { getExactType, isValidType, promiseWithSignal } from '/@/utils/helper';
 import { clipboard, nativeImage } from 'electron';
 import { testNodeConditions } from '../utils/test-node-condtion';
+import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
 
 export class NodeHandlerCode extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.CODE> {
   private controller = new AbortController();

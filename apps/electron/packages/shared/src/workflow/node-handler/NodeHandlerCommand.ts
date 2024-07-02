@@ -1,5 +1,4 @@
 /* eslint-disable drizzle/enforce-delete-with-where */
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
 import WorkflowNodeHandler from './WorkflowNodeHandler';
 import IPCRenderer from '#packages/common/utils/IPCRenderer';
 import { isIPCEventError } from '#packages/common/utils/helper';
@@ -14,6 +13,7 @@ import type { ExtensionCommandExecutePayloadWithData } from '#packages/common/in
 import type { ExtensionCommandArgument } from '@alt-dot/extension-core';
 import type { WorkflowRunnerBrowserContext } from '../runner/WorklowRunnerBrowser';
 import { ExtensionCommandModel } from '#packages/main/src/extension/extension-command/extension-command.interface';
+import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
 
 type CommandDataWithPath = ExtensionCommandModel & {
   filePath: string;

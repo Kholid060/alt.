@@ -5,6 +5,7 @@ import {
   AppCryptoCreateHashAlgorithm,
   AppCryptoCreateHashOptions,
 } from './app-crypto.interface';
+import { AppEnv } from '/@/common/validation/app-env.validation';
 
 const IV_LENGTH: number = 16; // For AES, this is always 16
 

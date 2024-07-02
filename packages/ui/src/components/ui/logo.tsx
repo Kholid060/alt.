@@ -3,10 +3,10 @@ import { forwardRef } from 'react';
 
 export const UiLogo = forwardRef<
   HTMLParagraphElement,
-  React.HTMLAttributes<HTMLParagraphElement>
+  React.HTMLAttributes<HTMLSpanElement>
 >(({ className, style, ...props }, ref) => {
   return (
-    <p
+    <span
       ref={ref}
       className={cn(
         'font-semibold leading-none cursor-default select-none',
@@ -16,7 +16,7 @@ export const UiLogo = forwardRef<
       {...props}
     >
       alt<span className="text-primary">.</span>
-    </p>
+    </span>
   );
 });
 UiLogo.displayName = 'UiLogo';

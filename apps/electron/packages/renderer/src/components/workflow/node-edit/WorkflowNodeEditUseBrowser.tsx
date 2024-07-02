@@ -1,9 +1,9 @@
-import { WorkflowNodeUseBrowser } from '#packages/common/interface/workflow-nodes.interface';
+import { WorkflowNodeUseBrowser } from '@alt-dot/workflow';
 import { UiSelect, UiSwitch } from '@alt-dot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
+import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
 
 function WorkflowNodeEditUseBrowser() {
   const node = useWorkflowEditorStore.use.editNode() as WorkflowNodeUseBrowser;

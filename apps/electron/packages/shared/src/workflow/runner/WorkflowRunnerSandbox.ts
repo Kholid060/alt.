@@ -4,9 +4,9 @@ import { getProperty, setProperty } from 'dot-prop';
 import type { QuickJSContext, QuickJSRuntime } from 'quickjs-emscripten';
 import { Scope, getQuickJS } from 'quickjs-emscripten';
 import type WorkflowRunner from './WorkflowRunner';
-import type { WorkflowNodeExpressionRecords } from '#packages/common/interface/workflow-nodes.interface';
 import { getExactType } from '/@/utils/helper';
 import WorkflowFileHandle from '../utils/WorkflowFileHandle';
+import { WorkflowNodeExpressionRecords } from '@alt-dot/workflow';
 
 const MUSTACHE_REGEX = /\{\{(.*?)\}\}/g;
 

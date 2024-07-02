@@ -1,5 +1,5 @@
 import IPCRenderer from '#packages/common/utils/IPCRenderer';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
+import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
 import type { WorkflowRunnerExecuteOptions } from '../WorkflowRunnerManager';
 import WorkflowRunnerManager from '../WorkflowRunnerManager';
 import { WorkflowRunnerNodeError } from '../runner/workflow-runner-errors';

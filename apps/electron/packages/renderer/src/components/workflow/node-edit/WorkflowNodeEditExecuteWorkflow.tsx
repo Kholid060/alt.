@@ -1,9 +1,9 @@
-import { WorkflowNodeExecuteWorkflow } from '#packages/common/interface/workflow-nodes.interface';
+import { WorkflowNodeExecuteWorkflow } from '@alt-dot/workflow';
 import { UiInput, UiList, UiListItem, UiTextarea } from '@alt-dot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
+import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import { useEffect, useMemo } from 'react';
 import {

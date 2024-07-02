@@ -23,9 +23,10 @@ interface ImportMetaEnv {
   readonly VITE_API_BASE_URL: string;
 }
 
-interface AppEnv extends ImportMetaEnv {
+interface Env extends ImportMetaEnv {
   readonly API_KEY: string;
   readonly SECRET_DATA_KEY: string;
+  readonly WS_ALLOWED_ORIGIN: string;
 }
 
 interface ImportMeta {

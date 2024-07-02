@@ -1,9 +1,9 @@
-import { WorkflowNodeBrowserTab } from '#packages/common/interface/workflow-nodes.interface';
+import { WorkflowNodeBrowserTab } from '@alt-dot/workflow';
 import { UiInput, UiLabel, UiSelect } from '@alt-dot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
+import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
 
 const actions: {
   name: string;

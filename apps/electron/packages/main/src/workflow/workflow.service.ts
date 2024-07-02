@@ -3,8 +3,6 @@ import { BrowserWindowService } from '../browser-window/browser-window.service';
 import { WorkflowQueryService } from './workflow-query.service';
 import { WorkflowRunPayload } from '#packages/common/interface/workflow.interface';
 import { GlobalShortcutService } from '../global-shortcut/global-shortcut.service';
-import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
-import { WORKFLOW_NODE_TYPE } from '#packages/common/utils/constant/workflow.const';
 import { KeyboardShortcutUtils } from '#packages/common/utils/KeyboardShortcutUtils';
 import { OnAppReady } from '../common/hooks/on-app-ready.hook';
 import path from 'path';
@@ -20,6 +18,7 @@ import {
   WorkflowInsertPayload,
   WorkflowUpdatePayload,
 } from './workflow.interface';
+import { WorkflowNodes, WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
 
 @Injectable()
 export class WorkflowService implements OnAppReady {

@@ -5,6 +5,10 @@ import {
   ApiExtensionUserDetail,
   ApiExtensionUserListItem,
   ApiExtensionCreatePayload,
+  ApiWorkflowUserInsertPayload,
+  ApiWorkflowUserUpdatePayload,
+  ApiWorkflowUserListItem,
+  ApiWorkflowDetail,
 } from '../../interfaces/api.interface';
 import API from '../index';
 
@@ -20,6 +24,36 @@ class APIMeNamespace {
       method: 'PATCH',
       body: JSON.stringify(profile),
     });
+  }
+
+  createWorkflow(payload: ApiWorkflowUserInsertPayload) {
+    return this.api.authorizeFetch<APISuccessResult<{ workflowId: string }>>(
+      '/me/workflows',
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      },
+    );
+  }
+
+  updateWorkflow(workflowId: string, payload: ApiWorkflowUserUpdatePayload) {
+    return this.api.authorizeFetch<APISuccessResult<{ workflowId: string }>>(
+      `/me/workflows/${workflowId}`,
+      {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      },
+    );
+  }
+
+  getWorkflow(workflowId: string) {
+    return this.api.authorizeFetch<ApiWorkflowDetail>(
+      `/me/workflows/${workflowId}`,
+    );
+  }
+
+  listWorkflows() {
+    return this.api.authorizeFetch<ApiWorkflowUserListItem[]>('/me/workflows');
   }
 
   createExtension(extensionPayload: ApiExtensionCreatePayload) {

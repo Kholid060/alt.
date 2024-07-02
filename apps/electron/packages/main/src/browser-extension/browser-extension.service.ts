@@ -6,9 +6,9 @@ import {
   Last,
 } from '@alt-dot/shared';
 import { Injectable } from '@nestjs/common';
-import type { ExtensionNamespace } from './browser-extension.gateway';
 import { CustomError } from '#packages/common/errors/custom-errors';
 import { isWSAckError } from '../common/utils/helper';
+import { BrowserExtensionNamespace } from './browser-extension.interface';
 
 type ExtensionBrowserInfo = BrowserInfo & { socketId: string };
 
@@ -16,7 +16,7 @@ const BROWSER_EMIT_TIMEOUT_MS = 60_000;
 
 @Injectable()
 export class BrowserExtensionService {
-  private server?: ExtensionNamespace;
+  private server?: BrowserExtensionNamespace;
   private connectedBrowsers: Map<string, ExtensionBrowserInfo> = new Map();
 
   private getBrowserSocket(browserId: string) {
@@ -59,7 +59,7 @@ export class BrowserExtensionService {
     };
   }
 
-  setSocket(server: ExtensionNamespace) {
+  setSocket(server: BrowserExtensionNamespace) {
     this.server = server;
   }
 

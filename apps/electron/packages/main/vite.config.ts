@@ -1,7 +1,7 @@
 import { node } from '../../.electron-vendors.cache.json';
 import { join } from 'node:path';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
-import swc from 'unplugin-swc';
+import { swcPlugin } from '../../plugins/swc';
 
 const PACKAGE_ROOT = __dirname;
 const PROJECT_ROOT = join(PACKAGE_ROOT, '../..');
@@ -45,25 +45,7 @@ const config = {
   },
   esbuild: false,
   plugins: [
-    swc.vite({
-      jsc: {
-        parser: {
-          syntax: 'typescript',
-          decorators: true,
-        },
-        transform: {
-          legacyDecorator: true,
-          decoratorMetadata: true,
-        },
-        keepClassNames: true,
-        target: 'es2022',
-        minify: {
-          format: {
-            comments: false,
-          },
-        },
-      },
-    }),
+    swcPlugin(),
     viteStaticCopy({
       targets: [
         {

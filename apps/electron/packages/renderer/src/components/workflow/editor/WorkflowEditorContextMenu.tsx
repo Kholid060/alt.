@@ -23,7 +23,7 @@ import {
   WorkflowEdge,
   WorkflowElement,
 } from '#packages/common/interface/workflow.interface';
-import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
+import { WorkflowNodes } from '@alt-dot/workflow';
 
 const ContextMenuContext =
   // @ts-expect-error not default val is expected

@@ -1,7 +1,6 @@
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
 import API from '#packages/common/utils/API';
 import { useQuery } from '@tanstack/react-query';
-import { UiExtIcon } from '@alt-dot/extension';
 import {
   UiAvatar,
   UiAvatarFallback,
@@ -20,6 +19,7 @@ import preloadAPI from '/@/utils/preloadAPI';
 import { useState } from 'react';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
+import { commandIcons } from '#packages/common/utils/command-icons';
 
 function ExtensionIcon({
   icon,
@@ -38,8 +38,8 @@ function ExtensionIcon({
 }) {
   if (icon.startsWith('icon:')) {
     const Icon =
-      UiExtIcon[icon.split(':')[1] as keyof typeof UiExtIcon] ??
-      UiExtIcon.Command;
+      commandIcons[icon.split(':')[1] as keyof typeof commandIcons] ??
+      commandIcons.Command;
 
     return (
       <div className="p-2 rounded-md border bg-card border-border/40 text-muted-foreground inline-block">

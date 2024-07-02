@@ -1,7 +1,3 @@
-import {
-  WorkflowNodeConditionPath,
-  WorkflowNodeConditional,
-} from '#packages/common/interface/workflow-nodes.interface';
 import { UiButton, UiDialog } from '@alt-dot/ui';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
@@ -10,6 +6,10 @@ import { useState } from 'react';
 import WorkflowUiConditionBuilder from '../ui/WorkflowUiConditionBuilder';
 import UiStateView from '../../ui/UiStateView';
 import { nanoid } from 'nanoid/non-secure';
+import {
+  WorkflowNodeConditional,
+  WorkflowNodeConditionPath,
+} from '@alt-dot/workflow';
 
 function WorkflowNodeEditConditional() {
   const node = useWorkflowEditorStore.use.editNode() as WorkflowNodeConditional;

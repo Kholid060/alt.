@@ -4,24 +4,24 @@ import type {
   WorkflowSettings,
   WorkflowVariable,
 } from '#common/interface/workflow.interface';
-import type * as ReactFlow from 'reactflow';
 import { relations, sql } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
-import type * as Workflow from '#common/interface/workflow-nodes.interface';
 import type { WORKFLOW_HISTORY_STATUS } from '#common/utils/constant/workflow.const';
+import { WorkflowNodes } from '@alt-dot/workflow';
+import { Viewport } from 'reactflow';
 
 export const workflows = sqliteTable('workflows', {
   id: text('id')
     .primaryKey()
     .$defaultFn(() => nanoid()),
   name: text('name').notNull(),
-  icon: text('icon'),
+  icon: text('icon').notNull(),
   description: text('description'),
   nodes: text('nodes', { mode: 'json' })
     .notNull()
     .default(sql`(json_array())`)
-    .$type<(Workflow.WorkflowNodes | ReactFlow.Node)[]>(),
-  viewport: text('viewport', { mode: 'json' }).$type<ReactFlow.Viewport>(),
+    .$type<WorkflowNodes[]>(),
+  viewport: text('viewport', { mode: 'json' }).$type<Viewport>(),
   edges: text('edges', { mode: 'json' })
     .notNull()
     .default(sql`(json_array())`)
@@ -29,7 +29,7 @@ export const workflows = sqliteTable('workflows', {
   triggers: text('triggers', { mode: 'json' })
     .notNull()
     .default(sql`(json_array())`)
-    .$type<(Workflow.WorkflowNodes | ReactFlow.Node)[]>(),
+    .$type<WorkflowNodes[]>(),
   isDisabled: integer('is_disabled', { mode: 'boolean' })
     .notNull()
     .$default(() => false),

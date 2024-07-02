@@ -19,19 +19,16 @@ import {
   TrashIcon,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import {
-  WORKFLOW_HISTORY_STATUS,
-  WORKFLOW_NODE_TYPE,
-} from '#packages/common/utils/constant/workflow.const';
+import { WORKFLOW_HISTORY_STATUS } from '#packages/common/utils/constant/workflow.const';
 import dayjs from 'dayjs';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '#packages/common/utils/helper';
-import { WORKFLOW_NODES } from '#packages/common/utils/constant/workflow-nodes.const';
 import UiItemsPagination from '/@/components/ui/UiItemsPagination';
 import {
   WorkflowHistoryListPaginationFilter,
   WorkflowHistoryModel,
 } from '#packages/main/src/workflow/workflow-history/workflow-history.interface';
+import { WORKFLOW_NODES, WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
 
 function WorkflowHistoryStatusBadge({
   status,

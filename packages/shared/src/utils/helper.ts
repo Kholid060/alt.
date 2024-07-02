@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { KeyboardShortcut } from '../interfaces/keyboard.interface';
+import { PromiseWithResolver } from '../interfaces/utils.interface';
 import { SHORTCUT_KEY_DISPLAY_MAP } from './constant/shortcut.const';
 
 export function debounce<T extends unknown[]>(
@@ -155,19 +157,15 @@ export function generateRandomString(length = 12) {
   return result;
 }
 
-export function promiseWithResolver<T = void>(): {
-  promise: Promise<T>;
-  resolve: (value: T | PromiseLike<T>) => void;
-  reject: (reason?: any) => void;
-} {
+export function promiseWithResolver<T = void>(): PromiseWithResolver<T> {
   let reject: (reason?: any) => void = () => {};
   let resolve: (value: T | PromiseLike<T>) => void = () => {};
   const promise = new window.Promise<T>((res, rej) => {
     reject = rej;
     resolve = res;
   });
-  
-  return { promise, resolve, reject }
+
+  return { promise, resolve, reject };
 }
 
 export function sleepWithRetry(

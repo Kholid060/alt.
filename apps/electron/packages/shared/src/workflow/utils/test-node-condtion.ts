@@ -1,7 +1,7 @@
-import type {
-  WorkflowNodeConditionItem,
+import {
   WorkflowNodeConditionItems,
-} from '#packages/common/interface/workflow-nodes.interface';
+  WorkflowNodeConditionItem,
+} from '@alt-dot/workflow';
 import { isValidType } from '/@/utils/helper';
 
 interface TestConditionsOptions {

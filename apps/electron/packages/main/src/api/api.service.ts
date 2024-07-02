@@ -1,6 +1,7 @@
 import { API } from '@alt-dot/shared';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { AppEnv } from '../common/validation/app-env.validation';
 
 @Injectable()
 export class APIService extends API implements OnModuleInit {

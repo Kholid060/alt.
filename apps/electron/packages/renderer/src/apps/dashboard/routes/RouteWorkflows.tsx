@@ -37,7 +37,6 @@ import {
   UiTooltip,
   useToast,
 } from '@alt-dot/ui';
-import { UiExtIcon } from '@alt-dot/extension';
 import { useCallback, useEffect, useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '/@/utils/helper';
@@ -53,11 +52,12 @@ import WorkflowDetailForm, {
   NewWorkflowSchema,
 } from '/@/components/workflow/WorkflowDetailForm';
 import { WorkflowListItemModel } from '#packages/main/src/workflow/workflow.interface';
+import { commandIcons } from '#packages/common/utils/command-icons';
 
-type IconsName = keyof typeof UiExtIcon;
+type IconsName = keyof typeof commandIcons;
 
 function WorkflowIcon({ icon, ...props }: { icon: string } & LucideProps) {
-  const Icon = UiExtIcon[icon as IconsName] ?? UiExtIcon.Command;
+  const Icon = commandIcons[icon as IconsName] ?? commandIcons.Command;
 
   return <Icon {...props} />;
 }

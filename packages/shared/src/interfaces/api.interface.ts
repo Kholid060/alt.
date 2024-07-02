@@ -131,7 +131,7 @@ export type ApiExtensionStoreDetail = Pick<
   | 'downloadCount'
 > & { baseAssetURL: string };
 
-export type ApiExtensionUserListItem = ApiExtensionListItem &
+export type ApiExtensionUserListItem = Omit<ApiExtensionListItem, 'owner'> &
   Pick<ApiExtension, 'entry'>;
 
 export type ApiExtensionUserDetail = ApiExtensionDetail &
@@ -158,3 +158,73 @@ export type ApiAdminSetExtentionEntryPayload =
       type: 'approved';
       extension: Partial<ApiExtensionCreatePayload & { downloadUrl: string }>;
     };
+
+export interface ApiWorkflowNode {
+  id: string;
+  type: string;
+  data: Record<string, unknown>;
+  position: {
+    x: number;
+    y: number;
+  };
+}
+export interface ApiWorkflowEdge {
+  id: string;
+  source: string;
+  target: string;
+  sourceHandle: string;
+  targetHandle: string;
+}
+export interface ApiWorkflowViewport {
+  x: number;
+  y: number;
+  zoom: number;
+}
+export interface ApiWorkflowData {
+  edges: ApiWorkflowEdge[];
+  nodes: ApiWorkflowNode[];
+  viewport?: ApiWorkflowViewport;
+}
+export interface ApiWorkflow {
+  id: string;
+  name: string;
+  icon: string;
+  readme: string;
+  createdAt: string;
+  updatedAt: string;
+  downloadCount: number;
+  owner: ApiExtensionOwner;
+  workflow: ApiWorkflowData;
+  description?: string | null;
+  categories: ExtensionCategories[];
+}
+export type ApiWorkflowUserInsertPayload = Pick<
+  ApiWorkflow,
+  'name' | 'description' | 'workflow' | 'categories' | 'icon' | 'readme'
+>;
+
+export type ApiWorkflowUserUpdatePayload =
+  Partial<ApiWorkflowUserInsertPayload>;
+export type ApiWorkflowListItem = Pick<
+  ApiWorkflow,
+  | 'id'
+  | 'icon'
+  | 'name'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'description'
+  | 'downloadCount'
+>;
+export type ApiWorkflowUserListItem = ApiWorkflowListItem;
+export type ApiWorkflowDetail = Pick<
+  ApiWorkflow,
+  | 'id'
+  | 'name'
+  | 'readme'
+  | 'workflow'
+  | 'createdAt'
+  | 'updatedAt'
+  | 'categories'
+  | 'description'
+  | 'downloadCount'
+>;

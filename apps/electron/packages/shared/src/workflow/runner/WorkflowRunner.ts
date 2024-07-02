@@ -1,10 +1,7 @@
 import dayjs from 'dayjs';
 import EventEmitter from 'eventemitter3';
 import type { WorkflowRunnerRunPayload } from '#packages/common/interface/workflow-runner.interace';
-import {
-  WORKFLOW_MANUAL_TRIGGER_ID,
-  WORKFLOW_NODE_TYPE,
-} from '#packages/common/utils/constant/workflow.const';
+import { WORKFLOW_MANUAL_TRIGGER_ID } from '#packages/common/utils/constant/workflow.const';
 import type {
   WorkflowEdge,
   WorkflowEmitEvents,
@@ -14,7 +11,6 @@ import { WorkflowRunnerNodeError } from './workflow-runner-errors';
 import { debugLog } from '#packages/common/utils/helper';
 import { sleep } from '@alt-dot/shared';
 import WorkflowRunnerData from './WorkflowRunnerData';
-import type { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
 import type { WorkflowNodeHandlerExecuteReturn } from '../node-handler/WorkflowNodeHandler';
 import WorkflowRunnerSandbox from './WorkflowRunnerSandbox';
 import { clipboard } from 'electron';
@@ -23,6 +19,7 @@ import { validateTypes } from '/@/utils/helper';
 import WorkflowRunnerBrowser from './WorklowRunnerBrowser';
 import { WorkflowDetailModel } from '#packages/main/src/workflow/workflow.interface';
 import { Edge, Node } from 'reactflow';
+import { WORKFLOW_NODE_TYPE, WorkflowNodes } from '@alt-dot/workflow';
 
 export type NodeHandlersObj = Record<
   WORKFLOW_NODE_TYPE,

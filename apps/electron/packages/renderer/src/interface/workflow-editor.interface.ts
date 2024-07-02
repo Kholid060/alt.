@@ -1,5 +1,4 @@
-import { WorkflowNodesMap } from '#packages/common/interface/workflow-nodes.interface';
-import { WORKFLOW_NODE_GROUP } from '#packages/common/utils/constant/workflow.const';
+import { WORKFLOW_NODE_GROUP, WorkflowNodesMap } from '@alt-dot/workflow';
 import { UiListItem } from '@alt-dot/ui';
 import { SetRequired } from 'type-fest';
 

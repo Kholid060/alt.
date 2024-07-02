@@ -1,10 +1,19 @@
 import { ExtensionDetailIcon } from '@/components/extension/ExtensionDetail';
 import ExtensionStatus from '@/components/extension/ExtensionStatus';
 import APIService from '@/services/api.service';
-import { UiSkeleton, UiButton } from '@alt-dot/ui';
+import {
+  UiSkeleton,
+  UiButton,
+  UiDropdownMenu,
+  UiDropdownMenuTrigger,
+  UiDropdownMenuContent,
+  UiDropdownMenuItem,
+} from '@alt-dot/ui';
 import { queryOptions, useQuery } from '@tanstack/react-query';
 import { Link, createFileRoute } from '@tanstack/react-router';
+import clsx from 'clsx';
 import dayjs from 'dayjs';
+import { EllipsisIcon } from 'lucide-react';
 
 const queryData = queryOptions({
   queryKey: ['me-extensions'],
@@ -114,7 +123,34 @@ function ExtensionsList() {
         <ExtensionStatus
           rejectReason={item.entry?.rejectReason}
           status={item.entry?.status ?? 'published'}
+          className="align-middle"
         />
+        <UiDropdownMenu>
+          <UiDropdownMenuTrigger asChild>
+            <UiButton
+              className="align-middle ml-2"
+              variant="ghost"
+              size="icon-sm"
+            >
+              <EllipsisIcon className="size-5" />
+            </UiButton>
+          </UiDropdownMenuTrigger>
+          <UiDropdownMenuContent asChild align="end">
+            <a
+              href={`/store/extensions/${item.name}/${item.id}`}
+              className={clsx(
+                'block',
+                item.entry?.status &&
+                  item.entry.status !== 'published' &&
+                  'pointer-events-none opacity-60',
+              )}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <UiDropdownMenuItem>Open in store</UiDropdownMenuItem>
+            </a>
+          </UiDropdownMenuContent>
+        </UiDropdownMenu>
       </td>
     </tr>
   ));
@@ -129,9 +165,9 @@ function DevConsoleExtensionsPage() {
             <th className="h-12 px-4 w-5/12 min-w-56">Name</th>
             <th className="h-12 px-4 w-3/12 min-w-32">Last updated</th>
             <th className="h-12 px-4 w-2/12 text-left min-w-32">
-              Downloads count
+              <span className="line-clamp-1">Downloads count</span>
             </th>
-            <th className="h-12 px-4 w-2/12 min-w-32"></th>
+            <th className="h-12 px-4 w-2/12 min-w-40"></th>
           </tr>
         </thead>
         <tbody>

@@ -1,13 +1,4 @@
-import {
-  APP_WEBSOCKET_PORT,
-  BrowserInfo,
-  BrowserType,
-  ExtensionSocketData,
-  ExtensionWSClientToServerEvents,
-  ExtensionWSInterServerEvents,
-  ExtensionWSServerToClientEvents,
-} from '@alt-dot/shared';
-import type { Namespace, Socket } from 'socket.io';
+import { APP_WEBSOCKET_PORT } from '@alt-dot/shared';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
@@ -15,52 +6,38 @@ import {
   WebSocketGateway,
 } from '@nestjs/websockets';
 import { BrowserExtensionService } from './browser-extension.service';
-import { z } from 'zod';
-
-const BROWSER_TYPE = [
-  'edge',
-  'chrome',
-  'firefox',
-] as const satisfies BrowserType[];
-
-const BrowserInfoSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  version: z.string(),
-  type: z.enum(BROWSER_TYPE),
-}) satisfies z.ZodType<BrowserInfo>;
-
-type BrowserExtensionSocket = Socket<
-  ExtensionWSClientToServerEvents,
-  ExtensionWSServerToClientEvents,
-  ExtensionWSInterServerEvents,
-  ExtensionSocketData
->;
-
-export type ExtensionNamespace = Namespace<
-  ExtensionWSClientToServerEvents,
-  ExtensionWSServerToClientEvents,
-  ExtensionWSInterServerEvents,
-  ExtensionSocketData
->;
+import { ConfigService } from '@nestjs/config';
+import { AppEnv } from '../common/validation/app-env.validation';
+import { browserInfoValidation } from './browser-extension.validation';
+import {
+  BrowserExtensionNamespace,
+  BrowserExtensionSocket,
+} from './browser-extension.interface';
 
 @WebSocketGateway(APP_WEBSOCKET_PORT, { namespace: '/extensions' })
 export class BrowserExtensionGateway
   implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect
 {
-  constructor(private browserExtension: BrowserExtensionService) {}
+  constructor(
+    private config: ConfigService<AppEnv>,
+    private browserExtension: BrowserExtensionService,
+  ) {}
 
-  afterInit(server: ExtensionNamespace) {
+  afterInit(server: BrowserExtensionNamespace) {
     this.browserExtension.setSocket(server);
   }
 
   handleConnection(client: BrowserExtensionSocket) {
-    // @ts-expect-error to save some memory
-    client.request = null;
+    const { auth, headers } = client.handshake;
+    if (
+      !headers.origin ||
+      !this.config.get('WS_ALLOWED_ORIGIN').includes(headers.origin)
+    ) {
+      client.disconnect();
+      return;
+    }
 
-    const connectedBrowser = BrowserInfoSchema.safeParse(
-      client.handshake.auth.browserInfo,
-    );
+    const connectedBrowser = browserInfoValidation.safeParse(auth.browserInfo);
     if (!connectedBrowser.success) {
       client.disconnect();
       return;

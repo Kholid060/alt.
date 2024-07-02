@@ -24,6 +24,7 @@ import ReactFlow, {
   SelectionDragHandler,
   OnInit,
   useStoreApi,
+  useReactFlow,
 } from 'reactflow';
 import WorkflowEditorHeader from '/@/components/workflow/editor/WorkflowEditorHeader';
 import WorkflowEditorControls, {
@@ -38,30 +39,30 @@ import { WorkflowEditorProvider } from '/@/context/workflow-editor.context';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 import { WorkflowEditorContextMenuType } from '/@/interface/workflow-editor.interface';
 import WorkflowEditorContextMenu from '/@/components/workflow/editor/WorkflowEditorContextMenu';
-import {
-  WORKFLOW_NODE_TRIGGERS,
-  WORKFLOW_NODE_TYPE,
-} from '#packages/common/utils/constant/workflow.const';
+import { WORKFLOW_NODE_TRIGGERS } from '#packages/common/utils/constant/workflow.const';
 import WorkflowEdgeDefault from '/@/components/workflow/edge/WorkflowEdgeDefault';
-import {
-  WorkflowNodeBasic,
-  WorkflowNodeCommand,
-  WorkflowNodeConditional,
-  WorkflowNodeLoop,
-} from '/@/components/workflow/WorkflowNodes';
 import { useDatabase } from '/@/hooks/useDatabase';
 import { useNavigate, useParams } from 'react-router-dom';
 import { debugLog } from '#packages/common/utils/helper';
 import { useDashboardStore } from '/@/stores/dashboard.store';
 import WorkflowEditorEditNode from '/@/components/workflow/editor/WorkflowEditorEditNode';
-import { WorkflowNodes } from '#packages/common/interface/workflow-nodes.interface';
 import WorkflowEventListener from '/@/components/workflow/WorkflowEventListener';
-import { WorkflowEditorNodeListModal } from '/@/components/workflow/editor/WorkflowEditorNodeLIst';
+import {
+  WORKFLOW_NODE_TYPE,
+  WorkflowNodeBasicNode,
+  WorkflowNodeLoopNode,
+  WorkflowNodeCommandNode,
+  WorkflowNodeConditionalNode,
+  WorkflowNodes,
+  WorkflowNodesProvider,
+} from '@alt-dot/workflow';
+import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
+import { WorkflowEditorNodeListModal } from '/@/components/workflow/editor/WorkflowEditorNodeList';
 
 const defaultNodeTypes = Object.values(WORKFLOW_NODE_TYPE).reduce<
   Partial<Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>>>
 >((acc, curr) => {
-  acc[curr] = WorkflowNodeBasic;
+  acc[curr] = WorkflowNodeBasicNode;
 
   return acc;
 }, {});
@@ -69,10 +70,10 @@ const nodeTypes: Partial<
   Record<WORKFLOW_NODE_TYPE | 'default', React.FC<NodeProps>>
 > = {
   ...defaultNodeTypes,
-  default: WorkflowNodeBasic,
-  [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoop,
-  [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeCommand,
-  [WORKFLOW_NODE_TYPE.CONDITIONAL]: WorkflowNodeConditional,
+  default: WorkflowNodeBasicNode,
+  [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoopNode,
+  [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeCommandNode,
+  [WORKFLOW_NODE_TYPE.CONDITIONAL]: WorkflowNodeConditionalNode,
 };
 
 const edgeTypes = {
@@ -412,6 +413,56 @@ function WorkflowEditor() {
   );
 }
 
+function WorkflowNodesWrapper({ children }: { children?: React.ReactNode }) {
+  const updateNodeData = useWorkflowEditorStore.use.updateNodeData();
+
+  const { deleteElements, getNode } = useReactFlow();
+  const {
+    copyElements,
+    runCurrentWorkflow,
+    isExtCommandExists,
+    event: workflowEditorEvent,
+  } = useWorkflowEditor();
+
+  function openContextMenu(
+    nodeId: string,
+    { clientX, clientY }: React.MouseEvent,
+  ) {
+    workflowEditorEvent.emit('context-menu:open', {
+      nodeId,
+      position: { x: clientX, y: clientY },
+      type: WorkflowEditorContextMenuType.NODE,
+    });
+  }
+
+  return (
+    <WorkflowNodesProvider
+      resolveExtIcon={(node) => (
+        <UiExtensionIcon
+          alt={node.data.extension.title + ' icon'}
+          icon={node.data.icon}
+          id={node.data.extension.id}
+        />
+      )}
+      extCommandChecker={isExtCommandExists}
+      onRunWorkflow={(node) => runCurrentWorkflow({ startNodeId: node.id })}
+      onOpenContextMenu={(node, event) => openContextMenu(node.id, event)}
+      onToggleDisable={(node, isDisabled) =>
+        updateNodeData(node.id, { isDisabled })
+      }
+      onDeleteNode={(node) => deleteElements({ nodes: [{ id: node.id }] })}
+      onCopyNode={(nodes) => {
+        const node = nodes[0] && (getNode(nodes[0].id) as WorkflowNodes);
+        if (!node) return;
+
+        copyElements({ nodes: [node] });
+      }}
+    >
+      {children}
+    </WorkflowNodesProvider>
+  );
+}
+
 function RouteWorkflow() {
   const hideSidebar = useDashboardStore.use.setHideSidebar();
   const setWorkflow = useWorkflowEditorStore.use.setWorkflow();
@@ -448,19 +499,21 @@ function RouteWorkflow() {
   return (
     <WorkflowEditorProvider>
       <ReactFlowProvider>
-        <WorkflowEditorContextMenu />
-        <div className="relative w-full h-screen flex flex-col">
-          <WorkflowEditorHeader />
-          <div className="flex-grow flex relative">
-            <WorkflowEditorNodeListModal />
-            <WorkflowEditor />
-            <Panel position="bottom-right">
-              <WorkflowUndoRedo />
-            </Panel>
-            <WorkflowEditorEditNode />
+        <WorkflowNodesWrapper>
+          <WorkflowEditorContextMenu />
+          <div className="relative w-full h-screen flex flex-col">
+            <WorkflowEditorHeader />
+            <div className="flex-grow flex relative">
+              <WorkflowEditorNodeListModal />
+              <WorkflowEditor />
+              <Panel position="bottom-right">
+                <WorkflowUndoRedo />
+              </Panel>
+              <WorkflowEditorEditNode />
+            </div>
           </div>
-        </div>
-        <WorkflowEventListener />
+          <WorkflowEventListener />
+        </WorkflowNodesWrapper>
       </ReactFlowProvider>
     </WorkflowEditorProvider>
   );

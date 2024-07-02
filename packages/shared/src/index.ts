@@ -30,4 +30,5 @@ export type * from './interfaces/api.interface';
 export type * from './interfaces/utils.interface';
 export type * from './interfaces/browser.interface';
 export type * from './interfaces/keyboard.interface';
+export type * from './interfaces/web-app-websocket.interface';
 export type * from './interfaces/extension-websocket.interface';
