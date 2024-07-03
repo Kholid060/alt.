@@ -7,6 +7,7 @@ import {
   UiAvatarImage,
   UiButton,
   UiButtonLoader,
+  UiIcons,
   UiImage,
   UiSkeleton,
 } from '@alt-dot/ui';
@@ -19,7 +20,6 @@ import preloadAPI from '/@/utils/preloadAPI';
 import { useState } from 'react';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
-import { commandIcons } from '#packages/common/utils/command-icons';
 
 function ExtensionIcon({
   icon,
@@ -38,8 +38,7 @@ function ExtensionIcon({
 }) {
   if (icon.startsWith('icon:')) {
     const Icon =
-      commandIcons[icon.split(':')[1] as keyof typeof commandIcons] ??
-      commandIcons.Command;
+      UiIcons[icon.split(':')[1] as keyof typeof UiIcons] ?? UiIcons.Command;
 
     return (
       <div className="p-2 rounded-md border bg-card border-border/40 text-muted-foreground inline-block">

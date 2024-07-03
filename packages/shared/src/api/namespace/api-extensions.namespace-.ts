@@ -1,3 +1,4 @@
+import { ApiExtensionHighlightItem } from '../../interfaces/api.interface';
 import API from '../index';
 
 class APIExtensionsNamespace {
@@ -24,6 +25,15 @@ class APIExtensionsNamespace {
       authToken: this.apiKey,
       body: JSON.stringify(extensions),
     });
+  }
+
+  getHighlights(ids: string[]) {
+    return this.api.authorizeFetch<ApiExtensionHighlightItem[]>(
+      `/extensions/highlights?ids=${ids.join(',')}`,
+      {
+        authToken: this.apiKey,
+      },
+    );
   }
 }
 

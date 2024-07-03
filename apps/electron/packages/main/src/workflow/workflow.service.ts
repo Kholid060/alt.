@@ -103,7 +103,7 @@ export class WorkflowService implements OnAppReady {
       filePath = result.filePath;
     }
 
-    await fs.writeFile(filePath, JSON.stringify(workflow));
+    await fs.writeFile(filePath, JSON.stringify(workflowData));
   }
 
   async execute(payload: WorkflowRunPayload) {

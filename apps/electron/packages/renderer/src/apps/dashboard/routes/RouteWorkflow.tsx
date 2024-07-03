@@ -58,6 +58,7 @@ import {
 } from '@alt-dot/workflow';
 import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
 import { WorkflowEditorNodeListModal } from '/@/components/workflow/editor/WorkflowEditorNodeList';
+import { useToast } from '@alt-dot/ui';
 
 const defaultNodeTypes = Object.values(WORKFLOW_NODE_TYPE).reduce<
   Partial<Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>>>
@@ -416,6 +417,7 @@ function WorkflowEditor() {
 function WorkflowNodesWrapper({ children }: { children?: React.ReactNode }) {
   const updateNodeData = useWorkflowEditorStore.use.updateNodeData();
 
+  const { toast } = useToast();
   const { deleteElements, getNode } = useReactFlow();
   const {
     copyElements,
@@ -455,7 +457,9 @@ function WorkflowNodesWrapper({ children }: { children?: React.ReactNode }) {
         const node = nodes[0] && (getNode(nodes[0].id) as WorkflowNodes);
         if (!node) return;
 
-        copyElements({ nodes: [node] });
+        copyElements({ nodes: [node] }).then(() => {
+          toast({ title: 'Node copied', duration: 2000 });
+        });
       }}
     >
       {children}

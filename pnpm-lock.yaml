@@ -403,6 +403,9 @@ importers:
       '@types/better-sqlite3':
         specifier: ^7.6.9
         version: 7.6.11
+      '@types/fs-extra':
+        specifier: ^11.0.4
+        version: 11.0.4
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
@@ -1191,6 +1194,9 @@ importers:
       reactflow:
         specifier: ^11.11.4
         version: 11.11.4(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      type-fest:
+        specifier: ^4.21.0
+        version: 4.21.0
     devDependencies:
       '@alt-dot/eslint-config':
         specifier: workspace:*
@@ -8572,6 +8578,10 @@ packages:
 
   type-fest@4.20.1:
     resolution: {integrity: sha512-R6wDsVsoS9xYOpy8vgeBlqpdOyzJ12HNfQhC/aAKWM3YoCV9TtunJzh/QpkMgeDhkoynDcw5f1y+qF9yc/HHyg==}
+    engines: {node: '>=16'}
+
+  type-fest@4.21.0:
+    resolution: {integrity: sha512-ADn2w7hVPcK6w1I0uWnM//y1rLXZhzB9mr0a3OirzclKF1Wp6VzevUmzz/NRAWunOT6E8HrnpGY7xOfc6K57fA==}
     engines: {node: '>=16'}
 
   typed-array-buffer@1.0.2:
@@ -17714,6 +17724,8 @@ snapshots:
   type-fest@3.13.1: {}
 
   type-fest@4.20.1: {}
+
+  type-fest@4.21.0: {}
 
   typed-array-buffer@1.0.2:
     dependencies:

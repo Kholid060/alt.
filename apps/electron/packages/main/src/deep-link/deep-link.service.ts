@@ -158,16 +158,12 @@ export class DeepLinkService {
     const [_, type, itemId] = pathname.split('/');
     if (!itemId) return;
 
-    if (type === 'extensions') {
-      const windowcommand = await this.browserWindowService.get('command');
-      await windowcommand.toggleWindow(true);
-      await windowcommand.sendMessage(
-        { ensureWindow: true, name: 'app:update-route' },
-        `/store/extensions/${itemId}/install`,
-      );
-    } else if (type === 'workflows') {
-      // TODO: install workflow
-    }
+    const windowcommand = await this.browserWindowService.get('command');
+    await windowcommand.toggleWindow(true);
+    await windowcommand.sendMessage(
+      { ensureWindow: true, name: 'app:update-route' },
+      `/store/${type}/${itemId}/install`,
+    );
   }
 
   async urlHandler(url: string) {

@@ -1,6 +1,5 @@
-import { UiImage } from '@alt-dot/ui';
+import { UiIcons, UiImage } from '@alt-dot/ui';
 import { AnimatePresence, motion } from 'framer-motion';
-import { commandIcons } from '#common/utils/command-icons';
 import { Loader2Icon } from 'lucide-react';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { useCommandStore } from '/@/stores/command.store';
@@ -11,12 +10,10 @@ function CommandHeaderPanel() {
   let headerIcon: React.ReactNode = header?.icon ?? null;
   if (header?.icon && typeof header.icon === 'string') {
     if (header.icon.startsWith('icon:')) {
-      let iconName = header.icon.slice(
-        'icon:'.length,
-      ) as keyof typeof commandIcons;
-      iconName = commandIcons[iconName] ? iconName : 'Command';
+      let iconName = header.icon.slice('icon:'.length) as keyof typeof UiIcons;
+      iconName = UiIcons[iconName] ? iconName : 'Command';
 
-      const Icon = commandIcons[iconName] ?? header.icon;
+      const Icon = UiIcons[iconName] ?? header.icon;
       headerIcon = <Icon className="w-5 h-5 mr-2" />;
     } else {
       headerIcon = (

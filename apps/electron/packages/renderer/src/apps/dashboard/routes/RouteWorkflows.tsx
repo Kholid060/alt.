@@ -3,7 +3,6 @@ import {
   ArrowDownAzIcon,
   ArrowUpAzIcon,
   EllipsisVerticalIcon,
-  LucideProps,
   PinIcon,
   PinOffIcon,
   PlusIcon,
@@ -52,15 +51,8 @@ import WorkflowDetailForm, {
   NewWorkflowSchema,
 } from '/@/components/workflow/WorkflowDetailForm';
 import { WorkflowListItemModel } from '#packages/main/src/workflow/workflow.interface';
-import { commandIcons } from '#packages/common/utils/command-icons';
+import WorkflowIcon from '/@/components/workflow/WorkflowIcon';
 
-type IconsName = keyof typeof commandIcons;
-
-function WorkflowIcon({ icon, ...props }: { icon: string } & LucideProps) {
-  const Icon = commandIcons[icon as IconsName] ?? commandIcons.Command;
-
-  return <Icon {...props} />;
-}
 function WorkflowCards({ workflows }: { workflows: WorkflowListItemModel[] }) {
   const { toast } = useToast();
   const navigate = useNavigate();

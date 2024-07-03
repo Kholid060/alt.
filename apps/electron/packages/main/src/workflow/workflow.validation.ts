@@ -17,8 +17,8 @@ export const workflowFileValidation = z.object({
       id: z.string(),
       source: z.string(),
       target: z.string(),
-      sourceHandle: z.string(),
-      targetHandle: z.string(),
+      sourceHandle: z.string().nullable(),
+      targetHandle: z.string().nullable(),
     })
     .array(),
   viewport: z
@@ -29,6 +29,9 @@ export const workflowFileValidation = z.object({
     })
     .nullable()
     .optional(),
+  variables: z
+    .object({ id: z.string().min(1), name: z.string(), value: z.string() })
+    .array(),
   description: z.string().default('').optional(),
 });
 export type WorkflowFileModel = z.infer<typeof workflowFileValidation>;

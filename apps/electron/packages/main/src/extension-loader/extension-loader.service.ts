@@ -27,6 +27,8 @@ import { ExtensionWithCommandsModel } from '../extension/extension.interface';
 
 @Injectable()
 export class ExtensionLoaderService {
+  private installingIds: Set<string> = new Set();
+
   constructor(
     private dbService: DBService,
     private logger: LoggerService,
@@ -205,6 +207,8 @@ export class ExtensionLoaderService {
     hasValidated = false,
   ): Promise<ExtensionWithCommandsModel | null> {
     try {
+      if (this.installingIds.has(extensionId)) return null;
+
       const findExtension = hasValidated
         ? false
         : await this.dbService.db.query.extensions.findFirst({
@@ -216,6 +220,8 @@ export class ExtensionLoaderService {
             },
           });
       if (findExtension) return null;
+
+      this.installingIds.add(extensionId);
 
       const extension =
         await this.apiService.extensions.getDownloadFileUrl(extensionId);
@@ -252,6 +258,9 @@ export class ExtensionLoaderService {
         error,
       );
       throw error;
+    } finally {
+      // eslint-disable-next-line drizzle/enforce-delete-with-where
+      this.installingIds.delete(extensionId);
     }
   }
 }

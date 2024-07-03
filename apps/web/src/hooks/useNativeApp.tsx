@@ -7,6 +7,12 @@ export function useNativeApp() {
       '_self',
     );
   }
+  function installWorkflow(workflowId: string) {
+    window.open(
+      `${APP_DEEP_LINK_SCHEME}://store/workflows/${workflowId}`,
+      '_self',
+    );
+  }
 
-  return { installExtension };
+  return { installExtension, installWorkflow };
 }

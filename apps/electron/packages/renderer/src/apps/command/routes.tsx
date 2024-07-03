@@ -1,3 +1,4 @@
+import RouteWorkflowInstall from '../dashboard/routes/RouteWorkflowInstall';
 import CommandList from './routes/CommandList';
 import CommandView from './routes/CommandView';
 import CommandViewJSON from './routes/CommandViewJSON';
@@ -19,6 +20,11 @@ export const commandAppRoutes = [
     name: 'store-extension-install',
     element: StoreExtensionsInstall,
     path: '/store/extensions/:extensionId/install',
+  },
+  {
+    name: 'store-workflow-install',
+    element: RouteWorkflowInstall,
+    path: '/store/workflows/:workflowId/install',
   },
   {
     element: CommandView,

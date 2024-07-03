@@ -1,10 +1,8 @@
-import { commandIcons } from '#common/utils/command-icons';
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
-import { UiImage } from '@alt-dot/ui';
+import { UiIcons, UiImage } from '@alt-dot/ui';
 import { LucideIcon } from 'lucide-react';
 
 const iconPrefix = 'icon:';
-type CommandIconName = keyof typeof commandIcons;
 
 function UiExtensionIcon({
   id,
@@ -20,10 +18,10 @@ function UiExtensionIcon({
   iconWrapper?: (icon: LucideIcon) => React.ReactNode;
 }) {
   if (icon.startsWith(iconPrefix)) {
-    let iconName = icon.slice(iconPrefix.length) as CommandIconName;
-    iconName = commandIcons[iconName] ? iconName : 'Command';
+    let iconName = icon.slice(iconPrefix.length) as keyof typeof UiIcons;
+    iconName = UiIcons[iconName] ? iconName : 'Command';
 
-    const Icon = commandIcons[iconName] ?? icon;
+    const Icon = UiIcons[iconName] ?? icon;
     if (iconWrapper) {
       return iconWrapper(Icon);
     }

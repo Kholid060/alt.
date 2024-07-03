@@ -7,6 +7,7 @@ import {
   UiFormItem,
   UiFormLabel,
   UiFormMessage,
+  UiIcons,
   UiInput,
 } from '@alt-dot/ui';
 import { useForm } from 'react-hook-form';
@@ -20,7 +21,6 @@ import UiSelectIcon from '/@/components/ui/UiSelectIcon';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
-import { commandIcons } from '#packages/common/utils/command-icons';
 
 const newCommandScriptSchema = z.object({
   icon: z.string(),
@@ -182,8 +182,8 @@ function CreateCommandScript() {
                   control={form.control}
                   render={({ field }) => {
                     const Icon =
-                      commandIcons[field.value as keyof typeof commandIcons] ??
-                      commandIcons.Command;
+                      UiIcons[field.value as keyof typeof UiIcons] ??
+                      UiIcons.Command;
 
                     return <Icon className="h-5 w-5" />;
                   }}

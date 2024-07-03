@@ -6,6 +6,7 @@ import {
   UiDropdownMenuItem,
   UiDropdownMenuSeparator,
   UiDropdownMenuTrigger,
+  UiIcons,
   UiLabel,
   UiSwitch,
   UiTooltip,
@@ -42,7 +43,6 @@ import DeepLinkURL from '#packages/common/utils/DeepLinkURL';
 import WorkflowDetailForm from '../WorkflowDetailForm';
 import { WorkflowUpdatePayload } from '#packages/main/src/workflow/workflow.interface';
 import { WORKFLOW_NODE_TRIGGERS } from '#packages/common/utils/constant/workflow.const';
-import { commandIcons } from '#packages/common/utils/command-icons';
 
 function WorkflowInformation() {
   const workflow = useWorkflowEditorStore.use.workflow();
@@ -53,8 +53,7 @@ function WorkflowInformation() {
   if (!workflow) return <div className="flex-grow"></div>;
 
   const WorkflowIcon =
-    commandIcons[workflow.icon as keyof typeof commandIcons] ??
-    commandIcons.Command;
+    UiIcons[workflow.icon as keyof typeof UiIcons] ?? UiIcons.Workflow;
 
   return (
     <>

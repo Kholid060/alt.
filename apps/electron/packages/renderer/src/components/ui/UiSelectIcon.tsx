@@ -1,10 +1,10 @@
-import { commandIcons } from '#packages/common/utils/command-icons';
 import {
   UiPopover,
   UiTooltip,
   UiPopoverTrigger,
   UiButton,
   UiPopoverContent,
+  UiIcons,
 } from '@alt-dot/ui';
 import clsx from 'clsx';
 
@@ -24,8 +24,7 @@ function UiSelectIcon({
   onValueChange,
   ...props
 }: UiSelectIconProps) {
-  const Icon =
-    commandIcons[value as keyof typeof commandIcons] ?? commandIcons.Command;
+  const Icon = UiIcons[value as keyof typeof UiIcons] ?? UiIcons.Command;
 
   return (
     <UiPopover modal>
@@ -39,7 +38,7 @@ function UiSelectIcon({
       <UiPopoverContent className="h-80 w-72 overflow-auto" side={side}>
         <p>Icons</p>
         <div className="grid grid-cols-5 gap-1 mt-2 text-muted-foreground">
-          {Object.entries(commandIcons).map(([name, Icon]) => (
+          {Object.entries(UiIcons).map(([name, Icon]) => (
             <button
               key={name}
               title={name}

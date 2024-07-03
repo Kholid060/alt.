@@ -8,11 +8,11 @@ import {
   UiInput,
   UiFormMessage,
   UiTextarea,
+  UiIcons,
 } from '@alt-dot/ui';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import UiSelectIcon from '../ui/UiSelectIcon';
-import { commandIcons } from '#packages/common/utils/command-icons';
 
 const newWorkflowSchema = z.object({
   description: z
@@ -58,8 +58,8 @@ function WorkflowDetailForm({
                 control={form.control}
                 render={({ field }) => {
                   const Icon =
-                    commandIcons[field.value as keyof typeof commandIcons] ??
-                    commandIcons.Command;
+                    UiIcons[field.value as keyof typeof UiIcons] ??
+                    UiIcons.Command;
                   return <Icon className="h-5 w-5" />;
                 }}
               />

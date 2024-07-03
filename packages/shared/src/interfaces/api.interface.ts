@@ -145,6 +145,11 @@ export type ApiAdminExtensionListItem = ApiExtensionListItem &
     owner: ApiExtensionOwner & Pick<ApiUserProfile, 'id'>;
   };
 
+export type ApiExtensionHighlightItem = Pick<
+  ApiExtension,
+  'id' | 'name' | 'title' | 'iconUrl' | 'description' | 'owner'
+>;
+
 export interface ApiStoreListExtensionsQuery {
   q?: string;
   nextCursor?: string;
@@ -216,6 +221,7 @@ export type ApiWorkflowListItem = Pick<
   | 'id'
   | 'icon'
   | 'name'
+  | 'owner'
   | 'createdAt'
   | 'updatedAt'
   | 'description'
@@ -227,6 +233,7 @@ export type ApiWorkflowDetail = Pick<
   | 'id'
   | 'name'
   | 'icon'
+  | 'owner'
   | 'readme'
   | 'workflow'
   | 'createdAt'
@@ -235,3 +242,5 @@ export type ApiWorkflowDetail = Pick<
   | 'description'
   | 'downloadCount'
 >;
+
+export type ApiWorkflowStoreListItem = ApiWorkflowListItem;

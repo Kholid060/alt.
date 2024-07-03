@@ -1,4 +1,4 @@
-import { UiList, UiListItem } from '@alt-dot/ui';
+import { UiIcons, UiList, UiListItem } from '@alt-dot/ui';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import { CpuIcon, WorkflowIcon } from 'lucide-react';
 import { useCommandPanelHeader } from '/@/hooks/useCommandPanelHeader';
@@ -10,7 +10,6 @@ import { ExtensionCommandProcess } from '#packages/common/interface/extension.in
 import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
 import { SetRequired } from 'type-fest';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
-import { commandIcons } from '#packages/common/utils/command-icons';
 
 type UiListItemProcess = SetRequired<
   UiListItem<'command' | 'workflow'>,
@@ -38,7 +37,7 @@ function RunningProcess() {
         icon: (
           <UiList.Icon
             icon={
-              commandIcons[item.workflow.icon as keyof typeof commandIcons] ??
+              UiIcons[item.workflow.icon as keyof typeof UiIcons] ??
               WorkflowIcon
             }
           />

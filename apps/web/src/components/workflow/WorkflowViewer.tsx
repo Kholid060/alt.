@@ -1,9 +1,11 @@
 import {
   Background,
   BackgroundVariant,
+  Controls,
   NodeProps,
   ReactFlow,
   ReactFlowProps,
+  useStoreApi,
 } from 'reactflow';
 import {
   WORKFLOW_NODE_TYPE,
@@ -17,7 +19,7 @@ import {
 import clsx from 'clsx';
 import { BlocksIcon, LucideIcon } from 'lucide-react';
 import { UiIcons } from '@alt-dot/ui';
-import { forwardRef, memo } from 'react';
+import { forwardRef, memo, useEffect } from 'react';
 
 const defaultNodeTypes = Object.values(WORKFLOW_NODE_TYPE).reduce<
   Partial<Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>>>
@@ -70,6 +72,20 @@ function IconResolver({
   );
 }
 
+function FlowStoreConsumer() {
+  const store = useStoreApi();
+
+  useEffect(() => {
+    store.setState({
+      nodesDraggable: false,
+      nodesConnectable: false,
+      elementsSelectable: false,
+    });
+  }, [store]);
+
+  return null;
+}
+
 const WorkflowViewer = memo(
   forwardRef<HTMLDivElement, ReactFlowProps>(
     ({ edges, nodes, className, ...props }, ref) => {
@@ -106,6 +122,8 @@ const WorkflowViewer = memo(
               color="currentColor"
               className="text-foreground/15"
             />
+            <FlowStoreConsumer />
+            <Controls showInteractive={false} />
           </ReactFlow>
         </WorkflowNodesProvider>
       );

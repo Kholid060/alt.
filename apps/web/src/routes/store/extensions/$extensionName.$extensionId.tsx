@@ -104,7 +104,7 @@ function ExtensionPageHeader({
         <div className="mt-2">
           <Link
             to={`/u/${extension.owner.username}`}
-            className="hover:text-foreground transition-colors line-clamp-1 text-muted-foreground text-sm"
+            className="hover:text-foreground transition-colors line-clamp-1 text-muted-foreground text-sm inline"
           >
             <UiAvatar className="size-4 inline-block align-middle">
               {extension.owner.avatarUrl && (
