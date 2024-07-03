@@ -103,7 +103,6 @@ function DevConsoleWorkflowsNewPage() {
       <WorkflowDetailHeader
         icon={data.icon}
         title={data.name}
-        iconUrl={data.icon}
         className="mt-8"
         description={data.description ?? ''}
         suffixSlot={

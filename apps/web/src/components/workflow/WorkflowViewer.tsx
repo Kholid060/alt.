@@ -17,6 +17,7 @@ import {
 import clsx from 'clsx';
 import { BlocksIcon, LucideIcon } from 'lucide-react';
 import { UiIcons } from '@alt-dot/ui';
+import { forwardRef, memo } from 'react';
 
 const defaultNodeTypes = Object.values(WORKFLOW_NODE_TYPE).reduce<
   Partial<Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>>>
@@ -69,42 +70,48 @@ function IconResolver({
   );
 }
 
-function WorkflowViewer({ edges, nodes, className, ...props }: ReactFlowProps) {
-  return (
-    <WorkflowNodesProvider
-      extCommandChecker={() => ({
-        cancel: () => {},
-        result: Promise.resolve(true),
-      })}
-      hideToolbar
-      resolveExtIcon={(node) => (
-        <IconResolver
-          id={node.id}
-          alt={node.data.title}
-          icon={node.data.icon}
-        />
-      )}
-    >
-      <ReactFlow
-        nodes={nodes}
-        tabIndex={-1}
-        edges={edges}
-        edgeTypes={edgeTypes}
-        nodeTypes={nodeTypes}
-        elevateNodesOnSelect
-        className={clsx('focus:outline-none', className)}
-        {...props}
-      >
-        <Background
-          variant={BackgroundVariant.Dots}
-          gap={12}
-          size={1}
-          color="currentColor"
-          className="text-foreground/15"
-        />
-      </ReactFlow>
-    </WorkflowNodesProvider>
-  );
-}
+const WorkflowViewer = memo(
+  forwardRef<HTMLDivElement, ReactFlowProps>(
+    ({ edges, nodes, className, ...props }, ref) => {
+      return (
+        <WorkflowNodesProvider
+          extCommandChecker={() => ({
+            cancel: () => {},
+            result: Promise.resolve(true),
+          })}
+          hideToolbar
+          resolveExtIcon={(node) => (
+            <IconResolver
+              id={node.id}
+              alt={node.data.title}
+              icon={node.data.icon}
+            />
+          )}
+        >
+          <ReactFlow
+            ref={ref}
+            nodes={nodes}
+            tabIndex={-1}
+            edges={edges}
+            edgeTypes={edgeTypes}
+            nodeTypes={nodeTypes}
+            elevateNodesOnSelect
+            className={clsx('focus:outline-none', className)}
+            {...props}
+          >
+            <Background
+              variant={BackgroundVariant.Dots}
+              gap={12}
+              size={1}
+              color="currentColor"
+              className="text-foreground/15"
+            />
+          </ReactFlow>
+        </WorkflowNodesProvider>
+      );
+    },
+  ),
+);
+WorkflowViewer.displayName = 'WorkflowViewer';
 
 export default WorkflowViewer;

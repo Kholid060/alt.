@@ -40,8 +40,17 @@ class APIMeNamespace {
     return this.api.authorizeFetch<APISuccessResult<{ workflowId: string }>>(
       `/me/workflows/${workflowId}`,
       {
-        method: 'POST',
+        method: 'PATCH',
         body: JSON.stringify(payload),
+      },
+    );
+  }
+
+  deleteWorkflow(workflowId: string) {
+    return this.api.authorizeFetch<APISuccessResult<{ workflowId: string }>>(
+      `/me/workflows/${workflowId}`,
+      {
+        method: 'DELETE',
       },
     );
   }

@@ -39,6 +39,7 @@ export class WebAppService {
         icon: true,
         nodes: true,
         edges: true,
+        variables: true,
         description: true,
       },
       where(fields, operators) {
@@ -48,11 +49,14 @@ export class WebAppService {
     if (!item) return { notFound: true };
 
     return {
+      readme: '',
       id: item.id,
+      categories: [],
       icon: item.icon,
       name: item.name,
       description: item.description,
       workflow: {
+        variables: item.variables ?? [],
         edges: item.edges as ApiWorkflowEdge[],
         nodes: item.nodes as ApiWorkflowNode[],
       },

@@ -59,9 +59,10 @@ export const WorkflowDetail = forwardRef<
     className?: string;
     workflow: WebAppWorkflow;
     children?: React.ReactNode;
+    prependSlot?: React.ReactNode;
     onSubmit?: (values: WorkflowFormValues) => void;
   }
->(({ workflow, className, children, onSubmit }, ref) => {
+>(({ workflow, className, prependSlot, children, onSubmit }, ref) => {
   const formRef = useRef<HTMLFormElement>(null);
 
   const form = useForm<WorkflowFormValues>({
@@ -93,6 +94,7 @@ export const WorkflowDetail = forwardRef<
           className,
         )}
       >
+        {prependSlot}
         <UiFormField
           name="name"
           control={form.control}
@@ -141,6 +143,7 @@ export const WorkflowDetail = forwardRef<
                         form.setValue(
                           'categories',
                           field.value.filter((category) => category !== item),
+                          { shouldDirty: true },
                         )
                       }
                     >
@@ -154,6 +157,7 @@ export const WorkflowDetail = forwardRef<
                         <UiButton
                           variant="secondary"
                           type="button"
+                          size="sm"
                           onBlur={field.onBlur}
                           ref={field.ref}
                           disabled={
@@ -164,7 +168,7 @@ export const WorkflowDetail = forwardRef<
                           Add
                         </UiButton>
                       </UiDropdownMenuTrigger>
-                      <UiDropdownMenuContent>
+                      <UiDropdownMenuContent align="start">
                         {EXTENSION_CATEGORIES.filter(
                           (item) => !field.value.includes(item),
                         ).map((item) => (
@@ -235,7 +239,6 @@ WorkflowDetail.displayName = 'WorkflowDetail';
 export function WorkflowDetailHeader({
   icon,
   title,
-  iconUrl,
   svgClass,
   className,
   suffixSlot,
@@ -244,7 +247,6 @@ export function WorkflowDetailHeader({
 }: {
   icon: string;
   title: string;
-  iconUrl: string;
   svgClass?: string;
   description: string;
   suffixSlot?: React.ReactNode;

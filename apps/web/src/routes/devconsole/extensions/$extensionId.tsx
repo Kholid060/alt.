@@ -200,7 +200,7 @@ function ExtensionHeader({
                   <EllipsisVerticalIcon className="size-5" />
                 </UiButton>
               </UiDropdownMenuTrigger>
-              <UiDropdownMenuContent>
+              <UiDropdownMenuContent align="end">
                 <UiDropdownMenuItem asChild>
                   <a
                     href={`/store/extensions/${extension.id}`}

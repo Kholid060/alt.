@@ -180,10 +180,16 @@ export interface ApiWorkflowViewport {
   y: number;
   zoom: number;
 }
+export interface ApiWorkflowVariable {
+  id: string;
+  name: string;
+  value: string;
+}
 export interface ApiWorkflowData {
   edges: ApiWorkflowEdge[];
   nodes: ApiWorkflowNode[];
   viewport?: ApiWorkflowViewport;
+  variables: ApiWorkflowVariable[];
 }
 export interface ApiWorkflow {
   id: string;
@@ -220,6 +226,7 @@ export type ApiWorkflowDetail = Pick<
   ApiWorkflow,
   | 'id'
   | 'name'
+  | 'icon'
   | 'readme'
   | 'workflow'
   | 'createdAt'
