@@ -139,4 +139,20 @@ export class ExtensionQueryService {
       $apiVersion: '',
     } as ExtensionManifest;
   }
+
+  async existsArr(ids: string[]) {
+    const result = await this.dbService.db.query.extensions.findMany({
+      columns: { id: true },
+      where(fields, operators) {
+        return operators.inArray(fields.id, ids);
+      },
+    });
+
+    const existsIds = new Set(result.map((item) => item.id));
+    return ids.reduce<Record<string, boolean>>((acc, id) => {
+      acc[id] = existsIds.has(id);
+
+      return acc;
+    }, {});
+  }
 }

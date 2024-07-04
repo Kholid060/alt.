@@ -23,6 +23,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { EyeIcon, PlusIcon, XIcon } from 'lucide-react';
 import UiMarkdown from '../ui/UiMarkdown';
 import { forwardRef, useImperativeHandle, useRef } from 'react';
+import dayjs from '@/lib/dayjs';
 
 const workflowFormSchema = z.object({
   name: z
@@ -239,7 +240,7 @@ WorkflowDetail.displayName = 'WorkflowDetail';
 export function WorkflowDetailHeader({
   icon,
   title,
-  svgClass,
+  updatedAt,
   className,
   suffixSlot,
   description,
@@ -247,7 +248,7 @@ export function WorkflowDetailHeader({
 }: {
   icon: string;
   title: string;
-  svgClass?: string;
+  updatedAt?: string;
   description: string;
   suffixSlot?: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>) {
@@ -257,12 +258,16 @@ export function WorkflowDetailHeader({
   return (
     <div className={clsx('md:flex items-center', className)} {...props}>
       <div className="p-2 rounded-md border bg-card border-border/40 text-muted-foreground inline-block">
-        <Icon className={svgClass} />
+        <Icon className="size-10" />
       </div>
       <div className="md:ml-4 flex-grow">
         <h2 className="text-2xl font-semibold cursor-default leading-tight">
           {title}
         </h2>
+        <p className="text-sm text-muted-foreground line-clamp-1">
+          {updatedAt && `Last updated ${dayjs(updatedAt).fromNow()} •`}{' '}
+          {description}
+        </p>
       </div>
       {suffixSlot}
     </div>

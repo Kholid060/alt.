@@ -4,7 +4,9 @@ import API from '../index';
 class APIExtensionsNamespace {
   private apiKey: string = '';
 
-  constructor(private api: API) {}
+  constructor(private api: API) {
+    this.apiKey = api.apiKey ?? '';
+  }
 
   $setApiKey(apiKey: string) {
     this.apiKey = apiKey;

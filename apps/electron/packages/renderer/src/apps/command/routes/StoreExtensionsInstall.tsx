@@ -142,18 +142,20 @@ function StoreExtensionsInstall() {
         <>
           <div className="flex items-center">
             <ExtensionIcon
-              svgClass="size-16"
+              svgClass="size-12"
               imageClass="h-[82px] w-[82px] rounded-lg"
               icon={query.data.iconUrl}
               iconUrl={query.data.iconUrl}
               title={query.data.title + ' icon'}
             />
             <div className="flex-grow ml-4">
-              <p className="font-semibold text-lg">{query.data.title}</p>
+              <p className="font-semibold leading-tight text-lg">
+                {query.data.title}
+              </p>
               <p className="text-muted-foreground leading-tight line-clamp-2 text-sm">
                 {query.data.description}
               </p>
-              <p className="text-sm mt-2 text-muted-foreground">
+              <p className="text-sm mt-1 text-muted-foreground">
                 <UiAvatar className="size-4 inline-block align-middle">
                   {query.data.owner.avatarUrl && (
                     <UiAvatarImage

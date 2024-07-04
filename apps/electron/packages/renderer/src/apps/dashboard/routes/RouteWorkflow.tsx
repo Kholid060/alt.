@@ -58,7 +58,7 @@ import {
 } from '@alt-dot/workflow';
 import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
 import { WorkflowEditorNodeListModal } from '/@/components/workflow/editor/WorkflowEditorNodeList';
-import { useToast } from '@alt-dot/ui';
+import { UiList, useToast } from '@alt-dot/ui';
 
 const defaultNodeTypes = Object.values(WORKFLOW_NODE_TYPE).reduce<
   Partial<Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>>>
@@ -444,6 +444,7 @@ function WorkflowNodesWrapper({ children }: { children?: React.ReactNode }) {
           alt={node.data.extension.title + ' icon'}
           icon={node.data.icon}
           id={node.data.extension.id}
+          iconWrapper={(icon) => <UiList.Icon icon={icon} />}
         />
       )}
       extCommandChecker={isExtCommandExists}

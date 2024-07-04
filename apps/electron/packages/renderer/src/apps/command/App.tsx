@@ -114,7 +114,7 @@ function IdleListener({
       offWindowVisibility();
       IdleTimer.instance.on('idle', onIdle);
     };
-  }, []);
+  }, [navigate, onToggleHide, setCommandStoreState]);
 
   return null;
 }
@@ -127,6 +127,7 @@ function App() {
   useEffect(() => {
     const onVisibilityChange = () => {
       const { isWindowHidden } = useCommandStore.getState();
+      console.log(!isWindowHidden && document.visibilityState === 'hidden');
       if (!isWindowHidden && document.visibilityState === 'hidden') {
         preloadAPI.main.ipc.invoke('command-window:close');
       }

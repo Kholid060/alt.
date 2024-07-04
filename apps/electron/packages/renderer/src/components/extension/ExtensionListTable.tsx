@@ -24,6 +24,7 @@ import {
   EllipsisIcon,
   FileIcon,
   FolderOpenIcon,
+  HardDriveIcon,
   LinkIcon,
   RotateCcwIcon,
   StopCircleIcon,
@@ -99,7 +100,7 @@ function ExtensionCommandList({
           <td></td>
           <td className="pr-3">
             <div className="flex items-center py-3 border-l border-border/50 pl-3">
-              <div className="h-7 w-7 flex-shrink-0">
+              <div className="h-7 w-7 flex-shrink-0 relative">
                 {command.icon ? (
                   <UiExtensionIcon
                     id={extensionId}
@@ -573,7 +574,14 @@ function ExtensionListTable({
                 </td>
                 <td className="py-3 pr-3">
                   <div className="flex items-center">
-                    <div className="h-7 w-7 flex-shrink-0">{extensionIcon}</div>
+                    <div className="h-7 w-7 flex-shrink-0 relative">
+                      {extension.isLocal && (
+                        <span className="bg-orange-500 rounded-full p-0.5 absolute -top-2 -left-2">
+                          <HardDriveIcon className="size-[14px] stroke-black" />
+                        </span>
+                      )}
+                      {extensionIcon}
+                    </div>
                     <p className="ml-2">
                       {extension.title}{' '}
                       <span className="text-muted-foreground ml-1">

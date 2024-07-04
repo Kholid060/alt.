@@ -85,6 +85,13 @@ export class ExtensionController {
     return this.extensionQuery.listCredentials();
   }
 
+  @IPCInvoke('database:get-extension-exists-arr')
+  async existsArr(
+    @Payload() [ids]: IPCInvokePayload<'database:get-extension-exists-arr'>,
+  ): IPCInvokeReturn<'database:get-extension-exists-arr'> {
+    return this.extensionQuery.existsArr(ids);
+  }
+
   @IPCSend('extension:stop-execute-command')
   stopCommandExecution(
     @Payload() [runnerId]: IPCSendPayload<'extension:stop-execute-command'>,

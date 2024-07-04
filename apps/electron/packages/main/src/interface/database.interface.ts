@@ -43,6 +43,9 @@ import type {
 import type { ExtensionManifest } from '@alt-dot/extension-core';
 
 export interface DatabaseQueriesEvent {
+  'database:get-extension-exists-arr': (
+    extensionId: string[],
+  ) => Record<string, boolean>;
   'database:get-extension-exists': (extensionId: string) => boolean;
   'database:get-command': (
     commandId: string | { commandId: string; extensionId: string },

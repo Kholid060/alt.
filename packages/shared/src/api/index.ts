@@ -3,6 +3,7 @@ import APIMeNamespace from './namespace/api-me.namespace';
 import APIStoreNamespace from './namespace/api-store.namespace';
 import APIAdminNamespace from './namespace/api-admin.namespace';
 import APIExtensionsNamespace from './namespace/api-extensions.namespace-';
+import APIWorkflowsNamespace from './namespace/api-workflows.namespace';
 
 class API {
   static getErrorMessage(error: unknown, byStatus?: Record<number, string>) {
@@ -35,16 +36,16 @@ class API {
   handleError: typeof API.handleError = API.handleError;
   getErrorMessage: typeof API.getErrorMessage = API.getErrorMessage;
 
-  apiBaseURL: string;
-
   me = new APIMeNamespace(this);
   store = new APIStoreNamespace(this);
   admin = new APIAdminNamespace(this);
+  workflows = new APIWorkflowsNamespace(this);
   extensions = new APIExtensionsNamespace(this);
 
-  constructor(apiBaseURL: string) {
-    this.apiBaseURL = apiBaseURL;
-  }
+  constructor(
+    readonly apiBaseURL: string,
+    readonly apiKey?: string,
+  ) {}
 
   async authorizeFetch<T = unknown>(
     path: string,

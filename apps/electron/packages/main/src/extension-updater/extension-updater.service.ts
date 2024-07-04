@@ -85,6 +85,7 @@ export class ExtensionUpdaterService implements OnAppReady {
         }),
       );
 
+      if (extensions.store.length === 0) return;
       const updateStoreExts = await this.getStoreExtUpdate(extensions.store);
       await Promise.all(
         updateStoreExts.map((extension) => {

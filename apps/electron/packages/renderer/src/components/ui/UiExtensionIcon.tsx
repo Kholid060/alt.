@@ -1,6 +1,7 @@
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
 import { UiIcons, UiImage } from '@alt-dot/ui';
-import { LucideIcon } from 'lucide-react';
+import { LucideIcon, TriangleAlertIcon } from 'lucide-react';
+import { useState } from 'react';
 
 const iconPrefix = 'icon:';
 
@@ -17,6 +18,8 @@ function UiExtensionIcon({
   extensionIcon?: boolean;
   iconWrapper?: (icon: LucideIcon) => React.ReactNode;
 }) {
+  const [imageError, setImageError] = useState(false);
+
   if (icon.startsWith(iconPrefix)) {
     let iconName = icon.slice(iconPrefix.length) as keyof typeof UiIcons;
     iconName = UiIcons[iconName] ? iconName : 'Command';
@@ -29,11 +32,16 @@ function UiExtensionIcon({
     return <Icon />;
   }
 
+  if (imageError) {
+    return iconWrapper ? iconWrapper(TriangleAlertIcon) : <TriangleAlertIcon />;
+  }
+
   return (
     <UiImage
       src={
         extensionIcon ? `${CUSTOM_SCHEME.extension}://${id}/icon/${icon}` : icon
       }
+      onError={() => setImageError(true)}
       alt={alt}
     />
   );

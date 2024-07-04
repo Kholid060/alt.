@@ -99,4 +99,12 @@ export class WorkflowController {
   ): IPCInvokeReturn<'workflow:save'> {
     await this.workflow.updateWorkflow(workflowId, payload);
   }
+
+  @IPCInvoke('workflow:get-with-extensions')
+  getWorkflowWithExts(
+    @Payload()
+    [workflowId]: IPCInvokePayload<'workflow:get-with-extensions'>,
+  ): IPCInvokeReturn<'workflow:get-with-extensions'> {
+    return this.workflow.getWorkflowWithExtDependency(workflowId);
+  }
 }

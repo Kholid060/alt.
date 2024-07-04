@@ -38,7 +38,10 @@ import type {
   AppCryptoCreateHashOptions,
 } from '../../main/src/app/app-crypto/app-crypto.interface';
 import { ExtensionWithCommandsModel } from '../../main/src/extension/extension.interface';
-import { WorkflowUpdatePayload } from '../../main/src/workflow/workflow.interface';
+import {
+  WorkflowApiWithExtensions,
+  WorkflowUpdatePayload,
+} from '../../main/src/workflow/workflow.interface';
 
 export interface IPCRendererInvokeEventPayload {
   name: string;
@@ -177,6 +180,9 @@ export interface IPCWorkflowEvents {
   'workflow:stop-running': (runnerId: string) => void;
   'workflow:execute': (payload: WorkflowRunPayload) => string | null;
   'workflow:save': (workflowId: string, payload: WorkflowUpdatePayload) => void;
+  'workflow:get-with-extensions': (
+    workflowId: string,
+  ) => WorkflowApiWithExtensions;
 }
 
 export interface IPCUserExtensionEvents {

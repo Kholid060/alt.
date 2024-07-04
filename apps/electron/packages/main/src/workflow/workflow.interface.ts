@@ -1,3 +1,4 @@
+import { ApiWorkflowDetail, ApiExtensionHighlightItem } from '@alt-dot/shared';
 import { NewWorkflow, SelectWorkflow } from '../db/schema/workflow.schema';
 
 export type WorkflowDetailModel = SelectWorkflow;
@@ -32,3 +33,8 @@ export type WorkflowUpsertPayload = Omit<
   NewWorkflow,
   'createdAt' | 'updatedAt'
 >;
+
+export interface WorkflowApiWithExtensions {
+  workflow: ApiWorkflowDetail;
+  missingExtensions: ApiExtensionHighlightItem[];
+}

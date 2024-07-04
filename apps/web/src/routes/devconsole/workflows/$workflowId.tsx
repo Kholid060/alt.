@@ -102,6 +102,7 @@ function DevConsoleWorkflowsDetailPage() {
       queryClient.setQueryData(queryData(params.workflowId).queryKey, {
         ...query.data,
         ...updatePayload,
+        updatedAt: new Date().toISOString(),
       });
       setImportedData(null);
 
@@ -142,6 +143,7 @@ function DevConsoleWorkflowsDetailPage() {
         okText: 'Delete',
         okButtonVariant: 'destructive',
       });
+      if (!isConfirmed) return;
 
       setIsUpdating(true);
 
@@ -157,7 +159,6 @@ function DevConsoleWorkflowsDetailPage() {
       });
 
       setIsUpdating(false);
-      if (!isConfirmed) return;
     } catch (error) {
       console.error(error);
       toast({
@@ -238,6 +239,7 @@ function DevConsoleWorkflowsDetailPage() {
         icon={data.icon}
         className="mt-8"
         title={data.name}
+        updatedAt={query.data.updatedAt}
         description={data.description ?? ''}
         suffixSlot={
           <>
@@ -293,7 +295,7 @@ function DevConsoleWorkflowsDetailPage() {
             <div className="col-span-5">
               <UiDialog open={showDialog} onOpenChange={setShowDialog}>
                 <UiDialog.Trigger asChild>
-                  <UiButton>Import data</UiButton>
+                  <UiButton variant="secondary">Import data</UiButton>
                 </UiDialog.Trigger>
                 <UiDialog.Content className="sm:max-w-[425px] z-[101]">
                   <UiDialog.Header>

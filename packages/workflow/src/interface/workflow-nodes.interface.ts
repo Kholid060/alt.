@@ -1,4 +1,3 @@
-import type { SetRequired } from 'type-fest';
 import type { ExtensionCommandArgument } from '@alt-dot/extension-core';
 import type { WORKFLOW_NODE_TYPE } from '../const/workflow-nodes.const';
 import type ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
@@ -44,7 +43,7 @@ export interface WorkflowNodeBaseData<T extends WORKFLOW_NODE_TYPE> {
 export type WorkflowNodeBase<
   T = unknown,
   P extends WORKFLOW_NODE_TYPE = WORKFLOW_NODE_TYPE,
-> = SetRequired<Node<T & WorkflowNodeBaseData<P>, P>, 'type'>;
+> = Node<T & WorkflowNodeBaseData<P>, P> & { type: P };
 
 export type WorkflowNodeCommand = WorkflowNodeBase<
   {

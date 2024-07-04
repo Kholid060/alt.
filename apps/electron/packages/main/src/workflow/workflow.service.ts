@@ -15,17 +15,23 @@ import {
 import { LoggerService } from '../logger/logger.service';
 import { fromZodError } from 'zod-validation-error';
 import {
+  WorkflowApiWithExtensions,
   WorkflowInsertPayload,
   WorkflowUpdatePayload,
 } from './workflow.interface';
 import { WorkflowNodes, WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
+import { APIService } from '../api/api.service';
+import { ApiExtensionHighlightItem } from '@alt-dot/shared';
+import { ExtensionQueryService } from '../extension/extension-query.service';
 
 @Injectable()
 export class WorkflowService implements OnAppReady {
   constructor(
     private logger: LoggerService,
+    private apiService: APIService,
     private browserWindow: BrowserWindowService,
     private workflowQuery: WorkflowQueryService,
+    private extensionQuery: ExtensionQueryService,
     private globalShortcut: GlobalShortcutService,
   ) {}
 
@@ -191,5 +197,42 @@ export class WorkflowService implements OnAppReady {
       this.unregisterTriggers(workflowId);
       this.registerTriggers(workflowId, payload.triggers as WorkflowNodes[]);
     }
+  }
+
+  async getWorkflowWithExtDependency(
+    workflowId: string,
+  ): Promise<WorkflowApiWithExtensions> {
+    const workflow = await this.apiService.workflows.get(workflowId);
+
+    const extIds = new Set<string>();
+    workflow.workflow.nodes.forEach((_node) => {
+      const node = _node as WorkflowNodes;
+      if (node.type !== WORKFLOW_NODE_TYPE.COMMAND || !node.data?.extension?.id)
+        return;
+
+      extIds.add(node.data.extension.id);
+    });
+
+    let missingExtensions: ApiExtensionHighlightItem[] = [];
+    if (extIds.size === 0) return { workflow, missingExtensions };
+
+    const notExistsExtIds = await this.extensionQuery
+      .existsArr([...extIds])
+      .then((result) => {
+        return Object.entries(result).reduce<string[]>(
+          (acc, [extId, exists]) => {
+            if (!exists) acc.push(extId);
+
+            return acc;
+          },
+          [],
+        );
+      });
+    if (notExistsExtIds.length === 0) return { workflow, missingExtensions };
+
+    missingExtensions =
+      await this.apiService.extensions.getHighlights(notExistsExtIds);
+
+    return { workflow, missingExtensions };
   }
 }
