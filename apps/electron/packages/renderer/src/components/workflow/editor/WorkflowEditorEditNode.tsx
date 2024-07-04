@@ -31,12 +31,12 @@ function Loading() {
         <UiSkeleton className="h-10 w-10" />
         <div className="flex-grow">
           <UiSkeleton className="h-4 w-7/12" />
-          <UiSkeleton className="h-4 w-5/12 mt-1.5" />
+          <UiSkeleton className="mt-1.5 h-4 w-5/12" />
         </div>
       </div>
-      <UiSkeleton className="h-9 w-full mt-6" />
-      <UiSkeleton className="h-9 w-full mt-4" />
-      <UiSkeleton className="h-9 w-full mt-4" />
+      <UiSkeleton className="mt-6 h-9 w-full" />
+      <UiSkeleton className="mt-4 h-9 w-full" />
+      <UiSkeleton className="mt-4 h-9 w-full" />
     </div>
   );
 }
@@ -69,10 +69,10 @@ function WorkflowEditorEditNode() {
   if (!EditComponent || !editNode) return null;
 
   return (
-    <div className="absolute right-0 h-full w-[340px] z-50 top-0 bg-background border-l text-sm">
+    <div className="absolute right-0 top-0 z-50 h-full w-[340px] border-l bg-background text-sm">
       <button
         onClick={() => setEditNode(null)}
-        className="absolute top-0 left-0 p-1.5 -translate-x-full rounded-bl-md border-l border-b text-muted-foreground bg-background"
+        className="absolute left-0 top-0 -translate-x-full rounded-bl-md border-b border-l bg-background p-1.5 text-muted-foreground"
       >
         <XIcon className="h-5 w-5" />
       </button>

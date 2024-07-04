@@ -167,18 +167,18 @@ function ExtensionApproveRequest({
 
   return (
     <UiDialog open modal onOpenChange={onClose}>
-      <UiDialog.Content className="gap-0 max-w-xl">
+      <UiDialog.Content className="max-w-xl gap-0">
         <UiDialog.Header>
           <UiDialog.Title>
             Approve &quot;{extension.title}&quot; request
           </UiDialog.Title>
         </UiDialog.Header>
-        <div className="flex items-center justify-between mt-6">
+        <div className="mt-6 flex items-center justify-between">
           <UiLabel className="ml-1">Update payload</UiLabel>
           <button
             tabIndex={-1}
             onClick={fetchExtDetail}
-            className="text-sm underline text-muted-foreground"
+            className="text-sm text-muted-foreground underline"
           >
             Fetch extension detail
           </button>
@@ -186,7 +186,7 @@ function ExtensionApproveRequest({
         <UiCodeEditor
           value={updatePayload}
           onChange={setUpdatePayload}
-          className="text-sm border rounded-md min-h-32 max-h-96 overflow-auto w-full"
+          className="max-h-96 min-h-32 w-full overflow-auto rounded-md border text-sm"
         />
         <div className="mt-2">
           <UiLabel className="ml-1" htmlFor="download-url-input">
@@ -260,7 +260,7 @@ function ExtensionRejectRequest({
           </div>
           {preview ? (
             <UiMarkdown
-              className="prose-sm border rounded-lg mt-2 p-2"
+              className="prose-sm mt-2 rounded-lg border p-2"
               markdown={rejectReason}
             />
           ) : (
@@ -346,7 +346,7 @@ function ExtensionListItem({
           }
         />
       ) : null}
-      <tr className="hover:bg-card border-b border-border/50 last:border-b-0">
+      <tr className="border-b border-border/50 last:border-b-0 hover:bg-card">
         <td className="p-3">
           <a
             href={`/store/extensions/${item.id}/${item.name}`}
@@ -362,7 +362,7 @@ function ExtensionListItem({
             />
             <div className="ml-3">
               <p className="leading-tight">{item.title}</p>
-              <p className="text-sm text-muted-foreground leading-tight">
+              <p className="text-sm leading-tight text-muted-foreground">
                 <span>{item.isPublished ? '✅' : '❌'}Published</span>
                 {' • '}
                 <span>v{item.version}</span>
@@ -374,10 +374,10 @@ function ExtensionListItem({
           <a
             href={`/u/${item.owner.username}`}
             target="_blank"
-            className="hover:text-foreground transition-colors line-clamp-1"
+            className="line-clamp-1 transition-colors hover:text-foreground"
             rel="noreferrer"
           >
-            <UiAvatar className="size-5 inline-block align-middle">
+            <UiAvatar className="inline-block size-5 align-middle">
               {item.owner.avatarUrl && (
                 <UiAvatarImage src={item.owner.avatarUrl} />
               )}
@@ -385,7 +385,7 @@ function ExtensionListItem({
                 <UserRoundIcon className="size-4" />
               </UiAvatarFallback>
             </UiAvatar>
-            <span className="align-middle ml-1.5">{item.owner.name}</span>
+            <span className="ml-1.5 align-middle">{item.owner.name}</span>
           </a>
         </td>
         <td className="p-3">
@@ -414,14 +414,14 @@ function ExtensionListItem({
               <UiDropdownMenuContent align="end">
                 <UiDropdownMenuItem asChild>
                   <a href={item.sourceUrl} target="_blank" rel="noreferrer">
-                    <ExternalLinkIcon className="size-4 mr-2" />
+                    <ExternalLinkIcon className="mr-2 size-4" />
                     Open extension source
                   </a>
                 </UiDropdownMenuItem>
                 {item.entry?.status !== 'published' && (
                   <>
                     <UiDropdownMenuSeparator />
-                    <UiDropdownMenuLabel className="font-normal text-muted-foreground text-xs">
+                    <UiDropdownMenuLabel className="text-xs font-normal text-muted-foreground">
                       {item.isPublished ? 'Update' : 'Submit'} request
                     </UiDropdownMenuLabel>
                     {item.entry?.updateReason && (
@@ -430,7 +430,7 @@ function ExtensionListItem({
                           <FileTextIcon className="mr-2 size-4" />
                           Reason
                         </UiDropdownMenuSubTrigger>
-                        <UiDropdownMenuSubContent className="text-sm min-h-12 max-w-md p-2 whitespace-pre-wrap">
+                        <UiDropdownMenuSubContent className="min-h-12 max-w-md whitespace-pre-wrap p-2 text-sm">
                           {item.entry.updateReason}
                         </UiDropdownMenuSubContent>
                       </UiDropdownMenuSub>
@@ -440,19 +440,19 @@ function ExtensionListItem({
                         <CircleCheckBigIcon className="mr-2 size-4" />
                         Approve/reject
                       </UiDropdownMenuSubTrigger>
-                      <UiDropdownMenuSubContent className="text-sm min-h-12 max-w-md p-2">
+                      <UiDropdownMenuSubContent className="min-h-12 max-w-md p-2 text-sm">
                         <UiDropdownMenuItem
                           className="text-green-400"
                           onClick={() => setState('approve')}
                         >
-                          <CheckIcon className="size-4 mr-2" />
+                          <CheckIcon className="mr-2 size-4" />
                           Approve
                         </UiDropdownMenuItem>
                         <UiDropdownMenuItem
                           className="text-destructive-text"
                           onClick={() => setState('reject')}
                         >
-                          <XIcon className="size-4 mr-2" />
+                          <XIcon className="mr-2 size-4" />
                           Reject
                         </UiDropdownMenuItem>
                       </UiDropdownMenuSubContent>
@@ -511,7 +511,7 @@ function ExtensionsList() {
           <UiButton
             size="sm"
             variant="secondary"
-            className="min-w-32 mt-4"
+            className="mt-4 min-w-32"
             onClick={() => query.refetch()}
           >
             Retry
@@ -525,7 +525,7 @@ function ExtensionsList() {
       <tr>
         <td
           colSpan={50}
-          className="p-3 text-muted-foreground text-sm text-center"
+          className="p-3 text-center text-sm text-muted-foreground"
         >
           No data
         </td>
@@ -540,23 +540,23 @@ function ExtensionsList() {
 
 function AdminPage() {
   return (
-    <div className="pt-36 container">
-      <h2 className="text-2xl font-semibold cursor-default leading-tight -mt-0.5">
+    <div className="container pt-36">
+      <h2 className="-mt-0.5 cursor-default text-2xl font-semibold leading-tight">
         Admin Dashboard
       </h2>
-      <div className="rounded-lg border w-full overflow-x-auto overflow-y-hidden mt-8">
+      <div className="mt-8 w-full overflow-x-auto overflow-y-hidden rounded-lg border">
         <table className="w-full">
-          <thead className="text-sm border-b h-12 w-full">
+          <thead className="h-12 w-full border-b text-sm">
             <tr className="text-left">
-              <th className="h-12 px-4 w-4/12 min-w-64 lg:min-w-0">Name</th>
-              <th className="h-12 px-4 w-2/12 min-w-40 lg:min-w-0">Owner</th>
-              <th className="h-12 px-4 w-2/12 min-w-40 lg:min-w-0">
+              <th className="h-12 w-4/12 min-w-64 px-4 lg:min-w-0">Name</th>
+              <th className="h-12 w-2/12 min-w-40 px-4 lg:min-w-0">Owner</th>
+              <th className="h-12 w-2/12 min-w-40 px-4 lg:min-w-0">
                 Last updated
               </th>
-              <th className="h-12 px-4 w-2/12 text-left min-w-40 lg:min-w-0">
+              <th className="h-12 w-2/12 min-w-40 px-4 text-left lg:min-w-0">
                 Downloads count
               </th>
-              <th className="h-12 px-4 w-2/12 min-w-32"></th>
+              <th className="h-12 w-2/12 min-w-32 px-4"></th>
             </tr>
           </thead>
           <tbody>

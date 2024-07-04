@@ -66,11 +66,11 @@ const RequestItemList: HTTPRequestComponent<{
   return (
     <>
       <div className="flex items-center">
-        <p className="text-muted-foreground flex-grow cursor-default">
+        <p className="flex-grow cursor-default text-muted-foreground">
           {title} List
         </p>
         <UiButton variant="secondary" size="sm" onClick={addItem}>
-          <PlusIcon className="h-5 w-5 mr-1 -ml-1" />
+          <PlusIcon className="-ml-1 mr-1 h-5 w-5" />
           <span>Add</span>
         </UiButton>
       </div>
@@ -83,7 +83,7 @@ const RequestItemList: HTTPRequestComponent<{
               labelChildren={
                 <button
                   onClick={() => deleteItem(index)}
-                  className="underline text-destructive-text ml-1 py-px group-focus-within/header:visible group-hover/header:visible invisible"
+                  className="invisible ml-1 py-px text-destructive-text underline group-focus-within/header:visible group-hover/header:visible"
                 >
                   Delete
                 </button>

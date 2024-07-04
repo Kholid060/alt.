@@ -90,7 +90,7 @@ const StringOperatorComponent: OperatorComponent = ({ item, onChange }) => {
       <input
         value={`${item.value2}`}
         placeholder="value 2"
-        className="h-10 px-3 rounded-b-md w-full bg-transparent focus-visible:outline focus-visible:outline-primary"
+        className="h-10 w-full rounded-b-md bg-transparent px-3 focus-visible:outline focus-visible:outline-primary"
         onChange={({ target }) => onChange({ value2: target.value })}
       />
     </WorkflowUiFormExpression>
@@ -111,7 +111,7 @@ const NumberOperatorComponent: OperatorComponent = ({ item, onChange }) => {
         value={`${item.value2}`}
         type="number"
         placeholder="value 2"
-        className="h-10 px-3 rounded-b-md w-full bg-transparent focus-visible:outline focus-visible:outline-primary"
+        className="h-10 w-full rounded-b-md bg-transparent px-3 focus-visible:outline focus-visible:outline-primary"
         onChange={({ target }) => onChange({ value2: target.valueAsNumber })}
       />
     </WorkflowUiFormExpression>
@@ -133,7 +133,7 @@ const ObjectOperatorComponent: OperatorComponent = ({ item, onChange }) => {
       <input
         value={`${item.value2}`}
         placeholder="value 2"
-        className="h-10 px-3 rounded-b-md w-full bg-transparent focus-visible:outline focus-visible:outline-primary"
+        className="h-10 w-full rounded-b-md bg-transparent px-3 focus-visible:outline focus-visible:outline-primary"
         onChange={({ target }) => onChange({ value2: target.value })}
       />
     </WorkflowUiFormExpression>
@@ -172,7 +172,7 @@ const ArrayOperatorComponent: OperatorComponent = ({ item, onChange }) => {
         value={`${item.value2}`}
         placeholder="value 2"
         type={item.operator === 'array:contains' ? 'text' : 'number'}
-        className="h-10 px-3 rounded-b-md w-full bg-transparent focus-visible:outline focus-visible:outline-primary"
+        className="h-10 w-full rounded-b-md bg-transparent px-3 focus-visible:outline focus-visible:outline-primary"
         onChange={({ target }) =>
           onChange({
             value2:
@@ -256,7 +256,7 @@ function OperatorSelect({
   return (
     <UiSelect.Native
       value={operator}
-      className="w-auto border-0 py-px rounded-none"
+      className="w-auto rounded-none border-0 py-px"
       prefixIcon={
         icon ? (
           <span className="absolute left-3 top-1/2 -translate-y-1/2">
@@ -337,17 +337,17 @@ function WorkflowUiConditionBuilder({
           <section key={index} className="flex flex-wrap">
             {conditions.length > 1 && (
               <div className="relative w-8">
-                <div className="h-full absolute top-0 left-0 rounded-l-md border-primary -z-10 border border-r-0 w-10"></div>
-                <span className="absolute top-1/2 -translate-y-1/2 -left-1/2 px-1 py-0.5 text-sm rounded-sm bg-primary">
+                <div className="absolute left-0 top-0 -z-10 h-full w-10 rounded-l-md border border-r-0 border-primary"></div>
+                <span className="absolute -left-1/2 top-1/2 -translate-y-1/2 rounded-sm bg-primary px-1 py-0.5 text-sm">
                   AND
                 </span>
               </div>
             )}
-            <ul className="space-y-9 flex-1">
+            <ul className="flex-1 space-y-9">
               {conditions.map((item) => (
                 <li
                   key={item.id}
-                  className="rounded-md border text-sm divide-y group/condition"
+                  className="group/condition divide-y rounded-md border text-sm"
                 >
                   <WorkflowUiFormExpression
                     path="value1"
@@ -359,25 +359,25 @@ function WorkflowUiConditionBuilder({
                       updateItem(index, item.id, { $expData })
                     }
                   >
-                    <div className="flex items-center h-10">
+                    <div className="flex h-10 items-center">
                       <input
                         value={item.value1}
                         placeholder="value 1"
                         onChange={({ target }) =>
                           updateItem(index, item.id, { value1: target.value })
                         }
-                        className="px-3 flex-1 h-full rounded-t-md bg-transparent focus-visible:outline focus-visible:outline-primary"
+                        className="h-full flex-1 rounded-t-md bg-transparent px-3 focus-visible:outline focus-visible:outline-primary"
                       />
                     </div>
                   </WorkflowUiFormExpression>
-                  <div className="flex items-center h-10">
+                  <div className="flex h-10 items-center">
                     <OperatorSelect
                       operator={item.operator}
                       onChange={(value) =>
                         updateItem(index, item.id, { operator: value })
                       }
                     />
-                    <span className="flex items-center flex-grow gap-2 px-3 h-full border-l">
+                    <span className="flex h-full flex-grow items-center gap-2 border-l px-3">
                       <UiSwitch
                         size="sm"
                         checked={item.reverseValue}
@@ -401,12 +401,12 @@ function WorkflowUiConditionBuilder({
                           </>
                         }
                       >
-                        <InfoIcon className="h-4 w-4 text-muted-foreground invisible group-hover/condition:visible" />
+                        <InfoIcon className="invisible h-4 w-4 text-muted-foreground group-hover/condition:visible" />
                       </UiTooltip>
                     </span>
                     <UiButton
                       variant="ghost"
-                      className="rounded-none invisible group-hover/condition:visible"
+                      className="invisible rounded-none group-hover/condition:visible"
                       size="icon"
                       onClick={() => deleteItem(index, item.id)}
                     >
@@ -429,14 +429,14 @@ function WorkflowUiConditionBuilder({
                     className="mt-2"
                     onClick={() => addItem('and', index)}
                   >
-                    <PlusIcon className="h-5 w-5 mr-1 -ml-1" />
+                    <PlusIcon className="-ml-1 mr-1 h-5 w-5" />
                     <span>AND</span>
                   </UiButton>
-                  <div className="h-8 relative w-full">
-                    <span className="bg-teal-500 px-1 py-0 rounded-sm min-w-9 top-1/2 -translate-y-1/2 z-10 left-1/2 -translate-x-1/2 absolute text-center">
+                  <div className="relative h-8 w-full">
+                    <span className="absolute left-1/2 top-1/2 z-10 min-w-9 -translate-x-1/2 -translate-y-1/2 rounded-sm bg-teal-500 px-1 py-0 text-center">
                       OR
                     </span>
-                    <span className="absolute h-px w-full bg-teal-500 left-0 top-1/2 -translate-y-1/2"></span>
+                    <span className="absolute left-0 top-1/2 h-px w-full -translate-y-1/2 bg-teal-500"></span>
                   </div>
                 </>
               )}
@@ -450,11 +450,11 @@ function WorkflowUiConditionBuilder({
           variant="secondary"
           onClick={() => addItem('and', items.length - 1)}
         >
-          <PlusIcon className="h-5 w-5 mr-1 -ml-1" />
+          <PlusIcon className="-ml-1 mr-1 h-5 w-5" />
           <span>AND</span>
         </UiButton>
         <UiButton size="sm" variant="secondary" onClick={() => addItem('or')}>
-          <PlusIcon className="h-5 w-5 mr-1 -ml-1" />
+          <PlusIcon className="-ml-1 mr-1 h-5 w-5" />
           <span>OR</span>
         </UiButton>
       </div>

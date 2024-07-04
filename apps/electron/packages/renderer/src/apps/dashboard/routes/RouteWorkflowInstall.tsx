@@ -44,7 +44,7 @@ function RouteWorkflowInstall() {
   const [installingExts, setInstallingExts] = useState<string[]>([]);
 
   useCommandPanelHeader({
-    icon: <LucideWorkflow className="size-5 mr-2" />,
+    icon: <LucideWorkflow className="mr-2 size-5" />,
     title: 'Add workflow',
   });
   const query = useQuery({
@@ -146,18 +146,18 @@ function RouteWorkflowInstall() {
   }
 
   return (
-    <div className="py-4 px-5">
+    <div className="flex min-h-48 flex-col px-5 py-4">
       {query.isPending ? (
         <>
           <div className="flex items-center">
             <UiSkeleton className="h-[82px] w-[82px] rounded-lg" />
             <div className="ml-4 flex-grow">
               <UiSkeleton className="h-8 w-44" />
-              <UiSkeleton className="h-3 w-52 mt-2" />
-              <UiSkeleton className="h-3 w-28 mt-4" />
+              <UiSkeleton className="mt-2 h-3 w-52" />
+              <UiSkeleton className="mt-4 h-3 w-28" />
             </div>
           </div>
-          <div className="flex items-center mt-10 gap-4">
+          <div className="mt-10 flex items-center gap-4">
             <UiSkeleton className="h-4 w-24" />
             <UiSkeleton className="h-4 w-24" />
             <UiSkeleton className="h-4 w-24" />
@@ -173,21 +173,21 @@ function RouteWorkflowInstall() {
       ) : (
         <>
           <div className="flex items-center">
-            <div className="p-2 rounded-md border bg-card border-border/40 text-muted-foreground inline-block">
+            <div className="inline-block rounded-md border border-border/40 bg-card p-2 text-muted-foreground">
               <WorkflowIcon
                 className="size-12"
                 icon={query.data.workflow.icon}
               />
             </div>
-            <div className="flex-grow ml-4">
-              <p className="font-semibold leading-tight text-lg">
+            <div className="ml-4 flex-grow">
+              <p className="text-lg font-semibold leading-tight">
                 {query.data.workflow.name}
               </p>
-              <p className="text-muted-foreground leading-tight line-clamp-2 text-sm">
+              <p className="line-clamp-2 text-sm leading-tight text-muted-foreground">
                 {query.data.workflow.description}
               </p>
-              <p className="text-sm mt-1 text-muted-foreground">
-                <UiAvatar className="size-4 inline-block align-middle">
+              <p className="mt-1 text-sm text-muted-foreground">
+                <UiAvatar className="inline-block size-4 align-middle">
                   {query.data.workflow.owner.avatarUrl && (
                     <UiAvatarImage
                       loading="lazy"
@@ -198,74 +198,76 @@ function RouteWorkflowInstall() {
                     <UserRoundIcon className="size-4" />
                   </UiAvatarFallback>
                 </UiAvatar>
-                <span className="align-middle ml-1.5">
+                <span className="ml-1.5 align-middle">
                   {query.data.workflow.owner.name}
                 </span>
               </p>
             </div>
           </div>
-          {query.data.missingExtensions.length > 0 && (
-            <div className="mt-6">
-              <div className="text-orange-500 text-sm">
-                <TriangleAlertIcon className="size-4 inline align-middle" />{' '}
-                <span className="align-middle">
-                  {query.data.missingExtensions.length} missing extensions
-                </span>
-              </div>
-              <div className="grid grid-cols-2 text-sm mt-2 gap-2">
-                {query.data.missingExtensions.map((extension) => (
-                  <div
-                    key={extension.id}
-                    className="flex items-center p-2 hover:bg-card rounded-md group/card"
-                  >
-                    <div className="h-8 w-8">
-                      <UiExtensionIcon
-                        extensionIcon
-                        id={extension.id}
-                        icon={extension.iconUrl}
-                        alt={`${extension.title} icon`}
-                        iconWrapper={(Icon) => <UiList.Icon icon={Icon} />}
-                      />
-                    </div>
-                    <div className="ml-2 flex-1">
-                      <p className="leading-tight line-clamp-1">
-                        {extension.title}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        by {extension.owner.name}
-                      </p>
-                    </div>
-                    <UiTooltip label="Open store page">
-                      <a
-                        href={`${import.meta.env.VITE_WEB_BASE_URL}/store/extensions/${extension.name}/${extension.id}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="invisible group-hover/card:visible"
-                      >
-                        <ExternalLinkIcon className="text-muted-foreground size-5" />
-                      </a>
-                    </UiTooltip>
-                    {installingExts.includes(extension.id) ? (
-                      <Loader2Icon className="size-5 animate-spin" />
-                    ) : (
-                      <UiTooltip label="Install extension">
-                        <button
-                          className="ml-3"
-                          onClick={() => installExtension(extension)}
+          <div className="mt-6 flex-1">
+            {query.data.missingExtensions.length > 0 && (
+              <>
+                <div className="text-sm text-orange-500">
+                  <TriangleAlertIcon className="inline size-4 align-middle" />{' '}
+                  <span className="align-middle">
+                    {query.data.missingExtensions.length} missing extensions
+                  </span>
+                </div>
+                <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
+                  {query.data.missingExtensions.map((extension) => (
+                    <div
+                      key={extension.id}
+                      className="group/card flex items-center rounded-md p-2 hover:bg-card"
+                    >
+                      <div className="h-8 w-8">
+                        <UiExtensionIcon
+                          extensionIcon
+                          id={extension.id}
+                          icon={extension.iconUrl}
+                          alt={`${extension.title} icon`}
+                          iconWrapper={(Icon) => <UiList.Icon icon={Icon} />}
+                        />
+                      </div>
+                      <div className="ml-2 flex-1">
+                        <p className="line-clamp-1 leading-tight">
+                          {extension.title}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          by {extension.owner.name}
+                        </p>
+                      </div>
+                      <UiTooltip label="Open store page">
+                        <a
+                          href={`${import.meta.env.VITE_WEB_BASE_URL}/store/extensions/${extension.name}/${extension.id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="invisible group-hover/card:visible"
                         >
-                          <DownloadIcon className="size-5" />
-                        </button>
+                          <ExternalLinkIcon className="size-5 text-muted-foreground" />
+                        </a>
                       </UiTooltip>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          <div className="flex items-center mt-9 text-muted-foreground text-sm">
+                      {installingExts.includes(extension.id) ? (
+                        <Loader2Icon className="ml-3 size-5 animate-spin" />
+                      ) : (
+                        <UiTooltip label="Install extension">
+                          <button
+                            className="ml-3"
+                            onClick={() => installExtension(extension)}
+                          >
+                            <DownloadIcon className="size-5" />
+                          </button>
+                        </UiTooltip>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+          <div className="mt-9 flex items-center text-sm text-muted-foreground">
             <span>
-              <DownloadIcon className="size-5 inline align-middle" />
-              <span className="align-middle ml-1">
+              <DownloadIcon className="inline size-5 align-middle" />
+              <span className="ml-1 align-middle">
                 {numberFormatter.format(query.data.workflow.downloadCount)}x
               </span>
             </span>

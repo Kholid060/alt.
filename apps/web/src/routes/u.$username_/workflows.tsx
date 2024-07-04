@@ -1,48 +1,42 @@
 import StoreListItems from '@/components/store/StoreListItems';
 import WorkflowStoreCard from '@/components/workflow/WorkflowStoreCard';
 import APIService from '@/services/api.service';
-import { StoreQueryValidation } from '@/validation/store-query.validation';
 import {
   infiniteQueryOptions,
-  keepPreviousData,
   useInfiniteQuery,
+  keepPreviousData,
 } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { Fragment } from 'react/jsx-runtime';
 
-function queryData(search: StoreQueryValidation) {
+function queryData(username: string, nextCursor?: string) {
   return infiniteQueryOptions<
-    Awaited<ReturnType<typeof APIService.instance.store.listWorkflows>>
+    Awaited<ReturnType<typeof APIService.instance.user.listWorkflows>>
   >({
     initialPageParam: null,
-    queryKey: ['store-workflows', search],
+    queryKey: ['user-workflows', username, nextCursor],
     getNextPageParam: (lastPage) => lastPage.nextCursor,
-    queryFn: ({ pageParam }) =>
-      APIService.instance.store.listWorkflows({
-        ...search,
-        nextCursor: (pageParam as string) ?? undefined,
-      }),
+    queryFn: () => APIService.instance.user.listWorkflows(username, nextCursor),
   });
 }
 
-export const Route = createFileRoute('/_store/store/workflows')({
-  loaderDeps: ({ search }) => search,
-  async loader({ context, deps }) {
-    await context.queryClient.prefetchInfiniteQuery(queryData(deps));
+export const Route = createFileRoute('/u/$username/workflows')({
+  async loader({ context, params }) {
+    await context.queryClient.prefetchInfiniteQuery(queryData(params.username));
   },
   staleTime: Infinity,
-  component: StoreWorkflowsPage,
+  component: UserWorkflows,
 });
 
-function StoreWorkflowsPage() {
-  const searchParams = Route.useSearch();
+function UserWorkflows() {
+  const params = Route.useParams();
 
   const query = useInfiniteQuery({
     refetchOnMount: false,
     refetchInterval: false,
     refetchOnWindowFocus: false,
     placeholderData: keepPreviousData,
-    ...queryData(searchParams),
+    ...queryData(params.username),
   });
 
   return (
@@ -52,7 +46,11 @@ function StoreWorkflowsPage() {
         items.pages.map((group, index) => (
           <Fragment key={index}>
             {group.items.map((workflow) => (
-              <WorkflowStoreCard key={workflow.id} workflow={workflow} />
+              <WorkflowStoreCard
+                key={workflow.id}
+                disabledOwnerLink
+                workflow={workflow}
+              />
             ))}
           </Fragment>
         ))

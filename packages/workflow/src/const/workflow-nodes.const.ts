@@ -95,7 +95,7 @@ export const WORKFLOW_NODES: {
       commandId: '',
       isDisabled: false,
       $nodeType: WORKFLOW_NODE_TYPE.COMMAND,
-      extension: { id: '', title: '', version: '' },
+      extension: { id: '', title: '', version: '', isLocal: true },
     },
     type: WORKFLOW_NODE_TYPE.COMMAND,
   },

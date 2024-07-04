@@ -83,7 +83,7 @@ function CredentialOAuth2({
             )}
           />
           <div>
-            <UiLabel className="ml-1 mb-1" htmlFor="cred-callback-url">
+            <UiLabel className="mb-1 ml-1" htmlFor="cred-callback-url">
               Callback URL
             </UiLabel>
             <UiInput
@@ -208,10 +208,10 @@ function CredentialDetail({
           icon={credential.providerIcon}
         />
       </div>
-      <h2 className="text-lg font-semibold mt-1 leading-tight">
+      <h2 className="mt-1 text-lg font-semibold leading-tight">
         {credential.providerName}
       </h2>
-      <p className="text-muted-foreground text-sm line-clamp-2">
+      <p className="line-clamp-2 text-sm text-muted-foreground">
         {extension.title} extension{' '}
         {credential.description ? `• ${credential.description}` : ''}
       </p>
@@ -226,7 +226,7 @@ function CredentialDetail({
           {credential.documentationUrl && (
             <button
               type="button"
-              className="underline text-sm text-muted-foreground hover:text-foreground"
+              className="text-sm text-muted-foreground underline hover:text-foreground"
               onClick={() =>
                 preloadAPI.main.ipc.invoke(
                   'shell:open-url',
@@ -234,7 +234,7 @@ function CredentialDetail({
                 )
               }
             >
-              <BookIcon className="h-5 w-5 inline mr-1 align-text-top" />
+              <BookIcon className="mr-1 inline h-5 w-5 align-text-top" />
               See documentation
             </button>
           )}
@@ -249,11 +249,11 @@ function CredentialDetail({
           </UiButton>
           <UiButton
             type="submit"
-            className="min-w-24 relative"
+            className="relative min-w-24"
             disabled={isSubmitting}
           >
             {isSubmitting && (
-              <div className="absolute flex items-center justify-center bg-black/20 h-full w-full rounded-md">
+              <div className="absolute flex h-full w-full items-center justify-center rounded-md bg-black/20">
                 <Loader2Icon className="animate-spin" />
               </div>
             )}

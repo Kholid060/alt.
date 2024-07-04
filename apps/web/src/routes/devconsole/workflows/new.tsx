@@ -111,7 +111,7 @@ function DevConsoleWorkflowsNewPage() {
           </UiButtonLoader>
         }
       ></WorkflowDetailHeader>
-      <div className="mt-6 h-64 md:h-96 lg:h-[500px] rounded-lg border-2 overflow-hidden border-border/70">
+      <div className="mt-6 h-64 overflow-hidden rounded-lg border-2 border-border/70 md:h-96 lg:h-[500px]">
         <WorkflowViewer
           edges={data.workflow.edges}
           nodes={data.workflow.nodes}

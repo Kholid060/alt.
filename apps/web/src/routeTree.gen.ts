@@ -17,8 +17,12 @@ import { Route as DevconsoleImport } from './routes/_devconsole'
 import { Route as IndexImport } from './routes/index'
 import { Route as StoreIndexImport } from './routes/store/index'
 import { Route as AuthIndexImport } from './routes/auth/index'
+import { Route as UUsernameImport } from './routes/u.$username_'
 import { Route as OauthRedirectImport } from './routes/oauth/redirect'
+import { Route as UUsernameIndexImport } from './routes/u.$username_/index'
 import { Route as AdminDashboardIndexImport } from './routes/admin/dashboard/index'
+import { Route as UUsernameWorkflowsImport } from './routes/u.$username_/workflows'
+import { Route as UUsernameExtensionsImport } from './routes/u.$username_/extensions'
 import { Route as StoreWorkflowsWorkflowIdImport } from './routes/store/workflows/$workflowId'
 import { Route as DevconsoleWorkflowsNewImport } from './routes/devconsole/workflows/new'
 import { Route as DevconsoleWorkflowsWorkflowIdImport } from './routes/devconsole/workflows/$workflowId'
@@ -63,14 +67,34 @@ const AuthIndexRoute = AuthIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const UUsernameRoute = UUsernameImport.update({
+  path: '/u/$username',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const OauthRedirectRoute = OauthRedirectImport.update({
   path: '/oauth/redirect',
   getParentRoute: () => rootRoute,
 } as any)
 
+const UUsernameIndexRoute = UUsernameIndexImport.update({
+  path: '/',
+  getParentRoute: () => UUsernameRoute,
+} as any)
+
 const AdminDashboardIndexRoute = AdminDashboardIndexImport.update({
   path: '/admin/dashboard/',
   getParentRoute: () => rootRoute,
+} as any)
+
+const UUsernameWorkflowsRoute = UUsernameWorkflowsImport.update({
+  path: '/workflows',
+  getParentRoute: () => UUsernameRoute,
+} as any)
+
+const UUsernameExtensionsRoute = UUsernameExtensionsImport.update({
+  path: '/extensions',
+  getParentRoute: () => UUsernameRoute,
 } as any)
 
 const StoreWorkflowsWorkflowIdRoute = StoreWorkflowsWorkflowIdImport.update({
@@ -172,6 +196,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OauthRedirectImport
       parentRoute: typeof rootRoute
     }
+    '/u/$username': {
+      id: '/u/$username'
+      path: '/u/$username'
+      fullPath: '/u/$username'
+      preLoaderRoute: typeof UUsernameImport
+      parentRoute: typeof rootRoute
+    }
     '/auth/': {
       id: '/auth/'
       path: '/auth'
@@ -256,12 +287,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StoreWorkflowsWorkflowIdImport
       parentRoute: typeof rootRoute
     }
+    '/u/$username/extensions': {
+      id: '/u/$username/extensions'
+      path: '/extensions'
+      fullPath: '/u/$username/extensions'
+      preLoaderRoute: typeof UUsernameExtensionsImport
+      parentRoute: typeof UUsernameImport
+    }
+    '/u/$username/workflows': {
+      id: '/u/$username/workflows'
+      path: '/workflows'
+      fullPath: '/u/$username/workflows'
+      preLoaderRoute: typeof UUsernameWorkflowsImport
+      parentRoute: typeof UUsernameImport
+    }
     '/admin/dashboard/': {
       id: '/admin/dashboard/'
       path: '/admin/dashboard'
       fullPath: '/admin/dashboard'
       preLoaderRoute: typeof AdminDashboardIndexImport
       parentRoute: typeof rootRoute
+    }
+    '/u/$username/': {
+      id: '/u/$username/'
+      path: '/'
+      fullPath: '/u/$username/'
+      preLoaderRoute: typeof UUsernameIndexImport
+      parentRoute: typeof UUsernameImport
     }
     '/store/extensions/$extensionName/$extensionId': {
       id: '/store/extensions/$extensionName/$extensionId'
@@ -287,6 +339,11 @@ export const routeTree = rootRoute.addChildren({
     StoreStoreWorkflowsRoute,
   }),
   OauthRedirectRoute,
+  UUsernameRoute: UUsernameRoute.addChildren({
+    UUsernameExtensionsRoute,
+    UUsernameWorkflowsRoute,
+    UUsernameIndexRoute,
+  }),
   AuthIndexRoute,
   StoreIndexRoute,
   DevconsoleExtensionsExtensionIdRoute,
@@ -311,6 +368,7 @@ export const routeTree = rootRoute.addChildren({
         "/_settings",
         "/_store",
         "/oauth/redirect",
+        "/u/$username",
         "/auth/",
         "/store/",
         "/devconsole/extensions/$extensionId",
@@ -347,6 +405,14 @@ export const routeTree = rootRoute.addChildren({
     },
     "/oauth/redirect": {
       "filePath": "oauth/redirect.tsx"
+    },
+    "/u/$username": {
+      "filePath": "u.$username_.tsx",
+      "children": [
+        "/u/$username/extensions",
+        "/u/$username/workflows",
+        "/u/$username/"
+      ]
     },
     "/auth/": {
       "filePath": "auth/index.tsx"
@@ -389,8 +455,20 @@ export const routeTree = rootRoute.addChildren({
     "/store/workflows/$workflowId": {
       "filePath": "store/workflows/$workflowId.tsx"
     },
+    "/u/$username/extensions": {
+      "filePath": "u.$username_/extensions.tsx",
+      "parent": "/u/$username"
+    },
+    "/u/$username/workflows": {
+      "filePath": "u.$username_/workflows.tsx",
+      "parent": "/u/$username"
+    },
     "/admin/dashboard/": {
       "filePath": "admin/dashboard/index.tsx"
+    },
+    "/u/$username/": {
+      "filePath": "u.$username_/index.tsx",
+      "parent": "/u/$username"
     },
     "/store/extensions/$extensionName/$extensionId": {
       "filePath": "store/extensions/$extensionName.$extensionId.tsx"

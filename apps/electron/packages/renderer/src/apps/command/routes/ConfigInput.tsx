@@ -412,16 +412,16 @@ function ConfigInput({
   if (!Array.isArray(data.config)) return null;
 
   return (
-    <div className="py-4 px-6">
+    <div className="px-6 py-4">
       <h2 className="font-semibold">Configuration</h2>
       {executeCommandPayload && (
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           You must input the config before running the command
         </p>
       )}
       <UiForm {...form}>
         <form
-          className="flex flex-col mt-4 gap-4"
+          className="mt-4 flex flex-col gap-4"
           onSubmit={form.handleSubmit(onSubmit)}
         >
           {data.config.map((item) => {
@@ -431,7 +431,7 @@ function ConfigInput({
               <ConfigComponent key={item.name} config={item} form={form} />
             );
           })}
-          <div className="flex items-center mt-2 gap-4">
+          <div className="mt-2 flex items-center gap-4">
             <UiButton className="mt-4 min-w-24" type="submit">
               Save
             </UiButton>

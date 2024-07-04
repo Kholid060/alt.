@@ -46,7 +46,7 @@ function WorkflowNodeEditSelectFile() {
       </WorkflowUiFormExpression>
       <hr className="my-4" />
       <div className="flex items-center">
-        <p className="font-semibold flex-grow">Files</p>
+        <p className="flex-grow font-semibold">Files</p>
         <div className="flex items-center gap-2">
           <UiSwitch
             checked={node.data.mode === 'json'}

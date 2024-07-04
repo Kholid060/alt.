@@ -78,14 +78,14 @@ function ExtensionDetailCard({
 
   return (
     <>
-      <div className="flex items-center h-[49px] px-4 border-b">
+      <div className="flex h-[49px] items-center border-b px-4">
         <button
-          className="text-muted-foreground hover:text-foreground transition"
+          className="text-muted-foreground transition hover:text-foreground"
           onClick={() => onClose?.()}
         >
           <XIcon className="h-5 w-5" />
         </button>
-        <div className="h-8 w-8 ml-4">
+        <div className="ml-4 h-8 w-8">
           {extension.data.isError ? (
             <UiList.Icon icon={extension.data.title[0].toUpperCase()} />
           ) : (
@@ -99,7 +99,7 @@ function ExtensionDetailCard({
         </div>
         <p className="ml-2 line-clamp-1">{extension.data.title}</p>
       </div>
-      <div className="p-4 text-sm space-y-4 text-muted-foreground">
+      <div className="space-y-4 p-4 text-sm text-muted-foreground">
         <div>
           <p className="text-foreground">Description</p>
           <p>{extension.data.description || '-'}</p>
@@ -110,7 +110,7 @@ function ExtensionDetailCard({
         </div>
         <div>
           <p className="text-foreground">Permissions</p>
-          <ul className="list-disc list-inside">
+          <ul className="list-inside list-disc">
             {permissions.map((permission, index) => (
               <li key={index}>{permission}</li>
             ))}
@@ -122,7 +122,7 @@ function ExtensionDetailCard({
             <p>
               Loaded from:{' '}
               <button
-                className="underline text-left leading-tight"
+                className="text-left leading-tight underline"
                 onClick={() =>
                   extension.data!.path &&
                   preloadAPI.main.ipc.invoke(

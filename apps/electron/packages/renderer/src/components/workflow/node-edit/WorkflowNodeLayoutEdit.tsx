@@ -180,7 +180,7 @@ function NodeExecution({ node }: { node: WorkflowNodes }) {
           inputSize="sm"
           id="select-node"
           placeholder="Select node"
-          className="[&>span]:line-clamp-1 overflow-hidden"
+          className="overflow-hidden [&>span]:line-clamp-1"
           onValueChange={setNodeId}
         >
           <UiSelect.Option value={node.id}>Current node</UiSelect.Option>
@@ -202,13 +202,13 @@ function NodeExecution({ node }: { node: WorkflowNodes }) {
         <UiButton
           size="sm"
           variant="secondary"
-          className="ml-2 relative"
+          className="relative ml-2"
           onClick={executeNode}
           disabled={outputs[nodeId]?.isLoading}
         >
           Execute
           {outputs[nodeId]?.isLoading && (
-            <div className="absolute h-full w-full flex items-center cursor-default justify-center rounded-md bg-inherit bg-secondary">
+            <div className="absolute flex h-full w-full cursor-default items-center justify-center rounded-md bg-inherit bg-secondary">
               <Loader2Icon className="animate-spin" />
             </div>
           )}
@@ -218,7 +218,7 @@ function NodeExecution({ node }: { node: WorkflowNodes }) {
         <div className="flex items-center justify-between">
           <p className="ml-1">Output</p>
           {outputs[nodeId]?.isError && (
-            <p className="flex items-center text-destructive-text gap-1 cursor-default">
+            <p className="flex cursor-default items-center gap-1 text-destructive-text">
               <TriangleAlertIcon className="size-4" />
               error
             </p>
@@ -258,7 +258,7 @@ function WorkflowNodeLayoutEdit({
 
   return (
     <>
-      <div className="p-4 pb-2 flex items-center gap-2">
+      <div className="flex items-center gap-2 p-4 pb-2">
         <div className="h-10 w-10">
           {icon ? icon : <UiList.Icon icon={nodeData.icon} />}
         </div>
@@ -271,19 +271,19 @@ function WorkflowNodeLayoutEdit({
         <NodeId nodeId={node.id} />
       </div>
       <UiTabs variant="line" defaultValue="parameters">
-        <UiTabsList className="sticky top-0 bg-background z-50">
+        <UiTabsList className="sticky top-0 z-50 bg-background">
           <UiTabsTrigger value="parameters">Parameters</UiTabsTrigger>
           <UiTabsTrigger value="execute-node">Preview node</UiTabsTrigger>
           <UiTabsTrigger value="settings">Settings</UiTabsTrigger>
           {tabsSlot}
         </UiTabsList>
-        <UiTabsContent value="parameters" className="p-4 mt-0">
+        <UiTabsContent value="parameters" className="mt-0 p-4">
           {children}
         </UiTabsContent>
-        <UiTabsContent value="execute-node" className="p-4 mt-0">
+        <UiTabsContent value="execute-node" className="mt-0 p-4">
           <NodeExecution node={node} />
         </UiTabsContent>
-        <UiTabsContent value="settings" className="p-4 mt-0">
+        <UiTabsContent value="settings" className="mt-0 p-4">
           <WorkflowNodeSettings data={node.data} />
         </UiTabsContent>
         {tabContentSlot}

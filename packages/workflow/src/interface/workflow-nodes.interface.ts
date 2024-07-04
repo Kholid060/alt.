@@ -54,6 +54,7 @@ export type WorkflowNodeCommand = WorkflowNodeBase<
       id: string;
       title: string;
       version: string;
+      isLocal: boolean;
     };
     args: ExtensionCommandArgument[];
     argsValue: Record<string, unknown>;

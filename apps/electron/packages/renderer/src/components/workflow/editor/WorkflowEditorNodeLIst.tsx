@@ -109,6 +109,7 @@ export function WorkflowEditorNodeList({
               id: extension.id,
               title: extension.title,
               version: extension.version,
+              isLocal: extension.isLocal,
             },
             $expData: {},
             argsValue: {},
@@ -199,9 +200,9 @@ export function WorkflowEditorNodeList({
       <div className={cn('flex flex-col', className)} {...props}>
         <div className="border-b">
           <div className="flex items-center gap-2 px-3">
-            <SearchIcon className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+            <SearchIcon className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
             <UiList.Input
-              className="focus:outline-none h-11 bg-transparent flex-grow"
+              className="h-11 flex-grow bg-transparent focus:outline-none"
               placeholder="Search nodes..."
               onKeyDown={onInputKeyDown}
             />
@@ -216,7 +217,7 @@ export function WorkflowEditorNodeList({
                   id={item}
                   key={item}
                   className={cn(
-                    'border-b-2 px-2 pb-2 hover:text-foreground transition-colors min-w-12 shrink-0',
+                    'min-w-12 shrink-0 border-b-2 px-2 pb-2 transition-colors hover:text-foreground',
                     nodeType === item
                       ? 'border-primary text-foreground'
                       : 'border-transparent',
@@ -232,11 +233,11 @@ export function WorkflowEditorNodeList({
         <UiList
           items={filteredItems}
           onItemSelected={onItemSelected}
-          className="h-72 p-2 overflow-auto"
+          className="h-72 overflow-auto p-2"
           renderItem={({ item, props, ref, selected }) => (
             <UiList.Item
               {...{ ...item, ...props, selected }}
-              className="aria-selected:bg-secondary min-h-10"
+              className="min-h-10 aria-selected:bg-secondary"
               ref={ref}
             />
           )}
@@ -387,11 +388,11 @@ export function WorkflowEditorNodeListModal() {
     <UiPopover open={show} onOpenChange={setShow} modal>
       <UiPopoverTrigger asChild>
         <button
-          className="invisible pointer-events-none fixed"
+          className="pointer-events-none invisible fixed"
           ref={triggerRef}
         ></button>
       </UiPopoverTrigger>
-      <UiPopoverContent align="start" className="p-0 w-80 text-sm">
+      <UiPopoverContent align="start" className="w-80 p-0 text-sm">
         <WorkflowEditorNodeList onSelectItem={onSelectItem} />
       </UiPopoverContent>
     </UiPopover>

@@ -12,7 +12,7 @@ function ErrorPageBase({
   return (
     <div
       className={clsx(
-        'w-full max-w-md text-center flex flex-col items-center justify-center mx-auto',
+        'mx-auto flex w-full max-w-md flex-col items-center justify-center text-center',
         className,
       )}
       {...props}
@@ -36,7 +36,7 @@ export function ErrorNotFoundPage({
   return (
     <ErrorPageBase {...props}>
       <img alt="not found illustration" src={notFoundSvg} className="h-96" />
-      <h3 className="font-semibold text-lg">
+      <h3 className="text-lg font-semibold">
         Looks like this page doesn&apos;t exist
       </h3>
       <p className="text-muted-foreground">{message}</p>
@@ -51,7 +51,7 @@ export function ErrorPage(props: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <ErrorPageBase {...props}>
       <img alt="error illustration" src={bugFixingSvg} className="h-96" />
-      <h3 className="font-semibold text-lg">Something went wrong!</h3>
+      <h3 className="text-lg font-semibold">Something went wrong!</h3>
       <p className="text-muted-foreground">
         An error occurred when trying to load this page
       </p>

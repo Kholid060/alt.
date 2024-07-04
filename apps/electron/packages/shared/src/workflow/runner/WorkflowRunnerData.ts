@@ -1,10 +1,7 @@
 import { isObject } from '@alt-dot/shared';
 import type WorkflowRunner from './WorkflowRunner';
 import WorkflowFileHandle from '../utils/WorkflowFileHandle';
-import {
-  WORKFLOW_NODE_TYPE,
-  WorkflowVariableMode,
-} from '@alt-dot/workflow';
+import { WORKFLOW_NODE_TYPE, WorkflowVariableMode } from '@alt-dot/workflow';
 
 interface WorkflowRunnerLoopData {
   index: number;

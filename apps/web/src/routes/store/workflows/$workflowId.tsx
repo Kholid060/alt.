@@ -32,19 +32,19 @@ export const Route = createFileRoute('/store/workflows/$workflowId')({
     <div className="container pt-36">
       <div className="md:flex md:items-center">
         <UiSkeleton className="size-16" />
-        <div className="md:flex-grow md:ml-4 mt-4 md:mt-0">
-          <UiSkeleton className="w-48 h-7" />
-          <UiSkeleton className="w-24 h-5 mt-2" />
+        <div className="mt-4 md:ml-4 md:mt-0 md:flex-grow">
+          <UiSkeleton className="h-7 w-48" />
+          <UiSkeleton className="mt-2 h-5 w-24" />
         </div>
-        <div className="w-full max-w-md md:w-auto flex items-center mt-4 md:mt-0">
+        <div className="mt-4 flex w-full max-w-md items-center md:mt-0 md:w-auto">
           <UiSkeleton className="h-10 w-24 flex-grow md:flex-auto" />
-          <UiSkeleton className="size-10 ml-2" />
+          <UiSkeleton className="ml-2 size-10" />
         </div>
       </div>
-      <UiSkeleton className="h-[400px] my-8" />
-      <div className="lg:flex lg:items-start lg:flex-row">
+      <UiSkeleton className="my-8 h-[400px]" />
+      <div className="lg:flex lg:flex-row lg:items-start">
         <UiSkeleton className="h-96 flex-1" />
-        <UiSkeleton className="w-72 mt-4 lg:mt-0 lg:ml-12 h-52" />
+        <UiSkeleton className="mt-4 h-52 w-72 lg:ml-12 lg:mt-0" />
       </div>
     </div>
   ),
@@ -84,19 +84,19 @@ function WorkflowPageHeader({ workflow }: { workflow: ApiWorkflowDetail }) {
   }
 
   return (
-    <div className="flex items-start md:items-center flex-col md:flex-row">
+    <div className="flex flex-col items-start md:flex-row md:items-center">
       <WorkflowIcon svgClass="size-16" className="p-1" icon={workflow.icon} />
-      <div className="flex-grow mt-2 md:mt-0 md:ml-4 md:mr-4">
+      <div className="mt-2 flex-grow md:ml-4 md:mr-4 md:mt-0">
         <h3 className="text-lg font-semibold">{workflow.name}</h3>
-        <p className="text-muted-foreground text-sm line-clamp-2">
+        <p className="line-clamp-2 text-sm text-muted-foreground">
           {workflow.description}
         </p>
         <div className="mt-2">
           <Link
             to={`/u/${workflow.owner.username}`}
-            className="hover:text-foreground transition-colors line-clamp-1 text-muted-foreground text-sm inline"
+            className="line-clamp-1 inline text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
-            <UiAvatar className="size-4 inline-block align-middle">
+            <UiAvatar className="inline-block size-4 align-middle">
               {workflow.owner.avatarUrl && (
                 <UiAvatarImage src={workflow.owner.avatarUrl} />
               )}
@@ -104,18 +104,18 @@ function WorkflowPageHeader({ workflow }: { workflow: ApiWorkflowDetail }) {
                 <UserRoundIcon className="size-4" />
               </UiAvatarFallback>
             </UiAvatar>
-            <span className="align-middle ml-1.5">{workflow.owner.name}</span>
+            <span className="ml-1.5 align-middle">{workflow.owner.name}</span>
           </Link>
         </div>
       </div>
-      <div className="flex items-center w-full max-w-md md:w-auto mt-4">
+      <div className="mt-4 flex w-full max-w-md items-center md:w-auto">
         <div className="flex-1 md:flex-auto">
           <UiButton
-            className="rounded-r-none align-middle relative"
+            className="relative rounded-r-none align-middle"
             onClick={() => installWorkflow(workflow.id)}
           >
             Add workflow
-            <hr className="absolute h-7 w-px bg-black/20 right-0" />
+            <hr className="absolute right-0 h-7 w-px bg-black/20" />
           </UiButton>
           <UiDropdownMenu>
             <UiDropdownMenuTrigger asChild>
@@ -148,21 +148,21 @@ function StoreWorkflowDetailPage() {
   const data = Route.useLoaderData();
 
   return (
-    <div className="py-36 container">
+    <div className="container py-36">
       <WorkflowPageHeader workflow={data} />
-      <div className="mt-6 h-64 md:h-96 lg:h-[500px] rounded-lg border-2 overflow-hidden border-border/70">
+      <div className="mt-6 h-64 overflow-hidden rounded-lg border-2 border-border/70 md:h-96 lg:h-[500px]">
         <WorkflowViewer
           edges={data.workflow.edges}
           nodes={data.workflow.nodes}
         />
       </div>
-      <div className="lg:flex lg:items-start mt-12">
+      <div className="mt-12 lg:flex lg:items-start">
         <div className="flex-1">
           <UiMarkdown markdown={data.readme} />
         </div>
         <hr className="my-8 lg:hidden" />
-        <div className="lg:w-72 lg:ml-12 text-sm">
-          <div className="border rounded-lg p-4 grid grid-cols-2 gap-y-4 gap-x-2 max-w-xs flex-1">
+        <div className="text-sm lg:ml-12 lg:w-72">
+          <div className="grid max-w-xs flex-1 grid-cols-2 gap-x-2 gap-y-4 rounded-lg border p-4">
             <p className="text-muted-foreground">Downloads count</p>
             <p className="text-right">
               {numberFormatter.format(data.downloadCount)}x

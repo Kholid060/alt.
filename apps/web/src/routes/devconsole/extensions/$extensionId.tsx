@@ -190,10 +190,10 @@ function ExtensionHeader({
         <>
           <ExtensionStatus
             status={status}
-            className="mt-2 md:mt-0 inline-block"
+            className="mt-2 inline-block md:mt-0"
             rejectReason={extension.entry?.rejectReason}
           />
-          <div className="flex items-center md:ml-4 mt-4 md:mt-0 w-full md:w-auto gap-2">
+          <div className="mt-4 flex w-full items-center gap-2 md:ml-4 md:mt-0 md:w-auto">
             <UiDropdownMenu>
               <UiDropdownMenuTrigger asChild>
                 <UiButton size="icon" variant="outline" disabled={isLoading}>
@@ -249,10 +249,10 @@ function ExtensionHeader({
                 </UiPopoverTrigger>
                 <UiPopoverContent align="end">
                   <h4 className="font-medium leading-none">Update extension</h4>
-                  <p className="text-sm text-muted-foreground leading-tight mt-2">
+                  <p className="mt-2 text-sm leading-tight text-muted-foreground">
                     Write the reason of the update. For example:
                   </p>
-                  <ul className="text-sm text-muted-foreground leading-tight list-disc">
+                  <ul className="list-disc text-sm leading-tight text-muted-foreground">
                     <li className="ml-4">Update to v1.x.x</li>
                     <li className="ml-4">Update extension description</li>
                   </ul>
@@ -298,20 +298,20 @@ function DevConsoleExtensionsDetailPage() {
 
   if (query.isPending) {
     return (
-      <div className="pt-28 container">
+      <div className="container pt-28">
         <div className="flex items-center">
           <UiSkeleton className="h-6 w-24" />
-          <UiSkeleton className="h-6 w-32 ml-2" />
+          <UiSkeleton className="ml-2 h-6 w-32" />
         </div>
         <div className="mt-8 flex items-center">
           <UiSkeleton className="size-14" />
           <div className="ml-4">
             <UiSkeleton className="h-7 w-40" />
-            <UiSkeleton className="h-4 mt-2 w-64" />
+            <UiSkeleton className="mt-2 h-4 w-64" />
           </div>
         </div>
         <hr className="my-8 border-border/40" />
-        <UiSkeleton className="w-full max-w-xl h-64" />
+        <UiSkeleton className="h-64 w-full max-w-xl" />
       </div>
     );
   }
@@ -326,11 +326,11 @@ function DevConsoleExtensionsDetailPage() {
     }
 
     return (
-      <div className="flex flex-col place-items-center mt-12 max-w-md mx-auto text-center pt-28 container">
+      <div className="container mx-auto mt-12 flex max-w-md flex-col place-items-center pt-28 text-center">
         <div className="inline-block rounded-full bg-card/60 p-6 text-muted-foreground">
           <BlocksIcon className="size-10" />
         </div>
-        <h2 className="font-semibold mt-4 text-lg">
+        <h2 className="mt-4 text-lg font-semibold">
           Couldn&apos;t load extension
         </h2>
         {!isNotFound && (
@@ -346,7 +346,7 @@ function DevConsoleExtensionsDetailPage() {
   }
 
   return (
-    <div className="pt-28 container">
+    <div className="container pt-28">
       <UiBreadcrumb>
         <UiBreadcrumbList>
           <UiBreadcrumbItem>

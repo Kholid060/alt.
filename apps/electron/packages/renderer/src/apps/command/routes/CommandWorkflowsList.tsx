@@ -37,7 +37,7 @@ function CommandWorkflowsList() {
           <UiSkeleton className="h-9" />
         </div>
       ) : workflows.state === 'error' ? (
-        <p className="text-destructive-text text-center">
+        <p className="text-center text-destructive-text">
           Something went wrong when loading workflows
         </p>
       ) : (

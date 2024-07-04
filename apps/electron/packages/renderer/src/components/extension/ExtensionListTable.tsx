@@ -93,14 +93,14 @@ function ExtensionCommandList({
         <tr
           key={extensionId + command.name}
           className={cn(
-            'border-b border-border/50 hover:bg-card group/row',
+            'group/row border-b border-border/50 hover:bg-card',
             (extensionDisabled || command.isDisabled) && 'opacity-60',
           )}
         >
           <td></td>
           <td className="pr-3">
-            <div className="flex items-center py-3 border-l border-border/50 pl-3">
-              <div className="h-7 w-7 flex-shrink-0 relative">
+            <div className="flex items-center border-l border-border/50 py-3 pl-3">
+              <div className="relative h-7 w-7 flex-shrink-0">
                 {command.icon ? (
                   <UiExtensionIcon
                     id={extensionId}
@@ -119,7 +119,7 @@ function ExtensionCommandList({
             {command.type === 'script' ? 'Script' : 'Command'}
           </td>
           <td
-            className="p-3 text-muted-foreground text-sm transition-colors hover:text-foreground group/shortcut cursor-pointer"
+            className="group/shortcut cursor-pointer p-3 text-sm text-muted-foreground transition-colors hover:text-foreground"
             onClick={() => onToggleRecordingShortcut?.(command.name)}
             title={
               recordingShortcutData?.commandId === command.name
@@ -129,9 +129,9 @@ function ExtensionCommandList({
           >
             {recordingShortcutData?.commandId === command.name ? (
               <div className="flex items-center">
-                <span className="relative flex h-6 w-6 mr-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/90 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-6 w-6 bg-primary/90 items-center justify-center">
+                <span className="relative mr-2 flex h-6 w-6">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/90 opacity-75"></span>
+                  <span className="relative inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/90">
                     <StopCircleIcon className="h-4 w-4 text-foreground" />
                   </span>
                 </span>
@@ -147,7 +147,7 @@ function ExtensionCommandList({
               <div className="flex items-center">
                 <CommandShortcut shortcut={command.shortcut} />
                 <button
-                  className="invisible group-hover/shortcut:visible ml-2 text-muted-foreground hover:text-foreground"
+                  className="invisible ml-2 text-muted-foreground hover:text-foreground group-hover/shortcut:visible"
                   title="Remove shortcut"
                   onClick={(event) => {
                     event.stopPropagation();
@@ -185,10 +185,10 @@ function ExtensionCommandList({
 
                 onUpdateCommand?.(command.name, { alias: value || null });
               }}
-              className="w-24 p-1 rounded-sm bg-transparent hover:border-border border-transparent border cursor-default"
+              className="w-24 cursor-default rounded-sm border border-transparent bg-transparent p-1 hover:border-border"
             />
           </td>
-          <td className="text-right px-3">
+          <td className="px-3 text-right">
             <div className="flex items-center justify-end gap-2">
               <UiSwitch
                 checked={!command.isDisabled}
@@ -226,7 +226,7 @@ function ExtensionCommandList({
                         })
                     }
                   >
-                    <LinkIcon className="h-4 w-4 mr-2" />
+                    <LinkIcon className="mr-2 h-4 w-4" />
                     <span>Copy Deep Link</span>
                   </UiDropdownMenuItem>
                   {command.config && command.config.length > 0 && (
@@ -242,7 +242,7 @@ function ExtensionCommandList({
                         )
                       }
                     >
-                      <BoltIcon className="h-4 w-4 mr-2" />
+                      <BoltIcon className="mr-2 h-4 w-4" />
                       <span>Configuration</span>
                     </UiDropdownMenuItem>
                   )}
@@ -257,7 +257,7 @@ function ExtensionCommandList({
                             )
                           }
                         >
-                          <FolderOpenIcon className="h-4 w-4 mr-2" />
+                          <FolderOpenIcon className="mr-2 h-4 w-4" />
                           <span>Open file location</span>
                         </UiDropdownMenuItem>
                         <UiDropdownMenuSeparator />
@@ -265,7 +265,7 @@ function ExtensionCommandList({
                           variant="destructive"
                           onClick={() => onDeleteCommand?.(command)}
                         >
-                          <TrashIcon className="h-4 w-4 mr-2" />
+                          <TrashIcon className="mr-2 h-4 w-4" />
                           <span>Delete script</span>
                         </UiDropdownMenuItem>
                       </>
@@ -512,14 +512,14 @@ function ExtensionListTable({
 
   return (
     <table className={cn('w-full cursor-default', className)} {...props}>
-      <thead className="text-sm border-b h-12 w-full">
+      <thead className="h-12 w-full border-b text-sm">
         <tr className="text-left">
           <th className="h-12 w-8"></th>
           <th className="h-12 pr-3">Name</th>
           <th className="h-12 px-3">Type</th>
           <th className="h-12 px-3">Shortcut</th>
           <th className="h-12 px-3">Alias</th>
-          <th className="h-12 px-3 w-32"></th>
+          <th className="h-12 w-32 px-3"></th>
         </tr>
       </thead>
       <tbody>
@@ -547,7 +547,7 @@ function ExtensionListTable({
             <Fragment key={extension.id}>
               <tr
                 className={cn(
-                  'hover:bg-card border-b border-border/50 last:border-b-0',
+                  'border-b border-border/50 last:border-b-0 hover:bg-card',
                   isExpanded && 'bg-card',
                   extension.isDisabled && 'opacity-60',
                 )}
@@ -568,15 +568,15 @@ function ExtensionListTable({
                 <td className="py-3 text-center">
                   {!extension.isError && (
                     <ChevronRightIcon
-                      className={`h-5 w-5 inline-block transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                      className={`inline-block h-5 w-5 transition-transform ${isExpanded ? 'rotate-90' : ''}`}
                     />
                   )}
                 </td>
                 <td className="py-3 pr-3">
                   <div className="flex items-center">
-                    <div className="h-7 w-7 flex-shrink-0 relative">
+                    <div className="relative h-7 w-7 flex-shrink-0">
                       {extension.isLocal && (
-                        <span className="bg-orange-500 rounded-full p-0.5 absolute -top-2 -left-2">
+                        <span className="absolute -left-2 -top-2 rounded-full bg-orange-500 p-0.5">
                           <HardDriveIcon className="size-[14px] stroke-black" />
                         </span>
                       )}
@@ -584,7 +584,7 @@ function ExtensionListTable({
                     </div>
                     <p className="ml-2">
                       {extension.title}{' '}
-                      <span className="text-muted-foreground ml-1">
+                      <span className="ml-1 text-muted-foreground">
                         {extension.version}
                       </span>
                     </p>
@@ -609,7 +609,7 @@ function ExtensionListTable({
                         </UiTooltip>
                         <UiPopoverContent>
                           <p>Extension Error</p>
-                          <pre className="bg-background overflow-auto p-3 rounded-lg mt-2 text-sm whitespace-pre-wrap text-muted-foreground">
+                          <pre className="mt-2 overflow-auto whitespace-pre-wrap rounded-lg bg-background p-3 text-sm text-muted-foreground">
                             {extension.errorMessage}
                           </pre>
                         </UiPopoverContent>
@@ -645,21 +645,21 @@ function ExtensionListTable({
                               )
                             }
                           >
-                            <BoltIcon className="h-4 w-4 mr-2" />
+                            <BoltIcon className="mr-2 h-4 w-4" />
                             <span>Configuration</span>
                           </UiDropdownMenuItem>
                         )}
                         <UiDropdownMenuItem
                           onClick={() => onExtensionSelected?.(extension.id)}
                         >
-                          <FileIcon className="h-4 w-4 mr-2" />
+                          <FileIcon className="mr-2 h-4 w-4" />
                           <span>See details</span>
                         </UiDropdownMenuItem>
                         {extension.isLocal && (
                           <UiDropdownMenuItem
                             onClick={() => reloadExtension(extension.id)}
                           >
-                            <RotateCcwIcon className="h-4 w-4 mr-2" />
+                            <RotateCcwIcon className="mr-2 h-4 w-4" />
                             <span>Reload</span>
                           </UiDropdownMenuItem>
                         )}
@@ -670,7 +670,7 @@ function ExtensionListTable({
                               variant="destructive"
                               onClick={() => deleteExtension(extension)}
                             >
-                              <TrashIcon className="h-4 w-4 mr-2" />
+                              <TrashIcon className="mr-2 h-4 w-4" />
                               <span>Delete</span>
                             </UiDropdownMenuItem>
                           </>

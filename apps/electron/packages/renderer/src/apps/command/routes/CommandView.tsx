@@ -114,7 +114,7 @@ function CommandView() {
       name={EXTENSION_VIEW.frameName}
       src={`extension://${activeRoute?.params.extensionId}/command/${activeRoute?.params.commandId}/`}
       sandbox="allow-scripts"
-      className="h-80 block w-full"
+      className="block h-80 w-full"
       style={{ visibility: 'hidden' }}
       onLoad={onIframeLoad}
     />

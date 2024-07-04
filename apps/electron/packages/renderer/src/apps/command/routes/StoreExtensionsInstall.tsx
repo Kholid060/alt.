@@ -41,7 +41,7 @@ function ExtensionIcon({
       UiIcons[icon.split(':')[1] as keyof typeof UiIcons] ?? UiIcons.Command;
 
     return (
-      <div className="p-2 rounded-md border bg-card border-border/40 text-muted-foreground inline-block">
+      <div className="inline-block rounded-md border border-border/40 bg-card p-2 text-muted-foreground">
         <Icon className={clsx(svgClass, className)} />
       </div>
     );
@@ -63,7 +63,7 @@ function StoreExtensionsInstall() {
   const addStatusPanel = useCommandPanelStore.use.addStatus();
 
   useCommandPanelHeader({
-    icon: <BlocksIcon className="size-5 mr-2" />,
+    icon: <BlocksIcon className="mr-2 size-5" />,
     title: 'Install extension',
   });
 
@@ -114,18 +114,18 @@ function StoreExtensionsInstall() {
   }
 
   return (
-    <div className="py-4 px-5">
+    <div className="flex min-h-48 flex-col px-5 py-4">
       {query.isPending ? (
         <>
           <div className="flex items-center">
             <UiSkeleton className="h-[82px] w-[82px] rounded-lg" />
             <div className="ml-4 flex-grow">
               <UiSkeleton className="h-8 w-44" />
-              <UiSkeleton className="h-3 w-52 mt-2" />
-              <UiSkeleton className="h-3 w-28 mt-4" />
+              <UiSkeleton className="mt-2 h-3 w-52" />
+              <UiSkeleton className="mt-4 h-3 w-28" />
             </div>
           </div>
-          <div className="flex items-center mt-10 gap-4">
+          <div className="mt-10 flex items-center gap-4">
             <UiSkeleton className="h-4 w-24" />
             <UiSkeleton className="h-4 w-24" />
             <UiSkeleton className="h-4 w-24" />
@@ -148,15 +148,15 @@ function StoreExtensionsInstall() {
               iconUrl={query.data.iconUrl}
               title={query.data.title + ' icon'}
             />
-            <div className="flex-grow ml-4">
-              <p className="font-semibold leading-tight text-lg">
+            <div className="ml-4 flex-grow">
+              <p className="text-lg font-semibold leading-tight">
                 {query.data.title}
               </p>
-              <p className="text-muted-foreground leading-tight line-clamp-2 text-sm">
+              <p className="line-clamp-2 text-sm leading-tight text-muted-foreground">
                 {query.data.description}
               </p>
-              <p className="text-sm mt-1 text-muted-foreground">
-                <UiAvatar className="size-4 inline-block align-middle">
+              <p className="mt-1 text-sm text-muted-foreground">
+                <UiAvatar className="inline-block size-4 align-middle">
                   {query.data.owner.avatarUrl && (
                     <UiAvatarImage
                       loading="lazy"
@@ -167,27 +167,28 @@ function StoreExtensionsInstall() {
                     <UserRoundIcon className="size-4" />
                   </UiAvatarFallback>
                 </UiAvatar>
-                <span className="align-middle ml-1.5">
+                <span className="ml-1.5 align-middle">
                   {query.data.owner.name}
                 </span>
               </p>
             </div>
           </div>
-          <div className="flex items-center mt-9 text-muted-foreground text-sm">
+          <div className="flex-1"></div>
+          <div className="flex items-center text-sm text-muted-foreground">
             <span>
-              <DownloadIcon className="size-5 inline align-middle" />
-              <span className="align-middle ml-1">
+              <DownloadIcon className="inline size-5 align-middle" />
+              <span className="ml-1 align-middle">
                 {numberFormatter.format(query.data.downloadCount)}x
               </span>
             </span>
             <span className="ml-6">
-              <CpuIcon className="size-5 inline align-middle" />
-              <span className="align-middle ml-1">
+              <CpuIcon className="inline size-5 align-middle" />
+              <span className="ml-1 align-middle">
                 {query.data.commands.length}
               </span>
             </span>
             <a
-              className="ml-6 underline inline-flex items-center"
+              className="ml-6 inline-flex items-center underline"
               href={query.data.sourceUrl}
               target="_blank"
               rel="noreferer noreferrer"

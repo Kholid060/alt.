@@ -63,7 +63,7 @@ const CommandInputArguments = forwardRef<
       {...props}
       ref={ref}
       style={{ translate: '0px 0px' }}
-      className="flex items-center absolute top-1/2 -translate-y-1/2 left-4 text-sm h-7 gap-2"
+      className="absolute left-4 top-1/2 flex h-7 -translate-y-1/2 items-center gap-2 text-sm"
     >
       {selectedCommand?.command.arguments?.map((argument) => {
         const key = selectedCommand.command.id + argument.name;
@@ -71,13 +71,13 @@ const CommandInputArguments = forwardRef<
         switch (argument.type) {
           case 'select':
             return (
-              <div className="rounded-sm relative max-w-28 h-full focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background">
+              <div className="relative h-full max-w-28 rounded-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background">
                 <select
                   key={key}
                   value={`${args[argument.name] ?? ''}`}
                   required={argument.required}
                   data-command-argument={argument.name}
-                  className="appearance-none transition-colors bg-secondary hover:bg-secondary-hover w-full h-full pl-2 pr-6 focus:outline-none rounded-sm"
+                  className="h-full w-full appearance-none rounded-sm bg-secondary pl-2 pr-6 transition-colors hover:bg-secondary-hover focus:outline-none"
                   onKeyDownCapture={(event) => {
                     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
                       event.stopPropagation();
@@ -100,7 +100,7 @@ const CommandInputArguments = forwardRef<
                     </option>
                   ))}
                 </select>
-                <ChevronDownIcon className="h-4 w-4 right-1.5 top-1/2 -translate-y-1/2 absolute pointer-events-none" />
+                <ChevronDownIcon className="pointer-events-none absolute right-1.5 top-1/2 h-4 w-4 -translate-y-1/2" />
               </div>
             );
           case 'input:text':
@@ -115,7 +115,7 @@ const CommandInputArguments = forwardRef<
                 required={argument.required}
                 data-command-argument={argument.name}
                 placeholder={argument.placeholder}
-                className="bg-secondary hover:bg-secondary-hover border-input rounded-sm px-2 max-w-28 h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                className="h-full max-w-28 rounded-sm border-input bg-secondary px-2 hover:bg-secondary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 onFocus={() => onArgFieldFocus?.(argument.name)}
                 onChange={(event) => {
                   const target = event.target as HTMLInputElement;
@@ -186,7 +186,7 @@ const CommandInputTextField = forwardRef<
       autoFocus
       onChange={(event) => onValueChange?.(event.target.value)}
       placeholder={SEARCH_INPUT_PLACEHOLDER}
-      className="bg-transparent w-full focus:outline-none h-full flex-grow min-w-56"
+      className="h-full w-full min-w-56 flex-grow bg-transparent focus:outline-none"
       {...props}
     />
   );
@@ -216,7 +216,7 @@ function CommandInputIcon({ onNavigateBack }: { onNavigateBack?: () => void }) {
   return (
     <button
       disabled={!isCanNavigateBack}
-      className="h-8 w-8 inline-flex items-center justify-center mr-2 text-muted-foreground flex-shrink-0"
+      className="mr-2 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center text-muted-foreground"
       onKeyDown={(event) => {
         event.stopPropagation();
       }}
@@ -383,12 +383,12 @@ function CommandInput() {
   return (
     // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
-      className="flex items-center px-4 h-14 focus:outline-none"
+      className="flex h-14 items-center px-4 focus:outline-none"
       tabIndex={-1}
       onKeyDown={onKeyDown}
     >
       <CommandInputIcon onNavigateBack={navigateBack} />
-      <div className="flex-grow relative h-full">
+      <div className="relative h-full flex-grow">
         <CommandInputTextField
           ref={inputRef}
           onValueChange={onInputValueChange}
@@ -402,7 +402,7 @@ function CommandInput() {
       </div>
       <span
         aria-hidden="true"
-        className="bg-transparent text-transparent -z-50 absolute pointer-events-none"
+        className="pointer-events-none absolute -z-50 bg-transparent text-transparent"
         ref={spanRef}
       ></span>
     </div>

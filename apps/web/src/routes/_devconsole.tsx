@@ -36,7 +36,7 @@ function AddItem() {
       <UiDropdownMenu>
         <UiDropdownMenuTrigger asChild>
           <UiButton>
-            <PlusIcon className="size-5 mr-2 -ml-0.5" />
+            <PlusIcon className="-ml-0.5 mr-2 size-5" />
             Item
           </UiButton>
         </UiDropdownMenuTrigger>
@@ -65,8 +65,8 @@ function DevConsoleLayout() {
   const navigate = useNavigate();
 
   return (
-    <div className="pt-36 container">
-      <h2 className="text-2xl font-semibold cursor-default leading-tight -mt-0.5">
+    <div className="container pt-36">
+      <h2 className="-mt-0.5 cursor-default text-2xl font-semibold leading-tight">
         Dev Console
       </h2>
       <div className="mt-8 flex items-center justify-between">

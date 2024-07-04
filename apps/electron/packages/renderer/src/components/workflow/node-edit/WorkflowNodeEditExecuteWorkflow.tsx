@@ -27,7 +27,7 @@ function WorkflowCombobox({
   }, [data.workflowId]);
 
   return (
-    <div className="relative group/combobox">
+    <div className="group/combobox relative">
       <UiInput
         value={data.workflowId}
         id="execute-workflow--workflow-id"
@@ -48,12 +48,12 @@ function WorkflowCombobox({
             {...{ ...props, ...item, selected }}
             subtitle=""
             tabIndex={-1}
-            className="aria-selected:bg-secondary text-sm"
+            className="text-sm aria-selected:bg-secondary"
             onKeyDown={() => onUpdateWorkflowId(item.value)}
             onSelected={() => onUpdateWorkflowId(item.value)}
           />
         )}
-        className="absolute bg-popover w-full rounded-md border p-1 mt-1 group-focus-within/combobox:block hidden max-h-80 overflow-auto"
+        className="absolute mt-1 hidden max-h-80 w-full overflow-auto rounded-md border bg-popover p-1 group-focus-within/combobox:block"
       />
     </div>
   );
@@ -121,9 +121,9 @@ function WorkflowNodeEditDelay() {
               }
             />
           </WorkflowUiFormExpression>
-          <p className="text-xs text-muted-foreground ml-1">
+          <p className="ml-1 text-xs text-muted-foreground">
             Use commas to separate the variable name. Use{' '}
-            <code className="bg-card px-1 rounded border select-all">
+            <code className="select-all rounded border bg-card px-1">
               $$all
             </code>{' '}
             to expose all variables

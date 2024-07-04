@@ -137,7 +137,7 @@ function CreateCommandScript() {
   }, [clearAll, setPanelHeader]);
 
   return (
-    <div className="py-4 px-6">
+    <div className="px-6 py-4">
       <h2 className="font-semibold">Create Command Script</h2>
       <UiForm {...form}>
         <form className="mt-4 space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
@@ -195,7 +195,7 @@ function CreateCommandScript() {
               control={form.control}
               name="name"
               render={({ field }) => (
-                <UiFormItem className="space-y-0 flex-1">
+                <UiFormItem className="flex-1 space-y-0">
                   <UiFormLabel className="ml-1">Name</UiFormLabel>
                   <UiFormControl>
                     <UiInput {...field} placeholder="Command script name" />

@@ -13,7 +13,7 @@ function UiMarkdown({
   return (
     <div
       className={clsx(
-        'prose dark:prose-invert prose-pre:rounded-lg prose-pre:bg-card prose-code:bg-card prose-hr:border-border prose-img:rounded-lg prose-thead:border-border prose-tr:border-border max-w-3xl',
+        'prose max-w-3xl dark:prose-invert prose-code:bg-card prose-pre:rounded-lg prose-pre:bg-card prose-thead:border-border prose-tr:border-border prose-img:rounded-lg prose-hr:border-border',
         className,
       )}
       {...props}

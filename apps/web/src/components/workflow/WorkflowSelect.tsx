@@ -97,16 +97,16 @@ function WorkflowSelect({
   }
   if (wsState === 'not-available') {
     return (
-      <div className="flex flex-col justify-center items-center">
+      <div className="flex flex-col items-center justify-center">
         <img alt="error illustration" src={bugFixingSvg} className="h-48" />
         <h3 className="font-semibold">
           Can&apos;t connect to the <UiLogo /> app
         </h3>
-        <p className="text-sm text-muted-foreground text-center">
+        <p className="text-center text-sm text-muted-foreground">
           Make sure you have installed the <UiLogo /> app or the app is open
         </p>
         <UiButton
-          className="min-w-40 mt-4"
+          className="mt-4 min-w-40"
           variant="secondary"
           onClick={() => {
             setWsState('connecting');

@@ -39,7 +39,7 @@ function CommandContent() {
           transition: 'height 250ms ease',
         }}
       >
-        <div ref={resizerContainerRef}>
+        <div ref={resizerContainerRef} className="h-full">
           <CommandRouteOutlet />
         </div>
       </UiScrollArea>

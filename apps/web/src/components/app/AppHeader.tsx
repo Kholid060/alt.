@@ -28,12 +28,12 @@ function AppHeader() {
   const profile = useUserStore.use.profile();
 
   return (
-    <header className="fixed top-0 left-0 w-full z-[49]">
+    <header className="fixed left-0 top-0 z-[49] w-full">
       <div className="container">
-        <nav className="h-14 mt-4 mx-auto border rounded-md px-4 items-center grid grid-cols-12 bg-background/70 backdrop-blur-sm">
+        <nav className="mx-auto mt-4 grid h-14 grid-cols-12 items-center rounded-md border bg-background/70 px-4 backdrop-blur-sm">
           <div className="col-span-2">
             <Link to="/">
-              <UiLogo className="text-2xl cursor-pointer inline-block" />
+              <UiLogo className="inline-block cursor-pointer text-2xl" />
             </Link>
           </div>
           <div className="col-span-8 text-center">
@@ -41,7 +41,7 @@ function AppHeader() {
               <Link to="/store">Store</Link>
             </UiButton>
           </div>
-          <div className="col-span-2 flex justify-end items-center">
+          <div className="col-span-2 flex items-center justify-end">
             {profile ? (
               <UiDropdownMenu>
                 <UiDropdownMenuTrigger className="rounded-full">
@@ -60,11 +60,11 @@ function AppHeader() {
                   align="end"
                   style={{ zIndex: 150 }}
                 >
-                  <div className="text-sm mb-2 px-3  pt-1">
+                  <div className="mb-2 px-3 pt-1 text-sm">
                     <p className="line-clamp-1 font-semibold leading-tight">
                       {profile.name}
                     </p>
-                    <p className="text-muted-foreground leading-tight line-clamp-1">
+                    <p className="line-clamp-1 leading-tight text-muted-foreground">
                       {profile.username || '-'}
                     </p>
                   </div>
@@ -72,21 +72,21 @@ function AppHeader() {
                     {profile.username && (
                       <UiDropdownMenuItem asChild>
                         <Link to={`/u/${profile.username}`}>
-                          <UserRoundIcon className="size-4 mr-2" />
+                          <UserRoundIcon className="mr-2 size-4" />
                           Profile
                         </Link>
                       </UiDropdownMenuItem>
                     )}
                     <UiDropdownMenuItem asChild>
                       <Link to="/devconsole/extensions">
-                        <CodeIcon className="size-4 mr-2" />
+                        <CodeIcon className="mr-2 size-4" />
                         Developer dashboard
                       </Link>
                     </UiDropdownMenuItem>
                     {profile.role === UserRole.Admin && (
                       <UiDropdownMenuItem asChild>
                         <Link to="/admin/dashboard">
-                          <UserRoundCogIcon className="size-4 mr-2" />
+                          <UserRoundCogIcon className="mr-2 size-4" />
                           Admin dashboard
                         </Link>
                       </UiDropdownMenuItem>
@@ -96,7 +96,7 @@ function AppHeader() {
                   <UiDropdownMenuGroup>
                     <UiDropdownMenuItem asChild>
                       <Link to="/settings/profile">
-                        <SettingsIcon className="size-4 mr-2" />
+                        <SettingsIcon className="mr-2 size-4" />
                         Settings
                       </Link>
                     </UiDropdownMenuItem>
@@ -108,7 +108,7 @@ function AppHeader() {
                       SupabaseService.instance.client.auth.signOut()
                     }
                   >
-                    <LogOutIcon className="size-4 mr-2" />
+                    <LogOutIcon className="mr-2 size-4" />
                     Log out
                   </UiDropdownMenuItem>
                 </UiDropdownMenuContent>
@@ -116,7 +116,7 @@ function AppHeader() {
             ) : (
               <Link to="/auth">
                 <UiButton size="sm" variant="secondary">
-                  <LogInIcon className="size-4 mr-2 -ml-1" />
+                  <LogInIcon className="-ml-1 mr-2 size-4" />
                   Log in
                 </UiButton>
               </Link>

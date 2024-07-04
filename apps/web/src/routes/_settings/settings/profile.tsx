@@ -43,6 +43,18 @@ const profileSchema = z.object({
       message:
         'Username can only contain lowercase letters, numbers, and underscores(_)',
     }),
+  website: z
+    .string()
+    .url()
+    .max(256, { message: 'Website URL must contain at most 256 character(s)' })
+    .nullable()
+    .optional(),
+  githubHandle: z
+    .string()
+    .min(2, { message: 'GitHub handle must contain at least 2 character(s)' })
+    .max(64, 'GitHub handle must contain at most 64 character(s)')
+    .optional()
+    .nullable(),
 });
 type ProfileSchema = z.infer<typeof profileSchema>;
 
@@ -108,7 +120,7 @@ function SettingsProfilePage() {
       <UiForm {...form}>
         <form className="mt-6 space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
           <div>
-            <UiLabel className="mb-1.5 inline-block ml-1">Email</UiLabel>
+            <UiLabel className="mb-1.5 ml-1 inline-block">Email</UiLabel>
             <UiInput
               value={profile.email ?? ''}
               placeholder="email@example.com"
@@ -146,7 +158,42 @@ function SettingsProfilePage() {
               </UiFormItem>
             )}
           />
-          <div className="pt-8 flex items-center gap-4 justify-end">
+          <UiFormField
+            control={form.control}
+            name="githubHandle"
+            render={({ field }) => (
+              <UiFormItem className="space-y-1">
+                <UiFormLabel className="ml-1">GitHub handle</UiFormLabel>
+                <UiFormControl>
+                  <UiInput
+                    placeholder="john_doe"
+                    {...field}
+                    value={field.value ?? ''}
+                  />
+                </UiFormControl>
+                <UiFormMessage />
+              </UiFormItem>
+            )}
+          />
+          <UiFormField
+            control={form.control}
+            name="website"
+            render={({ field }) => (
+              <UiFormItem className="space-y-1">
+                <UiFormLabel className="ml-1">Website URL</UiFormLabel>
+                <UiFormControl>
+                  <UiInput
+                    placeholder="https://example.com"
+                    type="url"
+                    {...field}
+                    value={field.value ?? ''}
+                  />
+                </UiFormControl>
+                <UiFormMessage />
+              </UiFormItem>
+            )}
+          />
+          <div className="flex items-center justify-end gap-4 pt-8">
             <UiButton
               variant="secondary"
               type="reset"

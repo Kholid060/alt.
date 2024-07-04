@@ -75,27 +75,27 @@ function StoreSidbear() {
       <UiButton
         size="icon"
         variant="secondary"
-        className="border fixed bottom-4 left-4 shadow-xl z-[53] lg:hidden"
+        className="fixed bottom-4 left-4 z-[53] border shadow-xl lg:hidden"
         onClick={() => setShow(!show)}
       >
         {show ? <XIcon className="size-5" /> : <MenuIcon className="size-5" />}
       </UiButton>
       <aside
         className={cn(
-          'w-full lg:border-0 lg:left-0 lg:bottom-0 md:left-16 md:bottom-4 md:w-64 md:pb-4 lg:p-0 border rounded-t-lg md:rounded-lg p-4 fixed left-0 bottom-0 bg-background z-[52] lg:relative lg:bg-transparent pb-16',
+          'fixed bottom-0 left-0 z-[52] w-full rounded-t-lg border bg-background p-4 pb-16 md:bottom-4 md:left-16 md:w-64 md:rounded-lg md:pb-4 lg:relative lg:bottom-0 lg:left-0 lg:border-0 lg:bg-transparent lg:p-0',
           show ? 'block' : 'hidden lg:block',
         )}
       >
         <div>
-          <p className="font-semibold text-sm text-muted-foreground flex-1">
+          <p className="flex-1 text-sm font-semibold text-muted-foreground">
             Sort by
           </p>
-          <ul className="text-muted-foreground space-y-1 mt-2">
+          <ul className="mt-2 space-y-1 text-muted-foreground">
             {storeSorts.map((sort) => (
               <li key={sort.id}>
                 <button
                   className={clsx(
-                    'flex items-center px-4 h-10 rounded-md hover:bg-card relative w-full',
+                    'relative flex h-10 w-full items-center rounded-md px-4 hover:bg-card',
                     search.sortBy === sort.id &&
                       'active-item-indicator bg-card text-foreground',
                   )}
@@ -106,20 +106,20 @@ function StoreSidbear() {
                     });
                   }}
                 >
-                  <sort.icon className="size-5 mr-4" />
+                  <sort.icon className="mr-4 size-5" />
                   {sort.name}
                 </button>
               </li>
             ))}
           </ul>
         </div>
-        <div className="flex items-center mt-4">
-          <p className="font-semibold text-sm text-muted-foreground flex-1">
+        <div className="mt-4 flex items-center">
+          <p className="flex-1 text-sm font-semibold text-muted-foreground">
             Categories
           </p>
           {search.category && (
             <button
-              className="underline text-muted-foreground text-sm"
+              className="text-sm text-muted-foreground underline"
               onClick={() => {
                 navigate({
                   search: (prev) => ({ ...prev, category: undefined }),
@@ -137,7 +137,7 @@ function StoreSidbear() {
               <li key={category}>
                 <button
                   className={clsx(
-                    'flex items-center px-4 h-10 rounded-md hover:bg-card relative w-full',
+                    'relative flex h-10 w-full items-center rounded-md px-4 hover:bg-card',
                     search.category === category &&
                       'active-item-indicator bg-card text-foreground',
                   )}
@@ -148,7 +148,7 @@ function StoreSidbear() {
                     });
                   }}
                 >
-                  <Icon className="size-5 mr-4" />
+                  <Icon className="mr-4 size-5" />
                   {category}
                 </button>
               </li>
@@ -159,7 +159,7 @@ function StoreSidbear() {
       {show && (
         // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
         <div
-          className="bg-black/50 fixed top-0 left-0 h-full w-full z-[51] backdrop-blur-sm lg:hidden"
+          className="fixed left-0 top-0 z-[51] h-full w-full bg-black/50 backdrop-blur-sm lg:hidden"
           onClick={() => setShow(false)}
         ></div>
       )}
@@ -180,7 +180,7 @@ function StoreFilter() {
   }, 500);
 
   return (
-    <div className="flex items-center flex-col-reverse md:flex-row gap-2 mb-8">
+    <div className="mb-8 flex flex-col-reverse items-center gap-2 md:flex-row">
       <UiTabs
         value={location.pathname}
         onValueChange={(value) => {
@@ -214,14 +214,14 @@ function StoreFilter() {
 }
 function StoreLayout() {
   return (
-    <main className="pt-36 pb-28 container">
-      <h2 className="text-3xl font-semibold cursor-default leading-tight -mt-0.5">
+    <main className="container pb-28 pt-36">
+      <h2 className="-mt-0.5 cursor-default text-3xl font-semibold leading-tight">
         Store
       </h2>
       <p className="text-muted-foreground">
         Browse extensions and workflows built and shared by the community
       </p>
-      <div className="lg:flex items-start mt-12">
+      <div className="mt-12 items-start lg:flex">
         <StoreSidbear />
         <div className="flex-1 lg:ml-8">
           <StoreFilter />

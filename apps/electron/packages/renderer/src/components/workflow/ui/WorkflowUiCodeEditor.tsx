@@ -44,28 +44,28 @@ function WorkflowUiCodeEditor({
 
   return (
     <div
-      className={cn('rounded-md overflow-hidden bg-card border', className)}
+      className={cn('overflow-hidden rounded-md border bg-card', className)}
       {...props}
     >
       {!hideHeader && (
-        <div className="px-2 h-9 border-b flex items-center">
+        <div className="flex h-9 items-center border-b px-2">
           <p className="font-semibold">{title}</p>
-          <span className="text-xs text-muted-foreground ml-1">
+          <span className="ml-1 text-xs text-muted-foreground">
             ({language.title})
           </span>
           <div className="flex-grow" />
           <UiDialog modal open={expandEditor} onOpenChange={setExpandEditor}>
             <UiDialog.Trigger asChild>
-              <button className="text-xs text-muted-foreground hover:underline h-full">
+              <button className="h-full text-xs text-muted-foreground hover:underline">
                 Expand
-                <ExpandIcon className="h-4 w-4 inline-block ml-1" />
+                <ExpandIcon className="ml-1 inline-block h-4 w-4" />
               </button>
             </UiDialog.Trigger>
-            <UiDialog.Content className="p-0 max-w-2xl">
+            <UiDialog.Content className="max-w-2xl p-0">
               <UiDialog.Header className="px-4 pt-4">
                 <UiDialog.Title>
                   {title}
-                  <span className="text-sm text-muted-foreground ml-1.5">
+                  <span className="ml-1.5 text-sm text-muted-foreground">
                     ({language.title})
                   </span>
                 </UiDialog.Title>
@@ -73,7 +73,7 @@ function WorkflowUiCodeEditor({
               <UiCodeEditor
                 value={value}
                 readOnly={readOnly}
-                className="text-sm min-h-72 border-t [&_.cm-gutters]:!bg-background"
+                className="min-h-72 border-t text-sm [&_.cm-gutters]:!bg-background"
                 style={{ maxHeight: 'calc(100vh - 10rem)' }}
                 placeholder={placeholder}
                 extensions={[language.module()]}
@@ -88,7 +88,7 @@ function WorkflowUiCodeEditor({
           theme="dark"
           value={value}
           readOnly={readOnly}
-          className="text-xs max-h-96 [&_.cm-scroller]:min-h-52 overflow-auto w-full [&_.cm-gutters]:!bg-card"
+          className="max-h-96 w-full overflow-auto text-xs [&_.cm-gutters]:!bg-card [&_.cm-scroller]:min-h-52"
           extensions={[language.module()]}
           onChange={(value) => onValueChange?.(value)}
           placeholder={placeholder || 'Your code here...'}

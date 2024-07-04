@@ -4,6 +4,7 @@ import APIStoreNamespace from './namespace/api-store.namespace';
 import APIAdminNamespace from './namespace/api-admin.namespace';
 import APIExtensionsNamespace from './namespace/api-extensions.namespace-';
 import APIWorkflowsNamespace from './namespace/api-workflows.namespace';
+import APIUserNamespace from './namespace/api-user.namespace';
 
 class API {
   static getErrorMessage(error: unknown, byStatus?: Record<number, string>) {
@@ -37,6 +38,7 @@ class API {
   getErrorMessage: typeof API.getErrorMessage = API.getErrorMessage;
 
   me = new APIMeNamespace(this);
+  user = new APIUserNamespace(this);
   store = new APIStoreNamespace(this);
   admin = new APIAdminNamespace(this);
   workflows = new APIWorkflowsNamespace(this);

@@ -62,7 +62,7 @@ function WorkflowNodeEditInsertData() {
       <div className="flex items-center justify-between">
         <p className="font-semibold">Items</p>
         <UiButton variant="secondary" size="sm" onClick={addItem}>
-          <PlusIcon className="mr-2 h-5 w-5 -ml-1" />
+          <PlusIcon className="-ml-1 mr-2 h-5 w-5" />
           Add
         </UiButton>
       </div>
@@ -76,7 +76,7 @@ function WorkflowNodeEditInsertData() {
                 labelChildren={
                   <button
                     onClick={() => deleteItem(index)}
-                    className="underline text-destructive-text ml-1 py-px group-focus-within/header:visible group-hover/header:visible invisible"
+                    className="invisible ml-1 py-px text-destructive-text underline group-focus-within/header:visible group-hover/header:visible"
                   >
                     Delete
                   </button>
@@ -89,7 +89,7 @@ function WorkflowNodeEditInsertData() {
                   value={item.name}
                   inputSize="sm"
                   title="Name"
-                  className="rounded-b-none rounded-r-none border-r-0 border-b-0 flex-1"
+                  className="flex-1 rounded-b-none rounded-r-none border-b-0 border-r-0"
                   placeholder="Variable name"
                   onValueChange={(value) => updateItem(index, 'name', value)}
                 />
@@ -99,7 +99,7 @@ function WorkflowNodeEditInsertData() {
                   <UiButton
                     size="icon-sm"
                     variant="outline"
-                    className="border-b-0 rounded-l-none rounded-br-none"
+                    className="rounded-l-none rounded-br-none border-b-0"
                   >
                     <EllipsisVerticalIcon className="h-5 w-5" />
                   </UiButton>

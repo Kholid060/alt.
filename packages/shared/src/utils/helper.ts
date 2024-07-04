@@ -191,3 +191,15 @@ export function sleepWithRetry(
 
   return resolver.promise;
 }
+
+export function searhParamsBuilder(
+  queries: Record<string, string | undefined>,
+) {
+  const searhParams = new URLSearchParams();
+  for (const key in queries) {
+    const value = queries[key];
+    if (typeof value !== 'undefined') searhParams.set(key, value);
+  }
+
+  return searhParams;
+}

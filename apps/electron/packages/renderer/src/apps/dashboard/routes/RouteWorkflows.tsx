@@ -155,17 +155,17 @@ function WorkflowCards({ workflows }: { workflows: WorkflowListItemModel[] }) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6 2xl:grid-cols-4">
+    <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
       {workflows.map((workflow) => (
         <UiCard
           key={workflow.id}
           className={clsx(
-            'flex flex-col cursor-default',
-            workflow.isDisabled && 'opacity-80 text-muted-foreground',
+            'flex cursor-default flex-col',
+            workflow.isDisabled && 'text-muted-foreground opacity-80',
           )}
         >
-          <UiCardHeader className="p-4 flex-row items-center pb-2">
-            <div className="h-10 w-10 border border-border/50 rounded-md bg-background/50 inline-flex justify-center items-center">
+          <UiCardHeader className="flex-row items-center p-4 pb-2">
+            <div className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border/50 bg-background/50">
               <WorkflowIcon icon={workflow.icon ?? ''} className="h-5 w-5" />
             </div>
             <div className="flex-grow"></div>
@@ -183,7 +183,7 @@ function WorkflowCards({ workflows }: { workflows: WorkflowListItemModel[] }) {
                 {workflow.isPinned ? (
                   <PinIcon className="size-5 fill-inherit" />
                 ) : (
-                  <PinOffIcon className="size-5 " />
+                  <PinOffIcon className="size-5" />
                 )}
               </UiButton>
             </UiTooltip>
@@ -191,20 +191,20 @@ function WorkflowCards({ workflows }: { workflows: WorkflowListItemModel[] }) {
           <Link to={`/workflows/${workflow.id}`} className="flex-grow">
             <UiCardContent
               className={clsx(
-                'px-4 flex-grow flex items-start gap-2',
+                'flex flex-grow items-start gap-2 px-4',
                 !workflow.description && 'items-center',
               )}
             >
               <div className="flex-grow">
                 <p className="line-clamp-2">{workflow.name}</p>
-                <p className="line-clamp-2 text-muted-foreground text-sm leading-tight">
+                <p className="line-clamp-2 text-sm leading-tight text-muted-foreground">
                   {workflow.description}
                 </p>
               </div>
             </UiCardContent>
           </Link>
-          <UiCardFooter className="px-4 pb-4 gap-2">
-            <p className="text-sm text-muted-foreground flex-grow line-clamp-1">
+          <UiCardFooter className="gap-2 px-4 pb-4">
+            <p className="line-clamp-1 flex-grow text-sm text-muted-foreground">
               Updated {dayjs(new Date(workflow.updatedAt)).fromNow()}
             </p>
             <UiSwitch
@@ -247,7 +247,7 @@ function WorkflowCards({ workflows }: { workflows: WorkflowListItemModel[] }) {
                   onClick={() =>
                     setDeleteDialog({ id: workflow.id, name: workflow.name })
                   }
-                  className="text-destructive-text data-[highlighted]:text-destructive-text data-[highlighted]:bg-destructive/20"
+                  className="text-destructive-text data-[highlighted]:bg-destructive/20 data-[highlighted]:text-destructive-text"
                 >
                   Delete
                 </UiDropdownMenuItem>
@@ -316,7 +316,7 @@ function WorkflowCreateDialog() {
     <UiDialog open={open} onOpenChange={setOpen}>
       <UiDialog.Trigger asChild>
         <UiButton className="w-24">
-          <PlusIcon className="mr-2 -ml-1 h-5 w-5" />
+          <PlusIcon className="-ml-1 mr-2 h-5 w-5" />
           New
         </UiButton>
       </UiDialog.Trigger>
@@ -451,18 +451,18 @@ function RouteWorkflows() {
   }, [importWorkflow, toast]);
 
   return (
-    <div className="p-8 container">
-      <h2 className="text-2xl font-semibold leading-tight -mt-0.5">
+    <div className="container p-8">
+      <h2 className="-mt-0.5 text-2xl font-semibold leading-tight">
         Workflows
       </h2>
-      <div className="flex items-center mt-8">
+      <div className="mt-8 flex items-center">
         <UiInput
           value={search}
           placeholder="Search workflows..."
           prefixIcon={<SearchIcon className="h-5 w-5" />}
           onValueChange={setSearch}
         />
-        <div className="flex items-center ml-4 rounded-md border text-sm">
+        <div className="ml-4 flex items-center rounded-md border text-sm">
           <UiButton
             variant="outline"
             size="icon"

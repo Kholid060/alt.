@@ -19,9 +19,16 @@ export interface ApiUserProfile {
   role: UserRole;
   createdAt: string;
   email: string | null;
+  website: string | null;
   username: string | null;
   avatarUrl: string | null;
+  githubHandle: string | null;
 }
+
+export type ApiUserData = Pick<
+  ApiUserProfile,
+  'name' | 'website' | 'avatarUrl' | 'username' | 'createdAt' | 'githubHandle'
+>;
 
 export interface ApiExtensionCommand {
   name: string;

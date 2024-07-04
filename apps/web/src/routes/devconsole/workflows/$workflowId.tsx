@@ -171,20 +171,20 @@ function DevConsoleWorkflowsDetailPage() {
 
   if (query.isPending) {
     return (
-      <div className="pt-28 container">
+      <div className="container pt-28">
         <div className="flex items-center">
           <UiSkeleton className="h-6 w-24" />
-          <UiSkeleton className="h-6 w-32 ml-2" />
+          <UiSkeleton className="ml-2 h-6 w-32" />
         </div>
         <div className="mt-8 flex items-center">
           <UiSkeleton className="size-14" />
           <div className="ml-4">
             <UiSkeleton className="h-7 w-40" />
-            <UiSkeleton className="h-4 mt-2 w-64" />
+            <UiSkeleton className="mt-2 h-4 w-64" />
           </div>
         </div>
         <hr className="my-8 border-border/40" />
-        <UiSkeleton className="w-full max-w-xl h-64" />
+        <UiSkeleton className="h-64 w-full max-w-xl" />
       </div>
     );
   }
@@ -199,11 +199,11 @@ function DevConsoleWorkflowsDetailPage() {
     }
 
     return (
-      <div className="flex flex-col place-items-center mt-12 max-w-md mx-auto text-center pt-28 container">
+      <div className="container mx-auto mt-12 flex max-w-md flex-col place-items-center pt-28 text-center">
         <div className="inline-block rounded-full bg-card/60 p-6 text-muted-foreground">
           <WorkflowIcon className="size-10" />
         </div>
-        <h2 className="font-semibold mt-4 text-lg">
+        <h2 className="mt-4 text-lg font-semibold">
           Couldn&apos;t load workflow
         </h2>
         {!isNotFound && (
@@ -221,7 +221,7 @@ function DevConsoleWorkflowsDetailPage() {
   const data = importedData ?? query.data;
 
   return (
-    <div className="py-28 container">
+    <div className="container py-28">
       <UiBreadcrumb>
         <UiBreadcrumbList>
           <UiBreadcrumbItem>
@@ -279,7 +279,7 @@ function DevConsoleWorkflowsDetailPage() {
           </>
         }
       />
-      <div className="mt-6 h-64 md:h-96 lg:h-[500px] rounded-lg border-2 overflow-hidden border-border/70">
+      <div className="mt-6 h-64 overflow-hidden rounded-lg border-2 border-border/70 md:h-96 lg:h-[500px]">
         <WorkflowViewer
           edges={data.workflow.edges}
           nodes={data.workflow.nodes}
@@ -297,7 +297,7 @@ function DevConsoleWorkflowsDetailPage() {
                 <UiDialog.Trigger asChild>
                   <UiButton variant="secondary">Import data</UiButton>
                 </UiDialog.Trigger>
-                <UiDialog.Content className="sm:max-w-[425px] z-[101]">
+                <UiDialog.Content className="z-[101] sm:max-w-[425px]">
                   <UiDialog.Header>
                     <UiDialog.Title>Import data</UiDialog.Title>
                     <UiDialog.Description>

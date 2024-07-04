@@ -506,9 +506,9 @@ function RouteWorkflow() {
       <ReactFlowProvider>
         <WorkflowNodesWrapper>
           <WorkflowEditorContextMenu />
-          <div className="relative w-full h-screen flex flex-col">
+          <div className="relative flex h-screen w-full flex-col">
             <WorkflowEditorHeader />
-            <div className="flex-grow flex relative">
+            <div className="relative flex flex-grow">
               <WorkflowEditorNodeListModal />
               <WorkflowEditor />
               <Panel position="bottom-right">

@@ -46,8 +46,8 @@ function WorkflowNodeEditTriggerShortcut() {
       {isRecording ? (
         <>
           <span className="relative inline-block h-8 w-8">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75"></span>
-            <span className="relative inline-flex rounded-full bg-destructive h-8 w-8 items-center justify-center">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-destructive opacity-75"></span>
+            <span className="relative inline-flex h-8 w-8 items-center justify-center rounded-full bg-destructive">
               <Disc2Icon className="text-destructive-foreground/75" />
             </span>
           </span>
@@ -59,16 +59,16 @@ function WorkflowNodeEditTriggerShortcut() {
           </div>
         </>
       ) : (
-        <div className="flex items-center mt-2">
+        <div className="mt-2 flex items-center">
           {shortcut ? (
-            <div className="p-2 rounded-md border w-full flex items-center">
+            <div className="flex w-full items-center rounded-md border p-2">
               <UiShortcut
                 shortcut={KeyboardShortcutUtils.toElectronShortcut(shortcut)}
-                className="text-sm mr-1"
+                className="mr-1 text-sm"
               />
               <div className="flex-grow"></div>
               <button
-                className="underline text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground underline hover:text-foreground"
                 onClick={() =>
                   updateEditNode<WorkflowNodeTriggerShortcut>({
                     shortcut: null,
@@ -79,7 +79,7 @@ function WorkflowNodeEditTriggerShortcut() {
               </button>
             </div>
           ) : (
-            <p className="text-center w-full text-muted-foreground">
+            <p className="w-full text-center text-muted-foreground">
               No keyboard shortcut
             </p>
           )}
@@ -88,10 +88,10 @@ function WorkflowNodeEditTriggerShortcut() {
       <UiButton
         variant="secondary"
         size="sm"
-        className="w-full mt-6"
+        className="mt-6 w-full"
         onClick={() => setIsRecording(!isRecording)}
       >
-        {!isRecording && <CircleDotIcon className="h-4 w-4 mr-2" />}
+        {!isRecording && <CircleDotIcon className="mr-2 h-4 w-4" />}
         {isRecording ? 'Cancel recording' : 'Record keyboard shortcut'}
       </UiButton>
     </WorkflowNodeLayoutEdit>

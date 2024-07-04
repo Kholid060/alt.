@@ -109,11 +109,11 @@ function RouteExtension() {
   }, []);
 
   return (
-    <div className="p-8 container">
-      <h2 className="text-2xl font-semibold leading-tight -mt-0.5">
+    <div className="container p-8">
+      <h2 className="-mt-0.5 text-2xl font-semibold leading-tight">
         Extensions
       </h2>
-      <div className="flex items-center mt-8">
+      <div className="mt-8 flex items-center">
         <UiToggleGroup
           type="single"
           value={activeFilter}
@@ -134,7 +134,7 @@ function RouteExtension() {
           onValueChange={setSearch}
         />
       </div>
-      <div className="text-sm border mt-4 rounded-lg overflow-hidden flex">
+      <div className="mt-4 flex overflow-hidden rounded-lg border text-sm">
         <div className={`flex-grow ${selectedExtensionId ? 'border-r' : ''}`}>
           <ExtensionListTable
             extensions={filteredExtensions}

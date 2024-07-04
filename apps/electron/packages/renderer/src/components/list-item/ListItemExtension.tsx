@@ -127,7 +127,7 @@ function ListItemExtension({
               Local Extension
             </span>
             {(extension.isError || hasError) && (
-              <AlertTriangleIcon className="h-4 w-4 text-destructive-text ml-2" />
+              <AlertTriangleIcon className="ml-2 h-4 w-4 text-destructive-text" />
             )}
           </>
         )

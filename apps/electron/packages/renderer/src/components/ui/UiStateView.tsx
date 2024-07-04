@@ -58,14 +58,14 @@ function UiStateView({
       )}
       {...props}
     >
-      <div className={clsx('p-6 rounded-full', stateData.iconContainerClass)}>
+      <div className={clsx('rounded-full p-6', stateData.iconContainerClass)}>
         {iconSlot || (
           <StateIcon className={clsx('h-10 w-10', stateData.iconClass)} />
         )}
       </div>
       <h3 className="mt-6 text-lg font-semibold">{title || stateData.title}</h3>
       {description && (
-        <p className="mt-2 max-w-sm text-muted-foreground leading-5">
+        <p className="mt-2 max-w-sm leading-5 text-muted-foreground">
           {description}
         </p>
       )}

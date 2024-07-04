@@ -128,7 +128,7 @@ function ListItemCommand({
       className={command.isDisabled ? 'opacity-60' : ''}
       alias={
         item.alias && (
-          <span className="border ml-1 px-1 rounded">{item.alias}</span>
+          <span className="ml-1 rounded border px-1">{item.alias}</span>
         )
       }
       suffix={

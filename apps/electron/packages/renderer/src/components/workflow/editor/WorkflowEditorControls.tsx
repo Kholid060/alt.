@@ -44,7 +44,7 @@ function WorkflowEditorControls() {
 
   return (
     <div className="flex items-center gap-2">
-      <div className="flex items-center border border-border/60 bg-secondary rounded-md">
+      <div className="flex items-center rounded-md border border-border/60 bg-secondary">
         <UiTooltip
           label={
             <>
@@ -62,7 +62,7 @@ function WorkflowEditorControls() {
             <MinusIcon className="h-5 w-5" />
           </UiButton>
         </UiTooltip>
-        <hr className="h-5 bg-border/60 w-px" />
+        <hr className="h-5 w-px bg-border/60" />
         <UiTooltip
           label={
             <>
@@ -117,7 +117,7 @@ export function WorkflowUndoRedo() {
   useHotkeys('mod+shift+z', redo, []);
 
   return (
-    <div className="border border-border/60 bg-secondary rounded-md">
+    <div className="rounded-md border border-border/60 bg-secondary">
       <UiTooltip
         label={
           <>
@@ -134,7 +134,7 @@ export function WorkflowUndoRedo() {
           <UndoIcon className="h-5 w-5" />
         </UiButton>
       </UiTooltip>
-      <hr className="h-5 bg-border/60 w-px inline-block" />
+      <hr className="inline-block h-5 w-px bg-border/60" />
       <UiTooltip
         label={
           <>

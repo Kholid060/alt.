@@ -100,33 +100,33 @@ function CommandOAuthOverlay() {
   }
 
   return (
-    <div className="h-full w-full absolute z-50 top-0 left-0 bg-background rounded-lg flex flex-col overflow-hidden">
-      <div className="h-14 flex items-center px-4 border-b flex-shrink-0">
+    <div className="absolute left-0 top-0 z-50 flex h-full w-full flex-col overflow-hidden rounded-lg bg-background">
+      <div className="flex h-14 flex-shrink-0 items-center border-b px-4">
         <button
-          className="h-8 w-8 inline-flex items-center justify-center mr-2 text-muted-foreground flex-shrink-0"
+          className="mr-2 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center text-muted-foreground"
           onClick={() => onClose('cancel')}
         >
           <ArrowLeftIcon className="h-5 w-5" />
         </button>
       </div>
-      <div className="p-4 flex-grow overflow-auto">
+      <div className="flex-grow overflow-auto p-4">
         <div className="py-8 text-center">
-          <div className="h-14 w-14 inline-block">
+          <div className="inline-block h-14 w-14">
             <UiExtensionIcon
               id={credential.extensionId}
               alt={credential.providerName}
               icon={credential.providerIcon}
             />
           </div>
-          <h2 className="text-lg font-semibold mt-2 leading-tight">
+          <h2 className="mt-2 text-lg font-semibold leading-tight">
             {credential.credentialName}
           </h2>
-          <p className="text-muted-foreground text-sm line-clamp-2 mt-1">
+          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
             Connect your {credential.providerName} account
           </p>
           <UiButton
             size="sm"
-            className="min-w-36 mt-6"
+            className="mt-6 min-w-36"
             onClick={() => onClose('submit')}
           >
             Connect account

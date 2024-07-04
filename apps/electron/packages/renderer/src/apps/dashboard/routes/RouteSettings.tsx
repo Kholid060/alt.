@@ -32,7 +32,7 @@ type SettingsSection<T extends object = object> = React.FC<
 const SettingGeneral: SettingsSection = ({ settings, onUpdateSetting }) => {
   return (
     <section
-      className="border rounded-lg settings-section"
+      className="settings-section rounded-lg border"
       aria-label="general"
     >
       <div className="px-4 pt-4">
@@ -44,7 +44,7 @@ const SettingGeneral: SettingsSection = ({ settings, onUpdateSetting }) => {
             <SquarePowerIcon />
             <div className="flex-1">
               <p className="leading-tight">Startup</p>
-              <p className="text-sm text-muted-foreground leading-tight">
+              <p className="text-sm leading-tight text-muted-foreground">
                 Launch alt. app on startup
               </p>
             </div>
@@ -54,11 +54,11 @@ const SettingGeneral: SettingsSection = ({ settings, onUpdateSetting }) => {
               onCheckedChange={(value) => onUpdateSetting({ startup: value })}
             />
           </li>
-          <li className="flex items-center pt-4 gap-4">
+          <li className="flex items-center gap-4 pt-4">
             <AppWindowIcon />
             <div className="flex-1">
               <p className="leading-tight">Clear command window state</p>
-              <p className="text-sm text-muted-foreground leading-tight">
+              <p className="text-sm leading-tight text-muted-foreground">
                 Clear command window state once idle
               </p>
             </div>
@@ -157,7 +157,7 @@ const SettingBackupData: SettingsSection<{ onRestore?(): void }> = ({
 
   return (
     <section
-      className="border rounded-lg settings-section"
+      className="settings-section rounded-lg border"
       aria-label="backup-data"
     >
       <div className="px-4 pt-4">
@@ -169,7 +169,7 @@ const SettingBackupData: SettingsSection<{ onRestore?(): void }> = ({
             <HardDriveDownloadIcon />
             <div className="flex-1">
               <p className="leading-tight">Backup</p>
-              <p className="text-sm text-muted-foreground leading-tight">
+              <p className="text-sm leading-tight text-muted-foreground">
                 Backup your settings, extensions data, and workflows
               </p>
             </div>
@@ -182,7 +182,7 @@ const SettingBackupData: SettingsSection<{ onRestore?(): void }> = ({
             >
               Backup data
               {loading === 'backup' && (
-                <div className="absolute h-full w-full flex items-center cursor-default justify-center rounded-md bg-inherit bg-secondary">
+                <div className="absolute flex h-full w-full cursor-default items-center justify-center rounded-md bg-inherit bg-secondary">
                   <Loader2Icon className="animate-spin" />
                 </div>
               )}
@@ -190,9 +190,9 @@ const SettingBackupData: SettingsSection<{ onRestore?(): void }> = ({
           </li>
           <li className="flex items-center pt-4">
             <HardDriveUploadIcon />
-            <div className="flex-1 ml-4">
+            <div className="ml-4 flex-1">
               <p className="leading-tight">Restore</p>
-              <p className="text-sm text-muted-foreground leading-tight">
+              <p className="text-sm leading-tight text-muted-foreground">
                 Restore your backed-up data
               </p>
             </div>
@@ -202,7 +202,7 @@ const SettingBackupData: SettingsSection<{ onRestore?(): void }> = ({
                   <SettingsIcon className="size-5" />
                 </UiButton>
               </UiPopoverTrigger>
-              <UiPopoverContent className="text-sm w-64">
+              <UiPopoverContent className="w-64 text-sm">
                 <p className="font-semibold">Restore settings</p>
                 <div className="mt-4 flex items-center">
                   <UiLabel htmlFor="upsert-restore" className="flex-1">
@@ -222,13 +222,13 @@ const SettingBackupData: SettingsSection<{ onRestore?(): void }> = ({
             <UiButton
               size="sm"
               variant="secondary"
-              className="ml-2 relative"
+              className="relative ml-2"
               disabled={!!loading}
               onClick={restoreData}
             >
               Restore data
               {loading === 'restore' && (
-                <div className="absolute h-full w-full flex items-center cursor-default justify-center rounded-md bg-inherit bg-secondary">
+                <div className="absolute flex h-full w-full cursor-default items-center justify-center rounded-md bg-inherit bg-secondary">
                   <Loader2Icon className="animate-spin" />
                 </div>
               )}
@@ -285,17 +285,17 @@ function SettingsSidebar() {
   }, []);
 
   return (
-    <aside className="lg:w-64 flex-shrink-0">
-      <ul className="space-y-1 text-muted-foreground flex items-center gap-2 lg:block">
+    <aside className="flex-shrink-0 lg:w-64">
+      <ul className="flex items-center gap-2 space-y-1 text-muted-foreground lg:block">
         {sections.map((section) => (
           <li key={section.id} className="relative">
             <span
-              className="h-4/6 w-2 bg-primary left-0 absolute top-1/2 -translate-y-1/2 rounded-full"
+              className="absolute left-0 top-1/2 h-4/6 w-2 -translate-y-1/2 rounded-full bg-primary"
               style={{ width: activeSetting === section.id ? 4 : 0 }}
             ></span>
             <button
               className={clsx(
-                'h-10 w-full text-left rounded-md px-3 hover:bg-secondary/70',
+                'h-10 w-full rounded-md px-3 text-left hover:bg-secondary/70',
                 activeSetting === section.id &&
                   'bg-secondary/70 text-foreground',
               )}
@@ -364,13 +364,13 @@ function RouteSettings() {
   if (!settings) return null;
 
   return (
-    <div className="p-8 container">
-      <h2 className="text-2xl font-semibold cursor-default leading-tight -mt-0.5">
+    <div className="container p-8">
+      <h2 className="-mt-0.5 cursor-default text-2xl font-semibold leading-tight">
         Settings
       </h2>
-      <main className="mt-8 lg:flex gap-6 cursor-default">
+      <main className="mt-8 cursor-default gap-6 lg:flex">
         <SettingsSidebar />
-        <div className="flex-1 lg:max-w-2xl space-y-8 mt-4 lg:mt-0">
+        <div className="mt-4 flex-1 space-y-8 lg:mt-0 lg:max-w-2xl">
           <SettingGeneral
             settings={settings}
             onUpdateSetting={updateSettings}

@@ -45,7 +45,7 @@ const SetAttributes: ActionComponent = ({ data, onUpdate }) => {
   return (
     <>
       <div className="flex items-center">
-        <p className="font-semibold flex-grow">Attributes</p>
+        <p className="flex-grow font-semibold">Attributes</p>
         <div className="flex items-center gap-2">
           <UiSwitch
             checked={data.useSetAttrsJSON}
@@ -83,7 +83,7 @@ const SetAttributes: ActionComponent = ({ data, onUpdate }) => {
                   labelChildren={
                     <button
                       onClick={() => deleteItem(index)}
-                      className="underline text-destructive-text ml-1 py-px group-focus-within/header:visible group-hover/header:visible invisible"
+                      className="invisible ml-1 py-px text-destructive-text underline group-focus-within/header:visible group-hover/header:visible"
                     >
                       Delete
                     </button>
@@ -96,7 +96,7 @@ const SetAttributes: ActionComponent = ({ data, onUpdate }) => {
                     value={item.name}
                     inputSize="sm"
                     title="Name"
-                    className="rounded-b-none border-b-0 flex-1"
+                    className="flex-1 rounded-b-none border-b-0"
                     placeholder="Attribute name"
                     onValueChange={(value) => updateItem(index, 'name', value)}
                   />
@@ -154,7 +154,7 @@ const GetAttributes: ActionComponent = ({ data, onUpdate }) => {
         placeholder="attr-a,attr-b,attr-c"
         onChange={(event) => onUpdate({ getAttrs: event.target.value })}
       />
-      <p className="text-xs text-muted-foreground ml-1">
+      <p className="ml-1 text-xs text-muted-foreground">
         Use commas to separate the attribute names
       </p>
     </WorkflowUiFormExpression>

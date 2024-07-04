@@ -127,7 +127,7 @@ function WorkflowNodeEditDelay() {
               }
             />
           </WorkflowUiFormExpression>
-          <div className="flex items-center gap-2 mt-3">
+          <div className="mt-3 flex items-center gap-2">
             <UiSwitch
               id="browser-keyboard--clear-value"
               size="sm"
@@ -174,7 +174,7 @@ function WorkflowNodeEditDelay() {
             </datalist>
           </WorkflowUiFormExpression>
           <p className="mt-4 font-semibold">Key modifiers</p>
-          <div className="grid grid-cols-2 gap-3 mt-2">
+          <div className="mt-2 grid grid-cols-2 gap-3">
             {keyModifiers.map((modifier) => (
               <div className="flex items-center gap-1.5" key={modifier.id}>
                 <UiCheckbox

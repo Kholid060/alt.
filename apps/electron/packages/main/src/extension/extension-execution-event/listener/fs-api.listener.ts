@@ -8,11 +8,12 @@ function getWriteContent(
   content: string | ArrayBuffer,
   options: Partial<ExtensionAPI.fs.WriteOptions>,
 ) {
-  if (typeof content === 'string' && options.stringType === 'base64') {
-    return Buffer.from(content, 'base64');
+  if (typeof content === 'string') {
+    if (options.stringType === 'base64') return Buffer.from(content, 'base64');
+    return Buffer.from(content);
   }
 
-  return content;
+  return Buffer.from(content);
 }
 
 @Injectable()
@@ -29,7 +30,7 @@ export class ExtensionFSApiListener {
     args: [path, data, options = {}],
   }: ExtensionApiEvent<'fs.writeFile'>) {
     return fs.writeFile(path, getWriteContent(data, options), {
-      encoding: options.encoding,
+      encoding: options.encoding as BufferEncoding,
     });
   }
 
@@ -38,7 +39,7 @@ export class ExtensionFSApiListener {
     args: [path, data, options = {}],
   }: ExtensionApiEvent<'fs.appendFile'>) {
     return fs.appendFile(path, getWriteContent(data, options), {
-      encoding: options.encoding,
+      encoding: options.encoding as BufferEncoding,
     });
   }
 
@@ -58,9 +59,10 @@ export class ExtensionFSApiListener {
 
   @OnExtensionAPI('fs.readFile')
   readFile({ args: [path, options = {}] }: ExtensionApiEvent<'fs.readFile'>) {
-    return fs.readFile(path, options.encoding ?? '') as Promise<
-      string | Uint8Array
-    >;
+    return fs.readFile(
+      path,
+      (options.encoding ?? undefined) as BufferEncoding,
+    ) as Promise<string | Uint8Array>;
   }
 
   @OnExtensionAPI('fs.readJSON')

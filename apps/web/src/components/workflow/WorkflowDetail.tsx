@@ -91,7 +91,7 @@ export const WorkflowDetail = forwardRef<
         ref={formRef}
         onSubmit={form.handleSubmit((values) => onSubmit?.(values))}
         className={clsx(
-          'grid grid-cols-1 md:grid-cols-12 items-start max-w-3xl gap-x-4 md:gap-y-8 gap-y-2',
+          'grid max-w-3xl grid-cols-1 items-start gap-x-4 gap-y-2 md:grid-cols-12 md:gap-y-8',
           className,
         )}
       >
@@ -139,7 +139,7 @@ export const WorkflowDetail = forwardRef<
                   {field.value.map((item) => (
                     <button
                       key={item}
-                      className="py-1.5 px-3 rounded-full border text-sm inline-flex items-center"
+                      className="inline-flex items-center rounded-full border px-3 py-1.5 text-sm"
                       onClick={() =>
                         form.setValue(
                           'categories',
@@ -149,7 +149,7 @@ export const WorkflowDetail = forwardRef<
                       }
                     >
                       {item}
-                      <XIcon className="size-4 inline ml-1 text-muted-foreground -mr-1" />
+                      <XIcon className="-mr-1 ml-1 inline size-4 text-muted-foreground" />
                     </button>
                   ))}
                   <UiFormControl>
@@ -217,7 +217,7 @@ export const WorkflowDetail = forwardRef<
                       size="sm"
                       variant="secondary"
                     >
-                      <EyeIcon className="size-5 mr-2" />
+                      <EyeIcon className="mr-2 size-5" />
                       Preview
                     </UiButton>
                   </UiDialog.Trigger>
@@ -256,15 +256,15 @@ export function WorkflowDetailHeader({
     UiIcons[icon.split(':')[1] as keyof typeof UiIcons] ?? UiIcons.Command;
 
   return (
-    <div className={clsx('md:flex items-center', className)} {...props}>
-      <div className="p-2 rounded-md border bg-card border-border/40 text-muted-foreground inline-block">
+    <div className={clsx('items-center md:flex', className)} {...props}>
+      <div className="inline-block rounded-md border border-border/40 bg-card p-2 text-muted-foreground">
         <Icon className="size-10" />
       </div>
-      <div className="md:ml-4 flex-grow">
-        <h2 className="text-2xl font-semibold cursor-default leading-tight">
+      <div className="flex-grow md:ml-4">
+        <h2 className="cursor-default text-2xl font-semibold leading-tight">
           {title}
         </h2>
-        <p className="text-sm text-muted-foreground line-clamp-1">
+        <p className="line-clamp-1 text-sm text-muted-foreground">
           {updatedAt && `Last updated ${dayjs(updatedAt).fromNow()} •`}{' '}
           {description}
         </p>

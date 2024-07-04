@@ -14,20 +14,20 @@ const menu: { path: string; name: string }[] = [
 
 function SettingsNavigation() {
   return (
-    <aside className="lg:w-64 flex-shrink-0">
-      <ul className="space-y-1 text-muted-foreground flex items-center gap-2 lg:block">
+    <aside className="flex-shrink-0 lg:w-64">
+      <ul className="flex items-center gap-2 space-y-1 text-muted-foreground lg:block">
         {menu.map((item) => (
           <li key={item.path} className="relative">
             <Link to={`/settings/${item.path}`}>
               {({ isActive }) => (
                 <>
                   <span
-                    className="h-4/6 w-2 bg-primary left-0 absolute top-1/2 -translate-y-1/2 rounded-full"
+                    className="absolute left-0 top-1/2 h-4/6 w-2 -translate-y-1/2 rounded-full bg-primary"
                     style={{ width: isActive ? 4 : 0 }}
                   ></span>
                   <span
                     className={clsx(
-                      'h-10 w-full text-left rounded-md px-3 hover:bg-secondary/70 flex items-center',
+                      'flex h-10 w-full items-center rounded-md px-3 text-left hover:bg-secondary/70',
                       isActive && 'bg-secondary/70 text-foreground',
                     )}
                   >
@@ -45,13 +45,13 @@ function SettingsNavigation() {
 
 function SettingsLayout() {
   return (
-    <div className="container pt-36 pb-14">
-      <h2 className="text-2xl font-semibold cursor-default leading-tight -mt-0.5">
+    <div className="container pb-14 pt-36">
+      <h2 className="-mt-0.5 cursor-default text-2xl font-semibold leading-tight">
         Settings
       </h2>
-      <div className="flex flex-col lg:flex-row mt-12">
+      <div className="mt-12 flex flex-col lg:flex-row">
         <SettingsNavigation />
-        <div className="lg:flex-1 lg:ml-10 lg:mt-0 mt-8">
+        <div className="mt-8 lg:ml-10 lg:mt-0 lg:flex-1">
           <Outlet />
         </div>
       </div>

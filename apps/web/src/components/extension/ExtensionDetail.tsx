@@ -34,7 +34,7 @@ export function ExtensionDetailIcon({
       UiIcons[icon.split(':')[1] as keyof typeof UiIcons] ?? UiIcons.Command;
 
     return (
-      <div className="p-2 rounded-md border bg-card border-border/40 text-muted-foreground inline-block">
+      <div className="inline-block rounded-md border border-border/40 bg-card p-2 text-muted-foreground">
         <Icon className={clsx(svgClass, className)} />
       </div>
     );
@@ -68,7 +68,7 @@ export function ExtensionDetailHeader({
   suffixSlot?: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={clsx('md:flex items-center', className)} {...props}>
+    <div className={clsx('items-center md:flex', className)} {...props}>
       <ExtensionDetailIcon
         icon={icon}
         title={title}
@@ -76,11 +76,11 @@ export function ExtensionDetailHeader({
         svgClass="size-11"
         imageClass="size-12"
       />
-      <div className="md:ml-4 flex-grow">
-        <h2 className="text-2xl font-semibold cursor-default leading-tight">
+      <div className="flex-grow md:ml-4">
+        <h2 className="cursor-default text-2xl font-semibold leading-tight">
           {title}
         </h2>
-        <p className="text-sm text-muted-foreground leading-tight line-clamp-1">
+        <p className="line-clamp-1 text-sm leading-tight text-muted-foreground">
           v{version} • {description}
         </p>
       </div>
@@ -115,7 +115,7 @@ export function ExtensionDetailMarkdownAsset({
 
   if (query.isLoading || query.isPending) {
     return (
-      <div className="space-y-2 mt-4">
+      <div className="mt-4 space-y-2">
         <UiSkeleton className="h-12 w-full rounded-md" />
         <UiSkeleton className="h-6 w-full rounded-sm" />
         <UiSkeleton className="h-6 w-full rounded-sm" />
@@ -129,11 +129,11 @@ export function ExtensionDetailMarkdownAsset({
     const isNotFound = 'status' in query.error && query.error.status === 404;
 
     return (
-      <div className="flex flex-col place-items-center mt-12 max-w-md mx-auto text-center">
+      <div className="mx-auto mt-12 flex max-w-md flex-col place-items-center text-center">
         <div className="inline-block rounded-full bg-card/60 p-6 text-muted-foreground">
           <FileIcon className="size-10" />
         </div>
-        <h2 className="font-semibold mt-4 text-lg">
+        <h2 className="mt-4 text-lg font-semibold">
           Couldn&apos;t {isNotFound ? 'find' : 'load'} {filename} file
         </h2>
         {!isNotFound && (
@@ -165,7 +165,7 @@ export function ExtensionDetail({
   loadingBanners?: boolean;
 }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-12 items-start max-w-3xl gap-x-4 md:gap-y-8 gap-y-2">
+    <div className="grid max-w-3xl grid-cols-1 items-start gap-x-4 gap-y-2 md:grid-cols-12 md:gap-y-8">
       <div className="col-span-5 leading-none">
         <UiLabel htmlFor="extension-repo-url">Extension repository URL</UiLabel>
       </div>
@@ -181,12 +181,12 @@ export function ExtensionDetail({
         }
         onClick={(event) => (event.target as HTMLInputElement).select()}
       />
-      <div className="col-span-5 leading-none mt-4 md:mt-0">
+      <div className="col-span-5 mt-4 leading-none md:mt-0">
         <UiLabel>Banner images</UiLabel>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 col-span-7 gap-2">
+      <div className="col-span-7 grid grid-cols-2 gap-2 md:grid-cols-3">
         {!loadingBanners && banners.length === 0 && (
-          <p className="col-span-full text-muted-foreground text-sm">
+          <p className="col-span-full text-sm text-muted-foreground">
             No banner images
           </p>
         )}
@@ -200,45 +200,45 @@ export function ExtensionDetail({
           banners.map((banner) => (
             <div
               key={banner}
-              className="aspect-video h-20 w-full rounded-md border-2 bg-card overflow-hidden"
+              className="aspect-video h-20 w-full overflow-hidden rounded-md border-2 bg-card"
             >
               <img
                 alt={banner}
                 src={banner}
-                className="object-cover object-center w-full h-full"
+                className="h-full w-full object-cover object-center"
               />
             </div>
           ))
         )}
       </div>
-      <div className="col-span-5 leading-none mt-4 md:mt-0">
+      <div className="col-span-5 mt-4 leading-none md:mt-0">
         <UiLabel>Categories</UiLabel>
       </div>
-      <div className="flex items-center col-span-7 gap-2 flex-wrap">
+      <div className="col-span-7 flex flex-wrap items-center gap-2">
         {categories.length === 0 && (
-          <p className="text-muted-foreground text-sm">No categories</p>
+          <p className="text-sm text-muted-foreground">No categories</p>
         )}
         {categories.map((category) => (
           <span
             key={category}
-            className="py-1.5 px-3 cursor-default rounded-full border text-sm inline-flex items-center"
+            className="inline-flex cursor-default items-center rounded-full border px-3 py-1.5 text-sm"
           >
             {category}
           </span>
         ))}
       </div>
-      <div className="col-span-5 leading-none mt-4 md:mt-0">
+      <div className="col-span-5 mt-4 leading-none md:mt-0">
         <UiLabel>Commands</UiLabel>
       </div>
       <ul className="col-span-7 space-y-3">
         {commands.map((command) => (
           <li key={command.name}>
-            <span className="px-2 py-0.5 border rounded-full text-xs">
+            <span className="rounded-full border px-2 py-0.5 text-xs">
               {EXTENSION_COMMAND_TYPE_NAME[command.type]}
             </span>
-            <div className="inline-block align-top ml-2 mt-px">
+            <div className="ml-2 mt-px inline-block align-top">
               <p>{command.title}</p>
-              <p className="text-muted-foreground leading-tight">
+              <p className="leading-tight text-muted-foreground">
                 {command.description}
               </p>
             </div>

@@ -111,7 +111,7 @@ function AddCredentials({ providers }: { providers: CredentialProviders }) {
     <UiDialog open={open} onOpenChange={setOpen}>
       <UiDialog.Trigger asChild>
         <UiButton>
-          <PlusIcon className="h-5 w-5 mr-2" />
+          <PlusIcon className="mr-2 h-5 w-5" />
           Credential
         </UiButton>
       </UiDialog.Trigger>
@@ -189,7 +189,7 @@ function EditCredential({
           />
         ) : (
           <div className="text-center">
-            <Loader2Icon className="h-5 w-5 animate-spin inline" />
+            <Loader2Icon className="inline h-5 w-5 animate-spin" />
           </div>
         )}
       </UiDialog.Content>
@@ -216,7 +216,7 @@ function CredentialCard({
 
   return (
     <UiCard>
-      <UiCardHeader className="items-center flex-row p-4 space-y-0 justify-between">
+      <UiCardHeader className="flex-row items-center justify-between space-y-0 p-4">
         <div className="h-9 w-9">
           <UiExtensionIcon
             id={credential.extension.id}
@@ -225,10 +225,10 @@ function CredentialCard({
           />
         </div>
         {credential.tokenId !== null ? (
-          <div className="flex items-center relative">
-            <div className="text-green-500 relative rounded-md bg-secondary cursor-default h-9 px-3 rounded-r-none flex items-center text-sm">
+          <div className="relative flex items-center">
+            <div className="relative flex h-9 cursor-default items-center rounded-md rounded-r-none bg-secondary px-3 text-sm text-green-500">
               Connected
-              <hr className="h-6 w-px bg-border absolute right-0" />
+              <hr className="absolute right-0 h-6 w-px bg-border" />
             </div>
             <UiTooltip label="Reconnect account">
               <UiButton
@@ -253,9 +253,9 @@ function CredentialCard({
       </UiCardHeader>
       <UiCardContent
         onClick={() => onEdit?.(credential)}
-        className="pb-4 px-4 text-sm text-muted-foreground cursor-pointer"
+        className="cursor-pointer px-4 pb-4 text-sm text-muted-foreground"
       >
-        <p className="text-base text-foreground line-clamp-1">
+        <p className="line-clamp-1 text-base text-foreground">
           {credential.name}
         </p>
         <p>
@@ -455,11 +455,11 @@ function RouteCredentials() {
   );
 
   return (
-    <div className="p-8 container">
-      <h2 className="text-2xl font-semibold leading-tight -mt-0.5">
+    <div className="container p-8">
+      <h2 className="-mt-0.5 text-2xl font-semibold leading-tight">
         Credentials
       </h2>
-      <div className="flex items-center mt-8">
+      <div className="mt-8 flex items-center">
         <UiInput
           type="search"
           defaultValue={search}
@@ -467,7 +467,7 @@ function RouteCredentials() {
           onValueChange={setSearch}
           prefixIcon={<SearchIcon className="h-5 w-5" />}
         />
-        <div className="flex items-center ml-4 rounded-md border text-sm">
+        <div className="ml-4 flex items-center rounded-md border text-sm">
           <UiButton
             variant="outline"
             size="icon"
@@ -504,7 +504,7 @@ function RouteCredentials() {
           <AddCredentials providers={credentialProviders} />
         </UiListProvider>
       </div>
-      <div className="mt-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {credentials.items.map((cred) => (
           <CredentialCard
             key={cred.id}
@@ -517,7 +517,7 @@ function RouteCredentials() {
         ))}
       </div>
       {credentials.count === 0 && (
-        <p className="text-muted-foreground text-center my-4">No data</p>
+        <p className="my-4 text-center text-muted-foreground">No data</p>
       )}
       <UiItemsPagination
         pagination={pagination}

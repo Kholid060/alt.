@@ -66,7 +66,7 @@ function IconResolver({
   }
 
   return (
-    <span className="h-full w-full flex items-center justify-center">
+    <span className="flex h-full w-full items-center justify-center">
       <BlocksIcon className="size-6" />
     </span>
   );

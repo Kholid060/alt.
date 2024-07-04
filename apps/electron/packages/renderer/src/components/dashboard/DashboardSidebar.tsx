@@ -66,7 +66,7 @@ function AboutApp() {
         <p>version {versions.app}</p>
         <p className="text-sm text-muted-foreground">{versions.os}</p>
       </div>
-      <UiDialog.Footer className="pt-6 justify-start">
+      <UiDialog.Footer className="justify-start pt-6">
         <UiButton
           variant="secondary"
           size="sm"
@@ -74,7 +74,7 @@ function AboutApp() {
             preloadAPI.main.ipc.invoke('shell:open-url', 'https://example.com')
           }
         >
-          <ExternalLinkIcon className="size-4 mr-2" />
+          <ExternalLinkIcon className="mr-2 size-4" />
           Documentation
         </UiButton>
         <UiButton
@@ -84,7 +84,7 @@ function AboutApp() {
             preloadAPI.main.ipc.invoke('shell:open-url', 'https://example.com')
           }
         >
-          <ExternalLinkIcon className="size-4 mr-2" />
+          <ExternalLinkIcon className="mr-2 size-4" />
           Website
         </UiButton>
         <div className="flex-grow"></div>
@@ -95,7 +95,7 @@ function AboutApp() {
             preloadAPI.main.ipc.invoke('shell:open-url', 'https://example.com')
           }
         >
-          <ExternalLinkIcon className="size-4 mr-2" />
+          <ExternalLinkIcon className="mr-2 size-4" />
           Report bug
         </UiButton>
       </UiDialog.Footer>
@@ -117,16 +117,16 @@ function DashboardSidebar({
   if (hideSidebar) return null;
 
   return (
-    <div className="w-20 lg:w-64 border-r h-screen pb-8 pt-6 px-4 flex flex-col gap-7 fixed left-0 top-0">
-      <UiLogo className="text-3xl text-center lg:text-left lg:text-4xl" />
-      <ul className="text-muted-foreground space-y-2">
+    <div className="fixed left-0 top-0 flex h-screen w-20 flex-col gap-7 border-r px-4 pb-8 pt-6 lg:w-64">
+      <UiLogo className="text-center text-3xl lg:text-left lg:text-4xl" />
+      <ul className="space-y-2 text-muted-foreground">
         {navigationItems.map((item) => (
           <NavLink
             to={item.path}
             key={item.path}
             className={({ isActive }) =>
               cn(
-                'p-3 gap-3 rounded-md flex items-center transition justify-center lg:justify-start overflow-hidden',
+                'flex items-center justify-center gap-3 overflow-hidden rounded-md p-3 transition lg:justify-start',
                 isActive ? 'bg-card text-foreground' : 'hover:bg-card/80',
               )
             }
@@ -138,7 +138,7 @@ function DashboardSidebar({
       </ul>
       <div className="flex-grow"></div>
       <UiDialog>
-        <UiDialog.Trigger className="p-3 gap-3 rounded-md flex items-center transition justify-center lg:justify-start overflow-hidden hover:bg-card/80 text-muted-foreground">
+        <UiDialog.Trigger className="flex items-center justify-center gap-3 overflow-hidden rounded-md p-3 text-muted-foreground transition hover:bg-card/80 lg:justify-start">
           <InfoIcon className="h-5 w-5" />
           <p className="hidden lg:block">About</p>
         </UiDialog.Trigger>

@@ -49,7 +49,7 @@ function WorkflowDetailForm({
   return (
     <UiForm {...form}>
       <form onSubmit={form.handleSubmit((value) => onSubmit?.(value))}>
-        <div className="flex items-start gap-4 mt-7">
+        <div className="mt-7 flex items-start gap-4">
           <UiSelectIcon
             label="Workflow icon"
             renderIcon={
@@ -70,8 +70,8 @@ function WorkflowDetailForm({
             name="name"
             control={form.control}
             render={({ field }) => (
-              <UiFormItem className="flex-grow space-y-0 relative">
-                <UiFormLabel className="ml-2 absolute -top-5">Name</UiFormLabel>
+              <UiFormItem className="relative flex-grow space-y-0">
+                <UiFormLabel className="absolute -top-5 ml-2">Name</UiFormLabel>
                 <UiFormControl>
                   <UiInput {...field} placeholder="Workflow name" />
                 </UiFormControl>
@@ -84,7 +84,7 @@ function WorkflowDetailForm({
           name="description"
           control={form.control}
           render={({ field }) => (
-            <UiFormItem className="space-y-1 mt-4">
+            <UiFormItem className="mt-4 space-y-1">
               <UiFormLabel className="ml-2">Description</UiFormLabel>
               <UiTextarea {...field} placeholder="Workflow description" />
               <UiFormMessage />

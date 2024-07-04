@@ -8,7 +8,7 @@ function UiLogo({
   return (
     <p
       className={clsx(
-        'font-semibold leading-none cursor-default select-none',
+        'cursor-default select-none font-semibold leading-none',
         className,
       )}
       style={{ fontFeatureSettings: '"ss02"', ...(style ?? {}) }}

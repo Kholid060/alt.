@@ -127,7 +127,6 @@ function App() {
   useEffect(() => {
     const onVisibilityChange = () => {
       const { isWindowHidden } = useCommandStore.getState();
-      console.log(!isWindowHidden && document.visibilityState === 'hidden');
       if (!isWindowHidden && document.visibilityState === 'hidden') {
         preloadAPI.main.ipc.invoke('command-window:close');
       }
@@ -153,7 +152,7 @@ function App() {
                 <div className="p-0.5">
                   <UiListProvider>
                     <AppDevtools />
-                    <div className="bg-background border rounded-lg w-full z-10 relative">
+                    <div className="relative z-10 w-full rounded-lg border bg-background">
                       <CommandHeader />
                       <CommandContent />
                       <CommandErrorOverlay />

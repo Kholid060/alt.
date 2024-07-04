@@ -57,18 +57,18 @@ function WorkflowInformation() {
 
   return (
     <>
-      <div className="inline-flex items-center justify-center h-10 w-10 bg-card rounded-md flex-shrink-0">
+      <div className="inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-md bg-card">
         <WorkflowIcon />
       </div>
-      <div className="ml-2 flex-grow mr-4">
+      <div className="ml-2 mr-4 flex-grow">
         <div className="flex items-center">
-          <h2 className="font-semibold line-clamp-1">{workflow.name}</h2>
+          <h2 className="line-clamp-1 font-semibold">{workflow.name}</h2>
           <PencilIcon
             onClick={() => setOpen(true)}
-            className="h-4 w-4 inline align-sub ml-2 text-muted-foreground flex-shrink-0"
+            className="ml-2 inline h-4 w-4 flex-shrink-0 align-sub text-muted-foreground"
           />
         </div>
-        <p className="text-muted-foreground text-xs leading-tight line-clamp-1">
+        <p className="line-clamp-1 text-xs leading-tight text-muted-foreground">
           {workflow.description}
         </p>
       </div>
@@ -186,13 +186,13 @@ function WorkflowVariableModal() {
           style={{ maxHeight: 'calc(100vh - 12rem)' }}
           className="overflow-auto px-6 pb-6"
         >
-          <div className="border rounded-md mt-2">
-            <table className="table-fixed w-full text-sm">
+          <div className="mt-2 rounded-md border">
+            <table className="w-full table-fixed text-sm">
               <thead>
-                <tr className="text-left divide-x border-b">
-                  <th className="h-12 px-3 w-5/12">Name</th>
-                  <th className="h-12 px-3 w-5/12">Value</th>
-                  <th className="h-12 px-3 w-2/12">
+                <tr className="divide-x border-b text-left">
+                  <th className="h-12 w-5/12 px-3">Name</th>
+                  <th className="h-12 w-5/12 px-3">Value</th>
+                  <th className="h-12 w-2/12 px-3">
                     <UiButton
                       variant="secondary"
                       size="icon-sm"
@@ -216,7 +216,7 @@ function WorkflowVariableModal() {
                   variables.map((variable) => (
                     <tr
                       key={variable.id}
-                      className="divide-x hover:bg-secondary/50 focus-within:bg-secondary/50 group/variable"
+                      className="group/variable divide-x focus-within:bg-secondary/50 hover:bg-secondary/50"
                     >
                       <td className="h-12">
                         <input
@@ -228,7 +228,7 @@ function WorkflowVariableModal() {
                           onBlur={({ target }) =>
                             updateVariable(variable.id, { name: target.value })
                           }
-                          className="w-full h-full px-3 bg-transparent focus:outline focus:outline-primary focus:bg-card"
+                          className="h-full w-full bg-transparent px-3 focus:bg-card focus:outline focus:outline-primary"
                           placeholder="variable name"
                         />
                       </td>
@@ -240,11 +240,11 @@ function WorkflowVariableModal() {
                               value: target.value,
                             });
                           }}
-                          className="w-full h-full px-3 bg-transparent focus:outline focus:outline-primary focus:bg-card"
+                          className="h-full w-full bg-transparent px-3 focus:bg-card focus:outline focus:outline-primary"
                           placeholder="variable value"
                         />
                       </td>
-                      <td className="px-3 h-12">
+                      <td className="h-12 px-3">
                         <UiButton
                           size="icon-sm"
                           variant="ghost"
@@ -260,7 +260,7 @@ function WorkflowVariableModal() {
               </tbody>
             </table>
           </div>
-          <p className="text-sm text-muted-foreground mt-2">
+          <p className="mt-2 text-sm text-muted-foreground">
             You can use a dynamic placeholder as the variable value such as{' '}
             {'{{currentTime}}'}, {'{{date}}'}, {'{{random}}'}, and{' '}
             {'{{clipboard}}'}
@@ -387,7 +387,7 @@ function WorkflowDisableBtn() {
   if (!workflow) return;
 
   return (
-    <div className="flex items-center px-2 h-10 rounded-md border border-border/60 gap-2 mr-2 text-sm">
+    <div className="mr-2 flex h-10 items-center gap-2 rounded-md border border-border/60 px-2 text-sm">
       <UiSwitch
         size="sm"
         checked={!workflow.isDisabled}
@@ -520,7 +520,7 @@ function WorkflowEditorHeader() {
   useHotkeys('alt+arrowLeft', () => navigate('/workflows'), []);
 
   return (
-    <header className="h-16 border-b flex items-center px-4">
+    <header className="flex h-16 items-center border-b px-4">
       <UiTooltip
         label={
           <>
@@ -539,11 +539,11 @@ function WorkflowEditorHeader() {
           </Link>
         </UiButton>
       </UiTooltip>
-      <hr className="h-2/6 bg-border/50 w-px mx-4" />
+      <hr className="mx-4 h-2/6 w-px bg-border/50" />
       <WorkflowInformation />
       <WorkflowVariableModal />
       <WorkflowMoreMenu />
-      <hr className="h-2/6 bg-border/50 w-px mx-4" />
+      <hr className="mx-4 h-2/6 w-px bg-border/50" />
       <WorkflowDisableBtn />
       <UiTooltip
         label={
@@ -553,7 +553,7 @@ function WorkflowEditorHeader() {
         }
       >
         <UiButton variant="secondary" onClick={() => runCurrentWorkflow()}>
-          <PlayIcon className="h-4 w-4 mr-2 -ml-0.5" />
+          <PlayIcon className="-ml-0.5 mr-2 h-4 w-4" />
           <p>Run</p>
         </UiButton>
       </UiTooltip>

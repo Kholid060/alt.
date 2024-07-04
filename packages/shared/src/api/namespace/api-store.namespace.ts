@@ -5,17 +5,14 @@ import {
   ApiWorkflowStoreListItem,
   ApiWorkflowDetail,
 } from '../../interfaces/api.interface';
+import { searhParamsBuilder } from '../../utils/helper';
 import API from '../index';
 
 class APIStoreNamespace {
   constructor(private api: API) {}
 
   listExtensions(options: ApiStoreListExtensionsQuery = {}) {
-    const searhParams = new URLSearchParams();
-    for (const key in options) {
-      const value = options[key as keyof ApiStoreListExtensionsQuery];
-      if (value) searhParams.set(key, value);
-    }
+    const searhParams = searhParamsBuilder(options as Record<string, string>);
 
     return this.api.authorizeFetch<{
       nextCursor: string;
@@ -24,11 +21,7 @@ class APIStoreNamespace {
   }
 
   listWorkflows(options: ApiStoreListExtensionsQuery = {}) {
-    const searhParams = new URLSearchParams();
-    for (const key in options) {
-      const value = options[key as keyof ApiStoreListExtensionsQuery];
-      if (value) searhParams.set(key, value);
-    }
+    const searhParams = searhParamsBuilder(options as Record<string, string>);
 
     return this.api.authorizeFetch<{
       nextCursor: string;

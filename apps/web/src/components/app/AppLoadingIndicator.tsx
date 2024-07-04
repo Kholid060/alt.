@@ -14,7 +14,7 @@ function AppLoadingIndicator() {
 
   return (
     <div
-      className="fixed top-0 z-[999] w-full h-1 bg-primary/20"
+      className="fixed top-0 z-[999] h-1 w-full bg-primary/20"
       style={
         {
           height: isLoading ? 4 : 0,
@@ -24,7 +24,7 @@ function AppLoadingIndicator() {
       }
     >
       <span
-        className="bg-primary/60 absolute h-full bottom-0 left-0 top-0"
+        className="absolute bottom-0 left-0 top-0 h-full bg-primary/60"
         style={{
           width: 'auto',
           transformOrigin: 'left center',
@@ -41,7 +41,7 @@ function AppLoadingIndicator() {
           animation:
             '2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite normal none var(--play) animation-progress-2',
         }}
-        className="bg-primary/60 h-full left-0 top-0 bottom-0 absolute"
+        className="absolute bottom-0 left-0 top-0 h-full bg-primary/60"
       />
     </div>
   );
@@ -50,13 +50,13 @@ function AppLoadingIndicator() {
 export function AppLoadingPlaceholder() {
   return (
     <div className="container">
-      <UiSkeleton className="h-12 mt-4" />
-      <UiSkeleton className="h-8 mt-24 max-w-sm" />
-      <div className="flex flex-col md:flex-row mt-4 gap-4">
+      <UiSkeleton className="mt-4 h-12" />
+      <UiSkeleton className="mt-24 h-8 max-w-sm" />
+      <div className="mt-4 flex flex-col gap-4 md:flex-row">
         <UiSkeleton className="h-48 w-full md:w-64" />
         <UiSkeleton className="h-48 flex-1" />
       </div>
-      <UiSkeleton className="h-64 w-full mt-4" />
+      <UiSkeleton className="mt-4 h-64 w-full" />
     </div>
   );
 }

@@ -8,7 +8,7 @@ function DevConsoleNewWorkflow({ onClose }: { onClose?: () => void }) {
 
   return (
     <UiDialog open onOpenChange={(value) => !value && onClose?.()}>
-      <UiDialog.Content className="sm:max-w-[425px] z-[101]">
+      <UiDialog.Content className="z-[101] sm:max-w-[425px]">
         <UiDialog.Header>
           <UiDialog.Title>Share workflow</UiDialog.Title>
           <UiDialog.Description>

@@ -43,7 +43,7 @@ function WorkflowHistoryStatusBadge({
     case WORKFLOW_HISTORY_STATUS.Running:
       return (
         <UiBadge variant="outline" className="text-yellow-400">
-          <LoaderIcon className="h-4 w-4 mr-1 animate-spin " />
+          <LoaderIcon className="mr-1 h-4 w-4 animate-spin" />
           Running
         </UiBadge>
       );
@@ -84,7 +84,7 @@ function WorkflowHistoryError({ item }: { item: WorkflowHistoryModel }) {
   return (
     <>
       {nodeName && nodeId && (
-        <p className="text-sm mb-2">
+        <p className="mb-2 text-sm">
           Error occured on the{' '}
           <Link
             to={`/workflows/${item.workflowId}?toNode=${nodeId}`}
@@ -95,7 +95,7 @@ function WorkflowHistoryError({ item }: { item: WorkflowHistoryModel }) {
           node
         </p>
       )}
-      <pre className="whitespace-pre-wrap text-sm p-2 rounded-md bg-background">
+      <pre className="whitespace-pre-wrap rounded-md bg-background p-2 text-sm">
         {item.errorMessage!}
       </pre>
     </>
@@ -158,11 +158,11 @@ function RouteWorkflowHistory() {
   );
 
   return (
-    <div className="p-8 container">
-      <h2 className="text-2xl font-semibold leading-tight -mt-0.5">
+    <div className="container p-8">
+      <h2 className="-mt-0.5 text-2xl font-semibold leading-tight">
         Workflow history
       </h2>
-      <div className="flex items-center mt-8">
+      <div className="mt-8 flex items-center">
         <UiInput
           defaultValue={search}
           prefixIcon={<SearchIcon className="h-5 w-5" />}
@@ -171,7 +171,7 @@ function RouteWorkflowHistory() {
           placeholder="Search..."
           onValueChange={setSearch}
         />
-        <div className="flex items-center ml-4 rounded-md border text-sm">
+        <div className="ml-4 flex items-center rounded-md border text-sm">
           <UiButton
             variant="outline"
             size="icon"
@@ -204,22 +204,22 @@ function RouteWorkflowHistory() {
           </UiSelect>
         </div>
       </div>
-      <div className="rounded-lg border mt-4 text-sm">
+      <div className="mt-4 rounded-lg border text-sm">
         <table className="w-full">
           <thead>
-            <tr className="text-left border-b">
-              <th className="h-12 px-3 min-w-48">Workflow</th>
+            <tr className="border-b text-left">
+              <th className="h-12 min-w-48 px-3">Workflow</th>
               <th className="h-12 px-3 text-center">Status</th>
               <th className="h-12 px-3">Started at</th>
               <th className="h-12 px-3">Duration</th>
-              <th className="h-12 px-3 w-36"></th>
+              <th className="h-12 w-36 px-3"></th>
             </tr>
           </thead>
           <tbody className="divide-y">
             {workflowHistory.items.length === 0 && (
               <tr>
                 <td
-                  className="text-center p-3 text-muted-foreground"
+                  className="p-3 text-center text-muted-foreground"
                   colSpan={9}
                 >
                   No data
@@ -229,15 +229,15 @@ function RouteWorkflowHistory() {
             {workflowHistory.items.map((item) => (
               <tr
                 key={item.id}
-                className="border-b border-border/50 hover:bg-card cursor-default group"
+                className="group cursor-default border-b border-border/50 hover:bg-card"
               >
                 <td>
                   <Link
-                    className="p-3 block"
+                    className="block p-3"
                     to={`/workflows/${item.workflowId}`}
                   >
                     <p>{item.workflow.name}</p>
-                    <p className="text-muted-foreground leading-tight">
+                    <p className="leading-tight text-muted-foreground">
                       {item.runnerId}
                     </p>
                   </Link>
@@ -267,12 +267,12 @@ function RouteWorkflowHistory() {
                     )}
                     {item.errorMessage && (
                       <UiPopover>
-                        <UiPopoverTrigger className="underline h-8">
+                        <UiPopoverTrigger className="h-8 underline">
                           see error
                         </UiPopoverTrigger>
                         <UiPopoverContent
                           side="left"
-                          className="max-h-72 overflow-auto w-80"
+                          className="max-h-72 w-80 overflow-auto"
                         >
                           <WorkflowHistoryError item={item} />
                         </UiPopoverContent>

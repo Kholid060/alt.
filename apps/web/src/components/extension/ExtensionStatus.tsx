@@ -38,14 +38,14 @@ function ExtensionStatus({
         <UiPopoverTrigger>
           <span
             className={clsx(
-              'px-3 py-1 rounded-md text-sm flex items-center',
+              'flex items-center rounded-md px-3 py-1 text-sm',
               data.class,
               className,
             )}
             {...props}
           >
             {data.name}
-            <hr className="h-4 mx-2 bg-destructive/40 w-px" />
+            <hr className="mx-2 h-4 w-px bg-destructive/40" />
             <FileTextIcon className="size-4" />
           </span>
         </UiPopoverTrigger>
@@ -53,7 +53,7 @@ function ExtensionStatus({
           <h4 className="font-medium leading-none">Rejected reason</h4>
           <UiMarkdown
             markdown={rejectReason}
-            className="bg-background mt-4 rounded-md p-3 prose-sm"
+            className="prose-sm mt-4 rounded-md bg-background p-3"
           />
         </UiPopoverContent>
       </UiPopover>
@@ -63,7 +63,7 @@ function ExtensionStatus({
   return (
     <span
       className={clsx(
-        'px-3 py-1 cursor-default rounded-md text-sm',
+        'cursor-default rounded-md px-3 py-1 text-sm',
         data.class,
         className,
       )}

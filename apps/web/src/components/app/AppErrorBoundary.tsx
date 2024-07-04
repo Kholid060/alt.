@@ -24,7 +24,7 @@ const AppErrorBoundary: ErrorRouteComponent = ({ error }) => {
     <div className="h-screen w-screen py-12">
       {page}
       {import.meta.env.DEV && (
-        <pre className="bg-card p-4 rounded-lg border mt-12 text-sm max-w-2xl mx-auto overflow-auto text-muted-foreground">
+        <pre className="mx-auto mt-12 max-w-2xl overflow-auto rounded-lg border bg-card p-4 text-sm text-muted-foreground">
           {getError(error)}
         </pre>
       )}

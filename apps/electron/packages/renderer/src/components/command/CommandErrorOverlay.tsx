@@ -55,8 +55,8 @@ function CommandErrorOverlayContent({
   if (!errorsQuery.data) return null;
 
   return (
-    <div className="absolute top-0 left-0 h-full w-full z-50 bg-black/10 backdrop-blur-sm rounded-lg overflow-hidden">
-      <div className="bg-card absolute bottom-0 w-full rounded-b-lg p-4 border-t-2 border-destructive max-h-full overflow-auto">
+    <div className="absolute left-0 top-0 z-50 h-full w-full overflow-hidden rounded-lg bg-black/10 backdrop-blur-sm">
+      <div className="absolute bottom-0 max-h-full w-full overflow-auto rounded-b-lg border-t-2 border-destructive bg-card p-4">
         <div className="flex items-center gap-3">
           <UiButton
             size="icon-sm"
@@ -71,11 +71,11 @@ function CommandErrorOverlayContent({
           {[...errors, ...errorsQuery.data].map((error, index) => (
             <UiAccordionItem key={index} value={index.toString()}>
               <UiAccordionTrigger
-                className="text-sm py-3"
+                className="py-3 text-sm"
                 suffixSlot={
                   error.id >= 0 && (
                     <>
-                      <hr className="w-px h-6 mx-4 bg-border" />
+                      <hr className="mx-4 h-6 w-px bg-border" />
                       <UiButton
                         size="icon-sm"
                         variant="ghost"
@@ -95,7 +95,7 @@ function CommandErrorOverlayContent({
                   error.message.slice(0, error.message.indexOf('\n'))}
                 <div className="flex-grow"></div>
               </UiAccordionTrigger>
-              <UiAccordionContent className="whitespace-pre-wrap bg-background px-4 py-2 rounded-md font-mono text-muted-foreground">
+              <UiAccordionContent className="whitespace-pre-wrap rounded-md bg-background px-4 py-2 font-mono text-muted-foreground">
                 {error.message}
               </UiAccordionContent>
             </UiAccordionItem>

@@ -65,7 +65,7 @@ function WorkflowsList() {
           <UiButton
             size="sm"
             variant="secondary"
-            className="min-w-32 mt-4"
+            className="mt-4 min-w-32"
             onClick={() => query.refetch()}
           >
             Retry
@@ -79,7 +79,7 @@ function WorkflowsList() {
       <tr>
         <td
           colSpan={50}
-          className="p-3 text-muted-foreground text-sm text-center"
+          className="p-3 text-center text-sm text-muted-foreground"
         >
           No data
         </td>
@@ -90,14 +90,14 @@ function WorkflowsList() {
   return (query.data ?? []).map((item) => (
     <tr
       key={item.id}
-      className="hover:bg-card border-b border-border/50 last:border-b-0"
+      className="border-b border-border/50 last:border-b-0 hover:bg-card"
     >
       <td className="p-3">
         <Link className="flex items-center" to={item.id}>
           <WorkflowIcon className="size-5" icon={item.icon} />
           <div className="ml-3">
-            <p className="leading-tight line-clamp-1">{item.name}</p>
-            <p className="leading-tight text-sm text-muted-foreground line-clamp-1">
+            <p className="line-clamp-1 leading-tight">{item.name}</p>
+            <p className="line-clamp-1 text-sm leading-tight text-muted-foreground">
               {item.description}
             </p>
           </div>
@@ -115,7 +115,7 @@ function WorkflowsList() {
         <UiDropdownMenu>
           <UiDropdownMenuTrigger asChild>
             <UiButton
-              className="align-middle ml-2"
+              className="ml-2 align-middle"
               variant="ghost"
               size="icon-sm"
             >
@@ -140,16 +140,16 @@ function WorkflowsList() {
 
 function DevConsoleWorkflowsPage() {
   return (
-    <div className="rounded-lg border w-full overflow-x-auto overflow-y-hidden">
+    <div className="w-full overflow-x-auto overflow-y-hidden rounded-lg border">
       <table className="w-full">
-        <thead className="text-sm border-b h-12 w-full">
+        <thead className="h-12 w-full border-b text-sm">
           <tr className="text-left">
-            <th className="h-12 px-4 w-5/12 min-w-56">Name</th>
-            <th className="h-12 px-4 w-3/12 min-w-32">Last updated</th>
-            <th className="h-12 px-4 w-2/12 text-left min-w-32">
+            <th className="h-12 w-5/12 min-w-56 px-4">Name</th>
+            <th className="h-12 w-3/12 min-w-32 px-4">Last updated</th>
+            <th className="h-12 w-2/12 min-w-32 px-4 text-left">
               Downloads count
             </th>
-            <th className="h-12 px-4 w-2/12 min-w-32"></th>
+            <th className="h-12 w-2/12 min-w-32 px-4"></th>
           </tr>
         </thead>
         <tbody>

@@ -43,19 +43,19 @@ export const Route = createFileRoute(
     <div className="container pt-36">
       <div className="md:flex md:items-center">
         <UiSkeleton className="size-16" />
-        <div className="md:flex-grow md:ml-4 mt-4 md:mt-0">
-          <UiSkeleton className="w-48 h-7" />
-          <UiSkeleton className="w-24 h-5 mt-2" />
+        <div className="mt-4 md:ml-4 md:mt-0 md:flex-grow">
+          <UiSkeleton className="h-7 w-48" />
+          <UiSkeleton className="mt-2 h-5 w-24" />
         </div>
-        <div className="w-full max-w-md md:w-auto flex items-center mt-4 md:mt-0">
+        <div className="mt-4 flex w-full max-w-md items-center md:mt-0 md:w-auto">
           <UiSkeleton className="h-10 w-24 flex-grow md:flex-auto" />
-          <UiSkeleton className="size-10 ml-2" />
+          <UiSkeleton className="ml-2 size-10" />
         </div>
       </div>
       <hr className="my-8" />
-      <div className="lg:flex lg:items-start lg:flex-row">
-        <UiSkeleton className="flex-1 h-96" />
-        <UiSkeleton className="w-72 mt-4 lg:mt-0 lg:ml-12 h-52" />
+      <div className="lg:flex lg:flex-row lg:items-start">
+        <UiSkeleton className="h-96 flex-1" />
+        <UiSkeleton className="mt-4 h-52 w-72 lg:ml-12 lg:mt-0" />
       </div>
     </div>
   ),
@@ -88,7 +88,7 @@ function ExtensionPageHeader({
   const { installExtension } = useNativeApp();
 
   return (
-    <div className="flex items-start md:items-center flex-col md:flex-row">
+    <div className="flex flex-col items-start md:flex-row md:items-center">
       <ExtensionDetailIcon
         svgClass="size-16"
         imageClass="h-[82px] w-[82px] rounded-lg"
@@ -96,17 +96,17 @@ function ExtensionPageHeader({
         icon={extension.iconUrl}
         iconUrl={extension.iconUrl}
       />
-      <div className="flex-grow mt-2 md:mt-0 md:ml-4 md:mr-4">
+      <div className="mt-2 flex-grow md:ml-4 md:mr-4 md:mt-0">
         <h3 className="text-lg font-semibold">{extension.title}</h3>
-        <p className="text-muted-foreground text-sm line-clamp-2">
+        <p className="line-clamp-2 text-sm text-muted-foreground">
           {extension.description}
         </p>
         <div className="mt-2">
           <Link
             to={`/u/${extension.owner.username}`}
-            className="hover:text-foreground transition-colors line-clamp-1 text-muted-foreground text-sm inline"
+            className="line-clamp-1 inline text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
-            <UiAvatar className="size-4 inline-block align-middle">
+            <UiAvatar className="inline-block size-4 align-middle">
               {extension.owner.avatarUrl && (
                 <UiAvatarImage src={extension.owner.avatarUrl} />
               )}
@@ -114,11 +114,11 @@ function ExtensionPageHeader({
                 <UserRoundIcon className="size-4" />
               </UiAvatarFallback>
             </UiAvatar>
-            <span className="align-middle ml-1.5">{extension.owner.name}</span>
+            <span className="ml-1.5 align-middle">{extension.owner.name}</span>
           </Link>
         </div>
       </div>
-      <div className="flex items-center w-full max-w-md md:w-auto mt-4">
+      <div className="mt-4 flex w-full max-w-md items-center md:w-auto">
         <UiButton
           className="flex-1 md:flex-auto"
           onClick={() => installExtension(extension.id)}
@@ -151,13 +151,13 @@ function ExtensionPageBanner({
         {extension.banners.map((banner, index) => (
           <div
             key={banner}
-            className="flex-shrink-0 aspect-video h-64 rounded-lg overflow-hidden snap-start relative"
+            className="relative aspect-video h-64 flex-shrink-0 snap-start overflow-hidden rounded-lg"
           >
             <img
               src={banner}
               loading="lazy"
               alt={`${extension.title} banner ${index + 1}`}
-              className="object-cover object-center h-full w-full"
+              className="h-full w-full object-cover object-center"
             />
           </div>
         ))}
@@ -277,13 +277,13 @@ function StoreExtensionsDetailPage() {
       <ExtensionPageHeader extension={extension} />
       <ExtensionPageBanner extension={extension} />
       <UiTabs variant="line" className="mt-6" defaultValue="readme">
-        <UiTabsList className="overflow-auto h-11">
+        <UiTabsList className="h-11 overflow-auto">
           <UiTabsTrigger value="readme" className="min-w-24 flex-shrink-0">
             Readme
           </UiTabsTrigger>
           <UiTabsTrigger value="commands" className="min-w-24 flex-shrink-0">
             Commands
-            <span className="h-5 w-5 bg-secondary ml-1.5 inline-flex items-center justify-center text-muted-foreground leading-0 rounded-full text-xs font-normal">
+            <span className="leading-0 ml-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-secondary text-xs font-normal text-muted-foreground">
               {extension.commands.length}
             </span>
           </UiTabsTrigger>
@@ -291,7 +291,7 @@ function StoreExtensionsDetailPage() {
             Changelog
           </UiTabsTrigger>
         </UiTabsList>
-        <div className="lg:flex lg:items-start mt-6">
+        <div className="mt-6 lg:flex lg:items-start">
           <div className="flex-1">
             <UiTabsContent value="readme">
               <ExtensionDetailMarkdownAsset
@@ -306,14 +306,14 @@ function StoreExtensionsDetailPage() {
                 <tbody>
                   {extension.commands.map((command) => (
                     <tr key={command.name}>
-                      <td className="align-top py-2 pr-2">
-                        <span className="px-2 py-0.5 border rounded-full text-xs whitespace-nowrap">
+                      <td className="py-2 pr-2 align-top">
+                        <span className="whitespace-nowrap rounded-full border px-2 py-0.5 text-xs">
                           {EXTENSION_COMMAND_TYPE_NAME[command.type]}
                         </span>
                       </td>
-                      <td className="py-2 px-3">
+                      <td className="px-3 py-2">
                         <p className="leading-tight">{command.title}</p>
-                        <p className="text-muted-foreground leading-tight">
+                        <p className="leading-tight text-muted-foreground">
                           {command.description}
                         </p>
                       </td>
@@ -332,8 +332,8 @@ function StoreExtensionsDetailPage() {
             </UiTabsContent>
           </div>
           <hr className="my-8 lg:hidden" />
-          <div className="lg:w-72 lg:ml-12 text-sm">
-            <div className="border rounded-lg p-4 grid grid-cols-2 gap-y-4 gap-x-2 max-w-xs flex-1">
+          <div className="text-sm lg:ml-12 lg:w-72">
+            <div className="grid max-w-xs flex-1 grid-cols-2 gap-x-2 gap-y-4 rounded-lg border p-4">
               <p className="text-muted-foreground">Downloads count</p>
               <p className="text-right">
                 {numberFormatter.format(extension.downloadCount)}x
@@ -355,7 +355,7 @@ function StoreExtensionsDetailPage() {
                   <img
                     src={githubLogoWhiteSvg}
                     alt="GitHub logo"
-                    className="size-4 inline align-text-top mr-1"
+                    className="mr-1 inline size-4 align-text-top"
                   />
                   View source
                 </a>
@@ -366,12 +366,12 @@ function StoreExtensionsDetailPage() {
                 <p className="font-semibold text-muted-foreground">
                   Categories
                 </p>
-                <div className="text-right flex gap-1 flex-wrap mt-1">
+                <div className="mt-1 flex flex-wrap gap-1 text-right">
                   {extension.categories.map((category) => (
                     <Link
                       key={category}
                       to={`/store/extensions?category=${category}`}
-                      className="py-0.5 px-1.5 text-xs rounded-full border inline-flex items-center"
+                      className="inline-flex items-center rounded-full border px-1.5 py-0.5 text-xs"
                     >
                       {category}
                     </Link>
@@ -384,7 +384,7 @@ function StoreExtensionsDetailPage() {
                 <p className="font-semibold text-muted-foreground">
                   Permissions
                 </p>
-                <ul className="mt-1 list list-disc">
+                <ul className="list mt-1 list-disc">
                   {permissions.map((permission, index) => (
                     <li key={index} className="ml-4">
                       {permission.description}

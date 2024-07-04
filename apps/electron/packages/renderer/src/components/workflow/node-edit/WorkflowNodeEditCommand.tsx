@@ -31,7 +31,7 @@ function CommandArgs({ data }: { data: WorkflowNodeCommand['data'] }) {
         switch (arg.type) {
           case 'select':
             argComponent = (
-              <div className="flex items-center relative">
+              <div className="relative flex items-center">
                 <UiSelect.Native
                   inputSize="sm"
                   id={arg.name}
@@ -50,7 +50,7 @@ function CommandArgs({ data }: { data: WorkflowNodeCommand['data'] }) {
                     </option>
                   ))}
                 </UiSelect.Native>
-                <ChevronDown className="h-5 w-5 right-3 top-1/2 -translate-y-1/2 absolute" />
+                <ChevronDown className="absolute right-3 top-1/2 h-5 w-5 -translate-y-1/2" />
               </div>
             );
             break;

@@ -6,7 +6,7 @@ function AppDevtools() {
   if (!import.meta.env.DEV) return null;
 
   return (
-    <div className="flex items-center gap-2 mb-2">
+    <div className="mb-2 flex items-center gap-2">
       <UiButton
         size="icon"
         variant="secondary"

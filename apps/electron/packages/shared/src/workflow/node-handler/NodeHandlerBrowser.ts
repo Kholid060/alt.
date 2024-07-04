@@ -14,10 +14,7 @@ import WorkflowNodeHandler from './WorkflowNodeHandler';
 import { shell } from 'electron';
 import { getExactType } from '/@/utils/helper';
 import WorkflowFileHandle from '../utils/WorkflowFileHandle';
-import {
-  WorkflowNodeUseBrowser,
-  WORKFLOW_NODE_TYPE,
-} from '@alt-dot/workflow';
+import { WorkflowNodeUseBrowser, WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
 
 const browserName: Record<BrowserType, string> = {
   firefox: 'Firefox',

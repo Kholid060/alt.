@@ -129,7 +129,7 @@ function DevConsoleNewExtension({ onClose }: { onClose?: () => void }) {
             placeholder="https://github.com/owner/repo"
           />
           {errorMessage && (
-            <p className="text-destructive-text ml-1 text-sm">{errorMessage}</p>
+            <p className="ml-1 text-sm text-destructive-text">{errorMessage}</p>
           )}
           <UiDialog.Footer className="mt-6">
             <UiButton disabled={!repoUrl} className="min-w-24" type="submit">

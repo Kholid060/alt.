@@ -1,48 +1,42 @@
 import ExtensionStoreCard from '@/components/extension/ExtensionStoreCard';
 import StoreListItems from '@/components/store/StoreListItems';
 import APIService from '@/services/api.service';
-import { StoreQueryValidation } from '@/validation/store-query.validation';
 import {
   infiniteQueryOptions,
-  keepPreviousData,
   useInfiniteQuery,
+  keepPreviousData,
 } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { Fragment } from 'react';
+import { Fragment } from 'react/jsx-runtime';
 
-function queryData(search: StoreQueryValidation) {
+function queryData(username: string, nextCursor?: string) {
   return infiniteQueryOptions<
-    Awaited<ReturnType<typeof APIService.instance.store.listExtensions>>
+    Awaited<ReturnType<typeof APIService.instance.user.listExtensions>>
   >({
     initialPageParam: null,
-    queryKey: ['store-extensions', search],
+    queryKey: ['user-extensions', username, nextCursor],
     getNextPageParam: (lastPage) => lastPage.nextCursor,
-    queryFn: ({ pageParam }) =>
-      APIService.instance.store.listExtensions({
-        ...search,
-        nextCursor: (pageParam as string) ?? undefined,
-      }),
+    queryFn: () =>
+      APIService.instance.user.listExtensions(username, nextCursor),
   });
 }
 
-export const Route = createFileRoute('/_store/store/extensions')({
-  loaderDeps: ({ search }) => search,
-  async loader({ context, deps }) {
-    await context.queryClient.prefetchInfiniteQuery(queryData(deps));
+export const Route = createFileRoute('/u/$username/extensions')({
+  async loader({ context, params }) {
+    await context.queryClient.prefetchInfiniteQuery(queryData(params.username));
   },
   staleTime: Infinity,
-  component: StoreExtensionsPage,
+  component: UserExtensions,
 });
 
-function StoreExtensionsPage() {
-  const searchParams = Route.useSearch();
-
+function UserExtensions() {
+  const params = Route.useParams();
   const query = useInfiniteQuery({
     refetchOnMount: false,
     refetchInterval: false,
     refetchOnWindowFocus: false,
     placeholderData: keepPreviousData,
-    ...queryData(searchParams),
+    ...queryData(params.username),
   });
 
   return (
@@ -52,7 +46,11 @@ function StoreExtensionsPage() {
         items.pages.map((group, index) => (
           <Fragment key={index}>
             {group.items.map((extension) => (
-              <ExtensionStoreCard extension={extension} key={extension.id} />
+              <ExtensionStoreCard
+                disabledOwnerLink
+                key={extension.id}
+                extension={extension}
+              />
             ))}
           </Fragment>
         ))

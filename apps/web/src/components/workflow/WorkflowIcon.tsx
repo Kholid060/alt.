@@ -16,7 +16,7 @@ function WorkflowIcon({
   const Icon = UiIcons[icon as keyof typeof UiIcons] ?? LucideWorkflow;
 
   return (
-    <div className="p-2 rounded-md border bg-card border-border/40 text-muted-foreground inline-block">
+    <div className="inline-block rounded-md border border-border/40 bg-card p-2 text-muted-foreground">
       <Icon aria-label={title} className={clsx(svgClass, className)} />
     </div>
   );

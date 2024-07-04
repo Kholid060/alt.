@@ -25,12 +25,12 @@ export function WorkflowUiExpressionInput({
   return (
     <div
       className={cn(
-        'flex border rounded-md focus-within:ring-2 focus-within:ring-primary',
+        'flex rounded-md border focus-within:ring-2 focus-within:ring-primary',
         className,
       )}
     >
-      <div className="bg-card border-r rounded-l-md pt-2 w-8 text-center expression-input-icon">
-        <FunctionSquareIcon className="h-5 w-5 text-muted-foreground inline-block" />
+      <div className="expression-input-icon w-8 rounded-l-md border-r bg-card pt-2 text-center">
+        <FunctionSquareIcon className="inline-block h-5 w-5 text-muted-foreground" />
       </div>
       <textarea
         rows={1}
@@ -38,7 +38,7 @@ export function WorkflowUiExpressionInput({
         value={value}
         placeholder="Expression here"
         onChange={({ target }) => onValueChange?.(target.value)}
-        className="flex-grow h-full min-h-9 p-2 rounded-r-md focus:outline-none"
+        className="h-full min-h-9 flex-grow rounded-r-md p-2 focus:outline-none"
       ></textarea>
     </div>
   );
@@ -72,12 +72,12 @@ function WorkflowUiExpressionLabel({
   return (
     <div
       className={clsx(
-        'flex items-center justify-between mb-0.5',
+        'mb-0.5 flex items-center justify-between',
         position === 'top' ? 'mb-0.5' : 'mt-0.5',
         className,
       )}
     >
-      <div className="flex-grow line-clamp-1">
+      <div className="line-clamp-1 flex-grow">
         {label && (
           <UiLabel htmlFor={labelId} className="ml-1 line-clamp-1 inline">
             {label}
@@ -85,14 +85,14 @@ function WorkflowUiExpressionLabel({
         )}
         {description && (
           <UiTooltip label={description} className="max-w-xs">
-            <InfoIcon className="h-4 w-4 text-muted-foreground inline-block align-sub ml-1 invisible group-hover/expression:visible" />
+            <InfoIcon className="invisible ml-1 inline-block h-4 w-4 align-sub text-muted-foreground group-hover/expression:visible" />
           </UiTooltip>
         )}
         {children}
       </div>
       <button
         className={clsx(
-          'group-hover/expression:visible group-focus-within/expression:visible invisible h-5 hover:bg-secondary leading-none px-1.5 rounded text-xs inline-flex items-center justify-center',
+          'invisible inline-flex h-5 items-center justify-center rounded px-1.5 text-xs leading-none hover:bg-secondary group-focus-within/expression:visible group-hover/expression:visible',
           !isActive && 'text-muted-foreground',
         )}
         onClick={() => onToggleExpression?.(!data[path]?.active)}
@@ -100,7 +100,7 @@ function WorkflowUiExpressionLabel({
         {
           <SwitchIcon
             className={clsx(
-              'h-4 w-4 mr-1',
+              'mr-1 h-4 w-4',
               isActive && 'fill-primary stroke-white',
             )}
           />

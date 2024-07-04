@@ -24,15 +24,15 @@ function AuthPage() {
   }
 
   return (
-    <div className="h-screen w-screen grid place-items-center px-4">
-      <div className="w-full max-w-xs bg-background text-center border-0">
+    <div className="grid h-screen w-screen place-items-center px-4">
+      <div className="w-full max-w-xs border-0 bg-background text-center">
         <UiLogo className="text-5xl" />
-        <div className="text-muted-foreground mt-2">
+        <div className="mt-2 text-muted-foreground">
           Create or sign in to your <UiLogo className="inline" /> app account
         </div>
         <div className="mt-12">
           <UiButton
-            className="w-full justify-start h-12"
+            className="h-12 w-full justify-start"
             variant="secondary"
             onClick={() => signInWithOAuth('google')}
           >
@@ -40,7 +40,7 @@ function AuthPage() {
             <p className="ml-4 text-base">Continue with Google</p>
           </UiButton>
           <UiButton
-            className="w-full justify-start h-12 mt-4 "
+            className="mt-4 h-12 w-full justify-start"
             variant="secondary"
             onClick={() => signInWithOAuth('github')}
           >

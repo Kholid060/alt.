@@ -19,7 +19,7 @@ type UiListItemProcess = SetRequired<
 function RunningProcess() {
   useCommandPanelHeader({
     title: 'Running Process',
-    icon: <CpuIcon className="h-5 w-5 mr-2" />,
+    icon: <CpuIcon className="mr-2 h-5 w-5" />,
   });
 
   const uiListStore = useUiListStore();
@@ -134,7 +134,7 @@ function RunningProcess() {
       className="p-2"
       items={[...runningCommands, ...(workflowQuery.data ?? [])]}
       noDataSlot={
-        <p className="text-center text-sm text-muted-foreground my-4">
+        <p className="my-4 text-center text-sm text-muted-foreground">
           No running process
         </p>
       }

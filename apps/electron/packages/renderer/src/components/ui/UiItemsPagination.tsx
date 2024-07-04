@@ -27,7 +27,7 @@ function UiItemsPagination({
   return (
     <div
       className={clsx(
-        'flex items-center mt-4 text-sm text-muted-foreground',
+        'mt-4 flex items-center text-sm text-muted-foreground',
         className,
       )}
       {...props}
@@ -40,7 +40,7 @@ function UiItemsPagination({
       <div className="flex-grow"></div>
       <UiLabel htmlFor="pagination-select">Rows per page</UiLabel>
       <UiSelect
-        className="w-16 ml-2"
+        className="ml-2 w-16"
         id="pagination-select"
         inputSize="sm"
         value={pagination.pageSize.toString()}
@@ -55,7 +55,7 @@ function UiItemsPagination({
         <UiSelect.Option value="25">25</UiSelect.Option>
         <UiSelect.Option value="50">50</UiSelect.Option>
       </UiSelect>
-      <hr className="h-6 bg-border w-px mx-4" />
+      <hr className="mx-4 h-6 w-px bg-border" />
       <UiButton
         variant="outline"
         size="sm"

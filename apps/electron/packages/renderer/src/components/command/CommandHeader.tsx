@@ -2,7 +2,7 @@ import CommandInput from './CommandInput';
 
 function CommandHeader() {
   return (
-    <div className="border-b rounded-t-lg">
+    <div className="rounded-t-lg border-b">
       <CommandInput />
     </div>
   );

@@ -54,7 +54,7 @@ function WorkflowNodeEditConditional() {
   return (
     <WorkflowNodeLayoutEdit node={node}>
       <div className="flex items-center gap-2">
-        <p className="font-semibold flex-1">Conditions path</p>
+        <p className="flex-1 font-semibold">Conditions path</p>
         <UiButton size="sm" variant="secondary" onClick={addPath}>
           Add path
         </UiButton>
@@ -63,18 +63,18 @@ function WorkflowNodeEditConditional() {
         {node.data.conditions.map((condition, index) => (
           <li
             key={condition.id}
-            className="flex items-center group rounded-sm hover:bg-secondary/50 h-10 text-muted-foreground hover:text-foreground"
+            className="group flex h-10 items-center rounded-sm text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
           >
             <button
-              className="flex-1 px-2 h-full flex items-center text-left gap-2"
+              className="flex h-full flex-1 items-center gap-2 px-2 text-left"
               onClick={() => setOpen(index)}
             >
               <SignpostIcon />
-              <p className="flex-1 line-clamp-1">{condition.name}</p>
+              <p className="line-clamp-1 flex-1">{condition.name}</p>
             </button>
             <button
               title="Delete path"
-              className="invisible group-hover:visible focus:visible pr-2"
+              className="invisible pr-2 focus:visible group-hover:visible"
               onClick={() => deletePath(index)}
             >
               <TrashIcon className="h-5 w-5" />
@@ -85,7 +85,7 @@ function WorkflowNodeEditConditional() {
           <UiStateView
             type="empty"
             title="No condition paths"
-            className="space-y-4 mt-8"
+            className="mt-8 space-y-4"
           />
         )}
       </ul>
@@ -93,13 +93,13 @@ function WorkflowNodeEditConditional() {
         {open !== null && (
           <UiDialog.Content className="max-w-2xl p-0">
             <UiDialog.Header className="px-6 pt-6">
-              <UiDialog.Title className="flex items-center relative">
-                <PencilIcon className="h-5 w-5 text-muted-foreground absolute left-2 pointer-events-none" />
+              <UiDialog.Title className="relative flex items-center">
+                <PencilIcon className="pointer-events-none absolute left-2 h-5 w-5 text-muted-foreground" />
                 <input
                   type="text"
                   value={node.data.conditions[open].name}
                   onChange={({ target }) => updatePath({ name: target.value })}
-                  className="h-9 focus:bg-secondary hover:bg-secondary focus:outline-none pl-9 rounded-md"
+                  className="h-9 rounded-md pl-9 hover:bg-secondary focus:bg-secondary focus:outline-none"
                 />
               </UiDialog.Title>
               <UiDialog.Description>
@@ -107,7 +107,7 @@ function WorkflowNodeEditConditional() {
               </UiDialog.Description>
             </UiDialog.Header>
             <div
-              className="px-6 pb-6 overflow-auto"
+              className="overflow-auto px-6 pb-6"
               style={{ maxHeight: 'calc(100vh - 12rem)' }}
             >
               <WorkflowUiConditionBuilder

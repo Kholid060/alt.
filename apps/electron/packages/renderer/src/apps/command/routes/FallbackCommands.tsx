@@ -127,7 +127,7 @@ function FallbackCommands() {
     setPanelHeader({
       subtitle: 'Utils',
       title: 'Fallback Commands',
-      icon: <SearchSlashIcon className="h-4 w-4 mr-2" />,
+      icon: <SearchSlashIcon className="mr-2 h-4 w-4" />,
     });
 
     return () => {

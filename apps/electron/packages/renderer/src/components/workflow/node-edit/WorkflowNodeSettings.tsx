@@ -48,14 +48,14 @@ const WorkflowNodeErrorHandler: SettingComponent = ({ data, onUpdate }) => {
   return (
     <section>
       <p className="font-semibold">Error Handler</p>
-      <div className="grid grid-cols-12 items-center justify-between gap-y-4 mt-4">
+      <div className="mt-4 grid grid-cols-12 items-center justify-between gap-y-4">
         <UiLabel
           htmlFor="error--retry-switch"
-          className="text-muted-foreground col-span-6"
+          className="col-span-6 text-muted-foreground"
         >
           Retry on error
         </UiLabel>
-        <div className="text-right col-span-6">
+        <div className="col-span-6 text-right">
           <UiSwitch
             size="sm"
             id="error--retry-switch"
@@ -69,7 +69,7 @@ const WorkflowNodeErrorHandler: SettingComponent = ({ data, onUpdate }) => {
           <>
             <UiLabel
               htmlFor="error--retry-count"
-              className="text-muted-foreground col-span-6"
+              className="col-span-6 text-muted-foreground"
             >
               Retry count
             </UiLabel>
@@ -88,7 +88,7 @@ const WorkflowNodeErrorHandler: SettingComponent = ({ data, onUpdate }) => {
             />
             <UiLabel
               htmlFor="error--retry-interval"
-              className="text-muted-foreground col-span-6"
+              className="col-span-6 text-muted-foreground"
             >
               Retry interval (MS)
             </UiLabel>
@@ -109,7 +109,7 @@ const WorkflowNodeErrorHandler: SettingComponent = ({ data, onUpdate }) => {
         )}
         <UiLabel
           htmlFor="error-handler-select"
-          className="text-muted-foreground col-span-6"
+          className="col-span-6 text-muted-foreground"
         >
           On error
         </UiLabel>
@@ -139,17 +139,17 @@ const WorkflowNodeOutput: SettingComponent = ({ data, onUpdate }) => {
   return (
     <>
       <p className="font-semibold">Output</p>
-      <section className="grid grid-cols-12 mt-4 items-center group">
+      <section className="group mt-4 grid grid-cols-12 items-center">
         <UiLabel
           htmlFor="output-var"
-          className="text-muted-foreground col-span-6"
+          className="col-span-6 text-muted-foreground"
         >
           Variable name
           <UiTooltip
             label="Name of the variable where the output value of the node will be assigned to"
             className="max-w-xs"
           >
-            <InfoIcon className="h-4 w-4 inline ml-1 invisible group-hover:visible group-focus-within:visible" />
+            <InfoIcon className="invisible ml-1 inline h-4 w-4 group-focus-within:visible group-hover:visible" />
           </UiTooltip>
         </UiLabel>
         <div className="relative col-span-6">

@@ -72,7 +72,7 @@ function ErrorBoundaryFallback({
   return (
     <div className="h-full w-full p-4">
       <div className="flex items-start">
-        <p className="text-destructive-text gap-4 font-semibold flex-1">
+        <p className="flex-1 gap-4 font-semibold text-destructive-text">
           {error.message}
         </p>
         <UiButton
@@ -83,7 +83,7 @@ function ErrorBoundaryFallback({
           Reload
         </UiButton>
       </div>
-      <div className="p-4 bg-card rounded-lg text-sm mt-4 whitespace-pre-wrap font-mono text-muted-foreground">
+      <div className="mt-4 whitespace-pre-wrap rounded-lg bg-card p-4 font-mono text-sm text-muted-foreground">
         {mappedStack}
       </div>
     </div>
