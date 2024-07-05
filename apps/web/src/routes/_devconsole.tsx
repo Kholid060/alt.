@@ -1,6 +1,7 @@
 import DevConsoleNewExtension from '@/components/devconsole/DevConsoleNewExtension';
 import DevConsoleNewWorkflow from '@/components/devconsole/DevConsoleNewWorkflow';
 import { authGuard } from '@/guards/auth.guard';
+import { APP_TITLE } from '@/utils/constant';
 import { routeBeforeLoadPipe } from '@/utils/route-utils';
 import {
   UiButton,
@@ -20,6 +21,7 @@ import {
 } from '@tanstack/react-router';
 import { PlusIcon, BlocksIcon, WorkflowIcon } from 'lucide-react';
 import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 
 export const Route = createFileRoute('/_devconsole')({
   component: DevConsoleLayout,
@@ -66,6 +68,9 @@ function DevConsoleLayout() {
 
   return (
     <div className="container pt-36">
+      <Helmet>
+        <title>Dev Console ー {APP_TITLE} App</title>
+      </Helmet>
       <h2 className="-mt-0.5 cursor-default text-2xl font-semibold leading-tight">
         Dev Console
       </h2>

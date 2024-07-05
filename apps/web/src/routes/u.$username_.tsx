@@ -3,6 +3,7 @@ import {
   UiAvatar,
   UiAvatarFallback,
   UiAvatarImage,
+  UiSkeleton,
   UiTabs,
   UiTabsList,
   UiTabsTrigger,
@@ -17,6 +18,8 @@ import {
 import { GlobeIcon, UserRoundIcon } from 'lucide-react';
 import githubLogoWhiteSvg from '@/assets/logo/github-white.svg';
 import dayjs from 'dayjs';
+import { APP_TITLE } from '@/utils/constant';
+import { Helmet } from 'react-helmet-async';
 
 function queryData(username: string) {
   return queryOptions({
@@ -27,10 +30,44 @@ function queryData(username: string) {
 
 export const Route = createFileRoute('/u/$username')({
   component: UserLayout,
-  loader({ params, context }) {
+  pendingComponent: PendingComponent,
+  async loader({ params, context }) {
     return context.queryClient.ensureQueryData(queryData(params.username));
   },
 });
+
+function PendingComponent() {
+  return (
+    <div className="container py-36 lg:flex lg:items-start">
+      <div className="w-56">
+        <UiSkeleton className="size-28 rounded-full" />
+        <UiSkeleton className="mt-4 h-8 w-11/12" />
+        <UiSkeleton className="mt-2 h-6 w-6/12" />
+        <div className="mt-5 space-y-3">
+          <div className="flex items-center gap-2">
+            <UiSkeleton className="h-5 w-4/12" />
+            <UiSkeleton className="h-5 w-8/12" />
+          </div>
+          <div className="flex items-center gap-2">
+            <UiSkeleton className="h-5 w-4/12" />
+            <UiSkeleton className="h-5 w-8/12" />
+          </div>
+        </div>
+        <UiSkeleton className="mt-6 h-5 w-6/12" />
+      </div>
+      <hr className="my-10 lg:hidden" />
+      <div className="flex-1 lg:mt-0 lg:pl-12">
+        <UiSkeleton className="h-10 w-40" />
+        <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
+          <UiSkeleton className="h-36" />
+          <UiSkeleton className="h-36" />
+          <UiSkeleton className="h-36" />
+          <UiSkeleton className="h-36" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const userTabs = [
   { name: 'Extensions', path: 'extensions' },
@@ -64,7 +101,16 @@ function UserLayout() {
   const data = Route.useLoaderData();
 
   return (
-    <div className="container pt-36 lg:flex lg:items-start">
+    <div className="container py-36 lg:flex lg:items-start">
+      <Helmet>
+        <title>
+          {data.name} ー {APP_TITLE} store
+        </title>
+        <meta
+          name="description"
+          content="Browse extensions and workflows built and shared by the community"
+        />
+      </Helmet>
       <div className="w-56">
         <UiAvatar className="size-28">
           <UiAvatarImage src={data.avatarUrl ?? undefined} />

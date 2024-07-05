@@ -36,6 +36,8 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { useDebounceCallback } from 'usehooks-ts';
+import { Helmet } from 'react-helmet-async';
+import { APP_TITLE } from '@/utils/constant';
 
 export const Route = createFileRoute('/_store')({
   component: StoreLayout,
@@ -215,6 +217,13 @@ function StoreFilter() {
 function StoreLayout() {
   return (
     <main className="container pb-28 pt-36">
+      <Helmet>
+        <title>Store ー {APP_TITLE}</title>
+        <meta
+          name="description"
+          content="Browse extensions and workflows built and shared by the community"
+        />
+      </Helmet>
       <h2 className="-mt-0.5 cursor-default text-3xl font-semibold leading-tight">
         Store
       </h2>

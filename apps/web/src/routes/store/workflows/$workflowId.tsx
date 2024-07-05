@@ -4,6 +4,7 @@ import WorkflowViewer from '@/components/workflow/WorkflowViewer';
 import { useNativeApp } from '@/hooks/useNativeApp';
 import dayjs from '@/lib/dayjs';
 import APIService from '@/services/api.service';
+import { APP_TITLE } from '@/utils/constant';
 import { ApiWorkflowDetail } from '@alt-dot/shared';
 import {
   UiAvatar,
@@ -19,6 +20,7 @@ import {
 import { queryOptions } from '@tanstack/react-query';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { UserRoundIcon, ShareIcon, ChevronDownIcon } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 
 const queryData = (workflowId: string) =>
   queryOptions({
@@ -149,6 +151,12 @@ function StoreWorkflowDetailPage() {
 
   return (
     <div className="container py-36">
+      <Helmet>
+        <title>
+          {data.name} workflow ー {APP_TITLE} store
+        </title>
+        <meta name="description" content={data.description ?? ''} />
+      </Helmet>
       <WorkflowPageHeader workflow={data} />
       <div className="mt-6 h-64 overflow-hidden rounded-lg border-2 border-border/70 md:h-96 lg:h-[500px]">
         <WorkflowViewer

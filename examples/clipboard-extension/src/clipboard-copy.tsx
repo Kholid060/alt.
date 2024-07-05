@@ -62,7 +62,9 @@ export default async function CommandMain(context: CommandLaunchContext) {
   //   subtitle: 'Hello worldo!!!',
   // });
 
-  _extension.ui.searchPanel.updatePlaceholder('Placeholder...');
+  // const element = await _extension.browser.activeTab.selectElement({ description: 'Select an element!!!' });
+  // console.log(element);
+  await _extension.browser.activeTab.type('textarea[aria-label="Search"]', 'hello!');
 
   // await selectFile();
 

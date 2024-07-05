@@ -1,5 +1,6 @@
 import APIService from '@/services/api.service';
 import { useUserStore } from '@/stores/user.store';
+import { APP_TITLE } from '@/utils/constant';
 import { FetchError } from '@alt-dot/shared';
 import {
   useToast,
@@ -23,6 +24,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createFileRoute } from '@tanstack/react-router';
 import { AlertTriangleIcon, UserRoundIcon } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -99,6 +101,9 @@ function SettingsProfilePage() {
 
   return (
     <div className="w-full max-w-lg">
+      <Helmet>
+        <title>Profile settings ー {APP_TITLE}</title>
+      </Helmet>
       {requiredUsername && (
         <UiAlert className="mb-8 border-amber-500 text-amber-500">
           <AlertTriangleIcon className="h-4 w-4 !text-amber-500" />

@@ -8,7 +8,7 @@ import {
 } from '@/interface/extension.interface';
 import APIService from '@/services/api.service';
 import GithubAPI from '@/utils/GithubAPI';
-import { EXTENSION_COMMAND_TYPE_NAME } from '@/utils/constant';
+import { APP_TITLE, EXTENSION_COMMAND_TYPE_NAME } from '@/utils/constant';
 import { ExtensionCommand } from '@alt-dot/extension-core';
 import {
   UiAvatar,
@@ -27,6 +27,7 @@ import githubLogoWhiteSvg from '@/assets/logo/github-white.svg';
 import { UserRoundIcon, ShareIcon } from 'lucide-react';
 import dayjs from '@/lib/dayjs';
 import { useNativeApp } from '@/hooks/useNativeApp';
+import { Helmet } from 'react-helmet-async';
 
 function queryData(extensionId: string) {
   return {
@@ -274,6 +275,12 @@ function StoreExtensionsDetailPage() {
 
   return (
     <div className="container py-36">
+      <Helmet>
+        <title>
+          {extension.title} extension ー {APP_TITLE} store
+        </title>
+        <meta name="description" content={extension.description} />
+      </Helmet>
       <ExtensionPageHeader extension={extension} />
       <ExtensionPageBanner extension={extension} />
       <UiTabs variant="line" className="mt-6" defaultValue="readme">

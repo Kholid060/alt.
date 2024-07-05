@@ -6,6 +6,7 @@ import {
 import WorkflowSelect from '@/components/workflow/WorkflowSelect';
 import WorkflowViewer from '@/components/workflow/WorkflowViewer';
 import APIService from '@/services/api.service';
+import { APP_TITLE } from '@/utils/constant';
 import { PageError } from '@/utils/custom-error';
 import { ApiWorkflowUserUpdatePayload, WebAppWorkflow } from '@alt-dot/shared';
 import {
@@ -33,6 +34,7 @@ import { queryOptions, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { EllipsisVerticalIcon, WorkflowIcon } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 
 const queryData = (workflowId: string) =>
   queryOptions({
@@ -222,6 +224,11 @@ function DevConsoleWorkflowsDetailPage() {
 
   return (
     <div className="container py-28">
+      <Helmet>
+        <title>
+          {query.data.name} workflow ー {APP_TITLE} Dev Console
+        </title>
+      </Helmet>
       <UiBreadcrumb>
         <UiBreadcrumbList>
           <UiBreadcrumbItem>

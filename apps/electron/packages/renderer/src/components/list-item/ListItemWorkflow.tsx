@@ -39,6 +39,20 @@ function ListItemWorkflow({
     },
     {
       onAction() {
+        preloadAPI.main.ipc.invoke(
+          'database:update-workflow',
+          item.metadata.workflowId,
+          {
+            isPinned: !item.metadata.isPinned,
+          },
+        );
+      },
+      value: 'unpin-workflow',
+      icon: item.metadata.isPinned ? PinOffIcon : PinIcon,
+      title: item.metadata.isPinned ? 'Unpin workflow' : 'Pin workflow',
+    },
+    {
+      onAction() {
         preloadAPI.main.ipc
           .invoke(
             'clipboard:copy',
@@ -56,20 +70,6 @@ function ListItemWorkflow({
       icon: LinkIcon,
       title: 'Copy Deep Link',
       value: 'copy-deeplink',
-    },
-    {
-      onAction() {
-        preloadAPI.main.ipc.invoke(
-          'database:update-workflow',
-          item.metadata.workflowId,
-          {
-            isPinned: !item.metadata.isPinned,
-          },
-        );
-      },
-      value: 'unpin-workflow',
-      icon: item.metadata.isPinned ? PinOffIcon : PinIcon,
-      title: item.metadata.isPinned ? 'Unpin workflow' : 'Pin workflow',
     },
   ];
 

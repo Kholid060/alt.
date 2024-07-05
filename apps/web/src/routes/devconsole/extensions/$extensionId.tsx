@@ -10,6 +10,7 @@ import {
 } from '@/interface/extension.interface';
 import APIService from '@/services/api.service';
 import GithubAPI from '@/utils/GithubAPI';
+import { APP_TITLE } from '@/utils/constant';
 import { PageError } from '@/utils/custom-error';
 import {
   useDialog,
@@ -42,6 +43,7 @@ import { useQueryClient, useQuery, queryOptions } from '@tanstack/react-query';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { EllipsisVerticalIcon, BlocksIcon } from 'lucide-react';
 import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 
 const queryData = (extensionId: string) =>
   queryOptions({
@@ -347,6 +349,11 @@ function DevConsoleExtensionsDetailPage() {
 
   return (
     <div className="container pt-28">
+      <Helmet>
+        <title>
+          {query.data.title} extension ー {APP_TITLE} Dev Console
+        </title>
+      </Helmet>
       <UiBreadcrumb>
         <UiBreadcrumbList>
           <UiBreadcrumbItem>

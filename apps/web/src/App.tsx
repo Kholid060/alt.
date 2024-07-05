@@ -10,6 +10,7 @@ import { useUserStore } from './stores/user.store';
 import { UserProfile } from './interface/user.interface';
 import { ErrorNotFoundPage } from './components/ErrorPage';
 import { useShallow } from 'zustand/react/shallow';
+import { HelmetProvider } from 'react-helmet-async';
 
 const router = createRouter({
   routeTree,
@@ -61,12 +62,14 @@ function App() {
   if (!profileFetched) return <AppLoadingPlaceholder />;
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider
-        router={router}
-        context={{ queryClient, userProfile: profile }}
-      />
-    </QueryClientProvider>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider
+          router={router}
+          context={{ queryClient, userProfile: profile }}
+        />
+      </QueryClientProvider>
+    </HelmetProvider>
   );
 }
 
