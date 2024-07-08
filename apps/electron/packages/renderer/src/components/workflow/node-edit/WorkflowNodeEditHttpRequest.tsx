@@ -1,4 +1,4 @@
-import { WorkflowNodeHttpRequest } from '@alt-dot/workflow';
+import { WorkflowNodeHttpRequest } from '@altdot/workflow';
 import {
   UiButton,
   UiInput,
@@ -10,11 +10,11 @@ import {
   UiTabsList,
   UiTabsTrigger,
   UiTextarea,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
-import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
+import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
 import { PlusIcon } from 'lucide-react';
 import WorkflowUiCodeEditor from '../ui/WorkflowUiCodeEditor';
 

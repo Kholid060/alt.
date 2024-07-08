@@ -13,7 +13,7 @@ import {
   UiDropdownMenuSeparator,
   UiDropdownMenuTrigger,
   UiLogo,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import { Link } from '@tanstack/react-router';
 import {
   CodeIcon,

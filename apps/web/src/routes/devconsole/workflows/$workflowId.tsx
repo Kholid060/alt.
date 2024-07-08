@@ -8,7 +8,7 @@ import WorkflowViewer from '@/components/workflow/WorkflowViewer';
 import APIService from '@/services/api.service';
 import { APP_TITLE } from '@/utils/constant';
 import { PageError } from '@/utils/custom-error';
-import { ApiWorkflowUserUpdatePayload, WebAppWorkflow } from '@alt-dot/shared';
+import { ApiWorkflowUserUpdatePayload, WebAppWorkflow } from '@altdot/shared';
 import {
   UiBreadcrumb,
   UiBreadcrumbItem,
@@ -28,8 +28,8 @@ import {
   UiSkeleton,
   useDialog,
   useToast,
-} from '@alt-dot/ui';
-import { UiListProvider } from '@alt-dot/ui/dist/context/list.context';
+} from '@altdot/ui';
+import { UiListProvider } from '@altdot/ui/dist/context/list.context';
 import { queryOptions, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { EllipsisVerticalIcon, WorkflowIcon } from 'lucide-react';

@@ -2,8 +2,8 @@ import {
   WorkflowNodeConditionItem,
   WorkflowNodeConditionItemOperator,
   WorkflowNodeConditionItems,
-} from '@alt-dot/workflow';
-import { UiButton, UiLabel, UiSelect, UiSwitch, UiTooltip } from '@alt-dot/ui';
+} from '@altdot/workflow';
+import { UiButton, UiLabel, UiSelect, UiSwitch, UiTooltip } from '@altdot/ui';
 import {
   BracesIcon,
   BracketsIcon,

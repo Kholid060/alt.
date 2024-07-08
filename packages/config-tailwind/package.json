@@ -1,12 +1,12 @@
 {
-  "name": "@alt-dot/tailwind-config",
+  "name": "@altdot/tailwind-config",
   "version": "0.0.1",
   "private": true,
   "exports": {
     ".": "./tailwind.config.js"
   },
   "devDependencies": {
-    "@alt-dot/typescript-config": "workspace:*",
+    "@altdot/typescript-config": "workspace:*",
     "@radix-ui/colors": "^3.0.0",
     "@types/node": "^20.12.12",
     "tailwindcss": "^3.4.1",

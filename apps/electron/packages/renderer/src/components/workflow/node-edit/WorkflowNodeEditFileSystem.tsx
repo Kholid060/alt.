@@ -1,9 +1,9 @@
-import { WorkflowNodeFileSystem } from '@alt-dot/workflow';
-import { UiInput, UiLabel, UiSelect, UiSwitch } from '@alt-dot/ui';
+import { WorkflowNodeFileSystem } from '@altdot/workflow';
+import { UiInput, UiLabel, UiSelect, UiSwitch } from '@altdot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
-import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
+import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
 
 type Data = WorkflowNodeFileSystem['data'];
 

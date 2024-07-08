@@ -38,7 +38,7 @@ import {
   UiTabsList,
   UiTabsTrigger,
   UiTabsContent,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import { useQueryClient, useQuery, queryOptions } from '@tanstack/react-query';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { EllipsisVerticalIcon, BlocksIcon } from 'lucide-react';

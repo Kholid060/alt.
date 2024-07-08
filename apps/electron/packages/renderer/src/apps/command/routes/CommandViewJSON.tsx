@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useCommandRoute } from '/@/hooks/useCommandRoute';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
-import { CommandJSONViews } from '@alt-dot/extension';
+import { CommandJSONViews } from '@altdot/extension';
 import CommandViewJSONText from '/@/components/command-view-json/CommandViewJSONText';
 import CommandViewJSONList from '/@/components/command-view-json/CommandViewJSONList';
 import { CommandViewJSONProvider } from '/@/context/command-view-json.context';
@@ -9,7 +9,7 @@ import { ExtensionCommandJSONViewData } from '#common/interface/extension.interf
 import { MessagePortCommandJSONUpdateUI } from '#packages/common/interface/message-port-events.interface';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
-import { debounce } from '@alt-dot/shared';
+import { debounce } from '@altdot/shared';
 
 const componentsMap = {
   text: CommandViewJSONText,

@@ -1,7 +1,7 @@
 import {
   WorkflowNodeExpressionData,
   WorkflowNodeExpressionRecords,
-} from '@alt-dot/workflow';
+} from '@altdot/workflow';
 import {
   FunctionSquareIcon,
   InfoIcon,
@@ -9,7 +9,7 @@ import {
   ToggleRightIcon,
 } from 'lucide-react';
 import clsx from 'clsx';
-import { UiLabel, UiTooltip, cn } from '@alt-dot/ui';
+import { UiLabel, UiTooltip, cn } from '@altdot/ui';
 
 export function WorkflowUiExpressionInput({
   value,

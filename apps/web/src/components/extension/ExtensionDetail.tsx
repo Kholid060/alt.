@@ -1,5 +1,5 @@
 import { Extension } from '@/interface/extension.interface';
-import { afetch } from '@alt-dot/shared';
+import { afetch } from '@altdot/shared';
 import {
   UiButton,
   UiIcons,
@@ -7,7 +7,7 @@ import {
   UiInput,
   UiLabel,
   UiSkeleton,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import { useQuery } from '@tanstack/react-query';
 import clsx from 'clsx';
 import { ExternalLinkIcon, FileIcon } from 'lucide-react';

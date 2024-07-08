@@ -3,7 +3,7 @@ import { DBService } from '../db/db.service';
 import { OnAppReady } from '../common/hooks/on-app-ready.hook';
 import { lt } from 'drizzle-orm';
 import { extensionErrors, extensions } from '../db/schema/extension.schema';
-import { CommandLaunchBy } from '@alt-dot/extension';
+import { CommandLaunchBy } from '@altdot/extension';
 import { GlobalShortcutService } from '../global-shortcut/global-shortcut.service';
 import { LoggerService } from '../logger/logger.service';
 import { IPCSendPayload } from '#packages/common/interface/ipc-events.interface';
@@ -12,12 +12,12 @@ import {
   ExtensionCommandExecutePayload,
   ExtensionCommandProcess,
 } from '#packages/common/interface/extension.interface';
-import ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
+import ExtensionAPI from '@altdot/extension-core/types/extension-api';
 import { BrowserWindowService } from '../browser-window/browser-window.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
 import { ExtensionLoaderService } from '../extension-loader/extension-loader.service';
-import { ExtensionCommandType } from '@alt-dot/shared';
+import { ExtensionCommandType } from '@altdot/shared';
 import { ExtensionConfigService } from './extension-config/extension-config.service';
 import { BrowserExtensionService } from '../browser-extension/browser-extension.service';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';

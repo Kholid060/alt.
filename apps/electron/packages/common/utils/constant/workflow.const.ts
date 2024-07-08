@@ -1,4 +1,4 @@
-import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
+import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
 
 export const WORKFLOW_MANUAL_TRIGGER_ID = '$manual$' as const;
 

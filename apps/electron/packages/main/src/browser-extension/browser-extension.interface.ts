@@ -3,7 +3,7 @@ import {
   ExtensionWSServerToClientEvents,
   ExtensionWSInterServerEvents,
   ExtensionSocketData,
-} from '@alt-dot/shared';
+} from '@altdot/shared';
 import { Socket, Namespace } from 'socket.io';
 
 export type BrowserExtensionSocket = Socket<

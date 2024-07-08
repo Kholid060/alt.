@@ -2,7 +2,7 @@ module.exports = {
   root: true,
   env: { browser: true, es2020: true },
   extends: [
-    "@alt-dot/eslint-config/react.js"
+    "@altdot/eslint-config/react.js"
   ],
   ignorePatterns: ['dist', '.eslintrc.cjs'],
   plugins: ['react-refresh'],

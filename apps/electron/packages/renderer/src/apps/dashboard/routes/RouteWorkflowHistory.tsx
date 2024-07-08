@@ -10,7 +10,7 @@ import {
   UiPopoverTrigger,
   UiSelect,
   useToast,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import {
   ArrowDownAzIcon,
   ArrowUpAzIcon,
@@ -28,7 +28,7 @@ import {
   WorkflowHistoryListPaginationFilter,
   WorkflowHistoryModel,
 } from '#packages/main/src/workflow/workflow-history/workflow-history.interface';
-import { WORKFLOW_NODES, WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
+import { WORKFLOW_NODES, WORKFLOW_NODE_TYPE } from '@altdot/workflow';
 
 function WorkflowHistoryStatusBadge({
   status,

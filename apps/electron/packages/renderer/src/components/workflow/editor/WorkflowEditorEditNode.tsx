@@ -2,10 +2,10 @@ import { useShallow } from 'zustand/react/shallow';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import { Suspense, lazy, memo } from 'react';
 import { XIcon } from 'lucide-react';
-import { UiSkeleton } from '@alt-dot/ui';
+import { UiSkeleton } from '@altdot/ui';
 import kebabCase from 'lodash-es/kebabCase';
 import WorkflowNodeLayoutEdit from '../node-edit/WorkflowNodeLayoutEdit';
-import { WorkflowNodes } from '@alt-dot/workflow';
+import { WorkflowNodes } from '@altdot/workflow';
 
 const editComponents = Object.fromEntries(
   Object.entries(import.meta.glob('../node-edit/WorkflowNodeEdit*.tsx')).map(

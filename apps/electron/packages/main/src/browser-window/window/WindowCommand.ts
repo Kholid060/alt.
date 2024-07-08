@@ -3,7 +3,7 @@ import { app, screen } from 'electron';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import WindowBase, { WindowBaseState } from './WindowBase';
-import { sleep } from '@alt-dot/shared';
+import { sleep } from '@altdot/shared';
 import { centerWindow } from '/@/common/utils/helper';
 
 export const COMMNAND_WINDOW_BOUND = {

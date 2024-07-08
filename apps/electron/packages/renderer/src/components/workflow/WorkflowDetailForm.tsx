@@ -9,7 +9,7 @@ import {
   UiFormMessage,
   UiTextarea,
   UiIcons,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import UiSelectIcon from '../ui/UiSelectIcon';

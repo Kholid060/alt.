@@ -9,7 +9,7 @@ import {
   UiFormMessage,
   UiIcons,
   UiInput,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import preloadAPI from '/@/utils/preloadAPI';

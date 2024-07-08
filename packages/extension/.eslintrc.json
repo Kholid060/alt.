@@ -2,5 +2,8 @@
 {
   "root": true,
   "ignorePatterns": [".eslintrc.cjs"],
-  "extends": ["@alt-dot/eslint-config/react.js"]
+  "rules": {
+    "@typescript-eslint/no-namespace": "off"
+  },
+  "extends": ["@altdot/eslint-config/react.js"]
 }

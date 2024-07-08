@@ -3,7 +3,7 @@ import {
   WebAppWSClientToServerEvents,
   WebAppWSServerToClientEvents,
   WebAppWSInterServerEvents,
-} from '@alt-dot/shared';
+} from '@altdot/shared';
 import { Socket, Namespace } from 'socket.io';
 
 export type WebAppSocket = Socket<

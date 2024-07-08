@@ -1,4 +1,4 @@
-import { UiIcons } from '@alt-dot/ui';
+import { UiIcons } from '@altdot/ui';
 import { LucideProps } from 'lucide-react';
 
 function WorkflowIcon({ icon, ...props }: { icon: string } & LucideProps) {

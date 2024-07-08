@@ -1,4 +1,4 @@
-import { KeyboardKey, Keyboard } from '@alt-dot/native';
+import { KeyboardKey, Keyboard } from '@altdot/native';
 import { Injectable } from '@nestjs/common';
 import { BrowserWindow, dialog } from 'electron';
 

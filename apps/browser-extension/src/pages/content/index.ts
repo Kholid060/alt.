@@ -8,5 +8,5 @@
  *
  */
 
-import('@alt-dot/shared');
+import('@altdot/shared');
 import('@root/src/pages/content/runtime-events/element.runtime-events');

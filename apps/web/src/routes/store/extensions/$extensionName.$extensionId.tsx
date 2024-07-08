@@ -9,7 +9,7 @@ import {
 import APIService from '@/services/api.service';
 import GithubAPI from '@/utils/GithubAPI';
 import { APP_TITLE, EXTENSION_COMMAND_TYPE_NAME } from '@/utils/constant';
-import { ExtensionCommand } from '@alt-dot/extension-core';
+import { ExtensionCommand } from '@altdot/extension-core';
 import {
   UiAvatar,
   UiAvatarImage,
@@ -21,7 +21,7 @@ import {
   UiTabsTrigger,
   UiTabsContent,
   UiSkeleton,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import { Link, createFileRoute, redirect } from '@tanstack/react-router';
 import githubLogoWhiteSvg from '@/assets/logo/github-white.svg';
 import { UserRoundIcon, ShareIcon } from 'lucide-react';

@@ -1,5 +1,5 @@
 {
-  "name": "@alt-dot/eslint-config",
+  "name": "@altdot/eslint-config",
   "version": "0.0.1",
   "main": "index.js",
   "publishConfig": {

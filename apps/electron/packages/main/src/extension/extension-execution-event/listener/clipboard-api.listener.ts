@@ -3,9 +3,9 @@ import { OnExtensionAPI } from '/@/common/decorators/extension.decorator';
 import { ExtensionApiEvent } from '../events/extension-api.event';
 import { NativeImage, clipboard, nativeImage } from 'electron';
 import { CustomError } from '#packages/common/errors/custom-errors';
-import ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
+import ExtensionAPI from '@altdot/extension-core/types/extension-api';
 import { BrowserWindowService } from '/@/browser-window/browser-window.service';
-import { KeyboardKey, Keyboard } from '@alt-dot/native';
+import { KeyboardKey, Keyboard } from '@altdot/native';
 
 const EXT_CLIPBOARD_FORMATS: ExtensionAPI.clipboard.ClipboardContentType[] = [
   'html',

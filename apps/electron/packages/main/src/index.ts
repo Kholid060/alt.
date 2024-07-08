@@ -1,14 +1,14 @@
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AppModule } from './app.module';
 import ElectronLogger from './common/utils/ElectronLogger';
 import ElectronNest from './ElectronNest';
 import { Menu, app } from 'electron';
-import { APP_DEEP_LINK_SCHEME, debounce } from '@alt-dot/shared';
-import path from 'path';
 import updater from 'electron-updater';
 import './common/utils/security-restrictions';
+import { APP_USER_MODEL_ID } from '@altdot/shared';
 
 async function bootstrap() {
+  app.setAppUserModelId(APP_USER_MODEL_ID);
+
   /**
    * Fix flashes when toggle the command window
    * https://github.com/electron/electron/issues/22691#issuecomment-599608331
@@ -25,19 +25,6 @@ async function bootstrap() {
     app.quit();
     process.exit(0);
     return;
-  }
-
-  /**
-   * Register Deep Link
-   */
-  if (process.defaultApp) {
-    if (process.argv.length >= 2) {
-      app.setAsDefaultProtocolClient(APP_DEEP_LINK_SCHEME, process.execPath, [
-        path.resolve(process.argv[2]),
-      ]);
-    }
-  } else {
-    app.setAsDefaultProtocolClient(APP_DEEP_LINK_SCHEME, process.execPath);
   }
 
   /**
@@ -60,19 +47,6 @@ async function bootstrap() {
   const electronNest = await ElectronNest.createApp(AppModule, {
     logger: new ElectronLogger(),
   });
-  const eventEmitter = electronNest.app.get(EventEmitter2);
-  app.on(
-    'second-instance',
-    // the event called twice for some reason 🤔
-    debounce((_event, commandLine) => {
-      const deepLink = commandLine ? commandLine.pop() : null;
-      if (!deepLink || !deepLink.startsWith(APP_DEEP_LINK_SCHEME)) {
-        return;
-      }
-
-      eventEmitter.emit('deep-link', deepLink);
-    }, 50),
-  );
   await electronNest.init();
 
   /**

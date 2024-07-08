@@ -1,5 +1,5 @@
 {
-  "name": "@alt-dot/workflow",
+  "name": "@altdot/workflow",
   "version": "0.0.0",
   "scripts": {
     "build": "tsup",
@@ -10,9 +10,9 @@
   "types": "./dist/index.d.ts",
   "type": "module",
   "dependencies": {
-    "@alt-dot/extension-core": "workspace:^",
-    "@alt-dot/shared": "workspace:*",
-    "@alt-dot/ui": "workspace:^",
+    "@altdot/extension-core": "workspace:^",
+    "@altdot/shared": "workspace:*",
+    "@altdot/ui": "workspace:^",
     "@types/react": "^18.3.3",
     "clsx": "^2.1.1",
     "lucide-react": "^0.400.0",
@@ -21,8 +21,8 @@
     "reactflow": "^11.11.4"
   },
   "devDependencies": {
-    "@alt-dot/eslint-config": "workspace:*",
-    "@alt-dot/typescript-config": "workspace:^",
+    "@altdot/eslint-config": "workspace:*",
+    "@altdot/typescript-config": "workspace:^",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "eslint": "^8.56.0",

@@ -1,4 +1,4 @@
-import { EXTENSION_COMMAND_TYPE } from '@alt-dot/shared';
+import { EXTENSION_COMMAND_TYPE } from '@altdot/shared';
 import { z } from 'zod';
 import { workflowFileValidation } from '/@/workflow/workflow.validation';
 

@@ -9,7 +9,7 @@ import type {
 import type WorkflowNodeHandler from '../node-handler/WorkflowNodeHandler';
 import { WorkflowRunnerNodeError } from './workflow-runner-errors';
 import { debugLog } from '#packages/common/utils/helper';
-import { sleep } from '@alt-dot/shared';
+import { sleep } from '@altdot/shared';
 import WorkflowRunnerData from './WorkflowRunnerData';
 import type { WorkflowNodeHandlerExecuteReturn } from '../node-handler/WorkflowNodeHandler';
 import WorkflowRunnerSandbox from './WorkflowRunnerSandbox';
@@ -19,7 +19,7 @@ import { validateTypes } from '/@/utils/helper';
 import WorkflowRunnerBrowser from './WorklowRunnerBrowser';
 import { WorkflowDetailModel } from '#packages/main/src/workflow/workflow.interface';
 import { Edge, Node } from 'reactflow';
-import { WORKFLOW_NODE_TYPE, WorkflowNodes } from '@alt-dot/workflow';
+import { WORKFLOW_NODE_TYPE, WorkflowNodes } from '@altdot/workflow';
 
 export type NodeHandlersObj = Record<
   WORKFLOW_NODE_TYPE,

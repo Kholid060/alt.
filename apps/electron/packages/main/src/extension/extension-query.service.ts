@@ -1,6 +1,6 @@
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
-import { ExtensionManifest } from '@alt-dot/extension-core';
+import { ExtensionManifest } from '@altdot/extension-core';
 import { Injectable } from '@nestjs/common';
 import { eq, sql, SQL } from 'drizzle-orm';
 import { DBService } from '../db/db.service';

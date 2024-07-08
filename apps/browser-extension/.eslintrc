@@ -5,7 +5,7 @@
     "node": true
   },
   "extends": [
-    "@alt-dot/eslint-config/react.js"
+    "@altdot/eslint-config/react.js"
   ],
   "globals": {
     "chrome": "readonly"

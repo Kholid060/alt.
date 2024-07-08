@@ -1,4 +1,6 @@
 import { defineConfig, Options } from 'tsup';
+import fs from 'fs-extra';
+import path from 'path';
 
 export default defineConfig((options: Options) => ({
   treeshake: true,
@@ -6,10 +8,10 @@ export default defineConfig((options: Options) => ({
   entry: {
     cli: './src/cli/index.ts',
     index: './src/client/index.ts',
+    extensionApi: './types/extension-api.d.ts',
   },
   format: ['esm', 'cjs'],
   dts: {
-    resolve: ['./types/extension-api.d.ts'],
     entry: {
       index: './src/client/index.ts',
     },
@@ -25,5 +27,11 @@ export default defineConfig((options: Options) => ({
   ],
   minify: true,
   clean: false,
+  async onSuccess() {
+    await fs.copyFile(
+      path.join(__dirname, 'src/client/extension-api.ts'),
+      path.join(__dirname, 'dist/extension-api.d.ts'),
+    );
+  },
   ...options,
 }));

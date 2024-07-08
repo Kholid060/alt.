@@ -13,7 +13,7 @@ import {
   SelectExtensionConfig,
   extensionConfigs,
 } from '/@/db/schema/extension.schema';
-import { parseJSON } from '@alt-dot/shared';
+import { parseJSON } from '@altdot/shared';
 import { eq } from 'drizzle-orm';
 import {
   ExtensionConfigGetPayload,

@@ -1,4 +1,4 @@
-import ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
+import ExtensionAPI from '@altdot/extension-core/dist/extension-api';
 
 declare global {
   const _extension: typeof ExtensionAPI;

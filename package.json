@@ -5,7 +5,7 @@
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "dev:app": "turbo dev --filter=electron --filter=\"@alt-dot/*\"",
+    "dev:app": "turbo dev --filter=electron --filter=\"@altdot/*\"",
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {

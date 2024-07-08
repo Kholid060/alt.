@@ -1,5 +1,5 @@
-import type { ExtensionConfig } from '@alt-dot/extension-core';
-import { WSAckErrorResult, isObject } from '@alt-dot/shared';
+import type { ExtensionConfig } from '@altdot/extension-core';
+import { WSAckErrorResult, isObject } from '@altdot/shared';
 import type { BrowserWindow, Display } from 'electron';
 
 export function getExtensionConfigDefaultValue(config: ExtensionConfig[]): {

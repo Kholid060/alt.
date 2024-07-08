@@ -12,7 +12,7 @@ import {
   ExtensionCommandBackupValidation,
   appBackupFileValidation,
 } from './app-backup.validation';
-import { parseJSON } from '@alt-dot/shared';
+import { parseJSON } from '@altdot/shared';
 import { LoggerService } from '../../logger/logger.service';
 import { CustomError } from '#packages/common/errors/custom-errors';
 import { fromZodError } from 'zod-validation-error';

@@ -1,5 +1,5 @@
-import type { FlatActionExtensionAPI } from '@alt-dot/extension-core/dist/flat-extension-api';
-import type ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
+import type { FlatActionExtensionAPI } from '@altdot/extension-core/dist/flat-extension-api';
+import type ExtensionAPI from '@altdot/extension-core/types/extension-api';
 import type {
   ExtensionBrowserTabContext,
   ExtensionNeedConfigInput,
@@ -17,7 +17,7 @@ import type {
   ExtensionActiveTabActionWSEvents,
   Last,
   WSAckErrorResult,
-} from '@alt-dot/shared';
+} from '@altdot/shared';
 import type { DatabaseEvents } from '../../main/src/interface/database.interface';
 import type {
   WorkflowEmitEvents,
@@ -26,7 +26,7 @@ import type {
 import type Electron from 'electron';
 import type { MessagePortChannelIds } from './message-port-events.interface';
 import type { WorkflowRunnerRunPayload } from './workflow-runner.interace';
-import type { ExtensionCredential } from '@alt-dot/extension-core/src/client/manifest/manifest-credential';
+import type { ExtensionCredential } from '@altdot/extension-core/src/client/manifest/manifest-credential';
 import type { WindowNames } from './window.interface';
 import type {
   AppMessagePortBridgeOptions,

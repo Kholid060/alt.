@@ -1,4 +1,4 @@
-import { BetterMessagePortAsync } from '@alt-dot/shared';
+import { BetterMessagePortAsync } from '@altdot/shared';
 import {
   ContentIframeEvents,
   ContentIframeToBackgroundEvents,

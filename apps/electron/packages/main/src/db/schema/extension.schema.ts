@@ -4,8 +4,8 @@ import type {
   ExtensionCommandArgument,
   ExtensionConfig,
   ExtensionPermissions,
-} from '@alt-dot/extension-core';
-import type { ExtensionCredential } from '@alt-dot/extension-core/src/client/manifest/manifest-credential';
+} from '@altdot/extension-core';
+import type { ExtensionCredential } from '@altdot/extension-core/src/client/manifest/manifest-credential';
 import { relations, sql } from 'drizzle-orm';
 import {
   text,

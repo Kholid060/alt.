@@ -1,4 +1,4 @@
-import { EXTENSION_CATEGORIES, WebAppWorkflow } from '@alt-dot/shared';
+import { EXTENSION_CATEGORIES, WebAppWorkflow } from '@altdot/shared';
 import {
   UiInput,
   UiTextarea,
@@ -15,7 +15,7 @@ import {
   UiDropdownMenuItem,
   UiIcons,
   UiDialog,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import clsx from 'clsx';
 import { UseFormReturn, useForm } from 'react-hook-form';
 import { z } from 'zod';

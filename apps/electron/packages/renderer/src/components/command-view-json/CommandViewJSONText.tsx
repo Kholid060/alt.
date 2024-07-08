@@ -1,4 +1,4 @@
-import { CommandJSONViewText } from '@alt-dot/extension';
+import { CommandJSONViewText } from '@altdot/extension';
 
 type TextType = Required<CommandJSONViewText>;
 

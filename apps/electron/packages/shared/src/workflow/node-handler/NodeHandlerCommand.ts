@@ -8,12 +8,12 @@ import type {
   WorkflowNodeHandlerExecuteReturn,
 } from './WorkflowNodeHandler';
 import ExtensionCommandRunner from '/@/extension/ExtensionCommandRunner';
-import { CommandLaunchBy } from '@alt-dot/extension';
+import { CommandLaunchBy } from '@altdot/extension';
 import type { ExtensionCommandExecutePayloadWithData } from '#packages/common/interface/extension.interface';
-import type { ExtensionCommandArgument } from '@alt-dot/extension-core';
+import type { ExtensionCommandArgument } from '@altdot/extension-core';
 import type { WorkflowRunnerBrowserContext } from '../runner/WorklowRunnerBrowser';
 import { ExtensionCommandModel } from '#packages/main/src/extension/extension-command/extension-command.interface';
-import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
+import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
 
 type CommandDataWithPath = ExtensionCommandModel & {
   filePath: string;

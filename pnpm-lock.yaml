@@ -26,10 +26,10 @@ importers:
 
   apps/browser-extension:
     dependencies:
-      '@alt-dot/extension-core':
+      '@altdot/extension-core':
         specifier: workspace:*
         version: link:../../packages/extension-core
-      '@alt-dot/shared':
+      '@altdot/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       '@medv/finder':
@@ -69,10 +69,10 @@ importers:
         specifier: 0.10.0
         version: 0.10.0
     devDependencies:
-      '@alt-dot/eslint-config':
+      '@altdot/eslint-config':
         specifier: workspace:*
         version: link:../../packages/config-eslint
-      '@alt-dot/typescript-config':
+      '@altdot/typescript-config':
         specifier: workspace:*
         version: link:../../packages/config-typescript
       '@commitlint/cli':
@@ -192,7 +192,7 @@ importers:
 
   apps/electron:
     dependencies:
-      '@alt-dot/workflow':
+      '@altdot/workflow':
         specifier: workspace:^
         version: link:../../packages/workflow
       '@codemirror/lang-javascript':
@@ -367,28 +367,28 @@ importers:
         specifier: ^4.5.1
         version: 4.5.4(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1)
     devDependencies:
-      '@alt-dot/eslint-config':
+      '@altdot/eslint-config':
         specifier: workspace:*
         version: link:../../packages/config-eslint
-      '@alt-dot/extension':
+      '@altdot/extension':
         specifier: workspace:*
         version: link:../../packages/extension
-      '@alt-dot/extension-core':
+      '@altdot/extension-core':
         specifier: workspace:*
         version: link:../../packages/extension-core
-      '@alt-dot/native':
+      '@altdot/native':
         specifier: workspace:*
         version: link:../../packages/native
-      '@alt-dot/shared':
+      '@altdot/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      '@alt-dot/tailwind-config':
+      '@altdot/tailwind-config':
         specifier: workspace:*
         version: link:../../packages/config-tailwind
-      '@alt-dot/typescript-config':
+      '@altdot/typescript-config':
         specifier: workspace:*
         version: link:../../packages/config-typescript
-      '@alt-dot/ui':
+      '@altdot/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@electron-forge/cli':
@@ -538,13 +538,13 @@ importers:
 
   apps/web:
     dependencies:
-      '@alt-dot/extension':
+      '@altdot/extension':
         specifier: workspace:*
         version: link:../../packages/extension
-      '@alt-dot/extension-core':
+      '@altdot/extension-core':
         specifier: workspace:*
         version: link:../../packages/extension-core
-      '@alt-dot/workflow':
+      '@altdot/workflow':
         specifier: workspace:^
         version: link:../../packages/workflow
       '@hookform/resolvers':
@@ -620,19 +620,19 @@ importers:
         specifier: ^4.5.2
         version: 4.5.4(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1)
     devDependencies:
-      '@alt-dot/eslint-config':
+      '@altdot/eslint-config':
         specifier: workspace:*
         version: link:../../packages/config-eslint
-      '@alt-dot/shared':
+      '@altdot/shared':
         specifier: workspace:*
         version: link:../../packages/shared
-      '@alt-dot/tailwind-config':
+      '@altdot/tailwind-config':
         specifier: workspace:*
         version: link:../../packages/config-tailwind
-      '@alt-dot/typescript-config':
+      '@altdot/typescript-config':
         specifier: workspace:*
         version: link:../../packages/config-typescript
-      '@alt-dot/ui':
+      '@altdot/ui':
         specifier: workspace:*
         version: link:../../packages/ui
       '@tailwindcss/typography':
@@ -717,10 +717,10 @@ importers:
         specifier: ^18.2.0
         version: 18.3.1
     devDependencies:
-      '@alt-dot/extension':
+      '@altdot/extension':
         specifier: workspace:*
         version: link:../../packages/extension
-      '@alt-dot/extension-core':
+      '@altdot/extension-core':
         specifier: workspace:*
         version: link:../../packages/extension-core
       '@types/react':
@@ -732,10 +732,10 @@ importers:
 
   examples/scripts-extension:
     dependencies:
-      '@alt-dot/extension':
+      '@altdot/extension':
         specifier: workspace:*
         version: link:../../packages/extension
-      '@alt-dot/extension-core':
+      '@altdot/extension-core':
         specifier: workspace:^
         version: link:../../packages/extension-core
 
@@ -748,10 +748,10 @@ importers:
         specifier: ^18.2.0
         version: 18.3.1
     devDependencies:
-      '@alt-dot/extension':
+      '@altdot/extension':
         specifier: workspace:*
         version: link:../../packages/extension
-      '@alt-dot/extension-core':
+      '@altdot/extension-core':
         specifier: workspace:*
         version: link:../../packages/extension-core
       typescript:
@@ -781,7 +781,7 @@ importers:
 
   packages/config-tailwind:
     devDependencies:
-      '@alt-dot/typescript-config':
+      '@altdot/typescript-config':
         specifier: workspace:*
         version: link:../config-typescript
       '@radix-ui/colors':
@@ -804,13 +804,13 @@ importers:
 
   packages/extension:
     dependencies:
-      '@alt-dot/extension-core':
+      '@altdot/extension-core':
         specifier: workspace:*
         version: link:../extension-core
-      '@alt-dot/shared':
+      '@altdot/shared':
         specifier: workspace:*
         version: link:../shared
-      '@alt-dot/ui':
+      '@altdot/ui':
         specifier: workspace:*
         version: link:../ui
       lucide-react:
@@ -820,18 +820,27 @@ importers:
         specifier: ^18.2.0
         version: 18.3.1
     devDependencies:
-      '@alt-dot/eslint-config':
+      '@altdot/eslint-config':
         specifier: workspace:*
         version: link:../config-eslint
-      '@alt-dot/typescript-config':
+      '@altdot/typescript-config':
         specifier: workspace:*
         version: link:../config-typescript
+      '@microsoft/api-extractor':
+        specifier: ^7.47.0
+        version: 7.47.0(@types/node@20.14.9)
+      '@types/fs-extra':
+        specifier: ^11.0.4
+        version: 11.0.4
       '@types/react':
         specifier: ^18.2.65
         version: 18.3.3
       '@typescript-eslint/eslint-plugin':
         specifier: ^7.2.0
         version: 7.15.0(@typescript-eslint/parser@7.15.0(eslint@8.57.0)(typescript@5.5.3))(eslint@8.57.0)(typescript@5.5.3)
+      dot-prop:
+        specifier: ^8.0.2
+        version: 8.0.2
       eslint:
         specifier: ^8.57.0
         version: 8.57.0
@@ -850,15 +859,24 @@ importers:
       eslint-plugin-react-hooks:
         specifier: ^4.6.0
         version: 4.6.0(eslint@8.57.0)
+      fs-extra:
+        specifier: ^11.2.0
+        version: 11.2.0
       globby:
         specifier: ^14.0.1
         version: 14.0.2
       prettier:
         specifier: ^3.2.5
         version: 3.3.2
+      semver:
+        specifier: ^7.6.0
+        version: 7.6.2
+      ts-morph:
+        specifier: ^21.0.1
+        version: 21.0.1
       tsup:
         specifier: ^8.0.2
-        version: 8.1.0(@microsoft/api-extractor@7.43.0)(@swc/core@1.6.7)(postcss@8.4.39)(typescript@5.5.3)
+        version: 8.1.0(@microsoft/api-extractor@7.47.0)(@swc/core@1.6.7)(postcss@8.4.39)(typescript@5.5.3)
       tsx:
         specifier: ^4.7.1
         version: 4.16.0
@@ -881,13 +899,13 @@ importers:
         specifier: ^3.22.4
         version: 3.23.8
     devDependencies:
-      '@alt-dot/eslint-config':
+      '@altdot/eslint-config':
         specifier: workspace:*
         version: link:../config-eslint
-      '@alt-dot/shared':
+      '@altdot/shared':
         specifier: workspace:*
         version: link:../shared
-      '@alt-dot/typescript-config':
+      '@altdot/typescript-config':
         specifier: workspace:*
         version: link:../config-typescript
       '@types/fs-extra':
@@ -937,7 +955,7 @@ importers:
         version: 21.0.1
       tsup:
         specifier: ^8.0.2
-        version: 8.1.0(@microsoft/api-extractor@7.43.0)(@swc/core@1.6.7)(postcss@8.4.39)(typescript@5.5.3)
+        version: 8.1.0(@microsoft/api-extractor@7.47.0)(@swc/core@1.6.7)(postcss@8.4.39)(typescript@5.5.3)
       tsx:
         specifier: ^4.7.1
         version: 4.16.0
@@ -956,10 +974,10 @@ importers:
 
   packages/native:
     devDependencies:
-      '@alt-dot/eslint-config':
+      '@altdot/eslint-config':
         specifier: workspace:*
         version: link:../config-eslint
-      '@alt-dot/typescript-config':
+      '@altdot/typescript-config':
         specifier: workspace:*
         version: link:../config-typescript
       '@neon-rs/cli':
@@ -997,17 +1015,17 @@ importers:
         version: 11.2.0
       tsup:
         specifier: ^8.1.0
-        version: 8.1.0(@microsoft/api-extractor@7.43.0)(@swc/core@1.6.7)(postcss@8.4.39)(typescript@5.5.3)
+        version: 8.1.0(@microsoft/api-extractor@7.47.0)(@swc/core@1.6.7)(postcss@8.4.39)(typescript@5.5.3)
       typescript:
         specifier: ^5.4.5
         version: 5.5.3
 
   packages/shared:
     devDependencies:
-      '@alt-dot/eslint-config':
+      '@altdot/eslint-config':
         specifier: workspace:*
         version: link:../config-eslint
-      '@alt-dot/typescript-config':
+      '@altdot/typescript-config':
         specifier: workspace:*
         version: link:../config-typescript
       '@typescript-eslint/eslint-plugin':
@@ -1031,7 +1049,7 @@ importers:
 
   packages/ui:
     dependencies:
-      '@alt-dot/shared':
+      '@altdot/shared':
         specifier: workspace:*
         version: link:../shared
       '@hookform/resolvers':
@@ -1146,10 +1164,10 @@ importers:
         specifier: ^4.5.1
         version: 4.5.4(@types/react@18.3.3)(immer@10.1.1)(react@18.3.1)
     devDependencies:
-      '@alt-dot/eslint-config':
+      '@altdot/eslint-config':
         specifier: workspace:*
         version: link:../config-eslint
-      '@alt-dot/typescript-config':
+      '@altdot/typescript-config':
         specifier: workspace:*
         version: link:../config-typescript
       '@typescript-eslint/eslint-plugin':
@@ -1178,17 +1196,17 @@ importers:
         version: 3.3.2
       tsup:
         specifier: ^8.0.2
-        version: 8.1.0(@microsoft/api-extractor@7.43.0)(@swc/core@1.6.7)(postcss@8.4.39)(typescript@5.5.3)
+        version: 8.1.0(@microsoft/api-extractor@7.47.0)(@swc/core@1.6.7)(postcss@8.4.39)(typescript@5.5.3)
 
   packages/workflow:
     dependencies:
-      '@alt-dot/extension-core':
+      '@altdot/extension-core':
         specifier: workspace:^
         version: link:../extension-core
-      '@alt-dot/shared':
+      '@altdot/shared':
         specifier: workspace:*
         version: link:../shared
-      '@alt-dot/ui':
+      '@altdot/ui':
         specifier: workspace:^
         version: link:../ui
       '@types/react':
@@ -1210,10 +1228,10 @@ importers:
         specifier: ^11.11.4
         version: 11.11.4(@types/react@18.3.3)(immer@10.1.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
-      '@alt-dot/eslint-config':
+      '@altdot/eslint-config':
         specifier: workspace:*
         version: link:../config-eslint
-      '@alt-dot/typescript-config':
+      '@altdot/typescript-config':
         specifier: workspace:^
         version: link:../config-typescript
       '@types/react-dom':
@@ -1245,7 +1263,7 @@ importers:
         version: 3.3.2
       tsup:
         specifier: ^8.0.2
-        version: 8.1.0(@microsoft/api-extractor@7.43.0)(@swc/core@1.6.7)(postcss@8.4.39)(typescript@5.5.3)
+        version: 8.1.0(@microsoft/api-extractor@7.47.0)(@swc/core@1.6.7)(postcss@8.4.39)(typescript@5.5.3)
       typescript:
         specifier: ^5.3.3
         version: 5.5.3
@@ -2206,15 +2224,28 @@ packages:
   '@microsoft/api-extractor-model@7.28.13':
     resolution: {integrity: sha512-39v/JyldX4MS9uzHcdfmjjfS6cYGAoXV+io8B5a338pkHiSt+gy2eXQ0Q7cGFJ7quSa1VqqlMdlPrB6sLR/cAw==}
 
+  '@microsoft/api-extractor-model@7.29.2':
+    resolution: {integrity: sha512-hAYajOjQan3uslhKJRwvvHIdLJ+ZByKqdSsJ/dgHFxPtEbdKpzMDO8zuW4K5gkSMYl5D0LbNwxkhxr51P2zsmw==}
+
   '@microsoft/api-extractor@7.43.0':
     resolution: {integrity: sha512-GFhTcJpB+MI6FhvXEI9b2K0snulNLWHqC/BbcJtyNYcKUiw7l3Lgis5ApsYncJ0leALX7/of4XfmXk+maT111w==}
+    hasBin: true
+
+  '@microsoft/api-extractor@7.47.0':
+    resolution: {integrity: sha512-LT8yvcWNf76EpDC+8/ArTVSYePvuDQ+YbAUrsTcpg3ptiZ93HIcMCozP/JOxDt+rrsFfFHcpfoselKfPyRI0GQ==}
     hasBin: true
 
   '@microsoft/tsdoc-config@0.16.2':
     resolution: {integrity: sha512-OGiIzzoBLgWWR0UdRJX98oYO+XKGf7tiK4Zk6tQ/E4IJqGCe7dvkTvgDZV5cFJUzLGDOjeAXrnZoA6QkVySuxw==}
 
+  '@microsoft/tsdoc-config@0.17.0':
+    resolution: {integrity: sha512-v/EYRXnCAIHxOHW+Plb6OWuUoMotxTN0GLatnpOb1xq0KuTNw/WI3pamJx/UbsoJP5k9MCw1QxvvhPcF9pH3Zg==}
+
   '@microsoft/tsdoc@0.14.2':
     resolution: {integrity: sha512-9b8mPpKrfeGRuhFH5iO1iwCLeIIsV6+H1sRfxbkoGXIyQE2BTsPd9zqSqQJ+pv5sJ/hT5M1zvOFL02MnEezFug==}
+
+  '@microsoft/tsdoc@0.15.0':
+    resolution: {integrity: sha512-HZpPoABogPvjeJOdzCOSJsXeL/SMCBgBZMVC3X3d7YYp2gf31MfxhUoYUNwf1ERPJOnQc0wkFn9trqI6ZEdZuA==}
 
   '@neon-rs/cli@0.1.73':
     resolution: {integrity: sha512-1kv8S/feB6UQWQQwsnGfkSkEBOtlFDNExnioL81E2BwvUWgjQPaseHgpi2EpWVgsPUgur5eBm4QowmlpWkD4/w==}
@@ -3241,6 +3272,14 @@ packages:
       '@types/node':
         optional: true
 
+  '@rushstack/node-core-library@5.4.1':
+    resolution: {integrity: sha512-WNnwdS8r9NZ/2K3u29tNoSRldscFa7SxU0RT+82B6Dy2I4Hl2MeCSKm4EXLXPKeNzLGvJ1cqbUhTLviSF8E6iA==}
+    peerDependencies:
+      '@types/node': '*'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
   '@rushstack/rig-package@0.5.2':
     resolution: {integrity: sha512-mUDecIJeH3yYGZs2a48k+pbhM6JYwWlgjs2Ca5f2n1G2/kgdgP9D/07oglEGf6mRyXEnazhEENeYTSNDRCwdqA==}
 
@@ -3252,8 +3291,19 @@ packages:
       '@types/node':
         optional: true
 
+  '@rushstack/terminal@0.13.0':
+    resolution: {integrity: sha512-Ou44Q2s81BqJu3dpYedAX54am9vn245F0HzqVrfJCMQk5pGgoKKOBOjkbfZC9QKcGNaECh6pwH2s5noJt7X6ew==}
+    peerDependencies:
+      '@types/node': '*'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
   '@rushstack/ts-command-line@4.19.1':
     resolution: {integrity: sha512-J7H768dgcpG60d7skZ5uSSwyCZs/S2HrWP1Ds8d1qYAyaaeJmpmmLr9BVw97RjFzmQPOYnoXcKA4GkqDCkduQg==}
+
+  '@rushstack/ts-command-line@4.22.0':
+    resolution: {integrity: sha512-Qj28t6MO3HRgAZ72FDeFsrpdE6wBWxF3VENgvrXh7JF2qIT+CrXiOJIesW80VFZB9QwObSpkB1ilx794fGQg6g==}
 
   '@sinclair/typebox@0.27.8':
     resolution: {integrity: sha512-+Fj43pSMwJs4KRrH/938Uf+uAELIgVBmQzg/q1YG10djyfA3TnrU8N8XzqCh/okZdszqBQTZf96idMfE5lnwTA==}
@@ -4162,8 +4212,24 @@ packages:
     resolution: {integrity: sha512-4I7Td01quW/RpocfNayFdFVk1qSuoh0E7JrbRJ16nH01HhKFQ88INq9Sd+nd72zqRySlr9BmDA8xlEJ6vJMrYA==}
     engines: {node: '>=8'}
 
+  ajv-draft-04@1.0.0:
+    resolution: {integrity: sha512-mv00Te6nmYbRp5DCwclxtt7yV/joXJPGS7nM+97GdxvuttCOfgI3K4U25zboyeX0O+myI8ERluxQe5wljMmVIw==}
+    peerDependencies:
+      ajv: ^8.5.0
+    peerDependenciesMeta:
+      ajv:
+        optional: true
+
   ajv-formats@2.1.1:
     resolution: {integrity: sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==}
+    peerDependencies:
+      ajv: ^8.0.0
+    peerDependenciesMeta:
+      ajv:
+        optional: true
+
+  ajv-formats@3.0.1:
+    resolution: {integrity: sha512-8iUql50EUR+uUcdRQ3HDqa6EVyo3docL8g5WJ3FNcWmu62IbkGUue/pEyLBW8VGKKucTPgqeks4fIU1DA4yowQ==}
     peerDependencies:
       ajv: ^8.0.0
     peerDependenciesMeta:
@@ -4177,6 +4243,12 @@ packages:
 
   ajv@6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
+
+  ajv@8.12.0:
+    resolution: {integrity: sha512-sRu1kpcO9yLtYxBKvqfTeh9KzZEwO3STyX1HT+4CaDzC6HpTGYhIhPIzj9XuKU7KYDwnaeh5hcOwjy1QuJzBPA==}
+
+  ajv@8.13.0:
+    resolution: {integrity: sha512-PRA911Blj99jR5RMeTunVbNXMF6Lp4vZXnk5GQjcnUWUTsrXtekg/pnmFFI2u/I36Y/2bITGS30GZCXei6uNkA==}
 
   ajv@8.16.0:
     resolution: {integrity: sha512-F0twR8U1ZU67JIEtekUcLkXkoO5mMMmgGD8sK/xUFzJ805jxHQl92hImFAqqXMyMYjSPOyUPAwHYhB72g5sTXw==}
@@ -10376,6 +10448,14 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
+  '@microsoft/api-extractor-model@7.29.2(@types/node@20.14.9)':
+    dependencies:
+      '@microsoft/tsdoc': 0.15.0
+      '@microsoft/tsdoc-config': 0.17.0
+      '@rushstack/node-core-library': 5.4.1(@types/node@20.14.9)
+    transitivePeerDependencies:
+      - '@types/node'
+
   '@microsoft/api-extractor@7.43.0(@types/node@20.14.9)':
     dependencies:
       '@microsoft/api-extractor-model': 7.28.13(@types/node@20.14.9)
@@ -10394,6 +10474,24 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
+  '@microsoft/api-extractor@7.47.0(@types/node@20.14.9)':
+    dependencies:
+      '@microsoft/api-extractor-model': 7.29.2(@types/node@20.14.9)
+      '@microsoft/tsdoc': 0.15.0
+      '@microsoft/tsdoc-config': 0.17.0
+      '@rushstack/node-core-library': 5.4.1(@types/node@20.14.9)
+      '@rushstack/rig-package': 0.5.2
+      '@rushstack/terminal': 0.13.0(@types/node@20.14.9)
+      '@rushstack/ts-command-line': 4.22.0(@types/node@20.14.9)
+      lodash: 4.17.21
+      minimatch: 3.0.8
+      resolve: 1.22.8
+      semver: 7.5.4
+      source-map: 0.6.1
+      typescript: 5.4.2
+    transitivePeerDependencies:
+      - '@types/node'
+
   '@microsoft/tsdoc-config@0.16.2':
     dependencies:
       '@microsoft/tsdoc': 0.14.2
@@ -10401,7 +10499,16 @@ snapshots:
       jju: 1.4.0
       resolve: 1.19.0
 
+  '@microsoft/tsdoc-config@0.17.0':
+    dependencies:
+      '@microsoft/tsdoc': 0.15.0
+      ajv: 8.12.0
+      jju: 1.4.0
+      resolve: 1.22.8
+
   '@microsoft/tsdoc@0.14.2': {}
+
+  '@microsoft/tsdoc@0.15.0': {}
 
   '@neon-rs/cli@0.1.73':
     optionalDependencies:
@@ -11434,6 +11541,19 @@ snapshots:
     optionalDependencies:
       '@types/node': 20.14.9
 
+  '@rushstack/node-core-library@5.4.1(@types/node@20.14.9)':
+    dependencies:
+      ajv: 8.13.0
+      ajv-draft-04: 1.0.0(ajv@8.13.0)
+      ajv-formats: 3.0.1(ajv@8.13.0)
+      fs-extra: 7.0.1
+      import-lazy: 4.0.0
+      jju: 1.4.0
+      resolve: 1.22.8
+      semver: 7.5.4
+    optionalDependencies:
+      '@types/node': 20.14.9
+
   '@rushstack/rig-package@0.5.2':
     dependencies:
       resolve: 1.22.8
@@ -11446,9 +11566,25 @@ snapshots:
     optionalDependencies:
       '@types/node': 20.14.9
 
+  '@rushstack/terminal@0.13.0(@types/node@20.14.9)':
+    dependencies:
+      '@rushstack/node-core-library': 5.4.1(@types/node@20.14.9)
+      supports-color: 8.1.1
+    optionalDependencies:
+      '@types/node': 20.14.9
+
   '@rushstack/ts-command-line@4.19.1(@types/node@20.14.9)':
     dependencies:
       '@rushstack/terminal': 0.10.0(@types/node@20.14.9)
+      '@types/argparse': 1.0.38
+      argparse: 1.0.10
+      string-argv: 0.3.2
+    transitivePeerDependencies:
+      - '@types/node'
+
+  '@rushstack/ts-command-line@4.22.0(@types/node@20.14.9)':
+    dependencies:
+      '@rushstack/terminal': 0.13.0(@types/node@20.14.9)
       '@types/argparse': 1.0.38
       argparse: 1.0.10
       string-argv: 0.3.2
@@ -12632,9 +12768,17 @@ snapshots:
       clean-stack: 2.2.0
       indent-string: 4.0.0
 
+  ajv-draft-04@1.0.0(ajv@8.13.0):
+    optionalDependencies:
+      ajv: 8.13.0
+
   ajv-formats@2.1.1(ajv@8.16.0):
     optionalDependencies:
       ajv: 8.16.0
+
+  ajv-formats@3.0.1(ajv@8.13.0):
+    optionalDependencies:
+      ajv: 8.13.0
 
   ajv-keywords@3.5.2(ajv@6.12.6):
     dependencies:
@@ -12645,6 +12789,20 @@ snapshots:
       fast-deep-equal: 3.1.3
       fast-json-stable-stringify: 2.1.0
       json-schema-traverse: 0.4.1
+      uri-js: 4.4.1
+
+  ajv@8.12.0:
+    dependencies:
+      fast-deep-equal: 3.1.3
+      json-schema-traverse: 1.0.0
+      require-from-string: 2.0.2
+      uri-js: 4.4.1
+
+  ajv@8.13.0:
+    dependencies:
+      fast-deep-equal: 3.1.3
+      json-schema-traverse: 1.0.0
+      require-from-string: 2.0.2
       uri-js: 4.4.1
 
   ajv@8.16.0:
@@ -17809,7 +17967,7 @@ snapshots:
 
   tslib@2.6.3: {}
 
-  tsup@8.1.0(@microsoft/api-extractor@7.43.0)(@swc/core@1.6.7)(postcss@8.4.39)(typescript@5.5.3):
+  tsup@8.1.0(@microsoft/api-extractor@7.47.0)(@swc/core@1.6.7)(postcss@8.4.39)(typescript@5.5.3):
     dependencies:
       bundle-require: 4.2.1(esbuild@0.21.5)
       cac: 6.7.14
@@ -17826,7 +17984,7 @@ snapshots:
       sucrase: 3.35.0
       tree-kill: 1.2.2
     optionalDependencies:
-      '@microsoft/api-extractor': 7.43.0(@types/node@20.14.9)
+      '@microsoft/api-extractor': 7.47.0(@types/node@20.14.9)
       '@swc/core': 1.6.7(@swc/helpers@0.5.5)
       postcss: 8.4.39
       typescript: 5.5.3

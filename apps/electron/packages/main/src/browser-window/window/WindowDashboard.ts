@@ -2,7 +2,7 @@ import { app, dialog } from 'electron';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import WindowBase from './WindowBase';
-import { parseJSON } from '@alt-dot/shared';
+import { parseJSON } from '@altdot/shared';
 
 class WindowDashboard extends WindowBase {
   constructor() {

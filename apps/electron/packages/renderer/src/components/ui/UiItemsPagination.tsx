@@ -1,4 +1,4 @@
-import { UiLabel, UiSelect, UiButton } from '@alt-dot/ui';
+import { UiLabel, UiSelect, UiButton } from '@altdot/ui';
 import clsx from 'clsx';
 
 interface Pagination {

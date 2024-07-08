@@ -1,4 +1,4 @@
-import { ExtensionCredential } from '@alt-dot/extension-core/src/client/manifest/manifest-credential';
+import { ExtensionCredential } from '@altdot/extension-core/src/client/manifest/manifest-credential';
 import {
   UiLabel,
   UiInput,
@@ -10,7 +10,7 @@ import {
   UiFormMessage,
   UiButton,
   useToast,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import UiExtensionIcon from '../ui/UiExtensionIcon';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';

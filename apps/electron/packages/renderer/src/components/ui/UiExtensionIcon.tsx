@@ -1,5 +1,5 @@
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
-import { UiIcons, UiImage } from '@alt-dot/ui';
+import { UiIcons, UiImage } from '@altdot/ui';
 import { LucideIcon, TriangleAlertIcon } from 'lucide-react';
 import { useState } from 'react';
 

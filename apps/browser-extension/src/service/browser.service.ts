@@ -1,4 +1,4 @@
-import { BrowserConnected, debounce } from '@alt-dot/shared';
+import { BrowserConnected, debounce } from '@altdot/shared';
 import Browser from 'webextension-polyfill';
 import getBrowserInfo from '../utils/getBrowserInfo';
 

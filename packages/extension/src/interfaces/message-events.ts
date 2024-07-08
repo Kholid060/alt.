@@ -1,4 +1,4 @@
-import ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
+import ExtensionAPI from '@altdot/extension-core/types/extension-api';
 
 export enum ExtensionExecutionFinishReason {
   done,

@@ -3,7 +3,7 @@ import AppLoadingIndicator, {
   AppLoadingPlaceholder,
 } from '@/components/app/AppLoadingIndicator';
 import { AppRouterContext } from '@/interface/app.interface';
-import { DialogProvider, UiToaster } from '@alt-dot/ui';
+import { DialogProvider, UiToaster } from '@altdot/ui';
 import {
   createRootRouteWithContext,
   Outlet,

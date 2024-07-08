@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DBService } from '/@/db/db.service';
-import { parseJSON } from '@alt-dot/shared';
-import ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
+import { parseJSON } from '@altdot/shared';
+import ExtensionAPI from '@altdot/extension-core/types/extension-api';
 import { safeStorage } from 'electron';
 import {
   NewExtensionStorage,

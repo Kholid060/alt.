@@ -1,7 +1,7 @@
-import { WorkflowNodeLoop } from '@alt-dot/workflow';
-import { UiSelect, UiLabel, UiInput } from '@alt-dot/ui';
+import { WorkflowNodeLoop } from '@altdot/workflow';
+import { UiSelect, UiLabel, UiInput } from '@altdot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
-import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
+import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
 import { WorkflowUiExpressionInput } from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
 

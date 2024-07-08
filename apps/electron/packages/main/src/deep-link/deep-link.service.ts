@@ -1,17 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { DBService } from '../db/db.service';
-import { dialog } from 'electron';
+import { app, dialog } from 'electron';
 import { extensionCommands } from '../db/schema/extension.schema';
 import { eq } from 'drizzle-orm';
-import { ExtensionCommandArgument } from '@alt-dot/extension-core';
-import { parseJSON } from '@alt-dot/shared';
-import { CommandLaunchBy } from '@alt-dot/extension';
+import { ExtensionCommandArgument } from '@altdot/extension-core';
+import { APP_DEEP_LINK_SCHEME, debounce, parseJSON } from '@altdot/shared';
+import { CommandLaunchBy } from '@altdot/extension';
 import { ExtensionService } from '../extension/extension.service';
 import { workflows } from '../db/schema/workflow.schema';
 import { WorkflowService } from '../workflow/workflow.service';
 import { WORKFLOW_MANUAL_TRIGGER_ID } from '#packages/common/utils/constant/workflow.const';
 import { BrowserWindowService } from '../browser-window/browser-window.service';
 import { LoggerService } from '../logger/logger.service';
+import path from 'path';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 function convertArgValue(argument: ExtensionCommandArgument, value: string) {
   let convertedValue: unknown = value;
@@ -29,14 +31,44 @@ function convertArgValue(argument: ExtensionCommandArgument, value: string) {
 }
 
 @Injectable()
-export class DeepLinkService {
+export class DeepLinkService implements OnModuleInit {
   constructor(
     private dbService: DBService,
+    private eventEmitter: EventEmitter2,
     private loggerService: LoggerService,
     private workflowService: WorkflowService,
     private extensionService: ExtensionService,
     private browserWindowService: BrowserWindowService,
   ) {}
+
+  onModuleInit() {
+    /**
+     * Register Deep Link
+     */
+    if (process.defaultApp) {
+      if (process.argv.length >= 2) {
+        app.setAsDefaultProtocolClient(APP_DEEP_LINK_SCHEME, process.execPath, [
+          path.resolve(process.argv[2]),
+        ]);
+      }
+    } else {
+      app.setAsDefaultProtocolClient(APP_DEEP_LINK_SCHEME, process.execPath);
+    }
+
+    app.on(
+      'second-instance',
+      // the event called twice for some reason 🤔
+      debounce((_event, commandLine) => {
+        console.log(_event, commandLine);
+        const deepLink = commandLine ? commandLine.pop() : null;
+        if (!deepLink || !deepLink.startsWith(APP_DEEP_LINK_SCHEME)) {
+          return;
+        }
+
+        this.eventEmitter.emit('deep-link', deepLink);
+      }, 50),
+    );
+  }
 
   private async extensionHandler({ pathname, searchParams }: URL) {
     const [_, extensionId, commandId] = pathname.split('/');

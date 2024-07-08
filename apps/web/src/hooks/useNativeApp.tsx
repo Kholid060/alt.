@@ -1,4 +1,4 @@
-import { APP_DEEP_LINK_SCHEME } from '@alt-dot/shared';
+import { APP_DEEP_LINK_SCHEME } from '@altdot/shared';
 
 export function useNativeApp() {
   function installExtension(extensionId: string) {

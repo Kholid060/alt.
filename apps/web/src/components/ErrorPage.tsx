@@ -1,6 +1,6 @@
 import notFoundSvg from '@/assets/svg/404.svg';
 import bugFixingSvg from '@/assets/svg/bug-fixing.svg';
-import { UiButton } from '@alt-dot/ui';
+import { UiButton } from '@altdot/ui';
 import { Link } from '@tanstack/react-router';
 import clsx from 'clsx';
 

@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 import { Injectable } from '@nestjs/common';
 import { OnExtensionAPI } from '/@/common/decorators/extension.decorator';
 import { ExtensionApiEvent } from '../events/extension-api.event';
-import ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
+import ExtensionAPI from '@altdot/extension-core/types/extension-api';
 
 function getWriteContent(
   content: string | ArrayBuffer,

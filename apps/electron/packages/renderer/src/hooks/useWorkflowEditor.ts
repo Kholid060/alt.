@@ -10,15 +10,15 @@ import {
   WORKFLOW_ELEMENT_FORMAT,
   WORKFLOW_MANUAL_TRIGGER_ID,
 } from '#packages/common/utils/constant/workflow.const';
-import { parseJSON } from '@alt-dot/shared';
+import { parseJSON } from '@altdot/shared';
 import { nanoid } from 'nanoid';
 import { Connection, useReactFlow, useStore, useStoreApi } from 'reactflow';
 import { isIPCEventError } from '../utils/helper';
 import preloadAPI from '../utils/preloadAPI';
 import { useWorkflowEditorStore } from '../stores/workflow-editor/workflow-editor.store';
 import { useShallow } from 'zustand/react/shallow';
-import { useToast } from '@alt-dot/ui';
-import { WORKFLOW_NODE_TYPE, WorkflowNodes } from '@alt-dot/workflow';
+import { useToast } from '@altdot/ui';
+import { WORKFLOW_NODE_TYPE, WorkflowNodes } from '@altdot/workflow';
 
 export function useWorkflowEditor() {
   const storeApi = useStoreApi();

@@ -2,9 +2,9 @@ import { ExtensionNewPayload } from '@/routes/devconsole/extensions/new';
 import APIService from '@/services/api.service';
 import { useUserStore } from '@/stores/user.store';
 import GithubAPI from '@/utils/GithubAPI';
-import { ExtensionManifestSchema } from '@alt-dot/extension-core';
-import { parseJSON } from '@alt-dot/shared';
-import { useToast, UiDialog, UiLabel, UiInput, UiButton } from '@alt-dot/ui';
+import { ExtensionManifestSchema } from '@altdot/extension-core';
+import { parseJSON } from '@altdot/shared';
+import { useToast, UiDialog, UiLabel, UiInput, UiButton } from '@altdot/ui';
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 

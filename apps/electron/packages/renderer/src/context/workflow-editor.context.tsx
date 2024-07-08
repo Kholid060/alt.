@@ -4,7 +4,7 @@ import {
   WorkflowEditorEvents,
   XYPosition,
 } from '../interface/workflow-editor.interface';
-import { createDebounce } from '@alt-dot/shared';
+import { createDebounce } from '@altdot/shared';
 import preloadAPI from '../utils/preloadAPI';
 import { isIPCEventError } from '#packages/common/utils/helper';
 

@@ -1,9 +1,9 @@
-import { WorkflowNodeBrowserMouse } from '@alt-dot/workflow';
-import { UiInput, UiLabel, UiSelect } from '@alt-dot/ui';
+import { WorkflowNodeBrowserMouse } from '@altdot/workflow';
+import { UiInput, UiLabel, UiSelect } from '@altdot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
-import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
+import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
 
 const mouseActions: {
   id: WorkflowNodeBrowserMouse['data']['action'];

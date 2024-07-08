@@ -2,7 +2,7 @@
 {
   "root": true,
   "ignorePatterns": [".eslintrc.cjs"],
-  "extends": ["@alt-dot/eslint-config/base.js"],
+  "extends": ["@altdot/eslint-config/base.js"],
   "parserOptions": {
     "project": true
   }

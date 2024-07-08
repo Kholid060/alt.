@@ -1,4 +1,4 @@
-import { ApiWorkflowDetail, ApiExtensionHighlightItem } from '@alt-dot/shared';
+import { ApiWorkflowDetail, ApiExtensionHighlightItem } from '@altdot/shared';
 import { NewWorkflow, SelectWorkflow } from '../db/schema/workflow.schema';
 
 export type WorkflowDetailModel = SelectWorkflow;

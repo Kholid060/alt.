@@ -1,7 +1,7 @@
 import type { ExtensionCommandExecutePayload } from '#common/interface/extension.interface';
 import { EventEmitter } from 'eventemitter3';
 import type ExtensionCommandRunner from '../ExtensionCommandRunner';
-import type { BetterMessagePayload } from '@alt-dot/shared';
+import type { BetterMessagePayload } from '@altdot/shared';
 import { ExtensionCommandModel } from '#packages/main/src/extension/extension-command/extension-command.interface';
 
 export enum ExtensionRunnerProcessFinishReason {

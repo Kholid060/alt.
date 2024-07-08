@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { UseFormReturn, useForm } from 'react-hook-form';
-import { ExtensionConfig, ExtensionConfigType } from '@alt-dot/extension-core';
+import { ExtensionConfig, ExtensionConfigType } from '@altdot/extension-core';
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
 import {
   UiButton,
@@ -14,7 +14,7 @@ import {
   UiInput,
   UiSelect,
   UiSwitch,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { IPCEventError } from '#common/interface/ipc-events.interface';

@@ -1,4 +1,4 @@
-import { BrowserInfo, BrowserType } from '@alt-dot/shared';
+import { BrowserInfo, BrowserType } from '@altdot/shared';
 import { z } from 'zod';
 
 const BROWSER_TYPE = [

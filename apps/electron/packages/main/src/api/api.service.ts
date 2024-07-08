@@ -1,4 +1,4 @@
-import { API } from '@alt-dot/shared';
+import { API } from '@altdot/shared';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AppEnv } from '../common/validation/app-env.validation';

@@ -15,10 +15,10 @@ import {
   WorkflowNodeConditionalNode,
   WorkflowEdgeDefault,
   WorkflowNodesProvider,
-} from '@alt-dot/workflow';
+} from '@altdot/workflow';
 import clsx from 'clsx';
 import { BlocksIcon, LucideIcon } from 'lucide-react';
-import { UiIcons } from '@alt-dot/ui';
+import { UiIcons } from '@altdot/ui';
 import { forwardRef, memo, useEffect } from 'react';
 
 const defaultNodeTypes = Object.values(WORKFLOW_NODE_TYPE).reduce<

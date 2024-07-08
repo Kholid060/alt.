@@ -1,5 +1,5 @@
-import { WORKFLOW_NODE_GROUP, WorkflowNodesMap } from '@alt-dot/workflow';
-import { UiListItem } from '@alt-dot/ui';
+import { WORKFLOW_NODE_GROUP, WorkflowNodesMap } from '@altdot/workflow';
+import { UiListItem } from '@altdot/ui';
 import { SetRequired } from 'type-fest';
 
 export enum WorkflowEditorContextMenuType {

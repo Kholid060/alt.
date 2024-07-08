@@ -1,4 +1,4 @@
-import type { BrowserSelectFileOptions } from '@alt-dot/shared';
+import type { BrowserSelectFileOptions } from '@altdot/shared';
 import fs from 'fs-extra';
 import path from 'path';
 import mime from 'mime-types';

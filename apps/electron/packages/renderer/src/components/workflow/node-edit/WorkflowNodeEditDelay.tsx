@@ -1,9 +1,9 @@
-import { WorkflowNodeDelay } from '@alt-dot/workflow';
-import { UiInput } from '@alt-dot/ui';
+import { WorkflowNodeDelay } from '@altdot/workflow';
+import { UiInput } from '@altdot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
-import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
+import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
 
 function WorkflowNodeEditDelay() {
   const node = useWorkflowEditorStore.use.editNode() as WorkflowNodeDelay;

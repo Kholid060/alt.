@@ -11,9 +11,9 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "@alt-dot/extension": "workspace:*",
-    "@alt-dot/extension-core": "workspace:*",
-    "@alt-dot/workflow": "workspace:^",
+    "@altdot/extension": "workspace:*",
+    "@altdot/extension-core": "workspace:*",
+    "@altdot/workflow": "workspace:^",
     "@hookform/resolvers": "^3.6.0",
     "@supabase/auth-ui-react": "^0.4.7",
     "@supabase/auth-ui-shared": "^0.1.8",
@@ -40,11 +40,11 @@
     "zustand": "^4.5.2"
   },
   "devDependencies": {
-    "@alt-dot/eslint-config": "workspace:*",
-    "@alt-dot/shared": "workspace:*",
-    "@alt-dot/tailwind-config": "workspace:*",
-    "@alt-dot/typescript-config": "workspace:*",
-    "@alt-dot/ui": "workspace:*",
+    "@altdot/eslint-config": "workspace:*",
+    "@altdot/shared": "workspace:*",
+    "@altdot/tailwind-config": "workspace:*",
+    "@altdot/typescript-config": "workspace:*",
+    "@altdot/ui": "workspace:*",
     "@tailwindcss/typography": "^0.5.13",
     "@tanstack/router-devtools": "^1.39.8",
     "@tanstack/router-plugin": "^1.39.9",

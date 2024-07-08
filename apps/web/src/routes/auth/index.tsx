@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import SupabaseService, {
   SupabaseOAuthProvider,
 } from '../../services/supabase.service';
-import { UiButton, UiImage, UiLogo } from '@alt-dot/ui';
+import { UiButton, UiImage, UiLogo } from '@altdot/ui';
 import googleLogoSvg from '@/assets/logo/google.svg';
 import githubLogoWhiteSvg from '@/assets/logo/github-white.svg';
 import { routeBeforeLoadPipe } from '@/utils/route-utils';

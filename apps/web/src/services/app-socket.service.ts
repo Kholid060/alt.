@@ -4,7 +4,7 @@ import {
   PromiseWithResolver,
   promiseWithResolver,
   WebAppWSClientToServerEvents,
-} from '@alt-dot/shared';
+} from '@altdot/shared';
 
 const APP_WEBSOCKET_URL = `ws://localhost:${APP_WEBSOCKET_PORT}/web-app`;
 

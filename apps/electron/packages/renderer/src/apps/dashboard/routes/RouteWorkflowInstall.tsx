@@ -10,7 +10,7 @@ import {
   UiList,
   UiSkeleton,
   UiTooltip,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import WorkflowIcon from '/@/components/workflow/WorkflowIcon';
 import {
   DownloadIcon,
@@ -24,10 +24,10 @@ import { useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
-import { ApiExtensionHighlightItem } from '@alt-dot/shared';
+import { ApiExtensionHighlightItem } from '@altdot/shared';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { WorkflowApiWithExtensions } from '#packages/main/src/workflow/workflow.interface';
-import { WorkflowNodes } from '@alt-dot/workflow';
+import { WorkflowNodes } from '@altdot/workflow';
 
 const numberFormatter = new Intl.NumberFormat();
 

@@ -2,7 +2,7 @@ import React from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { XIcon } from 'lucide-react';
 import UiExtensionIcon from '../ui/UiExtensionIcon';
-import { UiList } from '@alt-dot/ui';
+import { UiList } from '@altdot/ui';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import { ExtensionPermissions } from '#packages/common/interface/extension.interface';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';

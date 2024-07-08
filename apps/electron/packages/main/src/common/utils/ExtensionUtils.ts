@@ -1,9 +1,9 @@
 import fs from 'fs-extra';
-import type { ExtensionManifest } from '@alt-dot/extension-core';
-import { ExtensionManifestSchema } from '@alt-dot/extension-core';
+import type { ExtensionManifest } from '@altdot/extension-core';
+import { ExtensionManifestSchema } from '@altdot/extension-core';
 import { fromZodError } from 'zod-validation-error';
 import validateSemver from 'semver/functions/valid';
-import { parseJSON } from '@alt-dot/shared';
+import { parseJSON } from '@altdot/shared';
 
 type ExtractedData<T> =
   | { isError: true; message: string }

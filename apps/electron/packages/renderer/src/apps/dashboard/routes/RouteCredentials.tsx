@@ -30,13 +30,13 @@ import {
   UiTooltip,
   useDialog,
   useToast,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import {
   UiListProvider,
   useUiListStore,
-} from '@alt-dot/ui/dist/context/list.context';
+} from '@altdot/ui/dist/context/list.context';
 import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
-import { ExtensionCredential } from '@alt-dot/extension-core/src/client/manifest/manifest-credential';
+import { ExtensionCredential } from '@altdot/extension-core/src/client/manifest/manifest-credential';
 import CredentialDetail from '/@/components/credential/CredentialDetail';
 import UiItemsPagination from '/@/components/ui/UiItemsPagination';
 import preloadAPI from '/@/utils/preloadAPI';

@@ -8,12 +8,12 @@ import APIService from '@/services/api.service';
 import GithubAPI from '@/utils/GithubAPI';
 import { EXT_BANNER_NAME_REGEX, UserRole } from '@/utils/constant';
 import { routeBeforeLoadPipe } from '@/utils/route-utils';
-import { ExtensionManifestSchema } from '@alt-dot/extension-core';
+import { ExtensionManifestSchema } from '@altdot/extension-core';
 import {
   ApiAdminSetExtentionEntryPayload,
   afetch,
   parseJSON,
-} from '@alt-dot/shared';
+} from '@altdot/shared';
 import {
   useToast,
   UiDialog,
@@ -35,7 +35,7 @@ import {
   UiDropdownMenuSubTrigger,
   UiDropdownMenuSubContent,
   UiSkeleton,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import dayjs from 'dayjs';

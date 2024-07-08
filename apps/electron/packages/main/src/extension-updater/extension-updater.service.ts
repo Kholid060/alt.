@@ -7,7 +7,7 @@ import { LoggerService } from '../logger/logger.service';
 import path from 'path';
 import ExtensionUtils from '../common/utils/ExtensionUtils';
 import { APIService } from '../api/api.service';
-import { afetch } from '@alt-dot/shared';
+import { afetch } from '@altdot/shared';
 import AdmZip from 'adm-zip';
 import originalFs from 'original-fs';
 import { app } from 'electron';

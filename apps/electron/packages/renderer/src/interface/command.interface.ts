@@ -4,8 +4,8 @@ import {
 } from '#packages/common/interface/extension.interface';
 import { SelectExtensionCommand } from '#packages/main/src/db/schema/extension.schema';
 import { ExtensionListItemModel } from '#packages/main/src/extension/extension.interface';
-import { ExtensionCommand, ExtensionManifest } from '@alt-dot/extension-core';
-import { UiListItem } from '@alt-dot/ui';
+import { ExtensionCommand, ExtensionManifest } from '@altdot/extension-core';
+import { UiListItem } from '@altdot/ui';
 
 export interface CommandListItemCommandBuiltIn extends UiListItem {
   metadata: {

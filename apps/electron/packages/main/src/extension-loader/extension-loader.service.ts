@@ -14,7 +14,7 @@ import { ExtensionUpdaterService } from '../extension-updater/extension-updater.
 import { GlobalShortcutService } from '../global-shortcut/global-shortcut.service';
 import { eq } from 'drizzle-orm';
 import { APIService } from '../api/api.service';
-import { afetch } from '@alt-dot/shared';
+import { afetch } from '@altdot/shared';
 import fs from 'fs-extra';
 import AdmZip from 'adm-zip';
 import originalFs from 'original-fs';

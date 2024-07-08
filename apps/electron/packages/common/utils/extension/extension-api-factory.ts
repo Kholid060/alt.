@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ExtensionMessagePortEvent } from '@alt-dot/extension';
-import type ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
-import type { BetterMessagePortSync, EventMapEmit } from '@alt-dot/shared';
+import type { ExtensionMessagePortEvent } from '@altdot/extension';
+import type ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import type { BetterMessagePortSync, EventMapEmit } from '@altdot/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { CUSTOM_SCHEME } from '../constant/constant';
-import type { ExtensionAPIValues } from '@alt-dot/extension-core/dist/extensionApiBuilder';
+import type { ExtensionAPIValues } from '@altdot/extension-core/dist/extensionApiBuilder';
 import { createExtensionElementHandle } from './extension-element-handle';
 import type { IPCUserExtensionEventsMap } from '../../interface/ipc-events.interface';
-import extensionApiBuilder from '@alt-dot/extension-core/dist/extensionApiBuilder';
+import extensionApiBuilder from '@altdot/extension-core/dist/extensionApiBuilder';
 import type { ExtensionBrowserTabContext } from '../../interface/extension.interface';
 import { APP_ICON_DIR_PREFIX } from '../../utils/constant/app.const';
 

@@ -1,4 +1,4 @@
-import { ARequestInit, afetch } from '@alt-dot/shared';
+import { ARequestInit, afetch } from '@altdot/shared';
 import { EXT_BANNER_NAME_REGEX } from './constant';
 
 const GITHUB_API_BASE_URL = 'https://api.github.com';

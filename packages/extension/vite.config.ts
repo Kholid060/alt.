@@ -22,7 +22,7 @@ export default defineConfig({
       formats: ['es'],
     },
     rollupOptions: {
-      external: ['react', 'react/jsx-runtime', 'react-dom', '@alt-dot/ui'],
+      external: ['react', 'react/jsx-runtime', 'react-dom', '@altdot/ui'],
       output: {
         entryFileNames: '[name].js',
         sourcemapExcludeSources: true,

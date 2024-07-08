@@ -19,7 +19,7 @@ import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/const
 import { nanoid } from 'nanoid';
 import { SQLiteColumn } from 'drizzle-orm/sqlite-core';
 import { withPagination } from '/@/common/utils/database-utils';
-import { parseJSON } from '@alt-dot/shared';
+import { parseJSON } from '@altdot/shared';
 
 @Injectable()
 export class ExtensionCredentialService {

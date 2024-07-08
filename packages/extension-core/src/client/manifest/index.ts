@@ -10,7 +10,7 @@ import {
   ExtensionPermissions,
   ExtensionCommandType,
   ExtensionCommandArgumentType,
-} from '@alt-dot/shared';
+} from '@altdot/shared';
 
 const URL_FRIENDLY_REGEX = /^[a-zA-Z0-9_-]*$/;
 

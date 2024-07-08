@@ -1,5 +1,5 @@
 {
-  "name": "@alt-dot/ui",
+  "name": "@altdot/ui",
   "version": "0.0.1",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -12,8 +12,8 @@
     "clean": "rm -rf .turbo &&  rm -rf dist"
   },
   "devDependencies": {
-    "@alt-dot/eslint-config": "workspace:*",
-    "@alt-dot/typescript-config": "workspace:*",
+    "@altdot/eslint-config": "workspace:*",
+    "@altdot/typescript-config": "workspace:*",
     "@typescript-eslint/eslint-plugin": "^7.2.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
@@ -27,7 +27,7 @@
   },
   "type": "module",
   "dependencies": {
-    "@alt-dot/shared": "workspace:*",
+    "@altdot/shared": "workspace:*",
     "@hookform/resolvers": "^3.6.0",
     "@radix-ui/react-accordion": "^1.1.2",
     "@radix-ui/react-alert-dialog": "^1.0.5",

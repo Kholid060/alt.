@@ -4,8 +4,8 @@ import {
   UiListItem,
   UiListRenderItemDetail,
   uiListItemsFilter,
-} from '@alt-dot/ui';
-import { UiList } from '@alt-dot/ui';
+} from '@altdot/ui';
+import { UiList } from '@altdot/ui';
 import {
   CommandListItemCommand,
   CommandListItemCommandBuiltIn,

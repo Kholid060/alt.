@@ -26,14 +26,14 @@
     "db:generate": "drizzle-kit generate --config \"./drizzle.config.ts\""
   },
   "devDependencies": {
-    "@alt-dot/eslint-config": "workspace:*",
-    "@alt-dot/extension": "workspace:*",
-    "@alt-dot/extension-core": "workspace:*",
-    "@alt-dot/native": "workspace:*",
-    "@alt-dot/shared": "workspace:*",
-    "@alt-dot/tailwind-config": "workspace:*",
-    "@alt-dot/typescript-config": "workspace:*",
-    "@alt-dot/ui": "workspace:*",
+    "@altdot/eslint-config": "workspace:*",
+    "@altdot/extension": "workspace:*",
+    "@altdot/extension-core": "workspace:*",
+    "@altdot/native": "workspace:*",
+    "@altdot/shared": "workspace:*",
+    "@altdot/tailwind-config": "workspace:*",
+    "@altdot/typescript-config": "workspace:*",
+    "@altdot/ui": "workspace:*",
     "@electron-forge/cli": "^7.4.0",
     "@electron/rebuild": "^3.6.0",
     "@swc/core": "^1.6.6",
@@ -84,7 +84,7 @@
     "vitest": "1.2.2"
   },
   "dependencies": {
-    "@alt-dot/workflow": "workspace:^",
+    "@altdot/workflow": "workspace:^",
     "@codemirror/lang-javascript": "^6.2.2",
     "@codemirror/lang-json": "^6.0.1",
     "@hookform/resolvers": "^3.3.4",

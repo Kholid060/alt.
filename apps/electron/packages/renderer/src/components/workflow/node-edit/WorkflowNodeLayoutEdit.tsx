@@ -9,16 +9,16 @@ import {
   UiSelect,
   UiLabel,
   UiButton,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import WorkflowNodeSettings from './WorkflowNodeSettings';
-import { WorkflowNodes } from '@alt-dot/workflow';
-import { WORKFLOW_NODES } from '@alt-dot/workflow';
+import { WorkflowNodes } from '@altdot/workflow';
+import { WORKFLOW_NODES } from '@altdot/workflow';
 import { useEffect, useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 import WorkflowUiCodeEditor from '../ui/WorkflowUiCodeEditor';
 import { Edge, Node, getIncomers } from 'reactflow';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor/workflow-editor.store';
-import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
+import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 import { Loader2Icon, TriangleAlertIcon } from 'lucide-react';
 

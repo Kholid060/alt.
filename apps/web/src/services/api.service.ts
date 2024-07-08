@@ -1,4 +1,4 @@
-import { API } from '@alt-dot/shared';
+import { API } from '@altdot/shared';
 
 class APIService extends API {
   static instance = new APIService();

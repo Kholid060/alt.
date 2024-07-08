@@ -1,5 +1,5 @@
 import { WORKFLOW_MANUAL_TRIGGER_ID } from '#packages/common/utils/constant/workflow.const';
-import { UiIcons, UiList, UiListItemAction } from '@alt-dot/ui';
+import { UiIcons, UiList, UiListItemAction } from '@altdot/ui';
 import { ListItemRenderDetail } from '/@/apps/command/routes/CommandList';
 import preloadAPI from '/@/utils/preloadAPI';
 import {

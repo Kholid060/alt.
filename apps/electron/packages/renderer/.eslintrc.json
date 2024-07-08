@@ -4,6 +4,6 @@
     "node": false
   },
   "extends": [
-    "@alt-dot/eslint-config/react.js"
+    "@altdot/eslint-config/react.js"
   ]
 }

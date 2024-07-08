@@ -22,7 +22,7 @@ import {
   getShortcutStr,
   KeyboardShortcut,
   KeyboardShortcutModifier,
-} from '@alt-dot/shared';
+} from '@altdot/shared';
 import mergeRefs from '@/utils/mergeRefs';
 
 const ITEM_SELECTED_EVENT = 'ui-list-item-selected';

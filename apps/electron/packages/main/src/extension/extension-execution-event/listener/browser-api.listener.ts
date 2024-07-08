@@ -3,7 +3,7 @@ import { BrowserExtensionService } from '/@/browser-extension/browser-extension.
 import { OnExtensionAPI } from '/@/common/decorators/extension.decorator';
 import { ExtensionApiEvent } from '../events/extension-api.event';
 import { CustomError } from '#packages/common/errors/custom-errors';
-import ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
+import ExtensionAPI from '@altdot/extension-core/types/extension-api';
 import { ExtensionBrowserTabContext } from '#packages/common/interface/extension.interface';
 import {
   ExtensionWSServerToClientEvents,
@@ -11,7 +11,7 @@ import {
   AllButLast,
   Last,
   WSAckErrorResult,
-} from '@alt-dot/shared';
+} from '@altdot/shared';
 import { getFileDetail } from '/@/common/utils/getFileDetail';
 import { BrowserWindowService } from '/@/browser-window/browser-window.service';
 import { isWSAckError } from '/@/common/utils/helper';

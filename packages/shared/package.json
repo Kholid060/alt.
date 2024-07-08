@@ -1,11 +1,11 @@
 {
-  "name": "@alt-dot/shared",
+  "name": "@altdot/shared",
   "version": "0.0.1",
   "type": "module",
   "main": "./src/index.ts",
   "devDependencies": {
-    "@alt-dot/eslint-config": "workspace:*",
-    "@alt-dot/typescript-config": "workspace:*",
+    "@altdot/eslint-config": "workspace:*",
+    "@altdot/typescript-config": "workspace:*",
     "@typescript-eslint/eslint-plugin": "^7.4.0",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",

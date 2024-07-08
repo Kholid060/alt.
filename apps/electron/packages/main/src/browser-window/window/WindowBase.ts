@@ -8,7 +8,7 @@ import type {
   IPCRendererInvokeEventType,
   IPCRendererSendEvent,
 } from '#packages/common/interface/ipc-events.interface';
-import { isObject } from '@alt-dot/shared';
+import { isObject } from '@altdot/shared';
 import { IPC_ON_EVENT } from '#packages/common/utils/constant/constant';
 import { nanoid } from 'nanoid';
 import { debugLog } from '#packages/common/utils/helper';

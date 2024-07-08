@@ -6,8 +6,8 @@ import {
   USKeyboard,
   USKeyboardDetail,
   sleep,
-} from '@alt-dot/shared';
-import type ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
+} from '@altdot/shared';
+import type ExtensionAPI from '@altdot/extension-core/types/extension-api';
 
 function getModifierEventData(mods: ExtensionAPI.browser.KeyboardModifiers[]) {
   const modsData: Pick<

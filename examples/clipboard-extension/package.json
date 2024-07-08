@@ -11,8 +11,8 @@
     "dev": "altdot build --watch"
   },
   "devDependencies": {
-    "@alt-dot/extension": "workspace:*",
-    "@alt-dot/extension-core": "workspace:*",
+    "@altdot/extension": "workspace:*",
+    "@altdot/extension-core": "workspace:*",
     "@types/react": "^18.2.66",
     "typescript": "^5.4.2"
   },

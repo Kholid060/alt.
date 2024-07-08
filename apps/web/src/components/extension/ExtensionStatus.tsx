@@ -1,5 +1,5 @@
 import type { ExtensionStatus as ExtensionStatusType } from '@/interface/extension.interface';
-import { UiPopover, UiPopoverContent, UiPopoverTrigger } from '@alt-dot/ui';
+import { UiPopover, UiPopoverContent, UiPopoverTrigger } from '@altdot/ui';
 import clsx from 'clsx';
 import { FileTextIcon } from 'lucide-react';
 import UiMarkdown from '../ui/UiMarkdown';

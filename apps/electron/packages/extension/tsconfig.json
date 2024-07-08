@@ -6,7 +6,7 @@
       "#common/*": ["../common/*"]
     }
   },
-  "extends": ["@alt-dot/typescript-config/vite.json"],
+  "extends": ["@altdot/typescript-config/vite.json"],
   "include": [
     "types/**/*.d.ts",
     "src/**/*.ts",

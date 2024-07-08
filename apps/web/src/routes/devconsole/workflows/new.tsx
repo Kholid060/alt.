@@ -15,7 +15,7 @@ import {
   UiBreadcrumbPage,
   useToast,
   UiButtonLoader,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import {
   WorkflowDetail,
   WorkflowDetailHeader,

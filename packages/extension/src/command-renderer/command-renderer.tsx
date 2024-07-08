@@ -1,10 +1,10 @@
 import React from 'react';
-import { BetterMessagePortSync } from '@alt-dot/shared';
+import { BetterMessagePortSync } from '@altdot/shared';
 import { ExtensionProvider } from './context/extension.context';
 import { ExtensionMessagePortEvent } from '@/interfaces/message-events';
-import { UiListProvider } from '@alt-dot/ui/dist/context/list.context';
+import { UiListProvider } from '@altdot/ui/dist/context/list.context';
 import { CommandLaunchContext } from '@/interfaces/command.interface';
-import { UiTooltipProvider } from '@alt-dot/ui';
+import { UiTooltipProvider } from '@altdot/ui';
 
 export type ExtensionCommandView = (
   props: CommandLaunchContext,

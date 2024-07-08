@@ -1,7 +1,7 @@
 import APIService from '@/services/api.service';
 import { useUserStore } from '@/stores/user.store';
 import { APP_TITLE } from '@/utils/constant';
-import { FetchError } from '@alt-dot/shared';
+import { FetchError } from '@altdot/shared';
 import {
   useToast,
   UiAlert,
@@ -20,7 +20,7 @@ import {
   UiFormMessage,
   UiButton,
   UiButtonLoader,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createFileRoute } from '@tanstack/react-router';
 import { AlertTriangleIcon, UserRoundIcon } from 'lucide-react';

@@ -40,7 +40,7 @@ import type {
   WorkflowHistoryRunningItemModel,
   WorkflowHistoryUpdatePayload,
 } from '../workflow/workflow-history/workflow-history.interface';
-import type { ExtensionManifest } from '@alt-dot/extension-core';
+import type { ExtensionManifest } from '@altdot/extension-core';
 
 export interface DatabaseQueriesEvent {
   'database:get-extension-exists-arr': (

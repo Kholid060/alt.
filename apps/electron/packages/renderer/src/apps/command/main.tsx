@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
-import '@alt-dot/ui/dist/theme.css';
+import '@altdot/ui/dist/theme.css';
 import '/@/assets/css/style.css';
 import '/@/assets/css/fonts.css';
 

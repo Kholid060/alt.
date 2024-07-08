@@ -1,4 +1,4 @@
-import { APP_DEEP_LINK_SCHEME } from '@alt-dot/shared';
+import { APP_DEEP_LINK_SCHEME } from '@altdot/shared';
 import { APP_DEEP_LINK_HOST } from './constant/app.const';
 
 class DeepLinkURL {

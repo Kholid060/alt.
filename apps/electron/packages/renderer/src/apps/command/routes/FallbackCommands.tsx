@@ -1,12 +1,12 @@
 import { useEffect, useMemo } from 'react';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { SearchSlashIcon } from 'lucide-react';
-import { UiList, UiListItem } from '@alt-dot/ui';
+import { UiList, UiListItem } from '@altdot/ui';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '#packages/common/utils/helper';
-import { useUiListStore } from '@alt-dot/ui/dist/context/list.context';
+import { useUiListStore } from '@altdot/ui/dist/context/list.context';
 
 type CommandItem = UiListItem<{
   commandId: string;

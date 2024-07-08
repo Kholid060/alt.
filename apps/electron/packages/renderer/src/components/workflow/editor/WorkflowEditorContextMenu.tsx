@@ -7,7 +7,7 @@ import {
   UiContextMenuSeparator,
   UiContextMenuShortcut,
   UiContextMenuTrigger,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import {
   WorkflowEditorOnEvent,
   WorkflowEditorContextMenuEventPayload,
@@ -23,7 +23,7 @@ import {
   WorkflowEdge,
   WorkflowElement,
 } from '#packages/common/interface/workflow.interface';
-import { WorkflowNodes } from '@alt-dot/workflow';
+import { WorkflowNodes } from '@altdot/workflow';
 
 const ContextMenuContext =
   // @ts-expect-error not default val is expected

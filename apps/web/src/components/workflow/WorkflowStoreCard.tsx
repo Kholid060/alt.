@@ -1,5 +1,5 @@
 import { useNativeApp } from '@/hooks/useNativeApp';
-import { ApiWorkflowStoreListItem } from '@alt-dot/shared';
+import { ApiWorkflowStoreListItem } from '@altdot/shared';
 import {
   UiCard,
   UiCardHeader,
@@ -9,7 +9,7 @@ import {
   UiAvatar,
   UiAvatarImage,
   UiAvatarFallback,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import { ShareIcon, UserRoundIcon, DownloadIcon } from 'lucide-react';
 import WorkflowIcon from './WorkflowIcon';
 import { Link } from '@tanstack/react-router';

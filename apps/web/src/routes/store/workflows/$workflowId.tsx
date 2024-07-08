@@ -5,7 +5,7 @@ import { useNativeApp } from '@/hooks/useNativeApp';
 import dayjs from '@/lib/dayjs';
 import APIService from '@/services/api.service';
 import { APP_TITLE } from '@/utils/constant';
-import { ApiWorkflowDetail } from '@alt-dot/shared';
+import { ApiWorkflowDetail } from '@altdot/shared';
 import {
   UiAvatar,
   UiAvatarFallback,
@@ -16,7 +16,7 @@ import {
   UiDropdownMenuItem,
   UiDropdownMenuTrigger,
   UiSkeleton,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import { queryOptions } from '@tanstack/react-query';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { UserRoundIcon, ShareIcon, ChevronDownIcon } from 'lucide-react';

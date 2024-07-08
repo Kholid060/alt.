@@ -4,9 +4,9 @@ import fs from 'fs-extra';
 import { globby } from 'globby';
 import path from 'path';
 import { nanoid } from 'nanoid/non-secure';
-import type ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
+import type ExtensionAPI from '@altdot/extension-core/types/extension-api';
 import type { BrowserApp } from '#packages/common/interface/ipc-events.interface';
-import type { BrowserType } from '@alt-dot/shared';
+import type { BrowserType } from '@altdot/shared';
 import { Injectable } from '@nestjs/common';
 
 interface InstalledAppDetail

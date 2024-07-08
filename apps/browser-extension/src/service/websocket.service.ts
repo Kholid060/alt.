@@ -3,7 +3,7 @@ import {
   APP_WEBSOCKET_PORT,
   type ExtensionWSClientToServerEvents,
   type ExtensionWSServerToClientEvents,
-} from '@alt-dot/shared';
+} from '@altdot/shared';
 import getBrowserInfo from '../utils/getBrowserInfo';
 import { websocketEventsListener } from './websocket.service-events';
 import EventEmitter from 'eventemitter3';

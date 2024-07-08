@@ -9,13 +9,13 @@ import {
   UiSwitch,
   UiTextarea,
   UiTooltip,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import {
   WorkflowNodeErrorHandler as WorkflowNodeErrorHandlerType,
   WorkflowNodes,
   WorkflowVariableMode,
-} from '@alt-dot/workflow';
+} from '@altdot/workflow';
 import React from 'react';
 import { EllipsisVerticalIcon, InfoIcon } from 'lucide-react';
 

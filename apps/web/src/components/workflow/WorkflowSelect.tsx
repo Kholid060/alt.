@@ -7,12 +7,12 @@ import {
   UiButton,
   UiInput,
   UiList,
-} from '@alt-dot/ui';
-import { useUiListStore } from '@alt-dot/ui/dist/context/list.context';
+} from '@altdot/ui';
+import { useUiListStore } from '@altdot/ui/dist/context/list.context';
 import bugFixingSvg from '@/assets/svg/bug-fixing.svg';
 import { useState, useCallback, useEffect } from 'react';
 import WorkflowIcon from './WorkflowIcon';
-import { WebAppWorkflow } from '@alt-dot/shared';
+import { WebAppWorkflow } from '@altdot/shared';
 
 function WorkflowSelect({
   onSelected,

@@ -35,13 +35,13 @@ import {
   UiSwitch,
   UiTooltip,
   useToast,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import { useCallback, useEffect, useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '/@/utils/helper';
 import { arrayObjSorter } from '#packages/common/utils/helper';
 import { LOCALSTORAGE_KEYS } from '../../../utils/constant/constant';
-import { parseJSON } from '@alt-dot/shared';
+import { parseJSON } from '@altdot/shared';
 import dayjs from '/@/lib/dayjs';
 import clsx from 'clsx';
 import { Link, useNavigate } from 'react-router-dom';

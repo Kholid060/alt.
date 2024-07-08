@@ -1,4 +1,4 @@
-import { ExtensionCommandType } from '@alt-dot/extension-core';
+import { ExtensionCommandType } from '@altdot/extension-core';
 
 export enum UserRole {
   User = 'user',

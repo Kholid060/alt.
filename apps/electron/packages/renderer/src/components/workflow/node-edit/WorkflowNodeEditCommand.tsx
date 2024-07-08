@@ -1,10 +1,10 @@
-import { WorkflowNodeCommand } from '@alt-dot/workflow';
-import { UiInput, UiList, UiSelect, UiSwitch } from '@alt-dot/ui';
+import { WorkflowNodeCommand } from '@altdot/workflow';
+import { UiInput, UiList, UiSelect, UiSwitch } from '@altdot/ui';
 import UiExtensionIcon from '../../ui/UiExtensionIcon';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor/workflow-editor.store';
 import { ChevronDown } from 'lucide-react';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
-import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
+import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
 
 function CommandArgs({ data }: { data: WorkflowNodeCommand['data'] }) {

@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { OnExtensionAPI } from '/@/common/decorators/extension.decorator';
-import { sleep } from '@alt-dot/shared';
+import { sleep } from '@altdot/shared';
 import { BrowserWindowService } from '/@/browser-window/browser-window.service';
 import { ExtensionApiEvent } from '../events/extension-api.event';
 

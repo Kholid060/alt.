@@ -1,4 +1,4 @@
-import { WorkflowNodeBrowserKeyboard } from '@alt-dot/workflow';
+import { WorkflowNodeBrowserKeyboard } from '@altdot/workflow';
 import {
   UiCheckbox,
   UiInput,
@@ -6,12 +6,12 @@ import {
   UiSelect,
   UiSwitch,
   UiTextarea,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
-import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
-import { KeyboardModifiers, USKeyboard, USKeyboardKeys } from '@alt-dot/shared';
+import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
+import { KeyboardModifiers, USKeyboard, USKeyboardKeys } from '@altdot/shared';
 import { IS_MAC_OS } from '/@/utils/constant/constant';
 
 const mouseActions: {

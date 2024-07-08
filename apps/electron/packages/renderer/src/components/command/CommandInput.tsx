@@ -1,19 +1,19 @@
-import { UiSwitch, useUiList } from '@alt-dot/ui';
+import { UiSwitch, useUiList } from '@altdot/ui';
 import {
   UiListSelectedItem,
   useUiListStore,
-} from '@alt-dot/ui/dist/context/list.context';
+} from '@altdot/ui/dist/context/list.context';
 import { ArrowLeftIcon, ChevronDownIcon, SearchIcon } from 'lucide-react';
 import { forwardRef, useRef, useEffect, useCallback, useContext } from 'react';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
-import { ExtensionCommandArgument } from '@alt-dot/extension-core';
+import { ExtensionCommandArgument } from '@altdot/extension-core';
 import { useCommandStore } from '/@/stores/command.store';
 import { CommandListItems } from '/@/interface/command.interface';
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { CommandRouteContext } from '/@/context/command-route.context';
 import preloadAPI from '/@/utils/preloadAPI';
-import ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
+import ExtensionAPI from '@altdot/extension-core/types/extension-api';
 import { useShallow } from 'zustand/react/shallow';
 
 const CommandInputArguments = forwardRef<

@@ -1,7 +1,7 @@
-import type { ExtensionCommandArgument } from '@alt-dot/extension-core';
+import type { ExtensionCommandArgument } from '@altdot/extension-core';
 import type { WORKFLOW_NODE_TYPE } from '../const/workflow-nodes.const';
-import type ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
-import type { KeyboardShortcut, BrowserType } from '@alt-dot/shared';
+import type ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import type { KeyboardShortcut, BrowserType } from '@altdot/shared';
 import type { Edge, Node } from 'reactflow';
 
 export type WorkflowEdges = Edge;

@@ -1,4 +1,4 @@
-import { CommandActions } from '@alt-dot/extension';
+import { CommandActions } from '@altdot/extension';
 import {
   CopyIcon,
   GlobeIcon,

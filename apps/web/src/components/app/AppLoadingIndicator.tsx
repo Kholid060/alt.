@@ -1,4 +1,4 @@
-import { UiSkeleton } from '@alt-dot/ui';
+import { UiSkeleton } from '@altdot/ui';
 import { useIsFetching } from '@tanstack/react-query';
 import { useRouter } from '@tanstack/react-router';
 

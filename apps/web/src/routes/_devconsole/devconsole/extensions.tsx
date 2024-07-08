@@ -8,7 +8,7 @@ import {
   UiDropdownMenuTrigger,
   UiDropdownMenuContent,
   UiDropdownMenuItem,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import { queryOptions, useQuery } from '@tanstack/react-query';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import clsx from 'clsx';

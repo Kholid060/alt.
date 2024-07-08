@@ -1,6 +1,6 @@
-import { ExtensionConfigType } from '@alt-dot/shared';
+import { ExtensionConfigType } from '@altdot/shared';
 import { SelectExtensionConfig } from '../../db/schema/extension.schema';
-import { ExtensionConfig } from '@alt-dot/extension-core';
+import { ExtensionConfig } from '@altdot/extension-core';
 
 export type ExtensionConfigValue = Record<
   string,

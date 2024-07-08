@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { isObject } from '@alt-dot/shared';
+import { isObject } from '@altdot/shared';
 import { getProperty, setProperty } from 'dot-prop';
 import type { QuickJSContext, QuickJSRuntime } from 'quickjs-emscripten';
 import { Scope, getQuickJS } from 'quickjs-emscripten';
 import type WorkflowRunner from './WorkflowRunner';
 import { getExactType } from '/@/utils/helper';
 import WorkflowFileHandle from '../utils/WorkflowFileHandle';
-import { WorkflowNodeExpressionRecords } from '@alt-dot/workflow';
+import { WorkflowNodeExpressionRecords } from '@altdot/workflow';
 
 const MUSTACHE_REGEX = /\{\{(.*?)\}\}/g;
 

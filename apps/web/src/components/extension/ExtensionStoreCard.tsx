@@ -9,7 +9,7 @@ import {
   UiAvatar,
   UiAvatarImage,
   UiAvatarFallback,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import { ShareIcon, UserRoundIcon, CpuIcon, DownloadIcon } from 'lucide-react';
 import { ExtensionDetailIcon } from './ExtensionDetail';
 import { Link } from '@tanstack/react-router';

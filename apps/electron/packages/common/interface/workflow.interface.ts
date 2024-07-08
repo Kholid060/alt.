@@ -5,7 +5,7 @@ import {
   WORKFLOW_NODE_TYPE,
   WorkflowEdges,
   WorkflowNodes,
-} from '@alt-dot/workflow';
+} from '@altdot/workflow';
 
 export type WorkflowNodeErroHandlerAction = 'continue' | 'stop' | 'fallback';
 

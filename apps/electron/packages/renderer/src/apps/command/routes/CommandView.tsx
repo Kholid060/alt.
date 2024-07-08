@@ -6,7 +6,7 @@ import {
   ExtensionCommandExecutePayload,
   ExtensionCommandViewInitMessage,
 } from '#common/interface/extension.interface';
-import { BetterMessagePort } from '@alt-dot/shared';
+import { BetterMessagePort } from '@altdot/shared';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
@@ -50,7 +50,7 @@ function CommandView() {
       };
 
       payload.themeStyle = (
-        await import('@alt-dot/ui/dist/theme.css?inline')
+        await import('@altdot/ui/dist/theme.css?inline')
       ).default;
 
       initPortListener(messageChannelRef.current.port1);

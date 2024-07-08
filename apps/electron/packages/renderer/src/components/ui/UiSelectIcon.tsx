@@ -5,7 +5,7 @@ import {
   UiButton,
   UiPopoverContent,
   UiIcons,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import clsx from 'clsx';
 
 interface UiSelectIconProps extends React.HTMLAttributes<HTMLButtonElement> {

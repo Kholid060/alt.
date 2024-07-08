@@ -1,5 +1,5 @@
 {
-  "extends": "@alt-dot/typescript-config/vite.json",
+  "extends": "@altdot/typescript-config/vite.json",
   "compilerOptions": {
     "lib": ["ESNext"],
     "target": "esnext",

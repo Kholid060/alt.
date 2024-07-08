@@ -2,7 +2,7 @@ import {
   WORKFLOW_NODE_TYPE,
   WorkflowNodes,
   WorkflowNodesMap,
-} from '@alt-dot/workflow';
+} from '@altdot/workflow';
 import type WorkflowRunner from '../runner/WorkflowRunner';
 import type { WorkflowRunnerPrevNodeExecution } from '../runner/WorkflowRunner';
 import type { PossibleTypes } from '/@/interface/common.interface';

@@ -1,4 +1,4 @@
-import type { ExtensionCommandRenderer } from '@alt-dot/extension/dist/command-renderer/command-renderer';
+import type { ExtensionCommandRenderer } from '@altdot/extension/dist/command-renderer/command-renderer';
 import { MODULE_MAP } from './constant';
 import type { ExtensionRenderer } from '../interfaces/ext-renderer';
 import type ReactDOM from 'react-dom/client';
@@ -6,9 +6,9 @@ import React from 'react';
 import type { FallbackProps } from 'react-error-boundary';
 import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
 import { mapStackTrace } from 'sourcemapped-stacktrace';
-import type { BetterMessagePortSync } from '@alt-dot/shared';
-import type { ExtensionMessagePortEvent } from '@alt-dot/extension/dist/interfaces/message-events';
-import { UiButton } from '@alt-dot/ui';
+import type { BetterMessagePortSync } from '@altdot/shared';
+import type { ExtensionMessagePortEvent } from '@altdot/extension/dist/interfaces/message-events';
+import { UiButton } from '@altdot/ui';
 
 async function loadStyle(themeStyle: string) {
   try {

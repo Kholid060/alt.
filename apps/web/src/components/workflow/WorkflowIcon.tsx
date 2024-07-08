@@ -1,4 +1,4 @@
-import { UiIcons } from '@alt-dot/ui';
+import { UiIcons } from '@altdot/ui';
 import clsx from 'clsx';
 import { LucideWorkflow } from 'lucide-react';
 

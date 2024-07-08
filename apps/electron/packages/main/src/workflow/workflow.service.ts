@@ -19,9 +19,9 @@ import {
   WorkflowInsertPayload,
   WorkflowUpdatePayload,
 } from './workflow.interface';
-import { WorkflowNodes, WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
+import { WorkflowNodes, WORKFLOW_NODE_TYPE } from '@altdot/workflow';
 import { APIService } from '../api/api.service';
-import { ApiExtensionHighlightItem } from '@alt-dot/shared';
+import { ApiExtensionHighlightItem } from '@altdot/shared';
 import { ExtensionQueryService } from '../extension/extension-query.service';
 
 @Injectable()

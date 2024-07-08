@@ -1,4 +1,4 @@
-import { CommandViewJSONRenderer } from '@alt-dot/extension';
+import { CommandViewJSONRenderer } from '@altdot/extension';
 // import { evaluate } from 'mathjs';
 
 const CommandMain: CommandViewJSONRenderer = ({ updateView }) => {

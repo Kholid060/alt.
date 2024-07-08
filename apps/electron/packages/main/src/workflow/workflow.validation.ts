@@ -1,4 +1,4 @@
-import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
+import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
 import { z } from 'zod';
 
 export const workflowFileValidation = z.object({

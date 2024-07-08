@@ -1,9 +1,9 @@
 {
-  "name": "@alt-dot/extension-core",
+  "name": "@altdot/extension-core",
   "version": "0.0.2",
   "scripts": {
-    "build": "yarn build:ext-api && tsup",
-    "dev": "yarn build:ext-api && tsup --watch",
+    "build": "pnpm build:ext-api && tsup",
+    "dev": "pnpm build:ext-api && tsup --watch",
     "build:ext-api": "tsx ./scripts/ext-api/index.ts",
     "lint": "eslint . --ext js,mjs,cjs,ts,mts,cts,tsx"
   },
@@ -25,9 +25,9 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@alt-dot/eslint-config": "workspace:*",
-    "@alt-dot/shared": "workspace:*",
-    "@alt-dot/typescript-config": "workspace:*",
+    "@altdot/eslint-config": "workspace:*",
+    "@altdot/shared": "workspace:*",
+    "@altdot/typescript-config": "workspace:*",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^20.11.19",
     "@typescript-eslint/eslint-plugin": "^7.2.0",

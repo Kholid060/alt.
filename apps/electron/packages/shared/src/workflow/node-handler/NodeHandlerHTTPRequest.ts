@@ -1,4 +1,4 @@
-import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
+import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
 import WorkflowFileHandle from '../utils/WorkflowFileHandle';
 import type {
   WorkflowNodeHandlerExecute,

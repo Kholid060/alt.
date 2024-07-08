@@ -1,4 +1,4 @@
-import { APP_WEBSOCKET_PORT } from '@alt-dot/shared';
+import { APP_WEBSOCKET_PORT } from '@altdot/shared';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,

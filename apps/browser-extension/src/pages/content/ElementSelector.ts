@@ -1,6 +1,6 @@
 import { finder } from '@medv/finder';
-import ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
-import { debounce } from '@alt-dot/shared';
+import ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import { debounce } from '@altdot/shared';
 import Browser from 'webextension-polyfill';
 
 const ELEMENT_IDS = {

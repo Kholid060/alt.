@@ -4,7 +4,7 @@
     "build": "altdot build"
   },
   "dependencies": {
-    "@alt-dot/extension": "workspace:*",
-    "@alt-dot/extension-core": "workspace:^"
+    "@altdot/extension": "workspace:*",
+    "@altdot/extension-core": "workspace:^"
   }
 }

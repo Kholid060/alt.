@@ -1,4 +1,4 @@
-import { UiButton, UiKbd, UiTooltip } from '@alt-dot/ui';
+import { UiButton, UiKbd, UiTooltip } from '@altdot/ui';
 import {
   MaximizeIcon,
   MinusIcon,

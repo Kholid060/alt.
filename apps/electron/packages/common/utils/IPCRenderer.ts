@@ -9,7 +9,7 @@ import type {
   IPCRendererSendEvent,
 } from '#common/interface/ipc-events.interface';
 import { IPC_ON_EVENT } from '#common/utils/constant/constant';
-import { isObject } from '@alt-dot/shared';
+import { isObject } from '@altdot/shared';
 import { ipcRenderer } from 'electron';
 import { isIPCEventError } from './helper';
 

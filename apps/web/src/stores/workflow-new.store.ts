@@ -1,4 +1,4 @@
-import { WebAppWorkflow } from '@alt-dot/shared';
+import { WebAppWorkflow } from '@altdot/shared';
 import { StoreApi, createStore } from 'zustand';
 
 export interface WorkflowNewStoreState extends WebAppWorkflow {}

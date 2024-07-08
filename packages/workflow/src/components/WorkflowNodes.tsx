@@ -6,7 +6,7 @@ import {
   Position,
   useUpdateNodeInternals,
 } from 'reactflow';
-import { UiList, UiTooltip } from '@alt-dot/ui';
+import { UiList, UiTooltip } from '@altdot/ui';
 import clsx from 'clsx';
 import {
   BanIcon,

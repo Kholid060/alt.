@@ -1,15 +1,15 @@
-import { WorkflowNodeExecuteWorkflow } from '@alt-dot/workflow';
-import { UiInput, UiList, UiListItem, UiTextarea } from '@alt-dot/ui';
+import { WorkflowNodeExecuteWorkflow } from '@altdot/workflow';
+import { UiInput, UiList, UiListItem, UiTextarea } from '@altdot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
-import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
+import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import { useEffect, useMemo } from 'react';
 import {
   UiListProvider,
   useUiListStore,
-} from '@alt-dot/ui/dist/context/list.context';
+} from '@altdot/ui/dist/context/list.context';
 
 function WorkflowCombobox({
   data,

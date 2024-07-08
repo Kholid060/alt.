@@ -1,5 +1,5 @@
 /* eslint-disable drizzle/enforce-delete-with-where */
-import { isObject } from '@alt-dot/shared';
+import { isObject } from '@altdot/shared';
 import { debugLog } from '#common/utils/helper';
 import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
 import type { ExtensionMessagePortMessageHandler } from '../extension-execution-event.service';

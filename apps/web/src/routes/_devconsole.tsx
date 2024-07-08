@@ -12,7 +12,7 @@ import {
   UiTabs,
   UiTabsList,
   UiTabsTrigger,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import {
   Outlet,
   createFileRoute,

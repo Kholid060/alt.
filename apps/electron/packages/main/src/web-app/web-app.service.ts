@@ -6,7 +6,7 @@ import {
   ApiWorkflowNode,
   WebAppWorkflow,
   WebAppWorkflowListItem,
-} from '@alt-dot/shared';
+} from '@altdot/shared';
 
 @Injectable()
 export class WebAppService {

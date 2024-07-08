@@ -1,5 +1,5 @@
-import { CommandJSONViewList, UiList, UiListItem } from '@alt-dot/extension';
-import { UiListItemAction } from '@alt-dot/ui';
+import { CommandJSONViewList, UiList, UiListItem } from '@altdot/extension';
+import { UiListItemAction } from '@altdot/ui';
 import defaultCommandActions from '/@/utils/defaultCommandActions';
 import UiExtensionIcon from '../ui/UiExtensionIcon';
 import { useCommandViewJSON } from '/@/context/command-view-json.context';

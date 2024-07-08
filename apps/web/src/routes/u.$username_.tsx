@@ -7,7 +7,7 @@ import {
   UiTabs,
   UiTabsList,
   UiTabsTrigger,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import { queryOptions } from '@tanstack/react-query';
 import {
   Outlet,

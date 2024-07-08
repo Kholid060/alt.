@@ -14,7 +14,7 @@ import {
   cn,
   useDialog,
   useToast,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import UiExtensionIcon from '../ui/UiExtensionIcon';
 import { Fragment, useEffect, useRef, useState } from 'react';
 import {

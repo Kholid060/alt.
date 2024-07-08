@@ -19,8 +19,8 @@ import {
   WorkflowNewNode,
 } from '#common/interface/workflow.interface';
 import { WORKFLOW_NODE_TRIGGERS } from '#packages/common/utils/constant/workflow.const';
-import { createDebounce } from '@alt-dot/shared';
-import { WORKFLOW_NODE_TYPE, WorkflowNodes } from '@alt-dot/workflow';
+import { createDebounce } from '@altdot/shared';
+import { WORKFLOW_NODE_TYPE, WorkflowNodes } from '@altdot/workflow';
 import {
   UndoRedoStoreSlice,
   createUndoRedoStoreSlice,

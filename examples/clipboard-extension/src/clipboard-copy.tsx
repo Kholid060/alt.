@@ -1,4 +1,4 @@
-import { CommandLaunchContext } from '@alt-dot/extension';
+import { CommandLaunchContext, Extension } from '@altdot/extension';
 
 const filePath = 'D:\\test.txt';
 
@@ -25,7 +25,20 @@ async function commandExecutionFail() {
   }
 }
 function authorizeCredential() {
-  return _extension.oauth.authorizationRequest('google-drive').then((token) => {
+  const provider = {
+    client: {
+      type: 'pkce',
+      scope: 'profile',
+      redirectMethod: Extension.oauth.OAuthRedirect.AppUrl,
+      authorizeUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
+      clientId: '479459643785-qqth353989l18jm7rdrl7d6vqii8r73d.apps.googleusercontent.com',
+    },
+    name: 'Google Drive',
+    icon: 'google-drive.png',
+    description: 'Auth google drive',
+  };
+
+  return _extension.oauth.startAuth(provider).then((token) => {
     if (!token) {
       throw new Error("Credential hasn't been inputted");
     }
@@ -64,7 +77,9 @@ export default async function CommandMain(context: CommandLaunchContext) {
 
   // const element = await _extension.browser.activeTab.selectElement({ description: 'Select an element!!!' });
   // console.log(element);
-  await _extension.browser.activeTab.type('textarea[aria-label="Search"]', 'hello!');
+  // await _extension.browser.activeTab.type('textarea[aria-label="Search"]', 'hello!');
+
+  await authorizeCredential();
 
   // await selectFile();
 

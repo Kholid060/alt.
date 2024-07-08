@@ -1,6 +1,6 @@
-import { WorkflowNodeCode } from '@alt-dot/workflow';
+import { WorkflowNodeCode } from '@altdot/workflow';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
-import { WORKFLOW_NODE_TYPE } from '@alt-dot/workflow';
+import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
 import WorkflowUiCodeEditor from '../ui/WorkflowUiCodeEditor';
 

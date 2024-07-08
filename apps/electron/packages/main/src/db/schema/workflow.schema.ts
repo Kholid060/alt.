@@ -7,7 +7,7 @@ import type {
 import { relations, sql } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import type { WORKFLOW_HISTORY_STATUS } from '#common/utils/constant/workflow.const';
-import { WorkflowNodes } from '@alt-dot/workflow';
+import { WorkflowNodes } from '@altdot/workflow';
 import { Viewport } from 'reactflow';
 
 export const workflows = sqliteTable('workflows', {

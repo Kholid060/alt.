@@ -1,4 +1,4 @@
-import { UiList, UiSkeleton } from '@alt-dot/ui';
+import { UiList, UiSkeleton } from '@altdot/ui';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import { CommandListItemWorkflow } from '/@/interface/command.interface';
 import ListItemWorkflow from '/@/components/list-item/ListItemWorkflow';

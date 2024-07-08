@@ -12,7 +12,7 @@ import {
   UiTooltip,
   useDialog,
   useToast,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import {
   ChevronLeftIcon,
   CopyIcon,

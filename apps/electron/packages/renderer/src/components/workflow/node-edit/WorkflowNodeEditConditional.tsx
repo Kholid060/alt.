@@ -1,4 +1,4 @@
-import { UiButton, UiDialog } from '@alt-dot/ui';
+import { UiButton, UiDialog } from '@altdot/ui';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import { PencilIcon, SignpostIcon, TrashIcon } from 'lucide-react';
@@ -9,7 +9,7 @@ import { nanoid } from 'nanoid/non-secure';
 import {
   WorkflowNodeConditional,
   WorkflowNodeConditionPath,
-} from '@alt-dot/workflow';
+} from '@altdot/workflow';
 
 function WorkflowNodeEditConditional() {
   const node = useWorkflowEditorStore.use.editNode() as WorkflowNodeConditional;

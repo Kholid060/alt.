@@ -1,5 +1,5 @@
-import { UiDialog } from '@alt-dot/ui';
-import { UiListProvider } from '@alt-dot/ui/dist/context/list.context';
+import { UiDialog } from '@altdot/ui';
+import { UiListProvider } from '@altdot/ui/dist/context/list.context';
 import { useNavigate } from '@tanstack/react-router';
 import WorkflowSelect from '../workflow/WorkflowSelect';
 

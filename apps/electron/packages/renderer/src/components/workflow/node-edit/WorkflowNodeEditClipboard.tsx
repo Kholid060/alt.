@@ -1,9 +1,9 @@
-import { WorkflowNodeClipboard } from '@alt-dot/workflow';
-import { UiInput, UiLabel, UiSelect } from '@alt-dot/ui';
+import { WorkflowNodeClipboard } from '@altdot/workflow';
+import { UiInput, UiLabel, UiSelect } from '@altdot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
-import ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
+import ExtensionAPI from '@altdot/extension-core/types/extension-api';
 
 const EXT_CLIPBOARD_FORMATS: {
   format: ExtensionAPI.clipboard.ClipboardContentType;

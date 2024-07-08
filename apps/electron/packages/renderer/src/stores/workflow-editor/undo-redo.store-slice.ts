@@ -1,7 +1,7 @@
 import { StateCreator } from 'zustand';
 import { WorkflowEditorStore } from './workflow-editor.store';
 import { XYPosition } from 'reactflow';
-import { WorkflowNodes } from '@alt-dot/workflow';
+import { WorkflowNodes } from '@altdot/workflow';
 import { WorkflowEdge } from '#packages/common/interface/workflow.interface';
 
 export interface UndoRedoNodeMoveCommand {

@@ -1,16 +1,19 @@
+/* eslint-disable @typescript-eslint/no-namespace */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ExtensionManifest } from '../src/client/manifest';
+
+import type { ExtensionManifest } from './index';
 import type {
   USKeyboardKeys,
-  KeyboardModifiersType,
   BrowserGetHTMLOptions,
-  KeyboardKeyUpOptionsType,
   BrowserSelectFileOptions,
-  KeyboardKeyDownOptionsType,
   KeyboardBrowserTypeOptions,
   BrowserWaitForSelectorOptions,
   ExtensionBrowserElementSelector,
-} from '@alt-dot/shared';
+  KeyboardModifiers as KeyboardModifiersType,
+  KeyboardKeyUpOptions as KeyboardKeyUpOptionsType,
+  KeyboardKeyDownOptions as KeyboardKeyDownOptionsType,
+  BrowserGetTextOptions,
+} from '@altdot/shared';
 
 type OmitFirstArg<F> = F extends (x: any, ...args: infer P) => infer R
   ? (...args: P) => R
@@ -95,7 +98,7 @@ declare namespace ExtensionAPI.shell.installedApps {
       | `exact:${string}`
       | string
       | RegExp,
-  ): Promise<Extension.InstalledAppDetail[]>;
+  ): Promise<AppDetail[]>;
 
   export function showInFolder(appId: string): Promise<void>;
 
@@ -240,7 +243,6 @@ declare namespace ExtensionAPI.browser {
     press: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.press>;
     keyUp: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.keyUp>;
     select: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.select>;
-    getText: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.getText>;
     keyDown: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.keyDown>;
     getText: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.getText>;
     getHTML: OmitFirstArg<typeof ExtensionAPI.browser.activeTab.getHTML>;
@@ -381,22 +383,53 @@ declare namespace ExtensionAPI.mainWindow {
 }
 
 declare namespace ExtensionAPI.oauth {
-  interface OAuthToken {
-    scope: string;
-    expiresIn: number;
-    isExpired: boolean;
-    accessToken: string;
+  enum OAuthRedirect {
+    Web = 'web',
+    AppUrl = 'app-url',
+    DeepLink = 'deep-link',
   }
 
-  export function removeTokens(providerId: string): Promise<void>;
+  interface OAuthPKCEClient {
+    type: 'pkce';
+    scope: string;
+    clientId: string;
+    authorizeUrl: string;
+    redirectMethod?: OAuthRedirect;
+    extraParams?: Record<string, string>;
+  }
 
-  export function getTokens(providerId: string): Promise<OAuthToken | null>;
+  interface OAuthProvider {
+    name: string;
+    icon: string;
+    description?: string;
+    client: OAuthPKCEClient;
+    documentationUrl?: string;
+  }
 
-  export function refreshAccessToken(providerId: string): Promise<OAuthToken>;
+  interface OAuthPKCERequest {
+    code: string;
+    codeVerifier: string;
+    codeChallenge: string;
+  }
 
-  export function authorizationRequest(
-    providerId: string,
-  ): Promise<OAuthToken | null>;
+  interface OAuthToken {
+    scope?: string;
+    expiresIn?: number;
+    accessToken: string;
+    refreshToken?: string;
+  }
+
+  export function setToken(key: string, token: OAuthToken): Promise<void>;
+
+  export function removeTokens(key?: string | string[]): Promise<void>;
+
+  export function getTokens<T extends string[]>(
+    key?: T,
+  ): Promise<Record<T, OAuthToken | null>>;
+
+  export function startAuth(
+    provider: OAuthProvider,
+  ): Promise<OAuthPKCERequest | null>;
 }
 
 export default ExtensionAPI;

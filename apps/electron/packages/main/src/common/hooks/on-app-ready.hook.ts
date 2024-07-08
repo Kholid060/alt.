@@ -5,7 +5,7 @@ import {
   getNonTransientInstances,
 } from '@nestjs/core/injector/helpers/transient-instances';
 import { InstanceWrapper } from '@nestjs/core/injector/instance-wrapper';
-import { isObject } from '@alt-dot/shared';
+import { isObject } from '@altdot/shared';
 
 export abstract class OnAppReady {
   abstract onAppReady(): unknown;

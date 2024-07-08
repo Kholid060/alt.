@@ -3,7 +3,7 @@ import {
   StoreQueryValidation,
   storeQueryValidation,
 } from '@/validation/store-query.validation';
-import { EXTENSION_CATEGORIES } from '@alt-dot/extension-core';
+import { EXTENSION_CATEGORIES } from '@altdot/extension-core';
 import {
   UiButton,
   cn,
@@ -11,7 +11,7 @@ import {
   UiTabs,
   UiTabsList,
   UiTabsTrigger,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import {
   Outlet,
   createFileRoute,

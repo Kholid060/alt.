@@ -1,4 +1,4 @@
-import { UiSkeleton, UiButton, UiButtonLoader } from '@alt-dot/ui';
+import { UiSkeleton, UiButton, UiButtonLoader } from '@altdot/ui';
 import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
 import { StoreIcon } from 'lucide-react';
 

@@ -1,5 +1,5 @@
 import { useLazyRef } from '@/hooks/useLazyRef';
-import { KeyboardShortcut } from '@alt-dot/shared';
+import { KeyboardShortcut } from '@altdot/shared';
 import {
   useContext,
   useSyncExternalStore,

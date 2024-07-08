@@ -16,7 +16,7 @@ export type PackageJson = PackageJsonType & ExtensionManifest;
 
 type ExtPathName = 'dist-manifest.json' | 'package.json' | 'icon' | 'src';
 
-export const EXT_API_PKG_NAME = '@alt-dot/extension';
+export const EXT_API_PKG_NAME = '@altdot/extension';
 
 const SUPPORTED_ICON_SIZE = 256;
 const SUPPORTED_ICON_TYPE = ['.png'];

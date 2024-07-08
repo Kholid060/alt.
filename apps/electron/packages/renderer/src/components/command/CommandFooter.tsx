@@ -1,4 +1,4 @@
-import { UiIcons, UiImage } from '@alt-dot/ui';
+import { UiIcons, UiImage } from '@altdot/ui';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2Icon } from 'lucide-react';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';

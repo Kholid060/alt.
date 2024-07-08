@@ -55,10 +55,10 @@ import {
   WorkflowNodeConditionalNode,
   WorkflowNodes,
   WorkflowNodesProvider,
-} from '@alt-dot/workflow';
+} from '@altdot/workflow';
 import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
 import { WorkflowEditorNodeListModal } from '/@/components/workflow/editor/WorkflowEditorNodeList';
-import { UiList, useToast } from '@alt-dot/ui';
+import { UiList, useToast } from '@altdot/ui';
 
 const defaultNodeTypes = Object.values(WORKFLOW_NODE_TYPE).reduce<
   Partial<Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>>>

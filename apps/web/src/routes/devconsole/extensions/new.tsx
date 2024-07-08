@@ -11,8 +11,8 @@ import {
 } from '@/hooks/useExtensionNewStore';
 import APIService from '@/services/api.service';
 import GithubAPI from '@/utils/GithubAPI';
-import { ExtensionManifest } from '@alt-dot/extension-core';
-import { isObject } from '@alt-dot/shared';
+import { ExtensionManifest } from '@altdot/extension-core';
+import { isObject } from '@altdot/shared';
 import {
   useDialog,
   useToast,
@@ -27,7 +27,7 @@ import {
   UiTabsList,
   UiTabsTrigger,
   UiTabsContent,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import {
   Link,
   createFileRoute,

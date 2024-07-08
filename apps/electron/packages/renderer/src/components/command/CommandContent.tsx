@@ -1,4 +1,4 @@
-import { UiScrollArea } from '@alt-dot/ui';
+import { UiScrollArea } from '@altdot/ui';
 import { useEffect, useRef } from 'react';
 import { CommandRouteOutlet } from '../../context/command-route.context';
 

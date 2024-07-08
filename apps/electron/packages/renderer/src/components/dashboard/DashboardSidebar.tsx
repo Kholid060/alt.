@@ -1,4 +1,4 @@
-import { UiButton, UiDialog, cn } from '@alt-dot/ui';
+import { UiButton, UiDialog, cn } from '@altdot/ui';
 import { NavLink } from 'react-router-dom';
 import {
   BlocksIcon,

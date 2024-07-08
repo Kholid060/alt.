@@ -10,7 +10,7 @@ import {
   UiIcons,
   UiImage,
   UiSkeleton,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import clsx from 'clsx';
 import { useCommandPanelHeader } from '/@/hooks/useCommandPanelHeader';
 import { BlocksIcon, CpuIcon, DownloadIcon, UserRoundIcon } from 'lucide-react';

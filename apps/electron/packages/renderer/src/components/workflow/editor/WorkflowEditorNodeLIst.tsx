@@ -5,12 +5,12 @@ import {
   UiPopoverTrigger,
   UiScrollArea,
   cn,
-} from '@alt-dot/ui';
+} from '@altdot/ui';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { SearchIcon } from 'lucide-react';
-import { UiListProvider } from '@alt-dot/ui/dist/context/list.context';
+import { UiListProvider } from '@altdot/ui/dist/context/list.context';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import UiExtensionIcon from '../../ui/UiExtensionIcon';
 import { Connection, useReactFlow } from 'reactflow';
@@ -26,7 +26,7 @@ import {
   WORKFLOW_NODE_GROUP,
   WORKFLOW_NODE_TYPE,
   WORKFLOW_NODES,
-} from '@alt-dot/workflow';
+} from '@altdot/workflow';
 
 type WorkflowEditorNodeGroup = (typeof WORKFLOW_NODE_GROUP)[number];
 type NodeCommandItem = WorkflowEditorNodeListItem<WORKFLOW_NODE_TYPE.COMMAND>;

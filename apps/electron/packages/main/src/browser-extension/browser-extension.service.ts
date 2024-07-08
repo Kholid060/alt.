@@ -4,7 +4,7 @@ import {
   BrowserInfo,
   ExtensionWSServerToClientEvents,
   Last,
-} from '@alt-dot/shared';
+} from '@altdot/shared';
 import { Injectable } from '@nestjs/common';
 import { CustomError } from '#packages/common/errors/custom-errors';
 import { isWSAckError } from '../common/utils/helper';

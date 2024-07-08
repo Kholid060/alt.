@@ -3,6 +3,6 @@
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "lib": ["ESNext", "DOM"],
-    "types": ["@alt-dot/extension/api"]
+    "types": ["@altdot/extension/api"]
   },
 }

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ExtensionStorageService } from '../../extension-storage/extension-storage.service';
 import { OnExtensionAPI } from '/@/common/decorators/extension.decorator';
 import { ExtensionApiEvent } from '../events/extension-api.event';
-import ExtensionAPI from '@alt-dot/extension-core/types/extension-api';
+import ExtensionAPI from '@altdot/extension-core/types/extension-api';
 
 type StorageRecord = Record<string, ExtensionAPI.storage.Values>;
 function storageItemToRecord(

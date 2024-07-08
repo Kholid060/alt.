@@ -1,4 +1,4 @@
-import { UiList, UiListItemAction } from '@alt-dot/ui';
+import { UiList, UiListItemAction } from '@altdot/ui';
 import { ListItemRenderDetail } from '../../apps/command/routes/CommandList';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
@@ -9,7 +9,7 @@ import {
   ToggleRightIcon,
 } from 'lucide-react';
 import { useCommandStore } from '/@/stores/command.store';
-import { CommandLaunchBy } from '@alt-dot/extension';
+import { CommandLaunchBy } from '@altdot/extension';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
 import CommandShortcut from '../ui/UiShortcut';
