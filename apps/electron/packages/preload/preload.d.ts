@@ -1,4 +1,4 @@
-import type ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import type ExtensionAPI from '@altdot/extension/types/extension-api';
 import type * as MainPreload from './src/main/main-api';
 import type { PRELOAD_API_KEY } from '../common/utils/constant/constant';
 

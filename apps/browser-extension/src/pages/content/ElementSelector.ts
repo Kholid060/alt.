@@ -1,5 +1,5 @@
 import { finder } from '@medv/finder';
-import ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import { ExtensionAPI } from '@altdot/extension';
 import { debounce } from '@altdot/shared';
 import Browser from 'webextension-polyfill';
 
@@ -200,13 +200,13 @@ class ElementSelector {
 
   private resolverFunc: ((value: SelectElementResult) => void) | null = null;
 
-  filter?: ExtensionAPI.browser.activeTab.SelectElementFilter;
+  filter?: ExtensionAPI.Browser.ActiveTab.SelectElementFilter;
 
   constructor({
     title,
     filter,
     description,
-  }: ExtensionAPI.browser.activeTab.SelectElementOptions = {}) {
+  }: ExtensionAPI.Browser.ActiveTab.SelectElementOptions = {}) {
     this.filter = filter;
 
     this.styleEl = injectStyle();

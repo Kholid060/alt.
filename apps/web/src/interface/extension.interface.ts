@@ -2,7 +2,7 @@ import {
   EXTENSION_CATEGORIES,
   EXTENSION_PERMISSIONS,
   ExtensionCommandType,
-} from '@altdot/extension-core';
+} from '@altdot/extension';
 import { UserProfile } from './user.interface';
 
 export interface ExtensionCommand {

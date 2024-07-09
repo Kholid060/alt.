@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
-import { ExtensionCredential } from '@altdot/extension-core/src/client/manifest/manifest-credential';
+import { ExtensionCredential } from '@altdot/extension/dist/extension-manifest/manifest-credential';
 import { ArrowLeftIcon } from 'lucide-react';
 import UiExtensionIcon from '../ui/UiExtensionIcon';
 import { UiButton } from '@altdot/ui';

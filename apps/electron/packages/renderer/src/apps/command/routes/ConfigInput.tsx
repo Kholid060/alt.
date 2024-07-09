@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { UseFormReturn, useForm } from 'react-hook-form';
-import { ExtensionConfig, ExtensionConfigType } from '@altdot/extension-core';
+import { ExtensionConfig, ExtensionConfigType } from '@altdot/extension';
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
 import {
   UiButton,

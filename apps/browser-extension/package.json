@@ -20,7 +20,7 @@
   },
   "type": "module",
   "dependencies": {
-    "@altdot/extension-core": "workspace:*",
+    "@altdot/extension": "workspace:*",
     "@altdot/shared": "workspace:*",
     "@medv/finder": "^3.2.0",
     "@types/webextension-polyfill": "^0.10.7",
@@ -72,7 +72,7 @@
     "sass": "1.69.5",
     "ts-loader": "9.5.0",
     "tslib": "2.6.2",
-    "typescript": "^5.4.5",
+    "typescript": "catalog:",
     "vite": "5.0.12",
     "vitest": "^1.2.2",
     "ws": "^8.16.0"

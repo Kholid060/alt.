@@ -7,9 +7,9 @@ import {
   USKeyboardDetail,
   sleep,
 } from '@altdot/shared';
-import type ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import { ExtensionAPI } from '@altdot/extension';
 
-function getModifierEventData(mods: ExtensionAPI.browser.KeyboardModifiers[]) {
+function getModifierEventData(mods: ExtensionAPI.Browser.KeyboardModifiers[]) {
   const modsData: Pick<
     KeyboardEventInit,
     'altKey' | 'shiftKey' | 'metaKey' | 'ctrlKey'
@@ -59,7 +59,7 @@ type KeyboardEventInitData = KeyboardEventInit & {
 };
 function getKeyboardEventInit(
   key: string,
-  modifiers: ExtensionAPI.browser.KeyboardModifiers[] = [],
+  modifiers: ExtensionAPI.Browser.KeyboardModifiers[] = [],
 ): KeyboardEventInitData {
   const modsData = getModifierEventData(modifiers);
   const keyDetail = getKeyDetail(key);
@@ -152,12 +152,12 @@ function getInputEventType(
 }
 
 interface TypeCharOptions {
-  modifiers: ExtensionAPI.browser.KeyboardModifiers[];
+  modifiers: ExtensionAPI.Browser.KeyboardModifiers[];
 }
 
 interface KeyEventDetail {
   el: Element;
-  modifiers?: ExtensionAPI.browser.KeyboardModifiers[];
+  modifiers?: ExtensionAPI.Browser.KeyboardModifiers[];
   key: string | KeyboardEventInitData;
 }
 

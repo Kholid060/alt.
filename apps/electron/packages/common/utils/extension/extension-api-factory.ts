@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { ExtensionMessagePortEvent } from '@altdot/extension';
-import type ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import { ExtensionAPI } from '@altdot/extension';
 import type { BetterMessagePortSync, EventMapEmit } from '@altdot/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { CUSTOM_SCHEME } from '../constant/constant';
-import type { ExtensionAPIValues } from '@altdot/extension-core/dist/extensionApiBuilder';
+import type { ExtensionAPIValues } from '@altdot/extension/dist/extensionApiBuilder';
 import { createExtensionElementHandle } from './extension-element-handle';
 import type { IPCUserExtensionEventsMap } from '../../interface/ipc-events.interface';
-import extensionApiBuilder from '@altdot/extension-core/dist/extensionApiBuilder';
+import extensionApiBuilder from '@altdot/extension/dist/extensionApiBuilder';
 import type { ExtensionBrowserTabContext } from '../../interface/extension.interface';
 import { APP_ICON_DIR_PREFIX } from '../../utils/constant/app.const';
 
@@ -70,7 +70,7 @@ function extensionAPIUiToast(
   return {
     'ui.createToast': (options) => {
       const toastId = nanoid(5);
-      const toastOptions: Required<ExtensionAPI.ui.ToastOptions> = {
+      const toastOptions: Required<ExtensionAPI.UI.ToastOptions> = {
         timeout: 0,
         type: 'success',
         description: '',

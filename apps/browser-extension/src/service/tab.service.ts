@@ -7,7 +7,7 @@ import {
   ExtensionBrowserElementSelector,
   KeyboardBrowserTypeOptions,
 } from '@altdot/shared';
-import type ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import type { ExtensionAPI } from '@altdot/extension';
 
 interface TabTarget {
   tabId: number;
@@ -116,7 +116,7 @@ class TabService {
     { tabId, frameId = 0 }: TabTarget,
     selector: ExtensionBrowserElementSelector,
     key: string,
-    options?: ExtensionAPI.browser.KeyDownOptions,
+    options?: ExtensionAPI.Browser.KeyDownOptions,
   ) {
     await injectContentHandlerScript(tabId);
     return await RuntimeMessage.instance.sendMessageToTab({
@@ -131,7 +131,7 @@ class TabService {
     { tabId, frameId = 0 }: TabTarget,
     selector: ExtensionBrowserElementSelector,
     key: string,
-    options?: ExtensionAPI.browser.KeyUpOptions,
+    options?: ExtensionAPI.Browser.KeyUpOptions,
   ) {
     await injectContentHandlerScript(tabId);
     return await RuntimeMessage.instance.sendMessageToTab({
@@ -146,8 +146,8 @@ class TabService {
     { tabId, frameId = 0 }: TabTarget,
     selector: ExtensionBrowserElementSelector,
     key: string,
-    options?: ExtensionAPI.browser.KeyUpOptions &
-      ExtensionAPI.browser.KeyDownOptions,
+    options?: ExtensionAPI.Browser.KeyUpOptions &
+      ExtensionAPI.Browser.KeyDownOptions,
   ) {
     await injectContentHandlerScript(tabId);
     return await RuntimeMessage.instance.sendMessageToTab({
@@ -202,7 +202,7 @@ class TabService {
 
   static async selectElement(
     { tabId, frameId = 0 }: TabTarget,
-    options?: ExtensionAPI.browser.activeTab.SelectElementOptions,
+    options?: ExtensionAPI.Browser.ActiveTab.SelectElementOptions,
   ) {
     await injectContentHandlerScript(tabId);
 
@@ -220,7 +220,7 @@ class TabService {
   static async waitForSelector(
     { tabId, frameId = 0 }: TabTarget,
     selector: ExtensionBrowserElementSelector,
-    options?: ExtensionAPI.browser.WaitForSelectorOptions,
+    options?: ExtensionAPI.Browser.WaitForSelectorOptions,
   ) {
     await injectContentHandlerScript(tabId);
     return await RuntimeMessage.instance.sendMessageToTab({

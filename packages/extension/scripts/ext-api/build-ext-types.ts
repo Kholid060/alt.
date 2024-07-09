@@ -1,17 +1,15 @@
 import path from 'path';
 import fs from 'fs-extra';
-import { fileURLToPath } from 'url';
-import { BuildExtensionApi, FlatExtApiType } from '.';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-const FLAT_EXT_API_FILENAME = 'flat-extension-api.d.ts';
-const DIST_DIR = path.join(__dirname, '../../dist');
+import {
+  BuildExtensionApi,
+  DIST_DIR,
+  FLAT_EXT_API_FILENAME,
+  FlatExtApiType,
+} from './shared';
 
 function flatExtensionAPITemplate(content: string) {
   return `
-import ExtensionAPI from '../types/extension-api';
+import { ExtensionAPI } from './extension-api';
 
 ${content}
 
@@ -36,7 +34,7 @@ ${exportType} { ...flatActionExtensionAPI, ...flatValueExtensionAPI };
 
 function getExtensionType(type: 'Action' | 'Value', types: FlatExtApiType[]) {
   const typesStr = types
-    .map(([name, value]) => `\t'${name}': ${value};`)
+    .map(({ propPath, namespacePath }) => `\t'${propPath}': ${namespacePath};`)
     .join('\n');
 
   return `interface Flat${type}ExtensionAPI {\n${typesStr}\n}\n`;
@@ -46,8 +44,8 @@ function getExtensionTypeValue(
   types: FlatExtApiType[],
 ) {
   const valueStr = JSON.stringify(
-    types.reduce<Record<string, string>>((acc, [key]) => {
-      acc[key] = type.toLowerCase();
+    types.reduce<Record<string, string>>((acc, { propPath }) => {
+      acc[propPath] = type.toLowerCase();
 
       return acc;
     }, {}),

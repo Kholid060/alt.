@@ -1,8 +1,8 @@
-import type { CommandLaunchContext } from '@altdot/extension';
-import type {
+import {
+  CommandLaunchContext,
   EXTENSION_CONFIG_TYPE,
   EXTENSION_PERMISSIONS,
-} from '@altdot/extension-core';
+} from '@altdot/extension';
 import { ExtensionCommandModel } from '../../main/src/extension/extension-command/extension-command.interface';
 
 export type ExtensionConfigType = (typeof EXTENSION_CONFIG_TYPE)[number];

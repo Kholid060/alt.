@@ -3,10 +3,10 @@ import { UiInput, UiLabel, UiSelect } from '@altdot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
-import ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import { ExtensionAPI } from '@altdot/extension';
 
 const EXT_CLIPBOARD_FORMATS: {
-  format: ExtensionAPI.clipboard.ClipboardContentType;
+  format: ExtensionAPI.Clipboard.ClipboardContentType;
   title: string;
 }[] = [
   { format: 'text', title: 'Text' },
@@ -87,7 +87,7 @@ function WorkflowNodeEditClipboard() {
             value={node.data.format}
             onValueChange={(value) =>
               updateEditNode({
-                format: value as ExtensionAPI.clipboard.ClipboardContentType,
+                format: value as ExtensionAPI.Clipboard.ClipboardContentType,
               })
             }
           >

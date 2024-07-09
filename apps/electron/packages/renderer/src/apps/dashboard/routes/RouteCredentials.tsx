@@ -36,7 +36,7 @@ import {
   useUiListStore,
 } from '@altdot/ui/dist/context/list.context';
 import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
-import { ExtensionCredential } from '@altdot/extension-core/src/client/manifest/manifest-credential';
+import { ExtensionCredential } from '@altdot/extension/dist/extension-manifest/manifest-credential';
 import CredentialDetail from '/@/components/credential/CredentialDetail';
 import UiItemsPagination from '/@/components/ui/UiItemsPagination';
 import preloadAPI from '/@/utils/preloadAPI';

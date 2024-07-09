@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DBService } from '/@/db/db.service';
 import { parseJSON } from '@altdot/shared';
-import ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import { ExtensionAPI } from '@altdot/extension';
 import { safeStorage } from 'electron';
 import {
   NewExtensionStorage,
@@ -25,7 +25,7 @@ const mapStorageValue = <
       (parseJSON(
         decryptedValue,
         decryptedValue,
-      ) as ExtensionAPI.storage.Values) ?? null,
+      ) as ExtensionAPI.Storage.Values) ?? null,
     ...rest,
   };
 };

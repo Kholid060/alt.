@@ -4,13 +4,14 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint . --ext js,mjs,cjs,ts,mts,cts,tsx"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "type": "module",
   "dependencies": {
-    "@altdot/extension-core": "workspace:^",
+    "@altdot/extension": "workspace:*",
     "@altdot/shared": "workspace:*",
     "@altdot/ui": "workspace:^",
     "@types/react": "^18.3.3",
@@ -33,6 +34,6 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "prettier": "^3.2.5",
     "tsup": "^8.0.2",
-    "typescript": "^5.3.3"
+    "typescript": "catalog:"
   }
 }

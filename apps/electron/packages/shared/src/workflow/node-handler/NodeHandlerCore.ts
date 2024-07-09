@@ -1,7 +1,7 @@
 /* eslint-disable drizzle/enforce-delete-with-where */
 import IPCRenderer from '#packages/common/utils/IPCRenderer';
 import { isIPCEventError } from '#packages/common/utils/helper';
-import type ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import { ExtensionAPI } from '@altdot/extension';
 import type {
   WorkflowNodeHandlerExecute,
   WorkflowNodeHandlerExecuteReturn,
@@ -158,7 +158,7 @@ export class NodeHandlerClipboard extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE
   }
 
   private async readClipboard(
-    format: ExtensionAPI.clipboard.ClipboardContentType,
+    format: ExtensionAPI.Clipboard.ClipboardContentType,
   ) {
     switch (format) {
       case 'html':
@@ -175,7 +175,7 @@ export class NodeHandlerClipboard extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE
   }
 
   private async writeClipboard(
-    format: ExtensionAPI.clipboard.ClipboardContentType,
+    format: ExtensionAPI.Clipboard.ClipboardContentType,
     value: unknown,
   ) {
     if (!isValidType(value, ['String'])) {

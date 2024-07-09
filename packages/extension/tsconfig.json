@@ -1,7 +1,9 @@
 {
   "extends": "@altdot/typescript-config/vite.json",
-  "include": [".", "./api.d.ts"],
+  "include": ["src"],
   "compilerOptions": {
+    "lib": ["ES2021"],
+    "skipLibCheck": false,
     "paths": {
       "@/*": ["./src/*"]
     },

@@ -2,11 +2,11 @@ import fs from 'fs-extra';
 import { Injectable } from '@nestjs/common';
 import { OnExtensionAPI } from '/@/common/decorators/extension.decorator';
 import { ExtensionApiEvent } from '../events/extension-api.event';
-import ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import { ExtensionAPI } from '@altdot/extension';
 
 function getWriteContent(
   content: string | ArrayBuffer,
-  options: Partial<ExtensionAPI.fs.WriteOptions>,
+  options: Partial<ExtensionAPI.Fs.WriteOptions>,
 ) {
   if (typeof content === 'string') {
     if (options.stringType === 'base64') return Buffer.from(content, 'base64');

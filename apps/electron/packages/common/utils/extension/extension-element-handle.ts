@@ -1,4 +1,4 @@
-import type ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import { ExtensionAPI } from '@altdot/extension';
 import type { EventMapEmit } from '@altdot/shared';
 import type { IPCUserExtensionEventsMap } from '../../interface/ipc-events.interface';
 
@@ -6,7 +6,7 @@ export function extensionElementHandleFactory(
   sendMessage: CreateExtensionElementHandleDetail['sendMessage'],
   selector: string,
   elementIndex?: number,
-): ExtensionAPI.browser.ElementHandle {
+): ExtensionAPI.Browser.ElementHandle {
   return {
     click() {
       return sendMessage('browser.activeTab.click', {
@@ -108,18 +108,18 @@ interface CreateExtensionElementHandleDetail {
 export async function createExtensionElementHandle(
   detail: CreateExtensionElementHandleDetail,
   multiple?: false,
-): Promise<ExtensionAPI.browser.ElementHandle | null>;
+): Promise<ExtensionAPI.Browser.ElementHandle | null>;
 export async function createExtensionElementHandle(
   detail: CreateExtensionElementHandleDetail,
   multiple: true,
-): Promise<ExtensionAPI.browser.ElementHandle[]>;
+): Promise<ExtensionAPI.Browser.ElementHandle[]>;
 export async function createExtensionElementHandle(
   { selector, sendMessage }: CreateExtensionElementHandleDetail,
   multiple?: boolean,
 ): Promise<
   | null
-  | ExtensionAPI.browser.ElementHandle
-  | ExtensionAPI.browser.ElementHandle[]
+  | ExtensionAPI.Browser.ElementHandle
+  | ExtensionAPI.Browser.ElementHandle[]
 > {
   const elementExists = await sendMessage(
     'browser.activeTab.elementExists',

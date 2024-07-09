@@ -12,7 +12,7 @@ import {
   ExtensionCommandExecutePayload,
   ExtensionCommandProcess,
 } from '#packages/common/interface/extension.interface';
-import ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import { ExtensionAPI } from '@altdot/extension';
 import { BrowserWindowService } from '../browser-window/browser-window.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
@@ -29,7 +29,7 @@ export class ExtensionService implements OnAppReady {
   private runningCommands: Map<string, ExtensionCommandProcess> = new Map();
   private executionResolvers = new Map<
     string,
-    PromiseWithResolvers<ExtensionAPI.runtime.command.LaunchResult>
+    PromiseWithResolvers<ExtensionAPI.Runtime.Command.LaunchResult>
   >();
 
   constructor(
@@ -171,7 +171,7 @@ export class ExtensionService implements OnAppReady {
 
   async executeCommandAndWait(executePayload: ExtensionCommandExecutePayload) {
     const resolver =
-      Promise.withResolvers<ExtensionAPI.runtime.command.LaunchResult>();
+      Promise.withResolvers<ExtensionAPI.Runtime.Command.LaunchResult>();
 
     const runnerId = await this.executeCommand(executePayload, 'script');
     if (!runnerId) throw new Error("Config hasn't been inputted");

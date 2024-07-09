@@ -3,7 +3,7 @@ import { BrowserExtensionService } from '/@/browser-extension/browser-extension.
 import { OnExtensionAPI } from '/@/common/decorators/extension.decorator';
 import { ExtensionApiEvent } from '../events/extension-api.event';
 import { CustomError } from '#packages/common/errors/custom-errors';
-import ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import { ExtensionAPI } from '@altdot/extension';
 import { ExtensionBrowserTabContext } from '#packages/common/interface/extension.interface';
 import {
   ExtensionWSServerToClientEvents,
@@ -33,8 +33,8 @@ const elementHandlerWSEventMap = {
 } as const;
 
 const getElementSelector = (
-  selector: ExtensionAPI.browser.ElementSelector,
-): ExtensionAPI.browser.ElementSelectorDetail =>
+  selector: ExtensionAPI.Browser.ElementSelector,
+): ExtensionAPI.Browser.ElementSelectorDetail =>
   typeof selector === 'string' ? { selector } : selector;
 
 type ElementHandlerWSEventMap = typeof elementHandlerWSEventMap;
@@ -150,7 +150,7 @@ export class ExtensionBrowserApiListener {
       browserCtx,
       'getText',
       getElementSelector(selector ?? 'html'),
-      options,
+      options ?? {},
     );
   }
 
@@ -183,39 +183,42 @@ export class ExtensionBrowserApiListener {
   @OnExtensionAPI('browser.activeTab.keyDown')
   async keyDownActiveTab({
     context: { browserCtx },
-    args: [selector, ...args],
+    args: [selector, key, options],
   }: ExtensionApiEvent<'browser.activeTab.keyDown'>) {
     return this.elementHandle(
       browserCtx,
       'keyDown',
       getElementSelector(selector),
-      ...args,
+      key,
+      options ?? {},
     );
   }
 
   @OnExtensionAPI('browser.activeTab.keyUp')
   async keyUpActiveTab({
     context: { browserCtx },
-    args: [selector, ...args],
+    args: [selector, key, options],
   }: ExtensionApiEvent<'browser.activeTab.keyUp'>) {
     return this.elementHandle(
       browserCtx,
       'keyUp',
       getElementSelector(selector),
-      ...args,
+      key,
+      options ?? {},
     );
   }
 
   @OnExtensionAPI('browser.activeTab.press')
   async pressActiveTab({
     context: { browserCtx },
-    args: [selector, ...args],
+    args: [selector, key, options],
   }: ExtensionApiEvent<'browser.activeTab.press'>) {
     return this.elementHandle(
       browserCtx,
       'press',
       getElementSelector(selector),
-      ...args,
+      key,
+      options ?? {},
     );
   }
 

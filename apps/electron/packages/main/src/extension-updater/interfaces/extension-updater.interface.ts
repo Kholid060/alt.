@@ -1,4 +1,4 @@
-import { ExtensionManifest } from '@altdot/extension-core';
+import { ExtensionManifest } from '@altdot/extension';
 import { SelectExtension, NewExtension } from '/@/db/schema/extension.schema';
 
 export type ExtensionUpdaterExtension = Pick<

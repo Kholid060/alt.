@@ -1,6 +1,6 @@
 import { CustomError } from '#packages/common/errors/custom-errors';
 import { OAUTH_CALLBACK_URL } from '#packages/common/utils/constant/constant';
-import { ExtensionCredential } from '@altdot/extension-core';
+import { ExtensionCredential } from '@altdot/extension/dist/extension-manifest/manifest-credential';
 import { shell } from 'electron';
 import { OAuth2Response, OAuth2ResponseSchema } from '../oauth.validation';
 

@@ -9,7 +9,7 @@ import {
 import APIService from '@/services/api.service';
 import GithubAPI from '@/utils/GithubAPI';
 import { APP_TITLE, EXTENSION_COMMAND_TYPE_NAME } from '@/utils/constant';
-import { ExtensionCommand } from '@altdot/extension-core';
+import { ExtensionCommand } from '@altdot/extension';
 import {
   UiAvatar,
   UiAvatarImage,

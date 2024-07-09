@@ -1,38 +1,56 @@
-import { extname } from 'path';
-import { globbySync } from 'globby';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
-
-const entries = {
-  ...Object.fromEntries(
-    globbySync(['src/**/*.{tsx,ts}']).map((file) => [
-      file.substring('/src'.length, file.length).replace(extname(file), ''),
-      file,
-    ]),
-  ),
-  index: './src/index.ts',
-};
+import { builtinModules } from 'module';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
+import path from 'path';
 
 export default defineConfig({
   mode: process.env.MODE ?? 'production',
+  resolve: {
+    alias: {
+      '@/': path.join(__dirname, 'src'),
+    },
+  },
   build: {
     outDir: 'dist',
     lib: {
-      entry: entries,
-      formats: ['es'],
+      formats: ['es', 'cjs'],
+      entry: {
+        index: './src/index.ts',
+        cli: './src/cli/index.ts',
+      },
     },
     rollupOptions: {
-      external: ['react', 'react/jsx-runtime', 'react-dom', '@altdot/ui'],
+      external: [
+        'react',
+        'react/jsx-runtime',
+        'react-dom',
+        '@altdot/ui',
+        'tsup',
+        'fs-extra',
+        'zod-validation-error',
+        'commander',
+        'vite',
+        'vite-plugin-resolve',
+        'glob',
+        'semver',
+        ...builtinModules,
+      ],
       output: {
-        entryFileNames: '[name].js',
         sourcemapExcludeSources: true,
       },
     },
-    emptyOutDir: true,
+    emptyOutDir: false,
   },
   plugins: [
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    dts({ include: Object.values(entries) }),
+    dts({ exclude: ['src/cli/**/*', 'src/extension-api/**/*'] }),
+    viteStaticCopy({
+      targets: [
+        {
+          src: 'src/extension-api',
+          dest: '',
+        },
+      ],
+    }),
   ],
 });

@@ -1,14 +1,9 @@
 import { setProperty } from 'dot-prop';
 import path from 'path';
 import fs from 'fs-extra';
-import { fileURLToPath } from 'url';
-import { BuildExtensionApi, FlatExtApiType } from '.';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { FlatExtApiType, BuildExtensionApi, DIST_DIR } from './shared';
 
 const EXT_API_FILENAME = 'extensionApiBuilder';
-const DIST_DIR = path.join(__dirname, '../../dist');
 
 function apiFileTemplate(apiObj: Record<string, string>) {
   function replacer(_key: string, value: unknown) {
@@ -33,18 +28,18 @@ export default ${EXT_API_FILENAME};
 
 function apiFileTypeTemplate(values: FlatExtApiType[]) {
   return `
-import type ExtensionAPI from '../types/extension-api';
+import type { ExtensionAPI } from './extension-api';
 import type { FlatValueExtensionAPI } from './flat-extension-api';
 
 export interface ExtensionAPIValues extends FlatValueExtensionAPI {
-  ${values.map(([path, value]) => `'${path}': ${value};`).join('\t\n')}
+  ${values.map(({ propPath, namespacePath }) => `'${propPath}': ${namespacePath};`).join('\t\n')}
 }
 
 declare function ${EXT_API_FILENAME}(detail: {
   context?: unknown;
   values: ExtensionAPIValues;
   apiHandler: (...args: any[]) => Promise<unknown>;
-}): ExtensionAPI;
+}): typeof ExtensionAPI;
 
 export { ${EXT_API_FILENAME} as default }
 `;
@@ -58,13 +53,13 @@ const buildExtApiFile: BuildExtensionApi = async ({
   const api: Record<string, string> = {};
 
   const seen = new Set();
-  for (const [apiPath] of [...requireValues, ...values]) {
-    seen.add(apiPath);
-    setProperty(api, apiPath, `value::${apiPath}`);
+  for (const { propPath } of [...requireValues, ...values]) {
+    seen.add(propPath);
+    setProperty(api, propPath, `value::${propPath}`);
   }
-  for (const [apiPath] of actions) {
-    if (seen.has(apiPath)) continue;
-    setProperty(api, apiPath, `action::${apiPath}`);
+  for (const { propPath } of actions) {
+    if (seen.has(propPath)) continue;
+    setProperty(api, propPath, `action::${propPath}`);
   }
 
   await fs.writeFile(

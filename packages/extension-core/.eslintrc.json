@@ -1,9 +1,0 @@
-/** @type {import("eslint").Linter.Config} */
-{
-  "root": true,
-  "ignorePatterns": [".eslintrc.cjs", "node_modules", "dist"],
-  "extends": ["@altdot/eslint-config/base.js"],
-  "parserOptions": {
-    "project": true
-  }
-}

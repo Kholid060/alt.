@@ -1,5 +1,4 @@
-import type { EXTENSION_PERMISSIONS } from '@altdot/extension-core';
-import type ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import type { EXTENSION_PERMISSIONS, ExtensionAPI } from '@altdot/extension';
 import type { NestedKeyOf } from '../interface/utils.interface';
 import type { IPCUserExtensionCustomEventsMap } from '../interface/ipc-events.interface';
 
@@ -13,7 +12,7 @@ export const API_PERMISSION_MAP: [
   ExtensionAPIPaths,
   Partial<ExtensionPermission>[],
 ][] = [
-  ['oauth', []],
+  ['oAuth', []],
   ['fs', ['fs']],
   ['runtime', []],
   ['mainWindow', []],

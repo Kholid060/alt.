@@ -6,14 +6,14 @@ import {
 import { ArrowLeftIcon, ChevronDownIcon, SearchIcon } from 'lucide-react';
 import { forwardRef, useRef, useEffect, useCallback, useContext } from 'react';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
-import { ExtensionCommandArgument } from '@altdot/extension-core';
+import { ExtensionCommandArgument } from '@altdot/extension';
 import { useCommandStore } from '/@/stores/command.store';
 import { CommandListItems } from '/@/interface/command.interface';
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { CommandRouteContext } from '/@/context/command-route.context';
 import preloadAPI from '/@/utils/preloadAPI';
-import ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import { ExtensionAPI } from '@altdot/extension';
 import { useShallow } from 'zustand/react/shallow';
 
 const CommandInputArguments = forwardRef<
@@ -56,7 +56,7 @@ const CommandInputArguments = forwardRef<
       selectedCommand?.command.title ?? null,
       selectedCommand?.command.arguments ?? [],
     );
-  }, [selectedCommand, onArgumentsChange]);
+  }, [selectedCommand, onArgumentsChange, setCommandArgs]);
 
   return (
     <div
@@ -310,7 +310,7 @@ function CommandInput() {
     const viewMessagePort = commandCtx.commandViewMessagePort.current;
     if ((messagePort || viewMessagePort) && commandKeys.has(event.key)) {
       const { key, ctrlKey, altKey, metaKey, shiftKey } = event;
-      const keydownEvent: ExtensionAPI.ui.searchPanel.KeydownEvent = {
+      const keydownEvent: ExtensionAPI.UI.SearchPanel.KeydownEvent = {
         key,
         altKey,
         ctrlKey,

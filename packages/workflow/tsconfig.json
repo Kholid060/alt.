@@ -1,5 +1,5 @@
 {
-  "extends": "@altdot/typescript-config/vite.json",
+  "extends": "@altdot/typescript-config/react-library.json",
   "include": ["."],
   "compilerOptions": {
     "paths": {

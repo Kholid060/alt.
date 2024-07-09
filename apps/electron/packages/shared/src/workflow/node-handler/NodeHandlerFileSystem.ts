@@ -7,7 +7,7 @@ import WorkflowNodeHandler from './WorkflowNodeHandler';
 import fs from 'fs-extra';
 import { globby } from 'globby';
 import WorkflowFileHandle from '../utils/WorkflowFileHandle';
-import type ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import type { ExtensionAPI } from '@altdot/extension';
 
 type ExecuteParams = WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.FILE_SYSTEM>;
 
@@ -56,7 +56,7 @@ export class NodeHandlerFileSystem extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
 
   private async stat({
     node,
-  }: Pick<ExecuteParams, 'node'>): Promise<ExtensionAPI.fs.Stats[]> {
+  }: Pick<ExecuteParams, 'node'>): Promise<ExtensionAPI.Fs.Stats[]> {
     const files = await globby(node.data.readFilePath, { gitignore: false });
     if (files.length === 0 && node.data.throwIfEmpty) {
       throw new Error("Couldn't find files with inputted patterns");

@@ -1,6 +1,5 @@
-import type { ExtensionCommandArgument } from '@altdot/extension-core';
+import type { ExtensionAPI, ExtensionCommandArgument } from '@altdot/extension';
 import type { WORKFLOW_NODE_TYPE } from '../const/workflow-nodes.const';
-import type ExtensionAPI from '@altdot/extension-core/types/extension-api';
 import type { KeyboardShortcut, BrowserType } from '@altdot/shared';
 import type { Edge, Node } from 'reactflow';
 
@@ -104,7 +103,7 @@ export type WorkflowNodeClipboard = WorkflowNodeBase<
   {
     newClipboardVal: string;
     action: 'read' | 'write' | 'paste';
-    format: ExtensionAPI.clipboard.ClipboardContentType;
+    format: ExtensionAPI.Clipboard.ClipboardContentType;
   },
   WORKFLOW_NODE_TYPE.CLIPBOARD
 >;
@@ -188,7 +187,7 @@ export type WorkflowNodeTriggerShortcut = WorkflowNodeBase<
 >;
 
 export type WorkflowNodeNotification = WorkflowNodeBase<
-  Required<ExtensionAPI.notifications.NotificationOptions>,
+  Required<ExtensionAPI.Notifications.NotificationOptions>,
   WORKFLOW_NODE_TYPE.NOTIFICATION
 >;
 
@@ -254,9 +253,9 @@ export type WorkflowNodeBrowserKeyboard = WorkflowNodeBase<
     delay: number;
     selector: string;
     clearFormValue: boolean;
-    key: ExtensionAPI.browser.KeyboardKeys;
+    key: ExtensionAPI.Browser.KeyboardKeys;
     action: 'key-down' | 'press' | 'key-up' | 'type';
-    modifiers: ExtensionAPI.browser.KeyboardModifiers[];
+    modifiers: ExtensionAPI.Browser.KeyboardModifiers[];
   },
   WORKFLOW_NODE_TYPE.BROWSER_KEYBOARD
 >;
@@ -287,7 +286,7 @@ export type WorkflowNodeElementAttributes = WorkflowNodeBase<
 export type WorkflowNodeWaitSelector = WorkflowNodeBase<
   {
     selector: string;
-  } & Required<ExtensionAPI.browser.WaitForSelectorOptions>,
+  } & Required<ExtensionAPI.Browser.WaitForSelectorOptions>,
   WORKFLOW_NODE_TYPE.WAIT_SELECTOR
 >;
 

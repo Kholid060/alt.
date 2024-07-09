@@ -2,3 +2,6 @@ packages:
   - 'apps/*'
   - 'packages/*'
   - 'examples/*'
+
+catalog:
+  typescript: ^5.5.3

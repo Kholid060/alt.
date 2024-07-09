@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ExtensionConfig } from '@altdot/extension-core';
+import type { ExtensionConfig } from '@altdot/extension';
 import { isObject } from '@altdot/shared';
 import type { IPCEventError } from '../interface/ipc-events.interface';
 

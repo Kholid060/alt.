@@ -191,7 +191,7 @@ RuntimeMessage.instance.onMessage(
 
 RuntimeMessage.instance.onMessage(
   'element:key-up',
-  async (_, selector, key, options) => {
+  async (_, selector, key, options = {}) => {
     const element = await queryElement(selector);
 
     if (options.delay && options.delay > 0) {

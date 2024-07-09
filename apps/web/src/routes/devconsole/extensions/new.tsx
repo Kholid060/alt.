@@ -11,7 +11,7 @@ import {
 } from '@/hooks/useExtensionNewStore';
 import APIService from '@/services/api.service';
 import GithubAPI from '@/utils/GithubAPI';
-import { ExtensionManifest } from '@altdot/extension-core';
+import { ExtensionManifest } from '@altdot/extension';
 import { isObject } from '@altdot/shared';
 import {
   useDialog,

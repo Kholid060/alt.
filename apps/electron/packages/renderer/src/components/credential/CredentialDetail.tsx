@@ -1,4 +1,4 @@
-import { ExtensionCredential } from '@altdot/extension-core/src/client/manifest/manifest-credential';
+import { ExtensionCredential } from '@altdot/extension/dist/extension-manifest/manifest-credential';
 import {
   UiLabel,
   UiInput,

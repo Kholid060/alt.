@@ -1,4 +1,4 @@
-import { CommandLaunchContext, Extension } from '@altdot/extension';
+import { _extension, CommandLaunchContext } from '@altdot/extension';
 
 const filePath = 'D:\\test.txt';
 
@@ -25,11 +25,11 @@ async function commandExecutionFail() {
   }
 }
 function authorizeCredential() {
-  const provider = {
+  const provider: _extension.OAuth.OAuthProvider = {
     client: {
       type: 'pkce',
       scope: 'profile',
-      redirectMethod: Extension.oauth.OAuthRedirect.AppUrl,
+      redirectMethod: _extension.OAuth.OAuthRedirect.AppUrl,
       authorizeUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
       clientId: '479459643785-qqth353989l18jm7rdrl7d6vqii8r73d.apps.googleusercontent.com',
     },
@@ -38,7 +38,7 @@ function authorizeCredential() {
     description: 'Auth google drive',
   };
 
-  return _extension.oauth.startAuth(provider).then((token) => {
+  return _extension.oAuth.startAuth(provider).then((token) => {
     if (!token) {
       throw new Error("Credential hasn't been inputted");
     }

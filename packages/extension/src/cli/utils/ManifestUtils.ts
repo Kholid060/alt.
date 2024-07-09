@@ -5,7 +5,10 @@ import semverValid from 'semver/functions/valid';
 import semverClean from 'semver/functions/clean';
 import { PackageJson as PackageJsonType } from 'type-fest';
 import { BuildError, logger } from './logger';
-import { ExtensionManifest, ExtensionManifestSchema } from '../../client';
+import {
+  ExtensionManifest,
+  ExtensionManifestSchema,
+} from '../../extension-manifest';
 import { fromZodError } from 'zod-validation-error';
 import imageSize from 'image-size';
 import { glob } from 'glob';

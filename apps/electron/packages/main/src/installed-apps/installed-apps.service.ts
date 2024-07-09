@@ -4,7 +4,7 @@ import fs from 'fs-extra';
 import { globby } from 'globby';
 import path from 'path';
 import { nanoid } from 'nanoid/non-secure';
-import type ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import type { ExtensionAPI } from '@altdot/extension';
 import type { BrowserApp } from '#packages/common/interface/ipc-events.interface';
 import type { BrowserType } from '@altdot/shared';
 import { Injectable } from '@nestjs/common';
@@ -126,7 +126,7 @@ const browserRegex = /firefox|chrome|edge/i;
 @Injectable()
 export class InstalledAppsService {
   private isAppsFetched: boolean = false;
-  private apps: ExtensionAPI.shell.installedApps.AppDetail[] = [];
+  private apps: ExtensionAPI.Shell.InstalledApps.AppDetail[] = [];
   private appPaths: Map<
     string,
     {
@@ -153,7 +153,7 @@ export class InstalledAppsService {
 
     const shortcuts = await globby(shortcutDirs);
     const appPromise = await Promise.allSettled<
-      Promise<ExtensionAPI.shell.installedApps.AppDetail | null>[]
+      Promise<ExtensionAPI.Shell.InstalledApps.AppDetail | null>[]
     >(
       shortcuts.map(async (shortcut) => {
         const appDetail = await extractShortcutDetail(shortcut);
@@ -197,7 +197,7 @@ export class InstalledAppsService {
     );
 
     this.apps = appPromise
-      .reduce<ExtensionAPI.shell.installedApps.AppDetail[]>((acc, curr) => {
+      .reduce<ExtensionAPI.Shell.InstalledApps.AppDetail[]>((acc, curr) => {
         if (curr.status === 'fulfilled' && curr.value) {
           acc.push(curr.value);
         }

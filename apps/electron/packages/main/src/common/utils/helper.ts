@@ -1,4 +1,4 @@
-import type { ExtensionConfig } from '@altdot/extension-core';
+import type { ExtensionConfig } from '@altdot/extension';
 import { WSAckErrorResult, isObject } from '@altdot/shared';
 import type { BrowserWindow, Display } from 'electron';
 

@@ -3,7 +3,7 @@ import { DBService } from '../db/db.service';
 import { app, dialog } from 'electron';
 import { extensionCommands } from '../db/schema/extension.schema';
 import { eq } from 'drizzle-orm';
-import { ExtensionCommandArgument } from '@altdot/extension-core';
+import { ExtensionCommandArgument } from '@altdot/extension';
 import { APP_DEEP_LINK_SCHEME, debounce, parseJSON } from '@altdot/shared';
 import { CommandLaunchBy } from '@altdot/extension';
 import { ExtensionService } from '../extension/extension.service';

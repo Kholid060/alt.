@@ -1,4 +1,4 @@
-import ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import { ExtensionAPI } from '@/extension-api';
 
 export enum ExtensionExecutionFinishReason {
   done,
@@ -11,11 +11,11 @@ export interface ExtensionMessagePortEvent {
   'extension:reload': [];
   'extension:query-change': [query: string];
   'extension:keydown-event': [
-    KeydownEvent: ExtensionAPI.ui.searchPanel.KeydownEvent,
+    KeydownEvent: ExtensionAPI.UI.SearchPanel.KeydownEvent,
   ];
   'extension:show-toast': [
     toastId: string,
-    options: Required<ExtensionAPI.ui.ToastOptions>,
+    options: Required<ExtensionAPI.UI.ToastOptions>,
   ];
   'extension:query-clear-value': [];
   'extension:hide-toast': [toastId: string];

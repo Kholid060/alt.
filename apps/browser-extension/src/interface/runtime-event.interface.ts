@@ -1,4 +1,4 @@
-import type ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import { ExtensionAPI } from '@altdot/extension';
 import {
   BrowserGetHTMLOptions,
   BrowserGetTextOptions,
@@ -18,18 +18,18 @@ export interface RuntimeEvent {
   'element:key-down': (
     selector: ExtensionBrowserElementSelector,
     key: string,
-    options?: ExtensionAPI.browser.KeyDownOptions,
+    options?: ExtensionAPI.Browser.KeyDownOptions,
   ) => void;
   'element:key-up': (
     selector: ExtensionBrowserElementSelector,
     key: string,
-    options?: ExtensionAPI.browser.KeyUpOptions,
+    options?: ExtensionAPI.Browser.KeyUpOptions,
   ) => void;
   'element:press': (
     selector: ExtensionBrowserElementSelector,
     key: string,
-    options?: ExtensionAPI.browser.KeyUpOptions &
-      ExtensionAPI.browser.KeyDownOptions,
+    options?: ExtensionAPI.Browser.KeyUpOptions &
+      ExtensionAPI.Browser.KeyDownOptions,
   ) => void;
   'element:get-text': (
     selector?: ExtensionBrowserElementSelector,
@@ -57,11 +57,11 @@ export interface RuntimeEvent {
     multiple?: boolean,
   ) => boolean | number[];
   'element:select-element': (
-    filter?: ExtensionAPI.browser.activeTab.SelectElementOptions,
+    filter?: ExtensionAPI.Browser.ActiveTab.SelectElementOptions,
   ) => { canceled: boolean; selector: string };
   'element:wait-selector': (
     selector: ExtensionBrowserElementSelector,
-    option?: ExtensionAPI.browser.WaitForSelectorOptions,
+    option?: ExtensionAPI.Browser.WaitForSelectorOptions,
   ) => void;
   'element:select-file': (
     selector: ExtensionBrowserElementSelector,

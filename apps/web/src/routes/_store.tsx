@@ -3,7 +3,7 @@ import {
   StoreQueryValidation,
   storeQueryValidation,
 } from '@/validation/store-query.validation';
-import { EXTENSION_CATEGORIES } from '@altdot/extension-core';
+import { EXTENSION_CATEGORIES } from '@altdot/extension';
 import {
   UiButton,
   cn,

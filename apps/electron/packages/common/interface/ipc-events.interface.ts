@@ -1,5 +1,5 @@
-import type { FlatActionExtensionAPI } from '@altdot/extension-core/dist/flat-extension-api';
-import type ExtensionAPI from '@altdot/extension-core/types/extension-api';
+import type { FlatActionExtensionAPI } from '@altdot/extension/dist/flat-extension-api';
+import type { ExtensionAPI } from '@altdot/extension';
 import type {
   ExtensionBrowserTabContext,
   ExtensionNeedConfigInput,
@@ -26,7 +26,7 @@ import type {
 import type Electron from 'electron';
 import type { MessagePortChannelIds } from './message-port-events.interface';
 import type { WorkflowRunnerRunPayload } from './workflow-runner.interace';
-import type { ExtensionCredential } from '@altdot/extension-core/src/client/manifest/manifest-credential';
+import type { ExtensionCredential } from '@altdot/extension/dist/extension-manifest/manifest-credential';
 import type { WindowNames } from './window.interface';
 import type {
   AppMessagePortBridgeOptions,
@@ -106,7 +106,7 @@ export interface BrowserApp {
 }
 export interface IPCAppsEvents {
   'installed-apps:get-browsers': () => BrowserApp[];
-  'installed-apps:get-list': () => ExtensionAPI.shell.installedApps.AppDetail[];
+  'installed-apps:get-list': () => ExtensionAPI.Shell.InstalledApps.AppDetail[];
 }
 
 export interface IPCClipboardEvents {
@@ -253,7 +253,7 @@ export interface IPCSendEventRendererToMain {
   'extension:command-exec-change': [
     type: 'finish' | 'start',
     detail: ExtensionCommandProcess,
-    data: ExtensionAPI.runtime.command.LaunchResult,
+    data: ExtensionAPI.Runtime.Command.LaunchResult,
   ];
   'window:destroy': [name: WindowNames];
   'workflow:running-change': [
@@ -261,7 +261,7 @@ export interface IPCSendEventRendererToMain {
     detail: { workflowId: string; runnerId: string },
   ];
   'notification:show': [
-    options: ExtensionAPI.notifications.NotificationOptions,
+    options: ExtensionAPI.Notifications.NotificationOptions,
   ];
 }
 
