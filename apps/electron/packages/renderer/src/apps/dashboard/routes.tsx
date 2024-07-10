@@ -4,7 +4,7 @@ import DashboardApp from './DashboardApp';
 import RouteWorkflow from './routes/RouteWorkflow';
 import RouteWorkflows from './routes/RouteWorkflows';
 import RouteWorkflowHistory from './routes/RouteWorkflowHistory';
-import RouteCredentials from './routes/RouteCredentials';
+// import RouteCredentials from './routes/RouteCredentials';
 import RouteSettings from './routes/RouteSettings';
 
 const router = createBrowserRouter(
@@ -33,10 +33,10 @@ const router = createBrowserRouter(
           path: '/workflow-history',
           element: <RouteWorkflowHistory />,
         },
-        {
-          path: '/credentials',
-          element: <RouteCredentials />,
-        },
+        // {
+        //   path: '/credentials',
+        //   element: <RouteCredentials />,
+        // },
         {
           path: '/settings',
           element: <RouteSettings />,

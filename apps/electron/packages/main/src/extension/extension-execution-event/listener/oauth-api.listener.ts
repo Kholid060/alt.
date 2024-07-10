@@ -1,20 +1,59 @@
 import { Injectable } from '@nestjs/common';
-// import { OnExtensionAPI } from '/@/common/decorators/extension.decorator';
-// import { ExtensionApiEvent } from '../events/extension-api.event';
-// import { CustomError } from '#packages/common/errors/custom-errors';
+import { OnExtensionAPI } from '/@/common/decorators/extension.decorator';
+import { ExtensionApiEvent } from '../events/extension-api.event';
 import { OAuthService } from '/@/oauth/oauth.service';
-import { BrowserWindowService } from '/@/browser-window/browser-window.service';
-import { ExtensionCredentialService } from '../../extension-credential/extension-credential.service';
-import { ExtensionAuthTokenService } from '../../extension-auth-token/extension-auth-token.service';
+import type { ExtensionExecutionEventReturn } from '../extension-execution-event.interface';
+import { ExtensionOAuthTokensService } from '../../extension-oauth-tokens/extension-oauth-tokens.service';
 
 @Injectable()
 export class ExtensionOAuthApiListener {
   constructor(
     private oauthService: OAuthService,
-    private browserWindow: BrowserWindowService,
-    private authToken: ExtensionAuthTokenService,
-    private extensionCredential: ExtensionCredentialService,
+    private oauthTokenService: ExtensionOAuthTokensService,
   ) {}
+
+  @OnExtensionAPI('oAuth.startAuth')
+  startAuth({
+    args: [provider],
+    context: { extension, extensionId },
+  }: ExtensionApiEvent<'oAuth.startAuth'>): ExtensionExecutionEventReturn<'oAuth.startAuth'> {
+    return this.oauthService.startAuthOverlay(provider, {
+      id: extensionId,
+      icon: extension.icon,
+      title: extension.title,
+    });
+  }
+
+  @OnExtensionAPI('oAuth.getToken')
+  async getToken({
+    args: [provider],
+    context: { extensionId },
+  }: ExtensionApiEvent<'oAuth.getToken'>): ExtensionExecutionEventReturn<'oAuth.getToken'> {
+    return this.oauthService.getExtensionToken(extensionId, provider);
+  }
+
+  @OnExtensionAPI('oAuth.removeToken')
+  async removeToken({
+    args: [provider],
+    context: { extensionId },
+  }: ExtensionApiEvent<'oAuth.removeToken'>): ExtensionExecutionEventReturn<'oAuth.removeToken'> {
+    await this.oauthTokenService.remove({
+      extensionId,
+      key: provider.key,
+      clientId: provider.client.clientId,
+    });
+  }
+
+  @OnExtensionAPI('oAuth.setToken')
+  async setToken({
+    args: [provider, payload],
+    context: { extensionId },
+  }: ExtensionApiEvent<'oAuth.setToken'>): ExtensionExecutionEventReturn<'oAuth.setToken'> {
+    await this.oauthService.setExtensionToken(
+      { ...provider, extensionId },
+      payload,
+    );
+  }
 
   // @OnExtensionAPI('oAuth.authorizationRequest')
   // async authorizationRequest({

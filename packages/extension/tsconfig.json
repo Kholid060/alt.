@@ -1,12 +1,18 @@
 {
-  "extends": "@altdot/typescript-config/vite.json",
-  "include": ["src"],
+  "extends": "@altdot/typescript-config/react-library.json",
+  "include": ["./src/index.ts"],
   "compilerOptions": {
     "lib": ["ES2021"],
-    "skipLibCheck": false,
-    "paths": {
-      "@/*": ["./src/*"]
-    },
+    "noEmit": false,
+    "skipLibCheck": true,
+    "types": [],
+    "outDir": "dist",
+    "declaration": true,
+    "declarationMap": true,
+    "declarationDir": "dist",
+    "resolveJsonModule": true,
+    "emitDeclarationOnly": true,
+    "resolvePackageJsonImports": true,
   },
   "exclude": ["node_modules"]
 }

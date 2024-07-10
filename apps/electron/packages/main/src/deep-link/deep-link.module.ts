@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { DeepLinkService } from './deep-link.service';
-import { DeepLinkListener } from './deep-link.listener';
 import { WorkflowModule } from '../workflow/workflow.module';
 import { ExtensionModule } from '../extension/extension.module';
+import { OAuthModule } from '../oauth/oauth.module';
 
 @Module({
   exports: [DeepLinkService],
-  imports: [WorkflowModule, ExtensionModule],
-  providers: [DeepLinkService, DeepLinkListener],
+  providers: [DeepLinkService],
+  imports: [WorkflowModule, ExtensionModule, OAuthModule],
 })
 export class DeepLinkModule {}

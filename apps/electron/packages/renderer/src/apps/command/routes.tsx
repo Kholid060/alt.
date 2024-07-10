@@ -5,6 +5,7 @@ import CommandViewJSON from './routes/CommandViewJSON';
 import CommandWorkflowsList from './routes/CommandWorkflowsList';
 import ConfigInput from './routes/ConfigInput';
 import CreateCommandScript from './routes/CreateCommandScript';
+import ExtensionAccounts from './routes/ExtensionAccounts';
 import FallbackCommands from './routes/FallbackCommands';
 import RunningProcess from './routes/RunningProcess';
 import StoreExtensionsInstall from './routes/StoreExtensionsInstall';
@@ -20,6 +21,11 @@ export const commandAppRoutes = [
     name: 'store-extension-install',
     element: StoreExtensionsInstall,
     path: '/store/extensions/:extensionId/install',
+  },
+  {
+    name: 'connected-accounts',
+    element: ExtensionAccounts,
+    path: '/connected-accounts',
   },
   {
     name: 'store-workflow-install',

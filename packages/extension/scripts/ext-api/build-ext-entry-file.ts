@@ -23,6 +23,10 @@ export { ExtensionAPI, ExtensionAPI as _extension };
 `;
 }
 
+const jsFileContent = `// GENERATED FILE
+export const _extension = self._extension;
+`;
+
 export async function buildExtEntryFile(namespaces: ExtensionAPINamespace[]) {
   let importStr = '';
   let variableStr = '';
@@ -44,5 +48,6 @@ export async function buildExtEntryFile(namespaces: ExtensionAPINamespace[]) {
     export: exportTypeStr.trimEnd(),
   });
 
-  await fs.writeFile(path.join(EXT_API_DIR, 'index.ts'), fileStr);
+  await fs.writeFile(path.join(EXT_API_DIR, 'index.d.ts'), fileStr);
+  await fs.writeFile(path.join(EXT_API_DIR, 'index.js'), jsFileContent);
 }

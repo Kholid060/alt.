@@ -1,68 +1,70 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
-import { ExtensionCredential } from '@altdot/extension/dist/extension-manifest/manifest-credential';
-import { ArrowLeftIcon } from 'lucide-react';
+import {
+  ArrowLeftIcon,
+  ArrowRightLeftIcon,
+  CircleCheckBigIcon,
+} from 'lucide-react';
 import UiExtensionIcon from '../ui/UiExtensionIcon';
-import { UiButton } from '@altdot/ui';
-
-type ExtensionCredentialDetail = ExtensionCredential & {
-  commandId: string;
-  hasValue: boolean;
-  extensionId: string;
-  extensionTitle: string;
-  credentialName: string;
-};
-
-const OVERLAY_TIMEOUT_MS = 600_000; // 10 minutes
+import { UiButton, UiLogo } from '@altdot/ui';
+import { IPCSendEventMainToRenderer } from '#packages/common/interface/ipc-events.interface';
+import { useCommandPanelStore } from '/@/stores/command-panel.store';
+import { useUiListStore } from '@altdot/ui/dist/context/list.context';
 
 function CommandOAuthOverlay() {
-  const resolverRef = useRef<{
-    commandId: string;
-    extensionId: string;
-    resolver: PromiseWithResolvers<boolean>;
-  } | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | number>(-1);
+  const uiListStore = useUiListStore();
+  const addPanelStatus = useCommandPanelStore.use.addStatus();
 
-  const [credential, setCredential] =
-    useState<null | ExtensionCredentialDetail>(null);
+  const [credential, setCredential] = useState<
+    | null
+    | (IPCSendEventMainToRenderer['command-window:show-oauth-overlay'][0] & {
+        connected: boolean;
+      })
+  >(null);
 
-  useEffect(() =>
-    preloadAPI.main.ipc.handle(
-      'command-window:show-oauth-overlay',
-      (credentialProvider, detail) => {
-        setCredential({
-          ...credentialProvider,
-          ...detail,
+  function copyAuthLink() {
+    if (!credential?.authUrl) return;
+
+    preloadAPI.main.ipc
+      .invoke('clipboard:copy', credential.authUrl)
+      .then(() => {
+        addPanelStatus({
+          type: 'success',
+          title: 'Copied to clipboard',
         });
+      });
+  }
 
-        if (resolverRef.current) {
-          const { commandId, extensionId, resolver } = resolverRef.current;
-          if (
-            commandId === detail.commandId &&
-            extensionId === detail.extensionId
-          ) {
-            return resolver.promise;
-          }
-
-          resolver.resolve(false);
+  useEffect(() => {
+    const offAuthOverlay = preloadAPI.main.ipc.on(
+      'command-window:show-oauth-overlay',
+      (_, payload) => {
+        if (uiListStore.snapshot().search.trim()) {
+          uiListStore.setState('search', '');
         }
 
-        resolverRef.current = {
-          ...detail,
-          resolver: Promise.withResolvers(),
-        };
-
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = setTimeout(() => {
-          resolverRef.current?.resolver.resolve(false);
-          setCredential(null);
-          resolverRef.current = null;
-        }, OVERLAY_TIMEOUT_MS);
-
-        return resolverRef.current.resolver.promise;
+        setCredential({ ...payload, connected: false });
       },
-    ),
-  );
+    );
+    const offAuthSuccess = preloadAPI.main.ipc.on(
+      'command-window:oauth-success',
+      (_, sessionId) => {
+        setCredential((value) => {
+          if (!value || value.sessionId !== sessionId) return value;
+
+          return {
+            ...value,
+            connected: true,
+          };
+        });
+      },
+    );
+
+    return () => {
+      offAuthSuccess();
+      offAuthOverlay();
+    };
+  }, [uiListStore]);
   useEffect(() => {
     const keydownEvent = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
@@ -70,10 +72,7 @@ function CommandOAuthOverlay() {
       event.preventDefault();
       event.stopPropagation();
 
-      resolverRef.current?.resolver.resolve(false);
-
       setCredential(null);
-      resolverRef.current = null;
     };
     if (credential) {
       window.addEventListener('keydown', keydownEvent, true);
@@ -83,55 +82,70 @@ function CommandOAuthOverlay() {
       window.removeEventListener('keydown', keydownEvent, true);
     };
   }, [credential]);
-  useEffect(() => {
-    return () => {
-      clearTimeout(timeoutRef.current);
-    };
-  });
 
   if (!credential) return null;
-
-  function onClose(type: 'submit' | 'cancel') {
-    if (!resolverRef.current) return;
-
-    resolverRef.current?.resolver.resolve(type === 'submit');
-    setCredential(null);
-    resolverRef.current = null;
-  }
 
   return (
     <div className="absolute left-0 top-0 z-50 flex h-full w-full flex-col overflow-hidden rounded-lg bg-background">
       <div className="flex h-14 flex-shrink-0 items-center border-b px-4">
         <button
           className="mr-2 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center text-muted-foreground"
-          onClick={() => onClose('cancel')}
+          onClick={() => setCredential(null)}
         >
           <ArrowLeftIcon className="h-5 w-5" />
         </button>
       </div>
-      <div className="flex-grow overflow-auto p-4">
-        <div className="py-8 text-center">
-          <div className="inline-block h-14 w-14">
+      <div className="flex-grow items-center justify-center overflow-auto px-4 py-8 text-center">
+        <div className="flex items-center justify-center gap-1">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-lg border">
+            <UiLogo className="text-3xl" />
+          </div>
+          {credential.connected ? (
+            <CircleCheckBigIcon className="size-5 text-green-400" />
+          ) : (
+            <ArrowRightLeftIcon className="size-5 text-muted-foreground" />
+          )}
+          <div className="inline-block h-16 w-16 rounded-lg border p-1.5">
             <UiExtensionIcon
-              id={credential.extensionId}
-              alt={credential.providerName}
-              icon={credential.providerIcon}
+              id={credential.extension.id}
+              alt={credential.provider.name}
+              icon={credential.provider.icon}
             />
           </div>
-          <h2 className="mt-2 text-lg font-semibold leading-tight">
-            {credential.credentialName}
-          </h2>
-          <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-            Connect your {credential.providerName} account
-          </p>
-          <UiButton
-            size="sm"
-            className="mt-6 min-w-36"
-            onClick={() => onClose('submit')}
-          >
-            Connect account
-          </UiButton>
         </div>
+        <h2 className="mt-5 text-lg font-semibold leading-tight">
+          Connect {credential.provider.name} to <UiLogo />
+        </h2>
+        <p className="mx-auto mt-1.5 max-w-md text-sm text-muted-foreground">
+          {credential.connected ? (
+            'Account connected'
+          ) : (
+            <>
+              {credential.extension.title} extension needs to connect your{' '}
+              {credential.provider.name} account to <UiLogo />
+            </>
+          )}
+        </p>
+        {!credential.connected && (
+          <>
+            <UiButton
+              size="sm"
+              className="mt-8 min-w-36"
+              variant="secondary"
+              onClick={() =>
+                preloadAPI.main.ipc.invoke('shell:open-url', credential.authUrl)
+              }
+            >
+              Connect account
+            </UiButton>
+            <p className="mt-4 text-sm text-muted-foreground">
+              or{' '}
+              <button className="text-violet-11" onClick={copyAuthLink}>
+                copy authorization link
+              </button>
+            </p>
+          </>
+        )}
       </div>
     </div>
   );

@@ -59,6 +59,7 @@ export const extensionsRelations = relations(extensions, ({ many }) => ({
   storages: many(extensionStorages),
   commands: many(extensionCommands),
   credentials: many(extensionCreds),
+  oauthTokens: many(extensionOAuthTokens),
 }));
 
 export const extensionCommands = sqliteTable('extension_commands', {
@@ -187,6 +188,49 @@ export const extensionErrorsRelations = relations(
     extension: one(extensions, {
       fields: [extensionErrors.extensionId],
       references: [extensions.id],
+    }),
+  }),
+);
+
+export const extensionOAuthTokens = sqliteTable(
+  'extension_oauth_tokens',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    clientId: text('client_id').notNull(),
+    expiresTimestamp: integer('expires_timestamp'),
+    createdAt: text('created_at')
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    updatedAt: text('updated_at')
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP`),
+    providerName: text('provider_name').notNull(),
+    providerIcon: text('provider_icon').notNull(),
+    scope: text('scope'),
+    key: text('key').notNull(),
+    tokenType: text('token_type'),
+    extensionId: text('extension_id')
+      .notNull()
+      .references(() => extensions.id, { onDelete: 'cascade' }),
+    refreshToken: blob('refresh_token', { mode: 'buffer' }),
+    accessToken: blob('access_token', { mode: 'buffer' }).notNull(),
+  },
+  (table) => ({
+    oauthKeyIdx: index('oauth_key_idx').on(table.key),
+    oauthClientIdIdx: index('oauth_client_id_idx').on(table.clientId),
+    oauthExtensionIdIdx: index('oauth_ext_id_idx').on(table.extensionId),
+  }),
+);
+export type NewExtensionOauthToken = typeof extensionOAuthTokens.$inferInsert;
+export type SelectExtensionOauthToken =
+  typeof extensionOAuthTokens.$inferSelect;
+
+export const extensionsOAuthTokensRelations = relations(
+  extensionOAuthTokens,
+  ({ one }) => ({
+    extension: one(extensions, {
+      references: [extensions.id],
+      fields: [extensionOAuthTokens.extensionId],
     }),
   }),
 );

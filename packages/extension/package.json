@@ -6,8 +6,8 @@
   "types": "./dist/index.d.ts",
   "type": "module",
   "scripts": {
-    "dev": "pnpm build:ext-api && vite",
-    "build": "pnpm build:ext-api && vite build",
+    "dev": "pnpm build:ext-api && tsup --watch",
+    "build": "pnpm build:ext-api && tsup && tsc",
     "build:ext-api": "tsx ./scripts/ext-api/index.ts",
     "lint": "eslint . --ext js,mjs,cjs,ts,mts,cts,tsx"
   },
@@ -22,6 +22,9 @@
     "./dist/**/*",
     "./bin/**/*"
   ],
+  "bin": {
+    "altdot": "./bin/cli.js"
+  },
   "devDependencies": {
     "@altdot/eslint-config": "workspace:*",
     "@altdot/typescript-config": "workspace:*",
@@ -48,10 +51,11 @@
     "prettier": "^3.2.5",
     "semver": "^7.6.2",
     "ts-morph": "^21.0.1",
-    "tsup": "^8.0.2",
+    "tsc-alias": "^1.8.10",
+    "tsup": "^8.1.0",
     "tsx": "^4.7.1",
     "type-fest": "^4.21.0",
-    "typescript": "^5.5.3",
+    "typescript": "catalog:",
     "vite": "^5.1.4",
     "vite-plugin-dts": "^3.7.3",
     "vite-plugin-static-copy": "^1.0.1",

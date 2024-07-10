@@ -3,6 +3,7 @@ import ElectronLogger from './common/utils/ElectronLogger';
 import ElectronNest from './ElectronNest';
 import { Menu, app } from 'electron';
 import updater from 'electron-updater';
+import log from 'electron-log/main';
 import './common/utils/security-restrictions';
 import { APP_USER_MODEL_ID } from '@altdot/shared';
 
@@ -62,10 +63,12 @@ async function bootstrap() {
     app
       .whenReady()
       .then(() => updater.autoUpdater.checkForUpdatesAndNotify())
-      .catch((e) => console.error('Failed check and install updates:', e));
+      .catch((e) => log.error('Failed check and install updates:', e));
   }
 }
-bootstrap();
+bootstrap().catch((error) => {
+  log.error(error);
+});
 
 /**
  * Install Vue.js or any other extension in development mode only.

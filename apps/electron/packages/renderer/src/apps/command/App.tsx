@@ -1,4 +1,4 @@
-import { UiTooltipProvider } from '@altdot/ui';
+import { UiButton, UiTooltipProvider } from '@altdot/ui';
 import CommandHeader from '/@/components/command/CommandHeader';
 import CommandFooter from '/@/components/command/CommandFooter';
 import CommandContent from '/@/components/command/CommandContent';
@@ -12,6 +12,10 @@ import CommandErrorOverlay from '/@/components/command/CommandErrorOverlay';
 import AppDevtools from '/@/components/app/AppDevtools';
 import AppEventListener from '/@/components/app/AppEventListener';
 import { DatabaseProvider } from '/@/context/database.context';
+import {
+  FallbackProps,
+  ErrorBoundary as ReactErrorBoundary,
+} from 'react-error-boundary';
 import { commandAppRoutes } from './routes';
 import { useCommandStore } from '/@/stores/command.store';
 import { useEffect, useState } from 'react';
@@ -23,7 +27,6 @@ import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { ExtensionBrowserTabContext } from '#packages/common/interface/extension.interface';
 import { debounce } from '@altdot/shared';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const routes = createCommandRoutes(commandAppRoutes);
 
@@ -61,6 +64,27 @@ const getBrowserTabCtx = (() => {
   };
 })();
 
+function ErrorBoundaryFallback({ error }: FallbackProps) {
+  return (
+    <div className="h-full w-full rounded-lg border bg-background p-4">
+      <div className="flex items-start">
+        <p className="flex-1 gap-4 font-semibold text-destructive-text">
+          {error.message}
+        </p>
+        <UiButton
+          size="sm"
+          variant="secondary"
+          onClick={() => window.location.reload()}
+        >
+          Reload
+        </UiButton>
+      </div>
+      <div className="mt-4 overflow-auto whitespace-pre-wrap rounded-lg bg-card p-4 font-mono text-sm text-muted-foreground">
+        {error.stack}
+      </div>
+    </div>
+  );
+}
 function IdleListener({
   onToggleHide,
 }: {
@@ -119,8 +143,6 @@ function IdleListener({
   return null;
 }
 
-const queryClient = new QueryClient();
-
 function App() {
   const [hide, setHide] = useState(false);
 
@@ -139,7 +161,7 @@ function App() {
   }, []);
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <ReactErrorBoundary FallbackComponent={ErrorBoundaryFallback}>
       <UiTooltipProvider>
         <DatabaseProvider>
           <CommandRouteProvider routes={routes}>
@@ -166,7 +188,7 @@ function App() {
           </CommandRouteProvider>
         </DatabaseProvider>
       </UiTooltipProvider>
-    </QueryClientProvider>
+    </ReactErrorBoundary>
   );
 }
 

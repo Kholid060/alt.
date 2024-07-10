@@ -1,4 +1,4 @@
-import type { ExtensionCommandRenderer } from '@altdot/extension/dist/command-renderer/command-renderer';
+import type { ExtensionCommandRenderer } from '@altdot/extension';
 import { MODULE_MAP } from './constant';
 import type { ExtensionRenderer } from '../interfaces/ext-renderer';
 import type ReactDOM from 'react-dom/client';

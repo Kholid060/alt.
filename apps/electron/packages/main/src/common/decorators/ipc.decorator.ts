@@ -8,7 +8,7 @@ import { IpcInvokeFilter } from '../filter/ipc-invoke.filter';
 
 export function IPCInvoke(channel: keyof IPCEvents) {
   return applyDecorators(
-    UseFilters(new IpcInvokeFilter()),
+    UseFilters(new IpcInvokeFilter(channel)),
     MessagePattern(channel, { type: 'ipc:invoke' }),
   );
 }

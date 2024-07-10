@@ -23,6 +23,7 @@ import { OAuthModule } from '../oauth/oauth.module';
 import { ExtensionAuthTokenService } from './extension-auth-token/extension-auth-token.service';
 import { ExtensionStorageService } from './extension-storage/extension-storage.service';
 import { ExtensionQueryService } from './extension-query.service';
+import { ExtensionOAuthTokensModule } from './extension-oauth-tokens/extension-oauth-tokens.module';
 
 const extensionApiListeners = [
   ExtensionFSApiListener,
@@ -56,6 +57,7 @@ const extensionApiListeners = [
     ExtensionCommandModule,
     BrowserExtensionModule,
     ExtensionCredentialModule,
+    ExtensionOAuthTokensModule,
     ExtensionExecutionEventModule,
   ],
 })

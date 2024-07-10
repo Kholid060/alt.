@@ -8,6 +8,8 @@ import {
 
 @Catch()
 export class IpcInvokeFilter {
+  constructor(private readonly channel: string) {}
+
   catch(error: unknown, _host: ArgumentsHost): unknown {
     if (
       error instanceof CustomError ||
@@ -20,7 +22,7 @@ export class IpcInvokeFilter {
       };
     }
 
-    log.error(['IPCMainHandle'], error);
+    log.error(['IPCMainHandle', this.channel], error);
 
     throw error;
   }

@@ -10,8 +10,9 @@ import type { IPCUserExtensionEventsMap } from '../../interface/ipc-events.inter
 import extensionApiBuilder from '@altdot/extension/dist/extensionApiBuilder';
 import type { ExtensionBrowserTabContext } from '../../interface/extension.interface';
 import { APP_ICON_DIR_PREFIX } from '../../utils/constant/app.const';
+import { OAuthPKCEClient } from './extension-oauth-client';
 
-interface CreateExtensionAPI {
+export interface CreateExtensionAPI {
   context?: unknown;
   browserCtx: ExtensionBrowserTabContext;
   sendMessage: EventMapEmit<IPCUserExtensionEventsMap>;
@@ -128,6 +129,16 @@ function extensionAPIBrowser(
   };
 }
 
+function extensionOAuth({
+  sendMessage,
+}: CreateExtensionAPI): Pick<ExtensionAPIValues, 'oAuth.createPKCE'> {
+  return {
+    'oAuth.createPKCE': (provider) => {
+      return Object.freeze(new OAuthPKCEClient({ provider, sendMessage }));
+    },
+  };
+}
+
 export function createExtensionAPI({
   browserCtx,
   messagePort,
@@ -141,6 +152,7 @@ export function createExtensionAPI({
         ...extensionAPIUiToast(messagePort),
         ...extensionAPISearchPanel(messagePort),
         ...extensionAPIBrowser(sendMessage),
+        ...extensionOAuth({ browserCtx, messagePort, sendMessage, context }),
         'browser.activeTab.get': () =>
           Promise.resolve(
             browserCtx

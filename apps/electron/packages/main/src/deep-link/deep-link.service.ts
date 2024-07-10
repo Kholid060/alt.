@@ -4,7 +4,12 @@ import { app, dialog } from 'electron';
 import { extensionCommands } from '../db/schema/extension.schema';
 import { eq } from 'drizzle-orm';
 import { ExtensionCommandArgument } from '@altdot/extension';
-import { APP_DEEP_LINK_SCHEME, debounce, parseJSON } from '@altdot/shared';
+import {
+  APP_DEEP_LINK_SCHEME,
+  APP_USER_MODEL_ID,
+  debounce,
+  parseJSON,
+} from '@altdot/shared';
 import { CommandLaunchBy } from '@altdot/extension';
 import { ExtensionService } from '../extension/extension.service';
 import { workflows } from '../db/schema/workflow.schema';
@@ -13,7 +18,7 @@ import { WORKFLOW_MANUAL_TRIGGER_ID } from '#packages/common/utils/constant/work
 import { BrowserWindowService } from '../browser-window/browser-window.service';
 import { LoggerService } from '../logger/logger.service';
 import path from 'path';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { OAuthService } from '../oauth/oauth.service';
 
 function convertArgValue(argument: ExtensionCommandArgument, value: string) {
   let convertedValue: unknown = value;
@@ -34,7 +39,7 @@ function convertArgValue(argument: ExtensionCommandArgument, value: string) {
 export class DeepLinkService implements OnModuleInit {
   constructor(
     private dbService: DBService,
-    private eventEmitter: EventEmitter2,
+    private oauthService: OAuthService,
     private loggerService: LoggerService,
     private workflowService: WorkflowService,
     private extensionService: ExtensionService,
@@ -59,13 +64,14 @@ export class DeepLinkService implements OnModuleInit {
       'second-instance',
       // the event called twice for some reason 🤔
       debounce((_event, commandLine) => {
-        console.log(_event, commandLine);
         const deepLink = commandLine ? commandLine.pop() : null;
-        if (!deepLink || !deepLink.startsWith(APP_DEEP_LINK_SCHEME)) {
-          return;
-        }
+        if (!deepLink) return;
 
-        this.eventEmitter.emit('deep-link', deepLink);
+        if (deepLink.startsWith(APP_DEEP_LINK_SCHEME)) {
+          this.urlHandler(deepLink);
+        } else if (deepLink.startsWith(APP_USER_MODEL_ID)) {
+          this.appUrlHandler(deepLink);
+        }
       }, 50),
     );
   }
@@ -198,7 +204,7 @@ export class DeepLinkService implements OnModuleInit {
     );
   }
 
-  async urlHandler(url: string) {
+  urlHandler(url: string) {
     try {
       const urlObj = new URL(url);
 
@@ -215,6 +221,16 @@ export class DeepLinkService implements OnModuleInit {
       }
     } catch (error) {
       this.loggerService.error(['deepLinkHandler'], (error as Error).message);
+    }
+  }
+
+  appUrlHandler(url: string) {
+    const urlObj = new URL(url);
+    const [_, type] = urlObj.pathname.split('/');
+
+    if (type === 'oauth2callback') {
+      this.oauthService.resolveAuthSession(urlObj);
+      return;
     }
   }
 }

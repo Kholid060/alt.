@@ -1,4 +1,23 @@
+import { builtinModules } from 'module';
 import { defineConfig } from 'tsup';
+import path from 'path';
+import fs from 'fs-extra';
+
+const externalDeps = [
+  'react',
+  'react/jsx-runtime',
+  'react-dom',
+  '@altdot/ui',
+  'tsup',
+  'fs-extra',
+  'zod-validation-error',
+  'commander',
+  'vite',
+  'vite-plugin-resolve',
+  'glob',
+  'semver',
+  ...builtinModules,
+];
 
 export default defineConfig([
   {
@@ -8,24 +27,41 @@ export default defineConfig([
       NODE_ENV: 'production',
     },
     publicDir: './public',
-    entry: ['./src/**/!(index).ts?(x)'],
-    format: ['esm'],
-    dts: true,
+    entry: {
+      cli: './src/cli/index.ts',
+    },
+    format: ['cjs'],
+    noExternal: ['@altdot/shared'],
     minify: true,
-    external: ['react', 'react/jsx-runtime', 'react-dom'],
+    external: externalDeps,
+    clean: false,
     esbuildOptions(options) {
       options.outbase = './src';
     },
   },
   {
+    splitting: true,
     sourcemap: true,
-    entry: ['./src/index.ts'],
-    bundle: false,
-    dts: true,
+    env: {
+      NODE_ENV: 'production',
+    },
+    entry: {
+      index: './src/index.ts',
+    },
+    bundle: true,
+    clean: false,
+    minify: true,
     format: ['esm'],
     outDir: 'dist',
+    external: externalDeps,
     esbuildOptions(options) {
       options.outbase = './src';
+    },
+    async onSuccess() {
+      await fs.copy(
+        path.join(__dirname, 'src/extension-api'),
+        path.join(__dirname, 'dist/extension-api'),
+      );
     },
   },
 ]);

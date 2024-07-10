@@ -4,7 +4,7 @@ import { createContext, useEffect, useState } from 'react';
 import {
   ExtensionMessagePortCallback,
   ExtensionMessagePortEvent,
-} from '@/interfaces/message-events';
+} from '../../../interfaces/message-events';
 
 interface ExtensionContextState {
   query: string;

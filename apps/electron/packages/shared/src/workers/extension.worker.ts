@@ -146,16 +146,16 @@ self.onmessage = async ({
     const messagePort = BetterMessagePort.createStandalone('sync', ports[1]);
     const { commandId, extensionId, browserCtx } = data.payload;
 
-    const executeCommand = await getCommandExecution({
-      commandId,
-      extensionId,
-    });
     initExtensionAPI({
       commandId,
       messagePort,
       key: extensionId,
       mainMessagePort: ports[0],
       browserCtx: browserCtx ?? null,
+    });
+    const executeCommand = await getCommandExecution({
+      commandId,
+      extensionId,
     });
 
     const commandRunnerPayload: CommandRunnerData = {

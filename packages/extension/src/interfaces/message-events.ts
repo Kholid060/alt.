@@ -1,4 +1,4 @@
-import { ExtensionAPI } from '@/extension-api';
+import { ExtensionAPI } from '../extension-api';
 
 export enum ExtensionExecutionFinishReason {
   done,

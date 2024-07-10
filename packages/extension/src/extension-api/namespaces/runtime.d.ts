@@ -1,3 +1,5 @@
+import { ExtensionManifest } from '../../extension-manifest';
+
 export declare namespace Runtime {
   interface Static {
     config: Config.Static;
@@ -6,7 +8,7 @@ export declare namespace Runtime {
   }
 }
 
-declare namespace Runtime.Command {
+export declare namespace Runtime.Command {
   interface LaunchOptions {
     name: string;
     args?: Record<string, unknown>;
@@ -25,7 +27,7 @@ declare namespace Runtime.Command {
   }
 }
 
-declare namespace Runtime.Config {
+export declare namespace Runtime.Config {
   type ConfigType = 'extension' | 'command';
 
   interface Static {

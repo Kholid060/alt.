@@ -1,4 +1,4 @@
-import { _extension, CommandLaunchContext } from '@altdot/extension';
+import { _extension, CommandLaunchContext, OAuthRedirect } from '@altdot/extension';
 
 const filePath = 'D:\\test.txt';
 
@@ -24,27 +24,50 @@ async function commandExecutionFail() {
     console.error(error);
   }
 }
-function authorizeCredential() {
-  const provider: _extension.OAuth.OAuthProvider = {
+async function authorizeCredential() {
+  const clientId = '479459643785-qqth353989l18jm7rdrl7d6vqii8r73d.apps.googleusercontent.com';
+  const oauthClient = _extension.oAuth.createPKCE({
+    key: 'google-drive',
     client: {
-      type: 'pkce',
+      clientId,
       scope: 'profile',
-      redirectMethod: _extension.OAuth.OAuthRedirect.AppUrl,
+      redirectMethod: OAuthRedirect.AppUrl,
       authorizeUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
-      clientId: '479459643785-qqth353989l18jm7rdrl7d6vqii8r73d.apps.googleusercontent.com',
     },
     name: 'Google Drive',
-    icon: 'google-drive.png',
+    icon: 'google-drive',
     description: 'Auth google drive',
-  };
-
-  return _extension.oAuth.startAuth(provider).then((token) => {
-    if (!token) {
-      throw new Error("Credential hasn't been inputted");
-    }
-
-    console.log(token);
   });
+  
+  const token = await oauthClient.getToken();
+  if (token) {
+    console.log(token);
+    return;
+  }
+
+  const request = await oauthClient.startAuth();
+  if (!request) throw new Error('Missing request');
+
+  console.log(request);
+
+  const searchParams = new URLSearchParams();
+  searchParams.set('code', request.code);
+  searchParams.set('client_id', clientId);
+  searchParams.set('grant_type', 'authorization_code');
+  searchParams.set('redirect_uri', request.redirectUri);
+  searchParams.set('code_verifier', request.codeVerifier);
+
+  const response = await fetch(`https://oauth2.googleapis.com/token`, {
+    method: 'POST',
+    body: searchParams,
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+  });
+  const body = await response.json();
+  console.log(JSON.stringify(body));
+
+  await oauthClient.setToken(body);
 }
 
 async function selectFile() {

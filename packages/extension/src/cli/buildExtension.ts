@@ -42,6 +42,7 @@ async function buildCommands(watch = false) {
   const config: InlineConfig = {
     mode: process.env.MODE ?? 'production',
     define: {
+      _extension: '_extension',
       'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
     },
     publicDir: './public',

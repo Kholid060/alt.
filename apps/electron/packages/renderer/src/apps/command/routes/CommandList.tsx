@@ -18,9 +18,9 @@ import {
   BlocksIcon,
   CpuIcon,
   FileCodeIcon,
-  KeyRoundIcon,
   SearchSlashIcon,
   SettingsIcon,
+  UserRoundIcon,
   WorkflowIcon,
 } from 'lucide-react';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
@@ -48,7 +48,7 @@ const dashboardPageCommands: CommandListItemCommandBuiltIn[] = (
   [
     { title: 'Extensions Page', icon: BlocksIcon, path: '/extensions' },
     { title: 'Workflows Page', icon: WorkflowIcon, path: '/workflows' },
-    { title: 'Credentials Page', icon: KeyRoundIcon, path: '/credentials' },
+    // { title: 'Credentials Page', icon: KeyRoundIcon, path: '/credentials' },
     { title: 'Settings Page', icon: SettingsIcon, path: '/settings' },
   ] as const
 ).map((page) => ({
@@ -232,6 +232,19 @@ function CommandList() {
     return { suggestionItems, commandItems, extensionItems };
   }, [extensionQuery]);
   const builtInCommands: CommandListItemCommandBuiltIn[] = [
+    {
+      group: 'Commands',
+      title: 'Connected Accounts',
+      value: 'connected-accounts',
+      subtitle: 'Utils',
+      icon: <UiList.Icon icon={UserRoundIcon} />,
+      onSelected() {
+        navigate('/connected-accounts');
+      },
+      metadata: {
+        type: 'builtin-command',
+      },
+    },
     {
       group: 'Commands',
       title: 'Workflows List',

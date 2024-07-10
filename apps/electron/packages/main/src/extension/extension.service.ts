@@ -255,7 +255,7 @@ export class ExtensionService implements OnAppReady {
         const windowCommand = await this.browserWindow.get('command');
         await windowCommand.toggleWindow(true);
         await windowCommand.sendMessage(
-          'command-command-window:open-json-view',
+          'command-window:open-json-view',
           {
             ...payload,
             runnerId,
@@ -279,7 +279,7 @@ export class ExtensionService implements OnAppReady {
       case 'view': {
         const windowCommand = await this.browserWindow.get('command');
         windowCommand.toggleWindow(true);
-        windowCommand.sendMessage('command-command-window:open-view', {
+        windowCommand.sendMessage('command-window:open-view', {
           ...payload,
           title: command.title,
           subtitle: command.extension.title,

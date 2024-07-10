@@ -41,6 +41,7 @@ import type {
   WorkflowHistoryUpdatePayload,
 } from '../workflow/workflow-history/workflow-history.interface';
 import type { ExtensionManifest } from '@altdot/extension';
+import { ExtensionOAuthTokensListItemModel } from '../extension/extension-oauth-tokens/extension-oauth-tokens.interface';
 
 export interface DatabaseQueriesEvent {
   'database:get-extension-exists-arr': (
@@ -87,6 +88,7 @@ export interface DatabaseQueriesEvent {
     filter?: WorkflowHistoryListPaginationFilter,
   ) => WorkflowHistoryListPaginationModel;
   'database:get-running-workflows': () => WorkflowHistoryRunningItemModel[];
+  'database:get-oauth-tokens-account-list': () => ExtensionOAuthTokensListItemModel[];
 }
 
 export interface DatabaseInsertEvents {
@@ -138,6 +140,7 @@ export interface DatabaseDeleteEvents {
   'database:delete-extension-command': (id: string) => void;
   'database:delete-extension-errors': (id: number[]) => void;
   'database:delete-extension-credential': (id: string) => void;
+  'database:delete-extension-oauth-token': (id: number) => void;
   'database:delete-workflow-history': (historyId: number | number[]) => void;
 }
 

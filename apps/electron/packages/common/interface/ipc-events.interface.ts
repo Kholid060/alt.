@@ -26,7 +26,6 @@ import type {
 import type Electron from 'electron';
 import type { MessagePortChannelIds } from './message-port-events.interface';
 import type { WorkflowRunnerRunPayload } from './workflow-runner.interace';
-import type { ExtensionCredential } from '@altdot/extension/dist/extension-manifest/manifest-credential';
 import type { WindowNames } from './window.interface';
 import type {
   AppMessagePortBridgeOptions,
@@ -42,6 +41,7 @@ import {
   WorkflowApiWithExtensions,
   WorkflowUpdatePayload,
 } from '../../main/src/workflow/workflow.interface';
+import { SelectExtension } from '../../main/src/db/schema/extension.schema';
 
 export interface IPCRendererInvokeEventPayload {
   name: string;
@@ -67,6 +67,19 @@ export interface IPCUserExtensionCustomEventsMap {
     selector: string,
     multiple?: boolean,
   ) => Promise<boolean | number[]>;
+  'oAuth.startAuth': (
+    provider: ExtensionAPI.OAuth.OAuthProvider,
+  ) => Promise<ExtensionAPI.OAuth.OAuthPKCERequest>;
+  'oAuth.getToken': (
+    provider: ExtensionAPI.OAuth.OAuthProvider,
+  ) => Promise<ExtensionAPI.OAuth.OAuthTokenStorageValue | null>;
+  'oAuth.removeToken': (
+    provider: ExtensionAPI.OAuth.OAuthProvider,
+  ) => Promise<void>;
+  'oAuth.setToken': (
+    provider: ExtensionAPI.OAuth.OAuthProvider,
+    token: ExtensionAPI.OAuth.OAuthToken,
+  ) => Promise<void>;
 }
 
 export type IPCUserExtensionEventsMap = FlatActionExtensionAPI &
@@ -239,12 +252,19 @@ export interface IPCSendEventMainToRenderer {
   'shared-window:stop-execute-workflow': [runnerId: string];
   'window:visibility-change': [isHidden: boolean];
   'app:update-route': [path: string, routeData?: unknown];
-  'command-command-window:open-json-view': [
+  'command-window:open-json-view': [
     executeCommandPayload: ExtensionCommandJSONViewData,
   ];
-  'command-command-window:open-view': [
-    executeCommandPayload: ExtensionCommandViewData,
+  'command-window:open-view': [executeCommandPayload: ExtensionCommandViewData];
+  'command-window:show-oauth-overlay': [
+    {
+      authUrl: string;
+      sessionId: string;
+      provider: ExtensionAPI.OAuth.OAuthProvider;
+      extension: Pick<SelectExtension, 'title' | 'icon' | 'id'>;
+    },
   ];
+  'command-window:oauth-success': [sessionId: string];
 }
 
 export interface IPCSendEventRendererToMain {
@@ -310,18 +330,7 @@ export type IPCRendererSendEvent = IPCSendEventRendererToRenderer &
   IPCSendEventMainToRenderer &
   IPCPostMessageEventMainToRenderer;
 
-export type IPCRendererInvokeEvent = IPCInvokeEventMainToRenderer & {
-  'command-window:show-oauth-overlay': (
-    credential: ExtensionCredential,
-    detail: {
-      commandId: string;
-      hasValue: boolean;
-      extensionId: string;
-      extensionTitle: string;
-      credentialName: string;
-    },
-  ) => Promise<boolean>;
-};
+export type IPCRendererInvokeEvent = IPCInvokeEventMainToRenderer;
 
 export type IPCSendPayload<T extends keyof IPCMainSendEvent> =
   IPCMainSendEvent[T];

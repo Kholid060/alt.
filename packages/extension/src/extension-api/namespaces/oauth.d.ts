@@ -1,12 +1,7 @@
-export declare namespace OAuth {
-  enum OAuthRedirect {
-    Web = 'web',
-    AppUrl = 'app-url',
-    DeepLink = 'deep-link',
-  }
+import { OAuthRedirect } from '../../constant/oauth.const';
 
-  interface OAuthPKCEClient {
-    type: 'pkce';
+export declare namespace OAuth {
+  interface OAuthPKCEClientOptions {
     scope: string;
     clientId: string;
     authorizeUrl: string;
@@ -15,15 +10,17 @@ export declare namespace OAuth {
   }
 
   interface OAuthProvider {
+    key: string;
     name: string;
     icon: string;
     description?: string;
-    client: OAuthPKCEClient;
     documentationUrl?: string;
+    client: OAuthPKCEClientOptions;
   }
 
   interface OAuthPKCERequest {
     code: string;
+    redirectUri: string;
     codeVerifier: string;
     codeChallenge: string;
   }
@@ -35,10 +32,26 @@ export declare namespace OAuth {
     refreshToken?: string;
   }
 
+  interface OAuthTokenResponse {
+    scope?: string;
+    expires_in?: number;
+    access_token: string;
+    refresh_token?: string;
+  }
+
+  interface OAuthTokenStorageValue extends OAuthToken {
+    expiresTimestamp: number;
+  }
+
+  abstract class OAuthPKCEClient {
+    abstract removeToken(): Promise<void>;
+    abstract startAuth(): Promise<OAuthPKCERequest>;
+    abstract getToken(): Promise<OAuthTokenStorageValue | null>;
+    abstract setToken(token: OAuthToken | OAuthTokenResponse): Promise<void>;
+  }
+
   interface Static {
-    removeTokens(key?: string | string[]): Promise<void>;
-    setToken(key: string, token: OAuthToken): Promise<void>;
-    startAuth(provider: OAuthProvider): Promise<OAuthPKCERequest | null>;
-    getTokens<T extends string>(key?: T): Promise<Record<T, OAuthToken | null>>;
+    // @ext-api-value
+    createPKCE(provider: OAuthProvider): OAuthPKCEClient;
   }
 }

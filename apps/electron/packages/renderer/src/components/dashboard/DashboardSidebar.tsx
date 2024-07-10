@@ -5,9 +5,9 @@ import {
   ExternalLinkIcon,
   HistoryIcon,
   InfoIcon,
-  KeyRoundIcon,
   LucideIcon,
   SettingsIcon,
+  UserRoundIcon,
   WorkflowIcon,
 } from 'lucide-react';
 import { useDashboardStore } from '/@/stores/dashboard.store';
@@ -23,6 +23,11 @@ const navigationItems: { title: string; path: string; icon: LucideIcon }[] = [
     title: 'Extensions',
   },
   {
+    icon: UserRoundIcon,
+    path: '/accounts',
+    title: 'Accounts',
+  },
+  {
     icon: WorkflowIcon,
     path: '/workflows',
     title: 'Workflows',
@@ -32,11 +37,11 @@ const navigationItems: { title: string; path: string; icon: LucideIcon }[] = [
     path: '/workflow-history',
     title: 'Workflow history',
   },
-  {
-    icon: KeyRoundIcon,
-    path: '/credentials',
-    title: 'Credentials',
-  },
+  // {
+  //   icon: KeyRoundIcon,
+  //   path: '/credentials',
+  //   title: 'Credentials',
+  // },
   {
     path: '/settings',
     title: 'Settings',

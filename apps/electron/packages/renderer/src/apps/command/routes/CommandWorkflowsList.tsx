@@ -43,6 +43,11 @@ function CommandWorkflowsList() {
       ) : (
         <UiList
           items={workflows.data}
+          noDataSlot={
+            <p className="my-4 text-center text-sm text-muted-foreground">
+              No workflows
+            </p>
+          }
           renderItem={({ ref, item, ...detail }) => (
             <ListItemWorkflow
               itemRef={ref}

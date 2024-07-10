@@ -1,164 +1,202 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
-import OAuthServer from './utils/OAuthServer';
-import { LoggerService } from '../logger/logger.service';
-import OAuth2Provider from './utils/OAuth2Provider';
-import { ExtensionAuthTokenService } from '../extension/extension-auth-token/extension-auth-token.service';
+import { Injectable } from '@nestjs/common';
 import { CustomError } from '#packages/common/errors/custom-errors';
 import { nanoid } from 'nanoid/non-secure';
-import { ExtensionCredentialService } from '../extension/extension-credential/extension-credential.service';
-import {
-  OAuth2CredentialValueSchema,
-  OAuth2Response,
-} from './oauth.validation';
-import { fromZodError } from 'zod-validation-error';
-import { OAUTH_CALLBACK_URL } from '#packages/common/utils/constant/constant';
+import crypto from 'crypto';
+import { OAuthRedirect, type ExtensionAPI } from '@altdot/extension';
+import { BrowserWindowService } from '../browser-window/browser-window.service';
+import { APP_DEEP_LINK_SCHEME, APP_USER_MODEL_ID } from '@altdot/shared';
+import { APP_DEEP_LINK_HOST } from '#packages/common/utils/constant/app.const';
+import { ConfigService } from '@nestjs/config';
+import { AppEnv } from '../common/validation/app-env.validation';
+import { SelectExtension } from '../db/schema/extension.schema';
+import { ExtensionOAuthTokensService } from '../extension/extension-oauth-tokens/extension-oauth-tokens.service';
+import dayjs from 'dayjs';
+
+const MAX_SESSION_AGE_MS = 15 * 60 * 1000; // 15 minutes
 
 @Injectable()
-export class OAuthService implements OnModuleInit {
-  private server = new OAuthServer();
+export class OAuthService {
   private authSessions = new Map<
     string,
     {
-      provider: OAuth2Provider;
-      resolver?: PromiseWithResolvers<OAuth2Response>;
+      createdAt: Date;
+      payload: Omit<ExtensionAPI.OAuth.OAuthPKCERequest, 'code'>;
+      resolver: PromiseWithResolvers<ExtensionAPI.OAuth.OAuthPKCERequest>;
     }
   >();
 
   constructor(
-    private logger: LoggerService,
-    private extensionAuthToken: ExtensionAuthTokenService,
-    private extensionCredential: ExtensionCredentialService,
+    private config: ConfigService<AppEnv, true>,
+    private browserWindow: BrowserWindowService,
+    private extensionOAuthToken: ExtensionOAuthTokensService,
   ) {}
 
-  onModuleInit() {
-    this.server.addListener('authorize-callback', async (url) => {
-      let resolver: undefined | PromiseWithResolvers<OAuth2Response>;
-
-      try {
-        const code = url.searchParams.get('code');
-        const state = url.searchParams.get('state');
-        const authSession = state && this.authSessions.get(state);
-
-        if (!code || !authSession) return;
-
-        resolver = authSession.resolver;
-
-        const token = await authSession.provider.exchangeCode(code);
-        const payload = {
-          scope: token.scope,
-          tokenType: token.token_type,
-          accessToken: token.access_token,
-          refreshToken: token.refresh_token,
-          expiresTimestamp: Date.now() + token.expires_in * 1000,
-        };
-
-        if (authSession.provider.credential.oauthTokenId) {
-          await this.extensionAuthToken.updateToken(
-            authSession.provider.credential.oauthTokenId,
-            payload,
-          );
-        } else {
-          await this.extensionAuthToken.insertToken({
-            ...payload,
-            credentialId: authSession.provider.credential.id,
-          });
-        }
-
-        resolver?.resolve(token);
-      } catch (error) {
-        this.logger.error(['OAuthService', 'authorize-callback'], error);
-
-        resolver?.reject(error);
+  private clearExpSession() {
+    const currTime = new Date().getTime();
+    this.authSessions.forEach((value, key) => {
+      if (currTime - value.createdAt.getTime() >= MAX_SESSION_AGE_MS) {
+        value.resolver.reject(new Error('EXPIRED'));
+        // eslint-disable-next-line drizzle/enforce-delete-with-where
+        this.authSessions.delete(key);
       }
     });
   }
 
-  async getProvider(
-    credentialId: string | { providerId: string; extensionId: string },
-  ) {
-    const credential =
-      await this.extensionCredential.getCredentialDetail(credentialId);
-    if (!credential) {
-      throw new CustomError(
-        "Couldn't find the credential. Make sure the credential has been inputted",
-      );
-    }
+  async resolveAuthSession(url: string | URL) {
+    const urlObj = typeof url === 'string' ? new URL(url) : url;
+    const sessionId = urlObj.searchParams.get('state');
+    if (!sessionId) return;
 
-    const provider = credential.extension?.credentials?.find(
-      (provider) => provider.providerId === credential.providerId,
-    );
-    if (!provider) {
-      throw new CustomError("Couldn't find the credential provider.");
-    }
+    const session = this.authSessions.get(sessionId);
+    if (!session) return null;
 
-    const credentialValue = await OAuth2CredentialValueSchema.safeParseAsync(
-      credential.value,
-    );
-    if (!credentialValue.success) {
-      throw new CustomError(fromZodError(credentialValue.error).message);
-    }
-
-    const oauth2Provider = new OAuth2Provider({
-      ...credentialValue.data,
-      provider,
-      callbackURL: OAUTH_CALLBACK_URL,
-      credential: {
-        id: credential.id,
-        oauthTokenId: credential.oauthToken?.id ?? null,
-      },
+    const { payload, resolver } = session;
+    resolver.resolve({
+      ...payload,
+      code: urlObj.searchParams.get('code')!,
     });
 
-    return oauth2Provider;
+    // eslint-disable-next-line drizzle/enforce-delete-with-where
+    this.authSessions.delete(sessionId);
+
+    const windowCommand = await this.browserWindow.get('command');
+    await windowCommand.toggleWindow(true);
+    windowCommand.sendMessage('command-window:oauth-success', sessionId);
   }
 
-  async startAuth(credentialId: string, waitAuth?: false): Promise<void>;
-  async startAuth(
-    credentialId: string,
-    waitAuth?: true,
-  ): Promise<OAuth2Response>;
-  async startAuth(credentialId: string, waitAuth = false): Promise<unknown> {
-    const oauth2Provider = await this.getProvider(credentialId);
-    const sessionId = nanoid(8);
+  generateAuth(
+    sessionId: string,
+    client: ExtensionAPI.OAuth.OAuthProvider['client'],
+  ) {
+    const codeVerifier = nanoid(64);
+    const codeChallenge = crypto
+      .createHash('SHA256')
+      .update(codeVerifier)
+      .digest('base64url');
 
-    const resolver = waitAuth
-      ? Promise.withResolvers<OAuth2Response>()
-      : undefined;
+    const url = new URL(client.authorizeUrl);
+    if (client.extraParams) {
+      Object.keys(client.extraParams).forEach((key) => {
+        url.searchParams.set(key, client.extraParams![key]);
+      });
+    }
 
+    url.searchParams.set('response_type', 'code');
+    url.searchParams.set('code_challenge_method', 'S256');
+    url.searchParams.set('scope', client.scope);
+    url.searchParams.set('code_challenge', codeChallenge);
+    url.searchParams.set('client_id', client.clientId);
+    url.searchParams.set('state', sessionId);
+
+    let redirectUri = '';
+    switch (client.redirectMethod || OAuthRedirect.Web) {
+      case OAuthRedirect.AppUrl:
+        redirectUri = `${APP_USER_MODEL_ID}:/oauth2callback`;
+        break;
+      case OAuthRedirect.DeepLink:
+        redirectUri = `${APP_DEEP_LINK_SCHEME}://${APP_DEEP_LINK_HOST.oauth}/redirect`;
+        break;
+      case OAuthRedirect.Web:
+        redirectUri = new URL(
+          '/oauth2/extension/redirect',
+          this.config.get('VITE_WEB_BASE_URL'),
+        ).href;
+        break;
+      default:
+        throw new CustomError('Invalid OAuth redirect method');
+    }
+    url.searchParams.set('redirect_uri', redirectUri);
+
+    return { url, codeVerifier, codeChallenge, redirectUri };
+  }
+
+  async startAuthOverlay(
+    provider: ExtensionAPI.OAuth.OAuthProvider,
+    extension: Pick<SelectExtension, 'title' | 'icon' | 'id'>,
+  ) {
+    this.clearExpSession();
+
+    const windowCommand = await this.browserWindow.get('command');
+    await windowCommand.toggleWindow(true);
+
+    const sessionId = nanoid();
+    const { codeChallenge, codeVerifier, url, redirectUri } = this.generateAuth(
+      sessionId,
+      provider.client,
+    );
+
+    const resolver =
+      Promise.withResolvers<ExtensionAPI.OAuth.OAuthPKCERequest>();
     this.authSessions.set(sessionId, {
       resolver,
-      provider: oauth2Provider,
+      createdAt: new Date(),
+      payload: { codeChallenge, codeVerifier, redirectUri },
     });
 
-    this.server.start();
-    oauth2Provider.startAuth(sessionId);
+    windowCommand.sendMessage('command-window:show-oauth-overlay', {
+      provider,
+      sessionId,
+      extension,
+      authUrl: url.href,
+    });
 
-    return resolver?.promise;
+    return resolver.promise;
   }
 
-  async refreshAccessToken(extensionId: string, providerId: string) {
-    const oauthProvider = await this.getProvider({ extensionId, providerId });
-    if (typeof oauthProvider.credential.oauthTokenId !== 'number') {
-      throw new CustomError('No account connected to this app');
-    }
-
-    const oauthToken = await this.extensionAuthToken.getToken(
-      oauthProvider.credential.oauthTokenId,
-    );
-    if (!oauthToken?.refreshToken) {
-      throw new CustomError("This app doesn't have refresh token");
-    }
-
-    const token = await oauthProvider.refreshAccessToken(
-      oauthToken.refreshToken,
-    );
-    await this.extensionAuthToken.updateToken(oauthToken.id, {
-      scope: token.scope,
-      tokenType: token.token_type,
-      accessToken: token.access_token,
-      refreshToken: token.refresh_token,
-      expiresTimestamp: Date.now() + token.expires_in * 1000,
+  async getExtensionToken(
+    extensionId: string,
+    { client, key }: ExtensionAPI.OAuth.OAuthProvider,
+  ): Promise<ExtensionAPI.OAuth.OAuthTokenStorageValue | null> {
+    const token = await this.extensionOAuthToken.get({
+      key,
+      extensionId,
+      clientId: client.clientId,
     });
+    if (!token) return null;
 
-    return token;
+    return {
+      accessToken: token.accessToken,
+      scope: token.scope ?? undefined,
+      refreshToken: token.refreshToken,
+      expiresTimestamp: token.expiresTimestamp ?? 0,
+      expiresIn: token.expiresTimestamp
+        ? Math.max(
+            0,
+            new Date(token.expiresTimestamp).getTime() - new Date().getTime(),
+          ) / 1000
+        : 0,
+    };
+  }
+
+  async setExtensionToken(
+    {
+      key,
+      icon,
+      name,
+      client,
+      extensionId,
+    }: ExtensionAPI.OAuth.OAuthProvider & {
+      extensionId: string;
+    },
+    payload: ExtensionAPI.OAuth.OAuthToken,
+  ) {
+    await this.extensionOAuthToken.upsert(
+      {
+        key,
+        extensionId,
+        clientId: client.clientId,
+      },
+      {
+        ...payload,
+        key,
+        extensionId,
+        providerIcon: icon,
+        providerName: name,
+        clientId: client.clientId,
+        expiresTimestamp: payload.expiresIn
+          ? dayjs().add(payload.expiresIn, 'second').valueOf()
+          : null,
+      },
+    );
   }
 }
