@@ -13,6 +13,7 @@ import { fromZodError } from 'zod-validation-error';
 import imageSize from 'image-size';
 import { glob } from 'glob';
 import { z } from 'zod';
+import { bundleRequire } from 'bundle-require';
 import { errorMap } from 'zod-validation-error';
 
 export type PackageJson = PackageJsonType & ExtensionManifest;
@@ -86,8 +87,10 @@ class ManifestUtils {
     if (isJSON) {
       manifestObject = await fs.readJSON(manifestFilePath);
     } else {
-      const script = await import(`file://${manifestFilePath}`);
-      manifestObject = script.default ?? null;
+      const script = await bundleRequire({
+        filepath: manifestFilePath,
+      });
+      manifestObject = script.mod.default ?? null;
     }
 
     return manifestObject;

@@ -1,12 +1,9 @@
 import { UiSwitch, useUiList } from '@altdot/ui';
-import {
-  UiListSelectedItem,
-  useUiListStore,
-} from '@altdot/ui/dist/context/list.context';
+import { UiListSelectedItem, useUiListStore } from '@altdot/ui';
 import { ArrowLeftIcon, ChevronDownIcon, SearchIcon } from 'lucide-react';
 import { forwardRef, useRef, useEffect, useCallback, useContext } from 'react';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
-import { ExtensionCommandArgument } from '@altdot/extension';
+import { ExtensionCommandArgument } from '@altdot/extension/dist/extension-manifest';
 import { useCommandStore } from '/@/stores/command.store';
 import { CommandListItems } from '/@/interface/command.interface';
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
@@ -57,6 +54,8 @@ const CommandInputArguments = forwardRef<
       selectedCommand?.command.arguments ?? [],
     );
   }, [selectedCommand, onArgumentsChange, setCommandArgs]);
+
+  if (!selectedItem.id) return null;
 
   return (
     <div

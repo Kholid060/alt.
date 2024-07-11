@@ -254,16 +254,13 @@ export class ExtensionService implements OnAppReady {
 
         const windowCommand = await this.browserWindow.get('command');
         await windowCommand.toggleWindow(true);
-        await windowCommand.sendMessage(
-          'command-window:open-json-view',
-          {
-            ...payload,
-            runnerId,
-            title: command.title,
-            subtitle: command.extension.title,
-            icon: command.icon || command.extension.icon,
-          },
-        );
+        await windowCommand.sendMessage('command-window:open-json-view', {
+          ...payload,
+          runnerId,
+          title: command.title,
+          subtitle: command.extension.title,
+          icon: command.icon || command.extension.icon,
+        });
 
         return runnerId;
       }

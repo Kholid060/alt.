@@ -34,7 +34,7 @@ import {
 import {
   UiListProvider,
   useUiListStore,
-} from '@altdot/ui/dist/context/list.context';
+} from '@altdot/ui';
 import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
 import { ExtensionCredential } from '@altdot/extension/dist/extension-manifest/manifest-credential';
 import CredentialDetail from '/@/components/credential/CredentialDetail';

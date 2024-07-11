@@ -365,6 +365,9 @@ function CommandList() {
     useCommandStore.getState().setCommandAliases(aliases);
   }, [extensionQuery]);
 
+  if (extensionQuery.state !== 'idle' || workflowQuery.state !== 'idle')
+    return null;
+
   return (
     <UiList
       className="p-2"

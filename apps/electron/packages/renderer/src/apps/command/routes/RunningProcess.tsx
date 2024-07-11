@@ -5,7 +5,7 @@ import { useCommandPanelHeader } from '/@/hooks/useCommandPanelHeader';
 import { useEffect, useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '#packages/common/utils/helper';
-import { useUiListStore } from '@altdot/ui/dist/context/list.context';
+import { useUiListStore } from '@altdot/ui';
 import { ExtensionCommandProcess } from '#packages/common/interface/extension.interface';
 import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
 import { SetRequired } from 'type-fest';

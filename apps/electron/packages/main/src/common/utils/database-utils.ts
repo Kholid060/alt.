@@ -1,7 +1,7 @@
 import type {
   ExtensionCommand,
   ExtensionManifest,
-} from '@altdot/extension';
+} from '@altdot/extension/dist/extension-manifest';
 import type { SQL } from 'drizzle-orm';
 import { getTableColumns, sql } from 'drizzle-orm';
 import type { SQLiteSelect, SQLiteTable } from 'drizzle-orm/sqlite-core';

@@ -19,8 +19,8 @@ import { EXTENSION_FOLDER } from '/@/common/utils/constant';
 
 export class ExtensionUpdater {
   constructor(
-    readonly db: SQLiteDatabase,
-    readonly payload: ExtensionUpdaterPayload,
+    private readonly db: SQLiteDatabase,
+    private readonly payload: ExtensionUpdaterPayload,
   ) {}
 
   async startUpdate() {
@@ -38,6 +38,8 @@ export class ExtensionUpdater {
       payload = this.payload.extension;
     } else {
       payload = mapManifestToDB.extension(this.payload.manifest);
+      payload.isError = false;
+      payload.errorMessage = '';
     }
 
     if (!payload) return;

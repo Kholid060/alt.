@@ -9,7 +9,7 @@ import UiExtensionIcon from '../ui/UiExtensionIcon';
 import { UiButton, UiLogo } from '@altdot/ui';
 import { IPCSendEventMainToRenderer } from '#packages/common/interface/ipc-events.interface';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
-import { useUiListStore } from '@altdot/ui/dist/context/list.context';
+import { useUiListStore } from '@altdot/ui';
 
 function CommandOAuthOverlay() {
   const uiListStore = useUiListStore();

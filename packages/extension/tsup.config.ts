@@ -1,5 +1,5 @@
 import { builtinModules } from 'module';
-import { defineConfig } from 'tsup';
+import { defineConfig, Options } from 'tsup';
 import path from 'path';
 import fs from 'fs-extra';
 
@@ -16,47 +16,64 @@ const externalDeps = [
   'vite-plugin-resolve',
   'glob',
   'semver',
+  'bundle-require',
   ...builtinModules,
 ];
 
+const baseConfig: Options = {
+  splitting: true,
+  env: {
+    NODE_ENV: 'production',
+  },
+  publicDir: './public',
+  entry: {
+    cli: './src/cli/index.ts',
+  },
+  outDir: 'dist',
+  noExternal: ['@altdot/shared'],
+  minify: true,
+  external: externalDeps,
+  clean: false,
+  esbuildOptions(options) {
+    options.outbase = './src';
+  },
+};
+
 export default defineConfig([
   {
-    treeshake: true,
-    splitting: true,
-    env: {
-      NODE_ENV: 'production',
-    },
-    publicDir: './public',
+    ...baseConfig,
+    minify: false,
+    outDir: 'dist',
     entry: {
       cli: './src/cli/index.ts',
     },
     format: ['cjs'],
-    noExternal: ['@altdot/shared'],
-    minify: true,
-    external: externalDeps,
-    clean: false,
-    esbuildOptions(options) {
-      options.outbase = './src';
-    },
   },
   {
+    ...baseConfig,
+    entry: {
+      'extension-manifest/index': './src/extension-manifest/index.ts',
+    },
+    format: ['esm'],
+  },
+  {
+    ...baseConfig,
     splitting: true,
     sourcemap: true,
+    treeshake: true,
+    publicDir: './public',
     env: {
       NODE_ENV: 'production',
     },
-    entry: {
-      index: './src/index.ts',
-    },
-    bundle: true,
-    clean: false,
+    entry: [
+      'src/index.ts',
+      'src/constant/**/*@(ts|tsx)',
+      'src/interfaces/**/*@(ts|tsx)',
+      'src/components/**/*@(ts|tsx)',
+      'src/extension-api/**/*@(ts|tsx)',
+    ],
     minify: true,
     format: ['esm'],
-    outDir: 'dist',
-    external: externalDeps,
-    esbuildOptions(options) {
-      options.outbase = './src';
-    },
     async onSuccess() {
       await fs.copy(
         path.join(__dirname, 'src/extension-api'),

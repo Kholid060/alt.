@@ -3,7 +3,7 @@ import { DBService } from '../db/db.service';
 import { app, dialog } from 'electron';
 import { extensionCommands } from '../db/schema/extension.schema';
 import { eq } from 'drizzle-orm';
-import { ExtensionCommandArgument } from '@altdot/extension';
+import { ExtensionCommandArgument } from '@altdot/extension/dist/extension-manifest';
 import {
   APP_DEEP_LINK_SCHEME,
   APP_USER_MODEL_ID,

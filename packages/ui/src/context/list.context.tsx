@@ -179,7 +179,7 @@ export function UiListProvider({ children }: { children: React.ReactNode }) {
         }
       },
     }),
-    [],
+    [listeners, state],
   );
 
   useEffect(() => {
@@ -198,7 +198,7 @@ export function UiListProvider({ children }: { children: React.ReactNode }) {
       };
       listenersList.clear();
     };
-  }, []);
+  }, [listeners, state]);
 
   return (
     <UiListStoreContext.Provider value={{ ...store, listController }}>

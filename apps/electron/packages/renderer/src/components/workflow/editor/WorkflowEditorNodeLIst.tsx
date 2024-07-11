@@ -10,7 +10,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { SearchIcon } from 'lucide-react';
-import { UiListProvider } from '@altdot/ui/dist/context/list.context';
+import { UiListProvider } from '@altdot/ui';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import UiExtensionIcon from '../../ui/UiExtensionIcon';
 import { Connection, useReactFlow } from 'reactflow';

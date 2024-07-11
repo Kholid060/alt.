@@ -7,7 +7,6 @@ import {
   InfoIcon,
   LucideIcon,
   SettingsIcon,
-  UserRoundIcon,
   WorkflowIcon,
 } from 'lucide-react';
 import { useDashboardStore } from '/@/stores/dashboard.store';
@@ -21,11 +20,6 @@ const navigationItems: { title: string; path: string; icon: LucideIcon }[] = [
     icon: BlocksIcon,
     path: '/extensions',
     title: 'Extensions',
-  },
-  {
-    icon: UserRoundIcon,
-    path: '/accounts',
-    title: 'Accounts',
   },
   {
     icon: WorkflowIcon,

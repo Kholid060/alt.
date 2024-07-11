@@ -4,7 +4,7 @@ import { LogOutIcon, UserRoundIcon } from 'lucide-react';
 import { useCommandPanelHeader } from '/@/hooks/useCommandPanelHeader';
 import { useEffect } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
-import { useUiListStore } from '@altdot/ui/dist/context/list.context';
+import { useUiListStore } from '@altdot/ui';
 import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
 import { SetRequired } from 'type-fest';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';

@@ -349,7 +349,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
           setSelectedItem(prevItem);
         },
       };
-    }, [filteredItems, onItemSelected]);
+    }, [filteredItems, listStore, onItemSelected]);
 
     useImperativeHandle(ref, () => ({ controller, el: containerRef }), [
       controller,
@@ -374,7 +374,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
           true,
         );
       },
-      [onItemSelected],
+      [disabledItemSelection, listStore],
     );
     const onItemClick = useCallback(
       (item: UiListItem) => {
@@ -393,7 +393,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
       return () => {
         listStore.setController(null);
       };
-    }, [filteredItems, disabledItemSelection, controller]);
+    }, [filteredItems, disabledItemSelection, controller, listStore]);
     useEffect(() => {
       return () => {
         listStore.setSelectedItem({
@@ -404,7 +404,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
           actionIndex: -1,
         });
       };
-    }, []);
+    }, [listStore]);
 
     return (
       <div ref={containerRef} {...props}>
@@ -552,6 +552,8 @@ function UiListItemActions({ actions }: { actions: UiListItemAction[] }) {
     setOpenTooltip(actionIndex);
   }, [actionIndex]);
   useEffect(() => {
+    if (!actions || actions.length === 0) return;
+
     listStore.setSelectedItem(
       {
         actions: actions.map((action) => ({
@@ -562,7 +564,7 @@ function UiListItemActions({ actions }: { actions: UiListItemAction[] }) {
       },
       false,
     );
-  }, [actions]);
+  }, [actions, listStore]);
 
   return (
     <div className="flex items-center absolute rounded-sm top-0 h-full right-0 pr-2 pl-6 pointer-events-none bg-gradient-to-tl from-40% from-card to-100% to-transparent">
@@ -750,11 +752,9 @@ const UiListInput = forwardRef<
 });
 UiListInput.displayName = 'ExtCommandListIcon';
 
-const UiList = Object.assign(UiListRoot, {
+export const UiList = Object.assign(UiListRoot, {
   Icon: UiListIcon,
   Item: UiListItem,
   Input: UiListInput,
   GroupHeading: UiListGroupHeading,
 });
-
-export default UiList;

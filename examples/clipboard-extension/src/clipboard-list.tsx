@@ -1,10 +1,10 @@
 import dayjs from 'dayjs';
 import { ChangeEvent, useEffect, useState } from 'react';
-import { UiList, commandRenderer, Extension, UiImage, UiInput, UiListItem, UiExtIcon, _extension } from '@altdot/extension';
+import { UiList, commandRenderer, UiImage, UiInput, UiListItem, UiExtIcon, _extension } from '@altdot/extension';
 import ItemList from './components/ItemList';
 
 function CommandMain() {
-  const [apps, setApps] = useState<Extension.shell.installedApps.AppDetail[]>([]);
+  const [apps, setApps] = useState<_extension.Shell.InstalledApps.AppDetail[]>([]);
 
   const toast = _extension.ui.createToast({
     title: 'Toast',
@@ -32,7 +32,7 @@ function CommandMain() {
       value: 'testing',
       async onSelected() {
         const inputEl = await _extension.browser.activeTab.findElement('input');
-        await inputEl.type('hello');
+        await inputEl?.type('hello');
       }
     },
     {

@@ -1,7 +1,11 @@
-import extViewRenderer from './utils/extViewRenderer';
+import { UiIcons } from '@altdot/ui';
 import { BetterMessagePort } from '@altdot/shared';
-import type { ExtensionMessagePortEvent } from '@altdot/extension/dist/interfaces/message-events';
+import extViewRenderer from './utils/extViewRenderer';
+import { ExtensionMessagePortEvent } from '@altdot/extension';
 import type { ExtensionCommandViewInitMessage } from '#common/interface/extension.interface';
+
+// @ts-expect-error icons for the extension
+window.$UiExtIcons = UiIcons;
 
 async function onMessage({
   ports,
@@ -18,7 +22,6 @@ async function onMessage({
         'sync',
         port,
       );
-
     await extViewRenderer(
       { launchContext: data.payload.launchContext, messagePort },
       data.themeStyle,

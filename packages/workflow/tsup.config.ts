@@ -2,13 +2,13 @@ import { defineConfig, Options } from 'tsup';
 
 export default defineConfig((options: Options) => [
   {
+    treeshake: true,
     sourcemap: Boolean(options.watch),
-    entry: ['./src/index.ts'],
+    entry: ['./src/**/*@(ts|tsx)'],
     dts: true,
     clean: true,
     format: ['esm'],
     outDir: 'dist',
-    minify: !options.watch,
     esbuildOptions(options) {
       options.outbase = './src';
     },

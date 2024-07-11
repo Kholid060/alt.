@@ -6,7 +6,7 @@ import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '#packages/common/utils/helper';
-import { useUiListStore } from '@altdot/ui/dist/context/list.context';
+import { useUiListStore } from '@altdot/ui';
 
 type CommandItem = UiListItem<{
   commandId: string;

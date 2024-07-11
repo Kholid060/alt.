@@ -1,4 +1,3 @@
-import { UiScrollArea } from '@altdot/ui';
 import { useEffect, useRef } from 'react';
 import { CommandRouteOutlet } from '../../context/command-route.context';
 
@@ -30,10 +29,9 @@ function CommandContent() {
 
   return (
     <>
-      <UiScrollArea
+      <div
         ref={containerRef}
-        type="always"
-        className="max-h-80 min-h-48"
+        className="custom-scroller max-h-80 min-h-48 overflow-auto"
         style={{
           height: 'var(--ui-list-height)',
           transition: 'height 250ms ease',
@@ -42,7 +40,7 @@ function CommandContent() {
         <div ref={resizerContainerRef} className="h-full">
           <CommandRouteOutlet />
         </div>
-      </UiScrollArea>
+      </div>
     </>
   );
 }

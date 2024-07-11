@@ -10,7 +10,7 @@ import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandStore } from '/@/stores/command.store';
 import { useShallow } from 'zustand/react/shallow';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
-import { useUiListStore } from '@altdot/ui/dist/context/list.context';
+import { useUiListStore } from '@altdot/ui';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import { ExtensionErrorListItemModel } from '#packages/main/src/extension/extension-error/extension-error.interface';
 

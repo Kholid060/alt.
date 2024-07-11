@@ -2,15 +2,12 @@ import { node } from '../../.electron-vendors.cache.json';
 import { join } from 'node:path';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { swcPlugin } from '../../plugins/swc';
+import { UserConfig } from 'vite';
 
 const PACKAGE_ROOT = __dirname;
 const PROJECT_ROOT = join(PACKAGE_ROOT, '../..');
 
-/**
- * @type {import('vite').UserConfig}
- * @see https://vitejs.dev/config/
- */
-const config = {
+const config: UserConfig = {
   mode: process.env.MODE,
   root: PACKAGE_ROOT,
   envDir: PROJECT_ROOT,
@@ -23,7 +20,7 @@ const config = {
   },
   build: {
     ssr: true,
-    sourcemap: 'inline',
+    sourcemap: process.env.MODE === 'development',
     target: `node${node}`,
     outDir: 'dist',
     assetsDir: '.',
@@ -38,6 +35,7 @@ const config = {
       output: {
         entryFileNames: '[name].js',
       },
+      treeshake: 'smallest',
       external: ['@altdot/native', 'original-fs'],
     },
     emptyOutDir: true,

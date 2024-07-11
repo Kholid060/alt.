@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import type { ExtensionManifest } from '@altdot/extension';
-import { ExtensionManifestSchema } from '@altdot/extension';
+import { ExtensionManifestSchema } from '@altdot/extension/dist/extension-manifest';
 import { fromZodError } from 'zod-validation-error';
 import validateSemver from 'semver/functions/valid';
 import { parseJSON } from '@altdot/shared';

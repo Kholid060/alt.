@@ -30,3 +30,16 @@
     scrollbar-width: none; /* Firefox */
   }
 }
+
+.custom-scroller::-webkit-scrollbar-track {
+	border-radius: 6px;
+}
+
+.custom-scroller::-webkit-scrollbar {
+	width: 8px;
+}
+
+.custom-scroller::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+	background-color: theme('colors.border');
+}

@@ -6,6 +6,7 @@ import updater from 'electron-updater';
 import log from 'electron-log/main';
 import './common/utils/security-restrictions';
 import { APP_USER_MODEL_ID } from '@altdot/shared';
+import { devtoolsExtInstaller } from './common/utils/devtools-ext-installer';
 
 async function bootstrap() {
   app.setAppUserModelId(APP_USER_MODEL_ID);
@@ -71,23 +72,7 @@ bootstrap().catch((error) => {
 });
 
 /**
- * Install Vue.js or any other extension in development mode only.
- * Note: You must install `electron-devtools-installer` manually
+ * Install React or any other extension in development mode only.
+ * Note: You must install the extension in Google Chrome first
  */
-// if (import.meta.env.DEV) {
-//   app
-//     .whenReady()
-//     .then(() => import('electron-devtools-installer'))
-//     .then(module => {
-//       const {default: installExtension, VUEJS3_DEVTOOLS} =
-//         // @ts-expect-error Hotfix for https://github.com/cawa-93/vite-electron-builder/issues/915
-//         typeof module.default === 'function' ? module : (module.default as typeof module);
-//
-//       return installExtension(VUEJS3_DEVTOOLS, {
-//         loadExtensionOptions: {
-//           allowFileAccess: true,
-//         },
-//       });
-//     })
-//     .catch(e => console.error('Failed install extension:', e));
-// }
+devtoolsExtInstaller();

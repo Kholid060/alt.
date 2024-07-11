@@ -1,9 +1,8 @@
-import { UiButton, UiTooltipProvider } from '@altdot/ui';
+import { UiButton, UiTooltipProvider, UiListProvider } from '@altdot/ui';
 import CommandHeader from '/@/components/command/CommandHeader';
 import CommandFooter from '/@/components/command/CommandFooter';
 import CommandContent from '/@/components/command/CommandContent';
 import { CommandCtxProvider } from '/@/context/command.context';
-import { UiListProvider } from '@altdot/ui/dist/context/list.context';
 import {
   CommandRouteProvider,
   createCommandRoutes,

@@ -1,4 +1,4 @@
-import { useUiListStore } from '@altdot/ui/dist/context/list.context';
+import { useUiListStore } from '@altdot/ui';
 import { BetterMessagePortSync } from '@altdot/shared';
 import { createContext, useEffect, useState } from 'react';
 import {

@@ -1,8 +1,6 @@
 {
   "name": "clipboard-extension",
   "author": "kholid060",
-  "type": "module",
-  "sideEffects": false,
   "version": "1.0.0",
   "description": "Clipboard extension",
   "license": "MIT",
@@ -15,6 +13,7 @@
     "@types/react": "^18.2.66",
     "typescript": "catalog:"
   },
+  "type": "module",
   "dependencies": {
     "dayjs": "^1.11.10",
     "mathjs": "^12.4.1",

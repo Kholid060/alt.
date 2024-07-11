@@ -33,6 +33,7 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "prettier": "^3.2.5",
+    "rollup-plugin-pure": "^0.2.1",
     "tsup": "^8.0.2",
     "typescript": "catalog:"
   }

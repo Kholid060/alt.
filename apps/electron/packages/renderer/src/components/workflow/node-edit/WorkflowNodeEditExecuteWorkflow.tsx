@@ -9,7 +9,7 @@ import { useEffect, useMemo } from 'react';
 import {
   UiListProvider,
   useUiListStore,
-} from '@altdot/ui/dist/context/list.context';
+} from '@altdot/ui';
 
 function WorkflowCombobox({
   data,
