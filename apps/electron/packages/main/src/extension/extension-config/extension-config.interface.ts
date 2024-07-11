@@ -1,6 +1,6 @@
 import { ExtensionConfigType } from '@altdot/shared';
 import { SelectExtensionConfig } from '../../db/schema/extension.schema';
-import { ExtensionConfig } from '@altdot/extension';
+import { ExtensionConfig } from '@altdot/extension/dist/extension-manifest';
 
 export type ExtensionConfigValue = Record<
   string,

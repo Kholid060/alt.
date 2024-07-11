@@ -37,6 +37,7 @@ export interface WorkflowEmitEvents {
 export interface WorkflowRunPayload {
   id: string;
   maxStep?: number;
+  customElement?: WorkflowElement;
   startNodeId: typeof WORKFLOW_MANUAL_TRIGGER_ID | string;
   emitEvents?: Partial<Record<keyof WorkflowEmitEvents, boolean>>;
 }

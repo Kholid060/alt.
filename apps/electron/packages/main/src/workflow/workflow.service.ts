@@ -119,6 +119,11 @@ export class WorkflowService implements OnAppReady {
 
     await this.workflowQuery.incrementExecuteCount(payload.id);
 
+    if (payload.customElement) {
+      workflow.nodes = payload.customElement.nodes;
+      workflow.edges = payload.customElement.edges;
+    }
+
     const windowSharedProcess = await this.browserWindow.get('shared-process');
     return windowSharedProcess.invoke(
       { name: 'shared-window:execute-workflow', ensureWindow: true },

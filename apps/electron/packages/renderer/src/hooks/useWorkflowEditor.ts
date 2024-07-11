@@ -111,11 +111,15 @@ export function useWorkflowEditor() {
     maxStep,
     emitEvents,
     startNodeId,
+    ...rest
   }: Partial<
-    Pick<WorkflowRunPayload, 'maxStep' | 'emitEvents' | 'startNodeId'>
+    Pick<
+      WorkflowRunPayload,
+      'maxStep' | 'emitEvents' | 'startNodeId' | 'customElement'
+    >
   > = {}) {
     const { workflow } = useWorkflowEditorStore.getState();
-    if (!workflow) return;
+    if (!workflow) return null;
 
     const manualTriggerNode = !startNodeId
       ? workflow.nodes.find((node) => node.type === WORKFLOW_NODE_TYPE.TRIGGER)
@@ -126,16 +130,17 @@ export function useWorkflowEditor() {
         title: "Couldn't find a Manual Trigger node",
         description: 'Add a Manual Trigger node to run the workflow manually',
       });
-      return;
+      return null;
     }
 
-    preloadAPI.main.ipc
+    return preloadAPI.main.ipc
       .invoke('workflow:execute', {
         maxStep,
         emitEvents,
         id: workflow.id,
         startNodeId:
           startNodeId || (manualTriggerNode?.id ?? WORKFLOW_MANUAL_TRIGGER_ID),
+        ...rest,
       })
       .catch((error) => {
         console.error(error);
@@ -144,6 +149,8 @@ export function useWorkflowEditor() {
           title: 'Something went wrong!',
           description: `Something went wrong when running the "${workflow.name}" workfow`,
         });
+
+        return null;
       });
   }
 

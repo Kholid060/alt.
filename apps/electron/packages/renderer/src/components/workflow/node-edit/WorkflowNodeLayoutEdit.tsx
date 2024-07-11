@@ -9,6 +9,7 @@ import {
   UiSelect,
   UiLabel,
   UiButton,
+  useToast,
 } from '@altdot/ui';
 import WorkflowNodeSettings from './WorkflowNodeSettings';
 import { WorkflowNodes } from '@altdot/workflow';
@@ -21,6 +22,7 @@ import { useWorkflowEditorStore } from '/@/stores/workflow-editor/workflow-edito
 import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 import { Loader2Icon, TriangleAlertIcon } from 'lucide-react';
+import { isIPCEventError } from '#packages/common/utils/helper';
 
 function NodeId({ nodeId }: { nodeId: string }) {
   const [copied, setCopied] = useState(false);
@@ -99,6 +101,11 @@ function findPrevNodes(
   return prevNodes;
 }
 function NodeExecution({ node }: { node: WorkflowNodes }) {
+  const workflowDisabled = useWorkflowEditorStore((state) =>
+    Boolean(state.workflow?.isDisabled),
+  );
+
+  const { toast } = useToast();
   const { runCurrentWorkflow } = useWorkflowEditor();
 
   const [nodeId, setNodeId] = useState(node.id);
@@ -110,8 +117,38 @@ function NodeExecution({ node }: { node: WorkflowNodes }) {
     >
   >({});
 
-  function executeNode() {
+  async function executeNode() {
     if (!nodeId) return;
+
+    if (workflowDisabled) {
+      toast({
+        variant: 'destructive',
+        title: 'Workflow disabled',
+      });
+      return;
+    }
+
+    const result = await runCurrentWorkflow({
+      emitEvents: {
+        'node:execute-error': true,
+        'node:execute-finish': true,
+      },
+      maxStep: 1,
+      customElement: {
+        edges: [],
+        nodes: [node],
+      },
+      startNodeId: nodeId,
+    });
+    if (isIPCEventError(result)) {
+      toast({
+        variant: 'destructive',
+        description: result.message,
+        title: 'Error when executing node',
+      });
+      return;
+    }
+    if (!result) return;
 
     setOutputs({
       ...outputs,
@@ -120,14 +157,6 @@ function NodeExecution({ node }: { node: WorkflowNodes }) {
         output: '',
         isLoading: true,
       },
-    });
-    runCurrentWorkflow({
-      emitEvents: {
-        'node:execute-error': true,
-        'node:execute-finish': true,
-      },
-      maxStep: 1,
-      startNodeId: nodeId,
     });
   }
 

@@ -24,6 +24,26 @@ function ListItemWorkflow({
 
   const actions: UiListItemAction[] = [
     {
+      onAction() {
+        preloadAPI.main.ipc
+          .invoke(
+            'clipboard:copy',
+            DeepLinkURL.getWorkflow(item.metadata.workflowId),
+          )
+          .then((value) => {
+            if (value && '$isError' in value) return;
+
+            addPanelStatus({
+              type: 'success',
+              title: 'Copied to clipboard',
+            });
+          });
+      },
+      icon: LinkIcon,
+      title: 'Copy Deep Link',
+      value: 'copy-deeplink',
+    },
+    {
       icon: EditIcon,
       shortcut: { key: 'e', mod1: 'mod' },
       title: 'Edit workflow',
@@ -50,26 +70,6 @@ function ListItemWorkflow({
       value: 'unpin-workflow',
       icon: item.metadata.isPinned ? PinOffIcon : PinIcon,
       title: item.metadata.isPinned ? 'Unpin workflow' : 'Pin workflow',
-    },
-    {
-      onAction() {
-        preloadAPI.main.ipc
-          .invoke(
-            'clipboard:copy',
-            DeepLinkURL.getWorkflow(item.metadata.workflowId),
-          )
-          .then((value) => {
-            if (value && '$isError' in value) return;
-
-            addPanelStatus({
-              type: 'success',
-              title: 'Copied to clipboard',
-            });
-          });
-      },
-      icon: LinkIcon,
-      title: 'Copy Deep Link',
-      value: 'copy-deeplink',
     },
   ];
 
