@@ -1,7 +1,7 @@
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
 import { useCommandPanelHeader } from '/@/hooks/useCommandPanelHeader';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import bugFixingSvg from '/@/assets/svg/bug-fixing.svg';
+import bugFixingSvg from '#common/assets/svg/bug-fixing.svg';
 import {
   UiAvatar,
   UiAvatarFallback,

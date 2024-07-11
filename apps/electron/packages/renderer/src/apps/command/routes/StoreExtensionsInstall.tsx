@@ -14,8 +14,8 @@ import {
 import clsx from 'clsx';
 import { useCommandPanelHeader } from '/@/hooks/useCommandPanelHeader';
 import { BlocksIcon, CpuIcon, DownloadIcon, UserRoundIcon } from 'lucide-react';
-import bugFixingSvg from '/@/assets/svg/bug-fixing.svg';
-import githubWhiteLogoSvg from '/@/assets/svg/github-white.svg';
+import bugFixingSvg from '#common/assets/svg/bug-fixing.svg';
+import githubWhiteLogoSvg from '#common/assets/svg/github-white.svg';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useState } from 'react';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';

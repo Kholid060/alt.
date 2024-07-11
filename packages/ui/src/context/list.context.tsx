@@ -99,17 +99,17 @@ export function UiListProvider({ children }: { children: React.ReactNode }) {
       },
       setSelectedItem(payload, replace = true) {
         if (Object.is(state.current.selectedItem.id, payload.id)) return;
+        console.trace(payload);
 
         if (replace) {
           state.current.selectedItem = payload as UiListSelectedItem;
+          store.emit();
         } else {
           state.current.selectedItem = {
             ...state.current.selectedItem,
             ...payload,
           };
         }
-
-        store.emit();
       },
       snapshot() {
         return state.current;

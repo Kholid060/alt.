@@ -161,6 +161,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
     const listStore = useUiListStore();
     const query = useUiList((state) => (search ? search : state.search));
 
+    const itemsLen = useRef<number | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
     const filteredItems = useMemo<UiListFlatItems>(() => {
@@ -191,9 +192,14 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
         (groupedItems[groupIndex] as UiListGroupItem)[1].push(item);
       }
 
-      return groupedItems.flat(2);
+      const flatItems = groupedItems.flat(2);
+      if (itemsLen.current === null) itemsLen.current = flatItems.length;
+
+      return flatItems;
     }, [query, shouldFilter, items, customFilter]);
-    const controller = useMemo<UiListController>(() => {
+    const controller = useMemo<
+      UiListController & { itemChanged: boolean }
+    >(() => {
       const setSelectedItem = (
         selectedItem: {
           index: number;
@@ -218,7 +224,18 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
         });
       };
 
+      let itemChanged = itemsLen.current !== filteredItems.length;
+      if (!itemChanged) {
+        const { selectedItem } = listStore.snapshot();
+        const item = filteredItems[selectedItem.index];
+        itemChanged =
+          typeof item === 'string' || !item
+            ? true
+            : item.value !== selectedItem.id;
+      }
+
       return {
+        itemChanged,
         selectItem() {
           const { index, actionIndex, actions, id } =
             listStore.snapshot().selectedItem;
@@ -387,13 +404,13 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
     useEffect(() => {
       if (disabledItemSelection) return;
 
-      controller.firstItem();
+      if (controller.itemChanged) controller.firstItem();
       listStore.setController(controller);
 
       return () => {
         listStore.setController(null);
       };
-    }, [filteredItems, disabledItemSelection, controller, listStore]);
+    }, [disabledItemSelection, controller, listStore]);
     useEffect(() => {
       return () => {
         listStore.setSelectedItem({
