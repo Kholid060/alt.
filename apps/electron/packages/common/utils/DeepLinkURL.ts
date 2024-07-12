@@ -7,7 +7,7 @@ class DeepLinkURL {
   }
 
   static getWorkflow(workflowId: string) {
-    return `${APP_DEEP_LINK_SCHEME}://${APP_DEEP_LINK_HOST.workflow}/${workflowId}`;
+    return `${APP_DEEP_LINK_SCHEME}://${APP_DEEP_LINK_HOST.workflows}/${workflowId}`;
   }
 }
 

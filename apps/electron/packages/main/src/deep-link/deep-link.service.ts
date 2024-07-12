@@ -19,6 +19,7 @@ import { BrowserWindowService } from '../browser-window/browser-window.service';
 import { LoggerService } from '../logger/logger.service';
 import path from 'path';
 import { OAuthService } from '../oauth/oauth.service';
+import { APP_DEEP_LINK_HOST } from '#packages/common/utils/constant/app.const';
 
 function convertArgValue(argument: ExtensionCommandArgument, value: string) {
   let convertedValue: unknown = value;
@@ -209,14 +210,17 @@ export class DeepLinkService implements OnModuleInit {
       const urlObj = new URL(url);
 
       switch (urlObj.hostname) {
-        case 'extensions':
+        case APP_DEEP_LINK_HOST.extension:
           this.extensionHandler(urlObj);
           break;
-        case 'workflows':
+        case APP_DEEP_LINK_HOST.workflows:
           this.workflowHandler(urlObj);
           break;
-        case 'store':
+        case APP_DEEP_LINK_HOST.store:
           this.storeHandler(urlObj);
+          break;
+        case APP_DEEP_LINK_HOST.oauth:
+          this.oauthService.resolveAuthSession(urlObj);
           break;
       }
     } catch (error) {
