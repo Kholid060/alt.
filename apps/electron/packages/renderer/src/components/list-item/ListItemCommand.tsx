@@ -90,6 +90,7 @@ function ListItemCommand({
             }
           });
       },
+      type: 'button',
       icon: LinkIcon,
       title: 'Copy Deep Link',
       value: 'copy-deeplink',
@@ -103,6 +104,7 @@ function ListItemCommand({
           { isDisabled: !command.isDisabled },
         );
       },
+      type: 'button',
       value: 'toggle-command',
       title: command.isDisabled ? 'Enable' : 'Disable',
       icon: command.isDisabled ? ToggleLeftIcon : ToggleRightIcon,
@@ -114,6 +116,7 @@ function ListItemCommand({
       onAction() {
         navigate(`/configs/${extension.id}:${command.name}`);
       },
+      type: 'button',
       title: 'Config',
       value: 'config',
       shortcut: { key: ',', mod1: 'ctrlKey' },

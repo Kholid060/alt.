@@ -136,3 +136,31 @@
   --border: var(--mauve-6);
   --ring: var(--violet-8);
 }
+
+
+[data-tooltip-open="true"]:before {
+  display: block !important;
+}
+[data-tooltip]:hover:before {
+  display: block;
+}
+[data-tooltip]:before {
+  right: 0;
+  z-index: 1;
+  width: auto;
+  bottom: 110%;
+  display: none;
+  border-width: 1px;
+  position: absolute;
+  text-wrap: nowrap;
+  border-style: solid;
+  pointer-events: none;
+  content: attr(data-tooltip);
+  font-size: theme('fontSize.sm');
+  border-color: theme('colors.border');
+  border-radius: theme('borderRadius.md');
+  color: theme('colors.popover.foreground');
+  @apply shadow-md animate-in fade-in-0 zoom-in-95;
+  padding: theme('padding[1.5]') theme('padding.2');
+  background-color: theme('colors.popover.DEFAULT');
+}

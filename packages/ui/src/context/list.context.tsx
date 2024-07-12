@@ -9,17 +9,19 @@ import {
   useEffect,
 } from 'react';
 
+export interface UiListSelectedItemAction {
+  value: string;
+  onAction: () => void;
+  shortcut?: KeyboardShortcut;
+  items?: UiListSelectedItemAction[];
+}
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface UiListSelectedItem<M = any> {
   id: string;
   metadata: M;
   index: number;
   actionIndex: number;
-  actions: {
-    value: string;
-    onAction: () => void;
-    shortcut?: KeyboardShortcut;
-  }[];
+  actions: UiListSelectedItemAction[];
 }
 
 interface UiListState {
@@ -27,6 +29,7 @@ interface UiListState {
   selectedItem: UiListSelectedItem;
 }
 interface UiListStore {
+  containerRef: React.RefObject<HTMLDivElement>;
   listController: React.RefObject<UiListController | null>;
   setController(controller: UiListController | null): void;
   emit(): void;
@@ -84,9 +87,10 @@ export function UiListProvider({ children }: { children: React.ReactNode }) {
       actionIndex: -1,
     },
   }));
+  const containerRef = useRef<HTMLDivElement>(null);
   const listController = useRef<UiListController | null>(null);
 
-  const store = useMemo<Omit<UiListStore, 'listController'>>(
+  const store = useMemo<Omit<UiListStore, 'listController' | 'containerRef'>>(
     () => ({
       emit() {
         listeners.current.forEach((listener) => listener());
@@ -99,7 +103,6 @@ export function UiListProvider({ children }: { children: React.ReactNode }) {
       },
       setSelectedItem(payload, replace = true) {
         if (Object.is(state.current.selectedItem.id, payload.id)) return;
-        console.trace(payload);
 
         if (replace) {
           state.current.selectedItem = payload as UiListSelectedItem;
@@ -171,8 +174,8 @@ export function UiListProvider({ children }: { children: React.ReactNode }) {
               return;
 
             event.preventDefault();
-            state.current.selectedItem.actionIndex +=
-              event.key === 'ArrowLeft' ? -1 : 1;
+
+            state.current.selectedItem.actionIndex += toLeft ? -1 : 1;
             store.emit();
             break;
           }
@@ -201,7 +204,9 @@ export function UiListProvider({ children }: { children: React.ReactNode }) {
   }, [listeners, state]);
 
   return (
-    <UiListStoreContext.Provider value={{ ...store, listController }}>
+    <UiListStoreContext.Provider
+      value={{ ...store, listController, containerRef }}
+    >
       {children}
     </UiListStoreContext.Provider>
   );

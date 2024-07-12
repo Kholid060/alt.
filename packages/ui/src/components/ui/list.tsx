@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import {
   Fragment,
   forwardRef,
@@ -12,29 +14,47 @@ import {
 import { LucideIcon } from 'lucide-react';
 import {
   UiListController,
+  UiListSelectedItemAction,
   useUiList,
   useUiListStore,
 } from '@/context/list.context';
 import { matchSorter } from 'match-sorter';
 import { cn } from '@/utils/cn';
-import { UiTooltip } from './tooltip';
 import {
   getShortcutStr,
   KeyboardShortcut,
   KeyboardShortcutModifier,
 } from '@altdot/shared';
 import mergeRefs from '@/utils/mergeRefs';
+import {
+  UiDropdownMenu,
+  UiDropdownMenuContent,
+  UiDropdownMenuItem,
+  UiDropdownMenuShortcut,
+  UiDropdownMenuTrigger,
+} from './dropdown-menu';
 
 const ITEM_SELECTED_EVENT = 'ui-list-item-selected';
 
-export interface UiListItemAction {
+interface UiListItemActionBase {
   title: string;
   value: string;
   icon: LucideIcon;
-  onAction: () => void;
   shortcut?: KeyboardShortcut;
   color?: 'default' | 'primary' | 'destructive';
 }
+
+export interface UiListItemActionButton extends UiListItemActionBase {
+  type: 'button';
+  onAction: () => void;
+}
+
+export interface UiListItemActionMenu extends UiListItemActionBase {
+  type: 'menu';
+  items: UiListItemActionButton[];
+}
+
+export type UiListItemAction = UiListItemActionMenu | UiListItemActionButton;
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface UiListItem<T = any> {
@@ -122,6 +142,41 @@ function findNonSearchOnlyItem(
 
   return null;
 }
+function flattenActions(
+  actions: UiListItemAction[],
+  containerEl?: HTMLElement | null,
+): UiListSelectedItemAction[] {
+  return actions.flatMap<UiListSelectedItemAction>((action) => {
+    if (action.type === 'menu') {
+      return {
+        isInMenu: false,
+        value: action.value,
+        shortcut: action.shortcut,
+        items: action.items.map((item) => ({
+          isInMenu: true,
+          value: item.value,
+          onAction: item.onAction,
+          shortcut: item.shortcut,
+        })),
+        onAction() {
+          const element = (containerEl || document.body).querySelector(
+            `[data-action-id="${action.value}"]`,
+          );
+          if (!element) return;
+
+          element.dispatchEvent(new PointerEvent('click', { bubbles: true }));
+        },
+      };
+    }
+
+    return {
+      isInMenu: false,
+      value: action.value,
+      onAction: action.onAction,
+      shortcut: action.shortcut,
+    };
+  });
+}
 
 export interface UiListRef {
   controller: UiListController;
@@ -162,7 +217,6 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
     const query = useUiList((state) => (search ? search : state.search));
 
     const itemsLen = useRef<number | null>(null);
-    const containerRef = useRef<HTMLDivElement>(null);
 
     const filteredItems = useMemo<UiListFlatItems>(() => {
       let itemList: UiListItem[] = items;
@@ -215,12 +269,10 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
           id: item.value,
           actionIndex: -1,
           metadata: item.metadata,
-          actions:
-            item.actions?.map((action) => ({
-              value: action.value,
-              onAction: action.onAction,
-              shortcut: action.shortcut,
-            })) ?? [],
+          actions: flattenActions(
+            item.actions ?? [],
+            listStore.containerRef.current,
+          ),
         });
       };
 
@@ -267,9 +319,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
 
             return event[mod];
           };
-          const itemAction = actions.find(({ shortcut }) => {
-            if (!shortcut) return;
-
+          const isMatchAction = (shortcut: KeyboardShortcut) => {
             const isModMatch =
               checkShortcutMod(shortcut.mod1) &&
               (shortcut.mod2 ? checkShortcutMod(shortcut.mod2) : true);
@@ -277,7 +327,21 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
               event.key.toLowerCase() === shortcut.key.toLowerCase();
 
             return isModMatch && isKeyMatch;
-          });
+          };
+          const itemAction = (() => {
+            for (const action of actions) {
+              if (action.items) {
+                const matchAction = action.items.find(
+                  (item) => item.shortcut && isMatchAction(item.shortcut),
+                );
+                if (matchAction) return matchAction;
+              } else if (action.shortcut && isMatchAction(action.shortcut)) {
+                return action;
+              }
+            }
+
+            return null;
+          })();
 
           if (itemAction) {
             itemAction.onAction();
@@ -368,9 +432,11 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
       };
     }, [filteredItems, listStore, onItemSelected]);
 
-    useImperativeHandle(ref, () => ({ controller, el: containerRef }), [
-      controller,
-    ]);
+    useImperativeHandle(
+      ref,
+      () => ({ controller, el: listStore.containerRef }),
+      [controller, listStore.containerRef],
+    );
 
     const onPointerMove = useCallback(
       (item: UiListItem, index: number) => {
@@ -424,7 +490,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
     }, [listStore]);
 
     return (
-      <div ref={containerRef} {...props}>
+      <div ref={listStore.containerRef} {...props}>
         {filteredItems.length === 0 &&
           (noDataSlot || (
             <p className="text-center text-muted-foreground my-4">No data</p>
@@ -559,63 +625,124 @@ const uiListItemActionColors: Record<
   primary: 'text-primary',
   destructive: 'text-destructive-text',
 };
+const UiListItemActionsButton = forwardRef<
+  HTMLButtonElement,
+  {
+    index: number;
+    action: UiListItemAction;
+  } & React.HTMLAttributes<HTMLButtonElement>
+>(({ index, action, onClick, ...props }, ref) => {
+  const isActive = useUiList(
+    (state) => state.selectedItem.actionIndex === index,
+  );
+
+  return (
+    <button
+      ref={ref}
+      tabIndex={-1}
+      aria-pressed={isActive}
+      onClick={(event) => {
+        onClick?.(event);
+
+        if (action.type === 'menu') return;
+
+        event.preventDefault();
+        event.stopPropagation();
+        action.onAction?.();
+      }}
+      data-action-id={action.value}
+      data-tooltip-open={isActive}
+      data-tooltip={`${action.title} ${getShortcutStr(action.shortcut)}`}
+      className="h-9 w-9 relative focus:outline-none focus:ring-primary focus:ring-2 focus:ring-offset-2 aria-pressed:ring-primary aria-pressed:ring-2 aria-pressed:ring-offset-2 ring-offset-background aria-pressed:bg-secondary hover:bg-secondary rounded-sm inline-flex items-center justify-center pointer-events-auto"
+      {...props}
+    >
+      <action.icon
+        className={`h-4 w-4 ${uiListItemActionColors[action.color ?? 'default'] ?? ''}`}
+      />
+    </button>
+  );
+});
+UiListItemActionsButton.displayName = 'UiListItemActionsButton';
+function UiListItemActionMenuComp({
+  index,
+  action,
+}: {
+  index: number;
+  action: UiListItemActionMenu;
+}) {
+  const prevFocus = useRef<HTMLElement | null>(null);
+
+  const [open, setOpen] = useState(false);
+
+  function onCloseAutoFocus(event: Event) {
+    event.preventDefault();
+    prevFocus.current?.focus?.();
+  }
+
+  return (
+    <UiDropdownMenu
+      open={open}
+      onOpenChange={(value) => !value && setOpen(false)}
+    >
+      <UiDropdownMenuTrigger asChild>
+        <UiListItemActionsButton
+          index={index}
+          action={action}
+          onClick={() => {
+            setOpen(true);
+            prevFocus.current = document.activeElement as HTMLElement;
+          }}
+        />
+      </UiDropdownMenuTrigger>
+      <UiDropdownMenuContent
+        side="left"
+        align="start"
+        className="min-w-44 max-w-64"
+        onCloseAutoFocus={onCloseAutoFocus}
+      >
+        {action.items.map((item) => (
+          <UiDropdownMenuItem
+            key={action.value + item.value}
+            onClick={() => item.onAction()}
+          >
+            <item.icon className="mr-2 size-4" />
+            <span className="line-clamp-1 flex-1">{item.title}</span>
+            {item.shortcut && (
+              <UiDropdownMenuShortcut className="ml-4">
+                {getShortcutStr(item.shortcut)}
+              </UiDropdownMenuShortcut>
+            )}
+          </UiDropdownMenuItem>
+        ))}
+      </UiDropdownMenuContent>
+    </UiDropdownMenu>
+  );
+}
 function UiListItemActions({ actions }: { actions: UiListItemAction[] }) {
   const listStore = useUiListStore();
-  const actionIndex = useUiList((state) => state.selectedItem.actionIndex);
 
-  const [openTooltip, setOpenTooltip] = useState(-1);
-
-  useEffect(() => {
-    setOpenTooltip(actionIndex);
-  }, [actionIndex]);
   useEffect(() => {
     if (!actions || actions.length === 0) return;
 
     listStore.setSelectedItem(
       {
-        actions: actions.map((action) => ({
-          value: action.value,
-          shortcut: action.shortcut,
-          onAction: action.onAction,
-        })),
+        actions: flattenActions(actions, listStore.containerRef.current),
       },
       false,
     );
   }, [actions, listStore]);
 
   return (
-    <div className="flex items-center absolute rounded-sm top-0 h-full right-0 pr-2 pl-6 pointer-events-none bg-gradient-to-tl from-40% from-card to-100% to-transparent">
-      {actions.map(
-        (
-          { icon: Icon, onAction, title, value, shortcut, color = 'default' },
-          index,
-        ) => (
-          <UiTooltip
-            key={value}
-            align="end"
-            sideOffset={4}
-            open={openTooltip === index}
-            label={`${title} ${getShortcutStr(shortcut)}`}
-            onOpenChange={(isOpen) => setOpenTooltip(isOpen ? index : -1)}
-          >
-            <button
-              tabIndex={-1}
-              aria-pressed={actionIndex === index}
-              onClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-
-                onAction?.();
-              }}
-              className="h-9 w-9 aria-pressed:bg-secondary hover:bg-secondary rounded-sm inline-flex items-center justify-center pointer-events-auto"
-            >
-              <Icon
-                className={`h-4 w-4 ${uiListItemActionColors[color ?? 'default'] ?? ''}`}
-              />
-            </button>
-          </UiTooltip>
-        ),
-      )}
+    <div className="flex items-center z-2 absolute rounded-sm top-0 h-full right-0 pr-2 pl-6 pointer-events-none bg-gradient-to-tl from-40% from-card to-100% to-transparent">
+      {actions.map((action, index) => (
+        <Fragment key={action.value}>
+          {action.type === 'menu' ? (
+            <UiListItemActionMenuComp action={action} index={index} />
+          ) : (
+            <UiListItemActionsButton action={action} index={index} />
+          )}
+        </Fragment>
+      ))}
     </div>
   );
 }
@@ -670,7 +797,6 @@ const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
     }, [onSelected, value]);
 
     return (
-      // eslint-disable-next-line jsx-a11y/interactive-supports-focus, jsx-a11y/click-events-have-key-events
       <div
         className={cn(
           'relative group/item min-h-12 flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-card aria-selected:text-accent-foreground',
@@ -681,10 +807,6 @@ const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
         ref={mergedRef}
         data-item-value={value}
         role="option"
-        onClick={(event) => {
-          if (!onSelected) onClick?.(event);
-          else onSelected(value);
-        }}
       >
         {children ? (
           children
@@ -712,6 +834,13 @@ const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
               </span>
             </div>
             {suffix}
+            <div
+              onClick={(event) => {
+                if (!onSelected) onClick?.(event);
+                else onSelected(value);
+              }}
+              className="absolute z-1 h-full w-full left-0 top-0"
+            ></div>
             {actions && actions.length > 0 && selected && (
               <UiListItemActions actions={actions} />
             )}

@@ -37,6 +37,7 @@
 
 .custom-scroller::-webkit-scrollbar {
 	width: 8px;
+	height: 8px;
 }
 
 .custom-scroller::-webkit-scrollbar-thumb {

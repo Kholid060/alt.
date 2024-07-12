@@ -17,7 +17,7 @@ import {
   ExternalLinkIcon,
   Loader2Icon,
   LucideWorkflow,
-  TriangleAlertIcon,
+  LucideTriangleAlert,
   UserRoundIcon,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -208,7 +208,7 @@ function RouteWorkflowInstall() {
             {query.data.missingExtensions.length > 0 && (
               <>
                 <div className="text-sm text-orange-500">
-                  <TriangleAlertIcon className="inline size-4 align-middle" />{' '}
+                  <LucideTriangleAlert className="inline size-4 align-middle" />{' '}
                   <span className="align-middle">
                     {query.data.missingExtensions.length} missing extensions
                   </span>

@@ -7,6 +7,8 @@ import { UserConfig } from 'vite';
 const PACKAGE_ROOT = __dirname;
 const PROJECT_ROOT = join(PACKAGE_ROOT, '../..');
 
+const IS_DEV = process.env.MODE === 'development';
+
 const config: UserConfig = {
   mode: process.env.MODE,
   root: PACKAGE_ROOT,
@@ -20,11 +22,11 @@ const config: UserConfig = {
   },
   build: {
     ssr: true,
-    sourcemap: process.env.MODE === 'development',
+    sourcemap: IS_DEV,
     target: `node${node}`,
     outDir: 'dist',
     assetsDir: '.',
-    minify: process.env.MODE !== 'development',
+    minify: !IS_DEV,
     lib: {
       entry: {
         index: 'src/index.ts',
@@ -35,7 +37,7 @@ const config: UserConfig = {
       output: {
         entryFileNames: '[name].js',
       },
-      treeshake: 'smallest',
+      treeshake: IS_DEV ? undefined : 'smallest',
       external: ['@altdot/native', 'original-fs'],
     },
     emptyOutDir: true,

@@ -47,7 +47,7 @@ const config = {
     reportCompressedSize: false,
   },
   optimizeDeps: {
-    include: ['react/jsx-runtime'],
+    include: ['react/jsx-runtime', 'lucide-react'],
   },
   plugins: [
     react(),

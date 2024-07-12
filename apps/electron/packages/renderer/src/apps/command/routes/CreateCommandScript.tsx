@@ -163,8 +163,8 @@ function CreateCommandScript() {
                   />
                 </UiFormControl>
                 <UiFormDescription>
-                  Supported script files: JavaScript, Python, Bash, and
-                  PowerShell
+                  Supported script files: JavaScript, Python, TypeScript, Bash,
+                  and PowerShell
                 </UiFormDescription>
                 <UiFormMessage />
               </UiFormItem>

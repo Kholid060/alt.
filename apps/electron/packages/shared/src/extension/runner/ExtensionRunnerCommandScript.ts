@@ -1,24 +1,13 @@
 import path from 'node:path';
-import which from 'which';
 import { spawn } from 'node:child_process';
 import { snakeCase } from 'lodash-es';
 import type { ExtensionRunnerProcessConstructor } from './ExtensionRunnerProcess';
 import ExtensionRunnerProcess, {
   ExtensionRunnerProcessFinishReason,
 } from './ExtensionRunnerProcess';
+import { resolveFileCommand } from '/@/utils/resolve-file-command';
 
-const FILE_EXT_COMMAND_MAP: Record<string, string> = {
-  '.sh': 'sh',
-  '.js': 'node',
-  '.mjs': 'node',
-  '.cjs': 'node',
-  '.py': 'python',
-  '.pyi': 'python',
-  '.ps1': 'powershell',
-};
 const ARGS_PREFIX = '__ARGS__';
-
-const existedCommandCache = new Set<string>();
 
 class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
   readonly id: string;
@@ -31,23 +20,95 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
     super(options);
 
     this.id = id;
+
+    this.onProcessExit = this.onProcessExit.bind(this);
+    this.onProcessSpawn = this.onProcessSpawn.bind(this);
+    this.onProcessError = this.onProcessError.bind(this);
+    this.onProcessStdoutData = this.onProcessStdoutData.bind(this);
+    this.onProcessStderrData = this.onProcessStderrData.bind(this);
+  }
+
+  private onProcessSpawn() {
+    this.runner.messagePort.event.sendMessage('command-script:message', {
+      message: '',
+      type: 'start',
+      runnerId: this.id,
+      commandTitle: this.command.title,
+      commandId: this.payload.extensionId,
+      extensionId: this.payload.extensionId,
+    });
+  }
+
+  private onProcessError(error: Error) {
+    console.error(error);
+    this.runner.messagePort.event.sendMessage('command-script:message', {
+      type: 'error',
+      runnerId: this.id,
+      message: error.message,
+      commandTitle: this.command.title,
+      commandId: this.payload.extensionId,
+      extensionId: this.payload.extensionId,
+    });
+  }
+
+  private onProcessExit(code: number) {
+    const isSuccess = code === 0;
+    const message = isSuccess
+      ? this.lastMessage
+      : `Process finish with exit code ${code} \n\n ${this.errorMessage}`;
+
+    this.runner.messagePort.event.sendMessage('command-script:message', {
+      message,
+      runnerId: this.id,
+      commandTitle: this.command.title,
+      commandId: this.payload.extensionId,
+      type: isSuccess ? 'finish' : 'error',
+      extensionId: this.payload.extensionId,
+    });
+
+    if (isSuccess) {
+      this.emit('finish', ExtensionRunnerProcessFinishReason.Done, message);
+    } else {
+      this.emit('error', message);
+    }
+  }
+
+  private onProcessStdoutData(data: string) {
+    this.lastMessage = data.toString().trim();
+
+    this.runner.messagePort.event.sendMessage('command-script:message', {
+      type: 'message',
+      runnerId: this.id,
+      message: this.lastMessage,
+      commandTitle: this.command.title,
+      commandId: this.payload.extensionId,
+      extensionId: this.payload.extensionId,
+    });
+  }
+
+  private onProcessStderrData(chunk: string) {
+    if (!this.command.extension.isLocal) return;
+
+    this.runner.messagePort.event.sendMessage('command-script:message', {
+      type: 'stderr',
+      runnerId: this.id,
+      message: chunk.toString(),
+      commandTitle: this.command.title,
+      commandId: this.payload.extensionId,
+      extensionId: this.payload.extensionId,
+    });
   }
 
   async start() {
-    const { launchContext, commandId, extensionId } = this.payload;
+    const { launchContext, commandId } = this.payload;
 
-    const fileExt = path.extname(commandId);
-    const fileCommand = FILE_EXT_COMMAND_MAP[fileExt];
+    const fileCommand = await resolveFileCommand(this.commandFilePath);
     if (!fileCommand) {
-      this.emit('error', `"${fileExt}" script file is not supported`);
+      this.emit(
+        'error',
+        `"${path.basename(commandId)}" script file is not supported`,
+      );
       return;
-    }
-
-    let isCommandExists = existedCommandCache.has(fileCommand);
-    if (!isCommandExists) {
-      isCommandExists = Boolean(await which(fileCommand, { nothrow: true }));
-      if (isCommandExists) existedCommandCache.add(fileCommand);
-      else throw new Error(`"${fileExt}" is not supported on this machine`);
     }
 
     const env = Object.fromEntries(
@@ -67,72 +128,11 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
       env,
       signal: this.controller.signal,
     });
-    ls.addListener('spawn', () => {
-      this.runner.messagePort.event.sendMessage('command-script:message', {
-        commandId,
-        extensionId,
-        message: '',
-        type: 'start',
-        runnerId: this.id,
-        commandTitle: this.command.title,
-      });
-    });
-    ls.addListener('error', (error) => {
-      console.error(error);
-      this.runner.messagePort.event.sendMessage('command-script:message', {
-        commandId,
-        extensionId,
-        type: 'error',
-        runnerId: this.id,
-        message: error.message,
-        commandTitle: this.command.title,
-      });
-    });
-    ls.addListener('exit', (code) => {
-      const isSuccess = code === 0;
-      const message = isSuccess
-        ? this.lastMessage
-        : `Process finish with exit code ${code} \n\n ${this.errorMessage}`;
-
-      this.runner.messagePort.event.sendMessage('command-script:message', {
-        message,
-        commandId,
-        extensionId,
-        runnerId: this.id,
-        commandTitle: this.command.title,
-        type: isSuccess ? 'finish' : 'error',
-      });
-
-      if (isSuccess) {
-        this.emit('finish', ExtensionRunnerProcessFinishReason.Done, message);
-      } else {
-        this.emit('error', message);
-      }
-    });
-    ls.stdout.addListener('data', (data) => {
-      this.lastMessage = data.toString().trim();
-
-      this.runner.messagePort.event.sendMessage('command-script:message', {
-        commandId,
-        extensionId,
-        type: 'message',
-        runnerId: this.id,
-        message: this.lastMessage,
-        commandTitle: this.command.title,
-      });
-    });
-    ls.stderr.addListener('data', (chunk) => {
-      if (!this.command.extension.isLocal) return;
-
-      this.runner.messagePort.event.sendMessage('command-script:message', {
-        commandId,
-        extensionId,
-        type: 'stderr',
-        runnerId: this.id,
-        message: chunk.toString(),
-        commandTitle: this.command.title,
-      });
-    });
+    ls.addListener('exit', this.onProcessExit);
+    ls.addListener('spawn', this.onProcessSpawn);
+    ls.addListener('error', this.onProcessError);
+    ls.stdout.addListener('data', this.onProcessStdoutData);
+    ls.stderr.addListener('data', this.onProcessStderrData);
   }
 
   stop(): void {

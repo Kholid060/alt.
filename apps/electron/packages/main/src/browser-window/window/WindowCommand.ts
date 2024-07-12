@@ -35,7 +35,6 @@ class WindowCommand extends WindowBase {
   constructor() {
     super('command', {
       show: false, // Use the 'ready-to-show' event to show the instantiated BrowserWindow.
-      modal: true,
       frame: false,
       type: 'toolbar',
       resizable: false,
@@ -47,7 +46,6 @@ class WindowCommand extends WindowBase {
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
-        nodeIntegrationInSubFrames: true,
         sandbox: true, // Sandbox disabled because the demo of preload script depend on the Node.js api
         webviewTag: false, // The webview tag is not recommended. Consider alternatives like an iframe or Electron's BrowserView. @see https://www.electronjs.org/docs/latest/api/webview-tag#warning
         preload: join(app.getAppPath(), 'packages/preload/dist/index.mjs'),
@@ -88,9 +86,11 @@ class WindowCommand extends WindowBase {
         event.preventDefault();
       });
 
-      // browserWindow.on('ready-to-show', () => {
-      //   browserWindow.webContents.openDevTools({ mode: 'undocked' });
-      // });
+      if (import.meta.env.DEV) {
+        browserWindow.on('ready-to-show', () => {
+          browserWindow.webContents.openDevTools({ mode: 'undocked' });
+        });
+      }
 
       /**
        * Load the main page of the main window.

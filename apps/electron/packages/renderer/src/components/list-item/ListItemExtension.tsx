@@ -4,7 +4,8 @@ import {
   RotateCcwIcon,
   AlertTriangleIcon,
   BoltIcon,
-  ToggleRight,
+  ToggleRightIcon,
+  ToggleLeftIcon,
 } from 'lucide-react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandStore } from '/@/stores/command.store';
@@ -32,49 +33,23 @@ function ListItemExtension({
 
   const { extension } = item.metadata;
 
-  const actions: UiListItemAction[] = [];
-  if (extension.isDisabled) {
-    actions.push({
+  const actions: UiListItemAction[] = [
+    {
+      type: 'button',
       title: 'Enable',
       value: 'enable',
-      icon: ToggleRight,
+      icon: extension.isDisabled ? ToggleLeftIcon : ToggleRightIcon,
       onAction() {
         preloadAPI.main.ipc.invoke('database:update-extension', extension.id, {
-          isDisabled: false,
+          isDisabled: !extension.isDisabled,
         });
       },
-    });
-  }
-  if (extension.isLocal && !extension.isDisabled) {
-    actions.push({
-      icon: RotateCcwIcon,
-      async onAction() {
-        try {
-          const result = await preloadAPI.main.ipc.invoke(
-            'extension:reload',
-            extension.id,
-          );
-          if (!result) return;
+    },
+  ];
 
-          if ('$isError' in result) {
-            addPanelStatus({
-              type: 'error',
-              title: 'Error!',
-              description: result.message,
-            });
-            return;
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      },
-      title: 'Reload extension',
-      value: 'reload-extension',
-      shortcut: { key: 'r', mod1: 'mod', mod2: 'shiftKey' },
-    });
-  }
   if ((extension.isError || hasError) && !extension.isDisabled) {
-    actions.push({
+    actions.unshift({
+      type: 'button',
       icon: AlertTriangleIcon,
       onAction() {
         const errors: ExtensionErrorListItemModel[] = [];
@@ -103,7 +78,8 @@ function ListItemExtension({
     extension.config?.length > 0 &&
     !extension.isDisabled
   ) {
-    actions.push({
+    actions.unshift({
+      type: 'button',
       icon: BoltIcon,
       onAction() {
         navigate(`/configs/${extension.id}`);
@@ -111,6 +87,35 @@ function ListItemExtension({
       title: 'Config',
       value: 'config',
       shortcut: { key: ',', mod1: 'ctrlKey' },
+    });
+  }
+  if (extension.isLocal && !extension.isDisabled) {
+    actions.unshift({
+      type: 'button',
+      icon: RotateCcwIcon,
+      async onAction() {
+        try {
+          const result = await preloadAPI.main.ipc.invoke(
+            'extension:reload',
+            extension.id,
+          );
+          if (!result) return;
+
+          if ('$isError' in result) {
+            addPanelStatus({
+              type: 'error',
+              title: 'Error!',
+              description: result.message,
+            });
+            return;
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      },
+      title: 'Reload extension',
+      value: 'reload-extension',
+      shortcut: { key: 'r', mod1: 'mod', mod2: 'shiftKey' },
     });
   }
 
