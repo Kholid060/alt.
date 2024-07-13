@@ -26,6 +26,7 @@ export class NodeHandlerCode extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.CODE
   }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.CODE>): Promise<WorkflowNodeHandlerExecuteReturn> {
     const code = `(async () => {\n${node.data.jsCode}\n})()`;
     const result = await runner.sandbox.evaluateCode(code, {
+      node,
       isPromise: true,
       signal: this.controller.signal,
     });

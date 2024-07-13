@@ -6,8 +6,8 @@ import { Scope, getQuickJS } from 'quickjs-emscripten';
 import type WorkflowRunner from './WorkflowRunner';
 import { getExactType } from '/@/utils/helper';
 import WorkflowFileHandle from '../utils/WorkflowFileHandle';
-import { WorkflowNodeExpressionRecords } from '@altdot/workflow';
-import Logger from 'electron-log';
+import { WorkflowNodeExpressionRecords, WorkflowNodes } from '@altdot/workflow';
+import { Level } from 'pino';
 
 const MUSTACHE_REGEX = /\{\{(.*?)\}\}/g;
 
@@ -79,7 +79,7 @@ interface EvaluateExpressionOptions {
   data?: Record<PropertyKey, unknown>;
 }
 interface EvaluateCodeOptions {
-  name: string;
+  node?: WorkflowNodes;
   isPromise?: boolean;
   signal?: AbortSignal;
   data?: Record<PropertyKey, unknown>;
@@ -143,22 +143,25 @@ class WorkflowRunnerSandbox {
 
   private createConsoleHandle({
     vm,
+    node,
     scope,
-    name = '',
-    levels = ['debug', 'error', 'info', 'warn', 'verbose'],
+    levels = ['debug', 'error', 'info', 'warn', 'trace'],
   }: {
     scope: Scope;
-    name?: string;
+    levels?: Level[];
     vm: QuickJSContext;
-    levels?: Logger.LogLevel[];
+    node?: WorkflowNodes;
   }) {
-    const createLevel = (level: Logger.LogLevel) =>
+    const createLevel = (level: Level) =>
       scope.manage(
         vm.newFunction(level, (...args) => {
           const nativeArgs = args.map((handle) =>
             vm.dump(scope.manage(handle)),
           );
-          this.runner.logger[level](name, ...nativeArgs);
+          this.runner.logger.instance[level](
+            node && { node: node.id, type: node.type },
+            ...nativeArgs,
+          );
         }),
       );
 
@@ -172,7 +175,7 @@ class WorkflowRunnerSandbox {
 
   async evaluateCode(
     code: string,
-    { signal, isPromise, data = {}, name }: EvaluateCodeOptions = { name: '' },
+    { signal, isPromise, data = {}, node }: EvaluateCodeOptions,
   ) {
     const quickJS = await getQuickJS();
 
@@ -192,16 +195,7 @@ class WorkflowRunnerSandbox {
       const vm = scope.manage(runtime.newContext());
       this.injectContextGlobalVar(vm, scope, data);
 
-      const consoleHandle = scope.manage(vm.newObject());
-      (
-        ['debug', 'error', 'info', 'warn', 'verbose'] as Logger.LogLevel[]
-      ).forEach((level) => {
-        vm.setProp(
-          consoleHandle,
-          level,
-          this.createConsoleHandle({ scope, vm, name }),
-        );
-      });
+      const consoleHandle = this.createConsoleHandle({ scope, vm, node });
       vm.setProp(vm.global, 'console', consoleHandle);
 
       const result = vm.evalCode(code, '', {

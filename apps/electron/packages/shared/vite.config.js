@@ -5,6 +5,11 @@ import { node } from '../../.electron-vendors.cache.json';
 const PACKAGE_ROOT = __dirname;
 const PROJECT_ROOT = join(PACKAGE_ROOT, '../..');
 
+const builtinNodeModules = builtinModules.flatMap((item) => [
+  item,
+  `node:${item}`,
+]);
+
 /**
  * @type {import('vite').UserConfig}
  * @see https://vitejs.dev/config/
@@ -45,10 +50,7 @@ const config = {
         entryFileNames: '[name].js',
         chunkFileNames: '[name].cjs',
       },
-      external: [...builtinModules, 'electron'].flatMap((item) => [
-        item,
-        `node:${item}`,
-      ]),
+      external: [...builtinNodeModules, 'electron', 'pino'],
     },
     emptyOutDir: true,
   },

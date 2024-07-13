@@ -9,6 +9,7 @@ import {
   WorkflowHistoryRunningItemModel,
   WorkflowHistoryUpdatePayload,
   WorkflowHistoryModel,
+  WorkflowHistoryLogItem,
 } from './workflow-history.interface';
 import fs from 'fs-extra';
 import { eq, like, asc, desc, count, getOperators } from 'drizzle-orm';
@@ -21,6 +22,8 @@ import { findWorkflowHistoryByIdQuery } from './utils';
 import { OnAppReady } from '/@/common/hooks/on-app-ready.hook';
 import path from 'path';
 import { WORKFLOW_LOGS_FOLDER } from '/@/common/utils/constant';
+import { parseJSON } from '@altdot/shared';
+import readline from 'readline';
 
 @Injectable()
 export class WorkflowHistoryService implements OnAppReady {
@@ -218,14 +221,27 @@ export class WorkflowHistoryService implements OnAppReady {
     });
   }
 
-  async getLog(runnerId: string) {
+  async getLog(runnerId: string): Promise<WorkflowHistoryLogItem[]> {
     try {
-      return await fs.readFile(
-        path.join(WORKFLOW_LOGS_FOLDER, `${runnerId}.log`),
-        'utf-8',
-      );
-    } catch {
-      return null;
+      const logPath = path.join(WORKFLOW_LOGS_FOLDER, `${runnerId}.log`);
+      if (!fs.existsSync(logPath)) return [];
+
+      const logItems: WorkflowHistoryLogItem[] = [];
+
+      const fileStream = fs.createReadStream(logPath);
+      const rl = readline.createInterface({
+        input: fileStream,
+        crlfDelay: Infinity,
+      });
+      for await (const line of rl) {
+        const item = parseJSON<WorkflowHistoryLogItem, null>(line);
+        if (item) logItems.push(item);
+      }
+
+      return logItems;
+    } catch (error) {
+      console.error(error);
+      return [];
     }
   }
 }

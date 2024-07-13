@@ -1,3 +1,4 @@
+import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
 import {
   NewWorkflowHistory,
   SelectWorkflow,
@@ -50,3 +51,11 @@ export type WorkflowHistoryRunningItemModel = Pick<
 > & { workflow: { name: string; icon: string | null } };
 
 export type WorkflowHistoryFindById = number | { runnerId: string };
+
+export interface WorkflowHistoryLogItem {
+  id: number;
+  msg: string;
+  time: string;
+  level: number;
+  node?: { id: string; type: WORKFLOW_NODE_TYPE };
+}

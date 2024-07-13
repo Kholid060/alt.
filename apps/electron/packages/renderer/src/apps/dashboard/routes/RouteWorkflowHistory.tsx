@@ -6,10 +6,8 @@ import {
   UiButton,
   UiDialog,
   UiInput,
-  UiPopover,
-  UiPopoverContent,
-  UiPopoverTrigger,
   UiSelect,
+  UiTooltip,
   useToast,
 } from '@altdot/ui';
 import {
@@ -30,9 +28,10 @@ import { isIPCEventError } from '#packages/common/utils/helper';
 import UiItemsPagination from '/@/components/ui/UiItemsPagination';
 import {
   WorkflowHistoryListPaginationFilter,
+  WorkflowHistoryLogItem,
   WorkflowHistoryWithWorkflowModel,
 } from '#packages/main/src/workflow/workflow-history/workflow-history.interface';
-import { WORKFLOW_NODES, WORKFLOW_NODE_TYPE } from '@altdot/workflow';
+import { WORKFLOW_NODES } from '@altdot/workflow';
 
 function WorkflowHistoryStatusBadge({
   status,
@@ -74,48 +73,16 @@ function formatDuration(duration: number) {
 
 type HistorySort = Required<WorkflowHistoryListPaginationFilter>['sort'];
 
-function WorkflowHistoryError({
-  item,
-}: {
-  item: WorkflowHistoryWithWorkflowModel;
-}) {
-  let nodeId = '';
-  let nodeName = '';
-
-  if (item.errorLocation) {
-    let type = '';
-    [type, nodeId] = item.errorLocation.split(':');
-
-    nodeName = WORKFLOW_NODES[type as WORKFLOW_NODE_TYPE]?.title ?? 'Node';
-  }
-
-  return (
-    <>
-      {nodeName && nodeId && (
-        <p className="mb-2 text-sm">
-          Error occured on the{' '}
-          <Link
-            to={`/workflows/${item.workflowId}?toNode=${nodeId}`}
-            className="underline"
-          >
-            &quot;{nodeName}&quot;
-          </Link>{' '}
-          node
-        </p>
-      )}
-      <pre className="whitespace-pre-wrap rounded-md bg-background p-2 text-sm">
-        {item.errorMessage!}
-      </pre>
-    </>
-  );
-}
-
+const logLevelClass: Record<string, string> = {
+  default: 'hover:bg-card',
+  error: 'hover:bg-destructive/25 bg-destructive/20 text-destructive-text',
+};
 function WorkflowHistoryDetail({
   history,
 }: {
   history: WorkflowHistoryWithWorkflowModel;
 }) {
-  const [log, setlog] = useState<string | null>(null);
+  const [log, setlog] = useState<WorkflowHistoryLogItem[]>([]);
 
   useEffect(() => {
     preloadAPI.main.ipc
@@ -124,12 +91,58 @@ function WorkflowHistoryDetail({
   }, [history.runnerId]);
 
   return (
-    <pre
-      className="overflow-auto border-t p-6 text-sm leading-relaxed text-muted-foreground"
+    <div
+      className="overflow-auto border-t py-6 font-mono text-sm text-muted-foreground"
       style={{ maxHeight: 'calc(100vh - 15rem)' }}
     >
-      {log || 'No log data'}
-    </pre>
+      <table className="h-full w-full align-top">
+        <thead>
+          <tr>
+            <th className="w-32"></th>
+            <th className="w-40"></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {log.length === 0 && (
+            <tr>
+              <td colSpan={99} className="text-center">
+                No log data
+              </td>
+            </tr>
+          )}
+          {log.map((item) => (
+            <tr
+              key={item.id}
+              className={
+                'align-top ' +
+                (logLevelClass[item.level] ?? logLevelClass.default)
+              }
+            >
+              <td className="py-1.5 pl-6 pr-2">{item.time}</td>
+              <td className="line-clamp-1 px-2 py-1.5">
+                {item.node && (
+                  <Link
+                    title={
+                      (WORKFLOW_NODES[item.node.type]?.title ??
+                        item.node.type) + ' node'
+                    }
+                    className="hover:text-foreground"
+                    to={`/workflows/${history.workflowId}?toNode=${item.node.id}`}
+                  >
+                    <ArrowUpRightIcon className="mr-1 inline-block size-4 align-middle" />
+                    <span className="align-middle">
+                      {WORKFLOW_NODES[item.node.type]?.title ?? item.node.type}
+                    </span>
+                  </Link>
+                )}
+              </td>
+              <td className="py-1.5 pl-2 pr-6">{item.msg}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
@@ -283,7 +296,13 @@ function RouteWorkflowHistory() {
                   </button>
                 </td>
                 <td className="p-3 text-center">
-                  <WorkflowHistoryStatusBadge status={item.status} />
+                  {item.status === WORKFLOW_HISTORY_STATUS.Error ? (
+                    <UiTooltip label={item.errorMessage}>
+                      <WorkflowHistoryStatusBadge status={item.status} />
+                    </UiTooltip>
+                  ) : (
+                    <WorkflowHistoryStatusBadge status={item.status} />
+                  )}
                 </td>
                 <td className="p-3">{formatDate(item.startedAt)}</td>
                 <td className="p-3">
@@ -304,19 +323,6 @@ function RouteWorkflowHistory() {
                       >
                         Stop
                       </UiButton>
-                    )}
-                    {item.errorMessage && (
-                      <UiPopover>
-                        <UiPopoverTrigger className="h-8 underline">
-                          see error
-                        </UiPopoverTrigger>
-                        <UiPopoverContent
-                          side="left"
-                          className="max-h-72 w-80 overflow-auto"
-                        >
-                          <WorkflowHistoryError item={item} />
-                        </UiPopoverContent>
-                      </UiPopover>
                     )}
                     <UiButton
                       size="icon-sm"
@@ -344,7 +350,7 @@ function RouteWorkflowHistory() {
         open={Boolean(selectedHistory)}
         onOpenChange={(value) => !value && setSelectedHistoryId(null)}
       >
-        <UiDialog.Content className="max-w-2xl gap-0 p-0">
+        <UiDialog.Content className="max-w-5xl gap-0 p-0">
           {selectedHistory && (
             <>
               <div className="flex items-center p-6">

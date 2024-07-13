@@ -10,7 +10,6 @@ import WorkflowRunnerData from './WorkflowRunnerData';
 import type { WorkflowNodeHandlerExecuteReturn } from '../node-handler/WorkflowNodeHandler';
 import WorkflowRunnerSandbox from './WorkflowRunnerSandbox';
 import { clipboard } from 'electron';
-import { Logger } from 'electron-log';
 import { nanoid } from 'nanoid';
 import { validateTypes } from '/@/utils/helper';
 import WorkflowRunnerBrowser from './WorklowRunnerBrowser';
@@ -20,6 +19,7 @@ import {
   getWorkflowNodeConnectionsMap,
   WorkflowNodeConnectionMap,
 } from '../utils/workflow-utils';
+import WorkflowRunnerLogger from './WorkflowRunnerLogger';
 
 export type NodeHandlersObj = Record<
   WORKFLOW_NODE_TYPE,
@@ -33,14 +33,13 @@ export interface WorkflowRunnerParent {
 
 export interface WorkflowRunnerOptions extends WorkflowRunnerRunPayload {
   id: string;
-  logger: Logger;
   nodeHandlers: NodeHandlersObj;
   parentWorkflow?: WorkflowRunnerParent;
 }
 
 export interface WorkflowRunnerEvents {
   finish: (reason: WorkflowRunnerFinishReason) => void;
-  error: (error: { message: string; location?: string }) => void;
+  error: (error: { message: string; node?: WorkflowNodes }) => void;
   'node:execute-finish': (
     node: WorkflowNodes,
     result: WorkflowNodeHandlerExecuteReturn,
@@ -63,6 +62,7 @@ export enum WorkflowRunnerFinishReason {
 
 export interface WorkflowRunnerPrevNodeExecution {
   value: unknown;
+  execTime?: number;
   node: WorkflowNodes;
   retryCount?: number;
   isRetrying?: boolean;
@@ -83,8 +83,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   readonly workflow: WorkflowDetailModel;
   connectionsMap: Record<string, WorkflowNodeConnectionMap> = {};
 
-  readonly logger: Logger;
-
+  readonly logger: WorkflowRunnerLogger;
   readonly browser: WorkflowRunnerBrowser = new WorkflowRunnerBrowser();
   readonly dataStorage: WorkflowRunnerData = new WorkflowRunnerData(this);
   readonly sandbox: WorkflowRunnerSandbox = new WorkflowRunnerSandbox(this);
@@ -93,7 +92,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
 
   constructor({
     id,
-    logger,
+    logDir,
     workflow,
     emitEvents,
     startNodeId,
@@ -110,7 +109,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     this.nodeHandlers = nodeHandlers;
     this.parentWorkflow = parentWorkflow ?? null;
 
-    this.logger = logger;
+    this.logger = new WorkflowRunnerLogger(this, logDir);
 
     this.emitEvents = {
       'node:execute-finish': false,
@@ -142,7 +141,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
       return;
     }
 
-    this.logger.info('Start executing');
+    this.logger.instance.info('Start executing');
 
     // Init Connection Map
     this.connectionsMap = getWorkflowNodeConnectionsMap(
@@ -279,8 +278,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     node: WorkflowNodes,
     prevExec?: WorkflowRunnerPrevNodeExecution,
   ) {
-    const nodeName = `${node.data.$nodeType}--${node.id}`;
-
+    const startExecTime = prevExec?.execTime ?? Date.now();
     try {
       if (this.state !== WorkflowRunnerState.Running) return;
 
@@ -293,8 +291,8 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
       if (node.id === prevExec?.node.id) {
         this.state = WorkflowRunnerState.Error;
         this.emit('error', {
-          message: `(${nodeName}) Stopped to prevent infinite loop`,
-          location: `${node.type}:${node.id}`,
+          node,
+          message: 'Stopped to prevent infinite loop',
         });
         return;
       }
@@ -322,8 +320,10 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
           validateTypes(renderedNode.data, nodeHandler.dataValidation);
         }
 
-        const startExecTime = Date.now();
-        this.logger.info(`Executing ${nodeName} node`);
+        if (!prevExec?.isRetrying) {
+          this.logger.logNode('info', node, 'Start executing node');
+        }
+
         execResult = await nodeHandler.execute({
           runner: this,
           node: renderedNode,
@@ -341,8 +341,10 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
           this.emit('node:execute-finish', node, execResult);
         }
 
-        this.logger.info(
-          `Finish executing ${nodeName} in ${Date.now() - startExecTime}ms`,
+        this.logger.logNode(
+          'info',
+          node,
+          `Finish executing node in ${Date.now() - startExecTime}ms`,
         );
       }
 
@@ -373,17 +375,14 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
         this.state = WorkflowRunnerState.Error;
 
         const message = (<Error>error).message;
-        const currentNode = this.dataStorage.nodeData.get('currentNode');
 
         if (this.emitEvents['node:execute-error']) {
           this.emit('node:execute-error', node, message);
         }
 
         this.emit('error', {
-          message: `(${nodeName}) ${message}`,
-          location: currentNode
-            ? `${currentNode.type}:${currentNode.id}`
-            : undefined,
+          node,
+          message,
         });
         return;
       }
@@ -397,8 +396,8 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
           ? prevExec.retryCount <= retryCount
           : true);
       if (retryExecution) {
-        this.logger.info(
-          `Retry execution {${prevExec?.retryCount ?? 0} => ${retryCount}}`,
+        this.logger.instance.info(
+          `Retry node execution, ${prevExec?.retryCount ?? 1} of ${retryCount}`,
         );
 
         await sleep(retryIntervalMs);
@@ -406,7 +405,8 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
         this.executeNode(node, {
           ...(prevExec || { value: null, node }),
           isRetrying: true,
-          retryCount: (prevExec?.retryCount ?? 0) + 1,
+          execTime: startExecTime,
+          retryCount: (prevExec?.retryCount ?? 1) + 1,
         });
         return;
       }
@@ -431,7 +431,8 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
 
       this.state = WorkflowRunnerState.Error;
       this.emit('error', {
-        message: `(${nodeName}) ${(<Error>error).message}`,
+        node,
+        message: (<Error>error).message,
       });
     }
   }

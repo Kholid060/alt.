@@ -42,6 +42,7 @@ import {
   WorkflowUpdatePayload,
 } from '../../main/src/workflow/workflow.interface';
 import { SelectExtension } from '../../main/src/db/schema/extension.schema';
+import { WorkflowHistoryLogItem } from '../../main/src/workflow/workflow-history/workflow-history.interface';
 
 export interface IPCRendererInvokeEventPayload {
   name: string;
@@ -196,7 +197,7 @@ export interface IPCWorkflowEvents {
   'workflow:get-with-extensions': (
     workflowId: string,
   ) => WorkflowApiWithExtensions;
-  'workflow-history:get-log': (runnerId: string) => string | null;
+  'workflow-history:get-log': (runnerId: string) => WorkflowHistoryLogItem[];
 }
 
 export interface IPCUserExtensionEvents {
