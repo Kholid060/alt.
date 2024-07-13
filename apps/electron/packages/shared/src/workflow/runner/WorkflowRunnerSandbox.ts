@@ -7,6 +7,7 @@ import type WorkflowRunner from './WorkflowRunner';
 import { getExactType } from '/@/utils/helper';
 import WorkflowFileHandle from '../utils/WorkflowFileHandle';
 import { WorkflowNodeExpressionRecords } from '@altdot/workflow';
+import Logger from 'electron-log';
 
 const MUSTACHE_REGEX = /\{\{(.*?)\}\}/g;
 
@@ -66,6 +67,7 @@ function convertToJSHandle(vm: QuickJSContext, value: unknown, scope: Scope) {
   throw new Error(`Can't convert "${getExactType(value)}" to JSHandle`);
 }
 
+// EXP => Expression
 const EXP_RUNTIME_MEMORY_LIMIT_BYTE = 1.5 * 1024 * 1024; // 1.5MB
 const EXP_RUNTIME_MAX_STACK_SIZE_BYTE = 0.5 * 1024 * 1024; // 0.5MB
 
@@ -77,6 +79,7 @@ interface EvaluateExpressionOptions {
   data?: Record<PropertyKey, unknown>;
 }
 interface EvaluateCodeOptions {
+  name: string;
   isPromise?: boolean;
   signal?: AbortSignal;
   data?: Record<PropertyKey, unknown>;
@@ -138,9 +141,38 @@ class WorkflowRunnerSandbox {
     context.setProp(context.global, '$setVars', setVarsFunc);
   }
 
+  private createConsoleHandle({
+    vm,
+    scope,
+    name = '',
+    levels = ['debug', 'error', 'info', 'warn', 'verbose'],
+  }: {
+    scope: Scope;
+    name?: string;
+    vm: QuickJSContext;
+    levels?: Logger.LogLevel[];
+  }) {
+    const createLevel = (level: Logger.LogLevel) =>
+      scope.manage(
+        vm.newFunction(level, (...args) => {
+          const nativeArgs = args.map((handle) =>
+            vm.dump(scope.manage(handle)),
+          );
+          this.runner.logger[level](name, ...nativeArgs);
+        }),
+      );
+
+    const consoleHandle = scope.manage(vm.newObject());
+    levels.forEach((level) => {
+      vm.setProp(consoleHandle, level, createLevel(level));
+    });
+
+    return consoleHandle;
+  }
+
   async evaluateCode(
     code: string,
-    { signal, isPromise, data = {} }: EvaluateCodeOptions = {},
+    { signal, isPromise, data = {}, name }: EvaluateCodeOptions = { name: '' },
   ) {
     const quickJS = await getQuickJS();
 
@@ -160,16 +192,16 @@ class WorkflowRunnerSandbox {
       const vm = scope.manage(runtime.newContext());
       this.injectContextGlobalVar(vm, scope, data);
 
-      const logHandle = scope.manage(
-        vm.newFunction('log', (...args) => {
-          const nativeArgs = args.map((handle) =>
-            vm.dump(scope.manage(handle)),
-          );
-          console.log('Sandbox:', ...nativeArgs);
-        }),
-      );
       const consoleHandle = scope.manage(vm.newObject());
-      vm.setProp(consoleHandle, 'log', logHandle);
+      (
+        ['debug', 'error', 'info', 'warn', 'verbose'] as Logger.LogLevel[]
+      ).forEach((level) => {
+        vm.setProp(
+          consoleHandle,
+          level,
+          this.createConsoleHandle({ scope, vm, name }),
+        );
+      });
       vm.setProp(vm.global, 'console', consoleHandle);
 
       const result = vm.evalCode(code, '', {

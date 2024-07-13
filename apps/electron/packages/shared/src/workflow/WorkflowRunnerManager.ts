@@ -6,19 +6,20 @@ import type {
   WorkflowRunnerFinishReason,
   WorkflowRunnerParent,
 } from './runner/WorkflowRunner';
+import { create } from 'electron-log/node';
 import WorkflowRunner from './runner/WorkflowRunner';
 import * as nodeHandlersClasses from './node-handler';
-import { debugLog } from '#packages/common/utils/helper';
 import { WORKFLOW_HISTORY_STATUS } from '#packages/common/utils/constant/workflow.const';
 import IPCRenderer from '#packages/common/utils/IPCRenderer';
 import type { SetRequired } from 'type-fest';
 import IdleTimer from '#packages/common/utils/IdleTimer';
 import { WorkflowHistoryUpdatePayload } from '#packages/main/src/workflow/workflow-history/workflow-history.interface';
+import path from 'path';
 
 const IDLE_TIMER_KEY = 'workflow-manager';
 
 async function updateWorkflowHistory(
-  historyId: number,
+  historyId: number | { runnerId: string },
   {
     status,
     startedAt,
@@ -67,6 +68,7 @@ class WorkflowRunnerManager {
   constructor() {}
 
   async execute({
+    logDir,
     parent,
     onError,
     workflow,
@@ -76,106 +78,135 @@ class WorkflowRunnerManager {
   }: WorkflowRunnerExecuteOptions) {
     const runnerId = nanoid(5);
 
-    const historyId = await IPCRenderer.invokeWithError(
-      'database:insert-workflow-history',
-      {
+    const logger = create({ logId: runnerId });
+    logger.transports.console.writeFn = () => {};
+    logger.transports.file.format = '[{h}:{i}:{s}.{ms}] [{level}] {text}';
+    logger.transports.file.setAppName(runnerId);
+    logger.transports.file.resolvePathFn = () =>
+      path.join(logDir, `${runnerId}.log`);
+
+    try {
+      const historyId = await IPCRenderer.invokeWithError(
+        'database:insert-workflow-history',
+        {
+          runnerId,
+          workflowId: workflow.id,
+          startedAt: new Date().toString(),
+          status: WORKFLOW_HISTORY_STATUS.Running,
+        },
+      );
+
+      const nodeHandlers = Object.values(nodeHandlersClasses).reduce<
+        Record<string, unknown>
+      >((acc, HandlerClass) => {
+        const nodeHandler = new HandlerClass();
+        acc[nodeHandler.type] = nodeHandler;
+
+        return acc;
+      }, {}) as NodeHandlersObj;
+
+      const runner = new WorkflowRunner({
+        logDir,
+        logger,
+        workflow,
+        startNodeId,
+        nodeHandlers,
+        id: runnerId,
+        parentWorkflow: parent,
+        ...rest,
+      });
+      runner.once('error', async ({ message, location }) => {
+        try {
+          logger.error(`Stop executing because of error: ${message}`);
+
+          IPCRenderer.send('workflow:running-change', 'finish', {
+            runnerId,
+            workflowId: workflow.id,
+          });
+
+          await updateWorkflowHistory(historyId, {
+            errorMessage: message,
+            errorLocation: location,
+            startedAt: runner.startedAt,
+            status: WORKFLOW_HISTORY_STATUS.Error,
+          });
+
+          if (onError) await onError(runner, { message, location });
+        } catch (error) {
+          console.error(error);
+        } finally {
+          runner.destroy();
+          this.runners.delete(runnerId);
+        }
+      });
+      runner.once('finish', async (reason) => {
+        try {
+          logger.info(`Finish execution, reason: ${reason}`);
+
+          IPCRenderer.send('workflow:running-change', 'finish', {
+            runnerId,
+            workflowId: workflow.id,
+          });
+
+          await updateWorkflowHistory(historyId, {
+            startedAt: runner.startedAt,
+            status: WORKFLOW_HISTORY_STATUS.Finish,
+          });
+
+          if (onFinish) await onFinish(runner, reason);
+        } catch (error) {
+          console.error(error);
+        } finally {
+          runner.destroy();
+          this.runners.delete(runnerId);
+        }
+      });
+      runner.on('node:execute-finish', ({ id, type }, execResult) => {
+        IPCRenderer.send('shared-process:workflow-events', {
+          'node:execute-finish': [{ id, type }, execResult.value],
+        });
+      });
+      runner.on('node:execute-error', ({ id, type }, message) => {
+        IPCRenderer.send('shared-process:workflow-events', {
+          'node:execute-error': [{ id, type }, message],
+        });
+      });
+
+      IdleTimer.instance.lock(IDLE_TIMER_KEY);
+      IPCRenderer.send('workflow:running-change', 'running', {
         runnerId,
         workflowId: workflow.id,
-        startedAt: new Date().toString(),
-        status: WORKFLOW_HISTORY_STATUS.Running,
-      },
-    );
-
-    const nodeHandlers = Object.values(nodeHandlersClasses).reduce<
-      Record<string, unknown>
-    >((acc, HandlerClass) => {
-      const nodeHandler = new HandlerClass();
-      acc[nodeHandler.type] = nodeHandler;
-
-      return acc;
-    }, {}) as NodeHandlersObj;
-
-    const runner = new WorkflowRunner({
-      workflow,
-      startNodeId,
-      nodeHandlers,
-      id: runnerId,
-      parentWorkflow: parent,
-      ...rest,
-    });
-    runner.once('error', async ({ message, location }) => {
-      try {
-        debugLog(`Error on "${workflow.name}" workflow: ${message}`);
-
-        IPCRenderer.send('workflow:running-change', 'finish', {
-          runnerId,
-          workflowId: workflow.id,
-        });
-
-        await updateWorkflowHistory(historyId, {
-          errorMessage: message,
-          errorLocation: location,
-          startedAt: runner.startedAt,
-          status: WORKFLOW_HISTORY_STATUS.Error,
-        });
-
-        if (onError) await onError(runner, { message, location });
-      } catch (error) {
-        console.error(error);
-      } finally {
-        runner.destroy();
-        this.runners.delete(runnerId);
-      }
-    });
-    runner.once('finish', async (reason) => {
-      try {
-        debugLog(`Finish "${workflow.name}" execution: ${reason}`);
-
-        IPCRenderer.send('workflow:running-change', 'finish', {
-          runnerId,
-          workflowId: workflow.id,
-        });
-
-        await updateWorkflowHistory(historyId, {
-          startedAt: runner.startedAt,
-          status: WORKFLOW_HISTORY_STATUS.Finish,
-        });
-
-        if (onFinish) await onFinish(runner, reason);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        runner.destroy();
-        this.runners.delete(runnerId);
-      }
-    });
-    runner.on('node:execute-finish', ({ id, type }, execResult) => {
-      IPCRenderer.send('shared-process:workflow-events', {
-        'node:execute-finish': [{ id, type }, execResult.value],
       });
-    });
-    runner.on('node:execute-error', ({ id, type }, message) => {
-      IPCRenderer.send('shared-process:workflow-events', {
-        'node:execute-error': [{ id, type }, message],
-      });
-    });
 
-    IdleTimer.instance.lock(IDLE_TIMER_KEY);
-    IPCRenderer.send('workflow:running-change', 'running', {
-      runnerId,
-      workflowId: workflow.id,
-    });
+      runner.start();
+      this.runners.set(runnerId, runner);
 
-    runner.start();
-    this.runners.set(runnerId, runner);
-
-    return runner;
+      return runner;
+    } catch (error) {
+      logger.error(error, 'Error initiating workflow runner');
+      throw error;
+    }
   }
 
   stop(runnerId: string) {
-    if (!this.runners.has(runnerId)) return;
+    if (!this.runners.has(runnerId)) {
+      IPCRenderer.invokeWithError('database:get-workflow-history', {
+        runnerId,
+      }).then((value) => {
+        if (!value) return;
 
-    this.runners.get(runnerId)?.stop();
+        updateWorkflowHistory(
+          { runnerId },
+          {
+            startedAt: value.startedAt,
+            status: WORKFLOW_HISTORY_STATUS.Finish,
+          },
+        );
+      });
+      return;
+    }
+
+    this.runners.get(runnerId)!.stop();
     this.runners.delete(runnerId);
 
     if (this.runners.size === 0) {

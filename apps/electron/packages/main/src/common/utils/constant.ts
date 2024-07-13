@@ -2,12 +2,12 @@ import path from 'path';
 import { app } from 'electron';
 import { fileURLToPath } from 'url';
 
-export const EXTENSION_FOLDER = path.join(
-  app.getPath('userData'),
-  'extensions',
-);
+const userDataPath = app.getPath('userData');
 
-export const DATABASE_FOLDER = path.join(app.getPath('userData'), 'Database');
+export const EXTENSION_FOLDER = path.join(userDataPath, 'extensions');
+
+export const WORKFLOW_LOGS_FOLDER = path.join(userDataPath, 'logs/workflows');
+export const DATABASE_FOLDER = path.join(userDataPath, 'Database');
 
 export const EXTENSION_LOCAL_ID_PREFIX = 'local__';
 

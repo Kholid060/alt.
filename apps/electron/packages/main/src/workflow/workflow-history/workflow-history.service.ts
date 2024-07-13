@@ -1,23 +1,53 @@
 import { Injectable } from '@nestjs/common';
 import { DBService } from '/@/db/db.service';
 import {
+  WorkflowHistoryFindById,
   WorkflowHistoryInsertPayload,
   WorkflowHistoryListPaginationFilter,
   WorkflowHistoryListPaginationModel,
-  WorkflowHistoryModel,
+  WorkflowHistoryWithWorkflowModel,
   WorkflowHistoryRunningItemModel,
   WorkflowHistoryUpdatePayload,
+  WorkflowHistoryModel,
 } from './workflow-history.interface';
-import { eq, like, asc, desc, count, inArray } from 'drizzle-orm';
+import fs from 'fs-extra';
+import { eq, like, asc, desc, count, getOperators } from 'drizzle-orm';
 import { SQLiteColumn } from 'drizzle-orm/sqlite-core';
 import { workflowsHistory, workflows } from '/@/db/schema/workflow.schema';
 import { withPagination } from '/@/common/utils/database-utils';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import { WORKFLOW_HISTORY_STATUS } from '#packages/common/utils/constant/workflow.const';
+import { findWorkflowHistoryByIdQuery } from './utils';
+import { OnAppReady } from '/@/common/hooks/on-app-ready.hook';
+import path from 'path';
+import { WORKFLOW_LOGS_FOLDER } from '/@/common/utils/constant';
 
 @Injectable()
-export class WorkflowHistoryService {
+export class WorkflowHistoryService implements OnAppReady {
   constructor(private dbService: DBService) {}
+
+  onAppReady() {
+    // Reset all running workflow history
+    this.dbService.db
+      .update(workflowsHistory)
+      .set({ endedAt: new Date().toISOString() })
+      .where(eq(workflowsHistory.status, WORKFLOW_HISTORY_STATUS.Running));
+  }
+
+  async get(id: WorkflowHistoryFindById): Promise<WorkflowHistoryModel | null> {
+    const result = await this.dbService.db.query.workflowsHistory.findFirst({
+      where: findWorkflowHistoryByIdQuery(id),
+    });
+
+    return result ?? null;
+  }
+
+  deleteLogFile(runnerId: string | string[]) {
+    const ids = Array.isArray(runnerId) ? runnerId : [runnerId];
+    return Promise.allSettled(
+      ids.map((id) => fs.remove(path.join(WORKFLOW_LOGS_FOLDER, id))),
+    );
+  }
 
   async listHistoryPagination({
     sort,
@@ -67,7 +97,7 @@ export class WorkflowHistoryService {
       query = withPagination(query, pagination.page, pagination.pageSize);
     }
 
-    const items = (await query.execute()) as WorkflowHistoryModel[];
+    const items = (await query.execute()) as WorkflowHistoryWithWorkflowModel[];
     const historyLength = filter
       ? items.length
       : (
@@ -117,7 +147,7 @@ export class WorkflowHistoryService {
   }
 
   async updateHistory(
-    historyId: number,
+    historyId: WorkflowHistoryFindById,
     {
       status,
       endedAt,
@@ -129,7 +159,12 @@ export class WorkflowHistoryService {
     const result = await this.dbService.db
       .update(workflowsHistory)
       .set({ duration, endedAt, errorLocation, errorMessage, status })
-      .where(eq(workflowsHistory.id, historyId))
+      .where(
+        findWorkflowHistoryByIdQuery(historyId)(
+          workflowsHistory,
+          getOperators(),
+        ),
+      )
       .returning();
 
     this.dbService.emitChanges({
@@ -140,19 +175,27 @@ export class WorkflowHistoryService {
     return result;
   }
 
-  async deleteHistory(historyId: number[] | number) {
-    await this.dbService.db
+  async deleteHistory(
+    historyId: WorkflowHistoryFindById[] | WorkflowHistoryFindById,
+  ) {
+    const ids = await this.dbService.db
       .delete(workflowsHistory)
       .where(
-        Array.isArray(historyId)
-          ? inArray(workflowsHistory.id, historyId)
-          : eq(workflowsHistory.id, historyId),
-      );
+        findWorkflowHistoryByIdQuery(historyId)(
+          workflowsHistory,
+          getOperators(),
+        ),
+      )
+      .returning();
+
+    this.deleteLogFile(ids.map((id) => id.runnerId));
 
     this.dbService.emitChanges({
       'database:get-running-workflows': [DATABASE_CHANGES_ALL_ARGS],
       'database:get-workflow-history-list': [DATABASE_CHANGES_ALL_ARGS],
     });
+
+    return ids;
   }
 
   listRunningWorkflows(): Promise<WorkflowHistoryRunningItemModel[]> {
@@ -173,5 +216,16 @@ export class WorkflowHistoryService {
         return operators.eq(fields.status, WORKFLOW_HISTORY_STATUS.Running);
       },
     });
+  }
+
+  async getLog(runnerId: string) {
+    try {
+      return await fs.readFile(
+        path.join(WORKFLOW_LOGS_FOLDER, `${runnerId}.log`),
+        'utf-8',
+      );
+    } catch {
+      return null;
+    }
   }
 }

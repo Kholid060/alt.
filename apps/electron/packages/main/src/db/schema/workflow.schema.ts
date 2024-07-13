@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
 import type {
   WorkflowEdge,
   WorkflowSettings,
@@ -55,21 +55,27 @@ export const workflowsRelations = relations(workflows, ({ many }) => ({
   history: many(workflowsHistory),
 }));
 
-export const workflowsHistory = sqliteTable('workflows_history', {
-  id: integer('id').primaryKey({ autoIncrement: true }),
-  startedAt: text('started_at')
-    .notNull()
-    .$defaultFn(() => new Date().toISOString()),
-  endedAt: text('ended_at'),
-  duration: integer('duration'),
-  errorMessage: text('error_message'),
-  runnerId: text('runner_id').notNull(),
-  errorLocation: text('error_location'),
-  workflowId: text('workflow_id')
-    .notNull()
-    .references(() => workflows.id, { onDelete: 'cascade' }),
-  status: text('status').notNull().$type<WORKFLOW_HISTORY_STATUS>(),
-});
+export const workflowsHistory = sqliteTable(
+  'workflows_history',
+  {
+    id: integer('id').primaryKey({ autoIncrement: true }),
+    startedAt: text('started_at')
+      .notNull()
+      .$defaultFn(() => new Date().toISOString()),
+    endedAt: text('ended_at'),
+    duration: integer('duration'),
+    errorMessage: text('error_message'),
+    runnerId: text('runner_id').notNull(),
+    errorLocation: text('error_location'),
+    workflowId: text('workflow_id')
+      .notNull()
+      .references(() => workflows.id, { onDelete: 'cascade' }),
+    status: text('status').notNull().$type<WORKFLOW_HISTORY_STATUS>(),
+  },
+  (table) => ({
+    workflowRunnerIdIdx: index('workflow_runner_id_idx').on(table.runnerId),
+  }),
+);
 export type NewWorkflowHistory = typeof workflowsHistory.$inferInsert;
 export type SelectWorkflowHistory = typeof workflowsHistory.$inferSelect;
 

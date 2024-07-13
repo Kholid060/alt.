@@ -18,6 +18,13 @@ export class WorkflowHistoryController {
     return this.workflowHistory.listHistoryPagination(filter);
   }
 
+  @IPCInvoke('database:get-workflow-history')
+  getHistory(
+    @Payload() [id]: IPCInvokePayload<'database:get-workflow-history'>,
+  ): IPCInvokeReturn<'database:get-workflow-history'> {
+    return this.workflowHistory.get(id);
+  }
+
   @IPCInvoke('database:insert-workflow-history')
   async insertHistory(
     @Payload() [payload]: IPCInvokePayload<'database:insert-workflow-history'>,
@@ -45,5 +52,12 @@ export class WorkflowHistoryController {
   @IPCInvoke('database:get-running-workflows')
   listRunningWorkflows(): IPCInvokeReturn<'database:get-running-workflows'> {
     return this.workflowHistory.listRunningWorkflows();
+  }
+
+  @IPCInvoke('workflow-history:get-log')
+  getLog(
+    @Payload() [runnerId]: IPCInvokePayload<'workflow-history:get-log'>,
+  ): IPCInvokeReturn<'workflow-history:get-log'> {
+    return this.workflowHistory.getLog(runnerId);
   }
 }

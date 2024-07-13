@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDatabase } from '/@/hooks/useDatabase';
 import { useDebounceValue } from 'usehooks-ts';
 import {
   UiBadge,
   UiButton,
+  UiDialog,
   UiInput,
   UiPopover,
   UiPopoverContent,
@@ -14,19 +15,22 @@ import {
 import {
   ArrowDownAzIcon,
   ArrowUpAzIcon,
+  ArrowUpRightIcon,
+  CalendarIcon,
   LoaderIcon,
   SearchIcon,
+  TimerIcon,
   TrashIcon,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { WORKFLOW_HISTORY_STATUS } from '#packages/common/utils/constant/workflow.const';
-import dayjs from 'dayjs';
+import dayjs from '/@/lib/dayjs';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import UiItemsPagination from '/@/components/ui/UiItemsPagination';
 import {
   WorkflowHistoryListPaginationFilter,
-  WorkflowHistoryModel,
+  WorkflowHistoryWithWorkflowModel,
 } from '#packages/main/src/workflow/workflow-history/workflow-history.interface';
 import { WORKFLOW_NODES, WORKFLOW_NODE_TYPE } from '@altdot/workflow';
 
@@ -70,7 +74,11 @@ function formatDuration(duration: number) {
 
 type HistorySort = Required<WorkflowHistoryListPaginationFilter>['sort'];
 
-function WorkflowHistoryError({ item }: { item: WorkflowHistoryModel }) {
+function WorkflowHistoryError({
+  item,
+}: {
+  item: WorkflowHistoryWithWorkflowModel;
+}) {
   let nodeId = '';
   let nodeName = '';
 
@@ -102,14 +110,40 @@ function WorkflowHistoryError({ item }: { item: WorkflowHistoryModel }) {
   );
 }
 
+function WorkflowHistoryDetail({
+  history,
+}: {
+  history: WorkflowHistoryWithWorkflowModel;
+}) {
+  const [log, setlog] = useState<string | null>(null);
+
+  useEffect(() => {
+    preloadAPI.main.ipc
+      .invokeWithError('workflow-history:get-log', history.runnerId)
+      .then(setlog);
+  }, [history.runnerId]);
+
+  return (
+    <pre
+      className="overflow-auto border-t p-6 text-sm leading-relaxed text-muted-foreground"
+      style={{ maxHeight: 'calc(100vh - 15rem)' }}
+    >
+      {log || 'No log data'}
+    </pre>
+  );
+}
+
 function RouteWorkflowHistory() {
   const { toast } = useToast();
   const { queryDatabase } = useDatabase();
 
   const [search, setSearch] = useDebounceValue('', 500);
+  const [selectedHistoryId, setSelectedHistoryId] = useState<number | null>(
+    null,
+  );
   const [workflowHistory, setWorkflowHistory] = useState<{
     count: number;
-    items: WorkflowHistoryModel[];
+    items: WorkflowHistoryWithWorkflowModel[];
   }>({ count: 0, items: [] });
   const [pagination, setPagination] = useState({
     page: 1,
@@ -119,6 +153,12 @@ function RouteWorkflowHistory() {
     asc: false,
     by: 'startedAt',
   });
+
+  const selectedHistory = useMemo(() => {
+    if (!selectedHistoryId) return null;
+
+    return workflowHistory.items.find((item) => item.id === selectedHistoryId);
+  }, [selectedHistoryId, workflowHistory]);
 
   function deleteHistory(historyId: number) {
     preloadAPI.main.ipc
@@ -232,15 +272,15 @@ function RouteWorkflowHistory() {
                 className="group cursor-default border-b border-border/50 hover:bg-card"
               >
                 <td>
-                  <Link
-                    className="block p-3"
-                    to={`/workflows/${item.workflowId}`}
+                  <button
+                    className="block w-full p-3 text-left"
+                    onClick={() => setSelectedHistoryId(item.id)}
                   >
                     <p>{item.workflow.name}</p>
                     <p className="leading-tight text-muted-foreground">
                       {item.runnerId}
                     </p>
-                  </Link>
+                  </button>
                 </td>
                 <td className="p-3 text-center">
                   <WorkflowHistoryStatusBadge status={item.status} />
@@ -299,6 +339,50 @@ function RouteWorkflowHistory() {
         itemsCount={workflowHistory.count}
         onPaginationChange={setPagination}
       />
+      <UiDialog
+        modal
+        open={Boolean(selectedHistory)}
+        onOpenChange={(value) => !value && setSelectedHistoryId(null)}
+      >
+        <UiDialog.Content className="max-w-2xl gap-0 p-0">
+          {selectedHistory && (
+            <>
+              <div className="flex items-center p-6">
+                <UiDialog.Header className="flex-grow space-y-3 pr-2">
+                  <UiDialog.Title className="line-clamp-1">
+                    {selectedHistory.workflow.name}
+                  </UiDialog.Title>
+                  <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                    <Link
+                      to={`/workflows/${selectedHistory.workflowId}`}
+                      className="inline-flex items-center transition-colors hover:text-foreground"
+                    >
+                      <ArrowUpRightIcon className="-ml-1 mr-1 size-5" />
+                      Open
+                    </Link>
+                    <WorkflowHistoryStatusBadge
+                      status={selectedHistory.status}
+                    />
+                    <span title="Duration">
+                      <TimerIcon className="mr-2 inline-block size-5 align-middle" />
+                      <span className="align-middle">
+                        {formatDuration(selectedHistory.duration ?? 0)}
+                      </span>
+                    </span>
+                    <span title="Started at">
+                      <CalendarIcon className="mr-2 inline-block size-5 align-middle" />
+                      <span className="align-middle">
+                        {dayjs(selectedHistory.startedAt).fromNow()}
+                      </span>
+                    </span>
+                  </div>
+                </UiDialog.Header>
+              </div>
+              <WorkflowHistoryDetail history={selectedHistory} />
+            </>
+          )}
+        </UiDialog.Content>
+      </UiDialog>
     </div>
   );
 }

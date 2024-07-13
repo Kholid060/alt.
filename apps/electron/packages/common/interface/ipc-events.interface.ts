@@ -196,6 +196,7 @@ export interface IPCWorkflowEvents {
   'workflow:get-with-extensions': (
     workflowId: string,
   ) => WorkflowApiWithExtensions;
+  'workflow-history:get-log': (runnerId: string) => string | null;
 }
 
 export interface IPCUserExtensionEvents {

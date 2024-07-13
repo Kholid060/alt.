@@ -4,10 +4,11 @@ import { WorkflowQueryService } from './workflow-query.service';
 import { WorkflowService } from './workflow.service';
 import { ExtensionQueryService } from '../extension/extension-query.service';
 import { APIModule } from '../api/api.module';
+import { WorkflowHistoryModule } from './workflow-history/workflow-history.module';
 
 @Module({
-  imports: [APIModule],
   controllers: [WorkflowController],
+  imports: [APIModule, WorkflowHistoryModule],
   exports: [WorkflowService, WorkflowQueryService],
   providers: [WorkflowService, WorkflowQueryService, ExtensionQueryService],
 })

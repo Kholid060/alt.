@@ -3,6 +3,7 @@ import { WorkflowHistoryController } from './workflow-history.controller';
 import { WorkflowHistoryService } from './workflow-history.service';
 
 @Module({
+  exports: [WorkflowHistoryService],
   providers: [WorkflowHistoryService],
   controllers: [WorkflowHistoryController],
 })

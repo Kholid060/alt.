@@ -4,7 +4,9 @@ import {
   SelectWorkflowHistory,
 } from '../../db/schema/workflow.schema';
 
-export type WorkflowHistoryModel = SelectWorkflowHistory & {
+export type WorkflowHistoryModel = SelectWorkflowHistory;
+
+export type WorkflowHistoryWithWorkflowModel = SelectWorkflowHistory & {
   workflow: Pick<SelectWorkflow, 'name' | 'description'>;
 };
 
@@ -24,7 +26,7 @@ export interface WorkflowHistoryListPaginationFilter {
 
 export interface WorkflowHistoryListPaginationModel {
   count: number;
-  items: WorkflowHistoryModel[];
+  items: WorkflowHistoryWithWorkflowModel[];
 }
 
 export type WorkflowHistoryInsertPayload = Omit<NewWorkflowHistory, 'id'>;
@@ -46,3 +48,5 @@ export type WorkflowHistoryRunningItemModel = Pick<
   SelectWorkflowHistory,
   'runnerId' | 'startedAt'
 > & { workflow: { name: string; icon: string | null } };
+
+export type WorkflowHistoryFindById = number | { runnerId: string };

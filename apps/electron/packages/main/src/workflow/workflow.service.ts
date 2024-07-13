@@ -23,6 +23,10 @@ import { WorkflowNodes, WORKFLOW_NODE_TYPE } from '@altdot/workflow';
 import { APIService } from '../api/api.service';
 import { ApiExtensionHighlightItem } from '@altdot/shared';
 import { ExtensionQueryService } from '../extension/extension-query.service';
+import { WORKFLOW_LOGS_FOLDER } from '../common/utils/constant';
+import { WorkflowHistoryService } from './workflow-history/workflow-history.service';
+import { WORKFLOW_HISTORY_STATUS } from '#packages/common/utils/constant/workflow.const';
+import { WindowBaseState } from '../browser-window/window/WindowBase';
 
 @Injectable()
 export class WorkflowService implements OnAppReady {
@@ -33,10 +37,12 @@ export class WorkflowService implements OnAppReady {
     private workflowQuery: WorkflowQueryService,
     private extensionQuery: ExtensionQueryService,
     private globalShortcut: GlobalShortcutService,
+    private workflowHistory: WorkflowHistoryService,
   ) {}
 
-  onAppReady() {
+  async onAppReady() {
     this.registerAllWorkflowsTriggers();
+    await fs.ensureDir(WORKFLOW_LOGS_FOLDER);
   }
 
   private async registerAllWorkflowsTriggers() {
@@ -130,6 +136,7 @@ export class WorkflowService implements OnAppReady {
       {
         ...payload,
         workflow,
+        logDir: WORKFLOW_LOGS_FOLDER,
       },
     );
   }
@@ -183,7 +190,26 @@ export class WorkflowService implements OnAppReady {
       noThrow: true,
       autoCreate: false,
     });
-    if (!windowSharedProcess) return;
+    if (
+      !windowSharedProcess ||
+      windowSharedProcess.state === WindowBaseState.Closed
+    ) {
+      const history = await this.workflowHistory.get({ runnerId });
+      if (!history) return;
+
+      const endedAt = new Date();
+      await this.workflowHistory.updateHistory(
+        {
+          runnerId,
+        },
+        {
+          endedAt: endedAt.toISOString(),
+          status: WORKFLOW_HISTORY_STATUS.Finish,
+          duration: endedAt.getTime() - new Date(history.startedAt).getTime(),
+        },
+      );
+      return;
+    }
 
     await windowSharedProcess.sendMessage(
       {

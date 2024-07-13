@@ -34,9 +34,11 @@ import type {
   WorkflowUpdatePayload,
 } from '../workflow/workflow.interface';
 import type {
+  WorkflowHistoryFindById,
   WorkflowHistoryInsertPayload,
   WorkflowHistoryListPaginationFilter,
   WorkflowHistoryListPaginationModel,
+  WorkflowHistoryModel,
   WorkflowHistoryRunningItemModel,
   WorkflowHistoryUpdatePayload,
 } from '../workflow/workflow-history/workflow-history.interface';
@@ -48,6 +50,9 @@ export interface DatabaseQueriesEvent {
     extensionId: string[],
   ) => Record<string, boolean>;
   'database:get-extension-exists': (extensionId: string) => boolean;
+  'database:get-workflow-history': (
+    commandId: WorkflowHistoryFindById,
+  ) => WorkflowHistoryModel | null;
   'database:get-command': (
     commandId: string | { commandId: string; extensionId: string },
   ) => ExtensionCommandModel | null;
@@ -121,7 +126,7 @@ export interface DatabaseUpdateEvents {
     data: ExtensionUpdatePayload,
   ) => void;
   'database:update-workflow-history': (
-    historyId: number,
+    historyId: number | { runnerId: string },
     data: WorkflowHistoryUpdatePayload,
   ) => void;
   'database:update-extension-command': (

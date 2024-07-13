@@ -26,6 +26,10 @@ export class NodeHandlerFileSystem extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
   }
 
   private async readFile({ node }: Pick<ExecuteParams, 'node'>) {
+    if (!node.data.readFilePath) {
+      throw new Error('File pattern is empty');
+    }
+
     const files = await globby(node.data.readFilePath, { gitignore: false });
     if (files.length === 0 && node.data.throwIfEmpty) {
       throw new Error("Couldn't find files with inputted patterns");
@@ -87,7 +91,7 @@ export class NodeHandlerFileSystem extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
         value = await this.readFile({ node });
         break;
       case 'stat':
-        value = await this.readFile({ node });
+        value = await this.stat({ node });
         break;
       case 'write':
         await this.writeFile({ node });
