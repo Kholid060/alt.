@@ -3,7 +3,6 @@ import ElectronLogger from './common/utils/ElectronLogger';
 import ElectronNest from './ElectronNest';
 import { Menu, app } from 'electron';
 import updater from 'electron-updater';
-import log from 'electron-log/main';
 import './common/utils/security-restrictions';
 import { APP_USER_MODEL_ID } from '@altdot/shared';
 import { devtoolsExtInstaller } from './common/utils/devtools-ext-installer';
@@ -47,7 +46,7 @@ async function bootstrap() {
    * Start app
    */
   const electronNest = await ElectronNest.createApp(AppModule, {
-    logger: new ElectronLogger(),
+    logger: ElectronLogger._instance,
   });
   await electronNest.init();
 
@@ -64,11 +63,13 @@ async function bootstrap() {
     app
       .whenReady()
       .then(() => updater.autoUpdater.checkForUpdatesAndNotify())
-      .catch((e) => log.error('Failed check and install updates:', e));
+      .catch((e) =>
+        ElectronLogger._instance.error('Failed check and install updates:', e),
+      );
   }
 }
 bootstrap().catch((error) => {
-  log.error(error);
+  ElectronLogger._instance.error(error);
 });
 
 /**

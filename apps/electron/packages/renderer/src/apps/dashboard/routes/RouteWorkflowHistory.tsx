@@ -350,7 +350,7 @@ function RouteWorkflowHistory() {
         open={Boolean(selectedHistory)}
         onOpenChange={(value) => !value && setSelectedHistoryId(null)}
       >
-        <UiDialog.Content className="max-w-5xl gap-0 p-0">
+        <UiDialog.Content className="max-w-5xl gap-0 p-0" blurBg={false}>
           {selectedHistory && (
             <>
               <div className="flex items-center p-6">

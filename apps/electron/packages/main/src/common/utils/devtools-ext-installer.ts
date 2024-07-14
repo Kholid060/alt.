@@ -7,8 +7,6 @@ const EXT_ID = 'fmkadmapgofadopljbjfkapdkoienihi';
 
 export async function devtoolsExtInstaller() {
   try {
-    if (!import.meta.env.DEV) return;
-
     await app.whenReady();
 
     const extDir = path.join(

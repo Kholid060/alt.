@@ -6,7 +6,9 @@ const userDataPath = app.getPath('userData');
 
 export const EXTENSION_FOLDER = path.join(userDataPath, 'extensions');
 
-export const WORKFLOW_LOGS_FOLDER = path.join(userDataPath, 'logs/workflows');
+export const APP_LOGS_DIR = path.join(userDataPath, 'logs');
+
+export const WORKFLOW_LOGS_FOLDER = path.join(APP_LOGS_DIR, 'workflows');
 export const DATABASE_FOLDER = path.join(userDataPath, 'Database');
 
 export const EXTENSION_LOCAL_ID_PREFIX = 'local__';

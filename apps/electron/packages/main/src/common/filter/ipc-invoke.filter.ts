@@ -1,10 +1,10 @@
 import { Catch, ArgumentsHost } from '@nestjs/common';
-import log from 'electron-log/main';
 import {
   CustomError,
   ExtensionError,
   ValidationError,
 } from '#packages/common/errors/custom-errors';
+import ElectronLogger from '../utils/ElectronLogger';
 
 @Catch()
 export class IpcInvokeFilter {
@@ -22,7 +22,7 @@ export class IpcInvokeFilter {
       };
     }
 
-    log.error(['IPCMainHandle', this.channel], error);
+    ElectronLogger._instance.error(['IPCMainHandle', this.channel], error);
 
     throw error;
   }

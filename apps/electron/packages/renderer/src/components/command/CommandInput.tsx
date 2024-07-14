@@ -70,9 +70,11 @@ const CommandInputArguments = forwardRef<
         switch (argument.type) {
           case 'select':
             return (
-              <div className="relative h-full max-w-28 rounded-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background">
+              <div
+                key={key}
+                className="relative h-full max-w-28 rounded-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background"
+              >
                 <select
-                  key={key}
                   value={`${args[argument.name] ?? ''}`}
                   required={argument.required}
                   data-command-argument={argument.name}
@@ -174,7 +176,7 @@ const CommandInputTextField = forwardRef<
 
     inputEl.value = query;
     onValueChange?.(query);
-  }, [query]);
+  }, [onValueChange, query, ref]);
 
   return (
     <input
@@ -244,6 +246,7 @@ function CommandInput() {
   const inputRef = useRef<HTMLInputElement>(null);
   const argumentContainerRef = useRef<HTMLDivElement>(null);
 
+  const commandTitleRef = useRef('');
   const fallbackFocusToInput = useRef(false);
 
   const onArgumentsChange = useCallback(
@@ -263,9 +266,10 @@ function CommandInput() {
         moveArgumentContainer(commandTitle);
       }
 
+      commandTitleRef.current = commandTitle ?? '';
       inputRef.current.placeholder = commandTitle || SEARCH_INPUT_PLACEHOLDER;
     },
-    [],
+    [uiListStore],
   );
 
   function moveArgumentContainer(value: string) {
@@ -344,18 +348,25 @@ function CommandInput() {
         uiListStore.listControllerKeyBind(event.nativeEvent);
     }
   }
-  function onInputValueChange(value: string) {
-    moveArgumentContainer(value);
+  const onInputValueChange = useCallback(
+    (value: string) => {
+      moveArgumentContainer(value || commandTitleRef.current);
 
-    const messagePort = commandCtx.runnerMessagePort.current;
-    const viewMessagePort = commandCtx.commandViewMessagePort.current;
-    if (messagePort || viewMessagePort) {
-      viewMessagePort?.sendMessage('extension:query-change', value);
-      messagePort?.event.sendMessage('extension:query-change', value);
-    }
+      const messagePort = commandCtx.runnerMessagePort.current;
+      const viewMessagePort = commandCtx.commandViewMessagePort.current;
+      if (messagePort || viewMessagePort) {
+        viewMessagePort?.sendMessage('extension:query-change', value);
+        messagePort?.event.sendMessage('extension:query-change', value);
+      }
 
-    uiListStore.setState('search', value);
-  }
+      uiListStore.setState('search', value);
+    },
+    [
+      uiListStore,
+      commandCtx.runnerMessagePort,
+      commandCtx.commandViewMessagePort,
+    ],
+  );
 
   useEffect(() => {
     const messagePort = commandCtx.runnerMessagePort.current;
