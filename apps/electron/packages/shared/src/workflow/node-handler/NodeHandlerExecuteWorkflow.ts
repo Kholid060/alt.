@@ -86,6 +86,7 @@ export class NodeHandlerExecuteWorkflow extends WorkflowNodeHandler<WORKFLOW_NOD
 
     const result = await executeWorkflowPromise({
       workflow,
+      logDir: runner.logDir,
       startNodeId: triggerNode.id,
       parent: { id: runner.workflow.id, vars: exposedVars },
     });

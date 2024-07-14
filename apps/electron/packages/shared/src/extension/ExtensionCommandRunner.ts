@@ -12,6 +12,7 @@ import type { MessagePortSharedCommandWindowEvents } from '#packages/common/inte
 import type { SetRequired } from 'type-fest';
 import type { ExtensionRunnerProcessConstructor } from './runner/ExtensionRunnerProcess';
 import ExtensionRunnerCommandScript from './runner/ExtensionRunnerCommandScript';
+import { ExtensionMessagePortEventAsync } from '@altdot/extension';
 
 const IDLE_TIMER_KEY = 'extension-command';
 
@@ -31,7 +32,10 @@ class ExtensionCommandRunner {
     >['onCommandWindowEvents']
   > = new Map();
 
-  messagePort: MessagePortRenderer<MessagePortSharedCommandWindowEvents>;
+  messagePort: MessagePortRenderer<
+    ExtensionMessagePortEventAsync,
+    MessagePortSharedCommandWindowEvents
+  >;
 
   constructor() {
     this.messagePort = new MessagePortRenderer();

@@ -10,10 +10,10 @@ import type {
 import ExtensionCommandRunner from '/@/extension/ExtensionCommandRunner';
 import { CommandLaunchBy } from '@altdot/extension';
 import type { ExtensionCommandExecutePayloadWithData } from '#packages/common/interface/extension.interface';
-import type { ExtensionCommandArgument } from '@altdot/extension';
 import type { WorkflowRunnerBrowserContext } from '../runner/WorklowRunnerBrowser';
 import { ExtensionCommandModel } from '#packages/main/src/extension/extension-command/extension-command.interface';
 import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
+import { ExtensionCommandArgument } from '@altdot/extension/dist/extension-manifest';
 
 type CommandDataWithPath = ExtensionCommandModel & {
   filePath: string;

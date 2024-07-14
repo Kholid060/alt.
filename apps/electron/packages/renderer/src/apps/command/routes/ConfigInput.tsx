@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { UseFormReturn, useForm } from 'react-hook-form';
-import { ExtensionConfig, ExtensionConfigType } from '@altdot/extension';
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
 import {
   UiButton,
@@ -19,13 +18,17 @@ import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { IPCEventError } from '#common/interface/ipc-events.interface';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
-import { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
+import {
+  ExtensionCommandExecutePayload,
+  ExtensionConfigType,
+} from '#packages/common/interface/extension.interface';
 import { getExtIconURL, isIPCEventError } from '/@/utils/helper';
 import { useDatabase } from '/@/hooks/useDatabase';
 import {
   ExtensionConfigValue,
   ExtensionConfigWithSchemaModel,
 } from '#packages/main/src/extension/extension-config/extension-config.interface';
+import { ExtensionConfig } from '@altdot/extension/dist/extension-manifest';
 
 type ConfigComponent<T extends ExtensionConfigType = ExtensionConfigType> =
   React.FC<{

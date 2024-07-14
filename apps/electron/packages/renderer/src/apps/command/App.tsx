@@ -1,4 +1,9 @@
-import { UiButton, UiTooltipProvider, UiListProvider } from '@altdot/ui';
+import {
+  UiButton,
+  UiTooltipProvider,
+  UiListProvider,
+  DialogProvider,
+} from '@altdot/ui';
 import CommandHeader from '/@/components/command/CommandHeader';
 import CommandFooter from '/@/components/command/CommandFooter';
 import CommandContent from '/@/components/command/CommandContent';
@@ -17,7 +22,7 @@ import {
 } from 'react-error-boundary';
 import { commandAppRoutes } from './routes';
 import { useCommandStore } from '/@/stores/command.store';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 import CommandOAuthOverlay from '/@/components/command/CommandOAuthOverlay';
 import IdleTimer from '#packages/common/utils/IdleTimer';
@@ -143,6 +148,9 @@ function IdleListener({
 }
 
 function App() {
+  const contentRef = useRef<HTMLDivElement>(null);
+  const dialogFocusRef = useRef<Element | HTMLElement | null>(null);
+
   const [hide, setHide] = useState(false);
 
   useEffect(() => {
@@ -168,21 +176,50 @@ function App() {
               onToggleHide={(value) => value !== hide && setHide(value)}
             />
             {!hide && (
-              <CommandCtxProvider>
-                <AppEventListener />
-                <div className="p-0.5">
-                  <UiListProvider>
-                    <AppDevtools />
-                    <div className="relative z-10 w-full rounded-lg border bg-background">
-                      <CommandHeader />
-                      <CommandContent />
-                      <CommandErrorOverlay />
-                      <CommandOAuthOverlay />
-                    </div>
-                  </UiListProvider>
-                  <CommandFooter />
-                </div>
-              </CommandCtxProvider>
+              <DialogProvider
+                dialogOptions={{
+                  containerEl: contentRef,
+                  class: {
+                    title: 'text-base',
+                    content: 'p-4 absolute',
+                    overlay: 'absolute rounded-lg',
+                  },
+                }}
+                options={{
+                  onDialogAdded() {
+                    dialogFocusRef.current ??= document.activeElement;
+                  },
+                  onAllClosed() {
+                    if (
+                      dialogFocusRef.current &&
+                      'focus' in dialogFocusRef.current
+                    ) {
+                      dialogFocusRef.current.focus();
+                    }
+
+                    dialogFocusRef.current = null;
+                  },
+                }}
+              >
+                <CommandCtxProvider>
+                  <AppEventListener />
+                  <div className="p-0.5">
+                    <UiListProvider>
+                      <AppDevtools />
+                      <div
+                        ref={contentRef}
+                        className="relative z-10 w-full rounded-lg border bg-background"
+                      >
+                        <CommandHeader />
+                        <CommandContent />
+                        <CommandErrorOverlay />
+                        <CommandOAuthOverlay />
+                      </div>
+                    </UiListProvider>
+                    <CommandFooter />
+                  </div>
+                </CommandCtxProvider>
+              </DialogProvider>
             )}
           </CommandRouteProvider>
         </DatabaseProvider>

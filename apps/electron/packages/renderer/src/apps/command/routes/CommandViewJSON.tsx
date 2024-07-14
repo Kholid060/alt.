@@ -43,10 +43,10 @@ function CommandViewJSON() {
       runnerId.current = data.runnerId;
       setViewData(data.viewData);
     }, 100);
-    messagePort?.event.on('command-json:update-ui', onUpdateUI);
+    messagePort?.eventSync.on('command-json:update-ui', onUpdateUI);
 
     return () => {
-      messagePort?.event.off('command-json:update-ui', onUpdateUI);
+      messagePort?.eventSync.off('command-json:update-ui', onUpdateUI);
       preloadAPI.main.ipc.send(
         'extension:stop-execute-command',
         runnerId.current,

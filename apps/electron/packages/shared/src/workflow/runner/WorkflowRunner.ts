@@ -78,6 +78,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   id: string;
   startedAt: string;
   stepCount: number = 0;
+  readonly logDir: string;
   readonly maxStep: number;
   state: WorkflowRunnerState;
   readonly workflow: WorkflowDetailModel;
@@ -103,6 +104,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     super();
 
     this.id = id;
+    this.logDir = logDir;
     this.maxStep = maxStep;
     this.workflow = workflow;
     this.startNodeId = startNodeId;

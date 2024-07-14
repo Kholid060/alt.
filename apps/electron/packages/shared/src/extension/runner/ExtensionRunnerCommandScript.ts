@@ -29,7 +29,7 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
   }
 
   private onProcessSpawn() {
-    this.runner.messagePort.event.sendMessage('command-script:message', {
+    this.runner.messagePort.eventSync.sendMessage('command-script:message', {
       message: '',
       type: 'start',
       runnerId: this.id,
@@ -41,7 +41,7 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
 
   private onProcessError(error: Error) {
     console.error(error);
-    this.runner.messagePort.event.sendMessage('command-script:message', {
+    this.runner.messagePort.eventSync.sendMessage('command-script:message', {
       type: 'error',
       runnerId: this.id,
       message: error.message,
@@ -57,7 +57,7 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
       ? this.lastMessage
       : `Process finish with exit code ${code} \n\n ${this.errorMessage}`;
 
-    this.runner.messagePort.event.sendMessage('command-script:message', {
+    this.runner.messagePort.eventSync.sendMessage('command-script:message', {
       message,
       runnerId: this.id,
       commandTitle: this.command.title,
@@ -76,7 +76,7 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
   private onProcessStdoutData(data: string) {
     this.lastMessage = data.toString().trim();
 
-    this.runner.messagePort.event.sendMessage('command-script:message', {
+    this.runner.messagePort.eventSync.sendMessage('command-script:message', {
       type: 'message',
       runnerId: this.id,
       message: this.lastMessage,
@@ -89,7 +89,7 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
   private onProcessStderrData(chunk: string) {
     if (!this.command.extension.isLocal) return;
 
-    this.runner.messagePort.event.sendMessage('command-script:message', {
+    this.runner.messagePort.eventSync.sendMessage('command-script:message', {
       type: 'stderr',
       runnerId: this.id,
       message: chunk.toString(),

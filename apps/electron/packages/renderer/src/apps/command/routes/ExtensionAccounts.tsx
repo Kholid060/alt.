@@ -32,11 +32,12 @@ function ExtensionAccounts() {
 
         return data.map((item) => ({
           metadata: 'workflow',
-          value: item.id,
           title: item.providerName,
+          value: item.id.toString(),
           subtitle: item.extension.title,
           actions: [
             {
+              type: 'button',
               icon: LogOutIcon,
               value: 'logout',
               color: 'destructive',

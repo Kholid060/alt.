@@ -84,6 +84,15 @@ async function selectFile() {
 async function selectElement() {
   _extension.browser.activeTab.selectElement({ filter: {  } })
 }
+function alertConfirm() {
+  return _extension.ui.alert.confirm({
+    body: 'World',
+    title: 'Hello',
+    okText: 'Confirm!!',
+    okVariant: 'destructive',
+    cancelText: 'Cancel!!!!',
+  });
+}
 
 export default async function CommandMain(context: CommandLaunchContext) {
   console.log(JSON.stringify(context));
@@ -102,7 +111,12 @@ export default async function CommandMain(context: CommandLaunchContext) {
   // console.log(element);
   // await _extension.browser.activeTab.type('textarea[aria-label="Search"]', 'hello!');
 
-  await authorizeCredential();
+  // await authorizeCredential();
+
+
+  const toast = _extension.ui.createToast({ title: 'Hello world' });
+  toast.show();
+  console.log(await alertConfirm());
 
   // await selectFile();
 
@@ -132,9 +146,6 @@ export default async function CommandMain(context: CommandLaunchContext) {
   //   await _extension.browser.activeTab.getHTML('body'),
   //   await _extension.browser.activeTab.getHTML('body', { outerHTML: true }),
   // );
-
-  // const toast = _extension.ui.createToast({ title: 'Hello world' });
-  // toast.show();
 
   // await new Promise((r) => setTimeout(r, 1000));
 

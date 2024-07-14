@@ -8,6 +8,7 @@ import {
   UiAlertDialogHeader,
   UiAlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import clsx from 'clsx';
 import {
   createContext,
   forwardRef,
@@ -23,6 +24,23 @@ export interface DialogConfirmOptions {
   body?: string | React.ReactNode;
   title?: string | React.ReactNode;
   okButtonVariant?: 'default' | 'destructive';
+  containerEl?: React.RefObject<Element> | Element | null;
+  class?: {
+    title?: string;
+    okBtn?: string;
+    header?: string;
+    footer?: string;
+    overlay?: string;
+    content?: string;
+    cancelBtn?: string;
+    description?: string;
+  };
+}
+
+interface DialogProviderOptions {
+  onAllClosed?: () => void;
+  onCloseAutoFocus?: (event: Event) => void;
+  onDialogAdded?: (dialog: DialogConfirmOptions) => void;
 }
 
 interface DialogConfirm {
@@ -40,13 +58,21 @@ interface DialogContextState {
 // @ts-expect-error throw error if not inside the context
 const DialogContext = createContext<DialogContextState>();
 
-type DialogComponent<T extends Dialogs> = React.FC<T & { onClose(): void }>;
+type DialogComponent<T extends Dialogs> = React.FC<
+  T & { onClose(): void; providerOptions: DialogProviderOptions }
+>;
 
 const DialogConfirm: DialogComponent<DialogConfirm> = ({
   options,
-  resolver,
   onClose,
+  resolver,
+  providerOptions,
 }) => {
+  const container =
+    options.containerEl && 'current' in options.containerEl
+      ? options.containerEl.current
+      : options.containerEl;
+
   return (
     <UiAlertDialog
       defaultOpen={true}
@@ -55,13 +81,22 @@ const DialogConfirm: DialogComponent<DialogConfirm> = ({
         onClose();
       }}
     >
-      <UiAlertDialogContent>
-        <UiAlertDialogHeader>
-          <UiAlertDialogTitle>{options.title}</UiAlertDialogTitle>
-          <UiAlertDialogDescription>{options.body}</UiAlertDialogDescription>
+      <UiAlertDialogContent
+        container={container}
+        className={options.class?.content}
+        overlayClass={options.class?.overlay}
+        onCloseAutoFocus={providerOptions.onCloseAutoFocus}
+      >
+        <UiAlertDialogHeader className={options.class?.header}>
+          <UiAlertDialogTitle className={options.class?.title}>
+            {options.title}
+          </UiAlertDialogTitle>
+          <UiAlertDialogDescription className={options.class?.description}>
+            {options.body}
+          </UiAlertDialogDescription>
         </UiAlertDialogHeader>
-        <UiAlertDialogFooter className="mt-4">
-          <UiAlertDialogCancel>
+        <UiAlertDialogFooter className={clsx('mt-4', options.class?.footer)}>
+          <UiAlertDialogCancel className={options.class?.cancelBtn}>
             {options.cancelText || 'Cancel'}
           </UiAlertDialogCancel>
           <UiAlertDialogAction
@@ -70,6 +105,7 @@ const DialogConfirm: DialogComponent<DialogConfirm> = ({
               resolver.resolve(true);
               onClose();
             }}
+            className={options.class?.okBtn}
           >
             {options.okText || 'Confirm'}
           </UiAlertDialogAction>
@@ -82,23 +118,27 @@ const DialogConfirm: DialogComponent<DialogConfirm> = ({
 interface DialogContainerRef {
   addDialog(dialog: Dialogs): void;
 }
-const DialogContainer = forwardRef<DialogContainerRef>((_props, ref) => {
+const DialogContainer = forwardRef<
+  DialogContainerRef,
+  { providerOptions: DialogProviderOptions }
+>(({ providerOptions }, ref) => {
   const [dialogs, setDialogs] = useState<Dialogs[]>([]);
 
-  useImperativeHandle(
-    ref,
-    () => {
-      return {
-        addDialog(dialog) {
-          setDialogs((prevVal) => [...prevVal, dialog]);
-        },
-      };
-    },
-    [],
-  );
+  useImperativeHandle(ref, () => {
+    return {
+      addDialog(dialog) {
+        setDialogs((prevVal) => [...prevVal, dialog]);
+      },
+    };
+  }, []);
 
   function deleteDialog(id: number) {
-    setDialogs(dialogs.filter((dialog) => dialog.id !== id));
+    const filteredDialogs = dialogs.filter((dialog) => dialog.id !== id);
+    setDialogs(filteredDialogs);
+
+    if (filteredDialogs.length === 0) {
+      providerOptions.onAllClosed?.();
+    }
   }
 
   return (
@@ -110,6 +150,7 @@ const DialogContainer = forwardRef<DialogContainerRef>((_props, ref) => {
               <DialogConfirm
                 key={dialog.id}
                 {...dialog}
+                providerOptions={providerOptions}
                 onClose={() => deleteDialog(dialog.id)}
               />
             );
@@ -135,7 +176,15 @@ export function useDialog() {
   };
 }
 
-export function DialogProvider({ children }: { children?: React.ReactNode }) {
+export function DialogProvider({
+  children,
+  dialogOptions = {},
+  options: providerOptions = {},
+}: {
+  children?: React.ReactNode;
+  options?: DialogProviderOptions;
+  dialogOptions?: DialogConfirmOptions;
+}) {
   const dialogId = useRef(0);
   const containerRef = useRef<DialogContainerRef>(null);
 
@@ -145,12 +194,19 @@ export function DialogProvider({ children }: { children?: React.ReactNode }) {
     dialogId.current += 1;
 
     const resolver = Promise.withResolvers<boolean>();
+    const mergedOptions: DialogConfirmOptions = {
+      ...dialogOptions,
+      ...options,
+      class: { ...(dialogOptions.class ?? {}), ...(options.class ?? {}) },
+    };
     containerRef.current.addDialog({
-      options,
       resolver,
       type: 'confirm',
       id: dialogId.current,
+      options: mergedOptions,
     });
+
+    providerOptions.onDialogAdded?.(options);
 
     return resolver.promise;
   }
@@ -158,7 +214,7 @@ export function DialogProvider({ children }: { children?: React.ReactNode }) {
   return (
     <DialogContext.Provider value={{ confirm }}>
       {children}
-      <DialogContainer ref={containerRef} />
+      <DialogContainer ref={containerRef} providerOptions={providerOptions} />
     </DialogContext.Provider>
   );
 }

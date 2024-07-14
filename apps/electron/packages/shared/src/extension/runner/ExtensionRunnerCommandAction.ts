@@ -4,7 +4,7 @@ import ExtensionRunnerProcess, {
   ExtensionRunnerProcessFinishReason,
 } from './ExtensionRunnerProcess';
 import type { BetterMessagePayload } from '@altdot/shared';
-import { isObject } from '@altdot/shared';
+import { generateRandomString, isObject } from '@altdot/shared';
 import IPCRenderer from '#packages/common/utils/IPCRenderer';
 import type { ExtensionCommandWorkerInitMessage } from '/@/interface/extension.interface';
 
@@ -14,6 +14,8 @@ class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
 
   private messageChannel = new MessageChannel();
   private mainMessageChannel = new MessageChannel();
+
+  private asyncMessageIds = new Map<string, string>();
 
   readonly id: string;
 
@@ -26,11 +28,19 @@ class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
 
   private initWorkerMessagePort() {
     // forward message to command window
-    this.messageChannel.port2.onmessage = (event) => {
-      this.runner.messagePort.event.sendMessage(
-        event.data.name,
-        ...event.data.args,
-      );
+    this.messageChannel.port2.onmessage = ({ data }) => {
+      if (!data) return;
+
+      if (data?.type === 'send' && data.isSync) {
+        this.runner.messagePort.eventSync.sendMessage(data.name, ...data.args);
+      } else {
+        const messageId = `promise::${generateRandomString(5)}`;
+        this.asyncMessageIds.set(messageId, data.messageId);
+        this.runner.messagePort.eventAsync.sendMessage(
+          { name: data.name, messageId },
+          ...data.args,
+        );
+      }
     };
     this.messageChannel.port2.start();
   }
@@ -105,6 +115,10 @@ class ExtensionRunnerCommandAction extends ExtensionRunnerProcess {
   }
 
   onCommandWindowEvents(data: BetterMessagePayload) {
+    if (data.type === 'result' && this.asyncMessageIds.has(data.name)) {
+      data.name = this.asyncMessageIds.get(data.name)!;
+    }
+
     this.messageChannel.port2.postMessage(data);
   }
 

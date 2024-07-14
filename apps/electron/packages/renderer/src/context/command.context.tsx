@@ -10,16 +10,22 @@ import {
 import { MessagePortSharedCommandWindowEvents } from '#packages/common/interface/message-port-events.interface';
 import { debugLog } from '#packages/common/utils/helper';
 import { BetterMessagePortSync } from '@altdot/shared';
-import { ExtensionMessagePortEvent } from '@altdot/extension';
+import {
+  ExtensionMessagePortEvent,
+  ExtensionMessagePortEventAsync,
+} from '@altdot/extension';
+import { useDialog } from '@altdot/ui';
 
 type CommandViewMessagePort = BetterMessagePortSync<ExtensionMessagePortEvent>;
+type RunnerMessagePort = MessagePortRenderer<
+  ExtensionMessagePortEventAsync,
+  MessagePortSharedCommandWindowEvents
+>;
 
 export interface CommandContextState {
   executeCommand(payload: ExtensionCommandExecutePayload): void;
   setCommandViewMessagePort(port: CommandViewMessagePort | null): void;
-  runnerMessagePort: React.MutableRefObject<
-    MessagePortRenderer<MessagePortSharedCommandWindowEvents>
-  >;
+  runnerMessagePort: React.MutableRefObject<RunnerMessagePort>;
   commandViewMessagePort: React.RefObject<CommandViewMessagePort>;
 }
 
@@ -31,13 +37,12 @@ export function CommandCtxProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const clearAllPanel = useCommandPanelStore.use.clearAll();
-  const addPanelStatus = useCommandPanelStore.use.addStatus();
-
-  const runnerMessagePort = useRef<
-    MessagePortRenderer<MessagePortSharedCommandWindowEvents>
-  >(new MessagePortRenderer());
+  const runnerMessagePort = useRef<RunnerMessagePort>(
+    new MessagePortRenderer(),
+  );
   const commandViewMessagePort = useRef<CommandViewMessagePort | null>(null);
+
+  const dialog = useDialog();
 
   async function executeCommand(payload: ExtensionCommandExecutePayload) {
     preloadAPI.main.ipc
@@ -53,15 +58,17 @@ export function CommandCtxProvider({
   }
 
   useEffect(() => {
-    const offCommandScriptMessageEvent = runnerMessagePort.current.event.on(
+    const offCommandScriptMessageEvent = runnerMessagePort.current.eventSync.on(
       'command-script:message',
       (detail) => {
+        const { clearAll, addStatus } = useCommandPanelStore.getState();
+
         switch (detail.type) {
           case 'finish':
           case 'error': {
             const isError = detail.type === 'error';
 
-            addPanelStatus({
+            addStatus({
               description: detail.message.slice(
                 0,
                 detail.message.indexOf('\n'),
@@ -69,12 +76,25 @@ export function CommandCtxProvider({
               title: isError ? 'Error!' : 'Script finish running',
               type: isError ? 'error' : 'success',
               onClose() {
-                clearAllPanel();
+                clearAll();
               },
             });
             break;
           }
         }
+      },
+    );
+    const offConfirmAlert = runnerMessagePort.current.eventAsync.on(
+      'extension:show-confirm-alert',
+      async ({ title, body, cancelText, okText, okVariant }) => {
+        await preloadAPI.main.ipc.invoke('command-window:show');
+        return dialog.confirm({
+          body,
+          title,
+          okText,
+          cancelText,
+          okButtonVariant: okVariant,
+        });
       },
     );
 
@@ -89,10 +109,11 @@ export function CommandCtxProvider({
     );
 
     return () => {
+      offConfirmAlert();
       offSharedMessagePortListener();
       offCommandScriptMessageEvent();
     };
-  }, []);
+  }, [dialog]);
 
   return (
     <CommandContext.Provider

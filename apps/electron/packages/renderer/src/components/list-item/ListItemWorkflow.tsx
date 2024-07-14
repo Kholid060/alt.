@@ -24,6 +24,7 @@ function ListItemWorkflow({
 
   const actions: UiListItemAction[] = [
     {
+      type: 'button',
       onAction() {
         preloadAPI.main.ipc
           .invoke(
@@ -44,6 +45,7 @@ function ListItemWorkflow({
       value: 'copy-deeplink',
     },
     {
+      type: 'button',
       icon: EditIcon,
       shortcut: { key: 'e', mod1: 'mod' },
       title: 'Edit workflow',
@@ -58,6 +60,7 @@ function ListItemWorkflow({
       },
     },
     {
+      type: 'button',
       onAction() {
         preloadAPI.main.ipc.invoke(
           'database:update-workflow',

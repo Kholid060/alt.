@@ -321,7 +321,7 @@ function CommandInput() {
         shiftKey,
       };
       viewMessagePort?.sendMessage('extension:keydown-event', keydownEvent);
-      messagePort.event.sendMessage('extension:keydown-event', keydownEvent);
+      messagePort.eventSync.sendMessage('extension:keydown-event', keydownEvent);
     }
 
     switch (event.code) {
@@ -356,7 +356,7 @@ function CommandInput() {
       const viewMessagePort = commandCtx.commandViewMessagePort.current;
       if (messagePort || viewMessagePort) {
         viewMessagePort?.sendMessage('extension:query-change', value);
-        messagePort?.event.sendMessage('extension:query-change', value);
+        messagePort?.eventSync.sendMessage('extension:query-change', value);
       }
 
       uiListStore.setState('search', value);
@@ -370,13 +370,13 @@ function CommandInput() {
 
   useEffect(() => {
     const messagePort = commandCtx.runnerMessagePort.current;
-    const offListener = messagePort.event.on(
+    const offListener = messagePort.eventSync.on(
       'extension:query-clear-value',
       () => {
         uiListStore.setState('search', '');
       },
     );
-    const offUpdatePlaceholderListener = messagePort.event.on(
+    const offUpdatePlaceholderListener = messagePort.eventSync.on(
       'extension:query-update-placeholder',
       (placeholder) => {
         if (!inputRef.current) return;

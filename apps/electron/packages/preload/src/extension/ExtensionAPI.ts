@@ -6,10 +6,11 @@ import {
 } from '#common/utils/constant/constant';
 import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
 import { contextBridge } from 'electron';
-import type { BetterMessagePortSync, EventMapEmit } from '@altdot/shared';
+import type { EventMapEmit } from '@altdot/shared';
 import { BetterMessagePort } from '@altdot/shared';
 import { createExtensionAPI } from '#common/utils/extension/extension-api-factory';
 import IPCRenderer from '#common/utils/IPCRenderer';
+import { EXTENSION_MESSAGE_PORT_EVENT_TIMEOUT_MS } from '#common/utils/constant/extension.const';
 import type {
   ExtensionCommandExecutePayload,
   ExtensionCommandViewInitMessage,
@@ -41,7 +42,7 @@ class ExtensionAPI {
   private key: string = '';
 
   payload: ExtensionCommandExecutePayload;
-  messagePort: BetterMessagePortSync<ExtensionMessagePortEvent>;
+  messagePort: BetterMessagePort<ExtensionMessagePortEvent>;
 
   constructor({
     payload,
@@ -51,7 +52,9 @@ class ExtensionAPI {
     payload: ExtensionCommandExecutePayload;
   }) {
     this.payload = payload;
-    this.messagePort = BetterMessagePort.createStandalone('sync', messagePort);
+    this.messagePort = new BetterMessagePort(messagePort, {
+      eventTimeoutMs: EXTENSION_MESSAGE_PORT_EVENT_TIMEOUT_MS,
+    });
   }
 
   async loadAPI() {

@@ -23,6 +23,12 @@ export interface ExtensionMessagePortEvent {
   'extension:finish-execute': [ExtensionExecutionFinishReason, string?];
 }
 
+export interface ExtensionMessagePortEventAsync {
+  'extension:show-confirm-alert': (
+    options: ExtensionAPI.UI.Alert.ConfirmOptions,
+  ) => boolean;
+}
+
 export type ExtensionMessagePortCallback<
   T extends keyof ExtensionMessagePortEvent,
 > = (...args: ExtensionMessagePortEvent[T]) => void;

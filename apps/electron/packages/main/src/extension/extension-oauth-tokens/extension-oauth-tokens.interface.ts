@@ -2,7 +2,7 @@ import {
   NewExtensionOauthToken,
   SelectExtension,
   SelectExtensionOauthToken,
-} from '/@/db/schema/extension.schema';
+} from '../../db/schema/extension.schema';
 
 export interface ExtensionOAuthTokenValue
   extends Omit<

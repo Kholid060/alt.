@@ -49,6 +49,10 @@ export interface NormalizeMessagePort {
 
 type PostMessageFunc = (data: unknown) => void;
 
+export interface BetterMessagePortAsyncOptions {
+  eventTimeoutMs?: number;
+}
+
 export class BetterMessagePortAsync<MessagePortEvents> {
   private messages: Map<
     PropertyKey,
@@ -56,7 +60,10 @@ export class BetterMessagePortAsync<MessagePortEvents> {
   > = new Map();
   private listeners: Map<PropertyKey, (...args: any) => any> = new Map();
 
-  constructor(private postMessage: PostMessageFunc) {}
+  constructor(
+    private postMessage: PostMessageFunc,
+    private options?: BetterMessagePortAsyncOptions,
+  ) {}
 
   async messageHandler(data: BetterMessagePayload) {
     if (
@@ -104,11 +111,14 @@ export class BetterMessagePortAsync<MessagePortEvents> {
     this.postMessage(payload);
   }
 
-  on<K extends keyof MessagePortEvents>(
+  on<
+    K extends keyof MessagePortEvents,
+    R = ExtractReturnType<MessagePortEvents, K>,
+  >(
     name: K,
     callback: (
       ...args: ExtractParams<MessagePortEvents, K>
-    ) => ExtractReturnType<MessagePortEvents, K>,
+    ) => Promise<Awaited<R>>,
   ) {
     this.listeners.set(name, callback);
 
@@ -120,16 +130,21 @@ export class BetterMessagePortAsync<MessagePortEvents> {
   }
 
   sendMessage<K extends keyof MessagePortEvents>(
-    name: K,
+    name: K | { name: K; messageId: string },
     ...args: ExtractParams<MessagePortEvents, K>
   ): Promise<ExtractReturnType<MessagePortEvents, K>> {
     return new Promise((resolve, reject) => {
-      const messageId = `promise::${generateRandomString(5)}`;
+      const isObjectEvent = isObject(name);
+      const messageId = isObjectEvent
+        ? name.messageId
+        : `promise::${generateRandomString(5)}`;
+      const eventName = isObjectEvent ? name.name : name;
 
+      const timeoutMs = this.options?.eventTimeoutMs ?? EVENT_TIMEOUT_MS;
       const timeout = setTimeout(() => {
         reject(new Error('TIMEOUT'));
         this.messages.delete(messageId);
-      }, EVENT_TIMEOUT_MS);
+      }, timeoutMs);
 
       this.messages.set(messageId, {
         resolve(value) {
@@ -143,10 +158,10 @@ export class BetterMessagePortAsync<MessagePortEvents> {
       });
 
       this.postMessage({
-        name,
         args,
         messageId,
         type: 'send',
+        name: eventName,
       } as BetterMessagePortSend);
     });
   }
@@ -218,7 +233,10 @@ class BetterMessagePort<AsyncEvents = unknown, SyncEvents = unknown> {
 
   private nomalizedMessagePort: NormalizeMessagePort;
 
-  constructor(private messagePort: MessagePortType) {
+  constructor(
+    private messagePort: MessagePortType,
+    options?: BetterMessagePortAsyncOptions,
+  ) {
     this.nomalizedMessagePort =
       BetterMessagePort.normalizeMessagePort(messagePort);
 
@@ -227,6 +245,7 @@ class BetterMessagePort<AsyncEvents = unknown, SyncEvents = unknown> {
     );
     this.async = new BetterMessagePortAsync(
       this.nomalizedMessagePort.postMessage,
+      options,
     );
 
     this.onMessage = this.onMessage.bind(this);

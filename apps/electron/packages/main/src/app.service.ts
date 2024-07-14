@@ -27,9 +27,7 @@ export class AppService {
 
     switch (channelId) {
       case MESSAGE_PORT_CHANNEL_IDS.sharedWithCommand: {
-        const windowCommand = await this.browserWindow.get('command', {
-          autoCreate: false,
-        });
+        const windowCommand = await this.browserWindow.get('command');
         windowCommand.postMessage(
           options
             ? { ...options, name: 'message-port:created' }

@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { forwardRef, useEffect, useRef } from 'react';
 import { CommandRouteOutlet } from '../../context/command-route.context';
+import { mergeRefs } from '/@/utils/helper';
 
-function CommandContent() {
+const CommandContent = forwardRef<HTMLDivElement>((_, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const resizerContainerRef = useRef<HTMLDivElement>(null);
 
@@ -27,22 +28,25 @@ function CommandContent() {
     };
   }, []);
 
+  const mergedRef = mergeRefs(containerRef, ref);
+
   return (
     <>
       <div
-        ref={containerRef}
+        ref={mergedRef}
         className="custom-scroller max-h-80 min-h-48 overflow-auto"
         style={{
           height: 'var(--ui-list-height)',
           transition: 'height 250ms ease',
         }}
       >
-        <div ref={resizerContainerRef} className="h-full">
+        <div ref={resizerContainerRef}>
           <CommandRouteOutlet />
         </div>
       </div>
     </>
   );
-}
+});
+CommandContent.displayName = 'CommandContent';
 
 export default CommandContent;

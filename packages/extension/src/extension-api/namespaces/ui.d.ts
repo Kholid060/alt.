@@ -16,6 +16,7 @@ export declare namespace UI {
     // @ext-api-value
     createToast(options: ToastOptions): Toast;
 
+    alert: Alert.Static;
     searchPanel: SearchPanel.Static;
   }
 }
@@ -38,5 +39,22 @@ export declare namespace UI.SearchPanel {
 
     // @ext-api-value
     clearValue(): void;
+  }
+}
+
+export declare namespace UI.Alert {
+  type ButtonVariant = 'default' | 'secondary' | 'destructive';
+
+  interface ConfirmOptions {
+    title: string;
+    body?: string;
+    okText?: string;
+    cancelText?: string;
+    okVariant?: ButtonVariant;
+  }
+
+  interface Static {
+    // @ext-api-value
+    confirm(options: ConfirmOptions): Promise<boolean>;
   }
 }

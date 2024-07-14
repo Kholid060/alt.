@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ExtensionMessagePortEvent } from '@altdot/extension';
+import type {
+  ExtensionMessagePortEvent,
+  ExtensionMessagePortEventAsync,
+} from '@altdot/extension';
 import { ExtensionAPI } from '@altdot/extension';
-import type { BetterMessagePortSync, EventMapEmit } from '@altdot/shared';
+import type { BetterMessagePort, EventMapEmit } from '@altdot/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { CUSTOM_SCHEME } from '../constant/constant';
 import type { ExtensionAPIValues } from '@altdot/extension/dist/extensionApiBuilder';
@@ -16,7 +19,10 @@ export interface CreateExtensionAPI {
   context?: unknown;
   browserCtx: ExtensionBrowserTabContext;
   sendMessage: EventMapEmit<IPCUserExtensionEventsMap>;
-  messagePort: BetterMessagePortSync<ExtensionMessagePortEvent>;
+  messagePort: BetterMessagePort<
+    ExtensionMessagePortEventAsync,
+    ExtensionMessagePortEvent
+  >;
 }
 
 const extensionAPIGetIconURL = (): Pick<
@@ -40,14 +46,14 @@ function extensionAPISearchPanel(
     key: 'extension:query-change' | 'extension:keydown-event',
   ) => ({
     addListener: (callback: (...args: any[]) => void) => {
-      messagePort.on(key, callback);
+      messagePort.sync.on(key, callback);
 
       return () => {
-        messagePort.on(key, callback);
+        messagePort.sync.on(key, callback);
       };
     },
     removeListener: (callback: (...args: any[]) => void) => {
-      messagePort.off(key, callback);
+      messagePort.sync.off(key, callback);
     },
   });
 
@@ -55,20 +61,26 @@ function extensionAPISearchPanel(
     'ui.searchPanel.onChanged': createEventListener('extension:query-change'),
     'ui.searchPanel.onKeydown': createEventListener('extension:keydown-event'),
     'ui.searchPanel.clearValue': () => {
-      messagePort.sendMessage('extension:query-clear-value');
+      messagePort.sync.sendMessage('extension:query-clear-value');
     },
     'ui.searchPanel.updatePlaceholder': (placeholder) => {
-      messagePort.sendMessage(
+      messagePort.sync.sendMessage(
         'extension:query-update-placeholder',
         placeholder,
       );
     },
   };
 }
-function extensionAPIUiToast(
+function extensionAPIUi(
   messagePort: CreateExtensionAPI['messagePort'],
-): Pick<ExtensionAPIValues, 'ui.createToast'> {
+): Pick<ExtensionAPIValues, 'ui.createToast' | 'ui.alert.confirm'> {
   return {
+    'ui.alert.confirm': (options) => {
+      return messagePort.async.sendMessage(
+        'extension:show-confirm-alert',
+        options,
+      );
+    },
     'ui.createToast': (options) => {
       const toastId = nanoid(5);
       const toastOptions: Required<ExtensionAPI.UI.ToastOptions> = {
@@ -81,13 +93,13 @@ function extensionAPIUiToast(
       return {
         ...toastOptions,
         show(showOptions = {}) {
-          messagePort.sendMessage('extension:show-toast', toastId, {
+          messagePort.sync.sendMessage('extension:show-toast', toastId, {
             ...toastOptions,
             ...showOptions,
           });
         },
         hide() {
-          messagePort.sendMessage('extension:hide-toast', toastId);
+          messagePort.sync.sendMessage('extension:hide-toast', toastId);
         },
       };
     },
@@ -149,7 +161,7 @@ export function createExtensionAPI({
     extensionApiBuilder({
       values: {
         ...extensionAPIGetIconURL(),
-        ...extensionAPIUiToast(messagePort),
+        ...extensionAPIUi(messagePort),
         ...extensionAPISearchPanel(messagePort),
         ...extensionAPIBrowser(sendMessage),
         ...extensionOAuth({ browserCtx, messagePort, sendMessage, context }),

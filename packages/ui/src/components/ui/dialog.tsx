@@ -35,9 +35,10 @@ const UiDialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & {
     blurBg?: boolean;
     noCloseBtn?: boolean;
+    container?: null | Element;
   }
->(({ className, children, blurBg, noCloseBtn, ...props }, ref) => (
-  <UiDialogPortal>
+>(({ className, children, blurBg, container, noCloseBtn, ...props }, ref) => (
+  <UiDialogPortal container={container}>
     <UiDialogOverlay blurBg={blurBg} />
     <DialogPrimitive.Content
       ref={ref}

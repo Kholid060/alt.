@@ -30,6 +30,7 @@ function CommandViewJSONList({ data }: { data: CommandJSONViewList }) {
 
         return {
           onAction,
+          type: 'button',
           icon: actionData.icon,
           title: actionData.title,
           value: action.type + index,

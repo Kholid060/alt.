@@ -46,6 +46,7 @@ class WindowCommand extends WindowBase {
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
+        nodeIntegrationInSubFrames: true,
         sandbox: true, // Sandbox disabled because the demo of preload script depend on the Node.js api
         webviewTag: false, // The webview tag is not recommended. Consider alternatives like an iframe or Electron's BrowserView. @see https://www.electronjs.org/docs/latest/api/webview-tag#warning
         preload: join(app.getAppPath(), 'packages/preload/dist/index.mjs'),

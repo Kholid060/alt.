@@ -48,7 +48,7 @@ function AppEventListener() {
       offOpenCommandViewPage();
       offOpenCommandJSONViewPage();
     };
-  }, []);
+  }, [navigate]);
 
   return null;
 }

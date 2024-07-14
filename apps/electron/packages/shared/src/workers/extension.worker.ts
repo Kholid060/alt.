@@ -6,8 +6,9 @@ import type {
   CommandJSONViews,
   CommandLaunchContext,
   CommandViewJSONLaunchContext,
+  ExtensionMessagePortEventAsync,
 } from '@altdot/extension';
-import type { BetterMessagePortSync, EventMapEmit } from '@altdot/shared';
+import type { EventMapEmit } from '@altdot/shared';
 import { BetterMessagePort } from '@altdot/shared';
 import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
 import type {
@@ -39,7 +40,10 @@ interface InitExtensionAPIData {
   commandId: string;
   mainMessagePort: MessagePort;
   browserCtx: ExtensionBrowserTabContext;
-  messagePort: BetterMessagePortSync<MessagePortSharedCommandWindowEvents>;
+  messagePort: BetterMessagePort<
+    ExtensionMessagePortEventAsync,
+    MessagePortSharedCommandWindowEvents
+  >;
 }
 function initExtensionAPI({
   key,
@@ -55,7 +59,7 @@ function initExtensionAPI({
     messagePort: mainMessagePort,
   });
 
-  messagePort.sendMessage('extension:query-clear-value');
+  messagePort.sync.sendMessage('extension:query-clear-value');
 
   const extensionAPI = createExtensionAPI({
     browserCtx,
@@ -103,7 +107,7 @@ async function commandViewJSONRunner({
   executeCommand,
 }: CommandRunnerData) {
   const updateView: CommandViewJSONLaunchContext['updateView'] = (viewData) => {
-    messagePort.sendMessage('command-json:update-ui', {
+    messagePort.sync.sendMessage('command-json:update-ui', {
       viewData,
       runnerId,
       commandId,
@@ -143,7 +147,9 @@ self.onmessage = async ({
     self.name = '';
     self.onmessage = null;
 
-    const messagePort = BetterMessagePort.createStandalone('sync', ports[1]);
+    const messagePort = new BetterMessagePort(ports[1], {
+      eventTimeoutMs: 120_000, // 2 minutes
+    });
     const { commandId, extensionId, browserCtx } = data.payload;
 
     initExtensionAPI({
