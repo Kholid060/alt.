@@ -21,6 +21,7 @@ import {
   SettingsIcon,
   SquarePowerIcon,
 } from 'lucide-react';
+import { useDocumentTitle } from '/@/hooks/useDocumentTitle';
 
 type SettingsSection<T extends object = object> = React.FC<
   {
@@ -312,6 +313,8 @@ function SettingsSidebar() {
 }
 
 function RouteSettings() {
+  useDocumentTitle('Settings');
+
   const { toast } = useToast();
 
   const [settings, setSettings] = useState<AppSettings | null>(null);

@@ -52,6 +52,7 @@ import WorkflowDetailForm, {
 } from '/@/components/workflow/WorkflowDetailForm';
 import { WorkflowListItemModel } from '#packages/main/src/workflow/workflow.interface';
 import WorkflowIcon from '/@/components/workflow/WorkflowIcon';
+import { useDocumentTitle } from '/@/hooks/useDocumentTitle';
 
 function WorkflowCards({ workflows }: { workflows: WorkflowListItemModel[] }) {
   const { toast } = useToast();
@@ -348,6 +349,8 @@ function WorkflowCreateDialog() {
 type WorkflowSortBy = 'name' | 'updatedAt' | 'createdAt';
 type WorkflowSort = { asc: boolean; by: WorkflowSortBy };
 function RouteWorkflows() {
+  useDocumentTitle('Workflows');
+
   const workflowsQuery = useDatabaseQuery('database:get-workflow-list', [
     { sort: { by: 'isPinned', asc: true } },
   ]);

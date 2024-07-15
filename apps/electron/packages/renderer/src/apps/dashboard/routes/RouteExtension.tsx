@@ -14,6 +14,7 @@ import {
   ExtensionListItemModel,
   ExtensionUpdatePayload,
 } from '#packages/main/src/extension/extension.interface';
+import { useDocumentTitle } from '/@/hooks/useDocumentTitle';
 
 type FilterTypes = 'all' | 'commands' | 'extensions' | 'scripts';
 
@@ -25,6 +26,8 @@ const filterItems: { id: FilterTypes; name: string }[] = [
 ];
 
 function RouteExtension() {
+  useDocumentTitle('Extensions');
+
   const { toast } = useToast();
 
   const [search, setSearch] = useState('');

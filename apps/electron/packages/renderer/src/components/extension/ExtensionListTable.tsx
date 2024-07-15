@@ -1,3 +1,5 @@
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 import {
   UiButton,
   UiDropdownMenu,
@@ -118,48 +120,50 @@ function ExtensionCommandList({
           <td className="p-3">
             {command.type === 'script' ? 'Script' : 'Command'}
           </td>
-          <td
-            className="group/shortcut cursor-pointer p-3 text-sm text-muted-foreground transition-colors hover:text-foreground"
-            onClick={() => onToggleRecordingShortcut?.(command.name)}
-            title={
-              recordingShortcutData?.commandId === command.name
-                ? 'Stop recording'
-                : 'Record shortcut'
-            }
-          >
-            {recordingShortcutData?.commandId === command.name ? (
-              <div className="flex items-center">
-                <span className="relative mr-2 flex h-6 w-6">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/90 opacity-75"></span>
-                  <span className="relative inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/90">
-                    <StopCircleIcon className="h-4 w-4 text-foreground" />
+          <td className="group/shortcut p-3">
+            <button
+              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+              onClick={() => onToggleRecordingShortcut?.(command.name)}
+              title={
+                recordingShortcutData?.commandId === command.name
+                  ? 'Stop recording'
+                  : 'Record shortcut'
+              }
+            >
+              {recordingShortcutData?.commandId === command.name ? (
+                <div className="flex items-center">
+                  <span className="relative mr-2 flex h-6 w-6">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary/90 opacity-75"></span>
+                    <span className="relative inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/90">
+                      <StopCircleIcon className="h-4 w-4 text-foreground" />
+                    </span>
                   </span>
-                </span>
-                <span className="text-foreground">
-                  {recordingShortcutData.keys.length ? (
-                    <UiShortcut shortcut={recordingShortcutData.keys} />
-                  ) : (
-                    'Stop recording'
-                  )}
-                </span>
-              </div>
-            ) : command.shortcut ? (
-              <div className="flex items-center">
-                <CommandShortcut shortcut={command.shortcut} />
-                <button
-                  className="invisible ml-2 text-muted-foreground hover:text-foreground group-hover/shortcut:visible"
-                  title="Remove shortcut"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onUpdateCommand?.(command.name, { shortcut: null });
-                  }}
-                >
-                  <XIcon className="h-4 w-4" />
-                </button>
-              </div>
-            ) : (
-              'Record Shortcut'
-            )}
+                  <span className="text-foreground">
+                    {recordingShortcutData.keys.length ? (
+                      <UiShortcut shortcut={recordingShortcutData.keys} />
+                    ) : (
+                      'Stop recording'
+                    )}
+                  </span>
+                </div>
+              ) : command.shortcut ? (
+                <div className="flex items-center">
+                  <CommandShortcut shortcut={command.shortcut} />
+                  <button
+                    className="invisible ml-2 text-muted-foreground hover:text-foreground group-hover/shortcut:visible"
+                    title="Remove shortcut"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onUpdateCommand?.(command.name, { shortcut: null });
+                    }}
+                  >
+                    <XIcon className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                'Record Shortcut'
+              )}
+            </button>
           </td>
           <td className="p-3">
             <input

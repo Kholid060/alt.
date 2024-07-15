@@ -59,6 +59,7 @@ import {
 import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
 import { WorkflowEditorNodeListModal } from '/@/components/workflow/editor/WorkflowEditorNodeList';
 import { UiList, useToast } from '@altdot/ui';
+import { useDocumentTitle } from '/@/hooks/useDocumentTitle';
 
 const defaultNodeTypes = Object.values(WORKFLOW_NODE_TYPE).reduce<
   Partial<Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>>>
@@ -90,6 +91,7 @@ const selector = (state: WorkflowEditorStore) => ({
   setEditNode: state.setEditNode,
   deleteEdgeBy: state.deleteEdgeBy,
   setSelection: state.setSelection,
+  workflowName: state.workflow?.name,
   viewport: state.workflow?.viewport,
   applyElementChanges: state.applyElementChanges,
 });
@@ -116,10 +118,13 @@ function WorkflowEditor() {
     updateEdge,
     addCommands,
     setEditNode,
+    workflowName,
     deleteEdgeBy,
     setSelection,
     applyElementChanges,
   } = useWorkflowEditorStore(useShallow(selector));
+
+  useDocumentTitle(`"${workflowName}" workflow`);
 
   const onConnectEnd: OnConnectEnd = useCallback(
     (event) => {

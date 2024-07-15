@@ -1,4 +1,4 @@
-import { UiList, UiListItemAction } from '@altdot/ui';
+import { UiList, UiListItemAction, useDialog } from '@altdot/ui';
 import { ListItemRenderDetail } from '../../apps/command/routes/CommandList';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
@@ -7,6 +7,7 @@ import {
   LinkIcon,
   ToggleLeftIcon,
   ToggleRightIcon,
+  TrashIcon,
 } from 'lucide-react';
 import { useCommandStore } from '/@/stores/command.store';
 import { CommandLaunchBy } from '@altdot/extension';
@@ -15,6 +16,7 @@ import { useCommandCtx } from '/@/hooks/useCommandCtx';
 import CommandShortcut from '../ui/UiShortcut';
 import DeepLinkURL from '#packages/common/utils/DeepLinkURL';
 import { isIPCEventError } from '#packages/common/utils/helper';
+import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
 
 function ListItemCommand({
   item,
@@ -24,6 +26,7 @@ function ListItemCommand({
 }: ListItemRenderDetail<'command'>) {
   const addPanelStatus = useCommandPanelStore.use.addStatus();
 
+  const dialog = useDialog();
   const navigate = useCommandNavigate();
   const { executeCommand } = useCommandCtx();
 
@@ -120,6 +123,52 @@ function ListItemCommand({
       title: 'Config',
       value: 'config',
       shortcut: { key: ',', mod1: 'ctrlKey' },
+    });
+  }
+  if (
+    extension.id === EXTENSION_BUILT_IN_ID.userScript &&
+    command.type === 'script'
+  ) {
+    actions.push({
+      type: 'button',
+      async onAction() {
+        try {
+          const isConfirmed = await dialog.confirm({
+            title: 'Delete script?',
+            body: (
+              <>
+                Are you sure you want to delete{' '}
+                <b>&quot;{command.title}&quot;</b> script?
+              </>
+            ),
+            okText: 'Delete',
+            okButtonVariant: 'destructive',
+          });
+          if (!isConfirmed) return;
+
+          const result = await preloadAPI.main.ipc.invoke(
+            'database:delete-extension-command',
+            command.id,
+          );
+          if (isIPCEventError(result)) {
+            addPanelStatus({
+              type: 'error',
+              title: 'Error!',
+              description: result.message,
+            });
+          }
+        } catch (error) {
+          console.error(error);
+          addPanelStatus({
+            type: 'error',
+            title: 'Something went wrong!',
+          });
+        }
+      },
+      icon: TrashIcon,
+      color: 'destructive',
+      value: 'delete-command',
+      title: 'Delete command',
     });
   }
 

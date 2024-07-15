@@ -1,4 +1,4 @@
-import { UiList, UiListItemAction } from '@altdot/ui';
+import { UiList, UiListItemAction, useDialog } from '@altdot/ui';
 import { ListItemRenderDetail } from '../../apps/command/routes/CommandList';
 import {
   RotateCcwIcon,
@@ -6,6 +6,7 @@ import {
   BoltIcon,
   ToggleRightIcon,
   ToggleLeftIcon,
+  TrashIcon,
 } from 'lucide-react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandStore } from '/@/stores/command.store';
@@ -27,6 +28,7 @@ function ListItemExtension({
   );
   const addPanelStatus = useCommandPanelStore.use.addStatus();
 
+  const dialog = useDialog();
   const uiListStore = useUiListStore();
   const navigate = useCommandNavigate();
 
@@ -37,13 +39,55 @@ function ListItemExtension({
   const actions: UiListItemAction[] = [
     {
       type: 'button',
-      title: 'Enable',
       value: 'enable',
+      title: extension.isDisabled ? 'Enable' : 'Disable',
       icon: extension.isDisabled ? ToggleLeftIcon : ToggleRightIcon,
       onAction() {
         preloadAPI.main.ipc.invoke('database:update-extension', extension.id, {
           isDisabled: !extension.isDisabled,
         });
+      },
+    },
+    {
+      type: 'button',
+      icon: TrashIcon,
+      color: 'destructive',
+      title: 'Delete extension',
+      value: 'delete-extension',
+      async onAction() {
+        try {
+          const isConfirmed = await dialog.confirm({
+            title: 'Delete extension?',
+            body: (
+              <>
+                Are you sure you want to delete{' '}
+                <b>&quot;{extension.title}&quot;</b> extension? <br /> This will
+                delete all the extension data and it can&apos;t be undone
+              </>
+            ),
+            okText: 'Delete',
+            okButtonVariant: 'destructive',
+          });
+          if (!isConfirmed) return;
+
+          const result = await preloadAPI.main.ipc.invoke(
+            'extension:delete',
+            extension.id,
+          );
+          if (isIPCEventError(result)) {
+            addPanelStatus({
+              type: 'error',
+              title: 'Error!',
+              description: result.message,
+            });
+          }
+        } catch (error) {
+          console.error(error);
+          addPanelStatus({
+            type: 'error',
+            title: 'Something went wrong!',
+          });
+        }
       },
     },
   ];

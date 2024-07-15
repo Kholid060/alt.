@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { forwardRef, useEffect, useMemo, useState } from 'react';
 import { useDatabase } from '/@/hooks/useDatabase';
 import { useDebounceValue } from 'usehooks-ts';
 import {
@@ -32,20 +32,24 @@ import {
   WorkflowHistoryWithWorkflowModel,
 } from '#packages/main/src/workflow/workflow-history/workflow-history.interface';
 import { WORKFLOW_NODES } from '@altdot/workflow';
+import { useDocumentTitle } from '/@/hooks/useDocumentTitle';
 
-function WorkflowHistoryStatusBadge({
-  status,
-}: {
-  status: WORKFLOW_HISTORY_STATUS;
-}) {
+const WorkflowHistoryStatusBadge = forwardRef<
+  HTMLDivElement,
+  { status: WORKFLOW_HISTORY_STATUS }
+>(({ status }, ref) => {
   switch (status) {
     case WORKFLOW_HISTORY_STATUS.Error:
-      return <UiBadge variant="destructive">Error</UiBadge>;
+      return (
+        <UiBadge ref={ref} variant="destructive">
+          Error
+        </UiBadge>
+      );
     case WORKFLOW_HISTORY_STATUS.Finish:
-      return <UiBadge>Finish</UiBadge>;
+      return <UiBadge ref={ref}>Finish</UiBadge>;
     case WORKFLOW_HISTORY_STATUS.Running:
       return (
-        <UiBadge variant="outline" className="text-yellow-400">
+        <UiBadge ref={ref} variant="outline" className="text-yellow-400">
           <LoaderIcon className="mr-1 h-4 w-4 animate-spin" />
           Running
         </UiBadge>
@@ -53,7 +57,8 @@ function WorkflowHistoryStatusBadge({
     default:
       return null;
   }
-}
+});
+WorkflowHistoryStatusBadge.displayName = 'WorkflowHistoryStatusBadge';
 
 const today = new Date();
 function formatDate(dateStr: string) {
@@ -147,6 +152,8 @@ function WorkflowHistoryDetail({
 }
 
 function RouteWorkflowHistory() {
+  useDocumentTitle('Workflow history');
+
   const { toast } = useToast();
   const { queryDatabase } = useDatabase();
 
@@ -297,8 +304,10 @@ function RouteWorkflowHistory() {
                 </td>
                 <td className="p-3 text-center">
                   {item.status === WORKFLOW_HISTORY_STATUS.Error ? (
-                    <UiTooltip label={item.errorMessage}>
-                      <WorkflowHistoryStatusBadge status={item.status} />
+                    <UiTooltip delayDuration={0} label={item.errorMessage}>
+                      <div>
+                        <WorkflowHistoryStatusBadge status={item.status} />
+                      </div>
                     </UiTooltip>
                   ) : (
                     <WorkflowHistoryStatusBadge status={item.status} />

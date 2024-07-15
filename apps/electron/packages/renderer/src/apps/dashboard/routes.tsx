@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, redirect } from 'react-router-dom';
 import RouteExtension from './routes/RouteExtension';
 import DashboardApp from './DashboardApp';
 import RouteWorkflow from './routes/RouteWorkflow';
@@ -15,7 +15,9 @@ const router = createBrowserRouter(
       children: [
         {
           path: '',
-          element: <RouteExtension />,
+          loader() {
+            return redirect('/extensions');
+          },
         },
         {
           path: 'extensions',
