@@ -6,7 +6,6 @@ import {
 } from '#common/utils/constant/constant';
 import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
 import { contextBridge } from 'electron';
-import type { EventMapEmit } from '@altdot/shared';
 import { BetterMessagePort } from '@altdot/shared';
 import { createExtensionAPI } from '#common/utils/extension/extension-api-factory';
 import IPCRenderer from '#common/utils/IPCRenderer';
@@ -15,6 +14,7 @@ import type {
   ExtensionCommandExecutePayload,
   ExtensionCommandViewInitMessage,
 } from '#common/interface/extension.interface';
+import { isIPCEventError } from '#common/utils/helper';
 
 function setExtView(type: 'empty' | 'error' = 'empty') {
   contextBridge.exposeInMainWorld(PRELOAD_API_KEY.extension, {
@@ -89,30 +89,29 @@ class ExtensionAPI {
       context: this,
       messagePort: this.messagePort,
       browserCtx: this.payload.browserCtx ?? null,
-      sendMessage: this.sendAction.bind(
-        this,
-      ) as EventMapEmit<IPCUserExtensionEventsMap>,
+      sendMessage: this.sendAction.bind(this),
     });
 
     return Object.freeze(extensionAPI);
   }
 
-  private async sendAction<T extends keyof IPCUserExtensionEventsMap>(
+  private sendAction<T extends keyof IPCUserExtensionEventsMap>(
     name: T,
     ...args: Parameters<IPCUserExtensionEventsMap[T]>
-  ) {
-    const result = (await IPCRenderer.invoke('user-extension', {
+  ): ReturnType<IPCUserExtensionEventsMap[T]> {
+    return IPCRenderer.invoke('user-extension', {
       name,
       args,
       key: this.key,
       commandId: this.payload.commandId,
       browserCtx: this.payload.browserCtx ?? null,
-    })) as any;
-    if (typeof result === 'object' && result && '$isError' in result) {
-      throw new Error(result.message);
-    }
+    }).then((result) => {
+      if (isIPCEventError(result)) {
+        throw new Error(result.message);
+      }
 
-    return result;
+      return result;
+    }) as ReturnType<IPCUserExtensionEventsMap[T]>;
   }
 }
 

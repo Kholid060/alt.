@@ -202,12 +202,14 @@ class TabService {
 
   static async selectElement(
     { tabId, frameId = 0 }: TabTarget,
-    options?: ExtensionAPI.Browser.ActiveTab.SelectElementOptions,
+    options?: ExtensionAPI.Browser.Tabs.SelectElementOptions,
   ) {
     await injectContentHandlerScript(tabId);
 
-    // const currentWindow = await Browser.windows.getCurrent();
-    // await Browser.windows.update(currentWindow.id!, { focused: true });
+    const currentWindow = await Browser.windows.getCurrent();
+    if (currentWindow.id) {
+      await Browser.windows.update(currentWindow.id, { focused: true });
+    }
 
     return await RuntimeMessage.instance.sendMessageToTab({
       tabId,

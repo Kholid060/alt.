@@ -4,26 +4,37 @@ import type {
   ExtensionMessagePortEventAsync,
 } from '@altdot/extension';
 import { ExtensionAPI } from '@altdot/extension';
-import type { BetterMessagePort, EventMapEmit } from '@altdot/shared';
+import type { BetterMessagePort } from '@altdot/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { CUSTOM_SCHEME } from '../constant/constant';
 import type { ExtensionAPIValues } from '@altdot/extension/dist/extensionApiBuilder';
-import { createExtensionElementHandle } from './extension-element-handle';
 import type { IPCUserExtensionEventsMap } from '../../interface/ipc-events.interface';
 import extensionApiBuilder from '@altdot/extension/dist/extensionApiBuilder';
 import type { ExtensionBrowserTabContext } from '../../interface/extension.interface';
 import { APP_ICON_DIR_PREFIX } from '../../utils/constant/app.const';
 import { OAuthPKCEClient } from './extension-oauth-client';
+import { ExtensionBrowserTab } from './extension-browser-api';
 
 export interface CreateExtensionAPI {
   context?: unknown;
   browserCtx: ExtensionBrowserTabContext;
-  sendMessage: EventMapEmit<IPCUserExtensionEventsMap>;
+  sendMessage: <T extends keyof IPCUserExtensionEventsMap>(
+    name: T,
+    ...args: Parameters<IPCUserExtensionEventsMap[T]>
+  ) => ReturnType<IPCUserExtensionEventsMap[T]>;
   messagePort: BetterMessagePort<
     ExtensionMessagePortEventAsync,
     ExtensionMessagePortEvent
   >;
 }
+
+const sendTabActionMessage: (
+  sendMessage: CreateExtensionAPI['sendMessage'],
+) => IPCUserExtensionEventsMap['browser.tabs.#actions'] =
+  // @ts-expect-error wrapper
+  (sendMessage) => (detail) => {
+    return sendMessage('browser.tabs.#actions', detail);
+  };
 
 const extensionAPIGetIconURL = (): Pick<
   ExtensionAPIValues,
@@ -106,47 +117,54 @@ function extensionAPIUi(
   };
 }
 
-function extensionAPIBrowser(
-  sendMessage: CreateExtensionAPI['sendMessage'],
-): Pick<
-  ExtensionAPIValues,
-  | 'browser.activeTab.findAllElements'
-  | 'browser.activeTab.findElement'
-  | 'browser.activeTab.waitForSelector'
-> {
-  return {
-    'browser.activeTab.findElement': (selector) => {
-      return createExtensionElementHandle({
-        selector,
-        sendMessage,
-      });
-    },
-    'browser.activeTab.findAllElements': (selector) => {
-      return createExtensionElementHandle(
-        {
-          selector,
-          sendMessage,
-        },
-        true,
-      );
-    },
-    'browser.activeTab.waitForSelector': async (selector, options) => {
-      await sendMessage('browser.activeTab.waitForSelector', selector, options);
-
-      return createExtensionElementHandle({
-        selector,
-        sendMessage,
-      });
-    },
-  };
-}
-
 function extensionOAuth({
   sendMessage,
 }: CreateExtensionAPI): Pick<ExtensionAPIValues, 'oAuth.createPKCE'> {
   return {
     'oAuth.createPKCE': (provider) => {
       return Object.freeze(new OAuthPKCEClient({ provider, sendMessage }));
+    },
+  };
+}
+
+function extensionBrowserTabs({
+  browserCtx,
+  sendMessage,
+}: CreateExtensionAPI): Pick<
+  ExtensionAPIValues,
+  'browser.tabs.query' | 'browser.tabs.getActive'
+> {
+  return {
+    'browser.tabs.getActive': async () => {
+      if (!browserCtx) throw new Error('No active browser');
+      const [tab] = await sendTabActionMessage(sendMessage)({
+        name: 'tabs:query',
+        args: [{ active: true }],
+        browserId: browserCtx.browserId,
+      });
+
+      return tab
+        ? new ExtensionBrowserTab(
+            { ...tab, browserId: browserCtx.browserId },
+            sendMessage,
+          )
+        : null;
+    },
+    'browser.tabs.query': async (options) => {
+      if (!browserCtx) throw new Error('No active browser');
+
+      const tabs = await sendTabActionMessage(sendMessage)({
+        args: [options],
+        name: 'tabs:query',
+        browserId: browserCtx.browserId,
+      });
+      return tabs.map(
+        (tab) =>
+          new ExtensionBrowserTab(
+            { ...tab, browserId: browserCtx.browserId },
+            sendMessage,
+          ),
+      );
     },
   };
 }
@@ -163,18 +181,13 @@ export function createExtensionAPI({
         ...extensionAPIGetIconURL(),
         ...extensionAPIUi(messagePort),
         ...extensionAPISearchPanel(messagePort),
-        ...extensionAPIBrowser(sendMessage),
         ...extensionOAuth({ browserCtx, messagePort, sendMessage, context }),
-        'browser.activeTab.get': () =>
-          Promise.resolve(
-            browserCtx
-              ? {
-                  url: browserCtx.url,
-                  id: browserCtx.tabId,
-                  title: browserCtx.title,
-                }
-              : null,
-          ),
+        ...extensionBrowserTabs({
+          context,
+          browserCtx,
+          messagePort,
+          sendMessage,
+        }),
       },
       context,
       apiHandler: sendMessage,

@@ -42,6 +42,13 @@ export interface ExtensionBrowserTabDetail {
   tabId: number;
 }
 
+export interface ExtensionBrowserTab {
+  id: number;
+  url: string;
+  title: string;
+  active: boolean;
+}
+
 export interface ExtensionBrowserElementSelector {
   selector: string;
   elementIndex?: number;
@@ -64,7 +71,24 @@ type ExtensionWSAckElementHandler<
   R
 >;
 
+interface ExtensionTabsQueryOptions {
+  url?: string;
+  index?: number;
+  title?: string;
+  active?: boolean;
+  status?: 'loading' | 'complete';
+}
+
 export interface ExtensionActiveTabActionWSEvents {
+  'tabs:is-closed': ExtensionWSAckTabHandler<[], boolean>;
+  'tabs:query': ExtensionWSAckHandler<
+    [query: ExtensionTabsQueryOptions],
+    ExtensionBrowserTab[]
+  >;
+  'tabs:get-detail': ExtensionWSAckTabHandler<
+    [],
+    { id: number; title: string; url: string; active: boolean } | null
+  >;
   'tabs:click': ExtensionWSAckElementHandler;
   'tabs:mouse-up': ExtensionWSAckElementHandler;
   'tabs:mouse-down': ExtensionWSAckElementHandler;

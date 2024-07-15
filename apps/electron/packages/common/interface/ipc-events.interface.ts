@@ -13,9 +13,13 @@ import type {
   AllButLast,
   BrowserConnected,
   BrowserInfo,
+  BrowserSelectFileOptions,
   BrowserType,
   ExtensionActiveTabActionWSEvents,
+  ExtensionBrowserElementSelector,
+  ExtensionBrowserTabDetail,
   Last,
+  WSAckCallback,
   WSAckErrorResult,
 } from '@altdot/shared';
 import type { DatabaseEvents } from '../../main/src/interface/database.interface';
@@ -63,11 +67,32 @@ export type IPCRendererInvokeEventType<T = unknown> =
   | IPCRendererInvokeEventSuccess<T>
   | IPCRendererInvokeEventError;
 
+export interface IPCUserExtensionBrowserAPI
+  extends Omit<ExtensionActiveTabActionWSEvents, 'tabs:select-file'> {
+  'tabs:select-file': (
+    tab: ExtensionBrowserTabDetail,
+    selector: ExtensionBrowserElementSelector,
+    files: (string | BrowserSelectFileOptions)[],
+    cb: WSAckCallback<void>,
+  ) => void;
+}
 export interface IPCUserExtensionCustomEventsMap {
-  'browser.activeTab.elementExists': (
-    selector: string,
-    multiple?: boolean,
-  ) => Promise<boolean | number[]>;
+  'browser.tabs.#actions': <
+    T extends keyof Omit<ExtensionActiveTabActionWSEvents, 'tabs:select-file'>,
+    P extends Parameters<IPCUserExtensionBrowserAPI[T]>,
+  >(event: {
+    name: T;
+    timeout?: number;
+    browserId: string;
+    args: AllButLast<P>;
+  }) => Promise<Exclude<Parameters<Last<P>>[0], WSAckErrorResult>>;
+  'browser.tabs.selectFiles': (event: {
+    timeout?: number;
+    browserId: string;
+    tab: ExtensionBrowserTabDetail;
+    selector: ExtensionBrowserElementSelector;
+    files: (string | BrowserSelectFileOptions)[];
+  }) => ReturnType<ExtensionAPI.Browser.Tabs.Tab['selectFile']>;
   'oAuth.startAuth': (
     provider: ExtensionAPI.OAuth.OAuthProvider,
   ) => Promise<ExtensionAPI.OAuth.OAuthPKCERequest>;

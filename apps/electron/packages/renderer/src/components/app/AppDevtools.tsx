@@ -1,10 +1,8 @@
-import { UiButton, UiTooltip, useDialog } from '@altdot/ui';
+import { UiButton, UiTooltip } from '@altdot/ui';
 import { GripHorizontalIcon, AppWindowIcon, LockIcon } from 'lucide-react';
 import preloadAPI from '/@/utils/preloadAPI';
 
 function AppDevtools() {
-  const dialog = useDialog();
-
   if (!import.meta.env.DEV) return null;
 
   return (
@@ -22,11 +20,7 @@ function AppDevtools() {
           size="icon"
           variant="secondary"
           onClick={() => {
-            dialog.confirm({
-              body: 'halo',
-              title: 'hahaha',
-            });
-            // preloadAPI.main.ipc.invoke('app:open-devtools');
+            preloadAPI.main.ipc.invoke('app:open-devtools');
           }}
         >
           <AppWindowIcon className="h-5 w-5" />

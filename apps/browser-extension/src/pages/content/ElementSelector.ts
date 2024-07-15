@@ -200,13 +200,13 @@ class ElementSelector {
 
   private resolverFunc: ((value: SelectElementResult) => void) | null = null;
 
-  filter?: ExtensionAPI.Browser.ActiveTab.SelectElementFilter;
+  filter?: ExtensionAPI.Browser.Tabs.SelectElementFilter;
 
   constructor({
     title,
     filter,
     description,
-  }: ExtensionAPI.Browser.ActiveTab.SelectElementOptions = {}) {
+  }: ExtensionAPI.Browser.Tabs.SelectElementOptions = {}) {
     this.filter = filter;
 
     this.styleEl = injectStyle();

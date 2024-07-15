@@ -89,7 +89,7 @@ class ExtensionWorkerMessagePort {
       browserCtx: this.browserCtx,
     } as Omit<ExtensionAPIMessagePayload, 'sender'>);
 
-    return promise;
+    return promise as ReturnType<IPCUserExtensionEventsMap[K]>;
   }
 
   destroy() {

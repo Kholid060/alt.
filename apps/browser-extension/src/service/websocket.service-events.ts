@@ -16,6 +16,7 @@ function wsAckHandler<T extends unknown[]>(
       await fn(...args);
     } catch (error) {
       const callback = args.at(-1);
+      console.error(error);
       if (callback && typeof callback === 'function') {
         callback({
           error: true,
@@ -300,6 +301,44 @@ export function websocketEventsListener(
     wsAckHandler(async (isFocused, callback) => {
       const browser = await BrowserService.instance.getDetail();
       callback(isFocused && !browser?.focused ? null : browser);
+    }),
+  );
+
+  io.on(
+    'tabs:get-detail',
+    wsAckHandler(async (tab, callback) => {
+      const tabDetail = await Browser.tabs.get(tab.tabId);
+      callback(
+        tabDetail
+          ? {
+              id: tabDetail.id!,
+              url: tabDetail.url!,
+              title: tabDetail.title!,
+              active: tabDetail.active!,
+            }
+          : null,
+      );
+    }),
+  );
+
+  io.on(
+    'tabs:query',
+    wsAckHandler(async ({ active, index, status, title, url }, callback) => {
+      const tabs = await Browser.tabs.query({
+        url,
+        index,
+        title,
+        active,
+        status,
+      });
+      callback(
+        tabs.map((tab) => ({
+          id: tab.id!,
+          url: tab.url!,
+          title: tab.title!,
+          active: tab.active!,
+        })),
+      );
     }),
   );
 }

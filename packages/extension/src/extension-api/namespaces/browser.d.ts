@@ -29,30 +29,33 @@ export declare namespace Browser {
   type ElementSelectorDetail = ExtensionBrowserElementSelector;
 
   interface ElementHandle {
-    type: OmitFirstArg<ActiveTab.Static['type']>;
-    click: OmitFirstArg<ActiveTab.Static['click']>;
-    press: OmitFirstArg<ActiveTab.Static['press']>;
-    keyUp: OmitFirstArg<ActiveTab.Static['keyUp']>;
-    select: OmitFirstArg<ActiveTab.Static['select']>;
-    keyDown: OmitFirstArg<ActiveTab.Static['keyDown']>;
-    getText: OmitFirstArg<ActiveTab.Static['getText']>;
-    getHTML: OmitFirstArg<ActiveTab.Static['getHTML']>;
-    mouseUp: OmitFirstArg<ActiveTab.Static['mouseUp']>;
-    mouseDown: OmitFirstArg<ActiveTab.Static['mouseDown']>;
-    selectFile: OmitFirstArg<ActiveTab.Static['selectFile']>;
-    getAttributes: OmitFirstArg<ActiveTab.Static['getAttributes']>;
+    type: OmitFirstArg<Tabs.Tab['type']>;
+    click: OmitFirstArg<Tabs.Tab['click']>;
+    press: OmitFirstArg<Tabs.Tab['press']>;
+    keyUp: OmitFirstArg<Tabs.Tab['keyUp']>;
+    select: OmitFirstArg<Tabs.Tab['select']>;
+    keyDown: OmitFirstArg<Tabs.Tab['keyDown']>;
+    getText: OmitFirstArg<Tabs.Tab['getText']>;
+    getHTML: OmitFirstArg<Tabs.Tab['getHTML']>;
+    mouseUp: OmitFirstArg<Tabs.Tab['mouseUp']>;
+    mouseDown: OmitFirstArg<Tabs.Tab['mouseDown']>;
+    selectFile: OmitFirstArg<Tabs.Tab['selectFile']>;
+    getAttributes: OmitFirstArg<Tabs.Tab['getAttributes']>;
   }
 
   interface Static {
-    activeTab: ActiveTab.Static;
+    tabs: Tabs.Static;
   }
 }
 
-export declare namespace Browser.ActiveTab {
-  interface ActiveTab {
+export declare namespace Browser.Tabs {
+  type TabStatus = 'loading' | 'complete';
+
+  interface TabDetail {
     id: number;
     url: string;
     title: string;
+    active: boolean;
   }
 
   interface SelectElementFilter {
@@ -71,7 +74,14 @@ export declare namespace Browser.ActiveTab {
 
   type SelectFileDetail = BrowserSelectFileOptions;
 
-  interface Static {
+  interface Tab {
+    readonly id: number;
+    readonly url: string;
+    readonly title: string;
+    readonly active: boolean;
+
+    isClosed(): Promise<boolean>;
+
     selectElement(
       options?: SelectElementOptions,
     ): Promise<{ selector: string; canceled: boolean }>;
@@ -143,19 +153,31 @@ export declare namespace Browser.ActiveTab {
       files: (string | SelectFileDetail)[],
     ): Promise<void>;
 
-    // @ext-api-value
     findElement(selector: string): Promise<ElementHandle | null>;
 
-    // @ext-api-value
     findAllElements(selector: string): Promise<ElementHandle[]>;
 
-    // @ext-api-value
     waitForSelector(
       selector: string,
       options?: WaitForSelectorOptions,
     ): Promise<ElementHandle | null>;
 
+    getDetail(): Promise<TabDetail | null>;
+  }
+
+  interface QueryOptions {
+    url?: string;
+    index?: number;
+    title?: string;
+    active?: boolean;
+    status?: TabStatus;
+  }
+
+  interface Static {
     // @ext-api-value
-    get(): Promise<ActiveTab | null>;
+    query(options: QueryOptions): Promise<Tab[]>;
+
+    // @ext-api-value
+    getActive(): Promise<Tab | null>;
   }
 }

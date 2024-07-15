@@ -14,6 +14,7 @@ import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { useUiListStore } from '@altdot/ui';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import { ExtensionErrorListItemModel } from '#packages/main/src/extension/extension-error/extension-error.interface';
+import { isIPCEventError } from '#packages/common/utils/helper';
 
 function ListItemExtension({
   item,
@@ -99,9 +100,7 @@ function ListItemExtension({
             'extension:reload',
             extension.id,
           );
-          if (!result) return;
-
-          if ('$isError' in result) {
+          if (isIPCEventError(result)) {
             addPanelStatus({
               type: 'error',
               title: 'Error!',
@@ -109,6 +108,11 @@ function ListItemExtension({
             });
             return;
           }
+
+          addPanelStatus({
+            type: 'success',
+            title: 'Extension reloaded',
+          });
         } catch (error) {
           console.error(error);
         }

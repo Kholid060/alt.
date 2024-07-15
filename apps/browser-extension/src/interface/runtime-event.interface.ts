@@ -57,7 +57,7 @@ export interface RuntimeEvent {
     multiple?: boolean,
   ) => boolean | number[];
   'element:select-element': (
-    filter?: ExtensionAPI.Browser.ActiveTab.SelectElementOptions,
+    filter?: ExtensionAPI.Browser.Tabs.SelectElementOptions,
   ) => { canceled: boolean; selector: string };
   'element:wait-selector': (
     selector: ExtensionBrowserElementSelector,

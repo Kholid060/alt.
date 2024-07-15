@@ -71,7 +71,9 @@ async function authorizeCredential() {
 }
 
 async function selectFile() {
-  await _extension.browser.activeTab.selectFile('input[type="file"]', [
+  const activeTab = await _extension.browser.tabs.getActive();
+  if (!activeTab) throw new Error('No active tab');
+  await activeTab?.selectFile('input[type="file"]', [
     {
       contents: new Uint8Array([1]),
       fileName: '',
@@ -82,7 +84,11 @@ async function selectFile() {
 }
 
 async function selectElement() {
-  _extension.browser.activeTab.selectElement({ filter: {  } })
+  const activeTab = await _extension.browser.tabs.getActive();
+  if (!activeTab) throw new Error('No active tab');
+
+  const element = await activeTab?.selectElement({ filter: {  } })
+  console.log(element);
 }
 function alertConfirm() {
   return _extension.ui.alert.confirm({
@@ -92,6 +98,10 @@ function alertConfirm() {
     okVariant: 'destructive',
     cancelText: 'Cancel!!!!',
   });
+}
+async function getTabs() {
+  const tabs = await _extension.browser.tabs.query({});
+  console.log(JSON.stringify(tabs.map((tab) => ({ id: tab.id, title: tab.title, url: tab.title }))));
 }
 
 export default async function CommandMain(context: CommandLaunchContext) {
@@ -113,12 +123,9 @@ export default async function CommandMain(context: CommandLaunchContext) {
 
   // await authorizeCredential();
 
-
-  const toast = _extension.ui.createToast({ title: 'Hello world' });
-  toast.show();
-  console.log(await alertConfirm());
-
-  // await selectFile();
+  await getTabs();
+  await selectElement();
+  await selectFile();
 
   // await authorizeCredential();
   // await _extension.runtime.config.openConfigPage('command');

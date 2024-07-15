@@ -162,7 +162,7 @@ export default {
     'sqlite',
     'storage',
     'clipboard',
+    'browser.tabs',
     'notifications',
-    'browser.activeTab',
   ],
 }

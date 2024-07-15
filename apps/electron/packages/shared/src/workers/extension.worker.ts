@@ -8,9 +8,7 @@ import type {
   CommandViewJSONLaunchContext,
   ExtensionMessagePortEventAsync,
 } from '@altdot/extension';
-import type { EventMapEmit } from '@altdot/shared';
 import { BetterMessagePort } from '@altdot/shared';
-import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
 import type {
   ExtensionBrowserTabContext,
   ExtensionCommandExecutePayload,
@@ -66,7 +64,7 @@ function initExtensionAPI({
     messagePort,
     sendMessage: extensionWorkerMessage.sendMessage.bind(
       extensionWorkerMessage,
-    ) as EventMapEmit<IPCUserExtensionEventsMap>,
+    ),
     context: extensionWorkerMessage,
   });
 

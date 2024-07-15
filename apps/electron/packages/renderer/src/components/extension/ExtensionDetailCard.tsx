@@ -44,8 +44,8 @@ function getPermissionsDescription(
       case 'fs':
         descriptions.add('Read and write your local file');
         break;
-      case 'browser.activeTab':
-        descriptions.add('Access the active tab of a browser');
+      case 'browser.tabs':
+        descriptions.add('Access the browser tabs');
         break;
     }
   });

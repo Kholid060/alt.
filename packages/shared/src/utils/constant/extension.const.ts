@@ -15,13 +15,14 @@ export const EXTENSION_PERMISSIONS = [
   'fs',
   'shell',
   'sqlite',
+  'browser',
   'storage',
   'fs.read',
   'fs.write',
   'clipboard',
+  'browser.tabs',
   'notifications',
   'installed-apps',
-  'browser.activeTab',
 ] as const;
 export type ExtensionPermissions = ArrayUnion<typeof EXTENSION_PERMISSIONS>;
 
