@@ -1,12 +1,15 @@
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "asar": false,
+  "asar": true,
+  "appId": "com.altdot-app",
+  "productName": "altdot",
   "directories": {
     "output": "releases/${version}",
     "buildResources": "buildResources"
   },
   "files": [
     "packages/**/dist/**",
+    "!**/node_modules/better-sqlite3/deps/**",
     "buildResources/icon.png"
   ],
   "mac": {
@@ -32,6 +35,7 @@
     "allowToChangeInstallationDirectory": true,
     "deleteAppDataOnUninstall": false
   },
+  "electronLanguages": ["en-US"],
   "linux": {
     "target": [
       "AppImage"

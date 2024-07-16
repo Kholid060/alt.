@@ -389,4 +389,4 @@ function RouteSettings() {
   );
 }
 
-export default RouteSettings;
+export { RouteSettings as Component };

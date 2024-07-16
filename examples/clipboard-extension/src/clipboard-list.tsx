@@ -21,9 +21,6 @@ function CommandMain() {
       console.log('onKeydown', value);
     });
     _extension.runtime.config.getValues('command').then(console.log)
-
-    _extension.browser.activeTab.get().then(console.log);
-    _extension.browser.activeTab.type('textarea[name="q"]', 'Hello 世界').then(console.log);
   }, []);
 
   const customItem: UiListItem[] = [
@@ -31,7 +28,10 @@ function CommandMain() {
       title: 'Hello world',
       value: 'testing',
       async onSelected() {
-        const inputEl = await _extension.browser.activeTab.findElement('input');
+        const activeTab = await _extension.browser.tabs.getActive();
+        if (!activeTab) return;
+
+        const inputEl = await activeTab.findElement('input');
         await inputEl?.type('hello');
       }
     },
@@ -44,6 +44,7 @@ function CommandMain() {
       },
       actions: [
         {
+          type: 'button',
           title: 'Hide toast',
           value: 'hide-toast',
           color: 'destructive',

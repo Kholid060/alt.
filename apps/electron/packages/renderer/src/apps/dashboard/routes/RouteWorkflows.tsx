@@ -523,4 +523,4 @@ function RouteWorkflows() {
   );
 }
 
-export default RouteWorkflows;
+export { RouteWorkflows as Component };

@@ -402,4 +402,4 @@ function RouteWorkflowHistory() {
   );
 }
 
-export default RouteWorkflowHistory;
+export { RouteWorkflowHistory as Component };

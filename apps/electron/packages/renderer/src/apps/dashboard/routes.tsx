@@ -1,11 +1,6 @@
 import { createBrowserRouter, redirect } from 'react-router-dom';
-import RouteExtension from './routes/RouteExtension';
 import DashboardApp from './DashboardApp';
-import RouteWorkflow from './routes/RouteWorkflow';
-import RouteWorkflows from './routes/RouteWorkflows';
-import RouteWorkflowHistory from './routes/RouteWorkflowHistory';
 // import RouteCredentials from './routes/RouteCredentials';
-import RouteSettings from './routes/RouteSettings';
 
 const router = createBrowserRouter(
   [
@@ -21,19 +16,19 @@ const router = createBrowserRouter(
         },
         {
           path: 'extensions',
-          element: <RouteExtension />,
+          lazy: () => import('./routes/RouteExtension'),
         },
         {
           path: '/workflows',
-          element: <RouteWorkflows />,
+          lazy: () => import('./routes/RouteWorkflows'),
         },
         {
           path: '/workflows/:workflowId',
-          element: <RouteWorkflow />,
+          lazy: () => import('./routes/RouteWorkflow'),
         },
         {
           path: '/workflow-history',
-          element: <RouteWorkflowHistory />,
+          lazy: () => import('./routes/RouteWorkflowHistory'),
         },
         // {
         //   path: '/credentials',
@@ -41,7 +36,7 @@ const router = createBrowserRouter(
         // },
         {
           path: '/settings',
-          element: <RouteSettings />,
+          lazy: () => import('./routes/RouteSettings'),
         },
       ],
     },

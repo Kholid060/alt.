@@ -161,4 +161,4 @@ function RouteExtension() {
   );
 }
 
-export default RouteExtension;
+export { RouteExtension as Component };

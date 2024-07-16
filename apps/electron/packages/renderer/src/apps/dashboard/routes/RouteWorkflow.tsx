@@ -529,4 +529,4 @@ function RouteWorkflow() {
   );
 }
 
-export default RouteWorkflow;
+export { RouteWorkflow as Component };

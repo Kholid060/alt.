@@ -9,6 +9,7 @@ const builtinNodeModules = builtinModules.flatMap((item) => [
   item,
   `node:${item}`,
 ]);
+const IS_DEV = process.env.MODE === 'development';
 
 /**
  * @type {import('vite').UserConfig}
@@ -38,7 +39,7 @@ const config = {
     target: `node${node}`,
     outDir: 'dist',
     assetsDir: '.',
-    minify: process.env.MODE !== 'development',
+    minify: !IS_DEV,
     lib: {
       entry: {
         main: join(__dirname, '/src/main.ts'),
@@ -50,7 +51,21 @@ const config = {
         entryFileNames: '[name].js',
         chunkFileNames: '[name].cjs',
       },
-      external: [...builtinNodeModules, 'electron', 'pino'],
+      onwarn(warning, warn) {
+        // Suppress "Module level directives cause errors when bundled" warnings
+        if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+          return;
+        }
+
+        warn(warning);
+      },
+      treeshake: IS_DEV ? undefined : 'smallest',
+      external: [
+        ...builtinNodeModules,
+        'electron',
+        'pino',
+        'quickjs-emscripten',
+      ],
     },
     emptyOutDir: true,
   },

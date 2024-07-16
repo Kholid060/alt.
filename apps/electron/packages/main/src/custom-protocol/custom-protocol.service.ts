@@ -7,19 +7,27 @@ import { ExtensionLoaderService } from '../extension-loader/extension-loader.ser
 import { fileURLToPath } from 'url';
 import { InstalledAppsService } from '../installed-apps/installed-apps.service';
 import { createErrorResponse } from './utils/custom-protocol-utils';
+import { ConfigService } from '@nestjs/config';
+import { AppEnv } from '../common/validation/app-env.validation';
 
 const extensionFilePath = fileURLToPath(
   new URL('./../../extension/dist/', import.meta.url),
 );
-
-const devServer = import.meta.env.DEV && import.meta.env.VITE_DEV_SERVER_URL;
 
 @Injectable()
 export class CustomProtocolService {
   constructor(
     private installedApps: InstalledAppsService,
     private extensionLoader: ExtensionLoaderService,
+    private configService: ConfigService<AppEnv, true>,
   ) {}
+
+  private get devServer() {
+    const isDev = this.configService.get('DEV');
+    if (isDev) return this.configService.get('VITE_DEV_SERVER_URL');
+
+    return null;
+  }
 
   async handleFileIconProtocol(req: GlobalRequest) {
     const filePath = req.url.slice(`${CUSTOM_SCHEME.fileIcon}://`.length);
@@ -91,15 +99,15 @@ export class CustomProtocolService {
         break;
       case '@css': {
         path =
-          typeof devServer === 'string'
-            ? new URL('/src/assets/css/style.css?inline', devServer).href
+          this.devServer
+            ? new URL('/src/assets/css/style.css?inline', this.devServer).href
             : extensionFilePath + 'main.css';
         break;
       }
       case '@fonts': {
         path =
-          typeof devServer === 'string'
-            ? new URL(`/src/assets/fonts/${paths.join('/')}`, devServer).href
+          this.devServer
+            ? new URL(`/src/assets/fonts/${paths.join('/')}`, this.devServer).href
             : extensionFilePath + paths.join('/');
         break;
       }

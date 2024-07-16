@@ -1,18 +1,23 @@
 import { node } from '../../.electron-vendors.cache.json';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { swcPlugin } from '../../plugins/swc';
-import { UserConfig } from 'vite';
+import { defineConfig } from 'vite';
+import dotenv from 'dotenv';
+import { envConfig } from './src/common/config/env.config';
 
 const PACKAGE_ROOT = __dirname;
 const PROJECT_ROOT = join(PACKAGE_ROOT, '../..');
 
 const IS_DEV = process.env.MODE === 'development';
 
-const config: UserConfig = {
+if (!IS_DEV) dotenv.config({ path: resolve(PROJECT_ROOT, '.env') });
+
+const config = defineConfig({
   mode: process.env.MODE,
   root: PACKAGE_ROOT,
   envDir: PROJECT_ROOT,
+  define: IS_DEV ? {} : { 'process.env': envConfig() },
   resolve: {
     alias: {
       '/@/': join(PACKAGE_ROOT, 'src') + '/',
@@ -37,6 +42,14 @@ const config: UserConfig = {
       output: {
         entryFileNames: '[name].js',
       },
+      onwarn(warning, warn) {
+        // Suppress "Module level directives cause errors when bundled" warnings
+        if (warning.code === 'MODULE_LEVEL_DIRECTIVE') {
+          return;
+        }
+
+        warn(warning);
+      },
       treeshake: IS_DEV ? undefined : 'smallest',
       external: ['@altdot/native', 'original-fs'],
     },
@@ -55,6 +68,6 @@ const config: UserConfig = {
       ],
     }),
   ],
-};
+});
 
 export default config;

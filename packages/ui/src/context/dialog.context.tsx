@@ -23,7 +23,7 @@ export interface DialogConfirmOptions {
   cancelText?: string;
   body?: string | React.ReactNode;
   title?: string | React.ReactNode;
-  okButtonVariant?: 'default' | 'destructive';
+  okButtonVariant?: 'default' | 'destructive' | 'secondary';
   containerEl?: React.RefObject<Element> | Element | null;
   class?: {
     title?: string;

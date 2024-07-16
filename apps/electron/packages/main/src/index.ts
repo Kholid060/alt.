@@ -3,11 +3,12 @@ import ElectronLogger from './common/utils/ElectronLogger';
 import ElectronNest from './ElectronNest';
 import { Menu, app } from 'electron';
 import updater from 'electron-updater';
-import './common/utils/security-restrictions';
 import { APP_USER_MODEL_ID } from '@altdot/shared';
 import { devtoolsExtInstaller } from './common/utils/devtools-ext-installer';
+import { applySecurity } from './common/utils/security-restrictions';
 
 async function bootstrap() {
+  applySecurity();
   app.setAppUserModelId(APP_USER_MODEL_ID);
 
   /**

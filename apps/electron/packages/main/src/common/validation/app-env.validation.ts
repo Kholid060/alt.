@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const appEnvSchema = z.object({
   API_KEY: z.string().min(1),
+  DEV: z.boolean().optional(),
   SECRET_DATA_KEY: z.string().min(32),
   VITE_DEV_SERVER_URL: z.string().optional(),
   VITE_WEB_BASE_URL: z.string().url().min(1),
