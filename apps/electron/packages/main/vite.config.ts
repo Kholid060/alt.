@@ -4,6 +4,8 @@ import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { swcPlugin } from '../../plugins/swc';
 import { defineConfig } from 'vite';
 import dotenv from 'dotenv';
+import pkg from '../../package.json';
+
 import { envConfig } from './src/common/config/env.config';
 
 const PACKAGE_ROOT = __dirname;
@@ -24,6 +26,11 @@ const config = defineConfig({
       '#common': join(PACKAGE_ROOT, '../common'),
       '#packages': join(PACKAGE_ROOT, '../'),
     },
+  },
+  ssr: {
+    noExternal: IS_DEV
+      ? []
+      : Object.keys(pkg.devDependencies).concat(['lodash']),
   },
   build: {
     ssr: true,
@@ -50,8 +57,7 @@ const config = defineConfig({
 
         warn(warning);
       },
-      treeshake: IS_DEV ? undefined : 'smallest',
-      external: ['@altdot/native', 'original-fs'],
+      external: ['@altdot/native', 'original-fs', 'electron'],
     },
     emptyOutDir: true,
     reportCompressedSize: false,

@@ -5,8 +5,8 @@ import { WindowCommandService } from './service/window-command.service';
 
 @Global()
 @Module({
-  exports: [BrowserWindowService],
   controllers: [BrowserWindowController],
+  exports: [BrowserWindowService, WindowCommandService],
   providers: [BrowserWindowService, WindowCommandService],
 })
 export class BrowserWindowModule {}

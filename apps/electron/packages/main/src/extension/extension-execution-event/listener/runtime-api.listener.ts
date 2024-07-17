@@ -4,7 +4,7 @@ import { OnExtensionAPI } from '/@/common/decorators/extension.decorator';
 import { ExtensionConfigService } from '../../extension-config/extension-config.service';
 import { BrowserWindowService } from '/@/browser-window/browser-window.service';
 import { CustomError } from '#packages/common/errors/custom-errors';
-import { CommandLaunchBy } from '@altdot/extension';
+import { CommandLaunchBy } from '@altdot/extension/dist/interfaces/command.interface';
 import { isObject } from '@altdot/shared';
 import { ExtensionCommandService } from '../../extension-command/extension-command.service';
 import { ExtensionService } from '../../extension.service';

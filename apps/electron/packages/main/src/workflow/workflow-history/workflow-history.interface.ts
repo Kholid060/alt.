@@ -1,4 +1,4 @@
-import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
+import type { WORKFLOW_NODE_TYPE } from '@altdot/workflow/dist/const/workflow-nodes-type.const';
 import {
   NewWorkflowHistory,
   SelectWorkflow,
@@ -57,5 +57,6 @@ export interface WorkflowHistoryLogItem {
   msg: string;
   time: string;
   level: number;
+  args?: string[];
   node?: { id: string; type: WORKFLOW_NODE_TYPE };
 }

@@ -1,5 +1,5 @@
 /* eslint-disable drizzle/enforce-delete-with-where */
-import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
+import { WORKFLOW_NODE_TYPE } from '@altdot/workflow/dist/const/workflow-nodes-type.const';
 import { isObject } from '@altdot/shared';
 import type {
   WorkflowNodeHandlerExecute,

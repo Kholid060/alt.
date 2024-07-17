@@ -27,6 +27,7 @@ const config = {
       strict: true,
     },
   },
+  base: './',
   build: {
     sourcemap: process.env.MODE === 'development',
     target: `chrome${chrome}`,

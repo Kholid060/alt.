@@ -67,10 +67,10 @@ class ElectronNest {
 
   async init() {
     await this.app.listen();
-    await electronApp.whenReady();
 
-    await this.callAppReadyHooks();
-
+    electronApp.whenReady().then(() => {
+      this.callAppReadyHooks();
+    });
     electronApp.once('will-quit', () => this.app.close());
   }
 }

@@ -19,10 +19,8 @@ import {
   TrashIcon,
   TriangleAlertIcon,
 } from 'lucide-react';
-import {
-  WORKFLOW_NODES,
-  WORKFLOW_NODE_TYPE,
-} from '@/const/workflow-nodes.const';
+import { WORKFLOW_NODES } from '@/const/workflow-nodes.const';
+import { WORKFLOW_NODE_TYPE } from '@/const/workflow-nodes-type.const';
 import { useWorkflowNodes } from '@/context/workflow-nodes.context';
 import {
   WorkflowNodeCommand,

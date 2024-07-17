@@ -15,11 +15,11 @@ import {
 import { LoggerService } from '../logger/logger.service';
 import { fromZodError } from 'zod-validation-error';
 import {
-  WorkflowApiWithExtensions,
   WorkflowInsertPayload,
   WorkflowUpdatePayload,
 } from './workflow.interface';
-import { WorkflowNodes, WORKFLOW_NODE_TYPE } from '@altdot/workflow';
+import { WORKFLOW_NODE_TYPE } from '@altdot/workflow/dist/const/workflow-nodes-type.const';
+import type { WorkflowNodes } from '@altdot/workflow';
 import { APIService } from '../api/api.service';
 import { ApiExtensionHighlightItem } from '@altdot/shared';
 import { ExtensionQueryService } from '../extension/extension-query.service';
@@ -230,9 +230,7 @@ export class WorkflowService implements OnAppReady {
     }
   }
 
-  async getWorkflowWithExtDependency(
-    workflowId: string,
-  ): Promise<WorkflowApiWithExtensions> {
+  async getWorkflowWithExtDependency(workflowId: string): Promise {
     const workflow = await this.apiService.workflows.get(workflowId);
 
     const extIds = new Set<string>();

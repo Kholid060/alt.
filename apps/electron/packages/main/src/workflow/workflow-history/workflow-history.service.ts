@@ -33,8 +33,12 @@ export class WorkflowHistoryService implements OnAppReady {
     // Reset all running workflow history
     this.dbService.db
       .update(workflowsHistory)
-      .set({ endedAt: new Date().toISOString() })
-      .where(eq(workflowsHistory.status, WORKFLOW_HISTORY_STATUS.Running));
+      .set({
+        endedAt: new Date().toISOString(),
+        status: WORKFLOW_HISTORY_STATUS.Finish,
+      })
+      .where(eq(workflowsHistory.status, WORKFLOW_HISTORY_STATUS.Running))
+      .returning();
   }
 
   async get(id: WorkflowHistoryFindById): Promise<WorkflowHistoryModel | null> {

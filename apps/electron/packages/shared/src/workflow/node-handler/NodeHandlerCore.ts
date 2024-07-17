@@ -11,7 +11,7 @@ import { NodeInvalidType } from '/@/utils/custom-errors';
 import { getExactType, isValidType, promiseWithSignal } from '/@/utils/helper';
 import { clipboard, nativeImage } from 'electron';
 import { testNodeConditions } from '../utils/test-node-condtion';
-import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
+import { WORKFLOW_NODE_TYPE } from '@altdot/workflow/dist/const/workflow-nodes-type.const';
 
 export class NodeHandlerCode extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.CODE> {
   private controller = new AbortController();

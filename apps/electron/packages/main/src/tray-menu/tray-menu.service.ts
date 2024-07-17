@@ -18,7 +18,7 @@ export class TrayMenuService implements OnAppReady {
     this.tray = new Tray(
       nativeImage.createFromPath(
         fileURLToPath(
-          new URL('./../../../buildResources/icon.png', import.meta.url),
+          new URL('./../../../buildResources/icon.ico', import.meta.url),
         ),
       ),
     );

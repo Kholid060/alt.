@@ -2,7 +2,6 @@ import { app, dialog } from 'electron';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import WindowBase from './WindowBase';
-import { parseJSON } from '@altdot/shared';
 
 class WindowDashboard extends WindowBase {
   constructor() {
@@ -34,16 +33,12 @@ class WindowDashboard extends WindowBase {
         browserWindow?.show();
 
         if (import.meta.env.DEV) {
-          browserWindow?.webContents.openDevTools();
+          browserWindow?.webContents.openDevTools({ mode: 'detach' });
         }
       });
       browserWindow.on('close', async (event) => {
-        const url = new URL(browserWindow.webContents.getURL());
-        const preventCloseWindow = parseJSON(
-          url.searchParams.get('preventCloseWindow') ?? '',
-          false,
-        );
-        if (!preventCloseWindow) return;
+        const url = browserWindow.webContents.getURL();
+        if (!url.includes('preventCloseWindow=true')) return;
 
         const choice = dialog.showMessageBoxSync(browserWindow, {
           type: 'question',

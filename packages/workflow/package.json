@@ -8,6 +8,7 @@
     "lint": "eslint . --ext js,mjs,cjs,ts,mts,cts,tsx"
   },
   "main": "./dist/index.js",
+  "sideEffects": false,
   "types": "./dist/index.d.ts",
   "type": "module",
   "dependencies": {

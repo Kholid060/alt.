@@ -1,7 +1,7 @@
 import type * as ReactFlow from 'reactflow';
 import type { SetOptional } from 'type-fest';
 import type { WORKFLOW_MANUAL_TRIGGER_ID } from '../utils/constant/workflow.const';
-import {
+import type {
   WORKFLOW_NODE_TYPE,
   WorkflowEdges,
   WorkflowNodes,

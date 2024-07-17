@@ -34,6 +34,12 @@ import {
 import { WORKFLOW_NODES } from '@altdot/workflow';
 import { useDocumentTitle } from '/@/hooks/useDocumentTitle';
 
+/**
+ * TO_DO: add { nodeLink: number } property to save some space?
+ * The value of the "nodeLink" property is the "id" of the log
+ * store the log id when the node is logged for the first time in WorkflowRunnerLogger
+ */
+
 const WorkflowHistoryStatusBadge = forwardRef<
   HTMLDivElement,
   { status: WORKFLOW_HISTORY_STATUS }
@@ -142,7 +148,10 @@ function WorkflowHistoryDetail({
                   </Link>
                 )}
               </td>
-              <td className="py-1.5 pl-2 pr-6">{item.msg}</td>
+              <td className="py-1.5 pl-2 pr-6">
+                {item.msg}
+                {item.args ? ` ${item.args.join(' ')}` : ''}
+              </td>
             </tr>
           ))}
         </tbody>

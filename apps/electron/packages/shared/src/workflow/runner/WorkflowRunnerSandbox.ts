@@ -2,12 +2,20 @@
 import { isObject } from '@altdot/shared';
 import { getProperty, setProperty } from 'dot-prop';
 import type { QuickJSContext, QuickJSRuntime } from 'quickjs-emscripten';
-import { Scope, getQuickJS } from 'quickjs-emscripten';
 import type WorkflowRunner from './WorkflowRunner';
+import {
+  Scope,
+  newQuickJSWASMModuleFromVariant,
+} from 'quickjs-emscripten-core';
+import RELEASE_SYNC from '@jitl/quickjs-wasmfile-release-sync';
 import { getExactType } from '/@/utils/helper';
 import WorkflowFileHandle from '../utils/WorkflowFileHandle';
 import { WorkflowNodeExpressionRecords, WorkflowNodes } from '@altdot/workflow';
 import { Level } from 'pino';
+
+function getQuickJS() {
+  return newQuickJSWASMModuleFromVariant(RELEASE_SYNC);
+}
 
 const MUSTACHE_REGEX = /\{\{(.*?)\}\}/g;
 
@@ -84,6 +92,7 @@ interface EvaluateCodeOptions {
   signal?: AbortSignal;
   data?: Record<PropertyKey, unknown>;
 }
+type LogLevel = Level | 'log';
 
 class WorkflowRunnerSandbox {
   private _expRuntime: QuickJSRuntime | null = null;
@@ -145,23 +154,31 @@ class WorkflowRunnerSandbox {
     vm,
     node,
     scope,
-    levels = ['debug', 'error', 'info', 'warn', 'trace'],
+    levels = ['debug', 'error', 'info', 'warn', 'trace', 'log'],
   }: {
     scope: Scope;
-    levels?: Level[];
     vm: QuickJSContext;
+    levels?: LogLevel[];
     node?: WorkflowNodes;
   }) {
-    const createLevel = (level: Level) =>
+    const createLevel = (level: Level | 'log') =>
       scope.manage(
         vm.newFunction(level, (...args) => {
           const nativeArgs = args.map((handle) =>
             vm.dump(scope.manage(handle)),
           );
-          this.runner.logger.instance[level](
-            node && { node: node.id, type: node.type },
-            ...nativeArgs,
-          );
+          const consoleLevel = level === 'log' ? 'info' : level;
+
+          if (node) {
+            this.runner.logger.logNode(consoleLevel, node, '[console]', {
+              args: nativeArgs,
+            });
+          } else {
+            this.runner.logger.instance[consoleLevel](
+              { args: nativeArgs },
+              '[console]',
+            );
+          }
         }),
       );
 

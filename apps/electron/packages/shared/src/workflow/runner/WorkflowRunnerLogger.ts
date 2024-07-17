@@ -43,9 +43,9 @@ class WorkflowRunnerLogger {
     level: Level,
     { id, type }: WorkflowNodes,
     message: string,
-    ...args: unknown[]
+    additionalProps: Record<PropertyKey, unknown> = {}
   ) {
-    this.instance[level]({ node: { id, type } }, message, ...args);
+    this.instance[level]({ node: { id, type }, ...additionalProps }, message);
   }
 }
 

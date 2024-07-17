@@ -1,6 +1,8 @@
 import { join } from 'node:path';
 import { builtinModules } from 'node:module';
+import pkg from '../../package.json';
 import { node } from '../../.electron-vendors.cache.json';
+import { UserConfig } from 'vite';
 
 const PACKAGE_ROOT = __dirname;
 const PROJECT_ROOT = join(PACKAGE_ROOT, '../..');
@@ -11,17 +13,14 @@ const builtinNodeModules = builtinModules.flatMap((item) => [
 ]);
 const IS_DEV = process.env.MODE === 'development';
 
-/**
- * @type {import('vite').UserConfig}
- * @see https://vitejs.dev/config/
- */
-const config = {
+const config: UserConfig = {
   mode: process.env.MODE,
   root: PACKAGE_ROOT,
   envDir: PROJECT_ROOT,
   base: './',
   ssr: {
     target: 'node',
+    noExternal: IS_DEV ? ['@altdot/shared'] : Object.keys(pkg.devDependencies),
   },
   resolve: {
     alias: {
@@ -64,7 +63,8 @@ const config = {
         ...builtinNodeModules,
         'electron',
         'pino',
-        'quickjs-emscripten',
+        // 'quickjs-emscripten-core',
+        // '@jitl/quickjs-wasmfile-release-sync',
       ],
     },
     emptyOutDir: true,

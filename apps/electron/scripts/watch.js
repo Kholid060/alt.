@@ -26,7 +26,7 @@ function setupMainPackageWatcher({ resolvedUrls }) {
   return build({
     mode,
     logLevel,
-    configFile: 'packages/main/vite.config.js',
+    configFile: 'packages/main/vite.config.ts',
     build: {
       /**
        * Set to {} to enable rollup watcher
@@ -115,7 +115,7 @@ function setupSharedPackageWatcher({ resolvedUrls }) {
   return build({
     mode,
     logLevel,
-    configFile: 'packages/shared/vite.config.js',
+    configFile: 'packages/shared/vite.config.ts',
     build: {
       /**
        * Set to {} to enable rollup watcher

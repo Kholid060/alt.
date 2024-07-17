@@ -5,6 +5,7 @@
     "target": "esnext",
     "sourceMap": false,
     "moduleResolution": "Node",
+    "esModuleInterop": true,
     "skipLibCheck": true,
     "strict": true,
     "isolatedModules": true,

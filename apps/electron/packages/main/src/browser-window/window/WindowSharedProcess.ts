@@ -35,11 +35,11 @@ class WindowSharedProcess extends WindowBase {
 
   private init() {
     this.hook('window:created', async (browserWindow) => {
-      browserWindow.on('ready-to-show', () => {
-        if (!import.meta.env.DEV) return;
-
-        browserWindow.webContents.openDevTools({ mode: 'detach' });
-      });
+      if (import.meta.env.DEV) {
+        browserWindow.on('ready-to-show', () => {
+          browserWindow.webContents.openDevTools({ mode: 'detach' });
+        });
+      }
 
       const resolver = Promise.withResolvers<void>();
       browserWindow.webContents.once('did-finish-load', resolver.resolve);

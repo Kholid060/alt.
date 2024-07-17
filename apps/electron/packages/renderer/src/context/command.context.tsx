@@ -67,13 +67,14 @@ export function CommandCtxProvider({
           case 'finish':
           case 'error': {
             const isError = detail.type === 'error';
-
             addStatus({
               description: detail.message.slice(
                 0,
                 detail.message.indexOf('\n'),
               ),
-              title: isError ? 'Error!' : 'Script finish running',
+              title: isError
+                ? 'Error!'
+                : `"${detail.commandTitle}" Script finish running`,
               type: isError ? 'error' : 'success',
               onClose() {
                 clearAll();

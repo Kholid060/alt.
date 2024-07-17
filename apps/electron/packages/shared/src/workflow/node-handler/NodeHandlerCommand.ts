@@ -12,7 +12,7 @@ import { CommandLaunchBy } from '@altdot/extension';
 import type { ExtensionCommandExecutePayloadWithData } from '#packages/common/interface/extension.interface';
 import type { WorkflowRunnerBrowserContext } from '../runner/WorklowRunnerBrowser';
 import { ExtensionCommandModel } from '#packages/main/src/extension/extension-command/extension-command.interface';
-import { WORKFLOW_NODE_TYPE } from '@altdot/workflow';
+import { WORKFLOW_NODE_TYPE } from '@altdot/workflow/dist/const/workflow-nodes-type.const';
 import { ExtensionCommandArgument } from '@altdot/extension/dist/extension-manifest';
 
 type CommandDataWithPath = ExtensionCommandModel & {

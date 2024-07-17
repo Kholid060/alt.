@@ -28,7 +28,7 @@ import { ElectronApiModule } from './electron-api/electron-api.module';
 import { DeepLinkModule } from './deep-link/deep-link.module';
 import { app } from 'electron';
 import { WebAppModule } from './web-app/web-app.module';
-import { envConfig } from './common/config/env.config'
+import { envConfig } from './common/config/env.config';
 
 const envVarsSchema = z.object({
   API_KEY: z.string().min(1),
@@ -55,13 +55,16 @@ const envVarsSchema = z.object({
     ConfigModule.forRoot({
       cache: true,
       isGlobal: true,
-      ignoreEnvFile: true,
-      ignoreEnvVars: true,
-      validate: () => {
+      ...(import.meta.env.DEV
+        ? {}
+        : { ignoreEnvFile: true, ignoreEnvVars: true }),
+      validate: (config) => {
         const isSingleInstance = app.requestSingleInstanceLock();
         if (!isSingleInstance) return {};
 
-        return envVarsSchema.parse(envConfig());
+        return envVarsSchema.parse(
+          import.meta.env.DEV ? { ...process.env, ...config } : envConfig(),
+        );
       },
     }),
     AppStoreModule,

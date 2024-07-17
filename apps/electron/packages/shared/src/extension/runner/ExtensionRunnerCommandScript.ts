@@ -104,10 +104,16 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
 
     const fileCommand = await resolveFileCommand(this.commandFilePath);
     if (!fileCommand) {
-      this.emit(
-        'error',
-        `"${path.basename(commandId)}" script file is not supported`,
-      );
+      const errorMessage = `"${path.basename(commandId)}" script file is not supported`;
+      this.emit('error', errorMessage);
+      this.runner.messagePort.eventSync.sendMessage('command-script:message', {
+        type: 'error',
+        runnerId: this.id,
+        message: errorMessage,
+        commandTitle: this.command.title,
+        commandId: this.payload.extensionId,
+        extensionId: this.payload.extensionId,
+      });
       return;
     }
 

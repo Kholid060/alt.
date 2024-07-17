@@ -38,8 +38,9 @@ async function authorizeCredential() {
     icon: 'google-drive',
     description: 'Auth google drive',
   });
-  
+
   const token = await oauthClient.getToken();
+  console.log(oauthClient, token);
   if (token) {
     console.log(token);
     return;
@@ -123,11 +124,11 @@ export default async function CommandMain(context: CommandLaunchContext) {
 
   // await authorizeCredential();
 
-  await getTabs();
-  await selectElement();
-  await selectFile();
+  // await getTabs();
+  // await selectElement();
+  // await selectFile();
 
-  // await authorizeCredential();
+  await authorizeCredential();
   // await _extension.runtime.config.openConfigPage('command');
 
   // await _extension.storage.set('test', 'hello world');

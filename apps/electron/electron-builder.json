@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
   "asar": true,
-  "appId": "com.altdot-app",
-  "productName": "altdot",
+  "appId": "com.kholid060.altdot-app",
+  "productName": "alt.",
   "directories": {
     "output": "releases/${version}",
     "buildResources": "buildResources"
@@ -10,15 +10,18 @@
   "files": [
     "packages/**/dist/**",
     "!**/node_modules/better-sqlite3/deps/**",
-    "buildResources/icon.png"
+    "!**/node_modules/@jitl/quickjs-wasmfile-debug-*/**",
+    "!**/node_modules/@altdot/native/target",
+    "buildResources/icon.*"
   ],
   "mac": {
     "target": [
       "dmg"
     ],
-    "artifactName": "${productName}-Mac-${version}-Installer.${ext}"
+    "artifactName": "${productName}-mac-${version}-installer.${ext}"
   },
   "win": {
+    "icon": "buildResources/icon.ico",
     "target": [
       {
         "target": "nsis",
@@ -27,7 +30,7 @@
         ]
       }
     ],
-    "artifactName": "${productName}-Windows-${version}-Setup.${ext}"
+    "artifactName": "${productName}-windows-${version}-setup.${ext}"
   },
   "nsis": {
     "oneClick": false,
@@ -35,11 +38,14 @@
     "allowToChangeInstallationDirectory": true,
     "deleteAppDataOnUninstall": false
   },
+  "extraMetadata": {
+    "name": "altdot"
+  },
   "electronLanguages": ["en-US"],
   "linux": {
     "target": [
       "AppImage"
     ],
-    "artifactName": "${productName}-Linux-${version}.${ext}"
+    "artifactName": "${productName}-linux-${version}.${ext}"
   }
 }

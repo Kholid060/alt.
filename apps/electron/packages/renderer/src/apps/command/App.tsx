@@ -203,7 +203,7 @@ function App() {
               >
                 <CommandCtxProvider>
                   <AppEventListener />
-                  <div className="p-0.5">
+                  <div className="overflow-hidden p-0.5">
                     <UiListProvider>
                       <AppDevtools />
                       <div

@@ -10,7 +10,7 @@ import {
   debounce,
   parseJSON,
 } from '@altdot/shared';
-import { CommandLaunchBy } from '@altdot/extension';
+import { CommandLaunchBy } from '@altdot/extension/dist/interfaces/command.interface';
 import { ExtensionService } from '../extension/extension.service';
 import { workflows } from '../db/schema/workflow.schema';
 import { WorkflowService } from '../workflow/workflow.service';
@@ -144,6 +144,11 @@ export class DeepLinkService implements OnModuleInit {
         message: `The "${command.name}" is required these arguments:\n${requiredArgsStr}`,
       });
       return;
+    }
+
+    if (command.type === 'view' || command.type === 'view:json') {
+      const windowCommand = await this.browserWindowService.get('command');
+      windowCommand.toggleWindow(true);
     }
 
     const launchContext = {

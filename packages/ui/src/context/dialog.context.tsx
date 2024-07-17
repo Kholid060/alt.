@@ -124,13 +124,17 @@ const DialogContainer = forwardRef<
 >(({ providerOptions }, ref) => {
   const [dialogs, setDialogs] = useState<Dialogs[]>([]);
 
-  useImperativeHandle(ref, () => {
-    return {
-      addDialog(dialog) {
-        setDialogs((prevVal) => [...prevVal, dialog]);
-      },
-    };
-  }, []);
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        addDialog(dialog) {
+          setDialogs((prevVal) => [...prevVal, dialog]);
+        },
+      };
+    },
+    [],
+  );
 
   function deleteDialog(id: number) {
     const filteredDialogs = dialogs.filter((dialog) => dialog.id !== id);

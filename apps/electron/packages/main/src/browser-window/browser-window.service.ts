@@ -8,6 +8,8 @@ import { OnAppReady } from '../common/hooks/on-app-ready.hook';
 import { GlobalShortcutService } from '../global-shortcut/global-shortcut.service';
 import { BrowserWindow, WebContents } from 'electron';
 import { GLOBAL_SHORTCUTS } from '../common/utils/constant';
+import { LoggerService } from '../logger/logger.service';
+import { sleep } from '@altdot/shared';
 
 interface BrowserWindowMap {
   command: WindowCommand;
@@ -27,7 +29,10 @@ type WindowNames = keyof BrowserWindowMap;
 export class BrowserWindowService implements OnAppReady {
   private windows: Map<WindowNames, BrowserWindowMap[WindowNames]> = new Map();
 
-  constructor(private globalShortcut: GlobalShortcutService) {}
+  constructor(
+    private globalShortcut: GlobalShortcutService,
+    private loggerService: LoggerService,
+  ) {}
 
   async onAppReady() {
     const windowCommand = await this.get('command');
@@ -71,7 +76,9 @@ export class BrowserWindowService implements OnAppReady {
     let browserWindow = (this.windows.get(name) as BrowserWindowMap[T]) ?? null;
     if (browserWindow) return browserWindow;
 
-    browserWindow = new browserWindowMap[name]() as BrowserWindowMap[T];
+    browserWindow = new browserWindowMap[name](
+      this.loggerService,
+    ) as BrowserWindowMap[T];
     this.windows.set(name, browserWindow);
 
     if (autoCreate) {
@@ -93,6 +100,7 @@ export class BrowserWindowService implements OnAppReady {
   async open(name: WindowNames, routePath?: string) {
     const browserWindow = await this.get(name);
     await browserWindow.restoreOrCreateWindow();
+    await sleep(125);
     if (routePath) browserWindow.sendMessage('app:update-route', routePath);
   }
 

@@ -3,7 +3,7 @@ import { DBService } from '../db/db.service';
 import { OnAppReady } from '../common/hooks/on-app-ready.hook';
 import { lt } from 'drizzle-orm';
 import { extensionErrors, extensions } from '../db/schema/extension.schema';
-import { CommandLaunchBy } from '@altdot/extension';
+import { CommandLaunchBy } from '@altdot/extension/dist/interfaces/command.interface';
 import { GlobalShortcutService } from '../global-shortcut/global-shortcut.service';
 import { LoggerService } from '../logger/logger.service';
 import { IPCSendPayload } from '#packages/common/interface/ipc-events.interface';
