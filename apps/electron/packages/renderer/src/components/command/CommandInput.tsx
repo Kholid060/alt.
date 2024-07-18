@@ -256,6 +256,7 @@ function CommandInput() {
       inputRef.current?.focus();
     },
     [],
+    { enableOnFormTags: true },
   );
 
   const onArgumentsChange = useCallback(

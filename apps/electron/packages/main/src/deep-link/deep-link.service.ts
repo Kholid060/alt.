@@ -51,14 +51,24 @@ export class DeepLinkService implements OnModuleInit {
     /**
      * Register Deep Link
      */
+    console.log(process.defaultApp);
     if (process.defaultApp) {
       if (process.argv.length >= 2) {
         app.setAsDefaultProtocolClient(APP_DEEP_LINK_SCHEME, process.execPath, [
           path.resolve(process.argv[2]),
         ]);
+        app.setAsDefaultProtocolClient(
+          `com.${APP_DEEP_LINK_SCHEME}`,
+          process.execPath,
+          [path.resolve(process.argv[2])],
+        );
       }
     } else {
       app.setAsDefaultProtocolClient(APP_DEEP_LINK_SCHEME, process.execPath);
+      app.setAsDefaultProtocolClient(
+        `com.${APP_DEEP_LINK_SCHEME}`,
+        process.execPath,
+      );
     }
 
     app.on(

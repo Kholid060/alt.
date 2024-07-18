@@ -93,7 +93,7 @@ function CommandStatusPanel() {
           {indicator}
           <div>
             <p className="line-clamp-1 leading-tight">{status.title}</p>
-            <p className="line-clamp-1 text-xs leading-tight text-muted-foreground">
+            <p className="line-clamp-2 text-xs leading-tight text-muted-foreground">
               {status.description}
             </p>
           </div>

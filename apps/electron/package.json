@@ -5,8 +5,12 @@
   "private": true,
   "type": "module",
   "main": "packages/main/dist/index.js",
+  "author": {
+    "name": "Ahmad Kholid",
+    "email": "kholid060@gmail.com"
+  },
   "scripts": {
-    "build": "pnpm run build:main && pnpm build:shared && pnpm run build:preload && pnpm run build:renderer",
+    "build": "pnpm run build:main && pnpm build:shared && pnpm run build:preload && pnpm build:extension && pnpm run build:renderer",
     "build:shared": "cd ./packages/shared && vite build",
     "build:extension": "cd ./packages/extension && vite build",
     "build:main": "cd ./packages/main && vite build",
@@ -37,6 +41,7 @@
     "@codemirror/lang-json": "^6.0.1",
     "@electron/rebuild": "^3.6.0",
     "@hookform/resolvers": "^3.3.4",
+    "@rollup/plugin-replace": "^5.0.7",
     "@swc/core": "^1.6.6",
     "@tanstack/react-query": "^5.45.1",
     "@types/adm-zip": "^0.5.5",

@@ -2,7 +2,6 @@ import {
   UiButton,
   UiForm,
   UiFormControl,
-  UiFormDescription,
   UiFormField,
   UiFormItem,
   UiFormLabel,
@@ -162,10 +161,6 @@ function CreateCommandScript() {
                     {...field}
                   />
                 </UiFormControl>
-                <UiFormDescription>
-                  Supported script files: JavaScript, Python, TypeScript, Bash,
-                  and PowerShell
-                </UiFormDescription>
                 <UiFormMessage />
               </UiFormItem>
             )}

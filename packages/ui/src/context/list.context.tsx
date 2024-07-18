@@ -132,6 +132,8 @@ export function UiListProvider({ children }: { children: React.ReactNode }) {
           listController.current?.runActionByShortcut(event) ?? false;
         if (isRunningAction) return;
 
+        console.log('halo!!!');
+
         switch (event.key) {
           case 'Home':
             event.preventDefault();

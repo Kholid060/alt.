@@ -127,7 +127,7 @@ function RunningProcess() {
     return () => {
       offRunningExtChanges();
     };
-  }, []);
+  }, [uiListStore]);
 
   return (
     <UiList

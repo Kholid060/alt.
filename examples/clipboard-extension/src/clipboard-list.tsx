@@ -17,9 +17,6 @@ function CommandMain() {
     _extension.ui.searchPanel.onChanged.addListener((value) => {
       console.log('onChange', value);
     });
-    _extension.ui.searchPanel.onKeydown.addListener((value) => {
-      console.log('onKeydown', value);
-    });
     _extension.runtime.config.getValues('command').then(console.log)
   }, []);
 
@@ -60,10 +57,12 @@ function CommandMain() {
     title: app.name,
     value: app.appId,
     onSelected() {
+      console.log('hello')
       _extension.shell.installedApps.launch(app.appId);
     },
     actions: [
       {
+        type: 'button',
         icon: UiExtIcon.Clipboard,
         title: 'Paste',
         value: 'paste',
@@ -72,6 +71,7 @@ function CommandMain() {
         },
       },
       {
+        type: 'button',
         icon: UiExtIcon.FolderOpen,
         title: 'Open file location',
         value: 'open-file',

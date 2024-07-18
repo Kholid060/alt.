@@ -304,6 +304,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
           const itemEl = document.querySelector<HTMLElement>(
             `[data-item-value="${id}"]`,
           );
+          console.log(itemEl);
           itemEl?.dispatchEvent(new Event(ITEM_SELECTED_EVENT));
 
           onItemSelected?.(id);
@@ -519,6 +520,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
               value={item.value}
               renderItem={renderItem}
               onClick={() => onItemClick(item)}
+              onSelected={() => onItemSelected?.(item.value)}
               onPointerMove={() => onPointerMove(item, index)}
             />
           );
@@ -534,12 +536,14 @@ function UiListItemRenderer({
   value,
   index,
   onClick,
+  onSelected,
   renderItem,
   onPointerMove,
 }: {
   value: string;
   index: number;
   item: UiListItem;
+  onSelected?: () => void;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> &
   Pick<UiListProps, 'renderItem'>) {
   const itemId = useId();
@@ -592,6 +596,10 @@ function UiListItemRenderer({
       actions={item.actions}
       selected={isSelected}
       subtitle={item.subtitle}
+      onSelected={() => {
+        item.onSelected?.();
+        onSelected?.();
+      }}
       description={item.description}
       onClick={onClick}
       onPointerMove={onPointerMove}
@@ -789,13 +797,12 @@ const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
 
     useEffect(() => {
       const element = elementRef.current;
-      if (!element) return;
 
       const onSelectedEvent = () => onSelected?.(value);
-      element.addEventListener(ITEM_SELECTED_EVENT, onSelectedEvent);
+      element?.addEventListener(ITEM_SELECTED_EVENT, onSelectedEvent);
 
       return () => {
-        element.removeEventListener(ITEM_SELECTED_EVENT, onSelectedEvent);
+        element?.removeEventListener(ITEM_SELECTED_EVENT, onSelectedEvent);
       };
     }, [onSelected, value]);
 

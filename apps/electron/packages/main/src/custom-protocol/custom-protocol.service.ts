@@ -11,6 +11,9 @@ import { createErrorResponse } from './utils/custom-protocol-utils';
 const extensionFilePath = fileURLToPath(
   new URL('./../../extension/dist/', import.meta.url),
 );
+const rendererFilePath = fileURLToPath(
+  new URL('./../../renderer/dist/', import.meta.url),
+);
 
 @Injectable()
 export class CustomProtocolService {
@@ -92,15 +95,15 @@ export class CustomProtocolService {
         path = extensionFilePath + paths.join('/');
         break;
       case '@css': {
-        path = this.devServer
+        path = import.meta.env.DEV
           ? new URL('/src/assets/css/style.css?inline', this.devServer).href
-          : extensionFilePath + 'main.css';
+          : rendererFilePath + 'style.css';
         break;
       }
       case '@fonts': {
-        path = this.devServer
+        path = import.meta.env.DEV
           ? new URL(`/src/assets/fonts/${paths.join('/')}`, this.devServer).href
-          : extensionFilePath + paths.join('/');
+          : rendererFilePath + paths.join('/');
         break;
       }
       case '@renderer':

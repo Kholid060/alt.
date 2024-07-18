@@ -67,7 +67,7 @@ async function buildCommands(watch = false) {
         name: '[name].js',
       },
       rollupOptions: {
-        treeshake: 'smallest',
+        treeshake: watch ? undefined : 'smallest',
         external: [...Object.keys(DEPS_MAP)],
         output: {
           paths: (id) => {

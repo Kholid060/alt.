@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "asar": false,
-  "appId": "com.kholid060.altdot-app",
+  "asar": true,
+  "appId": "com.altdot-app",
   "productName": "alt.",
   "directories": {
     "output": "releases/${version}",
@@ -47,5 +47,9 @@
       "AppImage"
     ],
     "artifactName": "${productName}-linux-${version}.${ext}"
+  },
+  "protocols": {
+    "name": "Alt. app deep link",
+    "schemes": ["altdot-app", "com.altdot-app"]
   }
 }

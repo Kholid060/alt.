@@ -29,8 +29,9 @@ async function loadStyle(themeStyle: string) {
     `;
     document.head.appendChild(fontStyle);
 
-    if (import.meta.env) {
-      const { default: styleStr } = (await import(MODULE_MAP.css)) as {
+    if (import.meta.env.DEV) {
+      const cssPath = `.${MODULE_MAP.css}`;
+      const { default: styleStr } = (await import(cssPath)) as {
         default: string;
       };
       const styleEl = document.createElement('style');

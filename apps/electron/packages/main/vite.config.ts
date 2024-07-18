@@ -4,6 +4,7 @@ import { viteStaticCopy } from 'vite-plugin-static-copy';
 import { swcPlugin } from '../../plugins/swc';
 import { defineConfig } from 'vite';
 import dotenv from 'dotenv';
+import replace from '@rollup/plugin-replace';
 import pkg from '../../package.json';
 
 import { envConfig } from './src/common/config/env.config';
@@ -15,11 +16,21 @@ const IS_DEV = process.env.MODE === 'development';
 
 if (!IS_DEV) dotenv.config({ path: resolve(PROJECT_ROOT, '.env') });
 
+const env = IS_DEV
+  ? undefined
+  : Object.entries(envConfig()).reduce<Record<string, string>>(
+      (acc, [key, value]) => {
+        if (value) acc[`process.env.${key}`] = `'${value}'`;
+
+        return acc;
+      },
+      {},
+    );
+
 const config = defineConfig({
   mode: process.env.MODE,
   root: PACKAGE_ROOT,
   envDir: PROJECT_ROOT,
-  define: IS_DEV ? {} : { 'process.env': envConfig() },
   resolve: {
     alias: {
       '/@/': join(PACKAGE_ROOT, 'src') + '/',
@@ -38,7 +49,7 @@ const config = defineConfig({
     target: `node${node}`,
     outDir: 'dist',
     assetsDir: '.',
-    minify: false,
+    minify: !IS_DEV,
     lib: {
       entry: {
         index: 'src/index.ts',
@@ -64,6 +75,11 @@ const config = defineConfig({
   },
   esbuild: false,
   plugins: [
+    env &&
+      replace({
+        values: env,
+        preventAssignment: true,
+      }),
     swcPlugin(),
     viteStaticCopy({
       targets: [
