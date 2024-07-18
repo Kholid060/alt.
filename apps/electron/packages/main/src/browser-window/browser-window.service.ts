@@ -40,6 +40,8 @@ export class BrowserWindowService implements OnAppReady {
       keys: GLOBAL_SHORTCUTS.toggleCommandWindow,
       callback: () => windowCommand.toggleWindow(),
     });
+
+    windowCommand.toggleWindow(true);
   }
 
   getAll() {

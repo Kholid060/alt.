@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "asar": true,
+  "asar": false,
   "appId": "com.kholid060.altdot-app",
   "productName": "alt.",
   "directories": {

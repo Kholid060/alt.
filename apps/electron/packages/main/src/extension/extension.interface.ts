@@ -14,6 +14,7 @@ export interface ExtensionListItemModel
     | 'id'
     | 'path'
     | 'icon'
+    | 'name'
     | 'title'
     | 'config'
     | 'version'

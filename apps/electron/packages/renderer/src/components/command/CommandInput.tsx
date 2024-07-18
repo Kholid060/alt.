@@ -12,6 +12,7 @@ import { CommandRouteContext } from '/@/context/command-route.context';
 import preloadAPI from '/@/utils/preloadAPI';
 import { ExtensionAPI } from '@altdot/extension';
 import { useShallow } from 'zustand/react/shallow';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 const CommandInputArguments = forwardRef<
   HTMLDivElement,
@@ -249,6 +250,14 @@ function CommandInput() {
   const commandTitleRef = useRef('');
   const fallbackFocusToInput = useRef(false);
 
+  useHotkeys(
+    'mod+f',
+    () => {
+      inputRef.current?.focus();
+    },
+    [],
+  );
+
   const onArgumentsChange = useCallback(
     (commandTitle: string | null, commandArgs: ExtensionCommandArgument[]) => {
       if (!inputRef.current) return;
@@ -321,7 +330,10 @@ function CommandInput() {
         shiftKey,
       };
       viewMessagePort?.sendMessage('extension:keydown-event', keydownEvent);
-      messagePort.eventSync.sendMessage('extension:keydown-event', keydownEvent);
+      messagePort.eventSync.sendMessage(
+        'extension:keydown-event',
+        keydownEvent,
+      );
     }
 
     switch (event.code) {

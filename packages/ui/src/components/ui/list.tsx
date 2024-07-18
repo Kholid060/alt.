@@ -40,6 +40,7 @@ interface UiListItemActionBase {
   title: string;
   value: string;
   icon: LucideIcon;
+  disabled?: boolean;
   shortcut?: KeyboardShortcut;
   color?: 'default' | 'primary' | 'destructive';
 }
@@ -702,8 +703,10 @@ function UiListItemActionMenuComp({
       >
         {action.items.map((item) => (
           <UiDropdownMenuItem
+            disabled={item.disabled}
             key={action.value + item.value}
             onClick={() => item.onAction()}
+            variant={item.color === 'destructive' ? 'destructive' : undefined}
           >
             <item.icon className="mr-2 size-4" />
             <span className="line-clamp-1 flex-1">{item.title}</span>

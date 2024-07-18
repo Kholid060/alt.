@@ -28,6 +28,7 @@ import { ApiExtensionHighlightItem } from '@altdot/shared';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { WorkflowApiWithExtensions } from '#packages/main/src/workflow/workflow.interface';
 import { WorkflowNodes } from '@altdot/workflow';
+import WebURL from '#packages/common/utils/WebURL';
 
 const numberFormatter = new Intl.NumberFormat();
 
@@ -238,7 +239,10 @@ function RouteWorkflowInstall() {
                       </div>
                       <UiTooltip label="Open store page">
                         <a
-                          href={`${import.meta.env.VITE_WEB_BASE_URL}/store/extensions/${extension.name}/${extension.id}`}
+                          href={WebURL.storeExtension(
+                            extension.name,
+                            extension.id,
+                          )}
                           target="_blank"
                           rel="noreferrer"
                           className="invisible group-hover/card:visible"

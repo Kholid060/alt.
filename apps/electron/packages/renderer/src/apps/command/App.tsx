@@ -208,6 +208,7 @@ function App() {
                       <AppDevtools />
                       <div
                         ref={contentRef}
+                        id="command-content-container"
                         className="relative z-10 w-full rounded-lg border bg-background"
                       >
                         <CommandHeader />

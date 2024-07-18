@@ -7,6 +7,8 @@ import {
   ToggleRightIcon,
   ToggleLeftIcon,
   TrashIcon,
+  EllipsisVerticalIcon,
+  StoreIcon,
 } from 'lucide-react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandStore } from '/@/stores/command.store';
@@ -16,6 +18,7 @@ import { useUiListStore } from '@altdot/ui';
 import { useCommandNavigate } from '/@/hooks/useCommandRoute';
 import { ExtensionErrorListItemModel } from '#packages/main/src/extension/extension-error/extension-error.interface';
 import { isIPCEventError } from '#packages/common/utils/helper';
+import WebURL from '#packages/common/utils/WebURL';
 
 function ListItemExtension({
   item,
@@ -49,46 +52,65 @@ function ListItemExtension({
       },
     },
     {
-      type: 'button',
-      icon: TrashIcon,
-      color: 'destructive',
-      title: 'Delete extension',
-      value: 'delete-extension',
-      async onAction() {
-        try {
-          const isConfirmed = await dialog.confirm({
-            title: 'Delete extension?',
-            body: (
-              <>
-                Are you sure you want to delete{' '}
-                <b>&quot;{extension.title}&quot;</b> extension? <br /> This will
-                delete all the extension data and it can&apos;t be undone
-              </>
-            ),
-            okText: 'Delete',
-            okButtonVariant: 'destructive',
-          });
-          if (!isConfirmed) return;
+      type: 'menu',
+      title: 'More menu',
+      icon: EllipsisVerticalIcon,
+      value: 'extension-more-menu',
+      items: [
+        {
+          type: 'button',
+          icon: StoreIcon,
+          disabled: extension.isLocal,
+          onAction() {
+            window.open(WebURL.storeExtension(extension.name, extension.id));
+          },
+          title: 'Open store page',
+          value: 'extension-store-item',
+        },
+        {
+          type: 'button',
+          icon: TrashIcon,
+          color: 'destructive',
+          title: 'Delete extension',
+          value: 'delete-extension',
+          async onAction() {
+            try {
+              const isConfirmed = await dialog.confirm({
+                title: 'Delete extension?',
+                body: (
+                  <>
+                    Are you sure you want to delete{' '}
+                    <b>&quot;{extension.title}&quot;</b> extension? <br /> This
+                    will delete all the extension data and it can&apos;t be
+                    undone
+                  </>
+                ),
+                okText: 'Delete',
+                okButtonVariant: 'destructive',
+              });
+              if (!isConfirmed) return;
 
-          const result = await preloadAPI.main.ipc.invoke(
-            'extension:delete',
-            extension.id,
-          );
-          if (isIPCEventError(result)) {
-            addPanelStatus({
-              type: 'error',
-              title: 'Error!',
-              description: result.message,
-            });
-          }
-        } catch (error) {
-          console.error(error);
-          addPanelStatus({
-            type: 'error',
-            title: 'Something went wrong!',
-          });
-        }
-      },
+              const result = await preloadAPI.main.ipc.invoke(
+                'extension:delete',
+                extension.id,
+              );
+              if (isIPCEventError(result)) {
+                addPanelStatus({
+                  type: 'error',
+                  title: 'Error!',
+                  description: result.message,
+                });
+              }
+            } catch (error) {
+              console.error(error);
+              addPanelStatus({
+                type: 'error',
+                title: 'Something went wrong!',
+              });
+            }
+          },
+        },
+      ],
     },
   ];
 

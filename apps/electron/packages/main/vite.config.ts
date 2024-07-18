@@ -38,7 +38,7 @@ const config = defineConfig({
     target: `node${node}`,
     outDir: 'dist',
     assetsDir: '.',
-    minify: !IS_DEV,
+    minify: false,
     lib: {
       entry: {
         index: 'src/index.ts',

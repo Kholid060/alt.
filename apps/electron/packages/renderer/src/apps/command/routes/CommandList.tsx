@@ -96,6 +96,22 @@ function CommandList() {
   const addPanelStatus = useCommandPanelStore.use.addStatus();
   const navigate = useCommandNavigate();
 
+  const onItemSelected = useCallback(() => {
+    const el = document.getElementById('command-content-container');
+    console.log(el);
+    if (!el) return;
+
+    el.animate(
+      {
+        easing: [
+          'cubic-bezier(0.32, 0, 0.67, 0)',
+          'cubic-bezier(0.33, 1, 0.68, 1)',
+        ],
+        transform: ['scale(1)', 'scale(0.98)', 'scale(1)'],
+      },
+      { duration: 200, iterations: 1 },
+    );
+  }, []);
   const customListFilter = useCallback((items: UiListItem[], query: string) => {
     let cleanedQuery = query;
     let commandItems = items;
@@ -419,6 +435,7 @@ function CommandList() {
             return null;
         }
       }}
+      onItemSelected={onItemSelected}
       renderGroupHeader={(label, index) => (
         <UiList.GroupHeading className={`${index !== 0 ? 'mt-1 block' : ''}`}>
           {label}
