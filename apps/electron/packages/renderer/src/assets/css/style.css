@@ -10,9 +10,6 @@
 }
 
 @layer base {
-  html {
-    background-color: var(--background);
-  }
   body {
     color: theme('colors.foreground');
   }
@@ -45,4 +42,14 @@
 .custom-scroller::-webkit-scrollbar-thumb {
 	border-radius: 10px;
 	background-color: theme('colors.border');
+}
+
+#command-content-container {
+  .ui-list-item [data-action-id]:before {
+    right: auto;
+    bottom: auto;
+    position: fixed;
+    animation-name: none;
+    transform: translate(-25%, -110%);
+  }
 }

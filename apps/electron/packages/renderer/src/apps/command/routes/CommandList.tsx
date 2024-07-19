@@ -98,7 +98,6 @@ function CommandList() {
 
   const onItemSelected = useCallback(() => {
     const el = document.getElementById('command-content-container');
-    console.log(el);
     if (!el) return;
 
     el.animate(

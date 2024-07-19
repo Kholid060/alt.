@@ -304,7 +304,6 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
           const itemEl = document.querySelector<HTMLElement>(
             `[data-item-value="${id}"]`,
           );
-          console.log(itemEl);
           itemEl?.dispatchEvent(new Event(ITEM_SELECTED_EVENT));
 
           onItemSelected?.(id);
@@ -809,7 +808,7 @@ const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
     return (
       <div
         className={cn(
-          'relative group/item min-h-12 flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-card aria-selected:text-accent-foreground',
+          'relative group/item ui-list-item min-h-12 flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-card aria-selected:text-accent-foreground',
           className,
         )}
         {...props}
