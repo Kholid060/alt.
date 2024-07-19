@@ -45,11 +45,17 @@
 }
 
 #command-content-container {
-  .ui-list-item [data-action-id]:before {
-    right: auto;
-    bottom: auto;
-    position: fixed;
-    animation-name: none;
-    transform: translate(-25%, -110%);
+  .ui-list-item {
+    [data-action-id]:before {
+      animation-name: none;
+    }
+
+    &:first-of-type [data-action-id]:before {
+      right: auto;
+      bottom: auto;
+      position: fixed;
+      animation-name: none;
+      transform: translate(-25%, -110%);
+    }
   }
 }

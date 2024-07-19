@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import path from 'path';
+import path from 'path/posix';
 import fs from 'fs-extra';
 import semverValid from 'semver/functions/valid';
 import semverClean from 'semver/functions/clean';
@@ -11,7 +11,7 @@ import {
 } from '../../extension-manifest';
 import { fromZodError } from 'zod-validation-error';
 import imageSize from 'image-size';
-import { glob } from 'glob';
+import { globby } from 'globby';
 import { z } from 'zod';
 import { bundleRequire } from 'bundle-require';
 import { errorMap } from 'zod-validation-error';
@@ -33,7 +33,7 @@ class ManifestUtils {
   basePath: string;
 
   constructor(basePath: string) {
-    this.basePath = basePath;
+    this.basePath = basePath.split('\\').join(path.sep);
   }
 
   getExtPath(name: ExtPathName) {
@@ -75,7 +75,7 @@ class ManifestUtils {
   }
 
   private async resolveExtensionManifest() {
-    let [manifestFilePath] = await glob('./manifest.{js,json}');
+    let [manifestFilePath] = await globby('./manifest.{js,json}');
     if (!manifestFilePath) {
       throw new BuildError("Couldn't find Manifest file");
     }
@@ -160,7 +160,7 @@ class ManifestUtils {
           seenArg.add(arg.name);
         });
 
-        const [commandFilePath] = await glob(
+        const [commandFilePath] = await globby(
           command.type === 'script'
             ? path.join(this.getExtPath('src'), command.name)
             : [

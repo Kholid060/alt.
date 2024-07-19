@@ -49,6 +49,7 @@ async function buildCommands(watch = false) {
     esbuild: watch
       ? {
           keepNames: true,
+          minifyWhitespace: true,
           minifyIdentifiers: true,
         }
       : undefined,

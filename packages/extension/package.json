@@ -1,14 +1,15 @@
 {
   "name": "@altdot/extension",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "type": "module",
   "scripts": {
     "dev": "pnpm build:ext-api && tsup --watch",
-    "build": "pnpm build:ext-api && tsup && tsc",
+    "generate:dts": "tsx ./scripts/generate-dts.ts",
     "build:ext-api": "tsx ./scripts/ext-api/index.ts",
-    "lint": "eslint . --ext js,mjs,cjs,ts,mts,cts,tsx"
+    "lint": "eslint . --ext js,mjs,cjs,ts,mts,cts,tsx",
+    "build": "pnpm build:ext-api && tsup && pnpm generate:dts"
   },
   "dependencies": {
     "@altdot/shared": "workspace:*",
@@ -44,7 +45,6 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "fs-extra": "^11.2.0",
-    "glob": "^10.3.10",
     "globby": "^14.0.1",
     "image-size": "^1.1.1",
     "lodash-es": "^4.17.21",
@@ -57,7 +57,6 @@
     "type-fest": "^4.21.0",
     "typescript": "catalog:",
     "vite": "^5.1.4",
-    "vite-plugin-dts": "^3.7.3",
     "vite-plugin-static-copy": "^1.0.1",
     "zod-validation-error": "^3.3.0"
   }

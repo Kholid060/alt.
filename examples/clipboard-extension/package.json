@@ -9,9 +9,8 @@
     "dev": "altdot build --watch"
   },
   "devDependencies": {
-    "@altdot/extension": "workspace:*",
     "@types/react": "^18.2.66",
-    "typescript": "catalog:"
+    "typescript": "^5.5.3"
   },
   "type": "module",
   "dependencies": {

@@ -31,7 +31,6 @@ const baseConfig: Options = {
   },
   outDir: 'dist',
   noExternal: ['@altdot/shared'],
-  minify: true,
   external: externalDeps,
   clean: false,
   esbuildOptions(options) {
@@ -42,7 +41,7 @@ const baseConfig: Options = {
 export default defineConfig([
   {
     ...baseConfig,
-    minify: false,
+    minify: true,
     outDir: 'dist',
     entry: {
       cli: './src/cli/index.ts',
@@ -59,7 +58,7 @@ export default defineConfig([
   {
     ...baseConfig,
     splitting: true,
-    sourcemap: true,
+    sourcemap: false,
     treeshake: true,
     publicDir: './public',
     env: {
@@ -72,7 +71,7 @@ export default defineConfig([
       'src/components/**/*@(ts|tsx)',
       'src/extension-api/**/*@(ts|tsx)',
     ],
-    minify: true,
+    minify: false,
     format: ['esm'],
     async onSuccess() {
       await fs.copy(
