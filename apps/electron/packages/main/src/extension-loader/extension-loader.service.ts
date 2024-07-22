@@ -160,6 +160,7 @@ export class ExtensionLoaderService {
     if (!extension.isLocal) return false;
 
     const isUpdated = await this.extensionUpdater.updateExtension(extension);
+    console.log('halo', isUpdated);
     if (!isUpdated) return false;
 
     this.dbService.emitChanges({

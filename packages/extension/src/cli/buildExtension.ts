@@ -65,7 +65,6 @@ async function buildCommands(watch = false) {
       lib: {
         entry: commands,
         formats: ['es'],
-        name: '[name].js',
       },
       rollupOptions: {
         treeshake: watch ? undefined : 'smallest',
@@ -74,6 +73,7 @@ async function buildCommands(watch = false) {
           paths: (id) => {
             return DEPS_MAP[id] || id;
           },
+          entryFileNames: '[name].js',
           manualChunks: {
             [EXT_API_PKG_NAME]: [EXT_API_PKG_NAME],
           },

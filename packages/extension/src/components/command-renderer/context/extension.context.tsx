@@ -1,6 +1,6 @@
-import { useUiListStore } from '@altdot/ui';
 import { BetterMessagePortSync } from '@altdot/shared';
 import { createContext, useEffect, useState } from 'react';
+import { useUiListStore } from '@altdot/ui/dist/context/list.context';
 import {
   ExtensionMessagePortCallback,
   ExtensionMessagePortEvent,
@@ -49,7 +49,7 @@ export function ExtensionProvider({
       messagePort.on('extension:query-change', onQueryChange);
       messagePort.on('extension:keydown-event', onParentKeydown);
     };
-  }, [messagePort]);
+  }, [messagePort, listStore]);
 
   return (
     <ExtensionContext.Provider value={{ query }}>

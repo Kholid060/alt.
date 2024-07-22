@@ -75,7 +75,7 @@ class ManifestUtils {
   }
 
   private async resolveExtensionManifest() {
-    let [manifestFilePath] = await globby('./manifest.{js,json}');
+    let [manifestFilePath] = await globby('./manifest.{ts,js,json}');
     if (!manifestFilePath) {
       throw new BuildError("Couldn't find Manifest file");
     }
@@ -196,7 +196,7 @@ class ManifestUtils {
 
     const iconPath = path.join(this.getExtPath('icon'), iconName + '.png');
     if (!fs.existsSync(iconPath)) {
-      throw new BuildError(`Couldn't find "${iconName}" icon file`);
+      throw new BuildError(`Couldn't find "${iconName}" icon file. Put the icon file inside public/icon/icon-name.png directory`);
     }
 
     const iconExtName = path.extname(iconPath);

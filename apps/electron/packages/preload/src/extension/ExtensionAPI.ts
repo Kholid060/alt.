@@ -1,15 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ExtensionMessagePortEvent } from '@altdot/extension';
 import {
   CUSTOM_SCHEME,
   PRELOAD_API_KEY,
 } from '#common/utils/constant/constant';
 import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
 import { contextBridge } from 'electron';
-import { BetterMessagePort } from '@altdot/shared';
-import { createExtensionAPI } from '#common/utils/extension/extension-api-factory';
 import IPCRenderer from '#common/utils/IPCRenderer';
-import { EXTENSION_MESSAGE_PORT_EVENT_TIMEOUT_MS } from '#common/utils/constant/extension.const';
 import type {
   ExtensionCommandExecutePayload,
   ExtensionCommandViewInitMessage,
@@ -30,10 +26,7 @@ class ExtensionAPI {
         const [messagePort] = ports;
         if (!messagePort) throw new Error('PORT IS EMPTY');
 
-        new ExtensionAPI({
-          messagePort,
-          payload: data.payload,
-        }).loadAPI();
+        new ExtensionAPI(data.payload).loadAPI();
       },
       { once: true },
     );
@@ -41,20 +34,10 @@ class ExtensionAPI {
 
   private key: string = '';
 
-  payload: ExtensionCommandExecutePayload;
-  messagePort: BetterMessagePort<ExtensionMessagePortEvent>;
-
-  constructor({
-    payload,
-    messagePort,
-  }: {
-    messagePort: MessagePort;
-    payload: ExtensionCommandExecutePayload;
-  }) {
+  constructor(
+    readonly payload: ExtensionCommandExecutePayload
+  ) {
     this.payload = payload;
-    this.messagePort = new BetterMessagePort(messagePort, {
-      eventTimeoutMs: EXTENSION_MESSAGE_PORT_EVENT_TIMEOUT_MS,
-    });
   }
 
   async loadAPI() {
@@ -73,26 +56,11 @@ class ExtensionAPI {
 
       this.key = extensionId;
 
-      const extensionApi = await this.getExtensionAPI();
-      contextBridge.exposeInMainWorld(PRELOAD_API_KEY.extension, {
-        ...extensionApi,
-        $commandId: commandId,
-      });
+      contextBridge.exposeInMainWorld('$$extIPC', this.sendAction.bind(this));
     } catch (error) {
       console.error(error);
       setExtView('error');
     }
-  }
-
-  async getExtensionAPI(): Promise<typeof _extension> {
-    const extensionAPI = createExtensionAPI({
-      context: this,
-      messagePort: this.messagePort,
-      browserCtx: this.payload.browserCtx ?? null,
-      sendMessage: this.sendAction.bind(this),
-    });
-
-    return Object.freeze(extensionAPI);
   }
 
   private sendAction<T extends keyof IPCUserExtensionEventsMap>(

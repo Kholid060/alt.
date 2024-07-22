@@ -22,8 +22,11 @@ export class MessagePortListener {
   }
 }
 
+type PortType = 'view' | 'action';
+
 export class MessagePortRenderer<AsyncT, SyncT> {
-  private port: MessagePort | null = null;
+  private viewPort: MessagePort | null = null;
+  private actionPort: MessagePort | null = null;
 
   eventSync: BetterMessagePortSync<SyncT>;
   eventAsync: BetterMessagePortAsync<AsyncT>;
@@ -36,17 +39,17 @@ export class MessagePortRenderer<AsyncT, SyncT> {
     });
   }
 
-  get hasPort() {
-    return Boolean(this.port);
+  hasPort(type: PortType) {
+    return  Boolean(type === 'action' ? this.actionPort : this.viewPort);
   }
 
   private postMessage(data: unknown) {
-    if (!this.port) return;
-
-    this.port.postMessage(data);
+    this.viewPort?.postMessage(data);
+    this.actionPort?.postMessage(data);
   }
 
   private onMessage({ data }: MessageEvent) {
+    console.log(data);
     if (data?.type === 'send' && data.isSync) {
       this.eventSync.messageHandler(data);
     } else {
@@ -54,19 +57,24 @@ export class MessagePortRenderer<AsyncT, SyncT> {
     }
   }
 
-  changePort(port: MessagePort) {
-    this.destroyPort();
+  changePort(type: PortType, port: MessagePort) {
+    this.destroyPort(type);
 
-    this.port = port;
-    this.port.addEventListener('message', this.onMessage);
+    if (type === 'action') this.actionPort = port;
+    else this.viewPort = port;
 
+    port.addEventListener('message', this.onMessage);
     port.start();
   }
 
-  private destroyPort() {
-    if (!this.port) return;
+  destroyPort(type: PortType) {
+    const port = type === 'action' ? this.actionPort : this.viewPort;
+    if (!port) return;
 
-    this.port.removeEventListener('message', this.onMessage);
-    this.port.close();
+    console.log('des', type);
+    console.trace();
+
+    port.removeEventListener('message', this.onMessage);
+    port.close();
   }
 }

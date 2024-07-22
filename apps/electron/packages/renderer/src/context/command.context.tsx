@@ -9,14 +9,11 @@ import {
 } from '#common/utils/message-port-renderer';
 import { MessagePortSharedCommandWindowEvents } from '#packages/common/interface/message-port-events.interface';
 import { debugLog } from '#packages/common/utils/helper';
-import { BetterMessagePortSync } from '@altdot/shared';
 import {
-  ExtensionMessagePortEvent,
   ExtensionMessagePortEventAsync,
 } from '@altdot/extension';
 import { useDialog } from '@altdot/ui';
 
-type CommandViewMessagePort = BetterMessagePortSync<ExtensionMessagePortEvent>;
 type RunnerMessagePort = MessagePortRenderer<
   ExtensionMessagePortEventAsync,
   MessagePortSharedCommandWindowEvents
@@ -24,9 +21,9 @@ type RunnerMessagePort = MessagePortRenderer<
 
 export interface CommandContextState {
   executeCommand(payload: ExtensionCommandExecutePayload): void;
-  setCommandViewMessagePort(port: CommandViewMessagePort | null): void;
+  setCommandViewMessagePort(port: MessagePort | null): void;
   runnerMessagePort: React.MutableRefObject<RunnerMessagePort>;
-  commandViewMessagePort: React.RefObject<CommandViewMessagePort>;
+  commandViewMessagePort: React.RefObject<MessagePort>;
 }
 
 // @ts-expect-error ...
@@ -40,7 +37,7 @@ export function CommandCtxProvider({
   const runnerMessagePort = useRef<RunnerMessagePort>(
     new MessagePortRenderer(),
   );
-  const commandViewMessagePort = useRef<CommandViewMessagePort | null>(null);
+  const commandViewMessagePort = useRef<MessagePort | null>(null);
 
   const dialog = useDialog();
 
@@ -49,11 +46,14 @@ export function CommandCtxProvider({
       .invoke('extension:execute-command', payload)
       .catch(console.error);
   }
-  function setCommandViewMessagePort(port: CommandViewMessagePort | null) {
-    if (commandViewMessagePort.current) {
-      commandViewMessagePort.current.destroy();
+  function setCommandViewMessagePort(port: MessagePort | null) {
+    if (!port) {
+      runnerMessagePort.current.destroyPort('view');
+      return;
     }
 
+    runnerMessagePort.current.changePort('view', port);
+    console.log('view', runnerMessagePort, port);
     commandViewMessagePort.current = port;
   }
 
@@ -98,6 +98,15 @@ export function CommandCtxProvider({
         });
       },
     );
+    const offShowToast = runnerMessagePort.current.eventSync.on('extension:show-toast', (toastId, toast) => {
+      useCommandPanelStore.getState().addStatus({
+        ...toast,
+        name: toastId,
+      });
+    });
+    const offHideToast = runnerMessagePort.current.eventSync.on('extension:hide-toast', (toastId) => {
+      useCommandPanelStore.getState().removeStatus(toastId);
+    });
 
     const offSharedMessagePortListener = MessagePortListener.on(
       MESSAGE_PORT_CHANNEL_IDS.sharedWithCommand,
@@ -105,11 +114,13 @@ export function CommandCtxProvider({
         if (!port) return;
 
         debugLog('Receive MessagePort from shared process', port);
-        runnerMessagePort.current.changePort(port);
+        runnerMessagePort.current.changePort('action', port);
       },
     );
 
     return () => {
+      offHideToast();
+      offShowToast();
       offConfirmAlert();
       offSharedMessagePortListener();
       offCommandScriptMessageEvent();

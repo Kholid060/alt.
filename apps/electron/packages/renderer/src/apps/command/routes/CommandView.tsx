@@ -6,7 +6,7 @@ import {
   ExtensionCommandExecutePayload,
   ExtensionCommandViewInitMessage,
 } from '#common/interface/extension.interface';
-import { BetterMessagePort } from '@altdot/shared';
+import { sleep } from '@altdot/shared';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
@@ -26,16 +26,6 @@ function CommandView() {
   const [show, setShow] = useState(false);
   const [iframeKey, setIframeKey] = useState(0);
 
-  function initPortListener(port: MessagePort) {
-    commandCtx.setCommandViewMessagePort(
-      BetterMessagePort.createStandalone('sync', port),
-    );
-    const messagePort = commandCtx.commandViewMessagePort.current!;
-
-    messagePort.on('extension:reload', () => {
-      setIframeKey((prevVal) => prevVal + 1);
-    });
-  }
   async function onIframeLoad() {
     if (!activeRoute?.data || !iframeRef.current) return;
 
@@ -53,26 +43,30 @@ function CommandView() {
         await import('@altdot/ui/dist/theme.css?inline')
       ).default;
 
-      initPortListener(messageChannelRef.current.port1);
+      commandCtx.setCommandViewMessagePort(messageChannelRef.current.port1);
+      commandCtx.runnerMessagePort.current.eventSync.on('extension:reload', () => {
+        setIframeKey((prevVal) => prevVal + 1);
+      });
 
       iframe.contentWindow?.postMessage(payload, '*', [
         messageChannelRef.current.port2,
       ]);
 
+      await sleep(100);
       iframe.style.visibility = 'visible';
     } catch (error) {
       console.error(error);
     }
   }
 
-  useEffect(() => {
-    return () => {
-      messageChannelRef.current?.port1.close();
-      messageChannelRef.current?.port2.close();
+  // useEffect(() => {
+  //   return () => {
+  //     messageChannelRef.current?.port1.close();
+  //     messageChannelRef.current?.port2.close();
 
-      commandCtx.setCommandViewMessagePort(null);
-    };
-  }, [commandCtx]);
+  //     commandCtx.setCommandViewMessagePort(null);
+  //   };
+  // }, [commandCtx]);
   useEffect(() => {
     const data = activeRoute?.data as ExtensionCommandExecutePayload;
 

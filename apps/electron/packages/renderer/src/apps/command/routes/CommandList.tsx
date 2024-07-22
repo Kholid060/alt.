@@ -313,6 +313,12 @@ function CommandList() {
           if (inputExtensionConfig) {
             navigate(`/configs/${result.id}`);
           }
+
+          addPanelStatus({
+            type: 'success',
+            title: 'Extension imported',
+            description: `"${result.title}" extension imported`,
+          })
         } catch (error) {
           console.error(error);
           addPanelStatus({

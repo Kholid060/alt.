@@ -320,8 +320,7 @@ function CommandInput() {
     }
 
     const messagePort = commandCtx.runnerMessagePort.current;
-    const viewMessagePort = commandCtx.commandViewMessagePort.current;
-    if ((messagePort || viewMessagePort) && commandKeys.has(event.key)) {
+    if (messagePort && commandKeys.has(event.key)) {
       const { key, ctrlKey, altKey, metaKey, shiftKey } = event;
       const keydownEvent: ExtensionAPI.UI.SearchPanel.KeydownEvent = {
         key,
@@ -330,7 +329,6 @@ function CommandInput() {
         metaKey,
         shiftKey,
       };
-      viewMessagePort?.sendMessage('extension:keydown-event', keydownEvent);
       messagePort.eventSync.sendMessage(
         'extension:keydown-event',
         keydownEvent,
@@ -366,9 +364,7 @@ function CommandInput() {
       moveArgumentContainer(value || commandTitleRef.current);
 
       const messagePort = commandCtx.runnerMessagePort.current;
-      const viewMessagePort = commandCtx.commandViewMessagePort.current;
-      if (messagePort || viewMessagePort) {
-        viewMessagePort?.sendMessage('extension:query-change', value);
+      if (messagePort) {
         messagePort?.eventSync.sendMessage('extension:query-change', value);
       }
 

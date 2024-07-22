@@ -305,8 +305,6 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
             `[data-item-value="${id}"]`,
           );
           itemEl?.dispatchEvent(new Event(ITEM_SELECTED_EVENT));
-
-          onItemSelected?.(id);
         },
         runActionByShortcut(event) {
           const { actions } = listStore.snapshot().selectedItem;
@@ -431,7 +429,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
           setSelectedItem(prevItem);
         },
       };
-    }, [filteredItems, listStore, onItemSelected]);
+    }, [filteredItems, listStore]);
 
     useImperativeHandle(
       ref,
