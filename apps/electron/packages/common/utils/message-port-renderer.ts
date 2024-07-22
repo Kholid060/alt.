@@ -49,7 +49,6 @@ export class MessagePortRenderer<AsyncT, SyncT> {
   }
 
   private onMessage({ data }: MessageEvent) {
-    console.log(data);
     if (data?.type === 'send' && data.isSync) {
       this.eventSync.messageHandler(data);
     } else {
@@ -70,9 +69,6 @@ export class MessagePortRenderer<AsyncT, SyncT> {
   destroyPort(type: PortType) {
     const port = type === 'action' ? this.actionPort : this.viewPort;
     if (!port) return;
-
-    console.log('des', type);
-    console.trace();
 
     port.removeEventListener('message', this.onMessage);
     port.close();

@@ -53,7 +53,6 @@ export function CommandCtxProvider({
     }
 
     runnerMessagePort.current.changePort('view', port);
-    console.log('view', runnerMessagePort, port);
     commandViewMessagePort.current = port;
   }
 

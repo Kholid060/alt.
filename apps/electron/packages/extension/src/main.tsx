@@ -50,7 +50,6 @@ async function onMessage({
       throw new Error('Invalid payload');
 
     const messagePort: ExtensionMessagePort = new BetterMessagePort(port);
-    console.log(messagePort);
     await injectExtensionAPI(messagePort, data.payload.browserCtx);
     await extViewRenderer(
       { launchContext: data.payload.launchContext, messagePort: messagePort.sync },

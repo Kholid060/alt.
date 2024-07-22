@@ -59,14 +59,14 @@ function CommandView() {
     }
   }
 
-  // useEffect(() => {
-  //   return () => {
-  //     messageChannelRef.current?.port1.close();
-  //     messageChannelRef.current?.port2.close();
+  useEffect(() => {
+    return () => {
+      messageChannelRef.current?.port1.close();
+      messageChannelRef.current?.port2.close();
 
-  //     commandCtx.setCommandViewMessagePort(null);
-  //   };
-  // }, [commandCtx]);
+      commandCtx.setCommandViewMessagePort(null);
+    };
+  }, [commandCtx]);
   useEffect(() => {
     const data = activeRoute?.data as ExtensionCommandExecutePayload;
 
