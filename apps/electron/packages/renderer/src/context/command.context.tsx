@@ -9,9 +9,7 @@ import {
 } from '#common/utils/message-port-renderer';
 import { MessagePortSharedCommandWindowEvents } from '#packages/common/interface/message-port-events.interface';
 import { debugLog } from '#packages/common/utils/helper';
-import {
-  ExtensionMessagePortEventAsync,
-} from '@altdot/extension';
+import { ExtensionMessagePortEventAsync } from '@altdot/extension';
 import { useDialog } from '@altdot/ui';
 
 type RunnerMessagePort = MessagePortRenderer<
@@ -97,15 +95,21 @@ export function CommandCtxProvider({
         });
       },
     );
-    const offShowToast = runnerMessagePort.current.eventSync.on('extension:show-toast', (toastId, toast) => {
-      useCommandPanelStore.getState().addStatus({
-        ...toast,
-        name: toastId,
-      });
-    });
-    const offHideToast = runnerMessagePort.current.eventSync.on('extension:hide-toast', (toastId) => {
-      useCommandPanelStore.getState().removeStatus(toastId);
-    });
+    const offShowToast = runnerMessagePort.current.eventSync.on(
+      'extension:show-toast',
+      (toastId, toast) => {
+        useCommandPanelStore.getState().addStatus({
+          ...toast,
+          name: toastId,
+        });
+      },
+    );
+    const offHideToast = runnerMessagePort.current.eventSync.on(
+      'extension:hide-toast',
+      (toastId) => {
+        useCommandPanelStore.getState().removeStatus(toastId);
+      },
+    );
 
     const offSharedMessagePortListener = MessagePortListener.on(
       MESSAGE_PORT_CHANNEL_IDS.sharedWithCommand,

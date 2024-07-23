@@ -196,7 +196,9 @@ class ManifestUtils {
 
     const iconPath = path.join(this.getExtPath('icon'), iconName + '.png');
     if (!fs.existsSync(iconPath)) {
-      throw new BuildError(`Couldn't find "${iconName}" icon file. Put the icon file inside public/icon/icon-name.png directory`);
+      throw new BuildError(
+        `Couldn't find "${iconName}" icon file. Put the icon file inside public/icon/icon-name.png directory`,
+      );
     }
 
     const iconExtName = path.extname(iconPath);
