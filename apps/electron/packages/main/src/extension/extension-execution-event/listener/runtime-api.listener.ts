@@ -8,6 +8,7 @@ import { CommandLaunchBy } from '@altdot/extension/dist/interfaces/command.inter
 import { isObject } from '@altdot/shared';
 import { ExtensionCommandService } from '../../extension-command/extension-command.service';
 import { ExtensionService } from '../../extension.service';
+import { ExtensionManifest } from '@altdot/extension/dist/extension-manifest';
 
 @Injectable()
 export class ExtensionRuntimeApiListener {
@@ -57,7 +58,7 @@ export class ExtensionRuntimeApiListener {
   getManifest({
     context: { extension },
   }: ExtensionApiEvent<'runtime.getManifest'>) {
-    return Promise.resolve(extension);
+    return Promise.resolve(extension as ExtensionManifest);
   }
 
   @OnExtensionAPI('runtime.command.updateDetail')

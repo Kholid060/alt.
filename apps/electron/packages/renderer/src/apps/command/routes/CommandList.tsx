@@ -183,6 +183,7 @@ function CommandList() {
       if (extension.isError || extension.isDisabled) return;
 
       extension.commands.forEach((command) => {
+        if (command.isInternal) return;
         // let browserCtx: ExtensionBrowserTabContext | undefined;
 
         const isInSuggestion = false;
@@ -318,7 +319,7 @@ function CommandList() {
             type: 'success',
             title: 'Extension imported',
             description: `"${result.title}" extension imported`,
-          })
+          });
         } catch (error) {
           console.error(error);
           addPanelStatus({

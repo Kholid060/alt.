@@ -40,7 +40,7 @@ export class MessagePortRenderer<AsyncT, SyncT> {
   }
 
   hasPort(type: PortType) {
-    return  Boolean(type === 'action' ? this.actionPort : this.viewPort);
+    return Boolean(type === 'action' ? this.actionPort : this.viewPort);
   }
 
   private postMessage(data: unknown) {

@@ -11,8 +11,13 @@ import {
   ExtensionCommandType,
   ExtensionCommandArgumentType,
 } from '@altdot/shared';
+import type { UiIcons } from '@altdot/ui/dist/components/ui/icons';
 
 const URL_FRIENDLY_REGEX = /^[a-zA-Z0-9_-]*$/;
+
+const iconSchema = z.custom<
+  `icon:${keyof typeof UiIcons}` | (string & Record<never, never>)
+>((value) => typeof value === 'string' && value.length >= 1);
 
 const ExtensionCommandArgumentBaseSchema = z.object({
   name: z.string().min(1).max(32),
@@ -78,13 +83,13 @@ export const ExtensionConfigSchema = z.discriminatedUnion('type', [
 ]);
 export type ExtensionConfig = z.infer<typeof ExtensionConfigSchema>;
 
-export const ExtensionCommandSchema = z.object({
+const ExtensionCommandBase = z.object({
   name: z.string().min(1),
+  icon: iconSchema.optional(),
   subtitle: z.string().optional(),
   description: z.string().optional(),
   title: z.string().min(1).max(48),
-  icon: z.string().min(1).optional(),
-  type: z.enum(EXTENSION_COMMAND_TYPE),
+  type: z.enum(EXTENSION_COMMAND_TYPE).exclude(['script']),
   config: ExtensionConfigSchema.array().optional(),
   arguments: ExtensionCommandArgumentSchema.array().optional(),
   context: z
@@ -99,10 +104,19 @@ export const ExtensionCommandSchema = z.object({
     .array()
     .optional(),
 });
+const ExtensionCommandSchema = z.discriminatedUnion('type', [
+  ExtensionCommandBase,
+  ExtensionCommandBase.merge(
+    z.object({
+      type: z.literal('script'),
+      isInternal: z.boolean().optional(),
+    }),
+  ),
+]);
 export type ExtensionCommand = z.infer<typeof ExtensionCommandSchema>;
 
 export const ExtensionManifestSchema = z.object({
-  icon: z.string().min(1),
+  icon: iconSchema,
   $apiVersion: z.string(),
   version: z.string().min(1),
   title: z.string().min(3).max(64),

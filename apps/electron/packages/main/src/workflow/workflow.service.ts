@@ -15,6 +15,7 @@ import {
 import { LoggerService } from '../logger/logger.service';
 import { fromZodError } from 'zod-validation-error';
 import {
+  WorkflowApiWithExtensions,
   WorkflowInsertPayload,
   WorkflowUpdatePayload,
 } from './workflow.interface';
@@ -230,7 +231,9 @@ export class WorkflowService implements OnAppReady {
     }
   }
 
-  async getWorkflowWithExtDependency(workflowId: string): Promise {
+  async getWorkflowWithExtDependency(
+    workflowId: string,
+  ): Promise<WorkflowApiWithExtensions> {
     const workflow = await this.apiService.workflows.get(workflowId);
 
     const extIds = new Set<string>();

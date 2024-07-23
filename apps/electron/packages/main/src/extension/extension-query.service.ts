@@ -61,6 +61,7 @@ export class ExtensionQueryService {
         id: true,
         path: true,
         icon: true,
+        name: true,
         title: true,
         config: true,
         version: true,
