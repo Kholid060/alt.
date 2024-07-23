@@ -4,7 +4,7 @@ import crypto from 'node:crypto';
 import { DBService } from '../db/db.service';
 import ExtensionUtils from '../common/utils/ExtensionUtils';
 import {
-  ExtensionError,
+  CustomError,
   ValidationError,
 } from '#packages/common/errors/custom-errors';
 import { mapManifestToDB } from '/@/common/utils/database-utils';
@@ -156,7 +156,7 @@ export class ExtensionLoaderService {
         );
       },
     });
-    if (!extension) throw new ExtensionError("Couldn't find extension");
+    if (!extension) throw new CustomError("Couldn't find extension");
     if (!extension.isLocal) return false;
 
     const isUpdated = await this.extensionUpdater.updateExtension(extension);
@@ -171,27 +171,23 @@ export class ExtensionLoaderService {
   }
 
   async uninstallExtension(extensionId: string) {
-    const commands = await this.dbService.db.query.extensionCommands.findMany({
-      columns: {
-        id: true,
-        name: true,
-        shortcut: true,
-      },
+    const extension = await this.dbService.db.query.extensions.findFirst({
       where(fields, operators) {
-        return operators.and(
-          operators.eq(fields.extensionId, extensionId),
-          operators.isNotNull(fields.shortcut),
-        );
+        return operators.eq(fields.id, extensionId);
+      },
+      with: {
+        commands: true,
       },
     });
+    if (!extension) throw new CustomError("Couldn't find extension");
 
     // unregister command shortcut
-    commands.forEach((command) => {
+    extension.commands.forEach((command) => {
       this.globalShortcut.unregisterById(command.id);
     });
 
     // delete the extension database
-    this.extensionSqlite.deleteDB(extensionId);
+    await this.extensionSqlite.deleteDB(extensionId);
 
     await this.dbService.db
       .delete(extensions)
@@ -200,6 +196,12 @@ export class ExtensionLoaderService {
       'database:get-extension': [extensionId],
       'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
     });
+
+    if (extension.isLocal) return;
+
+    // delete extension folder
+    const extDir = path.join(EXTENSION_FOLDER, extensionId);
+    await fs.remove(extDir);
   }
 
   async installExtension(
