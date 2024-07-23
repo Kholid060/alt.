@@ -18,12 +18,16 @@ export interface ExtensionConfigData {
   value: Record<string, unknown>;
 }
 
+export interface ExtensionCommandExecuteScriptOptions {
+  captureAllMessages?: boolean;
+}
 export interface ExtensionCommandExecutePayload {
   commandId: string;
   timeoutMs?: number;
   extensionId: string;
   launchContext: CommandLaunchContext;
   browserCtx?: ExtensionBrowserTabContext;
+  scriptOptions?: ExtensionCommandExecuteScriptOptions;
 }
 
 export interface ExtensionCommandViewData

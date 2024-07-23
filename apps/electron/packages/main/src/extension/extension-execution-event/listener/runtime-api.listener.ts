@@ -91,6 +91,9 @@ export class ExtensionRuntimeApiListener {
           launchBy: CommandLaunchBy.COMMAND,
         },
         commandId: options.name,
+        scriptOptions: options.captureAllScriptMessages
+          ? { captureAllMessages: true }
+          : undefined,
       })
       .catch((error) => {
         throw new CustomError(error);

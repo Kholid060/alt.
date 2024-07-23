@@ -19,7 +19,7 @@ const IDLE_TIMER_KEY = 'extension-command';
 export type CommandRunnerMessagePort = MessagePortRenderer<
   ExtensionMessagePortEventAsync,
   MessagePortSharedCommandWindowEvents
-  >;
+>;
 
 class ExtensionCommandRunner {
   private static _instance: ExtensionCommandRunner;
@@ -44,7 +44,7 @@ class ExtensionCommandRunner {
   }
 
   private createCommandWindowMessagePort() {
-    if (this.messagePort.hasPort) return;
+    if (this.messagePort.hasPort('action')) return;
 
     const { port1, port2 } = new MessageChannel();
 
@@ -63,7 +63,7 @@ class ExtensionCommandRunner {
         listener(data);
       });
     });
-    this.messagePort.changePort(port2);
+    this.messagePort.changePort('view', port2);
 
     port2.start();
   }

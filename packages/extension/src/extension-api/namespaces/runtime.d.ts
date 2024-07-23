@@ -12,9 +12,10 @@ export declare namespace Runtime.Command {
   interface LaunchOptions {
     name: string;
     args?: Record<string, unknown>;
+    captureAllScriptMessages?: boolean;
   }
-  type LaunchResult =
-    | { success: true; result: unknown }
+  type LaunchResult<T = unknown> =
+    | { success: true; result: T }
     | { success: false; errorMessage: string };
 
   interface UpdateDetailOptions {
@@ -22,8 +23,8 @@ export declare namespace Runtime.Command {
   }
 
   interface Static {
-    launch(options: LaunchOptions): Promise<LaunchResult>;
     updateDetail(options: UpdateDetailOptions): Promise<void>;
+    launch<T = unknown>(options: LaunchOptions): Promise<LaunchResult<T>>;
   }
 }
 

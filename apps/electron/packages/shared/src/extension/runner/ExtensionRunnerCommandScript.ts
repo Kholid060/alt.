@@ -6,20 +6,30 @@ import ExtensionRunnerProcess, {
   ExtensionRunnerProcessFinishReason,
 } from './ExtensionRunnerProcess';
 import { resolveFileCommand } from '/@/utils/resolve-file-command';
+import { CommandLaunchBy } from '@altdot/extension';
+import { ExtensionCommandExecuteScriptOptions } from '#packages/common/interface/extension.interface';
 
 const ARGS_PREFIX = '__ARGS__';
 
 class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
   readonly id: string;
+  readonly emitEvent: boolean;
 
   private lastMessage: string = '';
+  private allMessages: string = '';
   private errorMessage: string = '';
-  private controller: AbortController = new AbortController();
+
+  private readonly controller: AbortController = new AbortController();
+  private readonly scriptOptions: ExtensionCommandExecuteScriptOptions = {};
 
   constructor({ id, ...options }: ExtensionRunnerProcessConstructor) {
     super(options);
 
     this.id = id;
+    this.scriptOptions = options.payload.scriptOptions ?? {};
+    this.emitEvent = [CommandLaunchBy.USER, CommandLaunchBy.DEEP_LINK].includes(
+      options.payload.launchContext.launchBy,
+    );
 
     this.onProcessExit = this.onProcessExit.bind(this);
     this.onProcessSpawn = this.onProcessSpawn.bind(this);
@@ -29,6 +39,8 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
   }
 
   private onProcessSpawn() {
+    if (!this.emitEvent) return;
+
     this.runner.messagePort.eventSync.sendMessage('command-script:message', {
       message: '',
       type: 'start',
@@ -40,6 +52,8 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
   }
 
   private onProcessError(error: Error) {
+    if (!this.emitEvent) return;
+
     console.error(error);
     this.runner.messagePort.eventSync.sendMessage('command-script:message', {
       type: 'error',
@@ -54,17 +68,21 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
   private onProcessExit(code: number) {
     const isSuccess = code === 0;
     const message = isSuccess
-      ? this.lastMessage
+      ? this.scriptOptions.captureAllMessages
+        ? this.allMessages
+        : this.lastMessage
       : `Process finish with exit code ${code} \n\n ${this.errorMessage}`;
 
-    this.runner.messagePort.eventSync.sendMessage('command-script:message', {
-      message,
-      runnerId: this.id,
-      commandTitle: this.command.title,
-      commandId: this.payload.extensionId,
-      type: isSuccess ? 'finish' : 'error',
-      extensionId: this.payload.extensionId,
-    });
+    if (this.emitEvent) {
+      this.runner.messagePort.eventSync.sendMessage('command-script:message', {
+        message,
+        runnerId: this.id,
+        commandTitle: this.command.title,
+        commandId: this.payload.extensionId,
+        type: isSuccess ? 'finish' : 'error',
+        extensionId: this.payload.extensionId,
+      });
+    }
 
     if (isSuccess) {
       this.emit('finish', ExtensionRunnerProcessFinishReason.Done, message);
@@ -76,6 +94,11 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
   private onProcessStdoutData(data: string) {
     this.lastMessage = data.toString().trim();
 
+    if (this.scriptOptions.captureAllMessages) {
+      this.allMessages += this.lastMessage;
+    }
+
+    if (!this.emitEvent) return;
     this.runner.messagePort.eventSync.sendMessage('command-script:message', {
       type: 'message',
       runnerId: this.id,
@@ -87,7 +110,7 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
   }
 
   private onProcessStderrData(chunk: string) {
-    if (!this.command.extension.isLocal) return;
+    if (!this.command.extension.isLocal || !this.emitEvent) return;
 
     this.runner.messagePort.eventSync.sendMessage('command-script:message', {
       type: 'stderr',
@@ -106,6 +129,8 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
     if (!fileCommand) {
       const errorMessage = `"${path.basename(commandId)}" script file is not supported`;
       this.emit('error', errorMessage);
+
+      if (!this.emitEvent) return;
       this.runner.messagePort.eventSync.sendMessage('command-script:message', {
         type: 'error',
         runnerId: this.id,
