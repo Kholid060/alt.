@@ -1,24 +1,18 @@
 import type { ExtensionManifest as ExtensionManifestType } from './extension-manifest';
 import type { UiIcons } from '@altdot/ui';
 
-export { UiList } from '@altdot/ui/dist/components/ui/list';
-export { UiInput } from '@altdot/ui/dist/components/ui/input';
-export { UiImage } from '@altdot/ui/dist/components/ui/image';
-export { UiSelect } from '@altdot/ui/dist/components/ui/select';
-export { UiSwitch } from '@altdot/ui/dist/components/ui/switch';
-export { UiTextarea } from '@altdot/ui/dist/components/ui/textarea';
-export { UiSkeleton } from '@altdot/ui/dist/components/ui/skeleton';
-export type { UiListItem, UiListProps, UiListRef } from '@altdot/ui';
-
-export { default as commandRenderer } from './components/command-renderer/command-renderer';
-export type {
-  ExtensionCommandRenderer,
-  ExtensionCommandView,
-} from './components/command-renderer/command-renderer';
-
 export * from './extension-api/index';
 
 export * from './constant/oauth.const';
+
+export * from '@altdot/ui/dist/components/ui/list';
+export * from '@altdot/ui/dist/components/ui/input';
+export * from '@altdot/ui/dist/components/ui/image';
+export * from '@altdot/ui/dist/components/ui/select';
+export * from '@altdot/ui/dist/components/ui/switch';
+export * from '@altdot/ui/dist/components/ui/textarea';
+export * from '@altdot/ui/dist/components/ui/skeleton';
+export * from './components/CommandRenderer';
 
 export type * from './interfaces/message-events';
 export type * from './interfaces/command.interface';

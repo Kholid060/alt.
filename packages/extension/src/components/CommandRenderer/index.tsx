@@ -14,7 +14,7 @@ export type ExtensionCommandRenderer = (detail: {
   context: CommandLaunchContext;
 }) => React.ReactNode;
 
-function commandRenderer(
+export function commandRenderer(
   CommandView: ExtensionCommandView,
 ): ExtensionCommandRenderer {
   const MemoView = React.memo(CommandView);
@@ -31,5 +31,3 @@ function commandRenderer(
     );
   };
 }
-
-export default commandRenderer;

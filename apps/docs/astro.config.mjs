@@ -3,15 +3,21 @@ import starlight from '@astrojs/starlight';
 
 // https://astro.build/config
 export default defineConfig({
+	redirects: {
+		'/': '/getting-started'
+	},
 	integrations: [
 		starlight({
-			title: 'My Docs',
+			title: 'Alt. Docs',
+			logo: {
+				src: './src/assets/logo.svg'
+			},
 			social: {
 				github: 'https://github.com/withastro/starlight',
 			},
 			sidebar: [
 				{
-					label: 'Getting Started',
+					label: 'Introduction',
 					autogenerate: { directory: 'getting-started' }
 				},
 				{

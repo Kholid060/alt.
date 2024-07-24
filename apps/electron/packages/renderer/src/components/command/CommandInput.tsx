@@ -195,21 +195,6 @@ const CommandInputTextField = forwardRef<
 });
 CommandInputTextField.displayName = 'CommandInputTextField';
 
-const commandKeys = new Set([
-  'n',
-  'j',
-  'p',
-  'k',
-  'End',
-  'Home',
-  'Enter',
-  'Escape',
-  'ArrowUp',
-  'ArrowDown',
-  'ArrowLeft',
-  'ArrowRight',
-]);
-
 function CommandInputIcon({ onNavigateBack }: { onNavigateBack?: () => void }) {
   const currentRoute = useCommandRoute((state) => state.currentRoute);
 
@@ -320,7 +305,7 @@ function CommandInput() {
     }
 
     const messagePort = commandCtx.runnerMessagePort.current;
-    if (messagePort && commandKeys.has(event.key)) {
+    if (messagePort) {
       const { key, ctrlKey, altKey, metaKey, shiftKey } = event;
       const keydownEvent: ExtensionAPI.UI.SearchPanel.KeydownEvent = {
         key,
@@ -370,11 +355,7 @@ function CommandInput() {
 
       uiListStore.setState('search', value);
     },
-    [
-      uiListStore,
-      commandCtx.runnerMessagePort,
-      commandCtx.commandViewMessagePort,
-    ],
+    [uiListStore, commandCtx.runnerMessagePort],
   );
 
   useEffect(() => {

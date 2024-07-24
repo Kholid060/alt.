@@ -110,6 +110,8 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
   }
 
   private onProcessStderrData(chunk: string) {
+    this.errorMessage = chunk.toString();
+
     if (!this.command.extension.isLocal || !this.emitEvent) return;
 
     this.runner.messagePort.eventSync.sendMessage('command-script:message', {

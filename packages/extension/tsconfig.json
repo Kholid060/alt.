@@ -1,6 +1,6 @@
 {
   "extends": "@altdot/typescript-config/react-library.json",
-  "include": ["src/index.ts"],
+  "include": ["src/**/*"],
   "compilerOptions": {
     "lib": ["ES2021"],
     "noEmit": false,

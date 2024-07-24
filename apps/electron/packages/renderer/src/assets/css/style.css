@@ -44,7 +44,7 @@
 	background-color: theme('colors.border');
 }
 
-#command-content-container {
+#command-content-container, .extension-main {
   .ui-list-item {
     [data-action-id]:before {
       animation-name: none;
