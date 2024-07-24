@@ -4,6 +4,10 @@ export declare namespace Runtime {
   interface Static {
     config: Config.Static;
     command: Command.Static;
+
+    // @ext-api-value
+    getFileIconURL(filePath: string): string;
+
     getManifest(): Promise<ExtensionManifest>;
   }
 }

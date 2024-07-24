@@ -3,12 +3,12 @@ import { ExtensionApiEvent } from '../events/extension-api.event';
 import { OnExtensionAPI } from '/@/common/decorators/extension.decorator';
 import { ExtensionConfigService } from '../../extension-config/extension-config.service';
 import { BrowserWindowService } from '/@/browser-window/browser-window.service';
-import { CustomError } from '#packages/common/errors/custom-errors';
 import { CommandLaunchBy } from '@altdot/extension/dist/interfaces/command.interface';
 import { isObject } from '@altdot/shared';
 import { ExtensionCommandService } from '../../extension-command/extension-command.service';
 import { ExtensionService } from '../../extension.service';
 import { ExtensionManifest } from '@altdot/extension/dist/extension-manifest';
+import type { ExtensionAPI } from '@altdot/extension';
 
 @Injectable()
 export class ExtensionRuntimeApiListener {
@@ -78,7 +78,7 @@ export class ExtensionRuntimeApiListener {
   commandLaunch({
     args: [options],
     context: { extensionId },
-  }: ExtensionApiEvent<'runtime.command.launch'>) {
+  }: ExtensionApiEvent<'runtime.command.launch'>): Promise<ExtensionAPI.Runtime.Command.LaunchResult> {
     if (typeof options.args !== 'undefined' && !isObject(options.args)) {
       throw new Error('The "args" options type must be an object.');
     }
@@ -96,7 +96,10 @@ export class ExtensionRuntimeApiListener {
           : undefined,
       })
       .catch((error) => {
-        throw new CustomError(error);
+        return {
+          success: false,
+          errorMessage: error.message,
+        };
       });
   }
 }
