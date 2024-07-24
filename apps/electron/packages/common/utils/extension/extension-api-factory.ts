@@ -84,7 +84,10 @@ function extensionAPISearchPanel(
 }
 function extensionAPIUi(
   messagePort: CreateExtensionAPI['messagePort'],
-): Pick<ExtensionAPIValues, 'ui.createToast' | 'ui.alert.confirm'> {
+): Pick<
+  ExtensionAPIValues,
+  'ui.createToast' | 'ui.alert.confirm' | 'ui.showToast'
+> {
   return {
     'ui.alert.confirm': (options) => {
       return messagePort.async.sendMessage(
@@ -113,6 +116,20 @@ function extensionAPIUi(
           messagePort.sync.sendMessage('extension:hide-toast', toastId);
         },
       };
+    },
+    'ui.showToast': (options) => {
+      const toastId = nanoid(5);
+      const toastOptions: Required<ExtensionAPI.UI.ToastOptions> = {
+        timeout: 5000,
+        type: 'success',
+        description: '',
+        ...options,
+      };
+      messagePort.sync.sendMessage(
+        'extension:show-toast',
+        toastId,
+        toastOptions,
+      );
     },
   };
 }
@@ -188,6 +205,8 @@ export function createExtensionAPI({
           messagePort,
           sendMessage,
         }),
+        'runtime.getFileIconURL': (filePath) =>
+          `${CUSTOM_SCHEME.fileIcon}://${filePath}`,
       },
       context,
       apiHandler: sendMessage,

@@ -820,12 +820,12 @@ const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
         ) : (
           <>
             {icon && (
-              <span className="h-8 w-8 mr-2 inline-flex items-center justify-center group-aria-selected/item:text-foreground text-muted-foreground">
+              <span className="h-8 w-8 mr-2 inline-flex items-center justify-center group-aria-selected/item:text-foreground text-muted-foreground flex-shrink-0">
                 {icon}
               </span>
             )}
-            <div className="flex-1">
-              <p className="leading-tight line-clamp-1">
+            <div className="flex-1 line-clamp-1">
+              <p className="leading-tight line-clamp-1 w-full">
                 {title}
                 <span className="text-muted-foreground leading-tight ml-2 text-xs">
                   {subtitle}

@@ -16,6 +16,9 @@ export declare namespace UI {
     // @ext-api-value
     createToast(options: ToastOptions): Toast;
 
+    // @ext-api-value
+    showToast(options: ToastOptions): void;
+
     alert: Alert.Static;
     searchPanel: SearchPanel.Static;
   }
