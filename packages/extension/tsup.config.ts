@@ -13,7 +13,7 @@ const baseConfig: Options = {
   },
   outDir: 'dist',
   noExternal: ['@altdot/shared'],
-  external: ['vite'],
+  external: ['vite', 'commander', 'react'],
   clean: false,
   esbuildOptions(options) {
     options.outbase = './src';
@@ -25,6 +25,7 @@ export default defineConfig([
     ...baseConfig,
     minify: true,
     outDir: 'dist',
+    platform: 'node',
     entry: {
       cli: './src/cli/index.ts',
     },
