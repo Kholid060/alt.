@@ -1,24 +1,6 @@
-import { builtinModules } from 'module';
 import { defineConfig, Options } from 'tsup';
 import path from 'path';
 import fs from 'fs-extra';
-
-const externalDeps = [
-  'react',
-  'react/jsx-runtime',
-  'react-dom',
-  '@altdot/ui',
-  'tsup',
-  'fs-extra',
-  'zod-validation-error',
-  'commander',
-  'vite',
-  'vite-plugin-resolve',
-  'glob',
-  'semver',
-  'bundle-require',
-  ...builtinModules,
-];
 
 const baseConfig: Options = {
   splitting: true,
@@ -31,7 +13,7 @@ const baseConfig: Options = {
   },
   outDir: 'dist',
   noExternal: ['@altdot/shared'],
-  external: externalDeps,
+  external: ['vite'],
   clean: false,
   esbuildOptions(options) {
     options.outbase = './src';
