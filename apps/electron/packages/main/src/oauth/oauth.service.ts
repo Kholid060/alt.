@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CustomError } from '#packages/common/errors/custom-errors';
 import { nanoid } from 'nanoid/non-secure';
 import crypto from 'crypto';
-import type  { ExtensionAPI } from '@altdot/extension';
+import type { ExtensionAPI } from '@altdot/extension';
 import { OAuthRedirect } from '@altdot/extension/dist/constant/oauth.const';
 import { BrowserWindowService } from '../browser-window/browser-window.service';
 import { APP_DEEP_LINK_SCHEME, APP_USER_MODEL_ID } from '@altdot/shared';

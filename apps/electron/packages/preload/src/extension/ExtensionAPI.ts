@@ -34,9 +34,7 @@ class ExtensionAPI {
 
   private key: string = '';
 
-  constructor(
-    readonly payload: ExtensionCommandExecutePayload
-  ) {
+  constructor(readonly payload: ExtensionCommandExecutePayload) {
     this.payload = payload;
   }
 
@@ -54,8 +52,13 @@ class ExtensionAPI {
       if (command.type !== 'view')
         throw new Error('Command is not a "view" type');
 
-      this.key = extensionId;
+      if (command.extension.isLocal) {
+        const script = document.createElement('script');
+        script.setAttribute('src', 'http://localhost:8097');
+        document.body.appendChild(script);
+      }
 
+      this.key = extensionId;
       contextBridge.exposeInMainWorld('$$extIPC', this.sendAction.bind(this));
     } catch (error) {
       console.error(error);

@@ -6,10 +6,7 @@ import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
 import { WORKFLOW_NODE_TYPE } from '@altdot/workflow/dist/const/workflow-nodes-type.const';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import { useEffect, useMemo } from 'react';
-import {
-  UiListProvider,
-  useUiListStore,
-} from '@altdot/ui';
+import { UiListProvider, useUiListStore } from '@altdot/ui';
 
 function WorkflowCombobox({
   data,

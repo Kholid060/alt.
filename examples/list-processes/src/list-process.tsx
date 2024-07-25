@@ -25,7 +25,9 @@ function ListProcess() {
       }
 
       setProcesses(
-        processes.filter((item) => item.processName !== processItem.name),
+        processes.filter(
+          (item) => item.processName !== processItem.processName,
+        ),
       );
       _extension.ui.showToast({
         title: `"${processItem.name}" process killed`,

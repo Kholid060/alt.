@@ -44,9 +44,12 @@ function CommandView() {
       ).default;
 
       commandCtx.setCommandViewMessagePort(messageChannelRef.current.port1);
-      commandCtx.runnerMessagePort.current.eventSync.on('extension:reload', () => {
-        setIframeKey((prevVal) => prevVal + 1);
-      });
+      commandCtx.runnerMessagePort.current.eventSync.on(
+        'extension:reload',
+        () => {
+          setIframeKey((prevVal) => prevVal + 1);
+        },
+      );
 
       iframe.contentWindow?.postMessage(payload, '*', [
         messageChannelRef.current.port2,

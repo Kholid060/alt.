@@ -76,9 +76,12 @@ export function ExtensionErrorUnhandled({ error }: { error: Error }) {
     <div className="h-full w-full p-4">
       <div className="flex flex-col items-center">
         <img src={bugFixingSvg} className="w-40" alt="error" />
-        <p className="mt-2 font-semibold">Error when trying to render the command</p>
+        <p className="mt-2 font-semibold">
+          Error when trying to render the command
+        </p>
         <p className="mt-1 text-sm text-muted-foreground">
-          Try to reload the app, and open a bug report in the <UiLogo /> repository if the error persists.
+          Try to reload the app, and open a bug report in the <UiLogo />{' '}
+          repository if the error persists.
         </p>
         <div className="mt-4 whitespace-pre-wrap rounded-lg bg-card p-4 font-mono text-sm text-muted-foreground">
           {mappedStack}
@@ -101,14 +104,17 @@ export function ExtensionErrorUnhandledVanilla(error: Error) {
   title.classList.value = 'mt-2 font-semibold';
 
   const description = document.createElement('p');
-  description.textContent = 'Try to reload the app, and open a bug report in the alt. repository if the error persists.';
+  description.textContent =
+    'Try to reload the app, and open a bug report in the alt. repository if the error persists.';
   description.classList.value = 'mt-1 text-sm text-muted-foreground';
 
   const stackTrace = document.createElement('pre');
-  stackTrace.classList.value = 'mt-4 whitespace-pre-wrap rounded-lg bg-card p-4 font-mono text-sm text-muted-foreground';
+  stackTrace.classList.value =
+    'mt-4 whitespace-pre-wrap rounded-lg bg-card p-4 font-mono text-sm text-muted-foreground';
 
   mapStackTrace(error.stack, (trace) => {
-    stackTrace.textContent = (error.stack?.slice(0, error.stack.indexOf('\n')) ?? '') +
+    stackTrace.textContent =
+      (error.stack?.slice(0, error.stack.indexOf('\n')) ?? '') +
       '\n' +
       trace.join('\n');
   });

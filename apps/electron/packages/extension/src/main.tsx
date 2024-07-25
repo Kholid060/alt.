@@ -1,10 +1,20 @@
 import { UiIcons } from '@altdot/ui';
 import { BetterMessagePort } from '@altdot/shared';
-import { CreateExtensionAPI, createExtensionAPI } from '#common/utils/extension/extension-api-factory';
+import {
+  CreateExtensionAPI,
+  createExtensionAPI,
+} from '#common/utils/extension/extension-api-factory';
 import extViewRenderer from './utils/extViewRenderer';
-import { ExtensionMessagePortEvent, ExtensionMessagePortEventAsync } from '@altdot/extension';
-import type { ExtensionBrowserTabContext, ExtensionCommandViewInitMessage } from '#common/interface/extension.interface';
+import {
+  ExtensionMessagePortEvent,
+  ExtensionMessagePortEventAsync,
+} from '@altdot/extension';
+import type {
+  ExtensionBrowserTabContext,
+  ExtensionCommandViewInitMessage,
+} from '#common/interface/extension.interface';
 import { PRELOAD_API_KEY } from '#common/utils/constant/constant';
+import { ExtensionErrorUnhandledVanilla } from './components/extension-errors';
 
 declare global {
   interface Window {
@@ -15,9 +25,15 @@ declare global {
 // @ts-expect-error icons for the extension
 window.$UiExtIcons = UiIcons;
 
-type ExtensionMessagePort = BetterMessagePort<ExtensionMessagePortEventAsync, ExtensionMessagePortEvent>;
+type ExtensionMessagePort = BetterMessagePort<
+  ExtensionMessagePortEventAsync,
+  ExtensionMessagePortEvent
+>;
 
-async function injectExtensionAPI(messagePort: ExtensionMessagePort, browserCtx?: ExtensionBrowserTabContext) {
+async function injectExtensionAPI(
+  messagePort: ExtensionMessagePort,
+  browserCtx?: ExtensionBrowserTabContext,
+) {
   await new Promise<void>((resolve) => {
     function isLoaded() {
       if ('$$extIPC' in window) return resolve();
@@ -52,11 +68,15 @@ async function onMessage({
     const messagePort: ExtensionMessagePort = new BetterMessagePort(port);
     await injectExtensionAPI(messagePort, data.payload.browserCtx);
     await extViewRenderer(
-      { launchContext: data.payload.launchContext, messagePort: messagePort.sync },
+      {
+        launchContext: data.payload.launchContext,
+        messagePort: messagePort.sync,
+      },
       data.themeStyle,
     );
   } catch (error) {
     console.error(error);
+    ExtensionErrorUnhandledVanilla(error as Error);
   } finally {
     window.removeEventListener('message', onMessage);
   }

@@ -7,7 +7,13 @@ export class CustomProtocolFilter {
 
   catch(error: unknown, _host: ArgumentsHost): unknown {
     ElectronLogger._instance.error(
-      { location: ['Custom protocol', this.scheme, _host.switchToHttp().getRequest()?.[0]?.url] },
+      {
+        location: [
+          'Custom protocol',
+          this.scheme,
+          _host.switchToHttp().getRequest()?.[0]?.url,
+        ],
+      },
       (<Error>error)?.message,
       error,
     );

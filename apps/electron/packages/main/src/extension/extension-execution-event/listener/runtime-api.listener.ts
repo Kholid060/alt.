@@ -75,7 +75,7 @@ export class ExtensionRuntimeApiListener {
   }
 
   @OnExtensionAPI('runtime.command.launch')
-  commandLaunch({
+  async commandLaunch({
     args: [options],
     context: { extensionId },
   }: ExtensionApiEvent<'runtime.command.launch'>): Promise<ExtensionAPI.Runtime.Command.LaunchResult> {
@@ -83,8 +83,8 @@ export class ExtensionRuntimeApiListener {
       throw new Error('The "args" options type must be an object.');
     }
 
-    return this.extension
-      .executeCommandAndWait({
+    try {
+      return await this.extension.executeCommandAndWait({
         extensionId,
         launchContext: {
           args: options.args ?? {},
@@ -94,12 +94,12 @@ export class ExtensionRuntimeApiListener {
         scriptOptions: options.captureAllScriptMessages
           ? { captureAllMessages: true }
           : undefined,
-      })
-      .catch((error) => {
-        return {
-          success: false,
-          errorMessage: error.message,
-        };
       });
+    } catch (error) {
+      return {
+        success: false,
+        errorMessage: (error as Error).message,
+      };
+    }
   }
 }

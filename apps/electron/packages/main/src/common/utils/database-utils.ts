@@ -104,3 +104,7 @@ export function conflictUpdateAllExcept<
     {},
   ) as Omit<Record<keyof typeof table.$inferInsert, SQL>, E[number]>;
 }
+
+export function getExtensionCommandId(extensionId: string, commandId: string) {
+  return `${extensionId}:${commandId}`;
+}
