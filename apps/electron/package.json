@@ -1,5 +1,5 @@
 {
-  "name": "electron",
+  "name": "electron-app",
   "description": "Electron",
   "version": "0.0.0",
   "private": true,

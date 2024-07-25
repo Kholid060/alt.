@@ -2,6 +2,7 @@
   "name": "browser-extension",
   "version": "0.0.1",
   "license": "MIT",
+  "private": true,
   "scripts": {
     "build": "tsc --noEmit && vite build",
     "build:firefox": "tsc --noEmit && cross-env __FIREFOX__=true vite build",

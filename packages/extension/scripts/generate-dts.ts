@@ -24,4 +24,3 @@ const project = new Project({
 await project.emit({ emitOnlyDtsFiles: true });
 
 console.log(chalk.green('✅ DTS Generated'));
-
