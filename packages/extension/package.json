@@ -58,6 +58,7 @@
     "typescript": "catalog:",
     "vite": "^5.1.4",
     "vite-plugin-static-copy": "^1.0.1",
+    "zod-to-json-schema": "^3.23.1",
     "zod-validation-error": "^3.3.0"
   }
 }

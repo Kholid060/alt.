@@ -9,11 +9,9 @@ import {
 } from 'ts-morph';
 import { camelCase } from 'lodash-es';
 import buildExtApiTypes from './build-ext-types';
-import { emptyDir, ensureDir } from 'fs-extra';
 import buildExtApiFile from './build-ext-file';
 import {
   FlatExtApiType,
-  DIST_DIR,
   BuildExtensionApi,
   ExtensionAPINamespace,
   EXT_API_DIR,
@@ -31,9 +29,6 @@ class ExtensionAPIBuilder {
   private seenAPIPath = new Set<string>();
 
   async start() {
-    await ensureDir(DIST_DIR);
-    await emptyDir(DIST_DIR);
-
     const project = new Project();
     project.addSourceFilesAtPaths(
       path.join(EXT_API_DIR, '/**/namespaces/*.d.ts'),

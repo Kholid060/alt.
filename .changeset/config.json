@@ -3,10 +3,9 @@
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "fixed": [
-    ["@altdot/*"]
+    ["@altdot/ui", "@altdot/extension", "@altdot/shared"]
   ],
   "linked": [],
-  "privatePackages": { "tag": true, "version": true },
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
