@@ -16,6 +16,6 @@ export function OnExtensionAPI<T extends keyof IPCUserExtensionEventsMap>(
   event: T,
 ): TypeMethodDecorator<T> {
   return applyDecorators(
-    OnEvent(`extension-api:${event}`),
+    OnEvent(`extension-api:${event}`, { suppressErrors: false }),
   ) as TypeMethodDecorator<T>;
 }

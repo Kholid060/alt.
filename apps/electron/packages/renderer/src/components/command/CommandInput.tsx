@@ -63,16 +63,19 @@ const CommandInputArguments = forwardRef<
       {...props}
       ref={ref}
       style={{ translate: '0px 0px' }}
-      className="absolute left-4 top-1/2 flex h-7 -translate-y-1/2 items-center gap-2 text-sm"
+      className="command-args absolute left-4 top-1/2 flex h-7 -translate-y-1/2 items-center gap-2 text-sm"
     >
       {selectedCommand?.command.arguments?.map((argument) => {
         const key = selectedCommand.command.id + argument.name;
+        const tooltip =
+          `${argument.title}${argument.required ? '*' : ''}\n${argument.description ?? ''}`.trim();
 
         switch (argument.type) {
           case 'select':
             return (
               <div
                 key={key}
+                data-tooltip={tooltip}
                 className="relative h-full max-w-28 rounded-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background"
               >
                 <select
@@ -110,31 +113,38 @@ const CommandInputArguments = forwardRef<
           case 'input:password': {
             const { 1: type } = argument.type.split(':');
             return (
-              <input
-                type={type}
-                key={key}
-                value={`${args[argument.name] ?? ''}`}
-                required={argument.required}
-                data-command-argument={argument.name}
-                placeholder={argument.placeholder}
-                className="h-full max-w-28 rounded-sm border-input bg-secondary px-2 hover:bg-secondary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                onFocus={() => onArgFieldFocus?.(argument.name)}
-                onChange={(event) => {
-                  const target = event.target as HTMLInputElement;
-                  setCommandArgs({
-                    commandId: selectedCommand.command.name,
-                    args: {
-                      [argument.name]:
-                        type === 'number' ? target.valueAsNumber : target.value,
-                    },
-                  });
-                }}
-              />
+              <span key={key} className="h-full" data-tooltip={tooltip}>
+                <input
+                  type={type}
+                  value={`${args[argument.name] ?? ''}`}
+                  required={argument.required}
+                  data-command-argument={argument.name}
+                  placeholder={argument.placeholder}
+                  className="h-full max-w-28 rounded-sm border-input bg-secondary px-2 hover:bg-secondary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                  onFocus={() => onArgFieldFocus?.(argument.name)}
+                  onChange={(event) => {
+                    const target = event.target as HTMLInputElement;
+                    setCommandArgs({
+                      commandId: selectedCommand.command.name,
+                      args: {
+                        [argument.name]:
+                          type === 'number'
+                            ? target.valueAsNumber
+                            : target.value,
+                      },
+                    });
+                  }}
+                />
+              </span>
             );
           }
           case 'toggle':
             return (
-              <span key={key} className="inline-flex items-center gap-1">
+              <span
+                key={key}
+                className="inline-flex items-center gap-1"
+                data-tooltip={tooltip}
+              >
                 <UiSwitch
                   size="sm"
                   checked={Boolean(args[argument.name] ?? false)}

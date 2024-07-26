@@ -153,10 +153,16 @@ function extensionBrowserTabs({
 > {
   return {
     'browser.tabs.getActive': async () => {
-      if (!browserCtx) throw new Error('No active browser');
+      if (!browserCtx) return null;
 
       return new ExtensionBrowserTab(
-        { browserId: browserCtx.browserId, title: browserCtx.title, active: true, id: browserCtx.tabId, url: browserCtx.url },
+        {
+          browserId: browserCtx.browserId,
+          title: browserCtx.title,
+          active: true,
+          id: browserCtx.tabId,
+          url: browserCtx.url,
+        },
         sendMessage,
       );
     },

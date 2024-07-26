@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { OnExtensionAPI } from '/@/common/decorators/extension.decorator';
 import { ExtensionApiEvent } from '../events/extension-api.event';
 import { ExtensionAPI } from '@altdot/extension';
+import { CustomError } from '#packages/common/errors/custom-errors';
 
 function getWriteContent(
   content: string | ArrayBuffer,
@@ -59,10 +60,11 @@ export class ExtensionFSApiListener {
 
   @OnExtensionAPI('fs.readFile')
   readFile({ args: [path, options = {}] }: ExtensionApiEvent<'fs.readFile'>) {
-    return fs.readFile(
-      path,
-      (options.encoding ?? undefined) as BufferEncoding,
-    ) as Promise<string | Uint8Array>;
+    return fs
+      .readFile(path, (options.encoding ?? undefined) as BufferEncoding)
+      .catch((error) => {
+        throw new CustomError(error.message);
+      }) as Promise<string | Uint8Array>;
   }
 
   @OnExtensionAPI('fs.readJSON')

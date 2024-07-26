@@ -39,7 +39,7 @@ export function isExtHasApiPermission(
   apiPath: ExtensionAPIPaths,
   permissions: Partial<ExtensionPermission>[],
 ) {
-  const apiPermission = API_PERMISSION_MAP.find(([path]) =>
+  const apiPermission = API_PERMISSION_MAP.findLast(([path]) =>
     apiPath.startsWith(path),
   );
   if (!apiPermission) throw new Error(`"${apiPath}" doesn't have permission`);

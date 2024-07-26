@@ -144,6 +144,12 @@
 [data-tooltip]:hover:before {
   display: block;
 }
+[data-tooltip]:focus:before {
+  display: block;
+}
+[data-tooltip]:focus-within:before {
+  display: block;
+}
 [data-tooltip]:before {
   right: 0;
   z-index: 1;
