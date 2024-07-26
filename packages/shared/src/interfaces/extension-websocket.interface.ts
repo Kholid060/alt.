@@ -47,6 +47,7 @@ export interface ExtensionBrowserTab {
   url: string;
   title: string;
   active: boolean;
+  windowId: number;
 }
 
 export interface ExtensionBrowserElementSelector {
@@ -76,19 +77,17 @@ interface ExtensionTabsQueryOptions {
   index?: number;
   title?: string;
   active?: boolean;
+  lastFocusedWindow?: boolean;
   status?: 'loading' | 'complete';
 }
 
 export interface ExtensionActiveTabActionWSEvents {
   'tabs:is-closed': ExtensionWSAckTabHandler<[], boolean>;
   'tabs:query': ExtensionWSAckHandler<
-    [query: ExtensionTabsQueryOptions],
+    [query: ExtensionTabsQueryOptions & { lastFocusedBrowser?: boolean }],
     ExtensionBrowserTab[]
   >;
-  'tabs:get-detail': ExtensionWSAckTabHandler<
-    [],
-    { id: number; title: string; url: string; active: boolean } | null
-  >;
+  'tabs:get-detail': ExtensionWSAckTabHandler<[], ExtensionBrowserTab | null>;
   'tabs:click': ExtensionWSAckElementHandler;
   'tabs:mouse-up': ExtensionWSAckElementHandler;
   'tabs:mouse-down': ExtensionWSAckElementHandler;
@@ -146,10 +145,7 @@ export interface ExtensionActiveTabActionWSEvents {
 export interface ExtensionWSServerToClientEvents
   extends ExtensionActiveTabActionWSEvents {
   'tabs:get-active': ExtensionWSAckHandler<[], BrowserExtensionTab>;
-  'browser:get-active': ExtensionWSAckHandler<
-    [filter: 'none' | 'focused-only'],
-    BrowserConnected | null
-  >;
+  'browser:get-active': ExtensionWSAckHandler<[], BrowserConnected | null>;
   'tabs:create-new': ExtensionWSAckHandler<[url: string], BrowserExtensionTab>;
 }
 

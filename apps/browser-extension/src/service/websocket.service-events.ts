@@ -5,8 +5,8 @@ import {
 import { Socket } from 'socket.io-client';
 import TabService from './tab.service';
 import Browser from 'webextension-polyfill';
-import BrowserService from './browser.service';
 import BackgroundFileHandle from '../pages/background/BackgroundFileHandle';
+import BrowserService from './browser.service';
 
 function wsAckHandler<T extends unknown[]>(
   fn: (...args: T) => Promise<void> | void,
@@ -297,14 +297,6 @@ export function websocketEventsListener(
   );
 
   io.on(
-    'browser:get-active',
-    wsAckHandler(async (isFocused, callback) => {
-      const browser = await BrowserService.instance.getDetail();
-      callback(isFocused && !browser?.focused ? null : browser);
-    }),
-  );
-
-  io.on(
     'tabs:get-detail',
     wsAckHandler(async (tab, callback) => {
       const tabDetail = await Browser.tabs.get(tab.tabId);
@@ -315,6 +307,7 @@ export function websocketEventsListener(
               url: tabDetail.url!,
               title: tabDetail.title!,
               active: tabDetail.active!,
+              windowId: tabDetail.windowId!,
             }
           : null,
       );
@@ -323,22 +316,44 @@ export function websocketEventsListener(
 
   io.on(
     'tabs:query',
-    wsAckHandler(async ({ active, index, status, title, url }, callback) => {
-      const tabs = await Browser.tabs.query({
-        url,
-        index,
-        title,
-        active,
-        status,
-      });
-      callback(
-        tabs.map((tab) => ({
-          id: tab.id!,
-          url: tab.url!,
-          title: tab.title!,
-          active: tab.active!,
-        })),
-      );
-    }),
+    wsAckHandler(
+      async (
+        {
+          active,
+          index,
+          status,
+          title,
+          url,
+          lastFocusedWindow,
+          lastFocusedBrowser,
+        },
+        callback,
+      ) => {
+        let windowId: number | undefined;
+        if (lastFocusedBrowser) {
+          if (!BrowserService.instance.isFocused) return callback([]);
+          windowId = BrowserService.instance.focusedWindowId;
+        }
+
+        const tabs = await Browser.tabs.query({
+          url,
+          index,
+          title,
+          active,
+          status,
+          windowId,
+          lastFocusedWindow,
+        });
+        callback(
+          tabs.map((tab) => ({
+            id: tab.id!,
+            url: tab.url!,
+            title: tab.title!,
+            active: tab.active!,
+            windowId: tab.windowId!,
+          })),
+        );
+      },
+    ),
   );
 }

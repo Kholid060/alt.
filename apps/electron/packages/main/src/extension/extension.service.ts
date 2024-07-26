@@ -185,12 +185,7 @@ export class ExtensionService implements OnAppReady {
     executePayload: ExtensionCommandExecutePayload,
     filterCommandType?: ExtensionCommandType,
   ): Promise<string | null> {
-    const payload: ExtensionCommandExecutePayload = {
-      ...executePayload,
-      browserCtx: Object.hasOwn(executePayload, 'browserCtx')
-        ? executePayload.browserCtx
-        : await this.getBrowserCtx(),
-    };
+    const payload: ExtensionCommandExecutePayload = executePayload;
     const { commandId, extensionId } = payload;
 
     const command = await this.dbService.db.query.extensionCommands.findFirst({
@@ -214,6 +209,10 @@ export class ExtensionService implements OnAppReady {
 
     if (filterCommandType && command.type !== filterCommandType) {
       throw new Error(`It only supported "${filterCommandType}" command type`);
+    }
+
+    if (!payload.browserCtx && command.extension.permissions?.some((permission) => permission.startsWith('browser'))) {
+      payload.browserCtx = await this.getBrowserCtx();
     }
 
     const commandFilePath =

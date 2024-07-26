@@ -154,18 +154,11 @@ function extensionBrowserTabs({
   return {
     'browser.tabs.getActive': async () => {
       if (!browserCtx) throw new Error('No active browser');
-      const [tab] = await sendTabActionMessage(sendMessage)({
-        name: 'tabs:query',
-        args: [{ active: true }],
-        browserId: browserCtx.browserId,
-      });
 
-      return tab
-        ? new ExtensionBrowserTab(
-            { ...tab, browserId: browserCtx.browserId },
-            sendMessage,
-          )
-        : null;
+      return new ExtensionBrowserTab(
+        { browserId: browserCtx.browserId, title: browserCtx.title, active: true, id: browserCtx.tabId, url: browserCtx.url },
+        sendMessage,
+      );
     },
     'browser.tabs.query': async (options) => {
       if (!browserCtx) throw new Error('No active browser');
