@@ -99,7 +99,9 @@ export interface UiListRenderItemDetail {
   selected: boolean;
   item: UiListItem;
   ref: React.Ref<HTMLDivElement>;
-  props: Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>;
+  props: Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> & {
+    onSelected?: () => void;
+  };
 }
 
 function findNonSearchOnlyItem(
@@ -576,7 +578,14 @@ function UiListItemRenderer({
         item,
         ref: elRef,
         selected: isSelected,
-        props: { onPointerMove, onClick },
+        props: {
+          onPointerMove,
+          onClick,
+          onSelected() {
+            item.onSelected?.();
+            onSelected?.();
+          },
+        },
       },
       index,
     );
