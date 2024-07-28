@@ -2,8 +2,16 @@ import { UiList, UiSkeleton } from '@altdot/ui';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import { CommandListItemWorkflow } from '/@/interface/command.interface';
 import ListItemWorkflow from '/@/components/list-item/ListItemWorkflow';
+import { useCommandPanelHeader } from '/@/hooks/useCommandPanelHeader';
+import { WorkflowIcon } from 'lucide-react';
 
 function CommandWorkflowsList() {
+  useCommandPanelHeader({
+    subtitle: 'Utils',
+    title: 'Workflows list',
+    icon: <WorkflowIcon className="mr-2 h-4 w-4" />,
+  });
+
   const workflows = useDatabaseQuery(
     'database:get-workflow-list',
     [{ limit: 10, sort: { by: 'isPinned', asc: false } }],

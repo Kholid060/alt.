@@ -42,13 +42,12 @@ class WebsocketService extends EventEmitter<WSEvent> {
     });
     this.socket.on('connect', () => {
       this.emit('connect');
-      websocketEventsListener(this.socket!);
-
       console.log('WEBSOCKET CONNECTED');
     });
     this.socket.on('disconnect', (reason) => {
       this.emit('disconnect', reason);
     });
+    websocketEventsListener(this.socket!);
   }
 
   tryConnect() {
