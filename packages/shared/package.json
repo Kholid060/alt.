@@ -1,10 +1,14 @@
 {
   "name": "@altdot/shared",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
   "main": "./src/index.ts",
+  "scripts": {
+    "build": "tsup"
+  },
   "files": [
-    "./src/**/*"
+    "./src/**/*",
+    "./dist/**/*"
   ],
   "devDependencies": {
     "@altdot/eslint-config": "workspace:*",
