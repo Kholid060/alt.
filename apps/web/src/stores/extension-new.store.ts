@@ -1,4 +1,4 @@
-import { ExtensionManifest } from '@altdot/extension';
+import { ExtensionManifest } from '@altdot/extension/dist/extension-manifest';
 import { StoreApi, createStore } from 'zustand';
 
 export interface ExtensionNewRepo {

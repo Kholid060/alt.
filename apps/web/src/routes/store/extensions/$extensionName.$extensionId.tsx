@@ -5,11 +5,11 @@ import {
 import {
   ExtensionStoreDetail,
   ExtensionPermissions,
+  ExtensionCommand,
 } from '@/interface/extension.interface';
 import APIService from '@/services/api.service';
 import GithubAPI from '@/utils/GithubAPI';
 import { APP_TITLE, EXTENSION_COMMAND_TYPE_NAME } from '@/utils/constant';
-import { ExtensionCommand } from '@altdot/extension';
 import {
   UiAvatar,
   UiAvatarImage,
@@ -252,11 +252,11 @@ function getPermissionsDescription(
           description: 'Read and write your local file',
         });
         break;
-      case 'browser.activeTab':
+      case 'browser.tabs':
         addPermission({
           permission,
           key: 'browser',
-          description: 'Access the active tab of a browser',
+          description: 'Access the the browser tabs',
         });
         break;
     }

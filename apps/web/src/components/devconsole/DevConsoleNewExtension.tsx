@@ -2,7 +2,7 @@ import { ExtensionNewPayload } from '@/routes/devconsole/extensions/new';
 import APIService from '@/services/api.service';
 import { useUserStore } from '@/stores/user.store';
 import GithubAPI from '@/utils/GithubAPI';
-import { ExtensionManifestSchema } from '@altdot/extension';
+import { ExtensionManifestSchema } from '@altdot/extension/dist/extension-manifest';
 import { parseJSON } from '@altdot/shared';
 import { useToast, UiDialog, UiLabel, UiInput, UiButton } from '@altdot/ui';
 import { useNavigate } from '@tanstack/react-router';
@@ -37,7 +37,7 @@ function DevConsoleNewExtension({ onClose }: { onClose?: () => void }) {
       const manifestContent = parseJSON(
         Array.isArray(manifestFile)
           ? 'null'
-          : atob(manifestFile.content ?? '') ?? 'null',
+          : (atob(manifestFile.content ?? '') ?? 'null'),
         null,
       );
       if (!manifestContent || Array.isArray(manifestFile)) {

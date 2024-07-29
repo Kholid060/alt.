@@ -11,7 +11,7 @@ import {
 } from '@/hooks/useExtensionNewStore';
 import APIService from '@/services/api.service';
 import GithubAPI from '@/utils/GithubAPI';
-import { ExtensionManifest } from '@altdot/extension';
+import { ExtensionManifest } from '@altdot/extension/dist/extension-manifest';
 import { isObject } from '@altdot/shared';
 import {
   useDialog,
@@ -64,10 +64,12 @@ function ExtensionDetailTab() {
   );
 
   useEffect(() => {
+    if (!repo.name || !repo.owner) return;
+
     GithubAPI.instance
       .getExtBanners(repo.owner, repo.name)
       .then((result) => updateState('banners', result));
-  }, []);
+  }, [repo.name, repo.owner, updateState]);
 
   return (
     <ExtensionDetail

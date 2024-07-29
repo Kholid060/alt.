@@ -3,7 +3,7 @@ import {
   StoreQueryValidation,
   storeQueryValidation,
 } from '@/validation/store-query.validation';
-import { EXTENSION_CATEGORIES } from '@altdot/extension';
+import { EXTENSION_CATEGORIES } from '@altdot/shared';
 import {
   UiButton,
   cn,
@@ -84,7 +84,7 @@ function StoreSidbear() {
       </UiButton>
       <aside
         className={cn(
-          'fixed bottom-0 left-0 z-[52] w-full rounded-t-lg border bg-background p-4 pb-16 md:bottom-4 md:left-16 md:w-64 md:rounded-lg md:pb-4 lg:relative lg:bottom-0 lg:left-0 lg:border-0 lg:bg-transparent lg:p-0',
+          'fixed bottom-0 left-0 z-[52] w-full rounded-t-lg border bg-background p-4 pb-16 md:bottom-4 md:left-16 md:w-52 md:rounded-lg md:pb-4 lg:relative lg:bottom-0 lg:left-0 lg:border-0 lg:bg-transparent lg:p-0',
           show ? 'block' : 'hidden lg:block',
         )}
       >
@@ -232,7 +232,7 @@ function StoreLayout() {
       </p>
       <div className="mt-12 items-start lg:flex">
         <StoreSidbear />
-        <div className="flex-1 lg:ml-8">
+        <div className="flex-1 lg:ml-12">
           <StoreFilter />
           <Outlet />
         </div>

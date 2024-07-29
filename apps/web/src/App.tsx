@@ -12,8 +12,14 @@ import { ErrorNotFoundPage } from './components/ErrorPage';
 import { useShallow } from 'zustand/react/shallow';
 import { HelmetProvider } from 'react-helmet-async';
 
+const queryClient = new QueryClient();
+
 const router = createRouter({
   routeTree,
+  context: {
+    queryClient,
+    userProfile: null,
+  },
   defaultPreloadStaleTime: 0,
   defaultErrorComponent: AppErrorBoundary,
   defaultNotFoundComponent: () => (
@@ -29,8 +35,6 @@ declare module '@tanstack/react-router' {
     router: typeof router;
   }
 }
-
-const queryClient = new QueryClient();
 
 function App() {
   const [profile, profileFetched] = useUserStore(

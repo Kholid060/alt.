@@ -1,8 +1,8 @@
 import {
+  ExtensionCommandType,
   EXTENSION_CATEGORIES,
   EXTENSION_PERMISSIONS,
-  ExtensionCommandType,
-} from '@altdot/extension';
+} from '@altdot/shared';
 import { UserProfile } from './user.interface';
 
 export interface ExtensionCommand {

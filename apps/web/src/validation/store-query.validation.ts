@@ -1,4 +1,4 @@
-import { EXTENSION_CATEGORIES } from '@altdot/extension';
+import { EXTENSION_CATEGORIES } from '@altdot/shared';
 import { z } from 'zod';
 
 export const storeQueryValidation = z.object({

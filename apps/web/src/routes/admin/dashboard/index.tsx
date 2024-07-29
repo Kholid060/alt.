@@ -8,7 +8,7 @@ import APIService from '@/services/api.service';
 import GithubAPI from '@/utils/GithubAPI';
 import { EXT_BANNER_NAME_REGEX, UserRole } from '@/utils/constant';
 import { routeBeforeLoadPipe } from '@/utils/route-utils';
-import { ExtensionManifestSchema } from '@altdot/extension';
+import { ExtensionManifestSchema } from '@altdot/extension/dist/extension-manifest';
 import {
   ApiAdminSetExtentionEntryPayload,
   afetch,
