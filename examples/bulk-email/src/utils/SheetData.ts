@@ -70,17 +70,32 @@ class SheetData {
     return values;
   }
 
+  private jsonStrExtractor(): SheetValues | null {
+    try {
+      const value = JSON.parse(this.filePath);
+      if (!Array.isArray(value)) return null;
+
+      return value;
+    } catch {
+      return null;
+    }
+  }
+
+  private tryParse() {
+    if (URL.canParse(this.filePath)) return this.sheetFileExtractor();
+
+    const jsonValue = this.jsonStrExtractor();
+    if (jsonValue) return jsonValue;
+
+    return this.googleSheetExtractor();
+  }
+
   async getData(): Promise<{
     values: SheetValues;
     columnsIndex: SheetColumnsIndex;
   }> {
-    const [firstRow, ...rows] = await (URL.canParse(this.filePath)
-      ? this.sheetFileExtractor()
-      : this.googleSheetExtractor());
-
-    if (!firstRow) {
-      return { values: [], columnsIndex: {} };
-    }
+    const [firstRow, ...rows] = await this.tryParse();
+    if (!firstRow) return { values: [], columnsIndex: {} };
 
     return {
       values: rows,

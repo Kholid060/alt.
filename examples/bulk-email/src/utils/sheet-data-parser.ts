@@ -15,8 +15,6 @@ export function getSheetColumnsIndex(firstRow: string[]) {
     }
   });
 
-  console.log(JSON.stringify({ columnsIndex, firstRow }));
-
   if (columns.size > 0) {
     throw new Error(`Missing required columns (${[...columns].join(', ')})`);
   }
