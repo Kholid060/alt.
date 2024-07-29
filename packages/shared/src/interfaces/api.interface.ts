@@ -34,6 +34,7 @@ export interface ApiExtensionCommand {
   name: string;
   title: string;
   description?: string;
+  isInternal?: boolean;
   type: ExtensionCommandType;
 }
 

@@ -11,6 +11,7 @@ import { UserProfile } from './interface/user.interface';
 import { ErrorNotFoundPage } from './components/ErrorPage';
 import { useShallow } from 'zustand/react/shallow';
 import { HelmetProvider } from 'react-helmet-async';
+import { UiTooltipProvider } from '@altdot/ui';
 
 const queryClient = new QueryClient();
 
@@ -68,10 +69,12 @@ function App() {
   return (
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
-        <RouterProvider
-          router={router}
-          context={{ queryClient, userProfile: profile }}
-        />
+        <UiTooltipProvider>
+          <RouterProvider
+            router={router}
+            context={{ queryClient, userProfile: profile }}
+          />
+        </UiTooltipProvider>
       </QueryClientProvider>
     </HelmetProvider>
   );

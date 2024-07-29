@@ -123,6 +123,8 @@ function ExtensionsNewHeader() {
           type: command.type,
           title: command.title,
           description: command.description ?? '',
+          isInternal:
+            command.type === 'script' ? command.isInternal : undefined,
         })),
       });
 

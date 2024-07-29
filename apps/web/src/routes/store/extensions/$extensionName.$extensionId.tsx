@@ -21,10 +21,12 @@ import {
   UiTabsTrigger,
   UiTabsContent,
   UiSkeleton,
+  UiBadge,
+  UiTooltip,
 } from '@altdot/ui';
 import { Link, createFileRoute, redirect } from '@tanstack/react-router';
 import githubLogoWhiteSvg from '@/assets/logo/github-white.svg';
-import { UserRoundIcon, ShareIcon } from 'lucide-react';
+import { UserRoundIcon, ShareIcon, CpuIcon } from 'lucide-react';
 import dayjs from '@/lib/dayjs';
 import { useNativeApp } from '@/hooks/useNativeApp';
 import { Helmet } from 'react-helmet-async';
@@ -314,12 +316,19 @@ function StoreExtensionsDetailPage() {
                   {extension.commands.map((command) => (
                     <tr key={command.name}>
                       <td className="py-2 pr-2 align-top">
-                        <span className="whitespace-nowrap rounded-full border px-2 py-0.5 text-xs">
+                        <UiBadge variant="outline">
                           {EXTENSION_COMMAND_TYPE_NAME[command.type]}
-                        </span>
+                        </UiBadge>
                       </td>
                       <td className="px-3 py-2">
-                        <p className="leading-tight">{command.title}</p>
+                        <p className="leading-tight">
+                          {command.isInternal && (
+                            <UiTooltip label="Internal command">
+                              <CpuIcon className="mr-2 inline h-5 w-5 text-muted-foreground" />
+                            </UiTooltip>
+                          )}
+                          {command.title}
+                        </p>
                         <p className="leading-tight text-muted-foreground">
                           {command.description}
                         </p>
