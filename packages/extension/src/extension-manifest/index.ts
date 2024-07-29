@@ -104,7 +104,7 @@ const ExtensionCommandBase = z.object({
     .array()
     .optional(),
 });
-const ExtensionCommandSchema = z.discriminatedUnion('type', [
+export const ExtensionCommandSchema = z.discriminatedUnion('type', [
   ExtensionCommandBase,
   ExtensionCommandBase.merge(
     z.object({
