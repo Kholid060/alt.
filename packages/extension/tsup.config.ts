@@ -36,7 +36,7 @@ export default defineConfig([
     entry: {
       'extension-manifest/index': './src/extension-manifest/index.ts',
     },
-    format: ['esm'],
+    format: ['esm', 'cjs'],
   },
   {
     ...baseConfig,
