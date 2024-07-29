@@ -1,6 +1,6 @@
 {
   "name": "@altdot/extension",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "type": "module",
