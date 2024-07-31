@@ -1,10 +1,11 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import starlightImageZoom from 'starlight-image-zoom';
 
 // https://astro.build/config
 export default defineConfig({
 	redirects: {
-		'/': '/getting-started'
+		'/': '/introduction'
 	},
 	integrations: [
 		starlight({
@@ -18,20 +19,18 @@ export default defineConfig({
 			sidebar: [
 				{
 					label: 'Introduction',
-					autogenerate: { directory: 'getting-started' }
+					link: 'introduction',
 				},
 				{
-					label: 'Guides',
-					items: [
-						// Each item here is one entry in the navigation menu.
-						{ label: 'Example Guide', slug: 'guides/example' },
-					],
+					label: 'Extensions',
+					autogenerate: { directory: 'extensions' },
 				},
 				{
 					label: 'Reference',
 					autogenerate: { directory: 'reference' },
 				},
 			],
+			plugins: [starlightImageZoom()],
 		}),
 	],
 });
