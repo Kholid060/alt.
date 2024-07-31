@@ -1,4 +1,107 @@
 :root {
+  --mauve-1: 253 252 253;
+	--mauve-2: 250 249 251;
+	--mauve-3: 242 239 243;
+	--mauve-4: 234 231 236;
+	--mauve-5: 227 223 230;
+	--mauve-6: 219 216 224;
+	--mauve-7: 208 205 215;
+	--mauve-8: 188 186 199;
+	--mauve-9: 142 140 153;
+	--mauve-10: 132 130 142;
+	--mauve-11: 101 99 109;
+	--mauve-12: 33 31 38;
+
+  --violet-1: 253 252 254;
+	--violet-2: 250 248 255;
+	--violet-3: 244 240 254;
+	--violet-4: 235 228 255;
+	--violet-5: 225 217 255;
+	--violet-6: 212 202 254;
+	--violet-7: 194 181 245;
+	--violet-8: 170 153 236;
+	--violet-9: 110 86 207;
+	--violet-10: 101 77 196;
+	--violet-11: 101 80 185;
+	--violet-12: 47 38 95;
+
+  --lime-1: 252 253 250;
+	--lime-2: 248 250 243;
+	--lime-3: 238 246 214;
+	--lime-4: 226 240 189;
+	--lime-5: 211 231 166;
+	--lime-6: 194 218 145;
+	--lime-7: 171 201 120;
+	--lime-8: 141 182 84;
+	--lime-9: 189 238 99;
+	--lime-10: 176 230 76;
+	--lime-11: 92 124 47;
+	--lime-12: 55 64 28;
+
+  --ruby-1: 255 252 253;
+	--ruby-2: 255 247 248;
+	--ruby-3: 254 234 237;
+	--ruby-4: 255 220 225;
+	--ruby-5: 255 206 214;
+	--ruby-6: 248 191 200;
+	--ruby-7: 239 172 184;
+	--ruby-8: 229 146 163;
+	--ruby-9: 229 70 102;
+	--ruby-10: 220 59 93;
+	--ruby-11: 202 36 77;
+	--ruby-12: 100 23 43;
+
+  --amber-1: 254 253 251;
+	--amber-2: 254 251 233;
+	--amber-3: 255 247 194;
+	--amber-4: 255 238 156;
+	--amber-5: 251 229 119;
+	--amber-6: 243 214 115;
+	--amber-7: 233 193 98;
+	--amber-8: 226 163 54;
+	--amber-9: 255 197 61;
+	--amber-10: 255 186 24;
+	--amber-11: 171 100 0;
+	--amber-12: 79 52 34;
+
+
+  --background: var(--mauve-1);
+  --foreground: var(--mauve-12);
+
+  --card: var(--mauve-2);
+  --card-foreground: var(--mauve-12);
+
+  --popover: var(--mauve-2);
+  --popover-foreground: var(--mauve-12);
+
+  --primary: var(--violet-9);
+  --primary-hover: var(--violet-10);
+  --primary-foreground: var(--mauve-1);
+
+  --secondary: var(--mauve-3);
+  --secondary-hover: var(--mauve-4);
+  --secondary-selected: var(--mauve-5);
+  --secondary-foreground: var(--mauve-12);
+
+  --muted: var(--mauve-3);
+  --muted-foreground: var(--mauve-11);
+
+  --accent: var(--mauve-4);
+  --accent-foreground: var(--mauve-12);
+
+  --destructive: var(--ruby-9);
+  --destructive-text: var(--ruby-10);
+  --destructive-foreground: var(--mauve-12);
+
+  --input: var(--mauve-7);
+  --input-focus: var(--mauve-8);
+  --border: var(--mauve-6);
+  --ring: var(--violet-8);
+
+  --radius: 0.75rem;
+}
+
+.dark {
   --mauve-1: 18 17 19;
   --mauve-2: 26 25 27;
   --mauve-3: 35 34 37;
@@ -64,43 +167,6 @@
   --amber-11: 255 202 22;
   --amber-12: 255 231 179;
 
-  --background: var(--mauve-12);
-  --foreground: var(--mauve-1);
-
-  --card: var(--mauve-11);
-  --card-foreground: var(--mauve-1);
-
-  --popover: var(--mauve-11);
-  --popover-foreground: var(--mauve-1);
-
-  --primary: var(--violet-9);
-  --primary-hover: var(--violet-10);
-  --primary-foreground: var(--mauve-1);
-
-  --secondary: var(--mauve-3);
-  --secondary-hover: var(--mauve-4);
-  --secondary-selected: var(--mauve-5);
-  --secondary-foreground: var(--mauve-12);
-
-  --muted: var(--mauve-3);
-  --muted-foreground: var(--mauve-11);
-
-  --accent: var(--mauve-4);
-  --accent-foreground: var(--mauve-12);
-
-  --destructive: var(--ruby-9);
-  --destructive-text: var(--ruby-10);
-  --destructive-foreground: var(--mauve-12);
-
-  --input: var(--mauve-7);
-  --input-focus: var(--mauve-8);
-  --border: var(--mauve-6);
-  --ring: var(--violet-8);
-
-  --radius: 0.75rem;
-}
-
-.dark {
   color-scheme: dark;
 
   --background: var(--mauve-1);

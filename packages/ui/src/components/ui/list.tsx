@@ -750,7 +750,7 @@ function UiListItemActions({ actions }: { actions: UiListItemAction[] }) {
   }, [actions, listStore]);
 
   return (
-    <div className="flex items-center z-2 absolute rounded-sm top-0 h-full right-0 pr-2 pl-6 pointer-events-none bg-gradient-to-tl from-40% from-card to-100% to-transparent">
+    <div className="flex items-center z-2 absolute rounded-sm top-0 h-full right-0 pr-2 pl-6 pointer-events-none bg-gradient-to-tl from-40% from-secondary dark:from-card to-100% to-transparent">
       {actions.map((action, index) => (
         <Fragment key={action.value}>
           {action.type === 'menu' ? (
@@ -815,7 +815,7 @@ const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
     return (
       <div
         className={cn(
-          'relative group/item ui-list-item min-h-12 flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-card aria-selected:text-accent-foreground',
+          'relative group/item ui-list-item min-h-12 flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none dark:aria-selected:bg-card aria-selected:bg-secondary aria-selected:text-accent-foreground',
           className,
         )}
         {...props}
