@@ -279,6 +279,7 @@ export interface IPCSendEventMainToRenderer {
   'shared-window:stop-execute-workflow': [runnerId: string];
   'window:visibility-change': [isHidden: boolean];
   'app:update-route': [path: string, routeData?: unknown];
+  'app:settings-changed': [settings: AppSettings];
   'command-window:open-json-view': [
     executeCommandPayload: ExtensionCommandJSONViewData,
   ];

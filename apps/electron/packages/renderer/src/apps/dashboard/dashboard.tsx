@@ -9,6 +9,7 @@ import router from './routes';
 import { DialogProvider, UiToaster, UiTooltipProvider } from '@altdot/ui';
 import { HotkeysProvider } from 'react-hotkeys-hook';
 import { DatabaseProvider } from '/@/context/database.context';
+import { ThemeProvider } from '/@/context/theme.context';
 
 if (window.location.pathname === '/') {
   window.location.assign('/dashboard');
@@ -16,15 +17,17 @@ if (window.location.pathname === '/') {
 
 ReactDOM.createRoot(document.getElementById('app')!).render(
   <React.StrictMode>
-    <HotkeysProvider>
-      <DialogProvider>
-        <UiTooltipProvider>
-          <DatabaseProvider>
-            <UiToaster />
-            <RouterProvider router={router} />
-          </DatabaseProvider>
-        </UiTooltipProvider>
-      </DialogProvider>
-    </HotkeysProvider>
+    <ThemeProvider>
+      <HotkeysProvider>
+        <DialogProvider>
+          <UiTooltipProvider>
+            <DatabaseProvider>
+              <UiToaster />
+              <RouterProvider router={router} />
+            </DatabaseProvider>
+          </UiTooltipProvider>
+        </DialogProvider>
+      </HotkeysProvider>
+    </ThemeProvider>
   </React.StrictMode>,
 );

@@ -1,12 +1,14 @@
 import { CommandLaunchContext } from '@altdot/extension';
 import { ExtensionCommandModel } from '../../main/src/extension/extension-command/extension-command.interface';
 import { EXTENSION_CONFIG_TYPE, EXTENSION_PERMISSIONS } from '@altdot/shared';
+import { AppTheme } from './app.interface';
 
 export type ExtensionConfigType = (typeof EXTENSION_CONFIG_TYPE)[number];
 export type ExtensionPermissions = (typeof EXTENSION_PERMISSIONS)[number];
 
 export interface ExtensionCommandViewInitMessage {
   type: 'init';
+  theme: AppTheme;
   themeStyle: string;
   payload: ExtensionCommandExecutePayload;
 }

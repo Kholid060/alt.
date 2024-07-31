@@ -31,6 +31,7 @@ import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { ExtensionBrowserTabContext } from '#packages/common/interface/extension.interface';
 import { debounce } from '@altdot/shared';
+import { ThemeProvider } from '/@/context/theme.context';
 
 const routes = createCommandRoutes(commandAppRoutes);
 
@@ -169,62 +170,63 @@ function App() {
 
   return (
     <ReactErrorBoundary FallbackComponent={ErrorBoundaryFallback}>
-      <UiTooltipProvider>
-        <DatabaseProvider>
-          <CommandRouteProvider routes={routes}>
-            <IdleListener
-              onToggleHide={(value) => value !== hide && setHide(value)}
-            />
-            {!hide && (
-              <DialogProvider
-                dialogOptions={{
-                  containerEl: contentRef,
-                  class: {
-                    title: 'text-base',
-                    content: 'p-4 absolute',
-                    overlay: 'absolute rounded-lg',
-                  },
-                }}
-                options={{
-                  onDialogAdded() {
-                    dialogFocusRef.current ??= document.activeElement;
-                  },
-                  onAllClosed() {
-                    if (
-                      dialogFocusRef.current &&
-                      'focus' in dialogFocusRef.current
-                    ) {
-                      dialogFocusRef.current.focus();
-                    }
-
-                    dialogFocusRef.current = null;
-                  },
-                }}
-              >
-                <CommandCtxProvider>
-                  <AppEventListener />
-                  <div className="overflow-hidden p-0.5">
-                    <UiListProvider>
-                      <AppDevtools />
-                      <div
-                        ref={contentRef}
-                        id="command-content-container"
-                        className="relative z-10 w-full rounded-lg border bg-background"
-                      >
-                        <CommandHeader />
-                        <CommandContent />
-                        <CommandErrorOverlay />
-                        <CommandOAuthOverlay />
-                      </div>
-                    </UiListProvider>
-                    <CommandFooter />
-                  </div>
-                </CommandCtxProvider>
-              </DialogProvider>
-            )}
-          </CommandRouteProvider>
-        </DatabaseProvider>
-      </UiTooltipProvider>
+      <ThemeProvider>
+        <UiTooltipProvider>
+          <DatabaseProvider>
+            <CommandRouteProvider routes={routes}>
+              <IdleListener
+                onToggleHide={(value) => value !== hide && setHide(value)}
+              />
+              {!hide && (
+                <DialogProvider
+                  dialogOptions={{
+                    containerEl: contentRef,
+                    class: {
+                      title: 'text-base',
+                      content: 'p-4 absolute',
+                      overlay: 'absolute rounded-lg',
+                    },
+                  }}
+                  options={{
+                    onDialogAdded() {
+                      dialogFocusRef.current ??= document.activeElement;
+                    },
+                    onAllClosed() {
+                      if (
+                        dialogFocusRef.current &&
+                        'focus' in dialogFocusRef.current
+                      ) {
+                        dialogFocusRef.current.focus();
+                      }
+                      dialogFocusRef.current = null;
+                    },
+                  }}
+                >
+                  <CommandCtxProvider>
+                    <AppEventListener />
+                    <div className="overflow-hidden p-0.5">
+                      <UiListProvider>
+                        <AppDevtools />
+                        <div
+                          ref={contentRef}
+                          id="command-content-container"
+                          className="relative z-10 w-full rounded-lg border bg-background"
+                        >
+                          <CommandHeader />
+                          <CommandContent />
+                          <CommandErrorOverlay />
+                          <CommandOAuthOverlay />
+                        </div>
+                      </UiListProvider>
+                      <CommandFooter />
+                    </div>
+                  </CommandCtxProvider>
+                </DialogProvider>
+              )}
+            </CommandRouteProvider>
+          </DatabaseProvider>
+        </UiTooltipProvider>
+      </ThemeProvider>
     </ReactErrorBoundary>
   );
 }

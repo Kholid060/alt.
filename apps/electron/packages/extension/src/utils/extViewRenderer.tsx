@@ -15,19 +15,6 @@ async function loadStyle(themeStyle: string) {
   themeStyleEl.textContent = themeStyle;
   document.head.appendChild(themeStyleEl);
 
-  const fontStyle = document.createElement('style');
-  fontStyle.textContent = `
-  @font-face {
-    font-family: Inter;
-    font-weight: 100 900;
-    font-display: swap;
-    font-style: normal;
-    font-named-instance: "Regular";
-    src: url("./@fonts/InterVariable.woff2") format("woff2");
-  }
-  `;
-  document.head.appendChild(fontStyle);
-
   if (import.meta.env.DEV) {
     const cssPath = `.${MODULE_MAP.css}`;
     const { default: styleStr } = (await import(cssPath)) as {

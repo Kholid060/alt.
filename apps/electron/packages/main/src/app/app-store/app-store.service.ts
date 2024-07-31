@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { AppSettings } from '#packages/common/interface/app.interface';
 import { app } from 'electron';
 import { APP_DEFAULT_SETTINGS } from '/@/common/config/app.config';
+import { BrowserWindowService } from '/@/browser-window/browser-window.service';
 
 export interface AppStoreData {
   settings: AppSettings | null;
@@ -11,7 +12,7 @@ export interface AppStoreData {
 
 @Injectable()
 export class AppStoreService extends Store<AppStoreData> {
-  constructor() {
+  constructor(private browserWindow: BrowserWindowService) {
     super({
       defaults: {
         lastCheckExtensionUpdate: null,
@@ -22,6 +23,10 @@ export class AppStoreService extends Store<AppStoreData> {
           type: ['object', 'null'],
           default: null,
           properties: {
+            theme: {
+              default: 'system',
+              enum: ['light', 'dark', 'system'],
+            },
             startup: { type: 'boolean', default: false },
             clearStateAfter: { type: 'number', default: 10 },
             upsertRestoreDuplicate: { type: 'boolean', default: true },
@@ -62,9 +67,15 @@ export class AppStoreService extends Store<AppStoreData> {
       });
     }
 
-    this.set('settings', {
+    const updatedSettings: AppSettings = {
       ...currentSettings,
       ...settings,
+    };
+
+    this.set('settings', updatedSettings);
+    this.browserWindow.sendMessageToAllWindows({
+      args: [updatedSettings],
+      name: 'app:settings-changed',
     });
   }
 }

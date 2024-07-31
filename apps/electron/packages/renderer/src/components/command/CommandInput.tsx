@@ -82,7 +82,7 @@ const CommandInputArguments = forwardRef<
                   value={`${args[argument.name] ?? ''}`}
                   required={argument.required}
                   data-command-argument={argument.name}
-                  className="h-full w-full appearance-none rounded-sm bg-secondary pl-2 pr-6 transition-colors hover:bg-secondary-hover focus:outline-none"
+                  className="h-full w-full appearance-none rounded-sm bg-secondary stroke-foreground pl-2 pr-6 transition-colors hover:bg-secondary-hover focus:outline-none"
                   onKeyDownCapture={(event) => {
                     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
                       event.stopPropagation();

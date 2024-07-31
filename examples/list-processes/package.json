@@ -21,6 +21,6 @@
     "typescript-eslint": "^7.17.0"
   },
   "dependencies": {
-    "@altdot/extension": "^0.0.1"
+    "@altdot/extension": "^0.0.9"
   }
 }

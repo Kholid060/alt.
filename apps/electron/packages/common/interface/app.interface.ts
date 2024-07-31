@@ -1,6 +1,9 @@
 import type { SelectWorkflow } from '../../main/src/db/schema/workflow.schema';
 
+export type AppTheme = 'dark' | 'light' | 'system';
+
 export interface AppSettings {
+  theme: AppTheme;
   startup: boolean;
   clearStateAfter: number;
   upsertRestoreDuplicate: boolean;

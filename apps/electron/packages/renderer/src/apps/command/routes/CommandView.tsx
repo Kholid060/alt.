@@ -11,10 +11,12 @@ import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { getExtIconURL } from '/@/utils/helper';
+import { useTheme } from '/@/hooks/useTheme';
 
 function CommandView() {
   const setHeader = useCommandPanelStore.use.setHeader();
 
+  const theme = useTheme();
   const navigate = useCommandNavigate();
   const activeRoute = useCommandRoute((state) => state.currentRoute);
 
@@ -36,6 +38,7 @@ function CommandView() {
       const payload: ExtensionCommandViewInitMessage = {
         type: 'init',
         themeStyle: '',
+        theme: theme.theme,
         payload: activeRoute.data as ExtensionCommandExecutePayload,
       };
 
@@ -99,7 +102,13 @@ function CommandView() {
     return () => {
       setHeader(null);
     };
-  }, [activeRoute]);
+  }, [activeRoute, navigate, setHeader]);
+  useEffect(() => {
+    commandCtx.runnerMessagePort.current.eventSync.sendMessage(
+      'app:theme-changed',
+      theme.theme,
+    );
+  }, [commandCtx.runnerMessagePort, theme.theme]);
 
   if (!show) return null;
 

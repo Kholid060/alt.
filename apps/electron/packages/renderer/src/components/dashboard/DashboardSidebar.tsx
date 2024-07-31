@@ -126,7 +126,9 @@ function DashboardSidebar({
             className={({ isActive }) =>
               cn(
                 'flex items-center justify-center gap-3 overflow-hidden rounded-md p-3 transition lg:justify-start',
-                isActive ? 'bg-card text-foreground' : 'hover:bg-card/80',
+                isActive
+                  ? 'bg-secondary text-foreground dark:bg-card'
+                  : 'hover:bg-card/80',
               )
             }
           >

@@ -5,7 +5,7 @@ import starlightImageZoom from 'starlight-image-zoom';
 // https://astro.build/config
 export default defineConfig({
 	redirects: {
-		'/': '/introduction'
+		'/': '/basics/introduction'
 	},
 	integrations: [
 		starlight({
@@ -18,8 +18,8 @@ export default defineConfig({
 			},
 			sidebar: [
 				{
-					label: 'Introduction',
-					link: 'introduction',
+					label: 'Basics',
+					autogenerate: { directory: 'basics' },
 				},
 				{
 					label: 'Extensions',

@@ -2,6 +2,7 @@
 import { isObject } from '@altdot/shared';
 import type { IPCEventError } from '../interface/ipc-events.interface';
 import { ExtensionConfig } from '@altdot/extension/dist/extension-manifest';
+import { AppTheme } from '../interface/app.interface';
 
 export function requireInputConfig(config?: ExtensionConfig[]) {
   if (!config) return false;
@@ -52,4 +53,16 @@ export function isIPCEventError(result: unknown): result is IPCEventError {
     '$isError' in result &&
     (result.$isError as boolean)
   );
+}
+
+export function applyTheme(
+  theme: AppTheme,
+  element = document.documentElement,
+) {
+  let isDark = theme === 'dark';
+  if (theme === 'system') {
+    isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+
+  element.classList.toggle('dark', isDark);
 }

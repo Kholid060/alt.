@@ -15,6 +15,7 @@ import type {
 } from '#common/interface/extension.interface';
 import { PRELOAD_API_KEY } from '#common/utils/constant/constant';
 import { ExtensionErrorUnhandledVanilla } from './components/extension-errors';
+import { applyTheme } from '#common/utils/helper';
 
 declare global {
   interface Window {
@@ -65,15 +66,19 @@ async function onMessage({
     if (typeof data !== 'object' || data.type !== 'init')
       throw new Error('Invalid payload');
 
+    applyTheme(data.theme);
+
     const messagePort: ExtensionMessagePort = new BetterMessagePort(port);
     await injectExtensionAPI(messagePort, data.payload.browserCtx);
     await extViewRenderer(
       {
-        launchContext: data.payload.launchContext,
         messagePort: messagePort.sync,
+        launchContext: data.payload.launchContext,
       },
       data.themeStyle,
     );
+
+    messagePort.sync.on('app:theme-changed', applyTheme);
   } catch (error) {
     console.error(error);
     ExtensionErrorUnhandledVanilla(error as Error);

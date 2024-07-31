@@ -13,6 +13,7 @@ export interface ExtensionMessagePortEvent {
   'extension:keydown-event': [
     KeydownEvent: ExtensionAPI.UI.SearchPanel.KeydownEvent,
   ];
+  'app:theme-changed': [theme: 'light' | 'dark' | 'system'];
   'extension:show-toast': [
     toastId: string,
     options: Required<ExtensionAPI.UI.ToastOptions>,

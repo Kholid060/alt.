@@ -22,6 +22,9 @@ import {
   SquarePowerIcon,
 } from 'lucide-react';
 import { useDocumentTitle } from '/@/hooks/useDocumentTitle';
+import themeDarkImg from '/@/assets/images/theme-dark.png';
+import themeLightImg from '/@/assets/images/theme-light.png';
+import themeSystemImg from '/@/assets/images/theme-system.png';
 
 type SettingsSection<T extends object = object> = React.FC<
   {
@@ -29,6 +32,12 @@ type SettingsSection<T extends object = object> = React.FC<
     onUpdateSetting(settings: Partial<AppSettings>): void;
   } & T
 >;
+
+const themes = [
+  { img: themeLightImg, name: 'Light', value: 'light' },
+  { img: themeDarkImg, name: 'Dark', value: 'dark' },
+  { img: themeSystemImg, name: 'System', value: 'system' },
+] as const;
 
 const SettingGeneral: SettingsSection = ({ settings, onUpdateSetting }) => {
   return (
@@ -41,7 +50,34 @@ const SettingGeneral: SettingsSection = ({ settings, onUpdateSetting }) => {
       </div>
       <div className="p-4">
         <ul className="space-y-4 divide-y divide-border/70">
-          <li className="flex items-center gap-4">
+          <li>
+            <p>Theme</p>
+            <div className="flex items-center gap-4">
+              {themes.map((theme) => (
+                <button
+                  key={theme.value}
+                  className={clsx(
+                    'group text-sm text-muted-foreground hover:text-foreground',
+                    theme.value === settings.theme && 'text-foreground',
+                  )}
+                  onClick={() => {
+                    onUpdateSetting({ theme: theme.value });
+                  }}
+                >
+                  <img
+                    src={theme.img}
+                    alt={`Theme ${theme.name}`}
+                    className={clsx(
+                      'h-20 w-36 rounded-md border-[3px] object-cover object-top transition group-hover:border-primary',
+                      theme.value === settings.theme && 'border-primary',
+                    )}
+                  />
+                  <p>{theme.name}</p>
+                </button>
+              ))}
+            </div>
+          </li>
+          <li className="flex items-center gap-4 pt-4">
             <SquarePowerIcon />
             <div className="flex-1">
               <p className="leading-tight">Startup</p>
@@ -86,9 +122,9 @@ const SettingGeneral: SettingsSection = ({ settings, onUpdateSetting }) => {
 };
 
 const SettingBackupData: SettingsSection<{ onRestore?(): void }> = ({
-  onUpdateSetting,
-  onRestore,
   settings,
+  onRestore,
+  onUpdateSetting,
 }) => {
   const { toast } = useToast();
 
