@@ -18,7 +18,9 @@ const mapStorageValue = <
   value,
   ...rest
 }: T) => {
-  const decryptedValue = safeStorage.decryptString(value);
+  const decryptedValue = rest.isSecure
+    ? safeStorage.decryptString(value)
+    : value.toString();
 
   return {
     value:
@@ -34,37 +36,66 @@ const mapStorageValue = <
 export class ExtensionStorageService {
   constructor(private dbService: DBService) {}
 
-  async listItemsByExtensionId(extensionId: string, keys?: string[]) {
+  async listItemsByExtensionId({
+    keys,
+    isSecure,
+    extensionId,
+  }: {
+    keys?: string[];
+    isSecure?: boolean;
+    extensionId: string;
+  }) {
     const result = await this.dbService.db.query.extensionStorages.findMany({
       columns: {
         key: true,
         value: true,
+        isSecure: true,
       },
       where(fields, { eq, inArray, and }) {
         if (keys) {
           return and(
             eq(fields.extensionId, extensionId),
             inArray(fields.key, keys),
+            typeof isSecure === 'boolean'
+              ? eq(fields.isSecure, isSecure)
+              : undefined,
           );
         }
-        return eq(fields.extensionId, extensionId);
+
+        return typeof isSecure === 'boolean'
+          ? and(
+              eq(fields.extensionId, extensionId),
+              eq(fields.isSecure, isSecure),
+            )
+          : eq(fields.extensionId, extensionId);
       },
     });
 
     return result.map(mapStorageValue);
   }
 
-  upsertItems(extensionId: string, values: Record<string, unknown>) {
+  upsertItems({
+    values,
+    isSecure,
+    extensionId,
+  }: {
+    isSecure?: boolean;
+    extensionId: string;
+    values: Record<string, unknown>;
+  }) {
     const records = Object.entries(values).reduce<NewExtensionStorage[]>(
       (acc, [key, value]) => {
         acc.push({
           key,
+          isSecure,
           extensionId,
-          id: `${extensionId}:${key}`,
           updatedAt: new Date().toISOString(),
-          value: safeStorage.encryptString(
-            typeof value === 'string' ? value : JSON.stringify(value),
-          ),
+          id: `${extensionId}:${key}${isSecure ? '$' : ''}`,
+          value: isSecure
+            ? safeStorage.encryptString(
+                typeof value === 'string' ? value : JSON.stringify(value),
+              )
+            : Buffer.from(JSON.stringify(value)),
         });
 
         return acc;
@@ -87,16 +118,34 @@ export class ExtensionStorageService {
       .returning();
   }
 
-  deleteItemsByExtensionId(extensionId: string, keys?: string[]) {
+  deleteItemsByExtensionId({
+    keys,
+    isSecure,
+    extensionId,
+  }: {
+    isSecure?: boolean;
+    extensionId: string;
+    keys?: string | string[];
+  }) {
     return this.dbService.db
       .delete(extensionStorages)
       .where(
         keys
           ? and(
               eq(extensionStorages.extensionId, extensionId),
-              inArray(extensionStorages.key, keys),
+              Array.isArray(keys)
+                ? inArray(extensionStorages.key, keys)
+                : eq(extensionStorages.key, keys),
+              typeof isSecure === 'boolean'
+                ? eq(extensionStorages.isSecure, isSecure)
+                : undefined,
             )
-          : eq(extensionStorages.extensionId, extensionId),
+          : typeof isSecure === 'boolean'
+            ? and(
+                eq(extensionStorages.extensionId, extensionId),
+                eq(extensionStorages.isSecure, isSecure),
+              )
+            : eq(extensionStorages.extensionId, extensionId),
       );
   }
 }

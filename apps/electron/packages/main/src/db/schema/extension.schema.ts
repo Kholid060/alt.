@@ -118,6 +118,7 @@ export const extensionStorages = sqliteTable(
       .references(() => extensions.id, { onDelete: 'cascade' }),
     key: text('key').notNull(),
     value: blob('value', { mode: 'buffer' }).notNull(),
+    isSecure: integer('is_secure', { mode: 'boolean' }),
   },
   (table) => ({
     storageKeyIdx: index('storage_key_idx').on(table.key),

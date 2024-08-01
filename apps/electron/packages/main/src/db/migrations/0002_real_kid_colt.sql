@@ -1,0 +1,1 @@
+ALTER TABLE `extension_storages` ADD `is_secure` integer;

@@ -104,6 +104,20 @@ async function getTabs() {
   const tabs = await _extension.browser.tabs.query({});
   console.log(JSON.stringify(tabs.map((tab) => ({ id: tab.id, title: tab.title, url: tab.title }))));
 }
+async function storage() {
+  await _extension.storage.secure.set('halo', 'secure!!');
+
+  const test = await _extension.storage.local.get('halo');
+  const secureTest = await _extension.storage.secure.get('halo');
+  console.log('secure', JSON.stringify(secureTest));
+  if (!test.halo) {
+    console.log('empty');
+    await _extension.storage.local.set('halo', { object: 'test' });
+    return;
+  }
+
+  console.log(JSON.stringify({ test }));
+}
 
 export default async function CommandMain(context: CommandLaunchContext) {
   console.log(JSON.stringify(context));
@@ -128,7 +142,9 @@ export default async function CommandMain(context: CommandLaunchContext) {
   // await selectElement();
   // await selectFile();
 
-  await authorizeCredential();
+  await storage();
+
+  // await authorizeCredential();
   // await _extension.runtime.config.openConfigPage('command');
 
   // await _extension.storage.set('test', 'hello world');
