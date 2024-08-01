@@ -40,19 +40,19 @@ export function ThemeProvider({ children }: { children?: React.ReactNode }) {
       },
     );
 
-    const offSystemColorSchemeChanged = () => {
+    const onSystemColorSchemeChanged = () => {
       if (theme !== 'system') return;
       applyTheme('system');
     };
     window
       .matchMedia('(prefers-color-scheme: dark)')
-      .addEventListener('change', offSystemColorSchemeChanged);
+      .addEventListener('change', onSystemColorSchemeChanged);
 
     return () => {
       offSettingsChanged();
       window
         .matchMedia('(prefers-color-scheme: dark)')
-        .removeEventListener('change', offSystemColorSchemeChanged);
+        .removeEventListener('change', onSystemColorSchemeChanged);
     };
   }, [theme]);
 

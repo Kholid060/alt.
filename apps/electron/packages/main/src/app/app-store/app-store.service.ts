@@ -1,7 +1,7 @@
 import Store from 'electron-store';
 import { Injectable } from '@nestjs/common';
 import { AppSettings } from '#packages/common/interface/app.interface';
-import { app } from 'electron';
+import { app, nativeTheme } from 'electron';
 import { APP_DEFAULT_SETTINGS } from '/@/common/config/app.config';
 import { BrowserWindowService } from '/@/browser-window/browser-window.service';
 
@@ -77,5 +77,9 @@ export class AppStoreService extends Store<AppStoreData> {
       args: [updatedSettings],
       name: 'app:settings-changed',
     });
+
+    if (settings.theme) {
+      nativeTheme.themeSource = settings.theme;
+    }
   }
 }

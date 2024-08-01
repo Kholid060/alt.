@@ -1,7 +1,8 @@
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
 import { UiIcons, UiImage } from '@altdot/ui';
 import { LucideIcon, TriangleAlertIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import { useIsDarkTheme } from '/@/hooks/useTheme';
 
 const iconPrefix = 'icon:';
 
@@ -18,6 +19,10 @@ function UiExtensionIcon({
   extensionIcon?: boolean;
   iconWrapper?: (icon: LucideIcon) => React.ReactNode;
 }) {
+  const isDarkTheme = useIsDarkTheme();
+
+  const hasTriedDarkIcon = useRef(false);
+
   const [imageError, setImageError] = useState(false);
 
   if (icon.startsWith(iconPrefix)) {
@@ -39,9 +44,28 @@ function UiExtensionIcon({
   return (
     <UiImage
       src={
-        extensionIcon ? `${CUSTOM_SCHEME.extension}://${id}/icon/${icon}` : icon
+        extensionIcon
+          ? `${CUSTOM_SCHEME.extension}://${id}/icon/${isDarkTheme && !hasTriedDarkIcon.current ? `${icon}@dark` : icon}`
+          : icon
       }
-      onError={() => setImageError(true)}
+      onError={(event) => {
+        const target = event.target as HTMLImageElement;
+        if (isDarkTheme) {
+          if (target.src.includes('@dark')) {
+            target.src = target.src.replaceAll('@dark', '');
+            hasTriedDarkIcon.current = true;
+          } else if (!hasTriedDarkIcon.current) {
+            target.src = target.src + '@dark';
+            hasTriedDarkIcon.current = true;
+          } else {
+            setImageError(true);
+          }
+        } else if (target.src.includes('@dark')) {
+          target.src = target.src.replaceAll('@dark', '');
+        } else {
+          setImageError(true);
+        }
+      }}
       alt={alt}
     />
   );
