@@ -1,5 +1,6 @@
 // GENERATED FILE
 import { Browser as ImportedBrowser } from './namespaces/browser';
+import { ChildProcess as ImportedChildProcess } from './namespaces/child-process';
 import { Clipboard as ImportedClipboard } from './namespaces/clipboard';
 import { Command as ImportedCommand } from './namespaces/command';
 import { Fs as ImportedFs } from './namespaces/fs';
@@ -14,6 +15,7 @@ import { UI as ImportedUI } from './namespaces/ui';
 
 declare namespace ExtensionAPI {
   const browser: Browser.Static;
+  const childProcess: ChildProcess.Static;
   const clipboard: Clipboard.Static;
   const command: Command.Static;
   const fs: Fs.Static;
@@ -27,6 +29,7 @@ declare namespace ExtensionAPI {
   const ui: UI.Static;
 
   export import Browser = ImportedBrowser;
+  export import ChildProcess = ImportedChildProcess;
   export import Clipboard = ImportedClipboard;
   export import Command = ImportedCommand;
   export import Fs = ImportedFs;

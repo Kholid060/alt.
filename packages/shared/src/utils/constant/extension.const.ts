@@ -18,13 +18,13 @@ export const EXTENSION_PERMISSIONS = [
   'browser',
   'storage',
   'command',
-  'scripts',
   'fs.read',
   'fs.write',
   'clipboard',
   'browser.tabs',
+  'childProcess',
   'notifications',
-  'installed-apps',
+  'installedApps',
 ] as const;
 export type ExtensionPermissions = ArrayUnion<typeof EXTENSION_PERMISSIONS>;
 

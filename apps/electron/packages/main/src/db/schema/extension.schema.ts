@@ -73,7 +73,6 @@ export const extensionCommands = sqliteTable('extension_commands', {
   description: text('description'),
   title: text('title').notNull(),
   name: text('name').notNull(),
-  isInternal: integer('is_internal', { mode: 'boolean' }).default(false),
   path: text('path'),
   context: text('context', { mode: 'json' }).$type<
     ('all' | `host:${string}`)[]

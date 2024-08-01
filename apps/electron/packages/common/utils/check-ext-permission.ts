@@ -22,6 +22,7 @@ export const API_PERMISSION_MAP: [
   ['command', ['command']],
   ['storage', ['storage']],
   ['clipboard', ['clipboard']],
+  ['childProcess', ['childProcess']],
   ['notifications', ['notifications']],
   ['fs.exists', ['fs', 'fs.read']],
   ['fs.readFile', ['fs', 'fs.read']],

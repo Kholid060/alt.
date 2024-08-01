@@ -16,13 +16,13 @@ function ListProcess() {
 
   async function killProcess(processItem: ProcessItem) {
     try {
-      const result = await _extension.command.launch({
-        args: { name: processItem.processName },
-        name: 'kill-process.js',
-      });
-      if (!result.success) {
-        throw new Error(result.errorMessage);
-      }
+      await _extension.childProcess.exec(
+        `Stop-Process -Name "${processItem.processName}"`,
+        [],
+        {
+          shell: 'powershell.exe',
+        },
+      );
 
       setProcesses(
         processes.filter(

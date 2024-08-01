@@ -57,13 +57,9 @@ export const mapManifestToDB = {
     config,
     context,
     subtitle,
-    isInternal,
     description,
     arguments: commandArguments,
-  }: ExtensionCommand & { isInternal?: boolean }): Omit<
-    NewExtensionCommand,
-    'extensionId' | 'id'
-  > {
+  }: ExtensionCommand): Omit<NewExtensionCommand, 'extensionId' | 'id'> {
     return {
       name,
       icon,
@@ -74,7 +70,6 @@ export const mapManifestToDB = {
       subtitle,
       description,
       arguments: commandArguments,
-      isInternal: isInternal ?? false,
     };
   },
 };

@@ -69,7 +69,6 @@ export class AppBackupService {
               shortcut: true,
               isFallback: true,
               isDisabled: true,
-              isInternal: true,
               extensionId: true,
             },
           },

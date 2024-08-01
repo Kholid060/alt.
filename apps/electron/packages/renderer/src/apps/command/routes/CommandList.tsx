@@ -183,7 +183,6 @@ function CommandList() {
       if (extension.isError || extension.isDisabled) return;
 
       extension.commands.forEach((command) => {
-        if (command.isInternal) return;
         // let browserCtx: ExtensionBrowserTabContext | undefined;
 
         const isInSuggestion = false;

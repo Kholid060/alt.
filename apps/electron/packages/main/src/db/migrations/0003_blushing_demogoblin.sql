@@ -1,0 +1,1 @@
+ALTER TABLE `extension_commands` DROP COLUMN `is_internal`;

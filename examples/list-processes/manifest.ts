@@ -16,20 +16,8 @@ const config: ExtensionManifest = {
       title: 'Running Processes',
       description: 'Pick color from screen',
     },
-    {
-      type: 'script',
-      isInternal: true,
-      name: 'get-process.js',
-      title: 'Get all running processes',
-    },
-    {
-      type: 'script',
-      isInternal: true,
-      name: 'kill-process.js',
-      title: 'Kill running processes',
-    },
   ],
-  permissions: ['shell', 'clipboard', 'command'],
+  permissions: ['shell', 'clipboard', 'childProcess'],
 };
 
 export default config;

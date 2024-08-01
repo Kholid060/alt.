@@ -25,6 +25,7 @@ import { ExtensionStorageService } from './extension-storage/extension-storage.s
 import { ExtensionQueryService } from './extension-query.service';
 import { ExtensionOAuthTokensModule } from './extension-oauth-tokens/extension-oauth-tokens.module';
 import { ExtensionCommandApiListener } from './extension-execution-event/listener/command-api.listener';
+import { ExtensionChildProcessApiListener } from './extension-execution-event/listener/child-process.listener';
 
 const extensionApiListeners = [
   ExtensionFSApiListener,
@@ -37,6 +38,7 @@ const extensionApiListeners = [
   ExtensionStorageApiListener,
   ExtensionClipboardApiListener,
   ExtensionMainWindowApiListener,
+  ExtensionChildProcessApiListener,
   ExtensionNotificationApiListener,
 ];
 

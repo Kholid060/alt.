@@ -36,9 +36,8 @@ export class ExtensionExecutionEventService {
     private extensionQuery: ExtensionQueryService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {
-    this.handleExecutionMessage = this.handleExecutionMessage.bind(this);
     this.messagePortHandler = new ExtensionMessagePortHandler(
-      this.handleExecutionMessage,
+      this.handleExecutionMessage.bind(this),
     );
   }
 

@@ -8,7 +8,11 @@ import {
   ValidationError,
 } from '#packages/common/errors/custom-errors';
 import { mapManifestToDB } from '/@/common/utils/database-utils';
-import { extensionCommands, extensions } from '../db/schema/extension.schema';
+import {
+  extensionCommands,
+  extensions,
+  SelectExtension,
+} from '../db/schema/extension.schema';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
 import { ExtensionUpdaterService } from '../extension-updater/extension-updater.service';
 import { GlobalShortcutService } from '../global-shortcut/global-shortcut.service';
@@ -40,24 +44,27 @@ export class ExtensionLoaderService {
   ) {}
 
   getPath(
-    extensionId: string,
+    extensionId: Pick<SelectExtension, 'path' | 'isLocal' | 'id'> | string,
     type: 'base' | 'icon' | 'libs',
     ...paths: string[]
   ) {
     return this.cacheManager.wrap(
       `ext-path:${extensionId}/${type}/${paths.join('/')}`,
       async () => {
-        const extension = await this.dbService.db.query.extensions.findFirst({
-          columns: { path: true, isLocal: true },
-          where(fields, operators) {
-            return operators.eq(fields.id, extensionId);
-          },
-        });
+        const extension =
+          typeof extensionId === 'string'
+            ? await this.dbService.db.query.extensions.findFirst({
+                columns: { path: true, isLocal: true, id: true },
+                where(fields, operators) {
+                  return operators.eq(fields.id, extensionId);
+                },
+              })
+            : extensionId;
         if (!extension) return null;
 
         let basePath = extension.isLocal
           ? extension.path
-          : path.join(EXTENSION_FOLDER, extensionId);
+          : path.join(EXTENSION_FOLDER, extension.id);
         switch (type) {
           case 'base':
             break;

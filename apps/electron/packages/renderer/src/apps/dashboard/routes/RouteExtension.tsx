@@ -64,8 +64,6 @@ function RouteExtension() {
     const filteredCommands = extension.isError
       ? []
       : extension.commands.filter((command) => {
-          if (command.isInternal) return false;
-
           let isMatchFilter = false;
           switch (activeFilter) {
             case 'commands':

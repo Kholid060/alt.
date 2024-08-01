@@ -97,12 +97,7 @@ export function WorkflowEditorNodeList({
       );
 
       extension.commands.forEach((command) => {
-        if (
-          command.type === 'view' ||
-          command.type === 'view:json' ||
-          command.isInternal
-        )
-          return;
+        if (command.type === 'view' || command.type === 'view:json') return;
 
         const isScript = command.type === 'script';
         const item: NodeCommandItem = {
