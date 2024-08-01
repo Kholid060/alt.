@@ -1,6 +1,7 @@
 // GENERATED FILE
 import { Browser as ImportedBrowser } from './namespaces/browser';
 import { Clipboard as ImportedClipboard } from './namespaces/clipboard';
+import { Command as ImportedCommand } from './namespaces/command';
 import { Fs as ImportedFs } from './namespaces/fs';
 import { MainWindow as ImportedMainWindow } from './namespaces/main-window';
 import { Notifications as ImportedNotifications } from './namespaces/notification';
@@ -14,6 +15,7 @@ import { UI as ImportedUI } from './namespaces/ui';
 declare namespace ExtensionAPI {
   const browser: Browser.Static;
   const clipboard: Clipboard.Static;
+  const command: Command.Static;
   const fs: Fs.Static;
   const mainWindow: MainWindow.Static;
   const notifications: Notifications.Static;
@@ -26,6 +28,7 @@ declare namespace ExtensionAPI {
 
   export import Browser = ImportedBrowser;
   export import Clipboard = ImportedClipboard;
+  export import Command = ImportedCommand;
   export import Fs = ImportedFs;
   export import MainWindow = ImportedMainWindow;
   export import Notifications = ImportedNotifications;

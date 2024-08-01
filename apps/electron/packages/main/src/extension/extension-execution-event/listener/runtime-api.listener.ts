@@ -3,20 +3,13 @@ import { ExtensionApiEvent } from '../events/extension-api.event';
 import { OnExtensionAPI } from '/@/common/decorators/extension.decorator';
 import { ExtensionConfigService } from '../../extension-config/extension-config.service';
 import { BrowserWindowService } from '/@/browser-window/browser-window.service';
-import { CommandLaunchBy } from '@altdot/extension/dist/interfaces/command.interface';
-import { isObject } from '@altdot/shared';
-import { ExtensionCommandService } from '../../extension-command/extension-command.service';
-import { ExtensionService } from '../../extension.service';
 import { ExtensionManifest } from '@altdot/extension/dist/extension-manifest';
-import type { ExtensionAPI } from '@altdot/extension';
 
 @Injectable()
 export class ExtensionRuntimeApiListener {
   constructor(
-    private extension: ExtensionService,
     private browserWindow: BrowserWindowService,
     private extensionConfig: ExtensionConfigService,
-    private extensionCommand: ExtensionCommandService,
   ) {}
 
   @OnExtensionAPI('runtime.config.getValues')
@@ -59,47 +52,5 @@ export class ExtensionRuntimeApiListener {
     context: { extension },
   }: ExtensionApiEvent<'runtime.getManifest'>) {
     return Promise.resolve(extension as ExtensionManifest);
-  }
-
-  @OnExtensionAPI('runtime.command.updateDetail')
-  async updateCommand({
-    args: [{ subtitle }],
-    context: { extensionId, commandId },
-  }: ExtensionApiEvent<'runtime.command.updateDetail'>) {
-    if (typeof subtitle === 'undefined') return;
-
-    await this.extensionCommand.updateCommand(
-      { commandId, extensionId },
-      { subtitle },
-    );
-  }
-
-  @OnExtensionAPI('runtime.command.launch')
-  async commandLaunch({
-    args: [options],
-    context: { extensionId },
-  }: ExtensionApiEvent<'runtime.command.launch'>): Promise<ExtensionAPI.Runtime.Command.LaunchResult> {
-    if (typeof options.args !== 'undefined' && !isObject(options.args)) {
-      throw new Error('The "args" options type must be an object.');
-    }
-
-    try {
-      return await this.extension.executeCommandAndWait({
-        extensionId,
-        launchContext: {
-          args: options.args ?? {},
-          launchBy: CommandLaunchBy.COMMAND,
-        },
-        commandId: options.name,
-        scriptOptions: options.captureAllScriptMessages
-          ? { captureAllMessages: true }
-          : undefined,
-      });
-    } catch (error) {
-      return {
-        success: false,
-        errorMessage: (error as Error).message,
-      };
-    }
   }
 }
