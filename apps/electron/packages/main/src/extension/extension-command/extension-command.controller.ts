@@ -35,21 +35,6 @@ export class ExtensionCommandController {
     await this.extensionCommand.insertCommands([payload]);
   }
 
-  @IPCInvoke('database:update-extension-command')
-  async updateCommand(
-    @Payload()
-    [
-      extensionId,
-      commandId,
-      payload,
-    ]: IPCInvokePayload<'database:update-extension-command'>,
-  ): IPCInvokeReturn<'database:update-extension-command'> {
-    await this.extensionCommand.updateCommand(
-      { commandId, extensionId },
-      payload,
-    );
-  }
-
   @IPCInvoke('database:delete-extension-command')
   async deleteCommand(
     @Payload()

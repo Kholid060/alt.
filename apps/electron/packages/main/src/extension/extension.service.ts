@@ -21,6 +21,8 @@ import { ExtensionCommandType } from '@altdot/shared';
 import { ExtensionConfigService } from './extension-config/extension-config.service';
 import { BrowserExtensionService } from '../browser-extension/browser-extension.service';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
+import { ExtensionCommandService } from './extension-command/extension-command.service';
+import { ExtensionCommandUpdatePayload } from './extension-command/extension-command.interface';
 
 const MAX_EXT_ERROR_AGE_DAY = 3;
 
@@ -39,6 +41,7 @@ export class ExtensionService implements OnAppReady {
     private globalShortcut: GlobalShortcutService,
     private extensionLoader: ExtensionLoaderService,
     private extensionConfig: ExtensionConfigService,
+    private extensionCommand: ExtensionCommandService,
     private browserExtension: BrowserExtensionService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
@@ -211,7 +214,12 @@ export class ExtensionService implements OnAppReady {
       throw new Error(`It only supported "${filterCommandType}" command type`);
     }
 
-    if (!payload.browserCtx && command.extension.permissions?.some((permission) => permission.startsWith('browser'))) {
+    if (
+      !payload.browserCtx &&
+      command.extension.permissions?.some((permission) =>
+        permission.startsWith('browser'),
+      )
+    ) {
       payload.browserCtx = await this.getBrowserCtx();
     }
 
@@ -296,5 +304,16 @@ export class ExtensionService implements OnAppReady {
       'shared-window:stop-execute-command',
       runnerId,
     );
+  }
+
+  async updateCommand(
+    id: { extensionId: string; commandId: string },
+    data: ExtensionCommandUpdatePayload,
+  ) {
+    await this.extensionCommand.updateCommand(id, data);
+
+    if (data.shortcut) {
+      this.toggleShortcut(id.extensionId, id.commandId, data.shortcut);
+    }
   }
 }

@@ -98,4 +98,19 @@ export class ExtensionController {
   ) {
     this.extensionService.stopCommandExecution(runnerId);
   }
+
+  @IPCInvoke('database:update-extension-command')
+  async updateCommand(
+    @Payload()
+    [
+      extensionId,
+      commandId,
+      payload,
+    ]: IPCInvokePayload<'database:update-extension-command'>,
+  ): IPCInvokeReturn<'database:update-extension-command'> {
+    await this.extensionService.updateCommand(
+      { commandId, extensionId },
+      payload,
+    );
+  }
 }
