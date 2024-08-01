@@ -301,7 +301,7 @@ export interface IPCSendEventRendererToMain {
   'extension:command-exec-change': [
     type: 'finish' | 'start',
     detail: ExtensionCommandProcess,
-    data: ExtensionAPI.Runtime.Command.LaunchResult,
+    data: ExtensionAPI.Command.LaunchResult,
   ];
   'window:destroy': [name: WindowNames];
   'workflow:running-change': [

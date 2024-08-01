@@ -19,6 +19,7 @@ export const API_PERMISSION_MAP: [
   ['mainWindow', []],
   ['shell', ['shell']],
   ['sqlite', ['sqlite']],
+  ['command', ['command']],
   ['storage', ['storage']],
   ['clipboard', ['clipboard']],
   ['notifications', ['notifications']],

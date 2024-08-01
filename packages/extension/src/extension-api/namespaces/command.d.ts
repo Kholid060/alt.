@@ -1,6 +1,7 @@
 export declare namespace Command {
   interface LaunchOptions {
     name: string;
+    waitUntilFinished?: boolean;
     args?: Record<string, unknown>;
     captureAllScriptMessages?: boolean;
   }
@@ -14,6 +15,8 @@ export declare namespace Command {
 
   interface Static {
     updateDetail(options: UpdateDetailOptions): Promise<void>;
-    launch<T = unknown>(options: LaunchOptions): Promise<LaunchResult<T>>;
+    launch<T = unknown>(
+      options: LaunchOptions,
+    ): Promise<LaunchResult<T> | null>;
   }
 }

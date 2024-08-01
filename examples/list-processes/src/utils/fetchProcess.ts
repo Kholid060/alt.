@@ -17,41 +17,13 @@ export interface GroupProcessItem {
 }
 
 async function fetchProcess() {
-  const processStr = await _extension.runtime.command.launch<string>({
+  const processStr = await _extension.command.launch<string>({
     name: 'get-process.js',
     captureAllScriptMessages: true,
   });
-  if (!processStr.success) return null;
+  if (!processStr?.success) return null;
 
   return JSON.parse(processStr.result) as ProcessItem[];
-
-  // const processes: ProcessItem[] = JSON.parse(processStr.result);
-  // console.log(processes);
-  // const groupedProcesses: Record<string, GroupProcessItem> = {};
-  // for (const item of processes) {
-  //   if (!item.Path) continue;
-
-  //   if (!groupedProcesses[item.ProcessName]) {
-  //     let product = item.MainWindowTitle || item.Product;
-  //     // Windowsr => Windows®
-  //     if (item.Product?.includes('Windowsr Operating System')) {
-  //       product = item.ProcessName;
-  //     }
-
-  //     groupedProcesses[item.ProcessName] = {
-  //       product,
-  //       path: item.Path,
-  //       memoryTotal: item.WS,
-  //       processIds: [item.Id],
-  //       processName: item.ProcessName,
-  //     };
-  //   } else {
-  //     groupedProcesses[item.ProcessName].memoryTotal += item.WS;
-  //     groupedProcesses[item.ProcessName].processIds.push(item.Id);
-  //   }
-  // }
-
-  // return Object.values(groupedProcesses);
 }
 
 export default fetchProcess;

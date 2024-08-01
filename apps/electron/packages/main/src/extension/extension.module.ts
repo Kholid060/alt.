@@ -24,12 +24,14 @@ import { ExtensionAuthTokenService } from './extension-auth-token/extension-auth
 import { ExtensionStorageService } from './extension-storage/extension-storage.service';
 import { ExtensionQueryService } from './extension-query.service';
 import { ExtensionOAuthTokensModule } from './extension-oauth-tokens/extension-oauth-tokens.module';
+import { ExtensionCommandApiListener } from './extension-execution-event/listener/command-api.listener';
 
 const extensionApiListeners = [
   ExtensionFSApiListener,
   ExtensionOAuthApiListener,
   ExtensionShellApiListener,
   ExtensionSqliteApiListener,
+  ExtensionCommandApiListener,
   ExtensionBrowserApiListener,
   ExtensionRuntimeApiListener,
   ExtensionStorageApiListener,

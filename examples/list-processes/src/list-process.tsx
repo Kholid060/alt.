@@ -16,7 +16,7 @@ function ListProcess() {
 
   async function killProcess(processItem: ProcessItem) {
     try {
-      const result = await _extension.runtime.command.launch({
+      const result = await _extension.command.launch({
         args: { name: processItem.processName },
         name: 'kill-process.js',
       });

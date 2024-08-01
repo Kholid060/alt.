@@ -17,7 +17,6 @@ import { BrowserWindowService } from '../browser-window/browser-window.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
 import { ExtensionLoaderService } from '../extension-loader/extension-loader.service';
-import { ExtensionCommandType } from '@altdot/shared';
 import { ExtensionConfigService } from './extension-config/extension-config.service';
 import { BrowserExtensionService } from '../browser-extension/browser-extension.service';
 import { EXTENSION_BUILT_IN_ID } from '#packages/common/utils/constant/extension.const';
@@ -31,7 +30,7 @@ export class ExtensionService implements OnAppReady {
   private runningCommands: Map<string, ExtensionCommandProcess> = new Map();
   private executionResolvers = new Map<
     string,
-    PromiseWithResolvers<ExtensionAPI.Runtime.Command.LaunchResult>
+    PromiseWithResolvers<ExtensionAPI.Command.LaunchResult>
   >();
 
   constructor(
@@ -172,22 +171,22 @@ export class ExtensionService implements OnAppReady {
     });
   }
 
-  async executeCommandAndWait(executePayload: ExtensionCommandExecutePayload) {
-    const resolver =
-      Promise.withResolvers<ExtensionAPI.Runtime.Command.LaunchResult>();
-
-    const runnerId = await this.executeCommand(executePayload, 'script');
-    if (!runnerId) throw new Error("Config hasn't been inputted");
-
-    this.executionResolvers.set(runnerId, resolver);
-
-    return resolver.promise;
-  }
-
   async executeCommand(
     executePayload: ExtensionCommandExecutePayload,
-    filterCommandType?: ExtensionCommandType,
-  ): Promise<string | null> {
+    options?: { waitUntilFinished?: boolean },
+  ): Promise<string | ExtensionAPI.Command.LaunchResult | null>;
+  async executeCommand(
+    executePayload: ExtensionCommandExecutePayload,
+    options?: { waitUntilFinished?: false },
+  ): Promise<string | null>;
+  async executeCommand(
+    executePayload: ExtensionCommandExecutePayload,
+    options?: { waitUntilFinished?: true },
+  ): Promise<ExtensionAPI.Command.LaunchResult | null>;
+  async executeCommand(
+    executePayload: ExtensionCommandExecutePayload,
+    options?: { waitUntilFinished?: boolean },
+  ): Promise<unknown> {
     const payload: ExtensionCommandExecutePayload = executePayload;
     const { commandId, extensionId } = payload;
 
@@ -209,10 +208,6 @@ export class ExtensionService implements OnAppReady {
       );
     }
     if (command.isDisabled) throw new Error('This command is disabled');
-
-    if (filterCommandType && command.type !== filterCommandType) {
-      throw new Error(`It only supported "${filterCommandType}" command type`);
-    }
 
     if (
       !payload.browserCtx &&
@@ -241,7 +236,7 @@ export class ExtensionService implements OnAppReady {
         executeCommandPayload: payload,
       });
 
-      return null;
+      throw new Error("Config hasn't been inputted");
     }
 
     const executeCommandPayload = {
@@ -250,11 +245,13 @@ export class ExtensionService implements OnAppReady {
       commandFilePath,
     };
 
+    let runnerId: string | null = null;
+
     switch (command.type) {
       case 'view:json': {
         const windowSharedProcess =
           await this.browserWindow.get('shared-process');
-        const runnerId = await windowSharedProcess.invoke(
+        runnerId = await windowSharedProcess.invoke(
           'shared-window:execute-command',
           executeCommandPayload,
         );
@@ -268,17 +265,18 @@ export class ExtensionService implements OnAppReady {
           subtitle: command.extension.title,
           icon: command.icon || command.extension.icon,
         });
-
-        return runnerId;
+        break;
       }
       case 'script':
       case 'action': {
         const windowSharedProcess =
           await this.browserWindow.get('shared-process');
-        return windowSharedProcess.invoke(
+        runnerId = await windowSharedProcess.invoke(
           'shared-window:execute-command',
           executeCommandPayload,
         );
+
+        break;
       }
       case 'view': {
         const windowCommand = await this.browserWindow.get('command');
@@ -289,13 +287,23 @@ export class ExtensionService implements OnAppReady {
           subtitle: command.extension.title,
           icon: command.icon || command.extension.icon,
         });
-        return null;
+        break;
       }
       default:
         throw new Error(
           `Command with "${command.type}" type doesn't have handler`,
         );
     }
+
+    if (options?.waitUntilFinished && runnerId) {
+      const resolver =
+        Promise.withResolvers<ExtensionAPI.Command.LaunchResult>();
+      this.executionResolvers.set(runnerId, resolver);
+
+      return resolver.promise;
+    }
+
+    return runnerId;
   }
 
   async stopCommandExecution(runnerId: string) {

@@ -29,7 +29,7 @@ const config: ExtensionManifest = {
       title: 'Kill running processes',
     },
   ],
-  permissions: ['shell', 'clipboard'],
+  permissions: ['shell', 'clipboard', 'command'],
 };
 
 export default config;

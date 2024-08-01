@@ -17,6 +17,8 @@ export const EXTENSION_PERMISSIONS = [
   'sqlite',
   'browser',
   'storage',
+  'command',
+  'scripts',
   'fs.read',
   'fs.write',
   'clipboard',
