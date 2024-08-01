@@ -29,16 +29,32 @@ export function ThemeProvider({ children }: { children?: React.ReactNode }) {
       applyTheme(value as AppTheme);
     });
   }, []);
-  useEffect(
-    () =>
-      preloadAPI.main.ipc.on('app:settings-changed', (_, value) => {
+  useEffect(() => {
+    const offSettingsChanged = preloadAPI.main.ipc.on(
+      'app:settings-changed',
+      (_, value) => {
         if (value.theme === theme) return;
 
         setTheme(value.theme);
         applyTheme(value.theme);
-      }),
-    [theme],
-  );
+      },
+    );
+
+    const offSystemColorSchemeChanged = () => {
+      if (theme !== 'system') return;
+      applyTheme('system');
+    };
+    window
+      .matchMedia('(prefers-color-scheme: dark)')
+      .addEventListener('change', offSystemColorSchemeChanged);
+
+    return () => {
+      offSettingsChanged();
+      window
+        .matchMedia('(prefers-color-scheme: dark)')
+        .removeEventListener('change', offSystemColorSchemeChanged);
+    };
+  }, [theme]);
 
   return (
     <ThemeContext.Provider value={{ theme, updateTheme }}>
