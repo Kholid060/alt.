@@ -14,8 +14,11 @@ function ListProcess() {
   const [processes, setProcesses] = useState<ProcessItem[]>([]);
   const [status, setStatus] = useState<'idle' | 'error' | 'loading'>('loading');
 
-  async function killProcess(processItem: ProcessItem) {
+  async function killProcess(processName: string) {
     try {
+      const processItem = processes.find((item) => item.processName === processName);
+      if (!processItem) return;
+
       await _extension.childProcess.exec(
         `Stop-Process -Name "${processItem.processName}"`,
         [],
@@ -82,16 +85,6 @@ function ListProcess() {
     actions: [
       {
         type: 'button',
-        value: 'kill-process',
-        title: 'Kill process',
-        color: 'destructive',
-        icon: UiExtIcon.XCircle,
-        onAction() {
-          killProcess(item);
-        },
-      },
-      {
-        type: 'button',
         value: 'open-location',
         icon: UiExtIcon.FolderOpen,
         title: 'Open file location',
@@ -142,7 +135,7 @@ function ListProcess() {
 
   return (
     <div className="p-2">
-      <UiList items={listItems} />
+      <UiList items={listItems} onItemSelected={killProcess} />
     </div>
   );
 }

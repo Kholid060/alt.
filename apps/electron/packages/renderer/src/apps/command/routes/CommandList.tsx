@@ -20,6 +20,7 @@ import {
   FileCodeIcon,
   SearchSlashIcon,
   SettingsIcon,
+  StoreIcon,
   UserRoundIcon,
   WorkflowIcon,
 } from 'lucide-react';
@@ -249,9 +250,25 @@ function CommandList() {
   const builtInCommands: CommandListItemCommandBuiltIn[] = [
     {
       group: 'Commands',
+      title: 'Store',
+      value: 'store',
+      subtitle: 'Core',
+      icon: <UiList.Icon icon={StoreIcon} />,
+      onSelected() {
+        preloadAPI.main.ipc.invoke(
+          'shell:open-url',
+          `${import.meta.env.VITE_WEB_BASE_URL}/store`,
+        );
+      },
+      metadata: {
+        type: 'builtin-command',
+      },
+    },
+    {
+      group: 'Commands',
       title: 'Connected Accounts',
       value: 'connected-accounts',
-      subtitle: 'Utils',
+      subtitle: 'Core',
       icon: <UiList.Icon icon={UserRoundIcon} />,
       onSelected() {
         navigate('/connected-accounts');
@@ -264,7 +281,7 @@ function CommandList() {
       group: 'Commands',
       title: 'Workflows List',
       value: 'workflows-page',
-      subtitle: 'Utils',
+      subtitle: 'Core',
       icon: <UiList.Icon icon={WorkflowIcon} />,
       onSelected() {
         navigate('/workflows');
@@ -278,7 +295,7 @@ function CommandList() {
       group: 'Commands',
       title: 'Import Extension',
       value: 'import-extension',
-      subtitle: 'Utils',
+      subtitle: 'Core',
       icon: <UiList.Icon icon={BlocksIcon} />,
       async onSelected() {
         try {
@@ -336,7 +353,7 @@ function CommandList() {
       group: 'Commands',
       title: 'Running Process',
       value: 'running-process',
-      subtitle: 'Utils',
+      subtitle: 'Core',
       icon: <UiList.Icon icon={CpuIcon} />,
       onSelected() {
         navigate('/running-process');
@@ -349,7 +366,7 @@ function CommandList() {
       group: 'Commands',
       title: 'Create Command Script',
       value: 'create-command-script',
-      subtitle: 'Utils',
+      subtitle: 'Core',
       icon: <UiList.Icon icon={FileCodeIcon} />,
       onSelected() {
         navigate('/create-command-script');
@@ -362,7 +379,7 @@ function CommandList() {
       group: 'Commands',
       title: 'Fallback Commands',
       value: 'fallback-commands',
-      subtitle: 'Utils',
+      subtitle: 'Core',
       icon: <UiList.Icon icon={SearchSlashIcon} />,
       onSelected() {
         navigate('/fallback-commands');
