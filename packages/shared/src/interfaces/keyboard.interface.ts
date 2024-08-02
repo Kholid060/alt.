@@ -10,7 +10,7 @@ export type KeyboardShortcutModifier =
   (typeof SHORTCUT_MODIFIER)[keyof typeof SHORTCUT_MODIFIER];
 
 export interface KeyboardShortcut {
-  key: KeyboardShortcutKeys;
+  key: string;
   mod1: KeyboardShortcutModifier;
   mod2?: KeyboardShortcutModifier;
 }

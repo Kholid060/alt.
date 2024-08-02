@@ -237,7 +237,7 @@ export function WorkflowEditorNodeList({
           renderItem={({ item, props, ref, selected }) => (
             <UiList.Item
               {...{ ...item, ...props, selected }}
-              className="min-h-10 aria-selected:bg-secondary"
+              className="min-h-10 dark:aria-selected:bg-secondary"
               ref={ref}
             />
           )}

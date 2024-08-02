@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "ES2021",
+    "jsx": "react-jsx",
+    "moduleResolution": "Node10",
+    "resolveJsonModule": true
+  },
+  "include": ["."],
+  "exclude": ["node_modules", "dist", "eslint.config.js"]
+}

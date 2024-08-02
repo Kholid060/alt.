@@ -87,6 +87,7 @@ export interface UiListProps
   noDataSlot?: React.ReactNode;
   disabledItemSelection?: boolean;
   onItemSelected?: (value: string) => void;
+  onSearchChanged?: (value: string) => void;
   customFilter?: (items: UiListItem[], query: string) => UiListItem[];
   renderGroupHeader?: (label: string, index: number) => React.ReactNode;
   renderItem?: (
@@ -209,6 +210,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
       renderItem,
       customFilter,
       onItemSelected,
+      onSearchChanged,
       renderGroupHeader,
       shouldFilter = true,
       disabledItemSelection,
@@ -468,6 +470,11 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
       [onItemSelected],
     );
 
+    useEffect(() => {
+      if (!onSearchChanged || search) return;
+
+      onSearchChanged(query);
+    }, [onSearchChanged, search, query]);
     useEffect(() => {
       if (disabledItemSelection) return;
 

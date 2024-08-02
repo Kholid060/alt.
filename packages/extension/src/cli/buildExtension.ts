@@ -1,4 +1,4 @@
-import { InlineConfig, Rollup } from 'vite';
+import type { InlineConfig, Rollup } from 'vite';
 import { BuildError, logger } from './utils/logger';
 import ManifestUtils, { EXT_API_PKG_NAME } from './utils/ManifestUtils';
 import path from 'path';
