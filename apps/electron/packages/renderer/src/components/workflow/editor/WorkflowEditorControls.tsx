@@ -6,7 +6,7 @@ import {
   RedoIcon,
   UndoIcon,
 } from 'lucide-react';
-import { useReactFlow, useStore } from 'reactflow';
+import { useReactFlow, useStore } from '@xyflow/react';
 import { useShallow } from 'zustand/react/shallow';
 import { isInsideWorkflowEditor } from '../WorkflowEventListener';
 import { useHotkeys } from 'react-hotkeys-hook';

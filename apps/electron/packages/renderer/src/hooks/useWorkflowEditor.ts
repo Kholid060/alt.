@@ -2,7 +2,6 @@ import { useContext } from 'react';
 import { WorkflowEditorContext } from '../context/workflow-editor.context';
 import {
   WorkflowClipboardData,
-  WorkflowEdge,
   WorkflowNewNode,
   WorkflowRunPayload,
 } from '#packages/common/interface/workflow.interface';
@@ -12,13 +11,17 @@ import {
 } from '#packages/common/utils/constant/workflow.const';
 import { parseJSON } from '@altdot/shared';
 import { nanoid } from 'nanoid';
-import { Connection, useReactFlow, useStore, useStoreApi } from 'reactflow';
+import { Connection, useReactFlow, useStore, useStoreApi } from '@xyflow/react';
 import { isIPCEventError } from '../utils/helper';
 import preloadAPI from '../utils/preloadAPI';
 import { useWorkflowEditorStore } from '../stores/workflow-editor/workflow-editor.store';
 import { useShallow } from 'zustand/react/shallow';
 import { useToast } from '@altdot/ui';
-import { WORKFLOW_NODE_TYPE, WorkflowNodes } from '@altdot/workflow';
+import {
+  WORKFLOW_NODE_TYPE,
+  WorkflowEdges,
+  WorkflowNodes,
+} from '@altdot/workflow';
 
 export function useWorkflowEditor() {
   const storeApi = useStoreApi();
@@ -36,7 +39,7 @@ export function useWorkflowEditor() {
   const { deleteElements } = useReactFlow();
 
   function selectAllNodes() {
-    const nodes = storeApi.getState().getNodes();
+    const nodes = storeApi.getState().nodes;
     storeApi.getState().addSelectedNodes(nodes.map((node) => node.id));
   }
   async function pasteElements() {
@@ -80,7 +83,7 @@ export function useWorkflowEditor() {
     return null;
   }
   async function copyElements(
-    { edges, nodes }: { nodes?: WorkflowNodes[]; edges?: WorkflowEdge[] },
+    { edges, nodes }: { nodes?: WorkflowNodes[]; edges?: WorkflowEdges[] },
     cut?: boolean,
   ) {
     const workflowClipboardData: WorkflowClipboardData = {

@@ -13,7 +13,7 @@ import { SearchIcon } from 'lucide-react';
 import { UiListProvider } from '@altdot/ui';
 import { useDatabaseQuery } from '/@/hooks/useDatabase';
 import UiExtensionIcon from '../../ui/UiExtensionIcon';
-import { Connection, useReactFlow } from 'reactflow';
+import { Connection, useReactFlow } from '@xyflow/react';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import type {
   WorkflowEditorNodeListItem,

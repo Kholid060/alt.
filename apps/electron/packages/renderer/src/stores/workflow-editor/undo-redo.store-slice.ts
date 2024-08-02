@@ -1,8 +1,7 @@
 import { StateCreator } from 'zustand';
 import { WorkflowEditorStore } from './workflow-editor.store';
-import { XYPosition } from 'reactflow';
-import { WorkflowNodes } from '@altdot/workflow';
-import { WorkflowEdge } from '#packages/common/interface/workflow.interface';
+import { XYPosition } from '@xyflow/react';
+import { WorkflowEdges, WorkflowNodes } from '@altdot/workflow';
 
 export interface UndoRedoNodeMoveCommand {
   type: 'node-move';
@@ -16,7 +15,7 @@ export interface UndoRedoNodeAddedRemovedCommand {
 }
 
 export interface UndoRedoEdgeAddedCommand {
-  edges: WorkflowEdge[];
+  edges: WorkflowEdges[];
   type: 'edge-added' | 'edge-removed';
 }
 

@@ -1,4 +1,8 @@
-import { WORKFLOW_NODE_GROUP, WorkflowNodesMap } from '@altdot/workflow';
+import {
+  WORKFLOW_NODE_GROUP,
+  WORKFLOW_NODE_TYPE,
+  WorkflowNodesMap,
+} from '@altdot/workflow';
 import { UiListItem } from '@altdot/ui';
 import { SetRequired } from 'type-fest';
 
@@ -19,6 +23,7 @@ export type WorkflowEditorContextMenuEventPayload =
   | {
       nodeId: string;
       position: XYPosition;
+      nodeType: WORKFLOW_NODE_TYPE;
       type: WorkflowEditorContextMenuType.NODE;
     }
   | {

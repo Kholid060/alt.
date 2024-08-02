@@ -1,14 +1,13 @@
 import { sqliteTable, text, integer, index } from 'drizzle-orm/sqlite-core';
 import type {
-  WorkflowEdge,
   WorkflowSettings,
   WorkflowVariable,
 } from '#common/interface/workflow.interface';
 import { relations, sql } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import type { WORKFLOW_HISTORY_STATUS } from '#common/utils/constant/workflow.const';
-import type { WorkflowNodes } from '@altdot/workflow';
-import { Viewport } from 'reactflow';
+import type { WorkflowEdges, WorkflowNodes } from '@altdot/workflow';
+import type { Viewport } from '@xyflow/react';
 
 export const workflows = sqliteTable('workflows', {
   id: text('id')
@@ -25,7 +24,7 @@ export const workflows = sqliteTable('workflows', {
   edges: text('edges', { mode: 'json' })
     .notNull()
     .default(sql`(json_array())`)
-    .$type<WorkflowEdge[]>(),
+    .$type<WorkflowEdges[]>(),
   triggers: text('triggers', { mode: 'json' })
     .notNull()
     .default(sql`(json_array())`)

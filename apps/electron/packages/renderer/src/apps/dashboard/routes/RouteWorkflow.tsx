@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
-import ReactFlow, {
+import {
+  ReactFlow,
   Edge,
   Node,
   Panel,
@@ -8,7 +9,6 @@ import ReactFlow, {
   Background,
   OnConnectEnd,
   OnConnectStart,
-  OnEdgeUpdateFunc,
   BackgroundVariant,
   ReactFlowProvider,
   EdgeMouseHandler,
@@ -18,14 +18,15 @@ import ReactFlow, {
   NodeMouseHandler,
   OnNodesDelete,
   IsValidConnection,
-  NodeDragHandler,
   XYPosition,
   OnEdgesDelete,
   SelectionDragHandler,
   OnInit,
   useStoreApi,
   useReactFlow,
-} from 'reactflow';
+  OnReconnect,
+  OnNodeDrag,
+} from '@xyflow/react';
 import WorkflowEditorHeader from '/@/components/workflow/editor/WorkflowEditorHeader';
 import WorkflowEditorControls, {
   WorkflowUndoRedo,
@@ -48,6 +49,7 @@ import { useDashboardStore } from '/@/stores/dashboard.store';
 import WorkflowEditorEditNode from '/@/components/workflow/editor/WorkflowEditorEditNode';
 import WorkflowEventListener from '/@/components/workflow/WorkflowEventListener';
 import {
+  NodeData,
   WORKFLOW_NODE_TYPE,
   WorkflowNodeBasicNode,
   WorkflowNodeLoopNode,
@@ -55,6 +57,8 @@ import {
   WorkflowNodeConditionalNode,
   WorkflowNodes,
   WorkflowNodesProvider,
+  WorkflowEdges,
+  WorkflowNodeNoteNode,
 } from '@altdot/workflow';
 import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
 import { WorkflowEditorNodeListModal } from '/@/components/workflow/editor/WorkflowEditorNodeList';
@@ -62,17 +66,19 @@ import { UiList, useToast } from '@altdot/ui';
 import { useDocumentTitle } from '/@/hooks/useDocumentTitle';
 
 const defaultNodeTypes = Object.values(WORKFLOW_NODE_TYPE).reduce<
-  Partial<Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>>>
+  Partial<Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps<WorkflowNodes>>>>
 >((acc, curr) => {
   acc[curr] = WorkflowNodeBasicNode;
 
   return acc;
 }, {});
 const nodeTypes: Partial<
-  Record<WORKFLOW_NODE_TYPE | 'default', React.FC<NodeProps>>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Record<WORKFLOW_NODE_TYPE | 'default', React.FC<any>>
 > = {
   ...defaultNodeTypes,
   default: WorkflowNodeBasicNode,
+  [WORKFLOW_NODE_TYPE.NOTE]: WorkflowNodeNoteNode,
   [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoopNode,
   [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeCommandNode,
   [WORKFLOW_NODE_TYPE.CONDITIONAL]: WorkflowNodeConditionalNode,
@@ -168,11 +174,12 @@ function WorkflowEditor() {
   );
 
   const onPaneContextMenu = useCallback(
-    (event: React.MouseEvent) =>
+    (event: MouseEvent | React.MouseEvent) => {
       workflowEditorEvent.emit('context-menu:open', {
         type: WorkflowEditorContextMenuType.PANE,
         position: { x: event.clientX, y: event.clientY },
-      }),
+      });
+    },
     [workflowEditorEvent],
   );
   const onNodeContextMenu = useCallback(
@@ -180,6 +187,7 @@ function WorkflowEditor() {
       workflowEditorEvent.emit('context-menu:open', {
         nodeId: node.id,
         type: WorkflowEditorContextMenuType.NODE,
+        nodeType: node.type as WORKFLOW_NODE_TYPE,
         position: { x: event.clientX, y: event.clientY },
       }),
     [workflowEditorEvent],
@@ -203,7 +211,7 @@ function WorkflowEditor() {
     [workflowEditorEvent],
   );
 
-  const onEdgeUpdate: OnEdgeUpdateFunc = useCallback(
+  const onReconnect: OnReconnect = useCallback(
     (oldEdge, newConnection) => {
       updateEdge(oldEdge, newConnection);
     },
@@ -215,7 +223,7 @@ function WorkflowEditor() {
     },
     [deleteEdgeBy],
   );
-  const onEdgesChange: OnEdgesChange = useCallback(
+  const onEdgesChange: OnEdgesChange<WorkflowEdges> = useCallback(
     (edges) => {
       if (!applyChanges.current) return;
       applyElementChanges({ edges });
@@ -225,7 +233,6 @@ function WorkflowEditor() {
   const onNodesChange: OnNodesChange = useCallback(
     (nodes) => {
       if (!applyChanges.current) return;
-
       applyElementChanges({ nodes });
     },
     [applyElementChanges],
@@ -236,7 +243,7 @@ function WorkflowEditor() {
     },
     [setEditNode],
   );
-  const onInit: OnInit = useCallback(
+  const onInit: OnInit<WorkflowNodes, WorkflowEdges> = useCallback(
     (reactFlow) => {
       setTimeout(() => {
         applyChanges.current = true;
@@ -273,7 +280,7 @@ function WorkflowEditor() {
     },
     [setEditNode, addCommands],
   );
-  const onNodeDragStop: NodeDragHandler = useCallback(
+  const onNodeDragStop: OnNodeDrag = useCallback(
     (_event, _node, nodes) => {
       const positions = nodeMoveChanges.current;
       if (!positions) return;
@@ -308,14 +315,11 @@ function WorkflowEditor() {
     },
     [addCommands],
   );
-  const onNodeDragStart: NodeDragHandler = useCallback(
-    (_event, _node, nodes) => {
-      nodeMoveChanges.current = new Map(
-        nodes.map((node) => [node.id, node.position]),
-      );
-    },
-    [],
-  );
+  const onNodeDragStart: OnNodeDrag = useCallback((_event, _node, nodes) => {
+    nodeMoveChanges.current = new Map(
+      nodes.map((node) => [node.id, node.position]),
+    );
+  }, []);
   const onSelectionDragStart: SelectionDragHandler = useCallback((_, nodes) => {
     nodeMoveChanges.current = new Map(
       nodes.map((node) => [node.id, node.position]),
@@ -374,7 +378,7 @@ function WorkflowEditor() {
   if (!nodes || !edges) return null;
 
   return (
-    <ReactFlow
+    <ReactFlow<WorkflowNodes, WorkflowEdges>
       nodes={nodes}
       tabIndex={-1}
       edges={edges}
@@ -384,8 +388,8 @@ function WorkflowEditor() {
       edgeTypes={edgeTypes}
       elevateNodesOnSelect
       onConnect={onConnect}
+      onReconnect={onReconnect}
       onConnectEnd={onConnectEnd}
-      onEdgeUpdate={onEdgeUpdate}
       onEdgesDelete={onEdgesDelete}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
@@ -432,11 +436,12 @@ function WorkflowNodesWrapper({ children }: { children?: React.ReactNode }) {
   } = useWorkflowEditor();
 
   function openContextMenu(
-    nodeId: string,
+    node: NodeData<WorkflowNodes>,
     { clientX, clientY }: React.MouseEvent,
   ) {
     workflowEditorEvent.emit('context-menu:open', {
-      nodeId,
+      nodeId: node.id,
+      nodeType: node.data.$nodeType,
       position: { x: clientX, y: clientY },
       type: WorkflowEditorContextMenuType.NODE,
     });
@@ -454,7 +459,7 @@ function WorkflowNodesWrapper({ children }: { children?: React.ReactNode }) {
       )}
       extCommandChecker={isExtCommandExists}
       onRunWorkflow={(node) => runCurrentWorkflow({ startNodeId: node.id })}
-      onOpenContextMenu={(node, event) => openContextMenu(node.id, event)}
+      onOpenContextMenu={(node, event) => openContextMenu(node, event)}
       onToggleDisable={(node, isDisabled) =>
         updateNodeData(node.id, { isDisabled })
       }

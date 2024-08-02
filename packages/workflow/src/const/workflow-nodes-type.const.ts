@@ -1,4 +1,5 @@
 export enum WORKFLOW_NODE_TYPE {
+  NOTE = 'node-note',
   LOOP = 'node-loop',
   CODE = 'node-code',
   DELAY = 'node-delay',

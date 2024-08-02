@@ -21,6 +21,6 @@
       "#common/*": ["../common/*"],
     }
   },
-  "include": ["src/**/*.ts", "../../types/**/*.d.ts","reactflow"],
+  "include": ["src/**/*.ts", "../../types/**/*.d.ts"],
   "exclude": ["**/*.spec.ts", "**/*.test.ts"]
 }

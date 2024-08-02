@@ -28,6 +28,7 @@ import {
   LocateFixedIcon,
   BracketsIcon,
   FileUpIcon,
+  StickyNoteIcon,
 } from 'lucide-react';
 import { WORKFLOW_NODE_TYPE } from './workflow-nodes-type.const';
 
@@ -440,5 +441,20 @@ export const WORKFLOW_NODES: {
     handleTarget: ['default'],
     handleSource: ['default'],
     type: WORKFLOW_NODE_TYPE.SELECT_FILE,
+  },
+  [WORKFLOW_NODE_TYPE.NOTE]: {
+    title: 'Note',
+    group: 'Core',
+    icon: StickyNoteIcon,
+    subtitle: 'Core',
+    defaultData: {
+      content: '',
+      isDisabled: false,
+      color: 'rgb(var(--background))',
+      $nodeType: WORKFLOW_NODE_TYPE.NOTE,
+    },
+    handleTarget: ['default'],
+    handleSource: ['default'],
+    type: WORKFLOW_NODE_TYPE.NOTE,
   },
 } as const;

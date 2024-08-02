@@ -1,7 +1,7 @@
 import type { ExtensionAPI } from '@altdot/extension';
 import type { WORKFLOW_NODE_TYPE } from '../const/workflow-nodes-type.const';
 import type { KeyboardShortcut, BrowserType } from '@altdot/shared';
-import type { Edge, Node } from 'reactflow';
+import type { Edge, Node } from '@xyflow/react';
 import { ExtensionCommandArgument } from '@altdot/extension/dist/extension-manifest';
 
 export type WorkflowEdges = Edge;
@@ -30,7 +30,7 @@ export type WorkflowNodeExpressionRecords = Record<
   WorkflowNodeExpressionData
 >;
 
-export interface WorkflowNodeBaseData<T extends WORKFLOW_NODE_TYPE> {
+export type WorkflowNodeBaseData<T extends WORKFLOW_NODE_TYPE> = {
   $nodeType: T;
   isDisabled: boolean;
   description?: string;
@@ -38,10 +38,10 @@ export interface WorkflowNodeBaseData<T extends WORKFLOW_NODE_TYPE> {
   $outputVarMode?: WorkflowVariableMode;
   $expData?: WorkflowNodeExpressionRecords;
   $errorHandler?: WorkflowNodeErrorHandler;
-}
+};
 
 export type WorkflowNodeBase<
-  T = unknown,
+  T extends Record<string, unknown> = Record<string, unknown>,
   P extends WORKFLOW_NODE_TYPE = WORKFLOW_NODE_TYPE,
 > = Node<T & WorkflowNodeBaseData<P>, P> & { type: P };
 
@@ -91,7 +91,7 @@ export type WorkflowNodeCode = WorkflowNodeBase<
 >;
 
 export type WorkflowNodeDoNothing = WorkflowNodeBase<
-  object,
+  Record<string, unknown>,
   WORKFLOW_NODE_TYPE.DO_NOTHING
 >;
 
@@ -179,7 +179,7 @@ export type WorkflowNodeHttpRequest = WorkflowNodeBase<
 >;
 
 export type WorkflowNodeTrigger = WorkflowNodeBase<
-  object,
+  Record<string, unknown>,
   WORKFLOW_NODE_TYPE.TRIGGER
 >;
 export type WorkflowNodeTriggerShortcut = WorkflowNodeBase<
@@ -228,7 +228,7 @@ export type WorkflowNodeInsertData = WorkflowNodeBase<
 >;
 
 export type WorkflowNodeTriggerExecuteWorkflow = WorkflowNodeBase<
-  object,
+  Record<string, unknown>,
   WORKFLOW_NODE_TYPE.TRIGGER_EXECUTE_WORKFLOW
 >;
 
@@ -301,7 +301,16 @@ export type WorkflowNodeSelectFile = WorkflowNodeBase<
   WORKFLOW_NODE_TYPE.SELECT_FILE
 >;
 
+export type WorkflowNodeNote = WorkflowNodeBase<
+  {
+    color: string;
+    content: string;
+  },
+  WORKFLOW_NODE_TYPE.NOTE
+>;
+
 export interface WorkflowNodesMap {
+  [WORKFLOW_NODE_TYPE.NOTE]: WorkflowNodeNote;
   [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoop;
   [WORKFLOW_NODE_TYPE.CODE]: WorkflowNodeCode;
   [WORKFLOW_NODE_TYPE.DELAY]: WorkflowNodeDelay;
@@ -328,4 +337,29 @@ export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.TRIGGER_EXECUTE_WORKFLOW]: WorkflowNodeTriggerExecuteWorkflow;
 }
 
-export type WorkflowNodes = WorkflowNodesMap[keyof WorkflowNodesMap];
+export type WorkflowNodes =
+  | WorkflowNodeNote
+  | WorkflowNodeLoop
+  | WorkflowNodeCode
+  | WorkflowNodeDelay
+  | WorkflowNodeCommand
+  | WorkflowNodeTrigger
+  | WorkflowNodeClipboard
+  | WorkflowNodeDoNothing
+  | WorkflowNodeBreakLoop
+  | WorkflowNodeSelectFile
+  | WorkflowNodeBrowserTab
+  | WorkflowNodeInsertData
+  | WorkflowNodeUseBrowser
+  | WorkflowNodeFileSystem
+  | WorkflowNodeConditional
+  | WorkflowNodeHttpRequest
+  | WorkflowNodeNotification
+  | WorkflowNodeBrowserMouse
+  | WorkflowNodeWaitSelector
+  | WorkflowNodeGetElementText
+  | WorkflowNodeBrowserKeyboard
+  | WorkflowNodeExecuteWorkflow
+  | WorkflowNodeTriggerShortcut
+  | WorkflowNodeElementAttributes
+  | WorkflowNodeTriggerExecuteWorkflow;

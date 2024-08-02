@@ -5,7 +5,7 @@ import {
   Position,
   getBezierPath,
   getSmoothStepPath,
-} from 'reactflow';
+} from '@xyflow/react';
 
 export const WorkflowEdgeDefault = memo(
   ({

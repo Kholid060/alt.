@@ -1,4 +1,4 @@
-@import 'reactflow/dist/style.css';
+@import '@xyflow/react/dist/style.css';
 
 .react-flow__handle {
   width: theme(spacing.3);
@@ -10,14 +10,14 @@
   }
 
   &-left {
-    left: -6px;
     border: none;
+    left: 0px !important;
     height: theme(spacing.8);
     border-radius: theme(borderRadius.sm);
     background-color: theme(colors.primary.DEFAULT);
   }
   &-right {
-    right: -7px;
+    right: 0px !important;
     width: theme(spacing.4);
     height: theme(spacing.4);
     border-radius: theme(borderRadius.full);

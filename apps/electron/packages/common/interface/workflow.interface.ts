@@ -1,4 +1,3 @@
-import type * as ReactFlow from 'reactflow';
 import type { SetOptional } from 'type-fest';
 import type { WORKFLOW_MANUAL_TRIGGER_ID } from '../utils/constant/workflow.const';
 import type {
@@ -8,8 +7,6 @@ import type {
 } from '@altdot/workflow';
 
 export type WorkflowNodeErroHandlerAction = 'continue' | 'stop' | 'fallback';
-
-export type WorkflowEdge = ReactFlow.Edge;
 
 export type WorkflowGetNode<T extends WORKFLOW_NODE_TYPE> = Extract<
   WorkflowNodes,
@@ -45,7 +42,7 @@ export interface WorkflowRunPayload {
 export interface WorkflowSettings {}
 
 export interface WorkflowElement {
-  edges: WorkflowEdge[];
+  edges: WorkflowEdges[];
   nodes: WorkflowNodes[];
 }
 

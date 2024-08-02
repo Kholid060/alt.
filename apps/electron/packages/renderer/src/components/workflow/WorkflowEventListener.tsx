@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Viewport, useOnViewportChange } from 'reactflow';
+import { Viewport, useOnViewportChange } from '@xyflow/react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';

@@ -14,16 +14,17 @@ import {
   WorkflowEditorContextMenuType,
 } from '/@/interface/workflow-editor.interface';
 import UiShortcut from '../../ui/UiShortcut';
-import { useReactFlow } from 'reactflow';
+import { useReactFlow } from '@xyflow/react';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import preloadAPI from '/@/utils/preloadAPI';
 import { WORKFLOW_ELEMENT_FORMAT } from '#packages/common/utils/constant/workflow.const';
 import { isIPCEventError } from '/@/utils/helper';
+import { WorkflowElement } from '#packages/common/interface/workflow.interface';
 import {
-  WorkflowEdge,
-  WorkflowElement,
-} from '#packages/common/interface/workflow.interface';
-import { WorkflowNodes } from '@altdot/workflow';
+  WORKFLOW_NODE_TYPE,
+  WorkflowEdges,
+  WorkflowNodes,
+} from '@altdot/workflow';
 
 const ContextMenuContext =
   // @ts-expect-error not default val is expected
@@ -81,7 +82,7 @@ function ContextMenuItemClipboard({
     let element: WorkflowElement = { edges: [], nodes: [] };
     if (edgeId && !copySelection) {
       const edge = getEdge(edgeId);
-      if (edge) element.edges.push(edge as WorkflowEdge);
+      if (edge) element.edges.push(edge as WorkflowEdges);
     }
     if (nodeId && !copySelection) {
       const node = getNode(nodeId);
@@ -234,13 +235,19 @@ function ContextMenuNode() {
 
   return (
     <>
-      <UiContextMenuItem onClick={editCurrentNode}>Edit</UiContextMenuItem>
-      <UiContextMenuItem
-        onClick={() => runCurrentWorkflow({ startNodeId: contextMenu.nodeId })}
-      >
-        Run workflow from here
-      </UiContextMenuItem>
-      <UiContextMenuSeparator />
+      {contextMenu.nodeType !== WORKFLOW_NODE_TYPE.NOTE && (
+        <>
+          <UiContextMenuItem onClick={editCurrentNode}>Edit</UiContextMenuItem>
+          <UiContextMenuItem
+            onClick={() =>
+              runCurrentWorkflow({ startNodeId: contextMenu.nodeId })
+            }
+          >
+            Run workflow from here
+          </UiContextMenuItem>
+          <UiContextMenuSeparator />
+        </>
+      )}
       <UiContextMenuItem onClick={copyNodeId}>Copy node id</UiContextMenuItem>
       <ContextMenuItemClipboard nodeId={contextMenu.nodeId} />
       <ContextMenuItemPaste />

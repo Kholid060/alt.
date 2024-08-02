@@ -4,7 +4,7 @@ import {
 } from '@/interface/workflow-nodes.interface';
 import { createContext, useContext } from 'react';
 
-interface NodeData<T extends WorkflowNodes = WorkflowNodes> {
+export interface NodeData<T extends WorkflowNodes = WorkflowNodes> {
   id: string;
   data: T['data'];
 }

@@ -2,25 +2,28 @@ import {
   type Edge,
   addEdge,
   Connection,
-  updateEdge,
   NodeChange,
   EdgeChange,
+  reconnectEdge,
   applyEdgeChanges,
   applyNodeChanges,
   Node,
-} from 'reactflow';
+} from '@xyflow/react';
 import { create } from 'zustand';
 import { subscribeWithSelector } from 'zustand/middleware';
 import createStoreSelectors from '../../utils/createStoreSelector';
 import { nanoid } from 'nanoid/non-secure';
 import {
-  WorkflowEdge,
   WorkflowElement,
   WorkflowNewNode,
 } from '#common/interface/workflow.interface';
 import { WORKFLOW_NODE_TRIGGERS } from '#packages/common/utils/constant/workflow.const';
 import { createDebounce } from '@altdot/shared';
-import { WORKFLOW_NODE_TYPE, WorkflowNodes } from '@altdot/workflow';
+import {
+  WORKFLOW_NODE_TYPE,
+  WorkflowEdges,
+  WorkflowNodes,
+} from '@altdot/workflow';
 import {
   UndoRedoStoreSlice,
   createUndoRedoStoreSlice,
@@ -118,7 +121,11 @@ const workflowEditorStore = create(
       return nodeFound;
     },
     setEditNode(node) {
-      if (get().editNode?.id === node?.id) return;
+      if (
+        node?.type === WORKFLOW_NODE_TYPE.NOTE ||
+        get().editNode?.id === node?.id
+      )
+        return;
 
       set({ editNode: structuredClone(node), isEditNodeDirty: false });
     },
@@ -177,8 +184,7 @@ const workflowEditorStore = create(
       if (edges) updatedElement.edges = applyEdgeChanges(edges, workflow.edges);
       if (nodes) {
         enableWorkflowSaveBtn =
-          enableWorkflowSaveBtnState ||
-          (nodes.length > 1 && nodes[0].type === 'select');
+          enableWorkflowSaveBtnState || nodes[0].type !== 'select';
         updatedElement.nodes = applyNodeChanges(
           nodes,
           workflow.nodes as Node[],
@@ -222,7 +228,7 @@ const workflowEditorStore = create(
         if (!oldEdge) return {};
 
         return {
-          edges: updateEdge(oldEdge, connection, workflow.edges),
+          edges: reconnectEdge(oldEdge, connection, workflow.edges),
         };
       });
 
@@ -292,9 +298,9 @@ const workflowEditorStore = create(
           return addEdge({ ...connection, id: edgeId }, acc);
         }, workflow.edges ?? []);
 
-        const addedEdges = newEdgeIds.reduce<WorkflowEdge[]>((acc, edgeId) => {
+        const addedEdges = newEdgeIds.reduce<WorkflowEdges[]>((acc, edgeId) => {
           const edge = newEdges.find((edge) => edge.id === edgeId);
-          if (edge) acc.push(edge as WorkflowEdge);
+          if (edge) acc.push(edge as WorkflowEdges);
 
           return acc;
         }, []);
@@ -309,7 +315,7 @@ const workflowEditorStore = create(
     },
     deleteEdgeBy(by, ids) {
       get().updateWorkflow((workflow) => {
-        const deletedEdges: WorkflowEdge[] = [];
+        const deletedEdges: WorkflowEdges[] = [];
 
         const edgeIds = new Set(ids);
         const newEdges = workflow.edges.filter((edge) => {

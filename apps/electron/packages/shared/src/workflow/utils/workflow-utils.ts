@@ -1,5 +1,5 @@
 import { WorkflowEdges, WorkflowNodes } from '@altdot/workflow';
-import type { Edge, Node } from 'reactflow';
+import type { Edge, Node } from '@xyflow/react';
 
 export function extractWorkflowNodeHandleType(handle: string) {
   const handles = handle.split(':');

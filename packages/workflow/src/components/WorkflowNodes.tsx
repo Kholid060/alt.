@@ -2,10 +2,12 @@ import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Handle,
   NodeProps,
+  NodeResizer,
   NodeToolbar,
   Position,
+  useReactFlow,
   useUpdateNodeInternals,
-} from 'reactflow';
+} from '@xyflow/react';
 import { UiList, UiTooltip } from '@altdot/ui';
 import clsx from 'clsx';
 import {
@@ -13,6 +15,7 @@ import {
   CircleAlertIcon,
   CopyIcon,
   EllipsisIcon,
+  PaletteIcon,
   PlayIcon,
   ToggleLeftIcon,
   ToggleRightIcon,
@@ -30,6 +33,7 @@ import {
   WorkflowNodeLoop,
   WorkflowNodes,
 } from '@/interface/workflow-nodes.interface';
+import { WorkflowNodeNote } from '../../dist';
 
 function NodeHandleWithLabel({
   label,
@@ -123,8 +127,12 @@ function NodeErrorHandlerHandle({
 function NodeToolbarMenu({
   nodeId,
   nodeData,
+  showRunNode = true,
+  showDisableNode = true,
 }: {
   nodeId: string;
+  showRunNode?: boolean;
+  showDisableNode?: boolean;
   nodeData: WorkflowNodes['data'];
 }) {
   const nodesCtx = useWorkflowNodes();
@@ -136,21 +144,23 @@ function NodeToolbarMenu({
       align="start"
       className="bg-background rounded-lg border p-1 flex items-center gap-0.5"
     >
-      <NodeToolbarButton
-        title={nodeData.isDisabled ? 'Enable' : 'Disable'}
-        onClick={() =>
-          nodesCtx.onToggleDisable?.(
-            { id: nodeId, data: nodeData },
-            !nodeData.isDisabled,
-          )
-        }
-      >
-        {nodeData.isDisabled ? (
-          <ToggleLeftIcon className="h-6 w-6" />
-        ) : (
-          <ToggleRightIcon className="h-6 w-6 fill-primary stroke-foreground" />
-        )}
-      </NodeToolbarButton>
+      {showDisableNode && (
+        <NodeToolbarButton
+          title={nodeData.isDisabled ? 'Enable' : 'Disable'}
+          onClick={() =>
+            nodesCtx.onToggleDisable?.(
+              { id: nodeId, data: nodeData },
+              !nodeData.isDisabled,
+            )
+          }
+        >
+          {nodeData.isDisabled ? (
+            <ToggleLeftIcon className="h-6 w-6" />
+          ) : (
+            <ToggleRightIcon className="h-6 w-6 fill-primary stroke-foreground" />
+          )}
+        </NodeToolbarButton>
+      )}
       <NodeToolbarButton
         title="Copy node"
         onClick={() => {
@@ -159,12 +169,16 @@ function NodeToolbarMenu({
       >
         <CopyIcon size="18px" />
       </NodeToolbarButton>
-      <NodeToolbarButton
-        title="Run workflow from here"
-        onClick={() => nodesCtx.onRunWorkflow?.({ id: nodeId, data: nodeData })}
-      >
-        <PlayIcon size="18px" />
-      </NodeToolbarButton>
+      {showRunNode && (
+        <NodeToolbarButton
+          title="Run workflow from here"
+          onClick={() =>
+            nodesCtx.onRunWorkflow?.({ id: nodeId, data: nodeData })
+          }
+        >
+          <PlayIcon size="18px" />
+        </NodeToolbarButton>
+      )}
       <hr className="h-6 block bg-border border-0 w-px mx-1" />
       <NodeToolbarButton
         title="Delete node"
@@ -243,60 +257,65 @@ function NodeCard({
   );
 }
 
-export const WorkflowNodeCommandNode: React.FC<
-  NodeProps<WorkflowNodeCommand['data']>
-> = memo(({ id, data }) => {
-  const { extCommandChecker, resolveExtIcon } = useWorkflowNodes();
+export const WorkflowNodeCommandNode: React.FC<NodeProps<WorkflowNodeCommand>> =
+  memo(({ id, data }) => {
+    const { extCommandChecker, resolveExtIcon } = useWorkflowNodes();
 
-  const [commandExists, setCommandExists] = useState(true);
+    const [commandExists, setCommandExists] = useState(true);
 
-  const extensionIcon = useMemo(() => resolveExtIcon({ id, data }), []);
+    const extensionIcon = useMemo(() => resolveExtIcon({ id, data }), []);
 
-  useEffect(() => {
-    const command = extCommandChecker(`${data.extension.id}:${data.commandId}`);
-    command.result.then(setCommandExists).catch(() => {
-      // do nothing
-    });
+    useEffect(() => {
+      const command = extCommandChecker(
+        `${data.extension.id}:${data.commandId}`,
+      );
+      command.result.then(setCommandExists).catch(() => {
+        // do nothing
+      });
 
-    return () => command.cancel();
-  }, [data.commandId, data.extension.id, extCommandChecker]);
+      return () => command.cancel();
+    }, [data.commandId, data.extension.id, extCommandChecker]);
 
-  return (
-    <>
-      <NodeToolbarMenu nodeId={id} nodeData={data} />
-      <NodeCard
-        title={data.title}
-        isDisabled={data.isDisabled}
-        description={data.description}
-        subtitle={data.extension.title}
-        icon={extensionIcon}
-      >
-        <Handle type="target" position={Position.Left} />
-        <Handle type="source" position={Position.Right} id={`default:${id}`} />
-        <NodeErrorHandlerHandle
-          nodeId={id}
-          errorHandlerAction={data.$errorHandler?.action}
-        />
-        {!commandExists && (
-          <UiTooltip
-            label={
-              <p className="text-xs max-w-64 text-muted-foreground leading-tight">
-                Couldn&apos;t find the command. <br /> Make sure the extension
-                that include this command is installed.
-              </p>
-            }
-          >
-            <TriangleAlertIcon className="absolute h-4 w-4 text-destructive-text top-2 right-2" />
-          </UiTooltip>
-        )}
-      </NodeCard>
-    </>
-  );
-});
+    return (
+      <>
+        <NodeToolbarMenu nodeId={id} nodeData={data} />
+        <NodeCard
+          title={data.title}
+          isDisabled={data.isDisabled}
+          description={data.description}
+          subtitle={data.extension.title}
+          icon={extensionIcon}
+        >
+          <Handle type="target" position={Position.Left} />
+          <Handle
+            type="source"
+            position={Position.Right}
+            id={`default:${id}`}
+          />
+          <NodeErrorHandlerHandle
+            nodeId={id}
+            errorHandlerAction={data.$errorHandler?.action}
+          />
+          {!commandExists && (
+            <UiTooltip
+              label={
+                <p className="text-xs max-w-64 text-muted-foreground leading-tight">
+                  Couldn&apos;t find the command. <br /> Make sure the extension
+                  that include this command is installed.
+                </p>
+              }
+            >
+              <TriangleAlertIcon className="absolute h-4 w-4 text-destructive-text top-2 right-2" />
+            </UiTooltip>
+          )}
+        </NodeCard>
+      </>
+    );
+  });
 WorkflowNodeCommandNode.displayName = 'WorkflowNodeCommand';
 
 export const WorkflowNodeConditionalNode: React.FC<
-  NodeProps<WorkflowNodeConditional['data']>
+  NodeProps<WorkflowNodeConditional>
 > = memo(({ id, data }) => {
   const updateNodeInternals = useUpdateNodeInternals();
 
@@ -345,53 +364,53 @@ export const WorkflowNodeConditionalNode: React.FC<
 });
 WorkflowNodeConditionalNode.displayName = 'WorkflowNodeConditional';
 
-export const WorkflowNodeLoopNode: React.FC<
-  NodeProps<WorkflowNodeLoop['data']>
-> = memo(({ id, data }) => {
-  const nodeData = WORKFLOW_NODES[WORKFLOW_NODE_TYPE.LOOP];
+export const WorkflowNodeLoopNode: React.FC<NodeProps<WorkflowNodeLoop>> = memo(
+  ({ id, data }) => {
+    const nodeData = WORKFLOW_NODES[WORKFLOW_NODE_TYPE.LOOP];
 
-  return (
-    <>
-      <NodeToolbarMenu nodeId={id} nodeData={data} />
-      <NodeCard
-        title={nodeData.title}
-        isDisabled={data.isDisabled}
-        subtitle={nodeData.subtitle}
-        description={data.description}
-        icon={<UiList.Icon icon={nodeData.icon} />}
-        handleSlot={
-          <>
-            <Handle
-              type="source"
-              position={Position.Right}
-              id={`start-loop:${id}`}
-              style={{ right: -9 }}
+    return (
+      <>
+        <NodeToolbarMenu nodeId={id} nodeData={data} />
+        <NodeCard
+          title={nodeData.title}
+          isDisabled={data.isDisabled}
+          subtitle={nodeData.subtitle}
+          description={data.description}
+          icon={<UiList.Icon icon={nodeData.icon} />}
+          handleSlot={
+            <>
+              <Handle
+                type="source"
+                position={Position.Right}
+                id={`start-loop:${id}`}
+                style={{ right: -9 }}
+              />
+            </>
+          }
+        >
+          <Handle type="target" position={Position.Left} />
+          <div className="text-right h-6">
+            <NodeHandleWithLabel
+              label="loop end"
+              handleId={`default:${id}`}
+              style={{ position: 'relative', bottom: 10, right: -9 }}
+              className="text-orange-500"
             />
-          </>
-        }
-      >
-        <Handle type="target" position={Position.Left} />
-        <div className="text-right h-6">
-          <NodeHandleWithLabel
-            label="loop end"
-            handleId={`default:${id}`}
-            style={{ position: 'relative', bottom: 10, right: -9 }}
-            className="text-orange-500"
+          </div>
+          <NodeErrorHandlerHandle
+            nodeId={id}
+            style={{ right: -7 }}
+            errorHandlerAction={data.$errorHandler?.action}
           />
-        </div>
-        <NodeErrorHandlerHandle
-          nodeId={id}
-          style={{ right: -7 }}
-          errorHandlerAction={data.$errorHandler?.action}
-        />
-      </NodeCard>
-    </>
-  );
-});
+        </NodeCard>
+      </>
+    );
+  },
+);
 WorkflowNodeLoopNode.displayName = 'WorkflowNodeLoop';
 
-export const WorkflowNodeBasicNode: React.FC<NodeProps<WorkflowNodes['data']>> =
-  memo(({ id, type, data }) => {
+export const WorkflowNodeBasicNode: React.FC<NodeProps<WorkflowNodes>> = memo(
+  ({ id, type, data }) => {
     const nodeData = WORKFLOW_NODES[type as WORKFLOW_NODE_TYPE] ||
       WORKFLOW_NODES[data.$nodeType as WORKFLOW_NODE_TYPE] || {
         handleSource: [],
@@ -428,5 +447,73 @@ export const WorkflowNodeBasicNode: React.FC<NodeProps<WorkflowNodes['data']>> =
         </NodeCard>
       </>
     );
-  });
+  },
+);
 WorkflowNodeBasicNode.displayName = 'WorkflowNodeBasic';
+
+const NOTE_COLORS = [
+  'rgb(var(--background))',
+  '#6e56cf',
+  '#0090ff',
+  '#12a594',
+  '#f76b15',
+  '#e54666',
+];
+
+// wat 🤯
+export const WorkflowNodeNoteNode: React.FC<NodeProps<WorkflowNodeNote>> = memo(
+  ({ id, data, selected }) => {
+    const nodeData = WORKFLOW_NODES[WORKFLOW_NODE_TYPE.NOTE];
+    const { updateNodeData } = useReactFlow();
+
+    return (
+      <>
+        <NodeResizer minWidth={160} minHeight={160} isVisible={selected} />
+        <NodeToolbarMenu
+          nodeId={id}
+          nodeData={data}
+          showRunNode={false}
+          showDisableNode={false}
+        />
+        <div
+          className="bg-background h-full w-full rounded-lg border-2 text-sm min-h-40 min-w-40 flex flex-col"
+          style={{ backgroundColor: data.color }}
+        >
+          <div className="flex items-center p-2 border-b border-black/25 text-xs relative">
+            <nodeData.icon className="size-4" />
+            <p className="ml-1 flex-1">Note</p>
+            <div
+              style={{ backgroundColor: data.color }}
+              className="size-5 rounded-full border group flex items-center justify-center"
+            >
+              <PaletteIcon className="size-3 opacity-80" />
+              <div
+                style={{ backgroundColor: data.color }}
+                className="absolute group-hover:flex hidden h-full w-full items-center top-0 left-0 gap-1 justify-end rounded-t-lg px-2"
+              >
+                {NOTE_COLORS.map((color) => (
+                  <button
+                    key={color}
+                    style={{ backgroundColor: color }}
+                    className="size-5 rounded-full border block"
+                    onClick={() => updateNodeData(id, { color })}
+                  ></button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <textarea
+            style={{ resize: 'none' }}
+            defaultValue={data.content}
+            placeholder="Write a note here..."
+            className="flex-1 w-full p-2 focus:outline-none rounded-b-lg bg-transparent"
+            onChange={(event) =>
+              updateNodeData(id, { content: event.target.value })
+            }
+          ></textarea>
+        </div>
+      </>
+    );
+  },
+);
+WorkflowNodeNoteNode.displayName = 'WorkflowNodeNote';
