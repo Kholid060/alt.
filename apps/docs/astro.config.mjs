@@ -26,6 +26,10 @@ export default defineConfig({
 					autogenerate: { directory: 'extensions' },
 				},
 				{
+					label: 'Workflow',
+					autogenerate: { directory: 'workflow' },
+				},
+				{
 					label: 'Reference',
 					autogenerate: { directory: 'reference' },
 				},
