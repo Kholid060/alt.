@@ -14,7 +14,10 @@ import {
   BrowserExtensionSocket,
 } from './browser-extension.interface';
 
-@WebSocketGateway(APP_WEBSOCKET_PORT, { namespace: '/extensions' })
+@WebSocketGateway(APP_WEBSOCKET_PORT, {
+  pingInterval: 20_000,
+  namespace: '/extensions',
+})
 export class BrowserExtensionGateway
   implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect
 {

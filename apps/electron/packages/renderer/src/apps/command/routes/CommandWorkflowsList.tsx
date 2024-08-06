@@ -19,10 +19,9 @@ function CommandWorkflowsList() {
       transform(data): CommandListItemWorkflow[] {
         return data.map((workflow) => {
           return {
-            group: '',
+            group: workflow.isPinned ? 'Pinned' : 'All',
             icon: workflow.icon,
             title: workflow.name,
-            subtitle: 'Workflow',
             value: `workflow:${workflow.id}`,
             metadata: {
               type: 'workflow',

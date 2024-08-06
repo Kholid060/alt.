@@ -320,8 +320,8 @@ export class ExtensionService implements OnAppReady {
   ) {
     await this.extensionCommand.updateCommand(id, data);
 
-    if (data.shortcut) {
-      this.toggleShortcut(id.extensionId, id.commandId, data.shortcut);
+    if (Object.hasOwn(data, 'shortcut')) {
+      this.toggleShortcut(id.extensionId, id.commandId, data.shortcut!);
     }
   }
 }
