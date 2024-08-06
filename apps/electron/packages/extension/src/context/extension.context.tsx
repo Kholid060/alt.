@@ -4,7 +4,7 @@ import { useUiListStore } from '@altdot/ui/dist/context/list.context';
 import {
   ExtensionMessagePortCallback,
   ExtensionMessagePortEvent,
-} from '../../../interfaces/message-events';
+} from '@altdot/extension';
 
 interface ExtensionContextState {
   query: string;

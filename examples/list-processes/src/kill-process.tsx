@@ -1,9 +1,8 @@
 import {
   _extension,
-  UiExtIcon,
+  UiIcons,
   UiList,
   UiListItem,
-  commandRenderer,
   UiImage,
 } from '@altdot/extension';
 import { useEffect, useState, useCallback } from 'react';
@@ -86,7 +85,7 @@ function ListProcess() {
       {
         type: 'button',
         value: 'open-location',
-        icon: UiExtIcon.FolderOpen,
+        icon: UiIcons.FolderOpen,
         title: 'Open file location',
         onAction() {
           _extension.shell.showItemInFolder(item.path);
@@ -96,7 +95,7 @@ function ListProcess() {
         type: 'button',
         value: 'reload',
         title: 'Reload',
-        icon: UiExtIcon.RotateCw,
+        icon: UiIcons.RotateCw,
         shortcut: { key: 'r', mod1: 'ctrlKey' },
         onAction() {
           loadProsses(true);
@@ -140,4 +139,4 @@ function ListProcess() {
   );
 }
 
-export default commandRenderer(ListProcess);
+export default ListProcess;

@@ -1,4 +1,3 @@
-import { UiIcons } from '@altdot/ui';
 import { BetterMessagePort } from '@altdot/shared';
 import {
   CreateExtensionAPI,
@@ -16,15 +15,13 @@ import type {
 import { PRELOAD_API_KEY } from '#common/utils/constant/constant';
 import { ExtensionErrorUnhandledVanilla } from './components/extension-errors';
 import { applyTheme } from '#common/utils/helper';
+import injectComponents from './utils/injectComponents';
 
 declare global {
   interface Window {
     $$extIPC: CreateExtensionAPI['sendMessage'];
   }
 }
-
-// @ts-expect-error icons for the extension
-window.$UiExtIcons = UiIcons;
 
 type ExtensionMessagePort = BetterMessagePort<
   ExtensionMessagePortEventAsync,
@@ -70,6 +67,7 @@ async function onMessage({
 
     const messagePort: ExtensionMessagePort = new BetterMessagePort(port);
     await injectExtensionAPI(messagePort, data.payload.browserCtx);
+    injectComponents();
     await extViewRenderer(
       {
         messagePort: messagePort.sync,

@@ -20,5 +20,8 @@
     "globals": "^15.8.0",
     "typescript": "^5.5.3",
     "typescript-eslint": "^7.16.1"
+  },
+  "dependencies": {
+    "@altdot/extension": "^0.0.9"
   }
 }

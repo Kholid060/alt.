@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import {
   UiList,
-  UiExtIcon,
+  UiIcons,
   UiSkeleton,
-  commandRenderer,
   type UiListItem,
   _extension,
 } from '@altdot/extension';
@@ -32,7 +31,7 @@ function ListGDFiles() {
         type: 'button',
         value: 'copy-url',
         title: 'Copy file link',
-        icon: UiExtIcon.Clipboard,
+        icon: UiIcons.Clipboard,
         onAction() {
           _extension.clipboard.write('text', getFileLink(file.id)).then(() => {
             const toast = _extension.ui.createToast({
@@ -44,7 +43,7 @@ function ListGDFiles() {
         },
       },
     ],
-    icon: <UiList.Icon icon={UiExtIcon.File} />,
+    icon: <UiList.Icon icon={UiIcons.File} />,
   }));
 
   useEffect(() => {
@@ -90,4 +89,4 @@ function ListGDFiles() {
   );
 }
 
-export default commandRenderer(ListGDFiles);
+export default ListGDFiles;

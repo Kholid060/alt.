@@ -7,9 +7,10 @@
   "scripts": {
     "dev": "pnpm build:ext-api && tsup --watch",
     "generate:dts": "tsx ./scripts/generate-dts.ts",
+    "build:components": "tsx ./scripts/generate-componets-map.ts",
     "build:ext-api": "tsx ./scripts/ext-api/index.ts",
     "lint": "eslint . --ext js,mjs,cjs,ts,mts,cts,tsx",
-    "build": "pnpm build:ext-api && tsup && pnpm generate:dts"
+    "build": "pnpm build:ext-api && pnpm build:components && tsup && pnpm generate:dts"
   },
   "dependencies": {
     "@altdot/shared": "workspace:*",

@@ -1,4 +1,4 @@
-import type { ExtensionCommandRenderer } from '@altdot/extension';
+import type { CommandLaunchContext } from '@altdot/extension';
 import { MODULE_MAP } from './constant';
 import type { ExtensionRenderer } from '../interfaces/ext-renderer';
 import type ReactDOM from 'react-dom/client';
@@ -8,6 +8,9 @@ import {
   ExtensionErrorBoundaryFallback,
   ExtensionErrorNotFound,
 } from '../components/extension-errors';
+import { UiListProvider } from '@altdot/ui/dist/context/list.context';
+import { UiTooltipProvider } from '@altdot/ui/dist/components/ui/tooltip';
+import { ExtensionProvider } from '../context/extension.context';
 
 async function loadStyle(themeStyle: string) {
   const themeStyleEl = document.createElement('style');
@@ -34,10 +37,10 @@ async function loadStyle(themeStyle: string) {
   document.head.appendChild(linkEl);
 }
 
-async function getRenderer() {
+async function getView() {
   try {
     const { default: renderer } = (await import(MODULE_MAP.renderer)) as {
-      default: ExtensionCommandRenderer;
+      default: React.FC<CommandLaunchContext>;
     };
 
     return renderer;
@@ -46,13 +49,14 @@ async function getRenderer() {
     return null;
   }
 }
+
 const extViewRenderer: ExtensionRenderer<[string]> = async (
   { messagePort, launchContext },
   theme,
 ) => {
   await loadStyle(theme);
 
-  const renderer = await getRenderer();
+  const CommandView = await getView();
   const reactDOM = (await import(MODULE_MAP.reactDOM)) as typeof ReactDOM;
 
   reactDOM.createRoot(document.querySelector('#app')!).render(
@@ -62,14 +66,17 @@ const extViewRenderer: ExtensionRenderer<[string]> = async (
           <ExtensionErrorBoundaryFallback {...{ ...props, messagePort }} />
         )}
       >
-        {renderer ? (
-          renderer({
-            messagePort,
-            context: launchContext,
-          })
-        ) : (
-          <ExtensionErrorNotFound />
-        )}
+        <UiListProvider>
+          <UiTooltipProvider>
+            <ExtensionProvider messagePort={messagePort}>
+              {CommandView ? (
+                <CommandView {...launchContext} />
+              ) : (
+                <ExtensionErrorNotFound />
+              )}
+            </ExtensionProvider>
+          </UiTooltipProvider>
+        </UiListProvider>
       </ReactErrorBoundary>
     </React.StrictMode>,
   );

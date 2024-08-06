@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   _extension,
-  commandRenderer,
-  UiExtIcon,
+  UiIcons,
   UiList,
   UiListItem,
 } from '@altdot/extension';
@@ -25,14 +24,14 @@ function ViewCommand() {
     value: item.id,
     title: item.title,
     group: item.isCompleted ? 'Completed' : 'To Do',
-    icon: item.isCompleted ? <UiExtIcon.CheckCircle /> : <UiExtIcon.Circle />,
+    icon: item.isCompleted ? <UiIcons.CheckCircle /> : <UiIcons.Circle />,
     actions: [
       {
         type: 'button',
         title: 'Delete',
         value: 'delete',
         color: 'destructive',
-        icon: UiExtIcon.Trash2,
+        icon: UiIcons.Trash2,
         shortcut: { mod1: 'ctrlKey', key: 'Delete' },
         onAction() {
           const updatedTodos = todos.filter((value) => value.id !== item.id);
@@ -103,4 +102,4 @@ function ViewCommand() {
   );
 }
 
-export default commandRenderer(ViewCommand);
+export default ViewCommand;
