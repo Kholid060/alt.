@@ -1,3 +1,5 @@
+import Browser from 'webextension-polyfill';
+
 /**
  * Storage area type for persisting and exchanging data.
  * @see https://developer.chrome.com/docs/extensions/reference/storage/#overview
@@ -116,7 +118,7 @@ let globalSessionAccessLevelFlag: StorageConfig['sessionAccessForContentScripts'
  * Checks if the storage permission is granted in the manifest.json.
  */
 function checkStoragePermission(storageType: StorageType): void {
-  if (chrome.storage[storageType] === undefined) {
+  if (Browser.storage[storageType] === undefined) {
     throw new Error(
       `Check your storage permission in manifest.json: ${storageType} is not defined`,
     );
@@ -138,6 +140,7 @@ export function createStorage<D>(
 
   // Set global session storage access level for StoryType.Session, only when not already done but needed.
   if (
+    chrome &&
     globalSessionAccessLevelFlag === false &&
     storageType === StorageType.Session &&
     config?.sessionAccessForContentScripts === true
@@ -152,7 +155,7 @@ export function createStorage<D>(
   // Register life cycle methods
   const _getDataFromStorage = async (): Promise<D> => {
     checkStoragePermission(storageType);
-    const value = await chrome.storage[storageType].get([key]);
+    const value = await Browser.storage[storageType].get([key]);
     return value[key] ?? fallback;
   };
 
@@ -163,7 +166,7 @@ export function createStorage<D>(
   const set = async (valueOrUpdate: ValueOrUpdate<D>) => {
     cache = await updateCache(valueOrUpdate, cache);
 
-    await chrome.storage[storageType].set({ [key]: cache });
+    await Browser.storage[storageType].set({ [key]: cache });
     _emitChange();
   };
 
@@ -185,7 +188,7 @@ export function createStorage<D>(
 
   // Listener for live updates from the browser
   async function _updateFromStorageOnChanged(changes: {
-    [key: string]: chrome.storage.StorageChange;
+    [key: string]: Browser.Storage.StorageChange;
   }) {
     // Check if the key we are listening for is in the changes object
     if (changes[key] === undefined) return;
@@ -201,7 +204,7 @@ export function createStorage<D>(
 
   // Register listener for live updates for our storage area
   if (liveUpdate) {
-    chrome.storage[storageType].onChanged.addListener(
+    Browser.storage[storageType].onChanged.addListener(
       _updateFromStorageOnChanged,
     );
   }

@@ -1,3 +1,5 @@
+import '@types/chrome';
+
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
