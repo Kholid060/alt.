@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { ChangeEvent, useEffect, useState } from 'react';
-import { UiList, commandRenderer, UiImage, UiInput, UiListItem, UiExtIcon, _extension } from '@altdot/extension';
+import { UiList, UiImage, UiInput, UiListItem, UiIcons, _extension } from '@altdot/extension';
 import ItemList from './components/ItemList';
 
 function CommandMain() {
@@ -45,7 +45,7 @@ function CommandMain() {
           title: 'Hide toast',
           value: 'hide-toast',
           color: 'destructive',
-          icon: UiExtIcon.Bike,
+          icon: UiIcons.Bike,
           onAction() {
             toast.hide();
           }
@@ -63,7 +63,7 @@ function CommandMain() {
     actions: [
       {
         type: 'button',
-        icon: UiExtIcon.Clipboard,
+        icon: UiIcons.Clipboard,
         title: 'Paste',
         value: 'paste',
         onAction() {
@@ -72,7 +72,7 @@ function CommandMain() {
       },
       {
         type: 'button',
-        icon: UiExtIcon.FolderOpen,
+        icon: UiIcons.FolderOpen,
         title: 'Open file location',
         value: 'open-file',
         onAction() {
@@ -91,4 +91,4 @@ function CommandMain() {
   );
 }
 
-export default commandRenderer(CommandMain);
+export default CommandMain;

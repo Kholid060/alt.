@@ -50,13 +50,22 @@ export class ExtensionSqliteService implements OnModuleInit {
     extensionId: string,
     {
       query,
+      dbPath,
       selectAll,
       params = [],
-    }: { query: string; selectAll?: boolean; params?: unknown[] },
+    }: {
+      query: string;
+      dbPath?: string;
+      params?: unknown[];
+      selectAll?: boolean;
+    },
   ) {
-    let database = this.DBs[extensionId]?.database;
+    let database =
+      this.DBs[dbPath ? `${extensionId}:${dbPath}` : extensionId]?.database;
     if (!database) {
-      database = new Database(path.join(BASE_EXT_DB_PATH, extensionId));
+      database = dbPath
+        ? new Database(dbPath, { fileMustExist: true })
+        : new Database(path.join(BASE_EXT_DB_PATH, extensionId));
       this.DBs[extensionId] = {
         database,
         lastQueryTime: Date.now(),

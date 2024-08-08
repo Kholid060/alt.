@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export declare namespace Sqlite {
   interface QueryOptions {
-    selectAll: boolean;
+    dbPath?: string;
+    selectAll?: boolean;
   }
 
   interface Static {

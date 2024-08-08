@@ -20,6 +20,8 @@ function setExtView(type: 'empty' | 'error' = 'empty') {
 
 class ExtensionAPI {
   static init() {
+    let payload: ExtensionCommandExecutePayload | null = null;
+
     window.addEventListener(
       'message',
       ({ ports, data }: MessageEvent<ExtensionCommandViewInitMessage>) => {
@@ -27,9 +29,27 @@ class ExtensionAPI {
         if (!messagePort) throw new Error('PORT IS EMPTY');
 
         new ExtensionAPI(data.payload).loadAPI();
+        payload = data.payload;
       },
       { once: true },
     );
+    window.addEventListener('unload', () => {
+      if (!payload) return;
+
+      IPCRenderer.send(
+        'extension:command-exec-change',
+        'finish',
+        {
+          icon: '',
+          title: '',
+          noEmit: true,
+          runnerId: '',
+          extensionTitle: '',
+          extensionId: payload.extensionId,
+        },
+        { success: true, result: '' },
+      );
+    });
   }
 
   private key: string = '';

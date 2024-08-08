@@ -300,7 +300,7 @@ export interface IPCSendEventRendererToMain {
   'extension:stop-execute-command': [runnerId: string];
   'extension:command-exec-change': [
     type: 'finish' | 'start',
-    detail: ExtensionCommandProcess,
+    detail: ExtensionCommandProcess & { noEmit?: boolean },
     data: ExtensionAPI.Command.LaunchResult,
   ];
   'window:destroy': [name: WindowNames];

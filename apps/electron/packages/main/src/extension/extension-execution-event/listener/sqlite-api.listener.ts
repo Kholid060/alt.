@@ -15,6 +15,7 @@ export class ExtensionSqliteApiListener {
     const result = this.extensionSqlite.query(extensionId, {
       query,
       params,
+      dbPath: options?.dbPath,
       selectAll: options?.selectAll,
     });
 

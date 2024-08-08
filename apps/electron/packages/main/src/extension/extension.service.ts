@@ -135,6 +135,8 @@ export class ExtensionService implements OnAppReady {
       this.runningCommands.delete(runnerId);
     }
 
+    if (detail.noEmit) return;
+
     this.browserWindow.sendMessageToAllWindows({
       name: 'extension:running-commands-change',
       args: [this.getRunningCommands()],
