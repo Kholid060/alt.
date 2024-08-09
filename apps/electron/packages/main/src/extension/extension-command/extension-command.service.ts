@@ -10,6 +10,11 @@ import {
   ExtensionCommandUpdatePayload,
 } from './extension-command.interface';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
+import { GlobalShortcutService } from '/@/global-shortcut/global-shortcut.service';
+import { LoggerService } from '/@/logger/logger.service';
+import { OnAppReady } from '/@/common/hooks/on-app-ready.hook';
+import { ExtensionRunnerService } from '../extension-runner/extension-runner.service';
+import { CommandLaunchBy } from '@altdot/extension';
 
 type FindByIdParam = string | { commandId: string; extensionId: string };
 function findByIdQuery(id: FindByIdParam) {
@@ -21,8 +26,30 @@ function findByIdQuery(id: FindByIdParam) {
 }
 
 @Injectable()
-export class ExtensionCommandService {
-  constructor(private dbService: DBService) {}
+export class ExtensionCommandService implements OnAppReady {
+  constructor(
+    private dbService: DBService,
+    private logger: LoggerService,
+    private globalShortcut: GlobalShortcutService,
+    private extensionRunner: ExtensionRunnerService,
+  ) {}
+
+  async onAppReady() {
+    // Register extension command shortcuts
+    const commands = await this.dbService.db.query.extensionCommands.findMany({
+      columns: {
+        name: true,
+        shortcut: true,
+        extensionId: true,
+      },
+      where(fields, operators) {
+        return operators.isNotNull(fields.shortcut);
+      },
+    });
+    commands.map((command) => {
+      this.toggleShortcut(command.extensionId, command.name, command.shortcut);
+    });
+  }
 
   async getCommand(id: FindByIdParam): Promise<ExtensionCommandModel | null> {
     const result = await this.dbService.db.query.extensionCommands.findFirst({
@@ -142,6 +169,10 @@ export class ExtensionCommandService {
       'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
     });
 
+    if (shortcut) {
+      this.toggleShortcut(extensionId, commandId, shortcut);
+    }
+
     return result;
   }
 
@@ -179,5 +210,31 @@ export class ExtensionCommandService {
     }, {});
 
     return result;
+  }
+
+  toggleShortcut(extensionId: string, commandId: string, keys: string | null) {
+    const shortcutId = `${extensionId}:${commandId}`;
+    this.globalShortcut.unregisterById(shortcutId);
+
+    if (!keys) return;
+
+    this.globalShortcut.register({
+      keys,
+      callback: async () => {
+        try {
+          await this.extensionRunner.executeCommand({
+            commandId,
+            extensionId,
+            launchContext: {
+              args: {},
+              launchBy: CommandLaunchBy.USER,
+            },
+          });
+        } catch (error) {
+          this.logger.error(['ExtensionService', 'toggleShortcut'], error);
+        }
+      },
+      id: shortcutId,
+    });
   }
 }

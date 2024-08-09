@@ -3,7 +3,6 @@ import {
   PRELOAD_API_KEY,
 } from '#common/utils/constant/constant';
 import type {
-  CommandJSONViews,
   CommandLaunchContext,
   CommandViewJSONLaunchContext,
   ExtensionMessagePortEventAsync,
@@ -20,7 +19,7 @@ import { createExtensionAPI } from '#common/utils/extension/extension-api-factor
 
 type ExtensionCommand = (
   payload: CommandLaunchContext | CommandViewJSONLaunchContext,
-) => void | Promise<void | CommandJSONViews>;
+) => void;
 
 async function loadExtensionCommand(extensionId: string, commandId: string) {
   const filePath = `${CUSTOM_SCHEME.extension}://${extensionId}/command/${commandId}/@renderer`;
@@ -96,30 +95,6 @@ interface CommandRunnerData extends ExtensionCommandExecutePayload {
   messagePort: InitExtensionAPIData['messagePort'];
 }
 
-async function commandViewJSONRunner({
-  runnerId,
-  commandId,
-  extensionId,
-  messagePort,
-  launchContext,
-  executeCommand,
-}: CommandRunnerData) {
-  const updateView: CommandViewJSONLaunchContext['updateView'] = (viewData) => {
-    messagePort.sync.sendMessage('command-json:update-ui', {
-      viewData,
-      runnerId,
-      commandId,
-      extensionId,
-    });
-  };
-
-  const viewData = await executeCommand({
-    updateView,
-    ...launchContext,
-  });
-  updateView(viewData as CommandJSONViews);
-}
-
 async function commandActionRunner({
   launchContext,
   executeCommand,
@@ -169,11 +144,7 @@ self.onmessage = async ({
       runnerId: data.runnerId,
     };
 
-    if (data.command.type === 'action') {
-      await commandActionRunner(commandRunnerPayload);
-    } else if (data.command.type === 'view:json') {
-      await commandViewJSONRunner(commandRunnerPayload);
-    }
+    await commandActionRunner(commandRunnerPayload);
   } catch (error) {
     self.postMessage({
       type: 'error',

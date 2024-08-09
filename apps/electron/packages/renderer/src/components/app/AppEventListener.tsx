@@ -26,7 +26,7 @@ function AppEventListener() {
     const offOpenCommandJSONViewPage = preloadAPI.main.ipc.on(
       'command-window:open-json-view',
       (_, payload) => {
-        const { extensionId, commandId } = payload;
+        const { extensionId, commandId } = payload.detail;
         navigate(`/extensions/${extensionId}/${commandId}/view-json`, {
           data: payload,
         });

@@ -11,7 +11,6 @@ import {
   parseJSON,
 } from '@altdot/shared';
 import { CommandLaunchBy } from '@altdot/extension/dist/interfaces/command.interface';
-import { ExtensionService } from '../extension/extension.service';
 import { workflows } from '../db/schema/workflow.schema';
 import { WorkflowService } from '../workflow/workflow.service';
 import { WORKFLOW_MANUAL_TRIGGER_ID } from '#packages/common/utils/constant/workflow.const';
@@ -20,6 +19,7 @@ import { LoggerService } from '../logger/logger.service';
 import path from 'path';
 import { OAuthService } from '../oauth/oauth.service';
 import { APP_DEEP_LINK_HOST } from '#packages/common/utils/constant/app.const';
+import { ExtensionRunnerService } from '../extension/extension-runner/extension-runner.service';
 
 function convertArgValue(argument: ExtensionCommandArgument, value: string) {
   let convertedValue: unknown = value;
@@ -43,7 +43,7 @@ export class DeepLinkService implements OnModuleInit {
     private oauthService: OAuthService,
     private loggerService: LoggerService,
     private workflowService: WorkflowService,
-    private extensionService: ExtensionService,
+    private extensionRunner: ExtensionRunnerService,
     private browserWindowService: BrowserWindowService,
   ) {}
 
@@ -155,7 +155,7 @@ export class DeepLinkService implements OnModuleInit {
       return;
     }
 
-    if (command.type === 'view' || command.type === 'view:json') {
+    if (command.type === 'view') {
       const windowCommand = await this.browserWindowService.get('command');
       windowCommand.toggleWindow(true);
     }
@@ -165,7 +165,7 @@ export class DeepLinkService implements OnModuleInit {
       launchBy: CommandLaunchBy.DEEP_LINK,
     };
 
-    await this.extensionService.executeCommand({
+    await this.extensionRunner.executeCommand({
       commandId,
       extensionId,
       launchContext,

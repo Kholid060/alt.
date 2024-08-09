@@ -149,8 +149,9 @@ export interface IPCAppsEvents {
 }
 
 export interface IPCClipboardEvents {
-  'clipboard:paste': () => void;
   'clipboard:copy': (content: string) => void;
+  'clipboard:write': (content: string) => void;
+  'clipboard:paste': (content?: string) => void;
   'clipboard:has-buffer': (contentType: string) => boolean;
   'clipboard:read-buffer': (contentType: string) => string;
   'clipboard:copy-buffer': (contentType: string, content: string) => void;

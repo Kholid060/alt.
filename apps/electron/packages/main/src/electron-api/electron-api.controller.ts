@@ -42,29 +42,6 @@ export class ElectronApiController {
     return shell.trashItem(filePath);
   }
 
-  @IPCInvoke('clipboard:copy')
-  clipboardCopy(
-    @Payload() [text]: IPCInvokePayload<'clipboard:copy'>,
-  ): IPCInvokeReturn<'clipboard:copy'> {
-    clipboard.writeText(text);
-    return Promise.resolve();
-  }
-
-  @IPCInvoke('clipboard:paste')
-  clipboardPaste(): IPCInvokeReturn<'clipboard:paste'> {
-    this.electronApi.clipboardPaste();
-    return Promise.resolve();
-  }
-
-  @IPCInvoke('clipboard:copy-buffer')
-  clipboardCopyBuffer(
-    @Payload()
-    [contentType, content]: IPCInvokePayload<'clipboard:copy-buffer'>,
-  ): IPCInvokeReturn<'clipboard:copy-buffer'> {
-    clipboard.writeBuffer(contentType, Buffer.from(content));
-    return Promise.resolve();
-  }
-
   @IPCInvoke('clipboard:read-buffer')
   clipboardReadBuffer(
     @Payload()

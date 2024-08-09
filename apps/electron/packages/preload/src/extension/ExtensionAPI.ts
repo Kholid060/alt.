@@ -43,9 +43,12 @@ class ExtensionAPI {
           icon: '',
           title: '',
           noEmit: true,
+          type: 'view',
           runnerId: '',
           extensionTitle: '',
+          commandId: payload.commandId,
           extensionId: payload.extensionId,
+          launchBy: payload.launchContext.launchBy,
         },
         { success: true, result: '' },
       );

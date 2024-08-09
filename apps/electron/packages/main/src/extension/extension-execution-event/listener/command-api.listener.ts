@@ -3,13 +3,13 @@ import { ExtensionApiEvent } from '../events/extension-api.event';
 import { OnExtensionAPI } from '/@/common/decorators/extension.decorator';
 import { CommandLaunchBy, ExtensionAPI } from '@altdot/extension';
 import { ExtensionCommandService } from '../../extension-command/extension-command.service';
-import { ExtensionService } from '../../extension.service';
 import { isObject } from '@altdot/shared';
+import { ExtensionRunnerService } from '../../extension-runner/extension-runner.service';
 
 @Injectable()
 export class ExtensionCommandApiListener {
   constructor(
-    private extension: ExtensionService,
+    private extensionRunner: ExtensionRunnerService,
     private extensionCommand: ExtensionCommandService,
   ) {}
 
@@ -37,7 +37,7 @@ export class ExtensionCommandApiListener {
 
     try {
       const waitUntilFinished = options.waitUntilFinished ?? true;
-      const result = await this.extension.executeCommand(
+      const result = await this.extensionRunner.executeCommand(
         {
           extensionId,
           launchContext: {

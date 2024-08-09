@@ -55,33 +55,6 @@ export function CommandCtxProvider({
   }
 
   useEffect(() => {
-    const offCommandScriptMessageEvent = runnerMessagePort.current.eventSync.on(
-      'command-script:message',
-      (detail) => {
-        const { clearAll, addStatus } = useCommandPanelStore.getState();
-
-        switch (detail.type) {
-          case 'finish':
-          case 'error': {
-            const isError = detail.type === 'error';
-            addStatus({
-              description: detail.message.slice(
-                0,
-                detail.message.indexOf('\n'),
-              ),
-              title: isError
-                ? 'Error!'
-                : `"${detail.commandTitle}" Script finish running`,
-              type: isError ? 'error' : 'success',
-              onClose() {
-                clearAll();
-              },
-            });
-            break;
-          }
-        }
-      },
-    );
     const offConfirmAlert = runnerMessagePort.current.eventAsync.on(
       'extension:show-confirm-alert',
       async ({ title, body, cancelText, okText, okVariant }) => {
@@ -126,7 +99,6 @@ export function CommandCtxProvider({
       offShowToast();
       offConfirmAlert();
       offSharedMessagePortListener();
-      offCommandScriptMessageEvent();
     };
   }, [dialog]);
 

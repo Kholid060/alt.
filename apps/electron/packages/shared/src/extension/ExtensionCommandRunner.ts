@@ -68,8 +68,6 @@ class ExtensionCommandRunner {
     port2.start();
   }
 
-  sendMessageToCommandWindow() {}
-
   async execute({
     command,
     commandFilePath,
@@ -98,7 +96,6 @@ class ExtensionCommandRunner {
 
       switch (command.type) {
         case 'action':
-        case 'view:json':
           commandRunner = new ExtensionRunnerCommandAction(
             commandRunnerPayload,
           );
@@ -128,8 +125,11 @@ class ExtensionCommandRunner {
           'finish',
           {
             runnerId,
+            type: command.type,
+            commandId: command.name,
             extensionId: command.extension.id,
             extensionTitle: command.extension.title,
+            launchBy: payload.launchContext.launchBy,
             icon: command.icon || command.extension.icon,
             title: `Error on "${command.title}" command`,
           },
@@ -152,9 +152,12 @@ class ExtensionCommandRunner {
           'finish',
           {
             runnerId,
+            type: command.type,
             title: command.title,
+            commandId: command.name,
             extensionId: command.extension.id,
             extensionTitle: command.extension.title,
+            launchBy: payload.launchContext.launchBy,
             icon: command.icon || command.extension.icon,
           },
           {
@@ -177,9 +180,12 @@ class ExtensionCommandRunner {
         'start',
         {
           runnerId,
+          type: command.type,
           title: command.title,
+          commandId: command.name,
           extensionId: command.extension.id,
           extensionTitle: command.extension.title,
+          launchBy: payload.launchContext.launchBy,
           icon: command.icon || command.extension.icon,
         },
         {

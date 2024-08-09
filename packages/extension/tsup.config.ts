@@ -50,6 +50,7 @@ export default defineConfig([
     entry: [
       'src/index.ts',
       'src/constant/**/*@(ts|tsx)',
+      'src/validation/**/*@(ts|tsx)',
       'src/interfaces/**/*@(ts|tsx)',
       'src/components/**/*@(ts|tsx)',
       'src/extension-api/**/*@(ts|tsx)',

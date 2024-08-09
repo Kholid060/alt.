@@ -27,6 +27,7 @@ class WindowSharedProcess extends WindowBase {
         webviewTag: false,
         nodeIntegration: true,
         contextIsolation: false,
+        nodeIntegrationInWorker: true,
       },
     });
 

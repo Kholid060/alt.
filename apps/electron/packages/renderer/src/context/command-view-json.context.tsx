@@ -1,8 +1,8 @@
-import { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
+import { ExtensionCommandJSONViewData } from '#packages/common/interface/extension.interface';
 import { createContext, useContext } from 'react';
 
 interface CommandViewJSONState {
-  payload: ExtensionCommandExecutePayload;
+  payload: ExtensionCommandJSONViewData;
 }
 
 // @ts-expect-error ...

@@ -9,6 +9,7 @@ const textStyle: Record<TextType['textStyle'], string> = {
   'heading-2': 'text-2xl',
   'heading-3': 'text-xl',
   'heading-4': 'text-lg',
+  code: 'font-mono text-sm',
 };
 const textColor: Record<TextType['color'], string> = {
   primary: 'text-primary',
@@ -19,8 +20,6 @@ const textColor: Record<TextType['color'], string> = {
 
 const CommandViewJSONText: React.FC<{ data: CommandJSONViewText }> = ({
   data,
-}: {
-  data: CommandJSONViewText;
 }) => {
   return (
     <p

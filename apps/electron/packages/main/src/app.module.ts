@@ -29,6 +29,8 @@ import { DeepLinkModule } from './deep-link/deep-link.module';
 import { app } from 'electron';
 import { WebAppModule } from './web-app/web-app.module';
 import { envConfig } from './common/config/env.config';
+import { ClipboardModule } from './clipboard/clipboard.module';
+import { ExtensionExecutionEventModule } from './extension/extension-execution-event/extension-execution-event.module';
 
 const envVarsSchema = z.object({
   API_KEY: z.string().min(1),
@@ -79,6 +81,7 @@ const envVarsSchema = z.object({
     WorkflowModule,
     DeepLinkModule,
     ExtensionModule,
+    ClipboardModule,
     ElectronApiModule,
     BrowserWindowModule,
     InstalledAppsModule,
@@ -89,6 +92,7 @@ const envVarsSchema = z.object({
     ExtensionConfigModule,
     ExtensionUpdaterModule,
     BrowserExtensionModule,
+    ExtensionExecutionEventModule,
   ],
 })
 export class AppModule {}

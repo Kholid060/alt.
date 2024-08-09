@@ -8,6 +8,7 @@ import ExtensionRunnerProcess, {
 import { resolveFileCommand } from '/@/utils/resolve-file-command';
 import { CommandLaunchBy } from '@altdot/extension';
 import { ExtensionCommandExecuteScriptOptions } from '#packages/common/interface/extension.interface';
+import { debugLog } from '#packages/common/utils/helper';
 
 const ARGS_PREFIX = '__ARGS__';
 
@@ -32,37 +33,8 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
     );
 
     this.onProcessExit = this.onProcessExit.bind(this);
-    this.onProcessSpawn = this.onProcessSpawn.bind(this);
-    this.onProcessError = this.onProcessError.bind(this);
     this.onProcessStdoutData = this.onProcessStdoutData.bind(this);
     this.onProcessStderrData = this.onProcessStderrData.bind(this);
-  }
-
-  private onProcessSpawn() {
-    if (!this.emitEvent) return;
-
-    this.runner.messagePort.eventSync.sendMessage('command-script:message', {
-      message: '',
-      type: 'start',
-      runnerId: this.id,
-      commandTitle: this.command.title,
-      commandId: this.payload.extensionId,
-      extensionId: this.payload.extensionId,
-    });
-  }
-
-  private onProcessError(error: Error) {
-    if (!this.emitEvent) return;
-
-    console.error(error);
-    this.runner.messagePort.eventSync.sendMessage('command-script:message', {
-      type: 'error',
-      runnerId: this.id,
-      message: error.message,
-      commandTitle: this.command.title,
-      commandId: this.payload.extensionId,
-      extensionId: this.payload.extensionId,
-    });
   }
 
   private onProcessExit(code: number) {
@@ -72,17 +44,6 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
         ? this.allMessages
         : this.lastMessage
       : `Process finish with exit code ${code} \n\n ${this.errorMessage}`;
-
-    if (this.emitEvent) {
-      this.runner.messagePort.eventSync.sendMessage('command-script:message', {
-        message,
-        runnerId: this.id,
-        commandTitle: this.command.title,
-        commandId: this.payload.extensionId,
-        type: isSuccess ? 'finish' : 'error',
-        extensionId: this.payload.extensionId,
-      });
-    }
 
     if (isSuccess) {
       this.emit('finish', ExtensionRunnerProcessFinishReason.Done, message);
@@ -98,30 +59,11 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
       this.allMessages += this.lastMessage;
     }
 
-    if (!this.emitEvent) return;
-    this.runner.messagePort.eventSync.sendMessage('command-script:message', {
-      type: 'message',
-      runnerId: this.id,
-      message: this.lastMessage,
-      commandTitle: this.command.title,
-      commandId: this.payload.extensionId,
-      extensionId: this.payload.extensionId,
-    });
+    debugLog('[SCRIPT STDOUT]', this.lastMessage);
   }
 
   private onProcessStderrData(chunk: string) {
     this.errorMessage = chunk.toString();
-
-    if (!this.command.extension.isLocal || !this.emitEvent) return;
-
-    this.runner.messagePort.eventSync.sendMessage('command-script:message', {
-      type: 'stderr',
-      runnerId: this.id,
-      message: chunk.toString(),
-      commandTitle: this.command.title,
-      commandId: this.payload.extensionId,
-      extensionId: this.payload.extensionId,
-    });
   }
 
   async start() {
@@ -132,15 +74,6 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
       const errorMessage = `"${path.basename(commandId)}" script file is not supported`;
       this.emit('error', errorMessage);
 
-      if (!this.emitEvent) return;
-      this.runner.messagePort.eventSync.sendMessage('command-script:message', {
-        type: 'error',
-        runnerId: this.id,
-        message: errorMessage,
-        commandTitle: this.command.title,
-        commandId: this.payload.extensionId,
-        extensionId: this.payload.extensionId,
-      });
       return;
     }
 
@@ -162,8 +95,6 @@ class ExtensionRunnerCommandScript extends ExtensionRunnerProcess {
       signal: this.controller.signal,
     });
     ls.addListener('exit', this.onProcessExit);
-    ls.addListener('spawn', this.onProcessSpawn);
-    ls.addListener('error', this.onProcessError);
     ls.stdout.addListener('data', this.onProcessStdoutData);
     ls.stderr.addListener('data', this.onProcessStderrData);
   }

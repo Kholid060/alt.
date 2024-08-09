@@ -30,12 +30,8 @@ export type ExtensionPermissions = ArrayUnion<typeof EXTENSION_PERMISSIONS>;
 
 export const EXTENSION_COMMAND_CONTEXT = ['all'] as const;
 
-export const EXTENSION_COMMAND_TYPE = [
-  'view',
-  'action',
-  'script',
-  'view:json',
-] as const;
+export const EXTENSION_COMMAND_TYPE = ['view', 'action', 'script'] as const;
+
 export type ExtensionCommandType = ArrayUnion<typeof EXTENSION_COMMAND_TYPE>;
 
 export const EXTENSION_COMMAND_ARGUMENT_TYPE = [

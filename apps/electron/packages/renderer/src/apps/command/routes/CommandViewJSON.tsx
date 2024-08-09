@@ -1,66 +1,48 @@
-import { useEffect, useRef, useState } from 'react';
 import { useCommandRoute } from '/@/hooks/useCommandRoute';
-import { useCommandCtx } from '/@/hooks/useCommandCtx';
-import { CommandJSONViews } from '@altdot/extension';
+import { CommandJSONView } from '@altdot/extension';
 import CommandViewJSONText from '/@/components/command-view-json/CommandViewJSONText';
 import CommandViewJSONList from '/@/components/command-view-json/CommandViewJSONList';
 import { CommandViewJSONProvider } from '/@/context/command-view-json.context';
 import { ExtensionCommandJSONViewData } from '#common/interface/extension.interface';
-import { MessagePortCommandJSONUpdateUI } from '#packages/common/interface/message-port-events.interface';
-import preloadAPI from '/@/utils/preloadAPI';
-import { useCommandPanelStore } from '/@/stores/command-panel.store';
-import { debounce } from '@altdot/shared';
+import CommandViewJSONForm from '/@/components/command-view-json/CommandViewJSONForm';
+import { useCommandPanelHeader } from '/@/hooks/useCommandPanelHeader';
+import { useUiListStore } from '@altdot/ui';
+import { useEffect } from 'react';
 
-const componentsMap = {
+const componentsMap: {
+  [T in CommandJSONView['type']]: React.FC<{
+    data: Extract<CommandJSONView, { type: T }>;
+  }>;
+} = {
+  form: CommandViewJSONForm,
   text: CommandViewJSONText,
   list: CommandViewJSONList,
 };
 
 function CommandViewJSON() {
-  const { runnerMessagePort } = useCommandCtx();
-  const setPanelHeader = useCommandPanelStore.use.setHeader();
+  const listStore = useUiListStore();
   const activeRoute = useCommandRoute((state) => state.currentRoute);
+  const { detail, view } = activeRoute?.data as ExtensionCommandJSONViewData;
 
-  const runnerId = useRef('');
-  const [viewData, setViewData] = useState<CommandJSONViews | null>(null);
+  useCommandPanelHeader({
+    icon: detail.icon,
+    title: detail.title,
+    subtitle: detail.subtitle,
+  });
 
-  const commandExecutePayload =
-    activeRoute?.data as ExtensionCommandJSONViewData;
+  const Component = componentsMap[view.type] as React.FC<{
+    data: CommandJSONView;
+  }>;
 
   useEffect(() => {
-    const { commandId, extensionId, icon, subtitle, title } =
-      commandExecutePayload;
+    listStore.setState('search', '');
+  }, [listStore]);
 
-    setPanelHeader({ title, subtitle, icon });
-    // runnerId.current = commandExecutePayload.runnerId;
-
-    const messagePort = runnerMessagePort.current;
-    const onUpdateUI = debounce((data: MessagePortCommandJSONUpdateUI) => {
-      if (data.commandId !== commandId || data.extensionId !== extensionId) {
-        return;
-      }
-
-      runnerId.current = data.runnerId;
-      setViewData(data.viewData);
-    }, 100);
-    messagePort?.eventSync.on('command-json:update-ui', onUpdateUI);
-
-    return () => {
-      messagePort?.eventSync.off('command-json:update-ui', onUpdateUI);
-      preloadAPI.main.ipc.send(
-        'extension:stop-execute-command',
-        runnerId.current,
-      );
-    };
-  }, [commandExecutePayload, setPanelHeader]);
-
-  if (!viewData) return null;
-
-  const Component = componentsMap[viewData.type];
+  if (!Component) return null;
 
   return (
-    <CommandViewJSONProvider payload={commandExecutePayload}>
-      <Component data={viewData as never} />
+    <CommandViewJSONProvider payload={activeRoute.data}>
+      <Component data={view} />
     </CommandViewJSONProvider>
   );
 }

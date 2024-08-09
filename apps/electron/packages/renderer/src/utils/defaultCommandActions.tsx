@@ -1,9 +1,7 @@
-import { CommandActions } from '@altdot/extension';
 import {
   CopyIcon,
   GlobeIcon,
   LucideIcon,
-  Trash2Icon,
   ClipboardPaste,
   FolderOpenIcon,
 } from 'lucide-react';
@@ -11,7 +9,7 @@ import preloadAPI from './preloadAPI';
 import { IPCEventError } from '#common/interface/ipc-events.interface';
 import { CommandPanelStoreActions } from '../stores/command-panel.store';
 import { isIPCEventError } from './helper';
-import { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
+import { CommandJSONAction } from '@altdot/extension';
 
 function resultHandler(
   {
@@ -36,16 +34,15 @@ function resultHandler(
 }
 
 const defaultCommandActions: {
-  [T in CommandActions['type']]: {
+  [T in CommandJSONAction['type']]: {
     id: T;
     title: string;
     icon: LucideIcon;
     onAction(
       detail: {
-        executePayload: ExtensionCommandExecutePayload;
         addStatus: CommandPanelStoreActions['addStatus'];
       },
-      data: Extract<CommandActions, { type: T }>,
+      data: Extract<CommandJSONAction, { type: T }>,
     ): void;
   };
 } = {
@@ -53,15 +50,9 @@ const defaultCommandActions: {
     id: 'copy',
     icon: CopyIcon,
     title: 'Copy to Clipboard',
-    onAction({ executePayload, addStatus }, data) {
+    onAction({ addStatus }, data) {
       preloadAPI.main.ipc
-        .invoke('user-extension', {
-          name: 'clipboard.write',
-          args: ['text', data.content],
-          key: executePayload.extensionId,
-          commandId: executePayload.commandId,
-          browserCtx: executePayload.browserCtx ?? null,
-        })
+        .invoke('clipboard:copy', data.content as string)
         .then((result) => {
           resultHandler({ addStatus, result }, () => {
             addStatus({
@@ -76,15 +67,9 @@ const defaultCommandActions: {
     id: 'paste',
     icon: ClipboardPaste,
     title: 'Paste Content',
-    onAction({ executePayload, addStatus }, data) {
+    onAction({ addStatus }, data) {
       preloadAPI.main.ipc
-        .invoke('user-extension', {
-          args: [data.content],
-          name: 'clipboard.paste',
-          key: executePayload.extensionId,
-          commandId: executePayload.commandId,
-          browserCtx: executePayload.browserCtx ?? null,
-        })
+        .invoke('clipboard:paste', data.content)
         .then((result) => {
           resultHandler({ addStatus, result });
         });
@@ -94,51 +79,19 @@ const defaultCommandActions: {
     id: 'open-url',
     icon: GlobeIcon,
     title: 'Open in Browser',
-    onAction({ executePayload, addStatus }, data) {
-      preloadAPI.main.ipc
-        .invoke('user-extension', {
-          args: [data.url],
-          name: 'shell.openURL',
-          key: executePayload.extensionId,
-          commandId: executePayload.commandId,
-          browserCtx: executePayload.browserCtx ?? null,
-        })
-        .then((result) => {
-          resultHandler({ addStatus, result });
-        });
+    onAction({ addStatus }, data) {
+      preloadAPI.main.ipc.invoke('shell:open-url', data.url).then((result) => {
+        resultHandler({ addStatus, result });
+      });
     },
   },
   'show-in-folder': {
     icon: FolderOpenIcon,
     id: 'show-in-folder',
     title: 'Show in Folder',
-    onAction({ executePayload, addStatus }, data) {
+    onAction({ addStatus }, data) {
       preloadAPI.main.ipc
-        .invoke('user-extension', {
-          args: [data.path],
-          name: 'shell.showItemInFolder',
-          key: executePayload.extensionId,
-          commandId: executePayload.commandId,
-          browserCtx: executePayload.browserCtx ?? null,
-        })
-        .then((result) => {
-          resultHandler({ addStatus, result });
-        });
-    },
-  },
-  'move-to-trash': {
-    icon: Trash2Icon,
-    id: 'move-to-trash',
-    title: 'Show in Folder',
-    onAction({ executePayload, addStatus }, data) {
-      preloadAPI.main.ipc
-        .invoke('user-extension', {
-          args: [data.path],
-          name: 'shell.moveToTrash',
-          key: executePayload.extensionId,
-          commandId: executePayload.commandId,
-          browserCtx: executePayload.browserCtx ?? null,
-        })
+        .invoke('shell:open-in-folder', data.path)
         .then((result) => {
           resultHandler({ addStatus, result });
         });

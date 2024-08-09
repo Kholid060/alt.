@@ -50,4 +50,19 @@ export class ExtensionCommandController {
   ): IPCInvokeReturn<'database:extension-command-exists'> {
     return this.extensionCommand.existsArr(ids);
   }
+
+  @IPCInvoke('database:update-extension-command')
+  async updateCommand(
+    @Payload()
+    [
+      extensionId,
+      commandId,
+      payload,
+    ]: IPCInvokePayload<'database:update-extension-command'>,
+  ): IPCInvokeReturn<'database:update-extension-command'> {
+    await this.extensionCommand.updateCommand(
+      { commandId, extensionId },
+      payload,
+    );
+  }
 }

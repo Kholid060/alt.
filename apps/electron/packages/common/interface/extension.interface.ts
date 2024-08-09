@@ -1,6 +1,14 @@
-import { CommandLaunchContext } from '@altdot/extension';
+import {
+  CommandJSONView,
+  CommandLaunchBy,
+  CommandLaunchContext,
+} from '@altdot/extension';
 import { ExtensionCommandModel } from '../../main/src/extension/extension-command/extension-command.interface';
-import { EXTENSION_CONFIG_TYPE, EXTENSION_PERMISSIONS } from '@altdot/shared';
+import {
+  EXTENSION_CONFIG_TYPE,
+  EXTENSION_PERMISSIONS,
+  ExtensionCommandType,
+} from '@altdot/shared';
 import { AppTheme } from './app.interface';
 
 export type ExtensionConfigType = (typeof EXTENSION_CONFIG_TYPE)[number];
@@ -39,8 +47,15 @@ export interface ExtensionCommandViewData
   subtitle: string;
 }
 
-export interface ExtensionCommandJSONViewData extends ExtensionCommandViewData {
-  runnerId: string;
+export interface ExtensionCommandJSONViewData {
+  view: CommandJSONView;
+  detail: {
+    title: string;
+    icon: string;
+    subtitle: string;
+    commandId: string;
+    extensionId: string;
+  };
 }
 
 export interface ExtensionCommandExecutePayloadWithData
@@ -71,6 +86,9 @@ export interface ExtensionCommandProcess {
   icon: string;
   title: string;
   runnerId: string;
+  commandId: string;
   extensionId: string;
   extensionTitle: string;
+  launchBy: CommandLaunchBy;
+  type: ExtensionCommandType;
 }

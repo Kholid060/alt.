@@ -1,12 +1,9 @@
-import { CommandJSONViewList, UiList, UiListItem } from '@altdot/extension';
-import { UiListItemAction } from '@altdot/ui';
+import { CommandJSONViewList } from '@altdot/extension';
+import { UiIcons, UiListItemAction, UiList, UiListItem } from '@altdot/ui';
 import defaultCommandActions from '/@/utils/defaultCommandActions';
-import UiExtensionIcon from '../ui/UiExtensionIcon';
-import { useCommandViewJSON } from '/@/context/command-view-json.context';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 
 function CommandViewJSONList({ data }: { data: CommandJSONViewList }) {
-  const { payload } = useCommandViewJSON();
   const addStatus = useCommandPanelStore.use.addStatus();
 
   const items: UiListItem[] = data.items.map((item) => {
@@ -18,7 +15,6 @@ function CommandViewJSONList({ data }: { data: CommandJSONViewList }) {
           actionData.onAction(
             {
               addStatus,
-              executePayload: payload,
             },
             action as never,
           );
@@ -38,23 +34,16 @@ function CommandViewJSONList({ data }: { data: CommandJSONViewList }) {
       },
     );
 
-    const icon = item.icon ? (
-      <UiExtensionIcon
-        icon={item.icon}
-        extensionIcon={false}
-        id={payload.extensionId}
-        alt={`${item.title} icon`}
-        iconWrapper={(icon) => <UiList.Icon icon={icon} />}
-      />
-    ) : undefined;
-
+    const Icon = item.icon
+      ? UiIcons[item.icon as keyof typeof UiIcons]
+      : undefined;
     return {
-      icon,
       actions,
       title: item.title,
       value: item.value,
       subtitle: item.subtitle,
       description: item.description,
+      icon: Icon && <UiList.Icon icon={Icon} />,
       onSelected: () => {
         if (!defaultAction) return;
 
