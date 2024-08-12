@@ -23,7 +23,7 @@ async function refreshToken(
 }
 
 export async function getToken(): Promise<_extension.OAuth.OAuthTokenStorageValue> {
-  const token = await credential.getToken();
+  let token = await credential.getToken();
   if (token) {
     if (Date.now() >= token.expiresTimestamp) {
       return refreshToken(token.refreshToken);
@@ -49,8 +49,10 @@ export async function getToken(): Promise<_extension.OAuth.OAuthTokenStorageValu
       'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
-  const body = await response.json();
+  const body: _extension.OAuth.OAuthTokenResponse = await response.json();
   await credential.setToken(body);
 
-  return body;
+  token = await credential.getToken();
+
+  return token;
 }
