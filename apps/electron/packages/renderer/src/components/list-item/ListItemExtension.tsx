@@ -9,6 +9,7 @@ import {
   TrashIcon,
   EllipsisVerticalIcon,
   StoreIcon,
+  FolderOpenIcon,
 } from 'lucide-react';
 import preloadAPI from '/@/utils/preloadAPI';
 import { useCommandStore } from '/@/stores/command.store';
@@ -57,16 +58,31 @@ function ListItemExtension({
       icon: EllipsisVerticalIcon,
       value: 'extension-more-menu',
       items: [
-        {
-          type: 'button',
-          icon: StoreIcon,
-          disabled: extension.isLocal,
-          onAction() {
-            window.open(WebURL.storeExtension(extension.name, extension.id));
-          },
-          title: 'Open store page',
-          value: 'extension-store-item',
-        },
+        extension.isLocal
+          ? {
+              type: 'button',
+              icon: FolderOpenIcon,
+              title: 'Open extension folder',
+              value: 'open-extension-folder',
+              onAction() {
+                preloadAPI.main.ipc.invoke(
+                  'shell:open-in-folder',
+                  extension.path,
+                );
+              },
+            }
+          : {
+              type: 'button',
+              icon: StoreIcon,
+              onAction() {
+                preloadAPI.main.ipc.invoke(
+                  'shell:open-url',
+                  WebURL.storeExtension(extension.name, extension.id),
+                );
+              },
+              title: 'Open store page',
+              value: 'extension-store-item',
+            },
         {
           type: 'button',
           icon: TrashIcon,
