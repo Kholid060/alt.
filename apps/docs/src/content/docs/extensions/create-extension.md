@@ -16,7 +16,7 @@ Before building your first extension, ensure you have the prerequisite.
 
 To create a new extension, fork or download the [extension starter template](https://github.com/Kholid060/alt-extension-starter) and install the modules using the package manager, for example, if you're using npm `npm install`;
 
-Open the `manifest.ts` file to change the extension details like the name, description, etc.
+Open the [`manifest.ts`](/extensions/extension-manifest) file to change the extension details like the name, description, etc.
 
 ## Develop Extension
 
@@ -28,7 +28,7 @@ Use the `npm run build` script to build the extension for production.
 
 ![Imported extension](@/assets/images/imported-extension.png)
 
-To import the extension into the Alt app, use the [Import Extension Command](/basics/core-commands/#import-extension-command), navigate to the extension directory, and select the `manifest.json` file inside the `dist` folder of the extension. You'll see the extension commands in the Command Bar.
+To import the extension into the Alt app, use the [Import Extension Command](/basics/core-commands/#import-extension-command), navigate to the extension directory, and select the `manifest.json` file inside the `dist` folder of the extension. You'll see the extension commands in the Command Bar once it imported.
 
 With that, congratulations 🎉 you just built your first extension.
 

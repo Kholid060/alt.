@@ -1,0 +1,519 @@
+---
+title: Manifest
+sidebar:
+  order: 2
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { EXTENSION_CATEGORIES, EXTENSION_COMMAND_TYPE, EXTENSION_PERMISSIONS, EXTENSION_CONFIG_TYPE, EXTENSION_COMMAND_ARGUMENT_TYPE } from '@altdot/shared';
+
+export const iconDescription = <>
+  Name of the image file in the <code>public/icon</code> folder. The image must be PNG and have 512x512 dimensions.
+  To support the dark theme, add a <code>@dark</code> suffix in the icon file name, e.g. <code>icon.png</code> into <code>icon@dark.png</code>. <br />
+  Or use the prefix <code>icon:</code> to use the icons in the UiIcons component as the icon. For example, <code>icon:Command</code>
+</>
+
+Every extension must contain a manifest file. That specifies the extension's metadata like, the name, version, and commands.
+
+In your extension project, the manifest file can be JavaScript, TypeScript, or JSON. And it's on the root directory. Extension manifest file example:
+
+<Tabs>
+  <TabItem label="TypeScript">
+    ```ts
+    // manifest.ts
+    import { ExtensionManifest } from '@altdot/extension';
+
+    const manifest: ExtensionManifest = {
+      name: 'extension-starter',
+      title: 'Hello World',
+      description: 'Alt. extension template starter',
+      author: 'username',
+      categories: ['Other'],
+      icon: 'logo',
+      version: '1.0.0',
+      commands: [
+        {
+          type: 'action',
+          name: 'action-command',
+          title: 'Action Command',
+          arguments: [{ name: 'text', type: 'input:text', title: 'Text arg' }],
+        },
+        {
+          type: 'view',
+          name: 'view-command',
+          title: 'View Command',
+        },
+        {
+          type: 'script',
+          name: 'js-script.js',
+          title: 'Script Command',
+        },
+      ],
+    };
+
+    export default manifest;
+    ```
+  </TabItem>
+  <TabItem label="JavaScript">
+    ```js
+    // manifest.js
+    /**
+     * @type {import('@altdot/extension').ExtensionManifest}
+    */
+    const manifest = {
+      name: 'extension-starter',
+      title: 'Hello World',
+      description: 'Alt. extension template starter',
+      author: 'username',
+      categories: ['Other'],
+      icon: 'logo',
+      version: '1.0.0',
+      commands: [
+        {
+          type: 'action',
+          name: 'action-command',
+          title: 'Action Command',
+          arguments: [{ name: 'text', type: 'input:text', title: 'Text arg' }],
+        },
+        {
+          type: 'view',
+          name: 'view-command',
+          title: 'View Command',
+        },
+        {
+          type: 'script',
+          name: 'js-script.js',
+          title: 'Script Command',
+        },
+      ],
+    };
+
+    export default manifest;
+    ```
+  </TabItem>
+  <TabItem label="JSON">
+    ```json
+    // manifest.json
+    {
+      "name": "extension-starter",
+      "title": "Hello World",
+      "description": "Alt. extension template starter",
+      "author": "username",
+      "categories": [
+        "Other"
+      ],
+      "icon": "logo",
+      "version": "1.0.0",
+      "commands": [
+        {
+          "type": "action",
+          "name": "action-command",
+          "title": "Action Command",
+          "arguments": [
+            {
+              "name": "text",
+              "type": "input:text",
+              "title": "Text arg"
+            }
+          ]
+        },
+        {
+          "type": "view",
+          "name": "view-command",
+          "title": "View Command"
+        },
+        {
+          "type": "script",
+          "name": "js-script.js",
+          "title": "Script Command"
+        }
+      ]
+    }
+    ```
+  </TabItem>
+</Tabs>
+
+## Manifest Properties
+
+export const manifestProps = [
+  {
+    name: 'name',
+    type: <code>string</code>,
+    description: 'URL-friendly name of the extension',
+  },
+  {
+    name: 'title',
+    type: <code>string</code>,
+    description: 'The title of the extension. The title will be shown in the Command Bar and the store when you publish it',
+  },
+  {
+    name: 'version',
+    type: <code>string</code>,
+    description: "The extension's version",
+  },
+  {
+    name: 'description',
+    type: <code>string</code>,
+    description: "Short description of the extension",
+  },
+  {
+    name: 'icon',
+    type: <code>string</code>,
+    description: iconDescription,
+  },
+  {
+    name: 'author',
+    type: <code>string</code>,
+    description: 'Username of your Alt. app account',
+  },
+  {
+    name: 'commands',
+    type: <code><a href="#command-properties">ExtensionCommand</a>[]</code>,
+    description: 'List of the extension commands',
+  },
+  {
+    name: 'categories',
+    type: <code><a href="#categories">Categories</a>[]</code>,
+    description: 'List of the extension categories',
+  },
+  {
+    name: 'config',
+    type: <code><a href="#config-properties">?Config</a>[]</code>,
+    description: <>List of the extension <a href="../configuration">configuration</a></>,
+  },
+  {
+    name: 'permissions',
+    type: <code><a href="#permissions">?Permissions</a>[]</code>,
+    description: 'List of Extension API permissions that the extension wants to have access to',
+  },
+]
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th style="min-width: 100px">Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {manifestProps.map((prop) => (
+      <tr key={prop.name}>
+        <td>{prop.name}</td>
+        <td style="white-space: nowrap">
+          {prop.type}
+        </td>
+        <td>
+          {prop.description}
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+## Command Properties
+
+export const commandProps = [
+  {
+    name: 'name',
+    type: <code>string</code>,
+    description: <>
+      A unique name of the command. The name must correspond with the command file or folder name inside the <code>src</code> directory.
+      For example, <code>view</code> and the file name must be <code>view.ts</code> or <code>view/index.ts</code>.<br />
+      For a command with the <code>script</code> type. The name must include the file extension.
+    </>,
+  },
+  {
+    name: 'type',
+    type: <code>{EXTENSION_COMMAND_TYPE.join(' | ')}</code>,
+    description: <>The command type. Read more about the difference in the <a href="/extensions/command">command page</a></>
+  },
+  {
+    name: 'title',
+    type: <code>string</code>,
+    description: 'The command title that will be shown to the user'
+  },
+  {
+    name: 'icon',
+    type: <code>?string</code>,
+    description: <>{iconDescription}<br /> It will use the extension icon if not defined</>
+  },
+  {
+    name: 'description',
+    type: <code>?string</code>,
+    description: 'A short description of the command'
+  },
+  {
+    name: 'config',
+    type: <code><a href="#config-properties">?Config</a>[]</code>,
+    description: <>List of the command <a href="../configuration">configuration</a></>,
+  },
+  {
+    name: 'arguments',
+    type: <code><a href="#config-properties">?Argument</a>[]</code>,
+    description: <>A list of the command <a href="../command#arguments">arguments</a> for the user needs to be filled in before running the command</>,
+  },
+];
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th style="min-width: 100px">Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {commandProps.map((prop) => (
+      <tr key={prop.name}>
+        <td>{prop.name}</td>
+        <td style="white-space: nowrap">
+          {prop.type}
+        </td>
+        <td>
+          {prop.description}
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+## Config Properties
+
+export const configProps = [
+  {
+    name: 'name',
+    type: <code>string</code>,
+    description: 'A unique name of the config. This name will be used as the key when accessing the config',
+  },
+  {
+    name: 'title',
+    type: <code>string</code>,
+    description: 'Config title that will be shown to the user',
+  },
+  {
+    name: 'type',
+    type: <code>{EXTENSION_CONFIG_TYPE.join(' | ')}</code>,
+    description: 'The config type',
+  },
+  {
+    name: 'placholder',
+    type: <code>?string</code>,
+    description: 'Text that will be displayed when the field has no value',
+  },
+  {
+    name: 'description',
+    type: <code>?string</code>,
+    description: 'Short description of the config',
+  },
+  {
+    name: 'required',
+    type: <code>?boolean</code>,
+    description: 'Whether the user is required to input a value or not',
+  },
+  {
+    name: 'defaultValue',
+    type: <code>string | boolean | number | undefined</code>,
+    description: 'Default value of the field',
+  },
+];
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th style="min-width: 100px">Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {configProps.map((prop) => (
+      <tr key={prop.name}>
+        <td>{prop.name}</td>
+        <td>
+          {prop.type}
+        </td>
+        <td>
+          {prop.description}
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+### Config `select` type Additional Properties
+
+export const selectConfigProps = [
+  {
+    name: 'options',
+    type: <code>{'{ label: string; value: string }'}[]</code>,
+    description: 'Select options',
+  },
+];
+
+<table style="display: table; width: 100%">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th style="min-width: 100px">Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {selectConfigProps.map((prop) => (
+      <tr key={prop.name}>
+        <td>{prop.name}</td>
+        <td>
+          {prop.type}
+        </td>
+        <td>
+          {prop.description}
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+### Config `input:file` type Additional Properties
+
+export const inputFileConfigProps = [
+  {
+    name: 'fileFilter',
+    type: <code>{'{ name: string; extensions: string[] }'}[]</code>,
+    description: <>Filter for which files the user can select. For example, <code>{"{ name: 'JavaScript', extensions: ['js', 'mjs', 'cjs'] }"}</code></>,
+  },
+];
+
+<table style="display: table; width: 100%">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th style="min-width: 100px">Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {inputFileConfigProps.map((prop) => (
+      <tr key={prop.name}>
+        <td>{prop.name}</td>
+        <td>
+          {prop.type}
+        </td>
+        <td>
+          {prop.description}
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+## Argument Properties
+
+export const argumentsProps = [
+  {
+    name: 'name',
+    type: <code>string</code>,
+    description: 'A unique name of the argument. This name will be used as the key when accessing the argument',
+  },
+  {
+    name: 'title',
+    type: <code>string</code>,
+    description: 'Argument title that will be shown to the user',
+  },
+  {
+    name: 'type',
+    type: <code>{EXTENSION_COMMAND_ARGUMENT_TYPE.join(' | ')}</code>,
+    description: 'The argument type',
+  },
+  {
+    name: 'description',
+    type: <code>?string</code>,
+    description: 'Short description of the argument',
+  },
+  {
+    name: 'placholder',
+    type: <code>?string</code>,
+    description: 'Text that will be displayed when the field has no value',
+  },
+  {
+    name: 'required',
+    type: <code>?boolean</code>,
+    description: 'Whether the user is required to input a value or not',
+  },
+];
+
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th style="min-width: 100px">Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {argumentsProps.map((prop) => (
+      <tr key={prop.name}>
+        <td>{prop.name}</td>
+        <td>
+          {prop.type}
+        </td>
+        <td>
+          {prop.description}
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+### Argument `select` type Additional Properties
+
+export const argConfigProps = [
+  {
+    name: 'options',
+    type: <code>{'{ label: string; value: string }'}[]</code>,
+    description: 'Select options',
+  },
+];
+
+<table style="display: table; width: 100%">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th style="min-width: 100px">Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {argConfigProps.map((prop) => (
+      <tr key={prop.name}>
+        <td>{prop.name}</td>
+        <td>
+          {prop.type}
+        </td>
+        <td>
+          {prop.description}
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+## Categories
+
+Here are some categories that you can put in the extension manifest:
+
+<ul>
+  {EXTENSION_CATEGORIES.map((category) => (
+    <li key={category}>{category}</li>
+  ))}
+</ul>
+
+## Permissions
+
+Available permissions:
+
+<ul>
+  {EXTENSION_PERMISSIONS.map((permission) => (
+    <li key={permission}><code>{permission}</code></li>
+  ))}
+</ul>
