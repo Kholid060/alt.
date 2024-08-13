@@ -30,7 +30,7 @@ export default defineConfig({
 					autogenerate: { directory: 'workflow' },
 				},
 				{
-					label: 'Reference',
+					label: 'API Reference',
 					autogenerate: { directory: 'reference' },
 				},
 			],

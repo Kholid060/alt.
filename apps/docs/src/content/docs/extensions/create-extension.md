@@ -11,6 +11,7 @@ Before building your first extension, ensure you have the prerequisite.
 - [Node.js](https://nodejs.org/) v20.16.0 or higher installed
 - Package manager like [npm](http://npmjs.com/), [yarn](https://yarnpkg.com/), or [pnpm](https://pnpm.io/) installed
 - Familiar with [React](https://react.dev/) or [Typescript](https://www.typescriptlang.org/)
+- Familiar with [Git](https://git-scm.com/)
 
 ## Create a New Extension
 
