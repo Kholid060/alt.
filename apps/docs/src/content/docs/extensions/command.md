@@ -1,0 +1,97 @@
+---
+title: Command
+sidebar:
+  order: 3
+---
+
+There are three types of you can build in your extension.
+
+## View Command
+
+As the name suggests, this command type creates a view in the Command Bar. The Alt app uses the React library for its user interface, and you can use the [DOM API](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model) and Extension API inside the view command. To match the Alt app user interface, use the provided UI components.
+
+```tsx
+// view-command.ts
+import { useEffect } from 'react';
+import { _extension, UiList, UiListItem } from '@aldot/extension';
+
+function Component() {
+  const items: UiListItem[] = [
+    {
+      value: 'hello-world',
+      title: 'Hello World',
+      onSelected() {
+        _extension.ui.showToast({
+          title: 'Hello world',
+        });
+      },
+    }
+  ];
+
+  return (
+    <div style={{ padding: '1rem' }}>
+      <UiList items={items} />
+    </div>
+  );
+}
+
+export default Component;
+```
+
+## Action Command
+
+Opposite of the view command, the action type command doesn't return view whatsoever. This command type runs in the background, and because it runs as a [Web Worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers), you can only use Extension APIs and [APIs](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Functions_and_classes_available_to_workers) that the Web Worker supports.
+
+```ts
+// action-command.ts
+import { _extension } from '@altdot/extension';
+
+async function command() {
+  await _extension.notifications.create({
+    title: 'Hello world',
+  });
+}
+
+export default command;
+```
+
+## Script Command
+
+You can write the script command in any supported language, unlike the View and Action command type that can only written in JS or TS. And because of that, the script command doesn't have access to the Extension API.
+
+And because the script command is just a script that runs on the user's computer, whether the script can be run depends on whether the language is installed. For example, when the extension has a [Python](https://www.python.org/) script, but the user doesn't have Python installed, the app will throw an error when the user tries to run the script command.
+
+The script command can show the user interface to the Command Bar by outputting JSON view. For example,
+
+```js
+// script.js
+const jsonView = {
+  view: {
+    type: 'text',
+    text: 'Hello world!',
+  },
+};
+
+console.log(JSON.stringify(jsonView));
+```
+
+```py
+// script.py
+
+import json
+
+print(json.dumps({
+  "view": {
+    "type": "text",
+    "text": "Hello world!"
+  }
+}))
+```
+### Supported Languages
+
+The script command supported languages:
+
+- JavaScript (using [Node](https://nodejs.org/))
+- Python
+- Bash
+- PowerShell

@@ -192,6 +192,9 @@ importers:
 
   apps/docs:
     dependencies:
+      '@altdot/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
       '@astrojs/check':
         specifier: ^0.9.1
         version: 0.9.1(prettier@3.3.3)(typescript@5.5.4)

@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import { ExtensionCredentialSchema } from './manifest-credential';
 import {
   EXTENSION_CATEGORIES,
   EXTENSION_CONFIG_TYPE,
@@ -92,24 +91,23 @@ const ExtensionCommandBase = z.object({
   type: z.enum(EXTENSION_COMMAND_TYPE).exclude(['script']),
   config: ExtensionConfigSchema.array().optional(),
   arguments: ExtensionCommandArgumentSchema.array().optional(),
-  context: z
-    .custom<'all' | `host:${string}`>(
-      (val) =>
-        typeof val === 'string' && (val.startsWith('host') || val === 'all'),
-      {
-        message:
-          'Command context must be "All" or match the "host:URL" pattern',
-      },
-    )
-    .array()
-    .optional(),
+  // context: z
+  //   .custom<'all' | `host:${string}`>(
+  //     (val) =>
+  //       typeof val === 'string' && (val.startsWith('host') || val === 'all'),
+  //     {
+  //       message:
+  //         'Command context must be "All" or match the "host:URL" pattern',
+  //     },
+  //   )
+  //   .array()
+  //   .optional(),
 });
 export const ExtensionCommandSchema = z.discriminatedUnion('type', [
   ExtensionCommandBase,
   ExtensionCommandBase.merge(
     z.object({
       type: z.literal('script'),
-      isInternal: z.boolean().optional(),
     }),
   ),
 ]);
@@ -131,7 +129,6 @@ export const ExtensionManifestSchema = z.object({
       message: `Extension must have at least one category.\nAvailable categories: ${EXTENSION_CATEGORIES.join(',')}`,
     })
     .transform((data) => [...new Set(data)]),
-  credentials: ExtensionCredentialSchema.array().optional(),
   permissions: z.enum(EXTENSION_PERMISSIONS).array().optional(),
   name: z
     .string()
