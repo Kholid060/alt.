@@ -1,4 +1,4 @@
-@import 'reactflow/dist/style.css';
+@import '@xyflow/react/dist/style.css';
 
 .react-flow__handle {
   width: theme(spacing.3);

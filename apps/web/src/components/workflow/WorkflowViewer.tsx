@@ -2,11 +2,10 @@ import {
   Background,
   BackgroundVariant,
   Controls,
-  NodeProps,
   ReactFlow,
   ReactFlowProps,
   useStoreApi,
-} from 'reactflow';
+} from '@xyflow/react';
 import {
   WORKFLOW_NODE_TYPE,
   WorkflowNodeBasicNode,
@@ -15,6 +14,7 @@ import {
   WorkflowNodeConditionalNode,
   WorkflowEdgeDefault,
   WorkflowNodesProvider,
+  WorkflowNodeNoteNode,
 } from '@altdot/workflow';
 import clsx from 'clsx';
 import { BlocksIcon, LucideIcon } from 'lucide-react';
@@ -22,18 +22,21 @@ import { UiIcons } from '@altdot/ui';
 import { forwardRef, memo, useEffect } from 'react';
 
 const defaultNodeTypes = Object.values(WORKFLOW_NODE_TYPE).reduce<
-  Partial<Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps>>>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Partial<Record<WORKFLOW_NODE_TYPE, React.FC<any>>>
 >((acc, curr) => {
   acc[curr] = WorkflowNodeBasicNode;
 
   return acc;
 }, {});
 const nodeTypes: Partial<
-  Record<WORKFLOW_NODE_TYPE | 'default', React.FC<NodeProps>>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  Record<WORKFLOW_NODE_TYPE | 'default', React.FC<any>>
 > = {
   ...defaultNodeTypes,
   default: WorkflowNodeBasicNode,
   [WORKFLOW_NODE_TYPE.LOOP]: WorkflowNodeLoopNode,
+  [WORKFLOW_NODE_TYPE.NOTE]: WorkflowNodeNoteNode,
   [WORKFLOW_NODE_TYPE.COMMAND]: WorkflowNodeCommandNode,
   [WORKFLOW_NODE_TYPE.CONDITIONAL]: WorkflowNodeConditionalNode,
 };
