@@ -4,14 +4,18 @@ sidebar:
   order: 3
 ---
 
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+## Command Type
+
 There are three types of you can build in your extension.
 
-## View Command
+### View Command
 
 As the name suggests, this command type creates a view in the Command Bar. The Alt app uses the React library for its user interface, and you can use the [DOM API](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model) and Extension API inside the view command. To match the Alt app user interface, use the provided UI components.
 
 ```tsx
-// view-command.ts
+// view-command.tsx
 import { useEffect } from 'react';
 import { _extension, UiList, UiListItem } from '@aldot/extension';
 
@@ -38,7 +42,7 @@ function Component() {
 export default Component;
 ```
 
-## Action Command
+### Action Command
 
 Opposite of the view command, the action type command doesn't return view whatsoever. This command type runs in the background, and because it runs as a [Web Worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers), you can only use Extension APIs and [APIs](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Functions_and_classes_available_to_workers) that the Web Worker supports.
 
@@ -55,7 +59,7 @@ async function command() {
 export default command;
 ```
 
-## Script Command
+### Script Command
 
 You can write the script command in any supported language, unlike the View and Action command type that can only written in JS or TS. And because of that, the script command doesn't have access to the Extension API.
 
@@ -87,7 +91,7 @@ print(json.dumps({
   }
 }))
 ```
-### Supported Languages
+#### Supported Languages
 
 The script command supported languages:
 
@@ -95,3 +99,42 @@ The script command supported languages:
 - Python
 - Bash
 - PowerShell
+
+## Command Arguments
+
+![Command arguments](@/assets/images/command-args.png)
+
+Arguments allow you to make the user pass values before running the command.
+
+You can define the command arguments in the [command properties](../manifest#command-properties) of the extension manifest, and they can only have up to **4 arguments**.
+
+### Accessing Arguments
+
+For view and action type commands, you can access the argument values in the `args` property of the function parameter.
+
+```ts
+// command.ts
+import { CommandLaunchContext } from '@altdot/extension';
+
+function Command({ args }: CommandLaunchContext<{ fileName: string }>) {
+  console.log(args.fileName);
+}
+
+export default Command;
+```
+
+The argument values can be accessed in the environment variable for the script command type. The argument property name has a `__ARGS__` prefix, and the argument name itself will converted into a snake case. For example, when the argument name is `file-name`, it can be accessed using the `__ARGS__FILE_NAME` key.
+
+```js
+// javascript.js
+
+console.log(process.env.__ARGS__FILE_NAME);
+```
+
+```py
+// python.js
+
+import os
+
+print(os.environ["__ARGS__FILE_NAME"])
+```
