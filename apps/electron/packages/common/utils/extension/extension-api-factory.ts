@@ -18,6 +18,7 @@ import { ExtensionBrowserTab } from './extension-browser-api';
 export interface CreateExtensionAPI {
   context?: unknown;
   browserCtx: ExtensionBrowserTabContext;
+  platform: ExtensionAPI.Runtime.PlatformInfo;
   sendMessage: <T extends keyof IPCUserExtensionEventsMap>(
     name: T,
     ...args: Parameters<IPCUserExtensionEventsMap[T]>
@@ -136,7 +137,10 @@ function extensionAPIUi(
 
 function extensionOAuth({
   sendMessage,
-}: CreateExtensionAPI): Pick<ExtensionAPIValues, 'oAuth.createPKCE'> {
+}: Pick<CreateExtensionAPI, 'sendMessage'>): Pick<
+  ExtensionAPIValues,
+  'oAuth.createPKCE'
+> {
   return {
     'oAuth.createPKCE': (provider) => {
       return Object.freeze(new OAuthPKCEClient({ provider, sendMessage }));
@@ -147,7 +151,7 @@ function extensionOAuth({
 function extensionBrowserTabs({
   browserCtx,
   sendMessage,
-}: CreateExtensionAPI): Pick<
+}: Pick<CreateExtensionAPI, 'browserCtx' | 'sendMessage'>): Pick<
   ExtensionAPIValues,
   'browser.tabs.query' | 'browser.tabs.getActive'
 > {
@@ -186,6 +190,7 @@ function extensionBrowserTabs({
 }
 
 export function createExtensionAPI({
+  platform,
   browserCtx,
   messagePort,
   sendMessage,
@@ -196,14 +201,13 @@ export function createExtensionAPI({
       values: {
         ...extensionAPIGetIconURL(),
         ...extensionAPIUi(messagePort),
+        ...extensionOAuth({ sendMessage }),
         ...extensionAPISearchPanel(messagePort),
-        ...extensionOAuth({ browserCtx, messagePort, sendMessage, context }),
         ...extensionBrowserTabs({
-          context,
           browserCtx,
-          messagePort,
           sendMessage,
         }),
+        'runtime.platform': platform,
         'runtime.getFileIconURL': (filePath) =>
           `${CUSTOM_SCHEME.fileIcon}://${filePath}`,
       },

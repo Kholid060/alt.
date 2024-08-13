@@ -9,7 +9,7 @@ import {
   ExtensionMessagePortEventAsync,
 } from '@altdot/extension';
 import type {
-  ExtensionBrowserTabContext,
+  ExtensionCommandExecutePayload,
   ExtensionCommandViewInitMessage,
 } from '#common/interface/extension.interface';
 import { PRELOAD_API_KEY } from '#common/utils/constant/constant';
@@ -30,7 +30,7 @@ type ExtensionMessagePort = BetterMessagePort<
 
 async function injectExtensionAPI(
   messagePort: ExtensionMessagePort,
-  browserCtx?: ExtensionBrowserTabContext,
+  { browserCtx, platform }: ExtensionCommandExecutePayload,
 ) {
   await new Promise<void>((resolve) => {
     function isLoaded() {
@@ -42,6 +42,7 @@ async function injectExtensionAPI(
   });
 
   const extensionAPI = createExtensionAPI({
+    platform,
     messagePort,
     sendMessage: window.$$extIPC,
     browserCtx: browserCtx ?? null,
@@ -66,7 +67,7 @@ async function onMessage({
     applyTheme(data.theme);
 
     const messagePort: ExtensionMessagePort = new BetterMessagePort(port);
-    await injectExtensionAPI(messagePort, data.payload.browserCtx);
+    await injectExtensionAPI(messagePort, data.payload);
     injectComponents();
     await extViewRenderer(
       {

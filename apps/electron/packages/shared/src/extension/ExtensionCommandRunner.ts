@@ -88,7 +88,11 @@ class ExtensionCommandRunner {
       let commandRunner: ExtensionRunnerProcess | null = null;
       const commandRunnerPayload: ExtensionRunnerProcessConstructor = {
         command,
-        payload,
+        payload: {
+          ...payload,
+          command,
+          commandFilePath,
+        },
         runner: this,
         id: runnerId,
         commandFilePath,

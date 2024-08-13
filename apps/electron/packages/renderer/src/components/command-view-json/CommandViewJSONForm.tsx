@@ -1,8 +1,7 @@
 import {
   CommandJSONViewForm,
   CommandJSONViewFormFields,
-  CommandLaunchBy,
-} from '@altdot/extension';
+} from '@altdot/extension/dist/validation/command-json.validation';
 import {
   UiButton,
   UiInput,
@@ -14,6 +13,7 @@ import {
 import { useId, useRef } from 'react';
 import { useCommandViewJSON } from '/@/context/command-view-json.context';
 import preloadAPI from '/@/utils/preloadAPI';
+import { CommandLaunchBy } from '@altdot/extension';
 
 function CommandViewJSONFormFields({
   field,

@@ -1,4 +1,4 @@
-import { CommandJSONViewText } from '@altdot/extension';
+import { CommandJSONViewText } from '@altdot/extension/dist/validation/command-json.validation';
 
 type TextType = Required<CommandJSONViewText>;
 

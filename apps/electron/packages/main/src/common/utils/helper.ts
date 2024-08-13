@@ -1,5 +1,7 @@
+import { ExtensionAPI } from '@altdot/extension';
 import type { ExtensionConfig } from '@altdot/extension/dist/extension-manifest';
 import { WSAckErrorResult, isObject } from '@altdot/shared';
+import { app } from 'electron';
 import type { BrowserWindow, Display } from 'electron';
 
 export function getExtensionConfigDefaultValue(config: ExtensionConfig[]): {
@@ -49,4 +51,12 @@ export function centerWindow(
 
 export function isWSAckError(result: unknown): result is WSAckErrorResult {
   return Boolean(result) && isObject(result) && 'error' in result;
+}
+
+export function getExtensionPlatform(): ExtensionAPI.Runtime.PlatformInfo {
+  return {
+    arch: process.arch,
+    os: process.platform,
+    appVersion: app.getVersion(),
+  };
 }

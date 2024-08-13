@@ -1,9 +1,16 @@
 import { ExtensionManifest } from '../../extension-manifest';
 
 export declare namespace Runtime {
+  interface PlatformInfo {
+    appVersion: string;
+    os: NodeJS.Platform;
+    arch: NodeJS.Architecture;
+  }
+
   interface Static {
     config: Config.Static;
-    command: Command.Static;
+
+    readonly platform: PlatformInfo;
 
     // @ext-api-value
     getFileIconURL(filePath: string): string;

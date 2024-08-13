@@ -60,9 +60,3 @@
   }
 }
 
-
-.command-args [data-tooltip]:before {
-  top: 110%;
-  bottom: auto;
-  white-space: pre;
-}

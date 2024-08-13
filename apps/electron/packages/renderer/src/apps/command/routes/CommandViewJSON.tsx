@@ -1,5 +1,5 @@
 import { useCommandRoute } from '/@/hooks/useCommandRoute';
-import { CommandJSONView } from '@altdot/extension';
+import { CommandJSONView } from '@altdot/extension/dist/validation/command-json.validation';
 import CommandViewJSONText from '/@/components/command-view-json/CommandViewJSONText';
 import CommandViewJSONList from '/@/components/command-view-json/CommandViewJSONList';
 import { CommandViewJSONProvider } from '/@/context/command-view-json.context';

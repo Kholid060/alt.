@@ -6,6 +6,7 @@ import type {
   IPCInvokeReturn,
 } from '#packages/common/interface/ipc-events.interface';
 import { ExtensionQueryService } from './extension-query.service';
+import { getExtensionPlatform } from '../common/utils/helper';
 
 @Controller()
 export class ExtensionController {
@@ -59,5 +60,10 @@ export class ExtensionController {
     @Payload() [ids]: IPCInvokePayload<'database:get-extension-exists-arr'>,
   ): IPCInvokeReturn<'database:get-extension-exists-arr'> {
     return this.extensionQuery.existsArr(ids);
+  }
+
+  @IPCInvoke('extension:get-platform')
+  async getExtensionPlatform(): IPCInvokeReturn<'extension:get-platform'> {
+    return getExtensionPlatform();
   }
 }

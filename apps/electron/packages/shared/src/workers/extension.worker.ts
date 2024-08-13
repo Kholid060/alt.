@@ -4,7 +4,7 @@ import {
 } from '#common/utils/constant/constant';
 import type {
   CommandLaunchContext,
-  CommandViewJSONLaunchContext,
+  ExtensionAPI,
   ExtensionMessagePortEventAsync,
 } from '@altdot/extension';
 import { BetterMessagePort } from '@altdot/shared';
@@ -17,9 +17,7 @@ import type { ExtensionCommandWorkerInitMessage } from '../interface/extension.i
 import type { MessagePortSharedCommandWindowEvents } from '#packages/common/interface/message-port-events.interface';
 import { createExtensionAPI } from '#common/utils/extension/extension-api-factory';
 
-type ExtensionCommand = (
-  payload: CommandLaunchContext | CommandViewJSONLaunchContext,
-) => void;
+type ExtensionCommand = (payload: CommandLaunchContext) => void;
 
 async function loadExtensionCommand(extensionId: string, commandId: string) {
   const filePath = `${CUSTOM_SCHEME.extension}://${extensionId}/command/${commandId}/@renderer`;
@@ -37,6 +35,7 @@ interface InitExtensionAPIData {
   commandId: string;
   mainMessagePort: MessagePort;
   browserCtx: ExtensionBrowserTabContext;
+  platform: ExtensionAPI.Runtime.PlatformInfo;
   messagePort: BetterMessagePort<
     ExtensionMessagePortEventAsync,
     MessagePortSharedCommandWindowEvents
@@ -44,6 +43,7 @@ interface InitExtensionAPIData {
 }
 function initExtensionAPI({
   key,
+  platform,
   commandId,
   browserCtx,
   messagePort,
@@ -59,6 +59,7 @@ function initExtensionAPI({
   messagePort.sync.sendMessage('extension:query-clear-value');
 
   const extensionAPI = createExtensionAPI({
+    platform,
     browserCtx,
     messagePort,
     sendMessage: extensionWorkerMessage.sendMessage.bind(
@@ -105,8 +106,8 @@ async function commandActionRunner({
 }
 
 self.onmessage = async ({
-  ports,
   data,
+  ports,
 }: MessageEvent<ExtensionCommandWorkerInitMessage>) => {
   try {
     if (!ports.length || data?.type !== 'init') {
@@ -123,9 +124,10 @@ self.onmessage = async ({
     const messagePort = new BetterMessagePort(ports[1], {
       eventTimeoutMs: 120_000, // 2 minutes
     });
-    const { commandId, extensionId, browserCtx } = data.payload;
+    const { commandId, extensionId, browserCtx, platform } = data.payload;
 
     initExtensionAPI({
+      platform,
       commandId,
       messagePort,
       key: extensionId,

@@ -33,7 +33,7 @@ export const mapManifestToDB = {
     config,
     author,
     version,
-    credentials,
+    // credentials,
     description,
     permissions,
   }: ExtensionManifest): Omit<NewExtension, 'id' | 'path'> {
@@ -44,7 +44,7 @@ export const mapManifestToDB = {
       author,
       config,
       version,
-      credentials,
+      // credentials,
       description,
       permissions,
     };
@@ -55,7 +55,6 @@ export const mapManifestToDB = {
     icon,
     title,
     config,
-    context,
     subtitle,
     description,
     arguments: commandArguments,
@@ -66,7 +65,6 @@ export const mapManifestToDB = {
       type,
       title,
       config,
-      context,
       subtitle,
       description,
       arguments: commandArguments,

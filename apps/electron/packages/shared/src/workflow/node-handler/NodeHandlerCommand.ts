@@ -8,7 +8,7 @@ import type {
   WorkflowNodeHandlerExecuteReturn,
 } from './WorkflowNodeHandler';
 import ExtensionCommandRunner from '/@/extension/ExtensionCommandRunner';
-import { CommandLaunchBy } from '@altdot/extension';
+import { CommandLaunchBy, ExtensionAPI } from '@altdot/extension';
 import type { ExtensionCommandExecutePayloadWithData } from '#packages/common/interface/extension.interface';
 import type { WorkflowRunnerBrowserContext } from '../runner/WorklowRunnerBrowser';
 import { ExtensionCommandModel } from '#packages/main/src/extension/extension-command/extension-command.interface';
@@ -66,6 +66,8 @@ export class NodeHandlerCommand extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.C
   private commandDataCache: Record<string, CommandDataWithPath> = {};
 
   private commandRunnerIds: Set<string> = new Set();
+
+  private runtimePlatformCache: ExtensionAPI.Runtime.PlatformInfo | null = null;
 
   constructor() {
     super(WORKFLOW_NODE_TYPE.COMMAND);
@@ -178,8 +180,15 @@ export class NodeHandlerCommand extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.C
       nodeId: node.id,
       extensionId: extension.id,
     });
+
+    const platform =
+      this.runtimePlatformCache ||
+      (await IPCRenderer.invokeWithError('extension:get-platform'));
+    if (!this.runtimePlatformCache) this.runtimePlatformCache = platform;
+
     const value = await this.executeCommandPromise({
       command,
+      platform,
       commandId,
       extensionId: extension.id,
       launchContext: {

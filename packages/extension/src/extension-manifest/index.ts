@@ -90,7 +90,7 @@ const ExtensionCommandBase = z.object({
   title: z.string().min(1).max(48),
   type: z.enum(EXTENSION_COMMAND_TYPE).exclude(['script']),
   config: ExtensionConfigSchema.array().optional(),
-  arguments: ExtensionCommandArgumentSchema.array().optional(),
+  arguments: ExtensionCommandArgumentSchema.array().max(4).optional(),
   // context: z
   //   .custom<'all' | `host:${string}`>(
   //     (val) =>

@@ -192,6 +192,7 @@ export interface IPCOAuthEvents {
 }
 
 export interface IPCExtensionEvents {
+  'extension:get-platform': () => ExtensionAPI.Runtime.PlatformInfo;
   'extension:is-config-inputted': (
     extensionId: string,
     commandId?: string,

@@ -3,7 +3,7 @@ import { _extension, CommandLaunchContext, OAuthRedirect } from '@altdot/extensi
 const filePath = 'D:\\test.txt';
 
 async function commandExecution() {
-  const test = await _extension.runtime.command.launch({
+  const test = await _extension.command.launch({
     name: 'javascript.js',
     args: {
       test: 'hello worldo',
@@ -13,7 +13,7 @@ async function commandExecution() {
 }
 async function commandExecutionFail() {
   try {
-    const test = await _extension.runtime.command.launch({
+    const test = await _extension.command.launch({
       name: 'a-command',
       args: {
         test: 'hello world',
@@ -142,7 +142,9 @@ export default async function CommandMain(context: CommandLaunchContext) {
   // await selectElement();
   // await selectFile();
 
-  await storage();
+  console.log('__', JSON.stringify(_extension.runtime.platform, null, 2));
+
+  // await storage();
 
   // await authorizeCredential();
   // await _extension.runtime.config.openConfigPage('command');

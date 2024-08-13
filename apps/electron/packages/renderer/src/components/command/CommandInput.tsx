@@ -1,4 +1,4 @@
-import { UiSwitch, useUiList } from '@altdot/ui';
+import { UiSwitch, UiTooltip, useUiList } from '@altdot/ui';
 import { UiListSelectedItem, useUiListStore } from '@altdot/ui';
 import { ArrowLeftIcon, ChevronDownIcon, SearchIcon } from 'lucide-react';
 import { forwardRef, useRef, useEffect, useCallback, useContext } from 'react';
@@ -67,101 +67,113 @@ const CommandInputArguments = forwardRef<
     >
       {selectedCommand?.command.arguments?.map((argument) => {
         const key = selectedCommand.command.id + argument.name;
-        const tooltip =
-          `${argument.title}${argument.required ? '*' : ''}\n${argument.description ?? ''}`.trim();
+        const tooltip = (
+          <div className="max-w-xs">
+            <p>
+              {argument.title}{' '}
+              {argument.required && (
+                <span className="text-destructive-text">*</span>
+              )}
+            </p>
+            <p className="text-xs text-muted-foreground">
+              {argument.description}
+            </p>
+          </div>
+        );
 
         switch (argument.type) {
           case 'select':
             return (
-              <div
-                key={key}
-                data-tooltip={tooltip}
-                className="relative h-full max-w-28 rounded-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background"
-              >
-                <select
-                  value={`${args[argument.name] ?? ''}`}
-                  required={argument.required}
-                  data-command-argument={argument.name}
-                  className="h-full w-full appearance-none rounded-sm bg-secondary stroke-foreground pl-2 pr-6 transition-colors hover:bg-secondary-hover focus:outline-none"
-                  onKeyDownCapture={(event) => {
-                    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-                      event.stopPropagation();
-                    }
-                  }}
-                  onChange={(event) => {
-                    setCommandArgs({
-                      commandId: selectedCommand.command.name,
-                      args: { [argument.name]: event.target.value },
-                    });
-                  }}
-                  onFocus={() => onArgFieldFocus?.(argument.name)}
-                >
-                  <option value="" disabled>
-                    {argument.placeholder || 'Select'}
-                  </option>
-                  {argument.options.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
+              <UiTooltip key={key} label={tooltip}>
+                <div className="relative h-full max-w-28 rounded-sm focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 focus-within:ring-offset-background">
+                  <select
+                    value={`${args[argument.name] ?? ''}`}
+                    required={argument.required}
+                    data-command-argument={argument.name}
+                    className="h-full w-full appearance-none rounded-sm bg-secondary stroke-foreground pl-2 pr-6 transition-colors hover:bg-secondary-hover focus:outline-none"
+                    onKeyDownCapture={(event) => {
+                      if (
+                        event.key === 'ArrowDown' ||
+                        event.key === 'ArrowUp'
+                      ) {
+                        event.stopPropagation();
+                      }
+                    }}
+                    onChange={(event) => {
+                      setCommandArgs({
+                        commandId: selectedCommand.command.name,
+                        args: { [argument.name]: event.target.value },
+                      });
+                    }}
+                    onFocus={() => onArgFieldFocus?.(argument.name)}
+                  >
+                    <option value="" disabled>
+                      {argument.placeholder || 'Select'}
                     </option>
-                  ))}
-                </select>
-                <ChevronDownIcon className="pointer-events-none absolute right-1.5 top-1/2 h-4 w-4 -translate-y-1/2" />
-              </div>
+                    {argument.options.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDownIcon className="pointer-events-none absolute right-1.5 top-1/2 h-4 w-4 -translate-y-1/2" />
+                </div>
+              </UiTooltip>
             );
           case 'input:text':
           case 'input:number':
           case 'input:password': {
             const { 1: type } = argument.type.split(':');
             return (
-              <span key={key} className="h-full" data-tooltip={tooltip}>
-                <input
-                  type={type}
-                  value={`${args[argument.name] ?? ''}`}
-                  required={argument.required}
-                  data-command-argument={argument.name}
-                  placeholder={argument.placeholder}
-                  className="h-full max-w-28 rounded-sm border-input bg-secondary px-2 hover:bg-secondary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                  onFocus={() => onArgFieldFocus?.(argument.name)}
-                  onChange={(event) => {
-                    const target = event.target as HTMLInputElement;
-                    setCommandArgs({
-                      commandId: selectedCommand.command.name,
-                      args: {
-                        [argument.name]:
-                          type === 'number'
-                            ? target.valueAsNumber
-                            : target.value,
-                      },
-                    });
-                  }}
-                />
-              </span>
+              <UiTooltip key={key} label={tooltip} align="start" side="bottom">
+                <span className="relative h-full">
+                  <input
+                    type={type}
+                    value={`${args[argument.name] ?? ''}`}
+                    required={argument.required}
+                    data-command-argument={argument.name}
+                    placeholder={argument.placeholder}
+                    className="h-full max-w-28 rounded-sm border-input bg-secondary px-2 hover:bg-secondary-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    onFocus={() => onArgFieldFocus?.(argument.name)}
+                    onChange={(event) => {
+                      const target = event.target as HTMLInputElement;
+                      setCommandArgs({
+                        commandId: selectedCommand.command.name,
+                        args: {
+                          [argument.name]:
+                            type === 'number'
+                              ? target.valueAsNumber
+                              : target.value,
+                        },
+                      });
+                    }}
+                  />
+                </span>
+              </UiTooltip>
             );
           }
           case 'toggle':
             return (
-              <span
-                key={key}
-                className="inline-flex items-center gap-1"
-                data-tooltip={tooltip}
-              >
-                <UiSwitch
-                  size="sm"
-                  checked={Boolean(args[argument.name] ?? false)}
-                  data-command-argument={argument.name}
-                  onFocus={() => onArgFieldFocus?.(argument.name)}
-                  onCheckedChange={(checked) => {
-                    setCommandArgs({
-                      commandId: selectedCommand.command.name,
-                      args: { [argument.name]: checked },
-                    });
-                  }}
-                  className="data-[state=unchecked]:bg-secondary-selected"
-                />
-                <span className="line-clamp-1 max-w-28">
-                  {argument.placeholder}
+              <UiTooltip key={key} label={tooltip}>
+                <span className="inline-flex items-center gap-1">
+                  <UiSwitch
+                    size="sm"
+                    checked={Boolean(args[argument.name] ?? false)}
+                    data-command-argument={argument.name}
+                    onFocus={() => onArgFieldFocus?.(argument.name)}
+                    onCheckedChange={(checked) => {
+                      setCommandArgs({
+                        commandId: selectedCommand.command.name,
+                        args: { [argument.name]: checked },
+                      });
+                    }}
+                    className="data-[state=unchecked]:bg-secondary-selected"
+                  />
+                  <span className="line-clamp-1 max-w-28">
+                    {argument.placeholder}
+                  </span>
                 </span>
-              </span>
+              </UiTooltip>
             );
           default:
             return null;

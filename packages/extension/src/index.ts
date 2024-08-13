@@ -8,8 +8,8 @@ export * from './components/components-map';
 
 export type * from './interfaces/message-events';
 export type * from './interfaces/command.interface';
-export type * from './interfaces/command-action.interface';
-export type * from './interfaces/command-json-view.interface';
+
+export type * from './validation/command-json.validation';
 
 export { CommandLaunchBy } from './interfaces/command.interface';
 

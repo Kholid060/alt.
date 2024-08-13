@@ -1,4 +1,4 @@
-import type { ExtensionCommandExecutePayload } from '#common/interface/extension.interface';
+import type { ExtensionCommandExecutePayloadWithData } from '#common/interface/extension.interface';
 import { EventEmitter } from 'eventemitter3';
 import type ExtensionCommandRunner from '../ExtensionCommandRunner';
 import type { BetterMessagePayload } from '@altdot/shared';
@@ -22,14 +22,14 @@ export interface ExtensionRunnerProcessConstructor {
   commandFilePath: string;
   runner: ExtensionCommandRunner;
   command: ExtensionCommandModel;
-  payload: ExtensionCommandExecutePayload;
+  payload: ExtensionCommandExecutePayloadWithData;
 }
 
 abstract class ExtensionRunnerProcess extends EventEmitter<ExtensionRunnerProcessEvents> {
   commandFilePath: string;
   runner: ExtensionCommandRunner;
   command: ExtensionCommandModel;
-  payload: ExtensionCommandExecutePayload;
+  payload: ExtensionCommandExecutePayloadWithData;
 
   abstract id: string;
 

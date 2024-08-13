@@ -7,7 +7,6 @@ import {
   SelectExtension,
   extensionCommands,
   extensionConfigs,
-  extensionCreds,
   extensions,
 } from '/@/db/schema/extension.schema';
 import {
@@ -101,19 +100,19 @@ export class ExtensionUpdater {
   private async updateCredentials() {
     if (this.payload.isError) return;
 
-    const extensionCredProvider =
-      this.payload.manifest.credentials?.map(({ providerId }) => providerId) ??
-      [];
-    await this.db
-      .delete(extensionCreds)
-      .where(
-        extensionCredProvider.length === 0
-          ? eq(extensionCreds.extensionId, this.payload.extensionId)
-          : and(
-              eq(extensionCreds.extensionId, this.payload.extensionId),
-              notInArray(extensionCreds.providerId, extensionCredProvider),
-            ),
-      );
+    // const extensionCredProvider =
+    //   this.payload.manifest.credentials?.map(({ providerId }) => providerId) ??
+    //   [];
+    // await this.db
+    //   .delete(extensionCreds)
+    //   .where(
+    //     extensionCredProvider.length === 0
+    //       ? eq(extensionCreds.extensionId, this.payload.extensionId)
+    //       : and(
+    //           eq(extensionCreds.extensionId, this.payload.extensionId),
+    //           notInArray(extensionCreds.providerId, extensionCredProvider),
+    //         ),
+    //   );
   }
 
   private async updateConfig() {

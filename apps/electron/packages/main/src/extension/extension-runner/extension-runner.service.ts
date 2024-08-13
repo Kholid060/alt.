@@ -1,6 +1,7 @@
 import {
   ExtensionBrowserTabContext,
   ExtensionCommandExecutePayload,
+  ExtensionCommandExecutePayloadWithData,
   ExtensionCommandJSONViewData,
   ExtensionCommandProcess,
 } from '#packages/common/interface/extension.interface';
@@ -23,6 +24,7 @@ import { ClipboardService } from '/@/clipboard/clipboard.service';
 import { shell } from 'electron';
 import { parseJSON } from '@altdot/shared';
 import { debugLog } from '#packages/common/utils/helper';
+import { getExtensionPlatform } from '/@/common/utils/helper';
 
 @Injectable()
 export class ExtensionRunnerService {
@@ -217,10 +219,11 @@ export class ExtensionRunnerService {
       throw new Error("Config hasn't been inputted");
     }
 
-    const executeCommandPayload = {
+    const executeCommandPayload: ExtensionCommandExecutePayloadWithData = {
       ...payload,
       command,
       commandFilePath,
+      platform: getExtensionPlatform(),
     };
 
     let runnerId: string | null = null;

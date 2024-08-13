@@ -9,7 +9,7 @@ import preloadAPI from './preloadAPI';
 import { IPCEventError } from '#common/interface/ipc-events.interface';
 import { CommandPanelStoreActions } from '../stores/command-panel.store';
 import { isIPCEventError } from './helper';
-import { CommandJSONAction } from '@altdot/extension';
+import { CommandJSONAction } from '@altdot/extension/dist/validation/command-json.validation';
 
 function resultHandler(
   {

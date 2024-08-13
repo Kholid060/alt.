@@ -1,8 +1,9 @@
 import {
-  CommandJSONView,
   CommandLaunchBy,
   CommandLaunchContext,
+  ExtensionAPI,
 } from '@altdot/extension';
+import { CommandJSONView } from '@altdot/extension/dist/validation/command-json.validation';
 import { ExtensionCommandModel } from '../../main/src/extension/extension-command/extension-command.interface';
 import {
   EXTENSION_CONFIG_TYPE,
@@ -62,6 +63,7 @@ export interface ExtensionCommandExecutePayloadWithData
   extends ExtensionCommandExecutePayload {
   commandFilePath: string;
   command: ExtensionCommandModel;
+  platform: ExtensionAPI.Runtime.PlatformInfo;
 }
 
 export type ExtensionNeedConfigInput = 'extension' | 'command' | false;
