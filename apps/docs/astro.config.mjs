@@ -26,12 +26,12 @@ export default defineConfig({
 					autogenerate: { directory: 'extensions' },
 				},
 				{
-					label: 'Workflow',
-					autogenerate: { directory: 'workflow' },
+					label: 'Workflows',
+					autogenerate: { directory: 'workflows' },
 				},
 				{
 					label: 'API Reference',
-					autogenerate: { directory: 'reference' },
+					autogenerate: { directory: 'api-reference' },
 				},
 			],
 			plugins: [starlightImageZoom()],
