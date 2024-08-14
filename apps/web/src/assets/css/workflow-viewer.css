@@ -10,14 +10,12 @@
   }
 
   &-left {
-    left: -6px;
     border: none;
     height: theme(spacing.8);
     border-radius: theme(borderRadius.sm);
     background-color: theme(colors.primary.DEFAULT);
   }
   &-right {
-    right: -7px;
     width: theme(spacing.4);
     height: theme(spacing.4);
     border-radius: theme(borderRadius.full);
