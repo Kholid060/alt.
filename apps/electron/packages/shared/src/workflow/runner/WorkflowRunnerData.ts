@@ -5,8 +5,9 @@ import { WORKFLOW_NODE_TYPE, WorkflowVariableMode } from '@altdot/workflow';
 
 interface WorkflowRunnerLoopData {
   index: number;
-  label?: string;
+  nodeId: string;
   data: unknown[];
+  currentData: unknown;
 }
 
 class StorageData<

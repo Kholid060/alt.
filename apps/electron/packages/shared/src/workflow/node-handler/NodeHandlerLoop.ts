@@ -56,6 +56,8 @@ export class NodeHandlerLoop extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.LOOP
       runner.dataStorage.loopData.set(node.id, {
         index: 0,
         data: dataArr,
+        nodeId: node.id,
+        currentData: dataArr[0],
       });
 
       return {
@@ -77,7 +79,9 @@ export class NodeHandlerLoop extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.LOOP
 
     runner.dataStorage.loopData.set(node.id, {
       data,
+      nodeId: node.id,
       index: nextIndex,
+      currentData: data[nextIndex],
     });
 
     return {

@@ -104,6 +104,9 @@ function CommandArgs({ data }: { data: WorkflowNodeCommand['data'] }) {
             >
               {argComponent}
             </WorkflowUiFormExpression>
+            <p className="ml-1 text-xs text-muted-foreground">
+              {arg.description}
+            </p>
           </li>
         );
       })}

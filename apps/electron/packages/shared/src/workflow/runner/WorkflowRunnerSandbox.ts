@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { isObject } from '@altdot/shared';
 import { getProperty, setProperty } from 'dot-prop';
-import type { QuickJSContext, QuickJSRuntime } from 'quickjs-emscripten';
 import type WorkflowRunner from './WorkflowRunner';
 import {
   Scope,
+  QuickJSRuntime,
+  QuickJSContext,
   newQuickJSWASMModuleFromVariant,
 } from 'quickjs-emscripten-core';
 import RELEASE_SYNC from '@jitl/quickjs-wasmfile-release-sync';
@@ -81,7 +82,7 @@ const EXP_RUNTIME_MAX_STACK_SIZE_BYTE = 0.5 * 1024 * 1024; // 0.5MB
 
 const CODE_RUNTIME_MEMORY_LIMIT_BYTE = 2.5 * 1024 * 1024; // 2.5MB
 const CODE_RUNTIME_MAX_STACK_SIZE_BYTE = 1 * 1024 * 1024; // 1MB
-const CODE_RUNTIME_MAX_AGE_MS = 2.5 * 1000 * 60; // 2.5 Minutesl
+const CODE_RUNTIME_MAX_AGE_MS = 2.5 * 1000 * 60; // 2.5 Minutes
 
 interface EvaluateExpressionOptions {
   data?: Record<PropertyKey, unknown>;
@@ -120,9 +121,7 @@ class WorkflowRunnerSandbox {
       context.newFunction('', (pathHandle) => {
         const pathValue = context.dump(scope.manage(pathHandle));
         if (typeof pathValue !== 'string') {
-          return scope.manage(
-            context.newError('The path must be string or array of string'),
-          );
+          return scope.manage(context.newError('The path must be string'));
         }
 
         const value = convertToJSHandle(
