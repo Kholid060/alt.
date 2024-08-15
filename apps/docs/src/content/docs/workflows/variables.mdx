@@ -1,0 +1,21 @@
+---
+title: Variables
+sidebar:
+  order: 4
+---
+
+import { VariableIcon } from 'lucide-react';
+
+Use the variables to store a value in the workflow. The variables only live while the workflow is running, and are deleted when it finishes.
+
+This variable can be used as a node parameter value using the [expressions](/workflows/expressions).
+
+## Initial Variable
+
+To set the initial variable in the workflow, click the <VariableIcon className="icon" /> button on the top right and click the "+" button to add a variable.
+
+![Workflow variables](@/assets/images/workflow-variables.png)
+
+## Variable Name
+
+You can name the variable whatever you want. But for easier access, it's recommended to write the variable name in snake-case or camel-case and avoid symbols such as dot(.) or bracket([]). For example, `variableName` or `variable_name`
