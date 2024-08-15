@@ -1,7 +1,7 @@
 ---
 title: Expressions
 sidebar:
-  order: 3
+  order: 4
 ---
 
 Expressions allow you to put dynamic data in the node parameter. The data can be from the workflow variables or the previous node.
@@ -34,7 +34,7 @@ List of data you can access:
 | Property | Type | Description |
 | ----------- | ----------- | ----------- |
 | `vars` | `Record<string, unknown>` | [Workflow variables](/workflows/variables) |
-| `loopData` | Record<string, [`LoopData`](/reference/workfllow-nodes/looping-node/#loopdata)> | The [Looping Node](/reference/workfllow-nodes/looping-node/) data. The property key is using the id of the Looping node |
+| `loopData` | <code>Record<string, [LoopData](/reference/workfllow-nodes/looping-node/#loopdata)> | The [Looping Node](/reference/workfllow-nodes/looping-node/)</code> data. The property key is using the node id of the Looping node |
 | `prevNode` | `unknown \| null` | Data returned by the previous node |
 | `parentWorkflow` | `{ id: string; vars: Record<string, unknown> } \| null` | The parent workflow data. This will be available if the workflow is executed using the Workflow Execute Node |
 

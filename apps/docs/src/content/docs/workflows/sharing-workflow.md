@@ -1,7 +1,7 @@
 ---
 title: Sharing Workflow
 sidebar:
-  order: 2
+  order: 3
 ---
 
 Sharing workflow allows you to share workflow with another Alt app user. To share a workflow, you can either share it to the store or 

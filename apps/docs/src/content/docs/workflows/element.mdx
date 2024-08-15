@@ -1,0 +1,53 @@
+---
+title: Workflow Element
+sidebar:
+  order: 2
+---
+
+import { ToggleRightIcon, CopyIcon, PlayIcon, TrashIcon } from 'lucide-react';
+
+Two elements make up the workflow: node and connection.
+
+## Node
+
+Node is the workflow building block that performs various actions like triggering the workflow, processing, and fetching data. 
+Nodes are categorized into several groups: core, flow, triggers, browser, commands, and script.
+
+![Workflow node](@/assets/images/workflow-node.png)
+
+### Node Toolbar
+
+The node toolbar will show up when you select a node. Available actions in the toolbar:
+- <ToggleRightIcon className="icon" /> **Toggle**: when the node is disabled, it won't execute and continue to the next node when you are running the workflow.
+- <CopyIcon className="icon" /> **Copy**: copy the node.
+- <PlayIcon className="icon" /> **Run workflow from here**: run the workflow from the current node.
+- <TrashIcon className="icon" /> **Delete**: delete the current node.
+
+### Preview Node
+
+![Workflow preview node](@/assets/images/workflow-preview-node.png)
+
+Some nodes output values and some do not. For example, the "HTTP Request" node outputs the request's response.
+Use this feature to preview the node output value. You can find it under the "Preview Node" tab when editing a node.
+
+### Node Settings
+
+Available settings:
+- **Description**: write a description of the node.
+- **Retry on error**: when execution fails, whether to retry execution until it succeeds
+  - **Retry count**: how many times to retry if the execution fails
+  - **Retry interval (MS)**: the interval between retry in milliseconds.
+- **On error**: action that the workflow will take when execution fails
+  - **Stop execution**: stop the workflow execution
+  - **Continue execution**: continue the execution to the next node despite the error
+  - **Execute fallback node**: continue execution to the fallback node
+- **Output**:
+  - **Variable name**: Name of the variable where the node output value will be assigned to
+
+## Connection
+
+You can guess from its name. A connection is a line that connects nodes, and a node can have multiple connections to different nodes. A node that has multiple connections is called a branching nodes.
+
+![Branching nodes](@/assets/images/workflow-branching-node.png)
+
+To delete a connection, you can either click the connection and press the "backspace" key or right-click the connection and click the "Delete" menu.
