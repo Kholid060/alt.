@@ -1,10 +1,36 @@
 import { ExtensionManifest } from '../../extension-manifest';
 
 export declare namespace Runtime {
+  type PlatformOS =
+    | 'arm'
+    | 'arm64'
+    | 'ia32'
+    | 'loong64'
+    | 'mips'
+    | 'mipsel'
+    | 'ppc'
+    | 'ppc64'
+    | 'riscv64'
+    | 's390'
+    | 's390x'
+    | 'x64';
+  type PlatformArch =
+    | 'arm'
+    | 'arm64'
+    | 'ia32'
+    | 'loong64'
+    | 'mips'
+    | 'mipsel'
+    | 'ppc'
+    | 'ppc64'
+    | 'riscv64'
+    | 's390'
+    | 's390x'
+    | 'x64';
   interface PlatformInfo {
+    os: PlatformOS;
+    arch: PlatformArch;
     appVersion: string;
-    os: NodeJS.Platform;
-    arch: NodeJS.Architecture;
   }
 
   interface Static {
