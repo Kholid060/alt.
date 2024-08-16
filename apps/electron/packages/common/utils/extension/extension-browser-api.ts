@@ -1,10 +1,11 @@
 import { ExtensionAPI } from '@altdot/extension';
 import { IPCUserExtensionEventsMap } from '../../interface/ipc-events.interface';
 import { CreateExtensionAPI } from './extension-api-factory';
+import { ExtensionBrowserElementSelector } from '@altdot/shared';
 
 const getElementSelector = (
-  selector: ExtensionAPI.Browser.ElementSelector,
-): ExtensionAPI.Browser.ElementSelectorDetail =>
+  selector: ExtensionAPI.Browser.Tabs.ElementSelector,
+): ExtensionBrowserElementSelector =>
   typeof selector === 'string' ? { selector } : selector;
 
 type TabDetail = ExtensionAPI.Browser.Tabs.TabDetail & { browserId: string };
@@ -69,7 +70,7 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
     });
   }
 
-  click(selector: ExtensionAPI.Browser.ElementSelector): Promise<void> {
+  click(selector: ExtensionAPI.Browser.Tabs.ElementSelector): Promise<void> {
     return this.#sendAction({
       name: 'tabs:click',
       browserId: this.#tabDetail.browserId,
@@ -77,7 +78,9 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
     });
   }
 
-  mouseDown(selector: ExtensionAPI.Browser.ElementSelector): Promise<void> {
+  mouseDown(
+    selector: ExtensionAPI.Browser.Tabs.ElementSelector,
+  ): Promise<void> {
     return this.#sendAction({
       name: 'tabs:mouse-down',
       browserId: this.#tabDetail.browserId,
@@ -85,7 +88,7 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
     });
   }
 
-  mouseUp(selector: ExtensionAPI.Browser.ElementSelector): Promise<void> {
+  mouseUp(selector: ExtensionAPI.Browser.Tabs.ElementSelector): Promise<void> {
     return this.#sendAction({
       name: 'tabs:mouse-up',
       browserId: this.#tabDetail.browserId,
@@ -94,9 +97,9 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
   }
 
   keyDown(
-    selector: ExtensionAPI.Browser.ElementSelector,
-    key: ExtensionAPI.Browser.KeyboardKeys,
-    options?: ExtensionAPI.Browser.KeyDownOptions,
+    selector: ExtensionAPI.Browser.Tabs.ElementSelector,
+    key: ExtensionAPI.Browser.Tabs.KeyboardKeys,
+    options?: ExtensionAPI.Browser.Tabs.KeyDownOptions,
   ): Promise<void> {
     return this.#sendAction({
       name: 'tabs:key-down',
@@ -111,9 +114,9 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
   }
 
   keyUp(
-    selector: ExtensionAPI.Browser.ElementSelector,
-    key: ExtensionAPI.Browser.KeyboardKeys,
-    options: ExtensionAPI.Browser.KeyUpOptions = {},
+    selector: ExtensionAPI.Browser.Tabs.ElementSelector,
+    key: ExtensionAPI.Browser.Tabs.KeyboardKeys,
+    options: ExtensionAPI.Browser.Tabs.KeyUpOptions = {},
   ): Promise<void> {
     return this.#sendAction({
       name: 'tabs:key-up',
@@ -123,8 +126,8 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
   }
 
   getText(
-    selector: ExtensionAPI.Browser.ElementSelector = 'html',
-    options: Partial<ExtensionAPI.Browser.GetTextOptions> = {},
+    selector: ExtensionAPI.Browser.Tabs.ElementSelector = 'html',
+    options: Partial<ExtensionAPI.Browser.Tabs.GetTextOptions> = {},
   ): Promise<string> {
     return this.#sendAction({
       name: 'tabs:get-text',
@@ -134,8 +137,8 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
   }
 
   getHTML(
-    selector: ExtensionAPI.Browser.ElementSelector = 'html',
-    options: Partial<ExtensionAPI.Browser.GetHTMLOptions> = {},
+    selector: ExtensionAPI.Browser.Tabs.ElementSelector = 'html',
+    options: Partial<ExtensionAPI.Browser.Tabs.GetHTMLOptions> = {},
   ): Promise<string> {
     return this.#sendAction({
       name: 'tabs:get-html',
@@ -145,7 +148,7 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
   }
 
   setAttributes(
-    selector: ExtensionAPI.Browser.ElementSelector,
+    selector: ExtensionAPI.Browser.Tabs.ElementSelector,
     attrs: Record<string, string>,
   ): Promise<void> {
     return this.#sendAction({
@@ -156,19 +159,19 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
   }
 
   getAttributes(
-    selector: ExtensionAPI.Browser.ElementSelector,
+    selector: ExtensionAPI.Browser.Tabs.ElementSelector,
     attrNames: string,
   ): Promise<string | null>;
   getAttributes(
-    selector: ExtensionAPI.Browser.ElementSelector,
+    selector: ExtensionAPI.Browser.Tabs.ElementSelector,
     attrNames?: string[],
   ): Promise<Record<string, string>>;
   getAttributes(
-    selector: ExtensionAPI.Browser.ElementSelector,
+    selector: ExtensionAPI.Browser.Tabs.ElementSelector,
     attrNames?: string | string[],
   ): Promise<string | null | Record<string, string>>;
   getAttributes(
-    selector: ExtensionAPI.Browser.ElementSelector,
+    selector: ExtensionAPI.Browser.Tabs.ElementSelector,
     attrNames?: string | string[],
   ): Promise<unknown> {
     return this.#sendAction({
@@ -183,9 +186,9 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
   }
 
   type(
-    selector: ExtensionAPI.Browser.ElementSelector,
+    selector: ExtensionAPI.Browser.Tabs.ElementSelector,
     text: string,
-    options: Partial<ExtensionAPI.Browser.KeyboardTypeOptions> = {},
+    options: Partial<ExtensionAPI.Browser.Tabs.KeyboardTypeOptions> = {},
   ): Promise<void> {
     return this.#sendAction({
       name: 'tabs:type',
@@ -195,7 +198,7 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
   }
 
   select(
-    selector: ExtensionAPI.Browser.ElementSelector,
+    selector: ExtensionAPI.Browser.Tabs.ElementSelector,
     ...values: string[]
   ): Promise<string[]> {
     return this.#sendAction({
@@ -206,10 +209,10 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
   }
 
   press(
-    selector: ExtensionAPI.Browser.ElementSelector,
+    selector: ExtensionAPI.Browser.Tabs.ElementSelector,
     key: string,
-    options: ExtensionAPI.Browser.KeyDownOptions &
-      ExtensionAPI.Browser.KeyUpOptions = {},
+    options: ExtensionAPI.Browser.Tabs.KeyDownOptions &
+      ExtensionAPI.Browser.Tabs.KeyUpOptions = {},
   ): Promise<void> {
     return this.#sendAction({
       name: 'tabs:press',
@@ -219,8 +222,8 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
   }
 
   selectFile(
-    selector: ExtensionAPI.Browser.ElementSelector,
-    files: (string | ExtensionAPI.Browser.Tabs.SelectFileDetail)[],
+    selector: ExtensionAPI.Browser.Tabs.ElementSelector,
+    files: (string | ExtensionAPI.Browser.Tabs.SelectFileOptions)[],
   ): Promise<void> {
     return this.#sendMessage('browser.tabs.selectFiles', {
       files,
@@ -233,7 +236,7 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
   #createElementHandle(selector: {
     selector: string;
     elementIndex?: number;
-  }): ExtensionAPI.Browser.ElementHandle {
+  }): ExtensionAPI.Browser.Tabs.ElementHandle {
     return {
       type: this.type.bind(this, selector),
       click: this.click.bind(this, selector),
@@ -247,12 +250,13 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
       mouseDown: this.mouseDown.bind(this, selector),
       selectFile: this.selectFile.bind(this, selector),
       getAttributes: this.getAttributes.bind(this, selector),
+      setAttributes: this.setAttributes.bind(this, selector),
     };
   }
 
   async findElement(
     selector: string,
-  ): Promise<ExtensionAPI.Browser.ElementHandle | null> {
+  ): Promise<ExtensionAPI.Browser.Tabs.ElementHandle | null> {
     const elementExists = await this.#sendAction({
       browserId: this.#tabDetail.browserId,
       name: 'tabs:element-exists',
@@ -265,7 +269,7 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
 
   async findAllElements(
     selector: string,
-  ): Promise<ExtensionAPI.Browser.ElementHandle[]> {
+  ): Promise<ExtensionAPI.Browser.Tabs.ElementHandle[]> {
     const elementExists = await this.#sendAction({
       browserId: this.#tabDetail.browserId,
       name: 'tabs:element-exists',
@@ -279,8 +283,8 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
 
   async waitForSelector(
     selector: string,
-    options: ExtensionAPI.Browser.WaitForSelectorOptions = {},
-  ): Promise<ExtensionAPI.Browser.ElementHandle | null> {
+    options: ExtensionAPI.Browser.Tabs.WaitForSelectorOptions = {},
+  ): Promise<ExtensionAPI.Browser.Tabs.ElementHandle | null> {
     await this.#sendAction({
       name: 'tabs:wait-for-selector',
       browserId: this.#tabDetail.browserId,

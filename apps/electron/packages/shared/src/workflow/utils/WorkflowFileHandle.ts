@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import { isObject } from 'lodash-es';
 import { basename } from 'path';
-import type { QuickJSContext, Scope } from 'quickjs-emscripten';
+import type { QuickJSContext, Scope } from 'quickjs-emscripten-core';
 
 type WorkflowFileHandleObject = Pick<
   WorkflowFileHandle,

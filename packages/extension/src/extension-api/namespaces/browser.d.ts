@@ -13,6 +13,12 @@ import type {
 } from '@altdot/shared';
 
 export declare namespace Browser {
+  interface Static {
+    tabs: Tabs.Static;
+  }
+}
+
+export declare namespace Browser.Tabs {
   type GetHTMLOptions = BrowserGetHTMLOptions;
   type GetTextOptions = BrowserGetTextOptions;
   type WaitForSelectorOptions = BrowserWaitForSelectorOptions;
@@ -23,10 +29,8 @@ export declare namespace Browser {
 
   type KeyUpOptions = KeyboardKeyUpOptionsType;
   type KeyDownOptions = KeyboardKeyDownOptionsType;
-  type KeyPressOptions = KeyUpOptions & KeyDownOptions;
 
-  type ElementSelector = ElementSelectorDetail | string;
-  type ElementSelectorDetail = ExtensionBrowserElementSelector;
+  type ElementSelector = ExtensionBrowserElementSelector | string;
 
   interface ElementHandle {
     type: OmitFirstArg<Tabs.Tab['type']>;
@@ -41,14 +45,9 @@ export declare namespace Browser {
     mouseDown: OmitFirstArg<Tabs.Tab['mouseDown']>;
     selectFile: OmitFirstArg<Tabs.Tab['selectFile']>;
     getAttributes: OmitFirstArg<Tabs.Tab['getAttributes']>;
+    setAttributes: OmitFirstArg<Tabs.Tab['setAttributes']>;
   }
 
-  interface Static {
-    tabs: Tabs.Static;
-  }
-}
-
-export declare namespace Browser.Tabs {
   type TabStatus = 'loading' | 'complete';
 
   interface TabDetail {
@@ -67,12 +66,7 @@ export declare namespace Browser.Tabs {
     filter?: SelectElementFilter;
   }
 
-  interface XYPoint {
-    x: number;
-    y: number;
-  }
-
-  type SelectFileDetail = BrowserSelectFileOptions;
+  type SelectFileOptions = BrowserSelectFileOptions;
 
   interface Tab {
     readonly id: number;
@@ -150,7 +144,7 @@ export declare namespace Browser.Tabs {
 
     selectFile(
       selector: ElementSelector,
-      files: (string | SelectFileDetail)[],
+      files: (string | SelectFileOptions)[],
     ): Promise<void>;
 
     findElement(selector: string): Promise<ElementHandle | null>;

@@ -1,19 +1,6 @@
 import { ExtensionManifest } from '../../extension-manifest';
 
 export declare namespace Runtime {
-  type PlatformOS =
-    | 'arm'
-    | 'arm64'
-    | 'ia32'
-    | 'loong64'
-    | 'mips'
-    | 'mipsel'
-    | 'ppc'
-    | 'ppc64'
-    | 'riscv64'
-    | 's390'
-    | 's390x'
-    | 'x64';
   type PlatformArch =
     | 'arm'
     | 'arm64'
@@ -27,6 +14,18 @@ export declare namespace Runtime {
     | 's390'
     | 's390x'
     | 'x64';
+  type PlatformOS =
+    | 'aix'
+    | 'android'
+    | 'darwin'
+    | 'freebsd'
+    | 'haiku'
+    | 'linux'
+    | 'openbsd'
+    | 'sunos'
+    | 'win32'
+    | 'cygwin'
+    | 'netbsd';
   interface PlatformInfo {
     os: PlatformOS;
     arch: PlatformArch;
