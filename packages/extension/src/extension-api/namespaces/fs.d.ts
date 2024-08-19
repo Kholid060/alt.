@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export declare namespace Fs {
   interface WriteOptions {
-    encoding: string;
-    stringType: 'base64';
+    encoding?: string;
+    stringType?: 'base64';
   }
   interface ReadOptions {
-    encoding: string;
+    encoding?: string;
   }
 
   interface Stats {
@@ -24,21 +24,18 @@ export declare namespace Fs {
 
     exists(path: string): Promise<boolean>;
 
-    readFile(
-      path: string,
-      options?: Partial<ReadOptions>,
-    ): Promise<Uint8Array | string>;
+    readFile(path: string, options?: ReadOptions): Promise<Uint8Array | string>;
 
     writeFile(
       path: string,
       data: string | Uint8Array,
-      options?: Partial<WriteOptions>,
+      options?: WriteOptions,
     ): Promise<void>;
 
     appendFile(
       path: string,
       data: string | Uint8Array,
-      options?: Partial<WriteOptions>,
+      options?: WriteOptions,
     ): Promise<void>;
   }
 }

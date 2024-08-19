@@ -18,18 +18,18 @@ export interface RuntimeEvent {
   'element:key-down': (
     selector: ExtensionBrowserElementSelector,
     key: string,
-    options?: ExtensionAPI.Browser.KeyDownOptions,
+    options?: ExtensionAPI.Browser.Tabs.KeyDownOptions,
   ) => void;
   'element:key-up': (
     selector: ExtensionBrowserElementSelector,
     key: string,
-    options?: ExtensionAPI.Browser.KeyUpOptions,
+    options?: ExtensionAPI.Browser.Tabs.KeyUpOptions,
   ) => void;
   'element:press': (
     selector: ExtensionBrowserElementSelector,
     key: string,
-    options?: ExtensionAPI.Browser.KeyUpOptions &
-      ExtensionAPI.Browser.KeyDownOptions,
+    options?: ExtensionAPI.Browser.Tabs.KeyUpOptions &
+      ExtensionAPI.Browser.Tabs.KeyDownOptions,
   ) => void;
   'element:get-text': (
     selector?: ExtensionBrowserElementSelector,
@@ -61,7 +61,7 @@ export interface RuntimeEvent {
   ) => { canceled: boolean; selector: string };
   'element:wait-selector': (
     selector: ExtensionBrowserElementSelector,
-    option?: ExtensionAPI.Browser.WaitForSelectorOptions,
+    option?: ExtensionAPI.Browser.Tabs.WaitForSelectorOptions,
   ) => void;
   'element:select-file': (
     selector: ExtensionBrowserElementSelector,
