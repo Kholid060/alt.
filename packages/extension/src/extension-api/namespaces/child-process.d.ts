@@ -4,7 +4,6 @@ export declare namespace ChildProcess {
     timeout?: number;
     encoding?: string;
     maxBuffer?: number;
-    killSignal?: string;
     shell?: string | boolean;
     env?: Record<PropertyKey, unknown>;
   }
@@ -17,7 +16,6 @@ export declare namespace ChildProcess {
   interface Static {
     exec<O, E>(
       command: string,
-      args: unknown[],
       options?: ExecOptions,
     ): Promise<ExecResult<O, E>>;
   }

@@ -144,6 +144,9 @@ export default async function CommandMain(context: CommandLaunchContext) {
 
   console.log('__', JSON.stringify(_extension.runtime.platform, null, 2));
 
+  const result = await _extension.childProcess.exec(`node -e "console.log(process.env)"`, [])
+  console.log(result.stdout);
+
   // await storage();
 
   // await authorizeCredential();

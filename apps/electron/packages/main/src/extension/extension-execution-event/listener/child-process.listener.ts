@@ -4,6 +4,7 @@ import { OnExtensionAPI } from '/@/common/decorators/extension.decorator';
 import { exec, ExecOptions } from 'child_process';
 import { ExtensionAPI } from '@altdot/extension';
 import { ExtensionLoaderService } from '/@/extension-loader/extension-loader.service';
+import { appEnvSchema } from '/@/common/validation/app-env.validation';
 
 @Injectable()
 export class ExtensionChildProcessApiListener {
@@ -11,15 +12,25 @@ export class ExtensionChildProcessApiListener {
 
   @OnExtensionAPI('childProcess.exec')
   async updateCommand({
-    args: [command, args, options = {}],
+    args: [command, options = {}],
     context: { extensionId },
   }: ExtensionApiEvent<'childProcess.exec'>) {
     const cwd = await this.extensionLoader.getPath(extensionId, 'base');
+    const filteredEnv = Object.fromEntries(
+      Object.keys(appEnvSchema.shape).map((key) => [key, '']),
+    );
+    console.log(filteredEnv);
+
     return new Promise<ExtensionAPI.ChildProcess.ExecResult>(
       (resolve, reject) => {
         exec(
-          `${command} ${args.join(' ')}`,
-          { ...options, cwd } as ExecOptions,
+          command,
+          {
+            cwd,
+            timeout: 10_000,
+            ...options,
+            env: { ...filteredEnv, ...(options.env ?? {}) },
+          } as ExecOptions,
           (error, stdout, stderr) => {
             if (error) reject(error);
             else resolve({ stdout, stderr });

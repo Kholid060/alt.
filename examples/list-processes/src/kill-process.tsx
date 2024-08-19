@@ -20,7 +20,6 @@ function ListProcess() {
 
       await _extension.childProcess.exec(
         `Stop-Process -Name "${processItem.processName}"`,
-        [],
         {
           shell: 'powershell.exe',
         },

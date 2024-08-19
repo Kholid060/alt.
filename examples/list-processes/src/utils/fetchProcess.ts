@@ -32,7 +32,6 @@ interface ProcessPerformanceData {
 async function powershellRunner<T = unknown>(command: string): Promise<T> {
   const result = await _extension.childProcess.exec<string, string>(
     command,
-    [],
     { shell: 'powershell.exe' },
   );
 
