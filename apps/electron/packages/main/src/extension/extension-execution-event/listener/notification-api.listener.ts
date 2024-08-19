@@ -9,7 +9,7 @@ export class ExtensionNotificationApiListener {
 
   @OnExtensionAPI('notifications.create')
   create({
-    args: [{ title, body, subtitle, silent }],
+    args: [{ title, body, silent }],
   }: ExtensionApiEvent<'notifications.create'>) {
     if (!Notification.isSupported()) return Promise.resolve(false);
 
@@ -17,7 +17,6 @@ export class ExtensionNotificationApiListener {
       body,
       title,
       silent,
-      subtitle,
     });
     notification.show();
 

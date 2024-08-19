@@ -3,7 +3,6 @@ export declare namespace Notifications {
     title: string;
     body?: string;
     silent?: boolean;
-    subtitle?: string;
   }
 
   interface Static {
