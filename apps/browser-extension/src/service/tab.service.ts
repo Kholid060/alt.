@@ -116,7 +116,7 @@ class TabService {
     { tabId, frameId = 0 }: TabTarget,
     selector: ExtensionBrowserElementSelector,
     key: string,
-    options?: ExtensionAPI.Browser.KeyDownOptions,
+    options?: ExtensionAPI.Browser.Tabs.KeyDownOptions,
   ) {
     await injectContentHandlerScript(tabId);
     return await RuntimeMessage.instance.sendMessageToTab({
@@ -131,7 +131,7 @@ class TabService {
     { tabId, frameId = 0 }: TabTarget,
     selector: ExtensionBrowserElementSelector,
     key: string,
-    options?: ExtensionAPI.Browser.KeyUpOptions,
+    options?: ExtensionAPI.Browser.Tabs.KeyUpOptions,
   ) {
     await injectContentHandlerScript(tabId);
     return await RuntimeMessage.instance.sendMessageToTab({
@@ -146,8 +146,8 @@ class TabService {
     { tabId, frameId = 0 }: TabTarget,
     selector: ExtensionBrowserElementSelector,
     key: string,
-    options?: ExtensionAPI.Browser.KeyUpOptions &
-      ExtensionAPI.Browser.KeyDownOptions,
+    options?: ExtensionAPI.Browser.Tabs.KeyUpOptions &
+      ExtensionAPI.Browser.Tabs.KeyDownOptions,
   ) {
     await injectContentHandlerScript(tabId);
     return await RuntimeMessage.instance.sendMessageToTab({
@@ -222,7 +222,7 @@ class TabService {
   static async waitForSelector(
     { tabId, frameId = 0 }: TabTarget,
     selector: ExtensionBrowserElementSelector,
-    options?: ExtensionAPI.Browser.WaitForSelectorOptions,
+    options?: ExtensionAPI.Browser.Tabs.WaitForSelectorOptions,
   ) {
     await injectContentHandlerScript(tabId);
     return await RuntimeMessage.instance.sendMessageToTab({

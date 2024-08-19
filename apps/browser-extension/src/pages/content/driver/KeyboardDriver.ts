@@ -9,7 +9,9 @@ import {
 } from '@altdot/shared';
 import { ExtensionAPI } from '@altdot/extension';
 
-function getModifierEventData(mods: ExtensionAPI.Browser.KeyboardModifiers[]) {
+function getModifierEventData(
+  mods: ExtensionAPI.Browser.Tabs.KeyboardModifiers[],
+) {
   const modsData: Pick<
     KeyboardEventInit,
     'altKey' | 'shiftKey' | 'metaKey' | 'ctrlKey'
@@ -59,7 +61,7 @@ type KeyboardEventInitData = KeyboardEventInit & {
 };
 function getKeyboardEventInit(
   key: string,
-  modifiers: ExtensionAPI.Browser.KeyboardModifiers[] = [],
+  modifiers: ExtensionAPI.Browser.Tabs.KeyboardModifiers[] = [],
 ): KeyboardEventInitData {
   const modsData = getModifierEventData(modifiers);
   const keyDetail = getKeyDetail(key);
@@ -152,12 +154,12 @@ function getInputEventType(
 }
 
 interface TypeCharOptions {
-  modifiers: ExtensionAPI.Browser.KeyboardModifiers[];
+  modifiers: ExtensionAPI.Browser.Tabs.KeyboardModifiers[];
 }
 
 interface KeyEventDetail {
   el: Element;
-  modifiers?: ExtensionAPI.Browser.KeyboardModifiers[];
+  modifiers?: ExtensionAPI.Browser.Tabs.KeyboardModifiers[];
   key: string | KeyboardEventInitData;
 }
 
