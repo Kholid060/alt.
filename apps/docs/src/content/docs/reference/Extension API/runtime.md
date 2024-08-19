@@ -36,7 +36,7 @@ Get the extension or the current command configuration values.
 
 ```tsx
 // action-command.ts
-import { UiImage, _extension } from '@altdot/extension';
+import { _extension } from '@altdot/extension';
 
 export default async function ActionCommand() {
   const commandConfig = await _extension.runtime.config.getValues('command');
@@ -102,18 +102,17 @@ The platform's operating system.
 
 ```ts
 type PlatformOS =
-  | 'arm'
-  | 'arm64'
-  | 'ia32'
-  | 'loong64'
-  | 'mips'
-  | 'mipsel'
-  | 'ppc'
-  | 'ppc64'
-  | 'riscv64'
-  | 's390'
-  | 's390x'
-  | 'x64';
+  | 'aix'
+  | 'android'
+  | 'darwin'
+  | 'freebsd'
+  | 'haiku'
+  | 'linux'
+  | 'openbsd'
+  | 'sunos'
+  | 'win32'
+  | 'cygwin'
+  | 'netbsd';
 ```
 
 ### `runtime.PlatformArch`
