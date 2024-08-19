@@ -61,3 +61,10 @@ export declare namespace UI.Alert {
     confirm(options: ConfirmOptions): Promise<boolean>;
   }
 }
+
+export declare namespace UI.CommandBarWindow {
+  interface Static {
+    // @ext-api-value
+    close(): Promise<void>;
+  }
+}

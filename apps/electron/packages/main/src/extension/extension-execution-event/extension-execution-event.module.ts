@@ -8,7 +8,7 @@ import { ExtensionChildProcessApiListener } from './listener/child-process.liste
 import { ExtensionClipboardApiListener } from './listener/clipboard-api.listener';
 import { ExtensionCommandApiListener } from './listener/command-api.listener';
 import { ExtensionFSApiListener } from './listener/fs-api.listener';
-import { ExtensionMainWindowApiListener } from './listener/main-window-api.listener';
+import { ExtensionUIApiListener } from './listener/ui-api.listener';
 import { ExtensionNotificationApiListener } from './listener/notification-api.listener';
 import { ExtensionOAuthApiListener } from './listener/oauth-api.listener';
 import { ExtensionRuntimeApiListener } from './listener/runtime-api.listener';
@@ -36,7 +36,7 @@ const extensionApiListeners = [
   ExtensionRuntimeApiListener,
   ExtensionStorageApiListener,
   ExtensionClipboardApiListener,
-  ExtensionMainWindowApiListener,
+  ExtensionUIApiListener,
   ExtensionChildProcessApiListener,
   ExtensionNotificationApiListener,
 ];

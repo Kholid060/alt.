@@ -4,7 +4,6 @@ import { ChildProcess as ImportedChildProcess } from './namespaces/child-process
 import { Clipboard as ImportedClipboard } from './namespaces/clipboard';
 import { Command as ImportedCommand } from './namespaces/command';
 import { Fs as ImportedFs } from './namespaces/fs';
-import { MainWindow as ImportedMainWindow } from './namespaces/main-window';
 import { Notifications as ImportedNotifications } from './namespaces/notification';
 import { OAuth as ImportedOAuth } from './namespaces/oauth';
 import { Runtime as ImportedRuntime } from './namespaces/runtime';
@@ -19,7 +18,6 @@ declare namespace ExtensionAPI {
   const clipboard: Clipboard.Static;
   const command: Command.Static;
   const fs: Fs.Static;
-  const mainWindow: MainWindow.Static;
   const notifications: Notifications.Static;
   const oAuth: OAuth.Static;
   const runtime: Runtime.Static;
@@ -33,7 +31,6 @@ declare namespace ExtensionAPI {
   export import Clipboard = ImportedClipboard;
   export import Command = ImportedCommand;
   export import Fs = ImportedFs;
-  export import MainWindow = ImportedMainWindow;
   export import Notifications = ImportedNotifications;
   export import OAuth = ImportedOAuth;
   export import Runtime = ImportedRuntime;
