@@ -11,7 +11,7 @@ Run child process inside the extension command. The extension must have the `chi
 
 Execute the command and return the `stdout` and `stderr` output.
 
-**Examples**
+**Example**
 ```ts
 import { _extension } from '@altdot/extension';
 

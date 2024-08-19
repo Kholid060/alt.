@@ -11,7 +11,7 @@ Contains information about the extension and it's environment.
 
 Return the icon URL of a file.
 
-**Examples**
+**Example**
 
 ```tsx
 // view-command.tsx

@@ -11,7 +11,7 @@ Interact with the system clipboard. To use this API, the extension must have the
 
 Read the value of the clipboard. When the format is `image`, it will return the [Data URL](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs) of the image.
 
-**Examples**
+**Example**
 
 ```ts
 import { _extension } from '@altdot/extension';

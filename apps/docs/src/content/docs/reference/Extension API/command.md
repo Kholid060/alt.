@@ -11,7 +11,7 @@ Launch or update the extension command. The extension must have the `command` pe
 
 Update the details of the current command.
 
-**Examples**
+**Example**
 
 ```ts
 import { _extension } from '@altdot/extension';
@@ -30,7 +30,7 @@ export default async function ActionCommand() {
 
 Launch another command of the extension. It will return an error if the command is disabled or does not exist.
 
-**Examples**
+**Example**
 
 ```ts
 import { _extension } from '@altdot/extension';

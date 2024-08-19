@@ -11,7 +11,7 @@ Interact with the browser. The extension must have the `browser` permission to u
 
 Query all the browser tabs.
 
-**Examples**
+**Example**
 
 ```js
 // get all tabs
@@ -29,159 +29,488 @@ console.log(await _extension.browser.tabs.query({ url: '*://*.mozilla.org/*' }))
 
 Get the active tab of the browser. The tab this method returns is the active tab when the command starts running. To get the last active tab of the browser, use the [`browser.tabs.query`](#browsertabsquery) instead.
 
-## Types
+
+## Classes
 
 ### `browser.tabs.Tab`
 
-Represents the browser tab
-
-```ts
-interface Tab {
-    readonly id: number;
-    readonly url: string;
-    readonly title: string;
-    readonly active: boolean;
-
-    isClosed(): Promise<boolean>;
-
-    selectElement(
-      options?: SelectElementOptions,
-    ): Promise<{ selector: string; canceled: boolean }>;
-
-    reload(): Promise<void>;
-
-    click(selector: ElementSelector): Promise<void>;
-
-    mouseDown(selector: ElementSelector): Promise<void>;
-
-    mouseUp(selector: ElementSelector): Promise<void>;
-
-    keyDown(
-      selector: ElementSelector,
-      key: KeyboardKeys,
-      options?: KeyDownOptions,
-    ): Promise<void>;
-
-    keyUp(
-      selector: ElementSelector,
-      key: KeyboardKeys,
-      options?: KeyUpOptions,
-    ): Promise<void>;
-
-    getText(
-      selector?: ElementSelector,
-      options?: Partial<GetTextOptions>,
-    ): Promise<string>;
-
-    getHTML(
-      selector?: ElementSelector,
-      options?: Partial<GetHTMLOptions>,
-    ): Promise<string>;
-
-    setAttributes(
-      selector: ElementSelector,
-      attrs: Record<string, string>,
-    ): Promise<void>;
-
-    getAttributes(
-      selector: ElementSelector,
-      attrNames: string,
-    ): Promise<string | null>;
-    getAttributes(
-      selector: ElementSelector,
-      attrNames?: string[],
-    ): Promise<Record<string, string>>;
-    getAttributes(
-      selector: ElementSelector,
-      attrNames?: string | string[],
-    ): Promise<string | null | Record<string, string>>;
-
-    type(
-      selector: ElementSelector,
-      text: string,
-      options?: Partial<KeyboardTypeOptions>,
-    ): Promise<void>;
-
-    select(selector: ElementSelector, ...values: string[]): Promise<string[]>;
-
-    press(
-      selector: ElementSelector,
-      key: string,
-      options?: KeyDownOptions & KeyUpOptions,
-    ): Promise<void>;
-
-    selectFile(
-      selector: ElementSelector,
-      files: (string | SelectFileOptions)[],
-    ): Promise<void>;
-
-    findElement(selector: string): Promise<ElementHandle | null>;
-
-    findAllElements(selector: string): Promise<ElementHandle[]>;
-
-    waitForSelector(
-      selector: string,
-      options?: WaitForSelectorOptions,
-    ): Promise<ElementHandle | null>;
-
-    getDetail(): Promise<TabDetail | null>;
-  }
-```
-
-| Property | Description |
-| ----------- | ----------- |
-| `id` | `number` <br /> The tab id |
-| `url` | `string` <br /> The tab URL |
-| `title` | `string` <br /> The tab title |
-| `active` | `boolean` <br /> Whether the tab is active or not |
-| `isClosed` | `() => Promise<boolean>` <br /> Check if the tab is closed |
-| `getDetail` | <code>() => Promise\<[TabDetail](#browsertabstabdetail)></code> <br /> Get the recent tab detail |
-| `findElement` | <code>(selector: string) => Promise\<[ElementHandle](#browsertabselementhandle) \| null></code> <br /> Find the first element that matches the given selector. |
-| `findAllElements` | <code>(selector: string) => Promise\<[ElementHandle](#browsertabselementhandle)[]></code> <br /> Find all  elements that matches the given selector. |
-| `selectElement` | `(options?: SelectElementOptions) => Promise<{ selector: string; canceled: boolean }>` <br /> Let the user manually select an element in the browser tab |
-| `reload` | `() => Promise<void>` <br /> Reload the tab |
-| `click` | `() => Promise<void>` <br /> Click an element. |
-| `mouseDown` | <code>(selector: [ElementSelector](#browsertabselementselector)) => Promise&lt;void></code> <br /> Presses the mouse to targeted element. |
-| `mouseUp` | <code>(selector: [ElementSelector](#browsertabselementselector)) => Promise&lt;void></code> <br /> Release the mouse from the targeted element. |
-| `keyDown` | <code>(selector: [ElementSelector](#browsertabselementselector), key: [KeyboardKeys](#browsertabskeyboardkeys), options?: [KeyDownOptions](#browsertabskeydownoptions)) => Promise&lt;void></code> <br /> Press key to the targeted element. |
-| `keyUp` | <code>(selector: [ElementSelector](#browsertabselementselector), key: [KeyboardKeys](#browsertabskeyboardkeys), options?: [KeyUpOptions](#browsertabskeyupoptions)) => Promise&lt;void></code> <br /> Release the key from the targeted element. |
-| `press` | <code>(selector: [ElementSelector](#browsertabselementselector), key: [KeyboardKeys](#browsertabskeyboardkeys), options?: [KeyUpOptions](#browsertabskeyupoptions) & [KeyDownOptions](#browsertabskeydownoptions)) => Promise&lt;void></code> <br /> Release from the targeted element. |
-| `type` | <code>(selector: [ElementSelector](#browsertabselementselector), text: string, options?: [KeyboardTypeOptions](#browsertabskeyboardtypeoptions)) => Promise&lt;void></code> <br /> Type the text character by character to the targeted element. |
-| `getText` | <code>(selector?: [ElementSelector](#browsertabselementselector), options?: [GetTextOptions](#browsertabsgettextoptions)) => Promise&lt;string></code> <br /> Get the element text, it will get the body text by default if the selector is not specified. |
-| `getHtml` | <code>(selector?: [ElementSelector](#browsertabselementselector), options?: [GetHTMLOptions](#browsertabsgethtmloptions)) => Promise&lt;string></code> <br /> Get the element HTML, it will get the body HTML by default if the selector is not specified. |
-| `setAttributes` | <code>(selector?: [ElementSelector](#browsertabselementselector), attrs: Record<string, string>) => Promise&lt;string></code> <br /> Set the element attribute. |
-| `getAttributes` | <code>(selector?: [ElementSelector](#browsertabselementselector), attrNames?: string \| string[]) => Promise&lt;string \| null \| Record\<string, string>></code> <br /> Get the element attributes. |
-| `select` | <code>(selector?: [ElementSelector](#browsertabselementselector), values: ...string[]) => Promise\<string[]></code> <br /> Select options in the [\<select>](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select) tag. If the select element has the `multiple` attribute, all the values will selected, otherwise it will only select the first value. |
-| `selectFile` | <code>(selector?: [ElementSelector](#browsertabselementselector), files: (string \| [SelectFileOptions](#browsertabsselectfileoptions))[]) => Promise\<string[]></code> <br /> Set the files as the value of the [`<input type="file" />`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file) file element. The string in the `files` parameter must be file path. |
-| `waitForSelector` | <code>(selector: [ElementSelector](#browsertabselementselector), options?: [WaitForSelectorOptions](#browsertabswaitforselectoroptions)) => Promise\<ElementHandle  \| null></code> <br /> Wait for an element until it matches the given state and selector |
-
+Represents the browser tab.
 
 :::caution
 Be careful when using the tab method that has the [`ElementSelector`](#browsertabselementselector) parameter because it will throw an error if no element matches the selector.
 :::
 
-**Examples**
-```js
-const tab = await _extension.tabs.query({ active: true });
+```ts
+interface Tab {
+  readonly id: number;
+  readonly url: string;
+  readonly title: string;
+  readonly active: boolean;
 
-// Type "hello world"
-await tab.type('input', 'Hello world');
+  isClosed(): Promise<boolean>;
 
-// Select files
-await tab.selectFile(
-  'input[type="file"]',
-  [
-    'D:\\image.png',
-    'D:\\document.txt',
-    {
-      mimeType: 'text/plain',
-      fileName: 'hello-world.txt',
-      lastModified: new Date().getTime(),
-      contents: new TextEncoder().encode('Hello world!!'),
-    }
-  ]
-);
+  selectElement(
+    options?: SelectElementOptions,
+  ): Promise<{ selector: string; canceled: boolean }>;
+
+  reload(): Promise<void>;
+
+  click(selector: ElementSelector): Promise<void>;
+
+  mouseDown(selector: ElementSelector): Promise<void>;
+
+  mouseUp(selector: ElementSelector): Promise<void>;
+
+  keyDown(
+    selector: ElementSelector,
+    key: KeyboardKeys,
+    options?: KeyDownOptions,
+  ): Promise<void>;
+
+  keyUp(
+    selector: ElementSelector,
+    key: KeyboardKeys,
+    options?: KeyUpOptions,
+  ): Promise<void>;
+
+  getText(
+    selector?: ElementSelector,
+    options?: Partial<GetTextOptions>,
+  ): Promise<string>;
+
+  getHTML(
+    selector?: ElementSelector,
+    options?: Partial<GetHTMLOptions>,
+  ): Promise<string>;
+
+  setAttributes(
+    selector: ElementSelector,
+    attrs: Record<string, string>,
+  ): Promise<void>;
+
+  getAttributes(
+    selector: ElementSelector,
+    attrNames: string,
+  ): Promise<string | null>;
+  getAttributes(
+    selector: ElementSelector,
+    attrNames?: string[],
+  ): Promise<Record<string, string>>;
+  getAttributes(
+    selector: ElementSelector,
+    attrNames?: string | string[],
+  ): Promise<string | null | Record<string, string>>;
+
+  type(
+    selector: ElementSelector,
+    text: string,
+    options?: Partial<KeyboardTypeOptions>,
+  ): Promise<void>;
+
+  select(selector: ElementSelector, ...values: string[]): Promise<string[]>;
+
+  press(
+    selector: ElementSelector,
+    key: string,
+    options?: KeyDownOptions & KeyUpOptions,
+  ): Promise<void>;
+
+  selectFile(
+    selector: ElementSelector,
+    files: (string | SelectFileOptions)[],
+  ): Promise<void>;
+
+  findElement(selector: string): Promise<ElementHandle | null>;
+
+  findAllElements(selector: string): Promise<ElementHandle[]>;
+
+  waitForSelector(
+    selector: string,
+    options?: WaitForSelectorOptions,
+  ): Promise<ElementHandle | null>;
+
+  getDetail(): Promise<TabDetail | null>;
+}
 ```
+
+#### `browser.tabs.Tab.id`
+> number
+
+The tab id
+
+#### `browser.tabs.Tab.url`
+> string
+
+The tab URL
+
+#### `browser.tabs.Tab.title`
+> string
+
+The tab title
+
+#### `browser.tabs.Tab.active`
+> boolean
+
+Whether the tab is active or not
+
+#### `browser.tabs.Tab.isClosed`
+> () =&gt; Promise&lt;boolean&gt;
+
+Check if the tab is closed
+
+#### `browser.tabs.Tab.getDetail`
+> () =&gt; Promise&lt;<a href="#browsertabstabdetail">TabDetail</a>&gt;
+
+Get the latest tab detail. Because the `url`, `title`, and `active` properties is not changed when the tab is updated on the actual browser, use this method to get the latest tab detail.  
+
+**Example**
+
+```ts
+import { _extension } from '@altdot/extension';
+
+export default async function Command() {
+  const activeTab = await _extension.browser.tabs.getActive();
+  if (!activeTab) return;
+
+  const tabDetail = await activeTab.getDetail();
+  console.log('active:', tabDetail.active);
+  console.log('title:', tabDetail.title);
+  console.log('url:', tabDetail.url);
+}
+```
+
+#### `browser.tabs.Tab.findElement`
+> (selector: string) =&gt; Promise&lt;<a href="#browsertabselementhandle" style="">ElementHandle</a> | null&gt;
+
+Find the first element that matches the given selector.
+
+**Example**
+
+```ts
+import { _extension } from '@altdot/extension';
+
+export default async function Command() {
+  const activeTab = await _extension.browser.tabs.getActive();
+  if (!activeTab) return;
+
+  const buttonEl = await activeTab.findElement('button');
+  if (!buttonEl) throw new Error('Button element not found');
+  
+  await buttonEl.click();
+}
+```
+
+#### `browser.tabs.Tab.findAllElements`
+> (selector: string) =&gt; Promise&lt;<a href="#browsertabselementhandle">ElementHandle</a>[]&gt;
+
+Find all elements that matches the given selector.
+
+**Example**
+
+```ts
+import { _extension } from '@altdot/extension';
+
+export default async function Command() {
+  const activeTab = await _extension.browser.tabs.getActive();
+  if (!activeTab) return;
+
+  const elements = await activeTab.findAllElements('h1');
+  const text = await Promise.all(elements.map((el) => el.getText()));
+
+  console.log(text);
+}
+```
+
+#### `browser.tabs.Tab.selectElement`
+> (options?: SelectElementOptions) =&gt; Promise&lt;{ selector: string; canceled: boolean }&gt;
+
+Let the user manually select an element in the browser tab
+
+**Example**
+
+```ts
+import { _extension } from '@altdot/extension';
+
+export default async function Command() {
+  const activeTab = await _extension.browser.tabs.getActive();
+  if (!activeTab) return;
+
+  const selectedEl = await activeTab.selectElement({
+    title: 'Select a table',
+    filter: {
+      selector: 'table'
+    }
+  });
+  if (selectedEl.canceled) return;
+  
+  const tableHeaderText = await activeTab.getText(`${selectedEl.selector} th`);
+  console.log(tableHeaderText);
+}
+```
+
+#### `browser.tabs.Tab.reload`
+> () =&gt; Promise&lt;void&gt;
+
+Reload the tab.
+
+#### `browser.tabs.Tab.click`
+> () =&gt; Promise&lt;void&gt;
+
+Click an element.
+
+**Example**
+
+```ts
+import { _extension } from '@altdot/extension';
+
+export default async function Command() {
+  const activeTab = await _extension.browser.tabs.getActive();
+  if (!activeTab) return;
+  
+  await activeTab.click('a');
+}
+```
+
+#### `browser.tabs.Tab.mouseDown`
+> (selector: <a href="#browsertabselementselector">ElementSelector</a>) =&gt; Promise&lt;void&gt;
+
+Presses the mouse to targeted element.
+
+#### `browser.tabs.Tab.mouseUp`
+> (selector: <a href="#browsertabselementselector">ElementSelector</a>) =&gt; Promise&lt;void&gt;
+
+Release the mouse from the targeted element.
+
+#### `browser.tabs.Tab.keyDown`
+> (selector: <a href="#browsertabselementselector">ElementSelector</a>, key: <a href="#browsertabskeyboardkeys">KeyboardKeys</a>, options?: <a href="#browsertabskeydownoptions">KeyDownOptions</a>) =&gt; Promise&lt;void&gt;
+
+Press key to the targeted element.
+
+#### `browser.tabs.Tab.keyUp`
+> (selector: <a href="#browsertabselementselector">ElementSelector</a>, key: <a href="#browsertabskeyboardkeys">KeyboardKeys</a>, options?: <a href="#browsertabskeyupoptions">KeyUpOptions</a>) =&gt; Promise&lt;void&gt;
+
+Release the key from the targeted element.
+
+#### `browser.tabs.Tab.press`
+> (selector: <a href="#browsertabselementselector">ElementSelector</a>, key: <a href="#browsertabskeyboardkeys">KeyboardKeys</a>, options?: <a href="#browsertabskeyupoptions">KeyUpOptions</a> &amp; <a href="#browsertabskeydownoptions">KeyDownOptions</a>) =&gt; Promise&lt;void&gt;
+
+Press and release key to the targeted element.
+
+**Example**
+
+```ts
+import { _extension } from '@altdot/extension';
+
+export default async function Command() {
+  const activeTab = await _extension.browser.tabs.getActive();
+  if (!activeTab) return;
+  
+  await textField.press('input', 'Enter');
+}
+```
+
+#### `browser.tabs.Tab.type`
+> (selector: <a href="#browsertabselementselector">ElementSelector</a>, text: string, options?: <a href="#browsertabskeyboardtypeoptions">KeyboardTypeOptions</a>) =&gt; Promise&lt;void&gt;
+
+Type the text character by character to the targeted element.
+
+**Example**
+
+```ts
+import { _extension } from '@altdot/extension';
+
+export default async function Command() {
+  const activeTab = await _extension.browser.tabs.getActive();
+  if (!activeTab) return;
+  
+  await textField.type('input', 'Hello world!!', { delay: 100, clearValue: true });
+}
+```
+
+#### `browser.tabs.Tab.getText`
+> (selector?: <a href="#browsertabselementselector">ElementSelector</a>, options?: <a href="#browsertabsgettextoptions">GetTextOptions</a>) =&gt; Promise&lt;string&gt;
+
+Get the element text, it will get the body text by default if the selector is not specified.
+
+**Example**
+
+```ts
+import { _extension } from '@altdot/extension';
+
+export default async function Command() {
+  const activeTab = await _extension.browser.tabs.getActive();
+  if (!activeTab) return;
+
+  console.log(await activeTab.getText('body'));
+}
+```
+
+#### `browser.tabs.Tab.getHtml`
+> (selector?: <a href="#browsertabselementselector">ElementSelector</a>, options?: <a href="#browsertabsgethtmloptions">GetHTMLOptions</a>) =&gt; Promise&lt;string&gt;
+
+Get the element HTML, it will get the body HTML by default if the selector is not specified.
+
+**Example**
+
+```ts
+import { _extension } from '@altdot/extension';
+
+export default async function Command() {
+  const activeTab = await _extension.browser.tabs.getActive();
+  if (!activeTab) return;
+
+  console.log(await activeTab.getText('body'));
+}
+```
+
+#### `browser.tabs.Tab.setAttributes`
+> (selector?: <a href="#browsertabselementselector">ElementSelector</a>, attrs: Record&lt;string, string&gt;) =&gt; Promise&lt;string&gt;
+
+Set the element attribute.
+
+**Example**
+
+```ts
+import { _extension } from '@altdot/extension';
+
+export default async function Command() {
+  const activeTab = await _extension.browser.tabs.getActive();
+  if (!activeTab) return;
+
+  await activeTab.setAttributes('body', {
+    style: 'background-color: white',
+  });
+}
+```
+
+#### `browser.tabs.Tab.getAttributes`
+> (selector?: <a href="#browsertabselementselector">ElementSelector</a>, attrNames?: string | string[]) =&gt; Promise&lt;string | null | Record&lt;string, string&gt;&gt;
+
+Get the element attributes.
+
+**Example**
+
+```ts
+import { _extension } from '@altdot/extension';
+
+export default async function Command() {
+  const activeTab = await _extension.browser.tabs.getActive();
+  if (!activeTab) return;
+
+  // only get the "style" attribute
+  console.log(await activeTab.getAttributes('body', 'style'));
+
+  // get multiple attributes
+  const textFieldAttrs = await activeTab.getAttributes('input', ['max', 'value']);
+  console.log(textFieldsAttrs.max, textFieldsAttrs.value);
+
+  // get all the attributes
+  const buttonAttrs = await activeTab.getAttributes('button');
+  console.log(buttonAttrs);
+}
+```
+
+#### `browser.tabs.Tab.select`
+> (selector?: <a href="#browsertabselementselector">ElementSelector</a>, values: …string[]) =&gt; Promise&lt;string[]&gt;
+
+Select options in the <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select">&lt;select&gt;</a> tag. If the select element has the> `multiple` attribute, all the values will selected, otherwise it only select the first value.
+
+**Example**
+
+```ts
+import { _extension } from '@altdot/extension';
+
+export default async function Command() {
+  const activeTab = await _extension.browser.tabs.getActive();
+  if (!activeTab) return;
+
+  await activeTab.setAttributes('select', 'option-1');
+}
+```
+
+#### `browser.tabs.Tab.selectFile`
+> (selector?: <a href="#browsertabselementselector">ElementSelector</a>, files: (string | <a href="#browsertabsselectfileoptions">SelectFileOptions</a>)[]) =&gt; Promise&lt;string[]&gt;
+
+Set the files as the value of the <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file"> &lt;input type="file" /&gt;</a> file element. The string in the> files</code> parameter mfile path.
+
+**Example**
+```ts
+import { _extension } from '@altdot/extension';
+
+export default async function Command() {
+  const activeTab = await _extension.browser.tabs.getActive();
+  if (!activeTab) return;
+
+  await activeTab.selectFile(
+    'input[type="file"]',
+    [
+      'D:\\image.png',
+      'D:\\document.txt',
+      {
+        mimeType: 'text/plain',
+        fileName: 'hello-world.txt',
+        lastModified: new Date().getTime(),
+        contents: new TextEncoder().encode('Hello world!!'),
+      }
+    ]
+  );
+}
+```
+
+#### `browser.tabs.Tab.waitForSelector`
+> (selector: <a href="#browsertabselementselector">ElementSelector</a>, options?: <a href="#browsertabswaitforselectoroptions">WaitForSelectorOptions</a>) =&gt; Promise&lt;ElementHandle  | null&gt;
+
+Wait for an element until it matches the given state and selector
+
+**Example**
+
+```ts
+import { _extension } from '@altdot/extension';
+
+export default async function Command() {
+  const activeTab = await _extension.browser.tabs.getActive();
+  if (!activeTab) return;
+
+  const submitBtn = await activeTab.waitForSelector('button', { state: 'visible' });
+  await submitBtn.click();
+
+  await activeTab.waitForSelector('.loading', { state: 'hidden' });
+}
+```
+
+## Types
+
+### `browser.tabs.SelectElementOptions`
+
+Options for the [`browser.tabs.Tab.selectElement`](#browsertabstabselectelement) method.
+
+```ts
+interface SelectElementOptions {
+  title?: string;
+  description?: string;
+  filter?: SelectElementFilter;
+}
+```
+
+| Property | Type | Description |
+| ----------- | ----------- | ----------- |
+| `title` | `?string` | Title that will be shown to the user when selecting an element |
+| `description` | `?string` | Description that will be shown to the user when selecting an element |
+| `filter` | [SelectElementFilter](#browsertabsselectelementfilter) | Filter for which element can be selected. |
+
+### `browser.tabs.SelectElementFilter`
+
+Filter for which element can be selected.
+
+```ts
+interface SelectElementFilter {
+  selector?: string;
+}
+```
+
+| Property | Type | Description |
+| ----------- | ----------- | ----------- |
+| `selector` | `?string` | The [CSS Selector](https://developer.mozilla.org/en-US/docs/Learn/CSS/Building_blocks/Selectors) that the element must match |
 
 ### `browser.tabs.ElementHandle`
 
@@ -352,7 +681,7 @@ Alt. app has a custom CSS Selector syntax that you can use:
 
 - `>>`: Selecting an element inside a [shadow DOM](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM). For example, `.element-a >> .element-b`
 
-**Examples**
+**Example**
 
 ```js
 const tab = await _extension.tabs.query({ active: true });
@@ -427,9 +756,9 @@ interface WaitForSelectorOptions {
 
 Element state:
 - `attached`: Element is available in the DOM tree.
-- `detached`: Element is detched from the DOM tree.
+- `detached`: Element is detached from the DOM tree.
 - `visible`: Element is considered visible when:
   - The element size (height and width) is not zero
   - The element doesn't have `visibility: hidden` computed style
   - The element doesn't have `display: none` computed style
-- `hidden`: The opposite of the `visible` state
+- `hidden`: Element is not in the DOM tree or element is the opposite of the `visible` state
