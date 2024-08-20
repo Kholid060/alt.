@@ -47,14 +47,6 @@ export class ExtensionShellApiListener {
     );
   }
 
-  @OnExtensionAPI('shell.moveToTrash')
-  async moveToTrash({
-    args: [itemPath],
-  }: ExtensionApiEvent<'shell.moveToTrash'>) {
-    const itemPaths = Array.isArray(itemPath) ? itemPath : [itemPath];
-    await Promise.all(itemPaths.map((item) => shell.trashItem(item)));
-  }
-
   @OnExtensionAPI('shell.showItemInFolder')
   async showItemInFolder({
     args: [itemPath],
@@ -80,11 +72,7 @@ export class ExtensionShellApiListener {
     args: [query],
   }: ExtensionApiEvent<'shell.installedApps.query'>) {
     const apps = await this.installedApps.getApps();
-    if (query instanceof RegExp) {
-      return apps.filter((app) => query.test(app.name));
-    }
-
-    if (!query.trim()) return apps;
+    if (!query?.trim()) return apps;
 
     if (query.startsWith('startsWith:')) {
       return apps.filter((app) => app.name.startsWith(query));

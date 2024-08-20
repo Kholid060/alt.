@@ -24,7 +24,6 @@ export const EXTENSION_PERMISSIONS = [
   'browser.tabs',
   'childProcess',
   'notifications',
-  'installedApps',
 ] as const;
 export type ExtensionPermissions = ArrayUnion<typeof EXTENSION_PERMISSIONS>;
 

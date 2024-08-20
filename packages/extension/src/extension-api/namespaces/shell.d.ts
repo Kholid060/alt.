@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/ban-types */
+
 export declare namespace Shell {
   interface Static {
-    moveToTrash(path: string | string[]): Promise<void>;
-
     showItemInFolder(path: string): Promise<void>;
 
     openURL(url: string): Promise<void>;
@@ -14,18 +14,16 @@ export declare namespace Shell.InstalledApps {
   interface AppDetail {
     name: string;
     appId: string;
-    icon?: string;
     description?: string;
   }
 
   interface Static {
     query(
-      query:
+      filter?:
         | `startsWith:${string}`
         | `endsWith:${string}`
         | `exact:${string}`
-        | string
-        | RegExp,
+        | (string & {}),
     ): Promise<AppDetail[]>;
 
     showInFolder(appId: string): Promise<void>;
