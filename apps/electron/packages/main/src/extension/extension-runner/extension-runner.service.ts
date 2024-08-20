@@ -245,7 +245,10 @@ export class ExtensionRunnerService {
         windowCommand.toggleWindow(true);
         windowCommand.sendMessage('command-window:open-view', {
           ...payload,
+          command,
+          commandFilePath: '',
           title: command.title,
+          platform: getExtensionPlatform(),
           subtitle: command.extension.title,
           icon: command.icon || command.extension.icon,
         });

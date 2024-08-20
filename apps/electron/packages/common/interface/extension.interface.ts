@@ -19,7 +19,7 @@ export interface ExtensionCommandViewInitMessage {
   type: 'init';
   theme: AppTheme;
   themeStyle: string;
-  payload: ExtensionCommandExecutePayload;
+  payload: ExtensionCommandExecutePayloadWithData;
 }
 
 export interface ExtensionConfigData {
@@ -42,7 +42,7 @@ export interface ExtensionCommandExecutePayload {
 }
 
 export interface ExtensionCommandViewData
-  extends ExtensionCommandExecutePayload {
+  extends ExtensionCommandExecutePayloadWithData {
   title: string;
   icon: string;
   subtitle: string;

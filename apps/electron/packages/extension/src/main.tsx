@@ -9,7 +9,7 @@ import {
   ExtensionMessagePortEventAsync,
 } from '@altdot/extension';
 import type {
-  ExtensionCommandExecutePayload,
+  ExtensionCommandExecutePayloadWithData,
   ExtensionCommandViewInitMessage,
 } from '#common/interface/extension.interface';
 import { PRELOAD_API_KEY } from '#common/utils/constant/constant';
@@ -30,7 +30,7 @@ type ExtensionMessagePort = BetterMessagePort<
 
 async function injectExtensionAPI(
   messagePort: ExtensionMessagePort,
-  { browserCtx, platform }: ExtensionCommandExecutePayload,
+  { browserCtx, platform }: ExtensionCommandExecutePayloadWithData,
 ) {
   await new Promise<void>((resolve) => {
     function isLoaded() {

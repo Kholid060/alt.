@@ -3,8 +3,8 @@ import { EXTENSION_VIEW } from '#common/utils/constant/constant';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
 import {
-  ExtensionCommandExecutePayload,
   ExtensionCommandViewInitMessage,
+  ExtensionCommandExecutePayloadWithData,
 } from '#common/interface/extension.interface';
 import { sleep } from '@altdot/shared';
 import preloadAPI from '/@/utils/preloadAPI';
@@ -39,7 +39,7 @@ function CommandView() {
         type: 'init',
         themeStyle: '',
         theme: theme.theme,
-        payload: activeRoute.data as ExtensionCommandExecutePayload,
+        payload: activeRoute.data as ExtensionCommandExecutePayloadWithData,
       };
 
       payload.themeStyle = (
@@ -74,7 +74,7 @@ function CommandView() {
     };
   }, [commandCtx]);
   useEffect(() => {
-    const data = activeRoute?.data as ExtensionCommandExecutePayload;
+    const data = activeRoute?.data as ExtensionCommandExecutePayloadWithData;
 
     if (!data) {
       navigate('');

@@ -8,8 +8,8 @@ import { ExtensionApiEvent } from '../events/extension-api.event';
 export class ExtensionUIApiListener {
   constructor(private browserWindow: BrowserWindowService) {}
 
-  @OnExtensionAPI('ui.commandBarWindow.close')
-  async close(_event: ExtensionApiEvent<'ui.commandBarWindow.close'>) {
+  @OnExtensionAPI('ui.closeWindow')
+  async close(_event: ExtensionApiEvent<'ui.closeWindow'>) {
     const windowCommand = await this.browserWindow.get('command', {
       noThrow: true,
       autoCreate: false,

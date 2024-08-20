@@ -19,9 +19,10 @@ export declare namespace UI {
     // @ext-api-value
     showToast(options: ToastOptions): void;
 
+    closeWindow(): Promise<void>;
+
     alert: Alert.Static;
     searchPanel: SearchPanel.Static;
-    commandBarWindow: CommandBarWindow.Static;
   }
 }
 
@@ -60,11 +61,5 @@ export declare namespace UI.Alert {
   interface Static {
     // @ext-api-value
     confirm(options: ConfirmOptions): Promise<boolean>;
-  }
-}
-
-export declare namespace UI.CommandBarWindow {
-  interface Static {
-    close(): Promise<void>;
   }
 }
