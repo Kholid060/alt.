@@ -51,13 +51,13 @@ export class ExtensionSqliteService implements OnModuleInit {
     {
       query,
       dbPath,
-      selectAll,
+      method,
       params = [],
     }: {
       query: string;
       dbPath?: string;
       params?: unknown[];
-      selectAll?: boolean;
+      method: 'get' | 'all' | 'run';
     },
   ) {
     let database =
@@ -77,7 +77,7 @@ export class ExtensionSqliteService implements OnModuleInit {
 
     try {
       const dbQuery = database.prepare(query);
-      return selectAll ? dbQuery.all(params) : dbQuery.get(...params);
+      return dbQuery[method](params);
     } catch (error) {
       throw new ExtensionError((error as Error).message);
     }

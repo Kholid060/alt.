@@ -10,13 +10,13 @@ export class ExtensionSqliteApiListener {
   @OnExtensionAPI('sqlite.query')
   query({
     context: { extensionId },
-    args: [query, params, options],
+    args: [{ params, sql, dbPath, method }],
   }: ExtensionApiEvent<'sqlite.query'>) {
     const result = this.extensionSqlite.query(extensionId, {
-      query,
       params,
-      dbPath: options?.dbPath,
-      selectAll: options?.selectAll,
+      dbPath,
+      method,
+      query: sql,
     });
 
     return Promise.resolve(result);

@@ -106,6 +106,12 @@ export interface IPCUserExtensionCustomEventsMap {
     provider: ExtensionAPI.OAuth.OAuthProvider,
     token: ExtensionAPI.OAuth.OAuthToken,
   ) => Promise<ExtensionAPI.OAuth.OAuthTokenStorageValue>;
+  'sqlite.query': (options: {
+    sql: string;
+    dbPath?: string;
+    params: unknown[];
+    method: 'get' | 'all' | 'run';
+  }) => Promise<unknown>;
 }
 
 export type IPCUserExtensionEventsMap = FlatActionExtensionAPI &

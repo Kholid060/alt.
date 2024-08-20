@@ -14,6 +14,7 @@ import type { ExtensionBrowserTabContext } from '../../interface/extension.inter
 import { APP_ICON_DIR_PREFIX } from '../../utils/constant/app.const';
 import { OAuthPKCEClient } from './extension-oauth-client';
 import { ExtensionBrowserTab } from './extension-browser-api';
+import { createSqliteStatement } from './extension-sqlite-utils';
 
 export interface CreateExtensionAPI {
   context?: unknown;
@@ -189,6 +190,17 @@ function extensionBrowserTabs({
   };
 }
 
+function extensionSqlite({
+  sendMessage,
+}: Pick<CreateExtensionAPI, 'sendMessage'>): Pick<
+  ExtensionAPIValues,
+  'sqlite.sql'
+> {
+  return {
+    'sqlite.sql': (sql) => createSqliteStatement(sql, { sendMessage }),
+  };
+}
+
 export function createExtensionAPI({
   platform,
   browserCtx,
@@ -207,6 +219,7 @@ export function createExtensionAPI({
           browserCtx,
           sendMessage,
         }),
+        ...extensionSqlite({ sendMessage }),
         'runtime.platform': platform,
         'runtime.getFileIconURL': (filePath) =>
           `${CUSTOM_SCHEME.fileIcon}://${filePath}`,
