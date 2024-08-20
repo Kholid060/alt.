@@ -1,0 +1,340 @@
+---
+title: oauth
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Add OAuth functionality to your extension to access resources from a service on the user's behalf. The Alt. app currently only support [PKCE flow](https://oauth.net/2/pkce/). To see if a provider is supporting PKCE flow, check if there is a `code_challenge` and `code_verifier` on their OAuth doc. 
+
+## Functions
+
+### `oauth.createPKCE`
+> createPKCE(provider: [OAuthProvider](#oauthoauthprovider)): [OAuthPKCEClient](#oauthpkceclient)
+
+Create PKCE client.
+
+## Classes
+
+### `OAuthPKCEClient`
+
+```ts
+abstract class OAuthPKCEClient {
+  abstract removeToken(): Promise<void>;
+  abstract startAuth(): Promise<OAuthPKCERequest>;
+  abstract getToken(): Promise<OAuthTokenStorageValue | null>;
+  abstract setToken(token: OAuthToken | OAuthTokenResponse): Promise<OAuthTokenStorageValue>;
+}
+```
+
+#### `OAuthPKCEClient.startAuth`
+> startAuth(): Promise\<[OAuthPKCERequest](#oauthoauthpkcerequest)>;
+
+Start the OAuth authorization.
+
+#### `OAuthPKCEClient.getToken`
+> getToken(): Promise\<[OAuthTokenStorageValue](#oauthoauthtokenstoragevalue) | null>;
+
+Get the stored OAuth token.
+
+#### `OAuthPKCEClient.setToken`
+> setToken(token: [OAuthToken](#oauthoauthtoken) | [OAuthTokenResponse](#oauthoauthtokenresponse)): Promise\<[OAuthTokenStorageValue](#oauthoauthtokenstoragevalue)>;
+
+Store the OAuth token.
+
+#### `OAuthPKCEClient.removeToken`
+> removeToken(): Promise\<void>
+
+Remove the OAuth token.
+
+## Example
+
+### Spotify OAuth
+
+```ts
+import { _extension } from '@altdot/extension';
+
+const SPOTIFY_CLIENT_ID = 'CLIENT_ID';
+
+const spotifyClient = _extension.oAuth.createPKCE({
+  key: 'spotify-oauth',
+  name: 'Spotify',
+  icon: 'spotify-logo',
+  description: 'Connect your Spotify account',
+  client: {
+    scope: 'user-read-email',
+    clientId: SPOTIFY_CLIENT_ID,
+    authorizeUrl: 'https://accounts.spotify.com/authorize',
+  },
+});
+
+async function refreshToken(refreshToken: string) {
+  const fetchResponse = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+      client_id: SPOTIFY_CLIENT_ID,
+    }),
+  });
+  const tokenResponse = await fetchResponse.json();
+  const token = await spotifyClient.setToken(tokenResponse);
+
+  return token;
+}
+
+async function startAuth() {
+  const response = await spotifyClient.startAuth();
+
+  // Exchange auth code
+  const response = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      code: response.code,
+      client_id: SPOTIFY_CLIENT_ID,
+      grant_type: 'authorization_code',
+      redirect_uri: response.redirectUri,
+      code_verifier: response.codeVerifier,
+    }),
+  });
+  const tokenResponse = await response.json();
+  const token = await spotifyClient.setToken(tokenResponse);
+
+  return token;
+}
+
+export default async function Command() {
+  let token = await spotifyClient.getToken();
+  if (!token || !token.refreshToken) {
+    token = await startAuth();
+  } else if (Date.now() >= token.expiresTimestamp) {
+    token = await refreshToken(token.refreshToken);
+  }
+
+  console.log(token.accessToken);
+}
+```
+
+### Google OAuth
+
+To use PKCE flow with Google OAuth, you must select the `iOS` application type when creating a new OAuth client ID.
+
+```ts
+import { _extension } from '@altdot/extension';
+
+const GOOGLE_CLIENT_ID = 'CLIENT_ID';
+
+const googleClient = _extension.oAuth.createPKCE({
+  client: {
+    clientId: GOOGLE_CLIENT_ID,
+    redirectMethod: _extension.OAuth.OAuthRedirect.AppUrl,
+    authorizeUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
+    scope: 'https://www.googleapis.com/auth/drive.metadata.readonly',
+  },
+  key: 'google-drive',
+  icon: 'google-drive',
+  name: 'Google Drive',
+});
+
+async function refreshToken(refreshToken: string) {
+  const response = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+      client_id: GOOGLE_CLIENT_ID,
+    }),
+  });
+  const tokenResponse = await response.json();
+  const token = await googleClient.setToken(tokenResponse);
+
+  return token;
+}
+
+async function startAuth() {
+  const response = await googleClient.startAuth();
+
+  // Exchange auth code
+  const fetchResponse = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      code: response.code,
+      client_id: GOOGLE_CLIENT_ID,
+      grant_type: 'authorization_code',
+      redirect_uri: response.redirectUri,
+      code_verifier: response.codeVerifier,
+    }),
+  });
+  const tokenResponse = await fetchResponse.json();
+  const token = await googleClient.setToken(tokenResponse);
+
+  return token;
+}
+
+export default async function Command() {
+  let token = await googleClient.getToken();
+  if (!token || !token.refreshToken) {
+    token = await startAuth();
+  } else if (Date.now() >= token.expiresTimestamp) {
+    token = await refreshToken(token.refreshToken);
+  }
+
+  console.log(token.accessToken);
+}
+```
+
+## Types
+
+### `oauth.OAuthPKCEClientOptions`
+
+The options when creating a PKCE client.
+
+```ts
+interface OAuthPKCEClientOptions {
+  scope: string;
+  clientId: string;
+  authorizeUrl: string;
+  redirectMethod?: OAuthRedirect;
+  extraParams?: Record<string, string>;
+}
+```
+
+| Property | Type | Description |
+| ----------- | ----------- | ----------- |
+| `scope` | `string` | The OAuth client's scope |
+| `clientId` | `string` | The OAuth client Id |
+| `authorizeUrl` | `string` | The authorization URL of the OAuth service provider |
+| `redirectMethod` | [`OAuthRedirect`](#oauthoauthredirect) | The OAuth redirect method. Default to `Web` |
+| `extraParams` | `?Record<string, string>` | Additional parameters to be added in the authorization URL |
+
+### `oauth.OAuthRedirect`
+
+Redirect methods for the OAuth flow
+
+```ts
+enum OAuthRedirect {
+  Web = 'web',
+  AppUrl = 'app-url',
+  DeepLink = 'deep-link',
+}
+```
+| Name | Description |
+| ----------- | ----------- |
+| `Web` | Configure <code>{import.meta.env.WEB_URL}/oauth/redirect/extension</code> as the redirect URL in the OAuth provider. |
+| `AppUrl` | Configure `com.altdot-app:/oauth2callback` as the redirect URL in the OAuth provider. |
+| `DeepLink` | Configure <code>altdot-app://oauth/redirect</code> as the redirect URL in the OAuth provider. |
+
+### `oauth.OAuthProvider`
+
+The options for creating an OAuth provider.
+
+```ts
+interface OAuthProvider {
+  key: string;
+  name: string;
+  icon: string;
+  description?: string;
+  documentationUrl?: string;
+  client: OAuthPKCEClientOptions;
+}
+```
+
+| Property | Type | Description |
+| ----------- | ----------- | ----------- |
+| `key` | `string` | Unique id for the provider |
+| `name` | `string` | Name of the provider that will be displayed to the user |
+| `icon` | `string` | Icon of the provider |
+| `description` | `?string` | Short description of the provider |
+| `documentationUrl` | `?string` | URL to the provider documentation |
+| `client` | [`OAuthPKCEClientOptions`](#oauthoauthpkceclientoptions) | The OAuth client data |
+
+### `oauth.OAuthPKCERequest`
+
+Value returned by the [`startAuth`](#oauthpkceclientstartauth) method
+
+```ts
+interface OAuthPKCERequest {
+  code: string;
+  redirectUri: string;
+  codeVerifier: string;
+  codeChallenge: string;
+}
+```
+
+| Property | Type | Description |
+| ----------- | ----------- | ----------- |
+| `code` | `string` | Code from the OAuth provider |
+| `redirectUri` | `string` | The OAuth's redirect uri |
+| `codeVerifier` | `string` | The PKCE code verifier |
+| `codeChallenge` | `string` | The PKCE code challenge |
+
+### `oauth.OAuthToken`
+
+Contains information about the OAuth token
+
+```ts
+interface OAuthToken {
+  scope?: string;
+  expiresIn?: number;
+  accessToken: string;
+  refreshToken?: string;
+}
+```
+
+| Property | Type | Description |
+| ----------- | ----------- | ----------- |
+| `accessToken` | `string` | The OAuth's access token |
+| `scope` | `?string` | The OAuth's scope |
+| `expiresIn` | `?number` | The lifetime in seconds of the access token |
+| `refreshToken` | `?string` | The OAuth's refresh token |
+
+### `oauth.OAuthTokenStorageValue`
+
+Contains information about the stored OAuth token in storage.
+
+```ts
+interface OAuthTokenStorageValue extends OAuthToken {
+  expiresTimestamp: number;
+}
+```
+
+| Property | Type | Description |
+| ----------- | ----------- | ----------- |
+| `accessToken` | `string` | The OAuth's access token |
+| `expiresTimestamp` | `number` | The expires timestamp of the access token |
+| `scope` | `?string` | The OAuth's scope |
+| `expiresIn` | `?number` | The lifetime in seconds of the access token |
+| `refreshToken` | `?string` | The OAuth's refresh token |
+
+### `oauth.OAuthTokenResponse`
+
+Standard response when making an OAuth token request
+
+
+```ts
+interface OAuthTokenResponse {
+  scope?: string;
+  expires_in?: number;
+  access_token: string;
+  refresh_token?: string;
+}
+```
+
+| Property | Type | Description |
+| ----------- | ----------- | ----------- |
+| `access_token` | `string` | The OAuth's access token |
+| `scope` | `?string` | The OAuth's scope |
+| `expires_in` | `?number` | The lifetime in seconds of the access token |
+| `refresh_token` | `?string` | The OAuth's refresh token |
+
