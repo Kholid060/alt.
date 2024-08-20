@@ -5,9 +5,9 @@ import { getOperators } from 'drizzle-orm';
 import {
   ExtensionOAuthTokenFindById,
   ExtensionOAuthTokenInsertPayload,
+  ExtensionOAuthTokenModel,
   ExtensionOAuthTokensListItemModel,
   ExtensionOAuthTokenUpdatePayload,
-  ExtensionOAuthTokenValue,
 } from './extension-oauth-tokens.interface';
 import {
   decryptOAuthValue,
@@ -21,7 +21,7 @@ export class ExtensionOAuthTokensService {
 
   async get(
     id: ExtensionOAuthTokenFindById,
-  ): Promise<ExtensionOAuthTokenValue | null> {
+  ): Promise<ExtensionOAuthTokenModel | null> {
     const value = await this.dbService.db.query.extensionOAuthTokens.findFirst({
       where: findOAuthTokenByIdQuery(id),
     });

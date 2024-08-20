@@ -1,5 +1,3 @@
-import { OAuthRedirect } from '../../constant/oauth.const';
-
 export declare namespace OAuth {
   interface OAuthPKCEClientOptions {
     scope: string;
@@ -47,7 +45,15 @@ export declare namespace OAuth {
     abstract removeToken(): Promise<void>;
     abstract startAuth(): Promise<OAuthPKCERequest>;
     abstract getToken(): Promise<OAuthTokenStorageValue | null>;
-    abstract setToken(token: OAuthToken | OAuthTokenResponse): Promise<void>;
+    abstract setToken(
+      token: OAuthToken | OAuthTokenResponse,
+    ): Promise<OAuthTokenStorageValue>;
+  }
+
+  enum OAuthRedirect {
+    Web = 'web',
+    AppUrl = 'app-url',
+    DeepLink = 'deep-link',
   }
 
   interface Static {

@@ -82,13 +82,12 @@ export class ElectronApiController {
   @IPCSend('notification:show')
   notificationShow(
     @Payload()
-    [{ title, body, silent, subtitle }]: IPCSendPayload<'notification:show'>,
+    [{ title, body, silent }]: IPCSendPayload<'notification:show'>,
   ) {
     const notification = new Notification({
       body,
       silent,
       title,
-      subtitle,
     });
     notification.show();
   }

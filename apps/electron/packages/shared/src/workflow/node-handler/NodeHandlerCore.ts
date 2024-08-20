@@ -128,7 +128,6 @@ export class NodeHandlerNotification extends WorkflowNodeHandler<WORKFLOW_NODE_T
         { key: 'body', name: 'Body', types: ['String'] },
         { key: 'title', name: 'Title', types: ['String'] },
         { key: 'silent', name: 'Silent', types: ['Boolean'] },
-        { key: 'subtitle', name: 'Subtitle', types: ['String'] },
       ],
     });
   }

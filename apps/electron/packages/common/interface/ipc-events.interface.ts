@@ -105,7 +105,7 @@ export interface IPCUserExtensionCustomEventsMap {
   'oAuth.setToken': (
     provider: ExtensionAPI.OAuth.OAuthProvider,
     token: ExtensionAPI.OAuth.OAuthToken,
-  ) => Promise<void>;
+  ) => Promise<ExtensionAPI.OAuth.OAuthTokenStorageValue>;
 }
 
 export type IPCUserExtensionEventsMap = FlatActionExtensionAPI &

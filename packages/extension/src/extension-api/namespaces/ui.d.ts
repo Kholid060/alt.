@@ -21,6 +21,7 @@ export declare namespace UI {
 
     alert: Alert.Static;
     searchPanel: SearchPanel.Static;
+    commandBarWindow: CommandBarWindow.Static;
   }
 }
 
@@ -64,7 +65,6 @@ export declare namespace UI.Alert {
 
 export declare namespace UI.CommandBarWindow {
   interface Static {
-    // @ext-api-value
     close(): Promise<void>;
   }
 }

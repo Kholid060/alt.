@@ -50,9 +50,7 @@ export async function getToken(): Promise<_extension.OAuth.OAuthTokenStorageValu
     },
   });
   const body: _extension.OAuth.OAuthTokenResponse = await response.json();
-  await credential.setToken(body);
-
-  token = await credential.getToken();
+  token = await credential.setToken(body);
 
   return token;
 }

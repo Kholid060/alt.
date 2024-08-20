@@ -45,11 +45,11 @@ export class ExtensionOAuthApiListener {
   }
 
   @OnExtensionAPI('oAuth.setToken')
-  async setToken({
+  setToken({
     args: [provider, payload],
     context: { extensionId },
   }: ExtensionApiEvent<'oAuth.setToken'>): ExtensionExecutionEventReturn<'oAuth.setToken'> {
-    await this.oauthService.setExtensionToken(
+    return this.oauthService.setExtensionToken(
       { ...provider, extensionId },
       payload,
     );

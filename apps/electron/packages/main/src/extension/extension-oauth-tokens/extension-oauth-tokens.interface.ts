@@ -13,6 +13,15 @@ export interface ExtensionOAuthTokenValue
   refreshToken?: string;
 }
 
+export interface ExtensionOAuthTokenModel
+  extends Omit<
+    SelectExtensionOauthToken,
+    'refreshToken' | 'accessToken' | 'createdAt' | 'updatedAt' | 'id'
+  > {
+  accessToken: string;
+  refreshToken?: string;
+}
+
 export type ExtensionOAuthTokenInsertPayload = ExtensionOAuthTokenValue & {
   extensionId: string;
   clientId: string;

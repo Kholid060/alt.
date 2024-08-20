@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CustomError } from '#packages/common/errors/custom-errors';
 import { nanoid } from 'nanoid/non-secure';
 import crypto from 'crypto';
-import type { ExtensionAPI } from '@altdot/extension';
-import { OAuthRedirect } from '@altdot/extension/dist/constant/oauth.const';
+import { ExtensionAPI } from '@altdot/extension';
 import { BrowserWindowService } from '../browser-window/browser-window.service';
 import { APP_DEEP_LINK_SCHEME, APP_USER_MODEL_ID } from '@altdot/shared';
 import { APP_DEEP_LINK_HOST } from '#packages/common/utils/constant/app.const';
@@ -12,6 +11,7 @@ import { AppEnv } from '../common/validation/app-env.validation';
 import { SelectExtension } from '../db/schema/extension.schema';
 import { ExtensionOAuthTokensService } from '../extension/extension-oauth-tokens/extension-oauth-tokens.service';
 import dayjs from 'dayjs';
+import { tokenDbToStorageValue } from './utils/oauth-utils';
 
 const MAX_SESSION_AGE_MS = 15 * 60 * 1000; // 15 minutes
 
@@ -90,16 +90,16 @@ export class OAuthService {
     url.searchParams.set('state', sessionId);
 
     let redirectUri = '';
-    switch (client.redirectMethod || OAuthRedirect.Web) {
-      case OAuthRedirect.AppUrl:
+    switch (client.redirectMethod || ExtensionAPI.OAuth.OAuthRedirect.Web) {
+      case ExtensionAPI.OAuth.OAuthRedirect.AppUrl:
         redirectUri = `${APP_USER_MODEL_ID}:/oauth2callback`;
         break;
-      case OAuthRedirect.DeepLink:
+      case ExtensionAPI.OAuth.OAuthRedirect.DeepLink:
         redirectUri = `${APP_DEEP_LINK_SCHEME}://${APP_DEEP_LINK_HOST.oauth}/redirect`;
         break;
-      case OAuthRedirect.Web:
+      case ExtensionAPI.OAuth.OAuthRedirect.Web:
         redirectUri = new URL(
-          '/oauth2/extension/redirect',
+          '/oauth/redirect/extension',
           this.config.get('VITE_WEB_BASE_URL'),
         ).href;
         break;
@@ -155,18 +155,7 @@ export class OAuthService {
     });
     if (!token) return null;
 
-    return {
-      accessToken: token.accessToken,
-      scope: token.scope ?? undefined,
-      refreshToken: token.refreshToken,
-      expiresTimestamp: token.expiresTimestamp ?? 0,
-      expiresIn: token.expiresTimestamp
-        ? Math.max(
-            0,
-            new Date(token.expiresTimestamp).getTime() - new Date().getTime(),
-          ) / 1000
-        : 0,
-    };
+    return tokenDbToStorageValue(token);
   }
 
   async setExtensionToken(
@@ -180,8 +169,8 @@ export class OAuthService {
       extensionId: string;
     },
     payload: ExtensionAPI.OAuth.OAuthToken,
-  ) {
-    await this.extensionOAuthToken.upsert(
+  ): Promise<ExtensionAPI.OAuth.OAuthTokenStorageValue> {
+    const [result] = await this.extensionOAuthToken.upsert(
       {
         key,
         extensionId,
@@ -199,5 +188,7 @@ export class OAuthService {
           : null,
       },
     );
+
+    return tokenDbToStorageValue(result);
   }
 }

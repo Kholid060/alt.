@@ -5,9 +5,8 @@ import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
 import { WORKFLOW_NODE_TYPE } from '@altdot/workflow/dist/const/workflow-nodes-type.const';
 
-const fields: { id: 'title' | 'subtitle' | 'body'; name: string }[] = [
+const fields: { id: 'title' | 'body'; name: string }[] = [
   { id: 'title', name: 'Title' },
-  { id: 'subtitle', name: 'Subtitle' },
   { id: 'body', name: 'Body' },
 ];
 

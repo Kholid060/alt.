@@ -2,8 +2,6 @@ import type { ExtensionManifest as ExtensionManifestType } from './extension-man
 
 export * from './extension-api/index';
 
-export * from './constant/oauth.const';
-
 export * from './components/components-map';
 
 export type * from './interfaces/message-events';
