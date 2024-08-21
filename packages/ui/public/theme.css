@@ -101,7 +101,7 @@
   --radius: 0.75rem;
 }
 
-.dark {
+.dark, :root[data-theme="dark"] {
   --mauve-1: 18 17 19;
   --mauve-2: 26 25 27;
   --mauve-3: 35 34 37;

@@ -7,6 +7,7 @@ import * as UiImage from '@altdot/ui/dist/components/ui/image';
 import * as UiButton from '@altdot/ui/dist/components/ui/button';
 import * as UiSelect from '@altdot/ui/dist/components/ui/select';
 import * as UiSwitch from '@altdot/ui/dist/components/ui/switch';
+import * as UiCheckbox from '@altdot/ui/dist/components/ui/checkbox';
 import * as UiTextarea from '@altdot/ui/dist/components/ui/textarea';
 import * as UiSkeleton from '@altdot/ui/dist/components/ui/skeleton';
 
@@ -34,6 +35,7 @@ function injectComponents() {
     UiButton,
     UiSelect,
     UiSwitch,
+    UiCheckbox,
     UiTextarea,
     UiSkeleton,
   ]);
