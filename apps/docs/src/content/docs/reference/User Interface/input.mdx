@@ -1,0 +1,59 @@
+---
+title: Input
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { UiInput } from '@altdot/ui';
+
+Displays a form input field.
+
+**Example**
+
+<Tabs>
+  <TabItem label="Input">
+    <div className="example-wrapper">
+      <div className="component">
+        <UiInput placeholder="Write something..." />
+      </div>
+```tsx
+import { UiLabel, UiCheckbox, UiIcons } from '@altdot/extension';
+import { useState } from 'react';
+
+export default function Command() {
+  const [value, setValue] = useState('');
+
+  return (
+    <>
+      <UiInput value={value} onValueChange={setValue} placeholder="Write something..." />
+      {value}
+    </>
+  );
+}
+```
+</div>
+  </TabItem>
+  <TabItem label="Input with icon">
+```tsx
+// view-command.tsx
+import { UiLabel, UiCheckbox } from '@altdot/extension';
+
+export default function Command() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <UiLabel htmlFor="email-input">Email</UiLabel>
+      <UiInput id="email-input" prefixIcon={UiIcons.Search} placeholder="john_doe@example.com" />
+    </div>
+  );
+}
+```
+  </TabItem>
+</Tabs>
+
+**Props**
+
+| Name | Type | Description |
+| ----------- | ----------- | ----------- |
+| `inputSize` | `?('default' \| 'sm')` | The input's size variant. Default to `default` |
+| `prefixIcon` | `?JSX.Element` | Add prefix icon to the input |
+| `suffixIcon` | `?JSX.Element` | Add suffix icon to the input |
+| `onValueChange` | `?((value: string) => void)` | Fired when the input value is changed |
