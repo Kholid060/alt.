@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CustomError } from '#packages/common/errors/custom-errors';
 import { nanoid } from 'nanoid/non-secure';
 import crypto from 'crypto';
-import { ExtensionAPI } from '@altdot/extension';
+import { ExtensionAPI, OAuthRedirect } from '@altdot/extension';
 import { BrowserWindowService } from '../browser-window/browser-window.service';
 import { APP_DEEP_LINK_SCHEME, APP_USER_MODEL_ID } from '@altdot/shared';
 import { APP_DEEP_LINK_HOST } from '#packages/common/utils/constant/app.const';
@@ -90,14 +90,14 @@ export class OAuthService {
     url.searchParams.set('state', sessionId);
 
     let redirectUri = '';
-    switch (client.redirectMethod || ExtensionAPI.OAuth.OAuthRedirect.Web) {
-      case ExtensionAPI.OAuth.OAuthRedirect.AppUrl:
+    switch (client.redirectMethod || OAuthRedirect.Web) {
+      case OAuthRedirect.AppUrl:
         redirectUri = `${APP_USER_MODEL_ID}:/oauth2callback`;
         break;
-      case ExtensionAPI.OAuth.OAuthRedirect.DeepLink:
+      case OAuthRedirect.DeepLink:
         redirectUri = `${APP_DEEP_LINK_SCHEME}://${APP_DEEP_LINK_HOST.oauth}/redirect`;
         break;
-      case ExtensionAPI.OAuth.OAuthRedirect.Web:
+      case OAuthRedirect.Web:
         redirectUri = new URL(
           '/oauth/redirect/extension',
           this.config.get('VITE_WEB_BASE_URL'),

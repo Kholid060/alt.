@@ -19,7 +19,6 @@ export class ExtensionChildProcessApiListener {
     const filteredEnv = Object.fromEntries(
       Object.keys(appEnvSchema.shape).map((key) => [key, '']),
     );
-    console.log(filteredEnv);
 
     return new Promise<ExtensionAPI.ChildProcess.ExecResult>(
       (resolve, reject) => {
