@@ -12,7 +12,7 @@ There are three types of you can build in your extension.
 
 ### View Command
 
-As the name suggests, this command type creates a view in the Command Bar. The Alt app uses the React library for its user interface, and you can use the [DOM API](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model) and Extension API inside the view command. To match the Alt app user interface, use the provided UI components.
+As the name suggests, this command type creates a view in the Command Bar. The Alt app uses the React library for its user interface, and you can use the [DOM API](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model) and [Extension API](/reference/extension-api/) inside the view command. To match the Alt app user interface, use the provided UI components.
 
 ```tsx
 // view-command.tsx
@@ -44,7 +44,7 @@ export default Component;
 
 ### Action Command
 
-Opposite of the view command, the action type command doesn't return view whatsoever. This command type runs in the background, and because it runs as a [Web Worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers), you can only use Extension APIs and [APIs](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Functions_and_classes_available_to_workers) that the Web Worker supports.
+Opposite of the view command, the action type command doesn't return view whatsoever. This command type runs in the background, and because it runs as a [Web Worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers), you can only use [Extension APIs](/reference/extension-api/) and [APIs](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Functions_and_classes_available_to_workers) that the Web Worker supports.
 
 ```ts
 // action-command.ts
@@ -61,7 +61,7 @@ export default command;
 
 ### Script Command
 
-You can write the script command in any supported language, unlike the View and Action command type that can only written in JS or TS. And because of that, the script command doesn't have access to the Extension API.
+You can write the script command in any supported language, unlike the View and Action command type that can only written in JS or TS. And because of that, the script command doesn't have access to the [Extension API](/reference/extension-api/).
 
 And because the script command is just a script that runs on the user's computer, whether the script can be run depends on whether the language is installed. For example, when the extension has a [Python](https://www.python.org/) script, but the user doesn't have Python installed, the app will throw an error when the user tries to run the script command.
 
