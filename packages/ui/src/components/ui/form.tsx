@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as LabelPrimitive from '@radix-ui/react-label';
 import { Slot } from '@radix-ui/react-slot';
 import {
+  useForm,
   Controller,
   ControllerProps,
   FieldPath,
@@ -188,8 +189,11 @@ const UiFormMessage = React.forwardRef<
 });
 UiFormMessage.displayName = 'FormMessage';
 
+const useUiForm = useForm;
+
 export {
   UiForm,
+  useUiForm,
   UiFormItem,
   UiFormLabel,
   UiFormField,

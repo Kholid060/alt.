@@ -1,6 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 .icon {
   width: 1.25rem;
   height: 1.25rem;
   vertical-align: middle;
   display: inline-block !important;
+}
+
+.example-wrapper {
+  width: 100%;
+  .component {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: theme('height.32');
+    @apply border-2 border-b-0 p-4;
+    border-color: var(--sl-color-gray-6)
+  }
+  .expressive-code {
+    margin-top: 0;
+  }
 }

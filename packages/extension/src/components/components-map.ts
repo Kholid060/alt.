@@ -29,6 +29,7 @@ export const UiFormField: typeof ImportForm.UiFormField = (<any>self).$UiFormFie
 export const UiFormItem: typeof ImportForm.UiFormItem = (<any>self).$UiFormItem;
 export const UiFormLabel: typeof ImportForm.UiFormLabel = (<any>self).$UiFormLabel;
 export const UiFormMessage: typeof ImportForm.UiFormMessage = (<any>self).$UiFormMessage;
+export const useUiForm: typeof ImportForm.useUiForm = (<any>self).$useUiForm;
 export const useUiFormField: typeof ImportForm.useUiFormField = (<any>self).$useUiFormField;
 export const UiLabel: typeof ImportLabel.UiLabel = (<any>self).$UiLabel;
 export const UiSwitch: typeof ImportSwitch.UiSwitch = (<any>self).$UiSwitch;

@@ -18,6 +18,7 @@ const COMPONENTS = [
   'select',
   'switch',
   'button',
+  'checkbox',
   'textarea',
   'skeleton',
 ];
