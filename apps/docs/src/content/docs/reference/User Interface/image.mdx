@@ -1,0 +1,60 @@
+---
+title: Image
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { UiImage } from '@altdot/ui';
+
+Display images with support for fallback.
+
+**Example**
+
+<Tabs>
+  <TabItem label="Image">
+    <div className="example-wrapper">
+      <div className="component">
+        <UiImage src="https://picsum.photos/200" />
+      </div>
+```tsx
+import { UiImage } from '@altdot/extension';
+import { useState } from 'react';
+
+export default function Command() {
+  return (
+    <UiImage src="https://picsum.photos/200" />
+  );
+}
+```
+    </div>
+  </TabItem>
+  <TabItem label="Image with fallback">
+    <div className="example-wrapper">
+      <div className="component">
+       <UiImage
+          src="https://picsum.photos/200"
+          fallbackSrc="https://via.placeholder.com/150"
+        />
+      </div>
+```tsx
+import { UiImage } from '@altdot/extension';
+import { useState } from 'react';
+
+export default function Command() {
+  return (
+    <UiImage
+      src="https://picsum.photos/200"
+      fallbackSrc="https://via.placeholder.com/150"
+    />
+  );
+}
+```
+    </div>
+  </TabItem>
+</Tabs>
+
+**Props**
+
+| Name | Type | Description |
+| ----------- | ----------- | ----------- |
+| `fallbackSrc` | `?string` | The image's fallback source |
+
