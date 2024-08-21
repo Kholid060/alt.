@@ -8,7 +8,7 @@ Button components to render button.
 
 ### UiButton
 
-**Usage**
+**Example**
 
 ```tsx
 // view-command.tsx

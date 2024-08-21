@@ -70,7 +70,6 @@ export interface UiListItem<T = any> {
   searchOnly?: boolean;
   icon?: React.ReactNode;
   onSelected?: () => void;
-  detail?: React.ReactNode;
   actions?: UiListItemAction[];
   suffix?: string | React.ReactNode;
 }
@@ -82,7 +81,6 @@ export interface UiListProps
   extends Omit<React.DetailsHTMLAttributes<HTMLDivElement>, 'children'> {
   search?: string;
   items: UiListItem[];
-  selectedItem?: string;
   shouldFilter?: boolean;
   noDataSlot?: React.ReactNode;
   disabledItemSelection?: boolean;
@@ -219,7 +217,9 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
     ref,
   ) => {
     const listStore = useUiListStore();
-    const query = useUiList((state) => (search ? search : state.search));
+    const query = useUiList((state) =>
+      typeof search === 'string' ? search : state.search,
+    );
 
     const itemsLen = useRef<number | null>(null);
 

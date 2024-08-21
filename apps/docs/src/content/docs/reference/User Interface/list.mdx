@@ -1,0 +1,435 @@
+---
+title: List
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+## Components
+
+### UiList
+
+Display a list of items. The items will be automatically filtered based on the command bar search panel value.
+
+![ui list](@/assets/images/ui-list.png)
+
+**Example**
+
+<Tabs>
+  <TabItem label="List">
+```tsx
+import { UiListItem, UiList, UiIcons } from '@altdot/extension';
+
+const items: UiListItem[] = [
+  {
+    group: 'fruit',
+    title: 'Apple',
+    value: 'apple',
+    icon: <UiList.Icon icon={UiIcons.Wand} />
+  },
+  {
+    group: 'fruit',
+    title: 'Banana',
+    value: 'banana',
+    icon: <UiList.Icon icon={UiIcons.Wand} />
+  },
+  {
+    group: 'vegetable',
+    title: 'Carrot',
+    value: 'carrot',
+    icon: <UiList.Icon icon={UiIcons.Wand} />
+  },
+  {
+    group: 'vegetable',
+    title: 'Eggplant',
+    value: 'eggplant',
+    icon: <UiList.Icon icon={UiIcons.Wand} />
+  },
+];
+
+export default function Command() {
+  return (
+    <UiList items={items} />
+  );
+}
+```
+  </TabItem>
+  <TabItem label="List with actions">
+```tsx
+import { UiListItem, UiList, UiIcons, _extension } from '@altdot/extension';
+
+const items: UiListItem[] = [
+  {
+    group: 'fruit',
+    title: 'Apple',
+    value: 'apple',
+    actions: [
+      {
+        type: 'button',
+        value: 'toast',
+        title: 'Show toast',
+        icon: UiIcons.BellRing,
+        onSelected() {
+          _extension.ui.showToast({ title: 'Apple' }),
+        }
+      }
+    ],
+  },
+  {
+    group: 'fruit',
+    title: 'Banana',
+    value: 'banana',
+    actions: [
+      {
+        type: 'button',
+        value: 'toast',
+        title: 'Show toast',
+        icon: UiIcons.BellRing,
+        onSelected() {
+          _extension.ui.showToast({ title: 'Banana' }),
+        }
+      }
+    ],
+  },
+  {
+    group: 'vegetable',
+    title: 'Carrot',
+    value: 'carrot',
+  },
+  {
+    group: 'vegetable',
+    title: 'Eggplant',
+    value: 'eggplant',
+  },
+];
+
+export default function Command() {
+  return (
+    <UiList items={items} />
+  );
+}
+```
+  </TabItem>
+  <TabItem label="List with custom render item">
+```tsx
+import { UiListItem, UiList, UiIcons, _extension } from '@altdot/extension';
+
+const items: UiListItem[] = [
+  {
+    group: 'fruit',
+    title: 'Apple',
+    value: 'apple',
+  },
+  {
+    group: 'fruit',
+    title: 'Banana',
+    value: 'banana',
+  },
+  {
+    group: 'vegetable',
+    title: 'Carrot',
+    value: 'carrot',
+  },
+  {
+    group: 'vegetable',
+    title: 'Eggplant',
+    value: 'eggplant',
+  },
+];
+
+export default function Command() {
+  return (
+    <UiList
+      items={items}
+      renderItem={({ item, ref, selected }) => (
+        <UiList.Item
+          {...item}
+          selected={selected}
+          ref={ref}
+          icon={<UiList.Icon icon={UiIcons.Wand} />}
+          actions={[
+            {
+              type: 'button',
+              value: 'toast',
+              title: 'Show toast',
+              icon: UiIcons.BellRing,
+              onSelected() {
+                _extension.ui.showToast({ title: item.title }),
+              }
+            }
+          ]}
+        />
+      )}
+    />
+  );
+}
+```
+  </TabItem>
+  <TabItem label="List with custom filter">
+```tsx
+import { UiListItem, UiList, UiIcons, _extension } from '@altdot/extension';
+
+const items: UiListItem[] = [
+  {
+    group: 'fruit',
+    title: 'Apple',
+    value: 'apple',
+  },
+  {
+    group: 'fruit',
+    title: 'Banana',
+    value: 'banana',
+  },
+  {
+    group: 'vegetable',
+    title: 'Carrot',
+    value: 'carrot',
+  },
+  {
+    group: 'vegetable',
+    title: 'Eggplant',
+    value: 'eggplant',
+  },
+];
+
+function customFilter(items: UiListItem[], search: string) {
+  return items.filter((item) => item.title.startsWith(search));
+}
+
+export default function Command() {
+  return (
+    <UiList
+      items={items}
+      customFilter={customFilter}
+    />
+  );
+}
+```
+  </TabItem>
+</Tabs>
+
+**Props**
+
+| Name | Type | Description |
+| ----------- | ----------- | ----------- |
+| `items` | [`UiListItem[]`](#uilistitem) | The list items |
+| `search` | `?string` | Items search filter |
+| `selectedItem` | `?string` | Items search filter |
+| `shouldFilter` | `?boolean` | Whether to filter the items |
+| `noDataSlot` | `?React.ReactNode` | Element to show when no items match the filter |
+| `disabledItemSelection` | `?boolean` | Disable the item selection |
+| `onItemSelected` | `?((value: string) => void)` | Fired when an item is selected |
+| `onSearchChanged` | `?((value: string) => void)` | Fired when the search is changed |
+| `renderItem` | <code>?((detail: [UiListRenderItemDetail](#uilistrenderitemdetail)[], index: number) => React.ReactNode)</code> | Custom list item renderer |
+| `renderGroupHeader` | <code>?((label: string, index: number) => React.ReactNode)</code> | Custom group header renderer |
+
+### `UiList.Item`
+
+Ui list item component.
+
+**Example**
+```tsx
+<UiList
+  items={items}
+  renderItem={({ item, ref, selected }) => (
+    <UiList.Item
+      {...item}
+      selected={selected}
+      ref={ref}
+      icon={<UiList.Icon icon={UiIcons.Wand} />}
+    />
+  )}
+/>
+```
+
+**Props**
+
+| Name | Type | Description |
+| ----------- | ----------- | ----------- |
+| `value` | `string` | The list item's unique value |
+| `selected` | `?boolean` | Whether the item is selected |
+| `title` | `?string \| React.ReactNode` | The list item's title that will be displayed |
+| `actions` | [`?UiListItemAction[]`](#uilistitemaction) | The list item's actions |
+| `subtitle` | `?(string \| React.ReactNode)` | Subtitle that will be displayed next to the title |
+| `icon` | `?(string | React.ReactNode)` | The list item's icon that will be displayed |
+| `description` | `?(string \| React.ReactNode)` | Shortcut description about the item |
+| `alias` | `?(string \| React.ReactNode)` | The list item's alias |
+| `keywords` | `?string[]` | Additional keywords for the item. It will be used when filtering the list items. |
+| `onSelected` | `?(() => void)` | Will be fired when the item is selected |
+| `suffix` | `?(string \| React.ReactNode)` | The item's suffix. Will be displayed on the item's right side. |
+
+### `UiList.Icon`
+
+Icon wrapper for the ui list item.
+
+**Example**
+```tsx
+<UiList
+  items={items}
+  renderItem={({ item, ref, selected }) => (
+    <UiList.Item
+      {...item}
+      selected={selected}
+      ref={ref}
+      icon={<UiList.Icon icon={UiIcons.Wand} />}
+    />
+  )}
+/>
+```
+
+**Props**
+
+| Name | Type | Description |
+| ----------- | ----------- | ----------- |
+| `icon` | `string | React.Element` | The Icon |
+
+## Types
+
+### `UiListItem`
+
+The list item data.
+
+```ts
+interface UiListItem<T = any> {
+  value: string;
+  title: string;
+  metadata?: T;
+  alias?: string;
+  group?: string;
+  subtitle?: string;
+  keywords?: string[];
+  description?: string;
+  searchOnly?: boolean;
+  icon?: React.ReactNode;
+  onSelected?: () => void;
+  actions?: UiListItemAction[];
+  suffix?: string | React.ReactNode;
+}
+```
+
+| Property | Type | Description |
+| ----------- | ----------- | ----------- |
+| `value` | `string` | The list item's unique value |
+| `title` | `string` | The list item's title that will be displayed |
+| `actions` | [`?UiListItemAction[]`](#uilistitemaction) | The list item's actions |
+| `subtitle` | `?string` | Subtitle that will be displayed next to the title |
+| `icon` | `?React.ReactNode` | The list item's icon that will be displayed |
+| `description` | `?string` | Shortcut description about the item |
+| `metadata` | `?any` | The list item's metadata |
+| `alias` | `?string` | The list item's alias |
+| `keywords` | `?string[]` | Additional keywords for the item. It will be used when filtering the list items. |
+| `searchOnly` | `?boolean` | Whether the item will only be shown when filtering the items |
+| `onSelected` | `?(() => void)` | Will be fired when the item is selected |
+| `suffix` | `?(string \| React.ReactNode)` | The item's suffix. Will be displayed on the item's right side. |
+
+### `UiListItemActionBase`
+
+Contains information about the list item.
+
+```ts
+interface UiListItemActionBase {
+  title: string;
+  value: string;
+  disabled?: boolean;
+  icon: React.ReactNode;
+  shortcut?: KeyboardShortcut;
+  color?: 'default' | 'primary' | 'destructive';
+}
+```
+
+| Property | Type | Description |
+| ----------- | ----------- | ----------- |
+| `value` | `string` | The action's unique value |
+| `title` | `string` | The action's title |
+| `icon` | `?React.ReactNode` | The action's icon |
+| `disabled` | `?boolean` | Whether the item is disabled |
+| `color` | `?('default' \| 'primary' \| 'destructive')` | The action's color |
+| `shortcut` | [`?KeyboardShortcut`](#keyboardshorcut) | The action's keyboard shortcut |
+
+### `UiListItemActionButton`
+
+List item action button type.
+
+```ts
+interface UiListItemActionButton extends UiListItemActionBase {
+  type: 'button';
+  onAction: () => void;
+}
+```
+
+| Property | Type | Description |
+| ----------- | ----------- | ----------- |
+| `type` | `button` | Item action type |
+| `onAction` | `() => void` | Will be fired when the action is selected |
+| [`UiListItemActionBase`](#uilistitemactionbase) |
+
+### `UiListItemActionMenu`
+
+List item action button type.
+
+```ts
+interface UiListItemActionMenu extends UiListItemActionBase {
+  type: 'menu';
+  items: UiListItemActionButton[];
+}
+```
+
+| Property | Type | Description |
+| ----------- | ----------- | ----------- |
+| `type` | `button` | Item action type |
+| `items` | <code>[UiListItemActionButton](#uilistitemactionbutton)[]</code> | The action menu items |
+| [`UiListItemActionBase`](#uilistitemactionbase) |
+
+### `UiListItemAction`
+
+The list item action.
+
+```ts
+type UiListItemAction = UiListItemActionMenu | UiListItemActionButton;
+```
+
+### `UiListRenderItemDetail`
+
+The item detail when passing a function in the `renderItem` prop. 
+
+```ts
+interface UiListRenderItemDetail {
+  item: UiListItem;
+  selected: boolean;
+  ref: React.Ref<HTMLDivElement>;
+  props: Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> & {
+    onSelected?: () => void;
+  };
+}
+```
+
+| Property | Type | Description |
+| ----------- | ----------- | ----------- |
+| `item` | [`UiListItem`](#uilistitem) | The list item |
+| `selected` | `boolean` | Whether the item is selected |
+| `ref` | `React.Ref<HTMLDivElement>` | The item's ref prop |
+| `props` | `Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> & { onSelected?: () => void }` | The item's props |
+
+### `KeyboardShorcut`
+
+Keyboard shortcut.
+
+```ts
+interface KeyboardShortcut {
+  key: string;
+  mod1: KeyboardShortcutModifier;
+  mod2?: KeyboardShortcutModifier;
+}
+```
+| Property | Type | Description |
+| ----------- | ----------- | ----------- |
+| `key` | `string` | The keyboard shortcut key |
+| `mod1` | [`KeyboardShortcutModifier`](#keyboardshortcutmodifier) | The keyboard shortcut modifier key |
+| `mod2` | [`?KeyboardShortcutModifier`](#keyboardshortcutmodifier) | The keyboard shortcut modifier key |
+
+### `KeyboardShortcutModifier`
+
+Keyboard shortcut modifier.
+
+```ts
+type KeyboardShortcutModifier = 'mod' | 'altKey' | 'metaKey' | 'ctrlKey' | 'shiftKey';
+```
