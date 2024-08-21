@@ -1,0 +1,41 @@
+---
+title: Checkbox
+---
+
+import { UiCheckbox, UiLabel } from '@altdot/ui';
+
+A control that allows the user to toggle between checked and not checked.
+
+**Example**
+
+<div className="example-wrapper">
+  <div className="component">
+    <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+      <UiCheckbox id="accept" />
+      <UiLabel htmlFor="accept" className="ml-2">Accept</UiLabel>
+    </div>
+  </div>
+
+```tsx
+import { UiLabel, UiCheckbox } from '@altdot/extension';
+
+export default function Command() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <UiCheckbox id="accept" />
+      <UiLabel htmlFor="accept">Accept</UiLabel>
+    </div>
+  );
+}
+```
+</div>
+
+**Props**
+
+| Name | Type | Description |
+| ----------- | ----------- | ----------- |
+| `defaultChecked` | `?(boolean \| 'indeterminate')` | The checked state of the checkbox when it is initially rendered |
+| `checked` | `?(boolean \| 'indeterminate')` | Checked state of the checkbox |
+| `onCheckedChange` | `?((value: boolean \| 'indeterminate') => void)` | Fired when the checked state of the checkbox changes |
+| `disabled` | `?boolean` | Whether to disable the checkbox |
+
