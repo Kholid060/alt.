@@ -10,11 +10,14 @@ const SRC_PATH = path.join(__dirname, '../src');
 
 const COMPONENTS = [
   'list',
+  'form',
   'input',
   'image',
   'icons',
+  'label',
   'select',
   'switch',
+  'button',
   'textarea',
   'skeleton',
 ];
@@ -40,8 +43,8 @@ async function componentExtractor(name: string) {
 async function main() {
   const componentTemplate: {
     import: string[];
-    exportType: string[];
     export: string[];
+    exportType: string[];
   } = {
     import: [],
     export: [],
