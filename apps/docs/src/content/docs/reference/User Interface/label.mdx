@@ -1,0 +1,38 @@
+---
+title: Label
+---
+
+import { UiCheckbox, UiLabel } from '@altdot/ui';
+
+Renders an accessible label associated with controls.
+
+**Example**
+
+<div className="example-wrapper">
+  <div className="component">
+    <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+      <UiCheckbox id="accept" />
+      <UiLabel htmlFor="accept" className="ml-2">Accept</UiLabel>
+    </div>
+  </div>
+
+```tsx
+import { UiLabel, UiCheckbox } from '@altdot/extension';
+
+export default function Command() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <UiCheckbox id="accept" />
+      <UiLabel htmlFor="accept">Accept</UiLabel>
+    </div>
+  );
+}
+```
+</div>
+
+**Props**
+
+| Name | Type | Description |
+| ----------- | ----------- | ----------- |
+| `htmlFor` | `string` | The id of the element the label is associated with. |
+
