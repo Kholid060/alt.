@@ -1,0 +1,39 @@
+---
+title: Skeleton
+---
+
+import { UiSkeleton } from '@altdot/ui';
+
+Show a placeholder while content is loading.
+
+**Example**
+
+<div className="example-wrapper">
+  <div className="component">
+    <div className="w-full flex flex-col items-center">
+      <UiSkeleton style={{ width: '75%', height: '2rem' }} />
+      <UiSkeleton style={{ width: '75%', height: '2rem' }} />
+      <UiSkeleton style={{ width: '75%', height: '2rem' }} />
+    </div>
+  </div>
+
+```tsx
+import { UiLabel, UiSwitch } from '@altdot/extension';
+
+export default function Command() {
+  return (
+    <>
+      <UiSkeleton style={{ width: '75%', height: '2rem' }} />
+      <UiSkeleton style={{ width: '75%', height: '2rem', marginTop: '1rem' }} />
+      <UiSkeleton style={{ width: '75%', height: '2rem', marginTop: '1rem' }} />
+    </>
+  );
+}
+```
+</div>
+
+**Props**
+
+| Name | Type | Description |
+| ----------- | ----------- | ----------- |
+
