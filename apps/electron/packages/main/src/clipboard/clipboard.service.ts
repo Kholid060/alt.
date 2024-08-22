@@ -1,6 +1,7 @@
 import { CustomError } from '#packages/common/errors/custom-errors';
 import { ExtensionAPI } from '@altdot/extension';
 import { KeyboardKey, Keyboard } from '@altdot/native';
+import { sleep } from '@altdot/shared';
 import { Injectable } from '@nestjs/common';
 import { BrowserWindow, clipboard, NativeImage, nativeImage } from 'electron';
 
@@ -44,6 +45,7 @@ export class ClipboardService {
   async paste(value?: unknown, targetForegroundApp: boolean = true) {
     const content =
       typeof value === 'string' ? value : value && JSON.stringify(value);
+    console.log('paste:', content);
     if (typeof content === 'string') clipboard.writeText(content);
 
     const focusedWindow: BrowserWindow[] = [];
@@ -62,6 +64,8 @@ export class ClipboardService {
     ];
     Keyboard.keyDown(...keys);
     Keyboard.keyUp(...keys);
+
+    await sleep(100);
 
     focusedWindow.forEach((window) => window.focus());
   }

@@ -21,8 +21,10 @@ export class ClipboardController {
   }
 
   @IPCInvoke('clipboard:paste')
-  clipboardPaste(): IPCInvokeReturn<'clipboard:paste'> {
-    this.clipboard.paste();
+  clipboardPaste(
+    @Payload() [value]: IPCInvokePayload<'clipboard:paste'>,
+  ): IPCInvokeReturn<'clipboard:paste'> {
+    this.clipboard.paste(value);
     return Promise.resolve();
   }
 
