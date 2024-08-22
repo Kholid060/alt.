@@ -1,0 +1,28 @@
+---
+title: Command JSON Output
+slug: reference/command-json-output
+sidebar:
+  order: 1
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+JSON schema that defined the action and UI of the Command Bar. This can only be returned by the command with the [`script`](/extensions/command/#script-command) type.
+
+**Signature**
+
+```ts
+interface CommandJSON {
+  view?: CommandJSONView;
+  action?: CommandJSONAction;
+}
+```
+
+| Name | Type | Description |
+| ----------- | ----------- | ----------- |
+| `view` | [`CommandJSONView`](view) | The UI of the Command Bar should be displayed |
+| `action` | [`CommandJSONAction`](action) | The action that the Command Bar should perform |
+
+:::caution
+When you return both `view` and `action`, the Command Bar will only perform the `action` and won't display the `view`.
+:::

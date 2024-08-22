@@ -65,7 +65,7 @@ You can write the script command in any supported language, unlike the View and 
 
 And because the script command is just a script that runs on the user's computer, whether the script can be run depends on whether the language is installed. For example, when the extension has a [Python](https://www.python.org/) script, but the user doesn't have Python installed, the app will throw an error when the user tries to run the script command.
 
-The script command can show the user interface to the Command Bar by outputting JSON view. For example,
+The script command can show the user interface to the Command Bar by outputting [JSON view](/reference/command-json-output/). For example,
 
 ```js
 // script.js
@@ -111,6 +111,8 @@ You can define the command arguments in the [command properties](../manifest#com
 
 ### Accessing Arguments
 
+#### `view` and `action` type
+
 For view and action type commands, you can access the argument values in the `args` property of the function parameter.
 
 ```ts
@@ -124,7 +126,9 @@ function Command({ args }: CommandLaunchContext<{ fileName: string }>) {
 export default Command;
 ```
 
-The argument values can be accessed in the environment variable for the script command type. The argument property name has a `__ARGS__` prefix, and the argument name itself will converted into a snake case. For example, when the argument name is `file-name`, it can be accessed using the `__ARGS__FILE_NAME` key.
+#### `script` type
+
+For the script type command, the argument values can be accessed in the environment variable. The argument property name has a `__ARGS__` prefix, and the argument name itself will converted into a [`SCREAMING_SNAKE_CASE`](https://en.wikipedia.org/wiki/Snake_case). For example, when the argument name is `file-name`, it can be accessed using the `__ARGS__FILE_NAME` key.
 
 ```js
 // javascript.js

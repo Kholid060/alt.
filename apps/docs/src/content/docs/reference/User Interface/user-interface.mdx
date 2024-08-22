@@ -3,19 +3,32 @@ title: User Interface
 slug: reference/user-interface
 ---
 
+export const components = [
+  'button',
+  'checkbox',
+  'form',
+  'icons',
+  'image',
+  'input',
+  'label',
+  'list',
+  'select',
+  'skeleton',
+  'switch',
+  'textarea',
+]
+
 The Alt app uses [React](https://react.dev/) to create the user interface and [React Dom](https://www.npmjs.com/package/react-dom) to render it, which means you can use any HTML Element. But to match the Alt app UI style, you can use the built-in React components.
 
-- UiButton
-- UiIcons
-- UiImage
-- UiInput
-- UiLabel
-- UiList
-- UiSelect
-- UiSelectRoot
-- UiSkeleton
-- UiSwitch
-- UiTextarea
+<ul>
+{components.map((component) => (
+  <li key={component} style={{ textTransform: 'capitalize' }}>
+    <a href={component}>
+      {component}
+    </a>
+  </li>
+))}
+</ul>
 
 To render the user interface, export the React component on the `view` command type.
 

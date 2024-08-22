@@ -1,0 +1,147 @@
+---
+title: List View
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Display a list of items.
+
+```ts
+interface CommandJSONViewList {
+  type: 'list';
+  shouldFilter?: boolean;
+  items: CommandJSONViewListItem[];
+} 
+```
+
+| Property | Type | Description |
+| ----------- | ----------- | ----------- |
+| `type` | `list` | The view type |
+| `items` | [`CommandJSONViewListItem[]`](#listitem) | The list items |
+| `shouldFilter` | `?boolean` | Whether to filter the items when the Command Bar search panel value is changed |
+
+**Example**
+
+<Tabs>
+  <TabItem label="List">
+```js
+console.log(JSON.stringify({
+  view: {
+    type: 'list',
+    items: [
+      {
+        value: 'open-url',
+        icon: 'icon:Link',
+        title: 'Open an URL',
+        actions: [
+          { type: 'open-url', url: 'https://google.com', defaultAction: true }
+        ],
+      },
+      {
+        value: 'paste-emoji',
+        icon: 'icon:Clipboard',
+        title: 'Paste Emoji',
+        actions: [
+          { type: 'paste', content: '🤯', defaultAction: true }
+        ],
+      },
+    ],
+  }
+}))
+```
+  </TabItem>
+  <TabItem label="List with actions">
+```js
+const emojis = ['🤯', '🎉', '✅', '🔃', '👏', '🟩', '🔴', '😅', '🤔', '❌', '🌿', '😍'];
+
+console.log(JSON.stringify({
+  view: {
+    type: 'list',
+    items: emojis.map((emoji, index) => ({
+      value: `emoji-${index}`,
+      title: emoji,
+      actions: [
+        { type: 'paste', content: emoji, defaultAction: true },
+        { type: 'open-url', url: `https://emojipedia.org/${emoji}` },
+      ],
+    })),
+  }
+}))
+```
+  </TabItem>
+  <TabItem label="List with grouped items">
+```js
+console.log(JSON.stringify({
+  view: {
+    type: 'list',
+    items: [
+      {
+        group: 'Emoji',
+        title: '😍',
+        value: 'emoji-1',
+        actions: [
+          { type: 'paste', content: '😍', defaultAction: true },
+        ],
+      },
+      {
+        title: '🌿',
+        group: 'Emoji',
+        value: 'emoji-2',
+        actions: [
+          { type: 'paste', content: '🌿', defaultAction: true },
+        ],
+      },
+      {
+        title: 'ヾ(≧▽≦*)o',
+        group: 'Kaomoji',
+        value: 'kaomoji-1',
+        actions: [
+          { type: 'paste', content: 'ヾ(≧▽≦*)o', defaultAction: true },
+        ],
+      },
+    ],
+  }
+}))
+```
+  </TabItem>
+</Tabs>
+
+## List Item
+
+Item for the [`list`](#list-type) type view.
+
+```ts
+interface CommandJSONViewListItem {
+  title: string;
+  value: string;
+  icon?: string;
+  group?: string;
+  subtitle?: string;
+  description?: string;
+  actions?: CommandJSONViewListItemAction[];
+}
+```
+
+| Property | Type | Description |
+| ----------- | ----------- | ----------- |
+| `value` | `string` | The list item's unique value |
+| `title` | `string` | The list item's title that will be displayed |
+| `icon` | `?string` | The list item's icon. This can be an image URL or use the `icon:ICON_NAME` format to use the built-in icon. Replace the `ICON_NAME` with the icon's name you can find [here](/reference/user-interface/icons/). |
+| `actions` | [`?CommandJSONViewListItemAction[]`](#list-item-action) | The list item's actions |
+| `subtitle` | `?string` | Subtitle that will be displayed next to the title |
+| `description` | `?string` | Shortcut description about the item |
+
+### List Item Action
+
+Action of the list item. it's similar with the [Action](/reference/command-json-output/action/) except it has additional properties.
+
+```ts
+interface CommandJSONViewListItemAction extends CommandJSONAction {
+  defaultAction?: boolean;
+}
+```
+
+| Property | Type | Description |
+| ----------- | ----------- | ----------- |
+| `defaultAction` | `?boolean` | Whether to perform the current action when the user selects the item |
+| `...rest` | [`CommandJSONAction`](/reference/command-json-output/action/) | |

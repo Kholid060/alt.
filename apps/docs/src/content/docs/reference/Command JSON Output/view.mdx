@@ -1,0 +1,31 @@
+---
+title: View
+sidebar:
+  order: 3
+---
+
+The UI of the Command Bar should be displayed.
+
+```ts
+type CommandJSONView = 
+  | CommandJSONViewList
+  | CommandJSONViewText
+  | CommandJSONViewForm;
+```
+
+export const views = ['form', 'list', 'text'];
+
+Available views:
+
+<ul>
+  {views.map((view) => (
+    <li key={view}>
+      <a
+        href={`/reference/command-json-output/${view}-view`}
+        style={{ textTransform: 'capitalize' }}
+      >
+        {view} View
+      </a>
+    </li>
+  ))}
+</ul>
