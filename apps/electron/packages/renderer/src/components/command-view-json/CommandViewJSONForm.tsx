@@ -202,7 +202,7 @@ function CommandViewJSONForm({ data }: { data: CommandJSONViewForm }) {
             {data.submitBtnText ?? 'Submit'}
           </UiButton>
           <UiButton type="button" className="min-w-24" variant="secondary">
-            {data.cancenBtnText ?? 'Cancel'}
+            {data.cancelBtnText ?? 'Cancel'}
           </UiButton>
         </div>
       </form>

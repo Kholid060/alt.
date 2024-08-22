@@ -69,7 +69,7 @@ export const CommandJSONViewListItemValidation = z.object({
   actions: z
     .intersection(
       CommandJSONActionValidation,
-      z.object({ defaultAction: z.string().optional() }),
+      z.object({ defaultAction: z.boolean().optional() }),
     )
     .array()
     .optional(),
@@ -178,7 +178,7 @@ export const CommandJSONViewFormValidation = z.object({
   type: z.literal('form'),
   title: z.string().optional(),
   description: z.string().optional(),
-  cancenBtnText: z.string().optional(),
+  cancelBtnText: z.string().optional(),
   submitBtnText: z.string().optional(),
   name: z.string().optional().default('form_value'),
   fields: z

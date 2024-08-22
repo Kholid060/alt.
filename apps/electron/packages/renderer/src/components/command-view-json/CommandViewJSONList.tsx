@@ -8,31 +8,32 @@ function CommandViewJSONList({ data }: { data: CommandJSONViewList }) {
 
   const items: UiListItem[] = data.items.map((item) => {
     let defaultAction: (() => unknown) | null = null;
-    const actions: UiListItemAction[] = (item.actions ?? []).map(
-      (action, index) => {
-        const actionData = defaultCommandActions[action.type];
-        const onAction = () => {
-          actionData.onAction(
-            {
-              addStatus,
-            },
-            action as never,
-          );
-        };
+    const actions: UiListItemAction[] = [];
 
-        if (!defaultAction && action.defaultAction) {
-          defaultAction = onAction;
-        }
+    (item.actions ?? []).map((action, index) => {
+      const actionData = defaultCommandActions[action.type];
+      const onAction = () => {
+        actionData.onAction(
+          {
+            addStatus,
+          },
+          action as never,
+        );
+      };
 
-        return {
-          onAction,
-          type: 'button',
-          icon: actionData.icon,
-          title: actionData.title,
-          value: action.type + index,
-        };
-      },
-    );
+      if (!defaultAction && action.defaultAction) {
+        defaultAction = onAction;
+        return;
+      }
+
+      actions.push({
+        onAction,
+        type: 'button',
+        icon: actionData.icon,
+        title: actionData.title,
+        value: action.type + index,
+      });
+    });
 
     const Icon = item.icon
       ? UiIcons[item.icon as keyof typeof UiIcons]
@@ -43,12 +44,8 @@ function CommandViewJSONList({ data }: { data: CommandJSONViewList }) {
       value: item.value,
       subtitle: item.subtitle,
       description: item.description,
+      onSelected: defaultAction || undefined,
       icon: Icon && <UiList.Icon icon={Icon} />,
-      onSelected: () => {
-        if (!defaultAction) return;
-
-        defaultAction();
-      },
     };
   });
 
