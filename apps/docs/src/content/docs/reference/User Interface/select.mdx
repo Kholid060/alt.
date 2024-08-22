@@ -1,0 +1,108 @@
+---
+title: Select
+---
+
+Displays a list of options for the user to pick from.
+
+## components
+
+### UiSelect
+
+The select component root.
+
+**Example**
+```tsx
+// view-command.tsx
+import { UiSelect } from '@altdot/extension';
+
+export default function Command() {
+  return (
+    <UiSelect>
+      {/* ... */}
+    </UiSelect>
+  )
+}
+```
+
+**Props**
+
+| Name | Type | Description |
+| ----------- | ----------- | ----------- |
+| `placeholder` | `?string` | The content that will be rendered when no option is selected |
+| `triggerLeft` | `?React.ReactNode` | The content that will be rendered on the left side |
+| `variant` | `?('default')` | The select's variant |
+| `inputSize` | `?('sm' \| 'lg' \| 'default')` | The select's size. Default is `default` |
+| `position` | `?('item-aligned' \| 'popper')` | The positioning mode to use, `item-aligned` is the default and behaves similarly to a native MacOS menu by positioning content relative to the active item. `popper` positions content in the same way as the [`<select>`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select) element. |
+
+### UiSelect.Option
+
+The component that contains the select option.
+
+**Example**
+```tsx
+// view-command.tsx
+import { UiSelect } from '@altdot/extension';
+
+export default function Command() {
+  return (
+    <UiSelect>
+      <UiSelect.Option value="option-1">Option 1</UiSelect.Option>
+      <UiSelect.Option value="option-2">Option 2</UiSelect.Option>
+    </UiSelect>
+  )
+}
+```
+
+**Props**
+
+| Name | Type | Description |
+| ----------- | ----------- | ----------- |
+| `value` | `string` | The option's value |
+| `disabled` | `?boolean` | Prevents the user from interacting with the item when it's `true` |
+
+### UiSelect.Group
+
+Used to group multiple options.
+
+**Example**
+```tsx {7-8} {11}
+// view-command.tsx
+import { UiSelect } from '@altdot/extension';
+
+export default function Command() {
+  return (
+    <UiSelect>
+      <UiSelect.Group>
+        <UiSelect.Label>Label</UiSelect.Label>
+        <UiSelect.Option>...</UiSelect.Option>
+        <UiSelect.Option>...</UiSelect.Option>
+      </UiSelect.Group>
+    </UiSelect>
+  )
+}
+```
+
+### UiSelect.Label
+
+Used to render the label of a group.
+
+### UiSelect.Separator
+
+Used to visually separate items in the select.
+
+**Example**
+```tsx {9}
+// view-command.tsx
+import { UiSelect } from '@altdot/extension';
+
+export default function Command() {
+  return (
+    <UiSelect>
+      <UiSelect.Option>...</UiSelect.Option>
+      <UiSelect.Option>...</UiSelect.Option>
+      <UiSelect.Separator />
+      <UiSelect.Option>...</UiSelect.Option>
+    </UiSelect>
+  )
+}
+```
