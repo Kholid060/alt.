@@ -2,20 +2,19 @@
 title: Button
 ---
 
-import { UiButton } from '@altdot/ui';
+import { UiButton, UiIcons } from '@altdot/ui';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 Button components to render button.
 
-## Components
-
-### UiButton
-
 **Example**
 
-<div className="example-wrapper">
-  <div className="component">
-    <UiButton>Hello world</UiButton>
-  </div>
+<Tabs>
+  <TabItem label="Button">
+    <div className="example-wrapper">
+      <div className="component">
+        <UiButton>Hello world</UiButton>
+      </div>
 
 ```tsx
 import { UiButton } from '@altdot/extension';
@@ -26,7 +25,47 @@ export default function Command() {
   );
 }
 ```
-</div>
+    </div>
+  </TabItem>
+  <TabItem label="Button secondary">
+    <div className="example-wrapper">
+      <div className="component">
+        <UiButton variant="secondary">Hello world</UiButton>
+      </div>
+
+```tsx
+import { UiButton } from '@altdot/extension';
+
+export default function Command() {
+  return (
+    <UiButton variant="secondary">Hello world</UiButton>
+  );
+}
+```
+    </div>
+  </TabItem>
+  <TabItem label="Button icon">
+    <div className="example-wrapper">
+      <div className="component">
+        <UiButton size="icon">
+          <UiIcons.Search />
+        </UiButton>
+      </div>
+
+```tsx
+import { UiButton } from '@altdot/extension';
+
+export default function Command() {
+  return (
+    <UiButton size="icon">
+      <UiIcons.Search />
+    </UiButton>
+  );
+}
+```
+    </div>
+  </TabItem>
+</Tabs>
 
 **Props**
 

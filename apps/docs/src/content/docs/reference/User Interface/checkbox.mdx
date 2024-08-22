@@ -3,19 +3,21 @@ title: Checkbox
 ---
 
 import { UiCheckbox, UiLabel } from '@altdot/ui';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 A control that allows the user to toggle between checked and not checked.
 
 **Example**
 
-<div className="example-wrapper">
-  <div className="component">
-    <div style={{ display: 'inline-flex', alignItems: 'center' }}>
-      <UiCheckbox id="accept" />
-      <UiLabel htmlFor="accept" className="ml-2">Accept</UiLabel>
-    </div>
-  </div>
-
+<Tabs>
+  <TabItem label="Checkbox">
+    <div className="example-wrapper">
+      <div className="component">
+        <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+          <UiCheckbox id="accept" />
+          <UiLabel htmlFor="accept" className="ml-2">Accept</UiLabel>
+        </div>
+      </div>
 ```tsx
 import { UiLabel, UiCheckbox } from '@altdot/extension';
 
@@ -28,7 +30,76 @@ export default function Command() {
   );
 }
 ```
-</div>
+    </div>
+  </TabItem>
+  <TabItem label="Checkbox in form">
+    Using checkbox with the [Form](/reference/user-interface/form) component.
+```tsx
+// view-command.tsx
+import {
+  UiForm,
+  UiButton,
+  useUiForm,
+  UiFormItem,
+  UiCheckbox,
+  UiFormField,
+  UiFormLabel,
+  UiFormControl,
+  UiFormMessage,
+  UiFormDescription,
+} from '@altdot/extension';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+
+const formSchema = z.object({
+  acceptTerm: z.boolean().optional().default(false),
+});
+type FormValue = z.infer<typeof formSchema>;
+
+export default function Command() {
+  const uiForm = useUiForm<FormValue>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      acceptTerm: false
+    }
+  });
+
+  function onSubmit(values: FormValue) {
+    console.log(values);
+  }
+
+  return (
+    <UiForm {...uiForm}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <UiFormField
+          name="username"
+          control={uiForm.control}
+          render={({ field }) => (
+            <UiFormItem style={{ display: 'flex', alignItems: 'center', }}>
+              <UiFormControl>
+                <UiCheckbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </UiFormControl>
+              <div style={{ marginLeft: '0.5rem' }}>
+                <UiFormLabel>Accept term</UiFormLabel>
+                <UiFormDescription>
+                  Description of the checkbox
+                </UiFormDescription>
+                <UiFormMessage />
+              </div>
+            </UiFormItem>
+          )}
+        />
+        <UiButton type="submit">Submit</UiButton>
+      </form>
+    </UiForm>
+  )
+}
+```
+  </TabItem>
+</Tabs>
 
 **Props**
 
