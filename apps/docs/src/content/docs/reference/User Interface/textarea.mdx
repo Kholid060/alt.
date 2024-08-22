@@ -1,0 +1,51 @@
+---
+title: Textarea
+---
+
+Displays a form textarea.
+
+import { UiTextarea, UiLabel } from '@altdot/ui';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+**Example**
+
+<Tabs>
+  <TabItem label="Textarea">
+    <div className="example-wrapper">
+      <div className="component">
+        <UiTextarea placeholder="Write something..." />
+      </div>
+```tsx
+import { UiLabel, UiCheckbox } from '@altdot/extension';
+
+export default function Command() {
+  return (
+    <UiTextarea placeholder="Write something..." />
+  );
+}
+```
+    </div>
+  </TabItem>
+  <TabItem label="Textarea with label">
+   <div className="example-wrapper">
+      <div className="component">
+        <div style="min-width: 80%">
+          <UiLabel htmlFor="message">Message</UiLabel>
+          <UiTextarea id="message" style={{ marginTop: '0px' }} placeholder="Write something..." />
+        </div>
+      </div>
+```tsx
+import { UiLabel, UiCheckbox } from '@altdot/extension';
+
+export default function Command() {
+  return (
+    <>
+      <UiLabel htmlFor="message">Message</UiLabel>
+      <UiTextarea id="message" placeholder="Write something..." />
+    </>
+  );
+}
+```
+    </div>
+  </TabItem>
+</Tabs>
