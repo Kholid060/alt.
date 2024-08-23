@@ -6,6 +6,25 @@ Interact with the browser. The extension must have the `browser` permission to u
 
 ## Functions
 
+### `browser.isAvailable`
+> browser.tabs.query(): Promise\<boolean>
+
+
+Check if there's a browser that can be used.
+
+**Example**
+
+```ts
+import { _extension } from '@altdot/extension';
+
+export default async function Command() {
+  const isBrowserAvailable = await _extension.browser.isAvailable();
+  if (!isBrowserAvailable) {
+    throw new Error('Make sure to open a browser or the Alt. browser extension is installed');
+  }
+}
+```
+
 ### `browser.tabs.query`
 > browser.tabs.query(options: [QueryOptions](#browsertabsqueryoptions)): Promise\<[Tab](#browsertabstab)[]>
 
@@ -14,6 +33,8 @@ Query all the browser tabs.
 **Example**
 
 ```js
+import { _extension } from '@altdot/extension';
+
 // get all tabs
 console.log(await _extension.browser.tabs.query({}));
 
