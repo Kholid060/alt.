@@ -227,7 +227,6 @@ export const WORKFLOW_NODES: {
     defaultData: {
       body: '',
       title: '',
-      subtitle: '',
       silent: false,
       isDisabled: false,
       $nodeType: WORKFLOW_NODE_TYPE.NOTIFICATION,

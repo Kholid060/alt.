@@ -254,9 +254,9 @@ export type WorkflowNodeBrowserKeyboard = WorkflowNodeBase<
     delay: number;
     selector: string;
     clearFormValue: boolean;
-    key: ExtensionAPI.Browser.KeyboardKeys;
+    key: ExtensionAPI.Browser.Tabs.KeyboardKeys;
     action: 'key-down' | 'press' | 'key-up' | 'type';
-    modifiers: ExtensionAPI.Browser.KeyboardModifiers[];
+    modifiers: ExtensionAPI.Browser.Tabs.KeyboardModifiers[];
   },
   WORKFLOW_NODE_TYPE.BROWSER_KEYBOARD
 >;
@@ -287,7 +287,7 @@ export type WorkflowNodeElementAttributes = WorkflowNodeBase<
 export type WorkflowNodeWaitSelector = WorkflowNodeBase<
   {
     selector: string;
-  } & Required<ExtensionAPI.Browser.WaitForSelectorOptions>,
+  } & Required<ExtensionAPI.Browser.Tabs.WaitForSelectorOptions>,
   WORKFLOW_NODE_TYPE.WAIT_SELECTOR
 >;
 

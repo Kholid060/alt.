@@ -31,9 +31,9 @@ import {
   WorkflowNodeErroHandlerAction,
   WorkflowNodeErrorHandler,
   WorkflowNodeLoop,
+  WorkflowNodeNote,
   WorkflowNodes,
 } from '@/interface/workflow-nodes.interface';
-import { WorkflowNodeNote } from '../../dist';
 
 function NodeHandleWithLabel({
   label,
