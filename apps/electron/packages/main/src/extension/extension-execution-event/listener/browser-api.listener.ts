@@ -9,6 +9,11 @@ import { isWSAckError } from '/@/common/utils/helper';
 export class ExtensionBrowserApiListener {
   constructor(private browserExtension: BrowserExtensionService) {}
 
+  @OnExtensionAPI('browser.isAvailable')
+  async isBrowserAvailable(_event: ExtensionApiEvent<'browser.isAvailable'>) {
+    return this.browserExtension.isBrowserConnected();
+  }
+
   @OnExtensionAPI('browser.tabs.#actions')
   async tabActions({
     args: [detail],

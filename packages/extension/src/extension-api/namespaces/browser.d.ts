@@ -15,6 +15,8 @@ import type {
 export declare namespace Browser {
   interface Static {
     tabs: Tabs.Static;
+
+    isAvailable(): Promise<boolean>;
   }
 }
 

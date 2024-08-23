@@ -29,6 +29,10 @@ export class BrowserExtensionService {
     return socket ?? null;
   }
 
+  isBrowserConnected() {
+    return this.connectedBrowsers.size > 0;
+  }
+
   async getActiveTab(browserId?: string) {
     if (browserId) {
       const tab = await this.emitToBrowserWithAck({

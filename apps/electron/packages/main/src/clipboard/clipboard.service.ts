@@ -45,7 +45,6 @@ export class ClipboardService {
   async paste(value?: unknown, targetForegroundApp: boolean = true) {
     const content =
       typeof value === 'string' ? value : value && JSON.stringify(value);
-    console.log('paste:', content);
     if (typeof content === 'string') clipboard.writeText(content);
 
     const focusedWindow: BrowserWindow[] = [];
