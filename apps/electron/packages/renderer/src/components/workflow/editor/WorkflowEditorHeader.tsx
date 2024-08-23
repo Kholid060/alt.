@@ -9,6 +9,9 @@ import {
   UiIcons,
   UiLabel,
   UiSwitch,
+  UiToggle,
+  UiToggleGroup,
+  UiToggleGroupItem,
   UiTooltip,
   useDialog,
   useToast,
@@ -19,8 +22,10 @@ import {
   DownloadIcon,
   EllipsisVerticalIcon,
   PencilIcon,
+  PinIcon,
   PlayIcon,
   PlusIcon,
+  PowerOffIcon,
   TrashIcon,
   VariableIcon,
 } from 'lucide-react';
@@ -380,21 +385,53 @@ function WorkflowSaveButton() {
     </UiTooltip>
   );
 }
-function WorkflowDisableBtn() {
+function WorkflowToggles() {
   const workflow = useWorkflowEditorStore.use.workflow();
   const updateWorkflow = useWorkflowEditorStore.use.updateWorkflow();
 
   if (!workflow) return;
 
+  console.log(workflow.isPinned, workflow.isDisabled);
+
   return (
-    <div className="mr-2 flex h-10 items-center gap-2 rounded-md border border-border/60 px-2 text-sm">
-      <UiSwitch
+    <div className="flex h-10 items-center gap-0.5 rounded-md border border-border/60 px-px">
+      <UiTooltip
+        label={workflow.isDisabled ? 'Enable workflow' : 'Disable workflow'}
+      >
+        <div>
+          <UiToggle
+            size="sm"
+            className="w-9 p-0 data-[state=on]:text-destructive-text"
+            pressed={workflow.isDisabled}
+            onPressedChange={(value) =>
+              updateWorkflow({ isDisabled: value }, true)
+            }
+          >
+            <PowerOffIcon className="size-5" />
+          </UiToggle>
+        </div>
+      </UiTooltip>
+      <UiTooltip label={workflow.isPinned ? 'Unpin workflow' : 'Pin workflow'}>
+        <div>
+          <UiToggle
+            size="sm"
+            pressed={workflow.isPinned ?? false}
+            className="w-9 p-0"
+            onPressedChange={(value) =>
+              updateWorkflow({ isPinned: value }, true)
+            }
+          >
+            <PinIcon className="size-5" />
+          </UiToggle>
+        </div>
+      </UiTooltip>
+      {/* <UiSwitch
         size="sm"
         checked={!workflow.isDisabled}
         id="workflow-disabled-switch"
         onCheckedChange={(value) => updateWorkflow({ isDisabled: !value })}
       />
-      <UiLabel htmlFor="workflow-disabled-switch">Enable</UiLabel>
+      <UiLabel htmlFor="workflow-disabled-switch">Enable</UiLabel> */}
     </div>
   );
 }
@@ -544,7 +581,8 @@ function WorkflowEditorHeader() {
       <WorkflowVariableModal />
       <WorkflowMoreMenu />
       <hr className="mx-4 h-2/6 w-px bg-border/50" />
-      <WorkflowDisableBtn />
+      <WorkflowToggles />
+      <hr className="mx-4 h-2/6 w-px bg-border/50" />
       <UiTooltip
         label={
           <>
