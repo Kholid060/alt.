@@ -243,6 +243,9 @@ importers:
       sharp:
         specifier: ^0.32.5
         version: 0.32.6
+      starlight-image-zoom:
+        specifier: ^0.8.0
+        version: 0.8.0(@astrojs/starlight@0.25.3(astro@4.13.1(@types/node@20.14.12)(sass@1.69.5)(terser@5.31.6)(typescript@5.5.4)))
       tailwindcss:
         specifier: ^3.4.10
         version: 3.4.10
@@ -9030,6 +9033,12 @@ packages:
 
   stackback@0.0.2:
     resolution: {integrity: sha512-1XMJE5fQo1jGH6Y/7ebnwPOBEkIEnT4QF32d5R1+VXdXveM0IBMJt8zfaxX1P3QhVwrYe+576+jkANtSS2mBbw==}
+
+  starlight-image-zoom@0.8.0:
+    resolution: {integrity: sha512-+YDqCyihQescGs9hJoyTQt+KHEq9s6zIv8ksBMjPjwOrVicXtY0pM4hHj8yO1r2znud4gTytyGt25kAOmRyP9A==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@astrojs/starlight': '>=0.22.0'
 
   stat-mode@1.0.0:
     resolution: {integrity: sha512-jH9EhtKIjuXZ2cWxmXS8ZP80XyC3iasQxMDV8jzhNJpfDb7VbQLVW4Wvsxz9QZvzV+G4YoSfBUVKDOyxLzi/sg==}
@@ -19624,6 +19633,13 @@ snapshots:
       minipass: 3.3.6
 
   stackback@0.0.2: {}
+
+  starlight-image-zoom@0.8.0(@astrojs/starlight@0.25.3(astro@4.13.1(@types/node@20.14.12)(sass@1.69.5)(terser@5.31.6)(typescript@5.5.4))):
+    dependencies:
+      '@astrojs/starlight': 0.25.3(astro@4.13.1(@types/node@20.14.12)(sass@1.69.5)(terser@5.31.6)(typescript@5.5.4))
+      rehype-raw: 7.0.0
+      unist-util-visit: 5.0.0
+      unist-util-visit-parents: 6.0.1
 
   stat-mode@1.0.0: {}
 
