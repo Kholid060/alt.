@@ -294,7 +294,10 @@ export const configProps = [
   {
     name: 'type',
     type: <code>{EXTENSION_CONFIG_TYPE.join(' | ')}</code>,
-    description: 'The config type',
+    description: <>
+      The config type.
+      Value of the <code>input:password</code> type will be encrypted using the electron <a href="https://www.electronjs.org/docs/latest/api/safe-storage" rel="noopener"><code>safeStorage</code></a> before being stored.
+    </>,
   },
   {
     name: 'placholder',

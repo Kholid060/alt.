@@ -8,4 +8,4 @@ When you have a branching node inside your workflow, the execution order will st
 
 ![Branching nodes](@/assets/images/workflow-branching-node.png)
 
-In this case, when the HTTP Request node execution is finished, the workflow will execute the File System node and then continue to the Notification node first. Then continues execution to the next branch, which is the Browser Tab node and the Mouse node.
+In this case, when the HTTP Request node execution is finished, the workflow will execute the File System node and then continue to the Notification node. Then continues execution to the next branch, which is the Browser Tab node and the Mouse node.
