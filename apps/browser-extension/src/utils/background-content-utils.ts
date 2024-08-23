@@ -1,4 +1,4 @@
-import { sleep, sleepWithRetry } from '@altdot/shared';
+import { promiseWithResolver, sleep, sleepWithRetry } from '@altdot/shared';
 import Browser from 'webextension-polyfill';
 
 async function isContentScriptInjected(tabId: number, frameId?: number) {
@@ -23,6 +23,8 @@ export async function injectContentHandlerScript(tabId: number) {
 
   let retryCount = 0;
 
+  await waitUntilTabLoaded(tabId);
+
   await sleepWithRetry(async () => {
     if (retryCount >= MAX_RETRY_COUNT) {
       throw new Error("Can't inject content script");
@@ -41,4 +43,25 @@ export async function injectContentHandlerScript(tabId: number) {
 
     return await isContentScriptInjected(tabId);
   }, 1000);
+}
+
+export function waitUntilTabLoaded(tabId: number) {
+  const resolver = promiseWithResolver();
+
+  const waitTab = async () => {
+    try {
+      const tab = await Browser.tabs.get(tabId);
+      if (tab.status && tab.status !== 'complete') {
+        await sleep(500);
+        return waitTab();
+      }
+
+      resolver.resolve();
+    } catch (error) {
+      resolver.reject(error);
+    }
+  };
+  waitTab();
+
+  return resolver.promise;
 }

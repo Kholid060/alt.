@@ -4,15 +4,15 @@ import Browser from 'webextension-polyfill';
 import BackgroundBrowserEventListener from './BackgroundBrowserEventListener';
 
 function initWebsocketService() {
-  WebsocketService.instance.addListener('connect', () => {
+  WebsocketService.instance.addListener('connect', async () => {
     BrowserService.instance.startListener();
-    Browser.action.setBadgeText({ text: ' ' });
-    Browser.action.setBadgeBackgroundColor({ color: '#6E56CF' });
+    await Browser.action.setBadgeText({ text: ' ' });
+    await Browser.action.setBadgeBackgroundColor({ color: '#6E56CF' });
   });
-  WebsocketService.instance.addListener('disconnect', () => {
+  WebsocketService.instance.addListener('disconnect', async () => {
     BrowserService.instance.stopListener();
-    Browser.action.setBadgeText({ text: '' });
-    Browser.action.setBadgeBackgroundColor({ color: '' });
+    await Browser.action.setBadgeText({ text: '' });
+    await Browser.action.setBadgeBackgroundColor({ color: null });
   });
 
   WebsocketService.instance.init();
