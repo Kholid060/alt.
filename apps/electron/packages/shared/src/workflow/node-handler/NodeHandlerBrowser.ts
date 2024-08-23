@@ -67,7 +67,7 @@ async function findBrowser(
 
 const MAX_RETRY_FIND_CONNECT_BROWSER = 5;
 
-export class NodeHandlerOpenBrowser extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.USE_BROWSER> {
+export class NodeHandleUseBrowser extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.USE_BROWSER> {
   constructor() {
     super(WORKFLOW_NODE_TYPE.USE_BROWSER, {
       dataValidation: [
