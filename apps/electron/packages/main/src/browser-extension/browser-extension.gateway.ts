@@ -13,6 +13,7 @@ import {
   BrowserExtensionNamespace,
   BrowserExtensionSocket,
 } from './browser-extension.interface';
+import { debugLog } from '#packages/common/utils/helper';
 
 @WebSocketGateway(APP_WEBSOCKET_PORT, {
   pingInterval: 20_000,
@@ -36,6 +37,7 @@ export class BrowserExtensionGateway
       !headers.origin ||
       !this.config.get('WS_ALLOWED_ORIGIN').includes(headers.origin)
     ) {
+      debugLog('WS Client not allowed', { auth, origin: headers.origin });
       client.disconnect();
       return;
     }

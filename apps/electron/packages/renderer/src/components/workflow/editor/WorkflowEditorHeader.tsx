@@ -7,11 +7,7 @@ import {
   UiDropdownMenuSeparator,
   UiDropdownMenuTrigger,
   UiIcons,
-  UiLabel,
-  UiSwitch,
   UiToggle,
-  UiToggleGroup,
-  UiToggleGroupItem,
   UiTooltip,
   useDialog,
   useToast,
@@ -390,8 +386,6 @@ function WorkflowToggles() {
   const updateWorkflow = useWorkflowEditorStore.use.updateWorkflow();
 
   if (!workflow) return;
-
-  console.log(workflow.isPinned, workflow.isDisabled);
 
   return (
     <div className="flex h-10 items-center gap-0.5 rounded-md border border-border/60 px-px">
