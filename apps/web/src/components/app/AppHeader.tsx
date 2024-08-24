@@ -117,7 +117,7 @@ function ProfileMenu() {
 
 const HEADER_LINKS: { name: string; url: string; isExternal?: boolean }[] = [
   { name: 'Store', url: '/store' },
-  { name: 'Documentation', url: '/store', isExternal: true },
+  { name: 'Documentation', url: 'https://docs.altdot.xyz', isExternal: true },
 ];
 
 function HeaderLinkMobile() {
@@ -154,7 +154,11 @@ function HeaderLinkMobile() {
       <UiDropdownMenuContent className="w-48 md:hidden" align="end">
         {[
           ...HEADER_LINKS,
-          { name: 'GitHub', url: 'https://github.com', isExternal: true },
+          {
+            name: 'GitHub',
+            url: 'https://github.com/kholid060/altdot',
+            isExternal: true,
+          },
         ].map((item) => (
           <UiDropdownMenuItem key={item.name} asChild>
             {item.isExternal ? (
