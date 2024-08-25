@@ -18,7 +18,7 @@ export default defineConfig({
       },
       customCss: ['./src/assets/css/style.css', '@altdot/ui/dist/theme.css'],
       social: {
-        github: 'https://github.com/withastro/starlight',
+        github: 'https://github.com/Kholid060/altdot',
       },
       sidebar: [
         {
