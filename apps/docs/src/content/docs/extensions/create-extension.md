@@ -15,9 +15,9 @@ Before building your first extension, ensure you have the prerequisite.
 
 ## Create a New Extension
 
-To create a new extension, fork or download the [extension starter template](https://github.com/Kholid060/alt-extension-starter) and install the modules using the package manager, for example, if you're using npm `npm install`;
+To create a new extension, fork or download the [extension starter template](https://github.com/Kholid060/altdot-extension-starter) and install the modules using the package manager, for example, if you're using npm `npm install`;
 
-Open the [`manifest.ts`](/extensions/extension-manifest) file to change the extension details like the name, description, etc.
+Open the [`manifest.ts`](/extensions/manifest) file to change the extension details like the name, description, etc.
 
 ## Develop Extension
 

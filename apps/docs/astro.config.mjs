@@ -2,6 +2,7 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightImageZoom from 'starlight-image-zoom';
 import react from '@astrojs/react';
+import starlightLinksValidator from 'starlight-links-validator';
 
 import tailwind from '@astrojs/tailwind';
 
@@ -47,7 +48,7 @@ export default defineConfig({
           },
         },
       ],
-      plugins: [starlightImageZoom()],
+      plugins: [starlightImageZoom(), starlightLinksValidator({ errorOnRelativeLinks: false })],
     }),
     react({
       experimentalReactChildren: true

@@ -34,7 +34,7 @@ List of data you can access:
 | Property | Type | Description |
 | ----------- | ----------- | ----------- |
 | `vars` | `Record<string, unknown>` | [Workflow variables](/workflows/variables) |
-| `loopData` | <code>Record<string, [LoopData](/reference/workfllow-nodes/looping-node/#loopdata)> | The [Looping Node](/reference/workfllow-nodes/looping-node/)</code> data. The property key is using the node id of the Looping node |
+| `loopData` | <code>Record<string, [LoopData](reference/workflow-nodes/node-loop/#loopdata)> | The [Looping Node](reference/workflow-nodes/node-loop/)</code> data. The property key is using the node id of the Looping node |
 | `prevNode` | `unknown \| null` | Data returned by the previous node |
 | `parentWorkflow` | `{ id: string; vars: Record<string, unknown> } \| null` | The parent workflow data. This will be available if the workflow is executed using the Workflow Execute Node |
 

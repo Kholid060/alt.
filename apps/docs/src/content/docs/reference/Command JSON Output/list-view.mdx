@@ -17,7 +17,7 @@ interface CommandJSONViewList {
 | Property | Type | Description |
 | ----------- | ----------- | ----------- |
 | `type` | `list` | The view type |
-| `items` | [`CommandJSONViewListItem[]`](#listitem) | The list items |
+| `items` | [`CommandJSONViewListItem[]`](#list-item) | The list items |
 | `shouldFilter` | `?boolean` | Whether to filter the items when the Command Bar search panel value is changed |
 
 **Example**
@@ -108,7 +108,7 @@ console.log(JSON.stringify({
 
 ## List Item
 
-Item for the [`list`](#list-type) type view.
+Item for the `list` type view.
 
 ```ts
 interface CommandJSONViewListItem {

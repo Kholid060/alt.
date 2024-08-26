@@ -207,6 +207,9 @@ importers:
       '@altdot/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@altdot/workflow':
+        specifier: workspace:*
+        version: link:../../packages/workflow
       '@astrojs/check':
         specifier: ^0.9.1
         version: 0.9.1(prettier@3.3.3)(typescript@5.5.4)
@@ -246,6 +249,9 @@ importers:
       starlight-image-zoom:
         specifier: ^0.8.0
         version: 0.8.0(@astrojs/starlight@0.25.3(astro@4.13.1(@types/node@20.14.12)(sass@1.69.5)(terser@5.31.6)(typescript@5.5.4)))
+      starlight-links-validator:
+        specifier: ^0.10.1
+        version: 0.10.1(@astrojs/starlight@0.25.3(astro@4.13.1(@types/node@20.14.12)(sass@1.69.5)(terser@5.31.6)(typescript@5.5.4)))(astro@4.13.1(@types/node@20.14.12)(sass@1.69.5)(terser@5.31.6)(typescript@5.5.4))
       tailwindcss:
         specifier: ^3.4.10
         version: 3.4.10
@@ -6737,6 +6743,10 @@ packages:
     resolution: {integrity: sha512-zHtQzGojZXTwZTHQqra+ETKd4Sn3vgi7uBmlPoXVWZqYvuKmtI0l/VZTjqGmJY9x88GGOaZ9+G9ES8hC4T4X8g==}
     engines: {node: '>= 12'}
 
+  is-absolute-url@4.0.1:
+    resolution: {integrity: sha512-/51/TKE88Lmm7Gc4/8btclNXWS+g50wXhYJq8HWIBAGUBnoAdRu1aXeh364t/O7wXDAcTJDP8PNuNKWUDWie+A==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+
   is-alphabetical@2.0.1:
     resolution: {integrity: sha512-FWyyY60MeTNyeSRpkM2Iry0G9hpr7/9kD40mD/cGQEuilcZYS4okz8SN2Q6rLCJ8gbCt6fN+rC+6tMGS99LaxQ==}
 
@@ -9039,6 +9049,13 @@ packages:
     engines: {node: '>=18'}
     peerDependencies:
       '@astrojs/starlight': '>=0.22.0'
+
+  starlight-links-validator@0.10.1:
+    resolution: {integrity: sha512-Z8VaWXaP+/0F6Jsml0zkDsPTbOyVO12qwfqseTp1aUI2B0gfF6GYt+WHvZ2EB5SCqkPmxmzyCOomqwRB0QmE5g==}
+    engines: {node: '>=18.14.1'}
+    peerDependencies:
+      '@astrojs/starlight': '>=0.15.0'
+      astro: '>=4.0.0'
 
   stat-mode@1.0.0:
     resolution: {integrity: sha512-jH9EhtKIjuXZ2cWxmXS8ZP80XyC3iasQxMDV8jzhNJpfDb7VbQLVW4Wvsxz9QZvzV+G4YoSfBUVKDOyxLzi/sg==}
@@ -16937,6 +16954,8 @@ snapshots:
       jsbn: 1.1.0
       sprintf-js: 1.1.3
 
+  is-absolute-url@4.0.1: {}
+
   is-alphabetical@2.0.1: {}
 
   is-alphanumerical@2.0.1:
@@ -19640,6 +19659,19 @@ snapshots:
       rehype-raw: 7.0.0
       unist-util-visit: 5.0.0
       unist-util-visit-parents: 6.0.1
+
+  starlight-links-validator@0.10.1(@astrojs/starlight@0.25.3(astro@4.13.1(@types/node@20.14.12)(sass@1.69.5)(terser@5.31.6)(typescript@5.5.4)))(astro@4.13.1(@types/node@20.14.12)(sass@1.69.5)(terser@5.31.6)(typescript@5.5.4)):
+    dependencies:
+      '@astrojs/starlight': 0.25.3(astro@4.13.1(@types/node@20.14.12)(sass@1.69.5)(terser@5.31.6)(typescript@5.5.4))
+      astro: 4.13.1(@types/node@20.14.12)(sass@1.69.5)(terser@5.31.6)(typescript@5.5.4)
+      github-slugger: 2.0.0
+      hast-util-from-html: 2.0.1
+      hast-util-has-property: 3.0.0
+      is-absolute-url: 4.0.1
+      kleur: 4.1.5
+      mdast-util-to-string: 4.0.0
+      picomatch: 4.0.2
+      unist-util-visit: 5.0.0
 
   stat-mode@1.0.0: {}
 
