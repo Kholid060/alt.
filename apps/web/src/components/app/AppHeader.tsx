@@ -201,7 +201,7 @@ function AppHeader() {
           <div className="col-span-6 flex items-center justify-end md:col-span-2">
             <UiTooltip label="Alt. GitHub repository">
               <a
-                href="https://github.com"
+                href="https://github.com/kholid060/altdot"
                 target="_blank"
                 className="mr-4 hidden md:block"
                 rel="noreferrer"
