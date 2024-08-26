@@ -142,6 +142,8 @@ export default async function CommandMain(context: CommandLaunchContext) {
   // await selectElement();
   // await selectFile();
 
+  fetch('extension-fs://hello-world');
+
   console.log('__', JSON.stringify(_extension.runtime.platform, null, 2));
 
   const result = await _extension.childProcess.exec(`node -e "console.log(process.env)"`, [])

@@ -117,7 +117,7 @@ function ProfileMenu() {
 
 const HEADER_LINKS: { name: string; url: string; isExternal?: boolean }[] = [
   { name: 'Store', url: '/store' },
-  { name: 'Documentation', url: 'https://docs.altdot.xyz', isExternal: true },
+  { name: 'Documentation', url: 'https://docs.altdot.app', isExternal: true },
 ];
 
 function HeaderLinkMobile() {

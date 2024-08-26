@@ -11,7 +11,7 @@ download the workflow as a JSON file and import it later on.
 
 When you share the workflow into the store, it will be publicly listed and can be installed by all the Alt users. To share the workflow:
 
-- Login into your Alt. account on the [website](https://altdot.xyz/) and open the [Developer Dashboard page](https://altdot.xyz/devconsole).
+- Login into your Alt. account on the [website](https://altdot.app/) and open the [Developer Dashboard page](https://altdot.app/devconsole).
 - On the Dev Console page. Click the "+ item" button and select the workflow menu. And make sure the Alt desktop app is running on your computer.
 - Select the workflow you want to share
 - Enter the details about the workflow, and when you are done, click the "Publish" button.

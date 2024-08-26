@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { OnAppReady } from '../common/hooks/on-app-ready.hook';
 import { BrowserWindowService } from '../browser-window/browser-window.service';
-import { Menu, Tray, nativeImage } from 'electron';
+import { Menu, Tray, nativeImage, shell } from 'electron';
 import { LoggerService } from '../logger/logger.service';
 import { fileURLToPath } from 'url';
 
@@ -46,10 +46,24 @@ export class TrayMenuService implements OnAppReady {
         type: 'separator',
       },
       {
+        label: 'Website',
+        click() {
+          shell.openExternal('https://altdot.app');
+        },
+      },
+      {
         label: 'Documentation',
+        click() {
+          shell.openExternal('https://docs.altdot.app');
+        },
       },
       {
         label: 'Report bug',
+        click() {
+          shell.openExternal(
+            'https://github.com/Kholid060/altdot/issues/new/choose',
+          );
+        },
       },
       {
         type: 'separator',
