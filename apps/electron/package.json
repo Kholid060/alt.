@@ -5,6 +5,7 @@
   "private": true,
   "type": "module",
   "main": "packages/main/dist/index.js",
+  "repository": "github:kholid060/altdot",
   "author": {
     "name": "Ahmad Kholid",
     "email": "kholid060@gmail.com"
