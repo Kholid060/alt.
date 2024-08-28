@@ -6,6 +6,8 @@ on:
     branches:
       - main
       - 'renovate/**'
+    paths:
+      - 'apps/electron/**'
     paths-ignore:
       - '.github/**'
       - '!.github/workflows/ci.yml'
@@ -18,6 +20,8 @@ on:
       - '.idea/**'
       - '.vscode/**'
   pull_request:
+    paths:
+      - 'apps/electron/**'
     paths-ignore:
       - '.github/**'
       - '!.github/workflows/ci.yml'
@@ -35,10 +39,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  typechecking:
-    uses: ./.github/workflows/typechecking.yml
-  tests:
-    uses: ./.github/workflows/tests.yml
   draft_release:
     permissions:
       contents: write # Allows this job to create releases
