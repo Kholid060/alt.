@@ -7,5 +7,5 @@ export const Route = createFileRoute('/u/$username/')({
       to: '/u/$username/extensions',
     });
   },
-  component: () => <p>Root</p>,
+  component: () => null,
 });
