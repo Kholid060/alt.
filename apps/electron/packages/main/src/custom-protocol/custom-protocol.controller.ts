@@ -13,7 +13,7 @@ export class CustomProtocolController {
     return this.customProtocolService.handleFileIconProtocol(req);
   }
 
-  @CustomProtocol(CUSTOM_SCHEME.extension)
+  @CustomProtocol(CUSTOM_SCHEME.extension, { privilege: { standard: true } })
   handleExtensionProtocol(@Payload() [req]: [GlobalRequest]) {
     return this.customProtocolService.handleExtensionProtocol(req);
   }

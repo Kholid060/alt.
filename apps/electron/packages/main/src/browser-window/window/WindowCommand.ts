@@ -25,7 +25,6 @@ function windowInitialPos() {
     x: screenBound.width / 2 - COMMNAND_WINDOW_BOUND.width / 2 + screenBound.x,
   };
 }
-
 class WindowCommand extends WindowBase {
   constructor(private logger: LoggerService) {
     super('command', {
@@ -88,6 +87,37 @@ class WindowCommand extends WindowBase {
             browserWindow.webContents.openDevTools({ mode: 'undocked' });
           });
         }
+
+        browserWindow.webContents.session.webRequest.onBeforeSendHeaders(
+          (details, callback) => {
+            if (details.frame?.url.startsWith(CUSTOM_SCHEME.extension)) {
+              details.requestHeaders['Origin'] = details.frame.url;
+              details.requestHeaders['Access-Control-Allow-Origin'] = '*';
+              callback({
+                cancel: false,
+                requestHeaders: details.requestHeaders,
+              });
+            } else {
+              callback({ requestHeaders: details.requestHeaders });
+            }
+          },
+        );
+        browserWindow.webContents.session.webRequest.onHeadersReceived(
+          ({ responseHeaders, frame, statusLine, method }, callback) => {
+            if (frame?.url.startsWith(CUSTOM_SCHEME.extension)) {
+              callback({
+                statusLine: method === 'OPTIONS' ? 'HTTP/1.1 200' : statusLine,
+                responseHeaders: {
+                  ...(responseHeaders ?? {}),
+                  'access-control-allow-origin': '*',
+                  'access-control-allow-headers': '*',
+                },
+              });
+            } else {
+              callback({ responseHeaders, statusLine });
+            }
+          },
+        );
 
         /**
          * Load the main page of the main window.

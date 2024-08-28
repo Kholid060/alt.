@@ -48,6 +48,30 @@ class WindowSharedProcess extends WindowBase {
       const htmlFilePath = path.join(BASE_DIR, 'index.html');
       await browserWindow.loadFile(htmlFilePath);
 
+      browserWindow.webContents.session.webRequest.onBeforeSendHeaders(
+        (details, callback) => {
+          if (details.frame?.url)
+            details.requestHeaders['Origin'] = details.frame.url;
+          details.requestHeaders['Access-Control-Allow-Origin'] = '*';
+          callback({
+            cancel: false,
+            requestHeaders: details.requestHeaders,
+          });
+        },
+      );
+      browserWindow.webContents.session.webRequest.onHeadersReceived(
+        ({ responseHeaders, statusLine, method }, callback) => {
+          callback({
+            statusLine: method === 'OPTIONS' ? 'HTTP/1.1 200' : statusLine,
+            responseHeaders: {
+              ...(responseHeaders ?? {}),
+              'access-control-allow-origin': '*',
+              'access-control-allow-headers': '*',
+            },
+          });
+        },
+      );
+
       if (import.meta.env.DEV) checkMainJSFile(browserWindow);
 
       await resolver.promise;
