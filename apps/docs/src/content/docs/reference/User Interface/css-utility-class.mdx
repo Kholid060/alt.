@@ -1,0 +1,46 @@
+---
+title: CSS Utility Class
+sidebar:
+  order: 2
+---
+
+Alt. app provides some CSS Utility Classes that you can use to create a user interface. This class is from the [Tailwindcss](https://tailwindcss.com/) framework.
+
+- [Height](https://tailwindcss.com/docs/height)
+- [Width](https://tailwindcss.com/docs/width)
+- [Size](https://tailwindcss.com/docs/size)
+- [Margin](https://tailwindcss.com/docs/margin)
+- [Padding](https://tailwindcss.com/docs/padding)
+- [Display](https://tailwindcss.com/docs/display)
+- [Gap](https://tailwindcss.com/docs/gap)
+- [Flex](https://tailwindcss.com/docs/flex)
+- [Flex Wrap](https://tailwindcss.com/docs/flex-wrap)
+- [Align Items](https://tailwindcss.com/docs/align-items)
+- [Justify Content](https://tailwindcss.com/docs/justify-content)
+- [Grid Template Rows](https://tailwindcss.com/docs/grid-template-rows)
+- [Grid Template Columns](https://tailwindcss.com/docs/grid-template-columns)
+- [Grid Column](https://tailwindcss.com/docs/grid-column), only support `col-auto` and `col-span-*`
+- [Grid Row](https://tailwindcss.com/docs/grid-row), only support `row-auto` and `row-span-*`
+
+**Example**
+
+```tsx
+// view-command.tsx
+import { UiText, UiButton, UiInput, UiButton } from '@altdot/extension';
+
+
+export default function Command() {
+  return (
+    <div className="p-2">
+      <UiText>Hello world!</UiText>
+      <div className="mt-4 flex items-center gap-2">
+        <UiInput placeholder="First name" />
+        <UiInput placeholder="Last name" />
+      </div>
+      <UiButton className="w-52 mt-4">
+        Add
+      </UiButton>
+    </div>
+  )
+}
+```
