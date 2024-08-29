@@ -822,7 +822,7 @@ const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
     return (
       <div
         className={cn(
-          'relative group/item ui-list-item min-h-12 flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none dark:aria-selected:bg-card aria-selected:bg-secondary aria-selected:text-accent-foreground',
+          'relative group/item ui-list-item min-h-12 text-muted-foreground flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none dark:aria-selected:bg-card aria-selected:bg-secondary aria-selected:text-accent-foreground',
           className,
         )}
         {...props}
@@ -836,12 +836,12 @@ const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
         ) : (
           <>
             {icon && (
-              <span className="h-8 w-8 mr-2 inline-flex items-center justify-center group-aria-selected/item:text-foreground text-muted-foreground flex-shrink-0">
+              <span className="h-8 w-8 mr-2 inline-flex items-center justify-center group-aria-selected/item:text-foreground flex-shrink-0">
                 {icon}
               </span>
             )}
             <div className="flex-1 line-clamp-1">
-              <p className="leading-tight line-clamp-1 w-full">
+              <p className="leading-tight line-clamp-1 w-full text-foreground">
                 {title}
                 <span className="text-muted-foreground leading-tight ml-2 text-xs">
                   {subtitle}

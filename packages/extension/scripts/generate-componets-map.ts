@@ -11,6 +11,7 @@ const SRC_PATH = path.join(__dirname, '../src');
 const COMPONENTS = [
   'list',
   'form',
+  'text',
   'input',
   'image',
   'icons',

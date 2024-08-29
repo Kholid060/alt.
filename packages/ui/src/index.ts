@@ -32,6 +32,7 @@ export * from './components/ui/alert';
 export * from './components/ui/checkbox';
 export * from './components/ui/logo';
 export * from './components/ui/icons';
+export * from './components/ui/text';
 export * from './components/ui/breadcrumb';
 
 export * from './context/list.context';
