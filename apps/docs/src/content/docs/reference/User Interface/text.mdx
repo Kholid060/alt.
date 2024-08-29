@@ -1,0 +1,91 @@
+---
+title: Text
+---
+
+import { UiText, UiIcons } from '@altdot/ui';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Component to render text.
+
+**Example**
+
+<Tabs>
+  <TabItem label="Text">
+    <div className="example-wrapper">
+      <div className="component">
+        <UiText>Hello world</UiText>
+      </div>
+
+```tsx
+import { UiText } from '@altdot/extension';
+
+export default function Command() {
+  return (
+    <UiText>Hello world</UiText>
+  );
+}
+```
+    </div>
+  </TabItem>
+  <TabItem label="Colors">
+    <div className="example-wrapper">
+      <div className="component">
+        <div>
+          <UiText>Default color</UiText>
+          <UiText color="primary">Primary color</UiText>
+          <UiText color="destructive">Destructive color</UiText>
+          <UiText color="muted">Muted color</UiText>
+        </div>
+      </div>
+
+```tsx
+import { UiText } from '@altdot/extension';
+
+export default function Command() {
+  return (
+    <>
+      <UiText>Default color</UiText>
+      <UiText color="primary">Primary color</UiText>
+      <UiText color="destructive">Destructive color</UiText>
+      <UiText color="muted">Muted color</UiText>
+    </>
+  );
+}
+```
+    </div>
+  </TabItem>
+  <TabItem label="Heading">
+    <div className="example-wrapper">
+      <div className="component">
+        <div>
+          <UiText variant="heading-1">heading-1 variant</UiText>
+          <UiText variant="heading-2">heading-2 variant</UiText>
+          <UiText variant="heading-3">heading-3 variant</UiText>
+          <UiText variant="heading-4">heading-4 variant</UiText>
+          <UiText variant="body">body variant</UiText>
+          <UiText variant="body-small">body-small variant</UiText>
+          <UiText variant="code">code variant</UiText>
+        </div>
+      </div>
+
+```tsx
+import { UiText } from '@altdot/extension';
+
+export default function Command() {
+  return (
+    <UiText size="icon">
+      <UiIcons.Search />
+    </UiText>
+  );
+}
+```
+    </div>
+  </TabItem>
+</Tabs>
+
+**Props**
+
+| Name | Type | Description |
+| ----------- | ----------- | ----------- |
+| `variant` | `'code' \| 'body-small' \| 'body' \| 'heading-1' \| 'heading-2' \| 'heading-3' \| 'heading-4'` | The text's variant. Default to `body` |
+| `color` | `'primary' \| 'default' \| 'destructive' \| 'muted'` | The button's color. Default to `default` |
