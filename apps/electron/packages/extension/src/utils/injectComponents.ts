@@ -1,4 +1,5 @@
 import * as UiList from '@altdot/ui/dist/components/ui/list';
+import * as UiText from '@altdot/ui/dist/components/ui/text';
 import * as UiForms from '@altdot/ui/dist/components/ui/form';
 import * as UiInput from '@altdot/ui/dist/components/ui/input';
 import * as UiIcons from '@altdot/ui/dist/components/ui/icons';
@@ -26,6 +27,7 @@ function injector(modules: Record<string, unknown>[]) {
 
 function injectComponents() {
   injector([
+    UiText,
     UiList,
     UiForms,
     UiLabel,
