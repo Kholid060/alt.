@@ -190,6 +190,22 @@ function extensionBrowserTabs({
   };
 }
 
+function extensionUiNavigation(): Pick<
+  ExtensionAPIValues,
+  'ui.navigation.pop' | 'ui.navigation.push'
+> {
+  return {
+    'ui.navigation.pop': (...args) => {
+      // @ts-expect-error injected on the page
+      window.$navigation?.pop(...args);
+    },
+    'ui.navigation.push': (...args) => {
+      // @ts-expect-error injected on the page
+      window.$navigation?.push(...args);
+    },
+  };
+}
+
 function extensionSqlite({
   sendMessage,
 }: Pick<CreateExtensionAPI, 'sendMessage'>): Pick<
@@ -211,6 +227,7 @@ export function createExtensionAPI({
   return Object.freeze(
     extensionApiBuilder({
       values: {
+        ...extensionUiNavigation(),
         ...extensionAPIGetIconURL(),
         ...extensionAPIUi(messagePort),
         ...extensionOAuth({ sendMessage }),

@@ -12,9 +12,11 @@ import { isIPCEventError } from '#packages/common/utils/helper';
 import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { getExtIconURL } from '/@/utils/helper';
 import { useTheme } from '/@/hooks/useTheme';
+import { useCommandStore } from '/@/stores/command.store';
 
 function CommandView() {
   const setHeader = useCommandPanelStore.use.setHeader();
+  const updateCommandState = useCommandStore.use.setState();
 
   const theme = useTheme();
   const navigate = useCommandNavigate();
@@ -53,6 +55,18 @@ function CommandView() {
           setIframeKey((prevVal) => prevVal + 1);
         },
       );
+      commandCtx.runnerMessagePort.current.eventSync.on(
+        'extension:navigation-toggle-root-lock',
+        (lock) => {
+          updateCommandState('useCommandViewNavigation', lock);
+        },
+      );
+      commandCtx.runnerMessagePort.current.eventSync.on(
+        'extension:finish-execute',
+        () => {
+          navigate('');
+        },
+      );
 
       iframe.contentWindow?.postMessage(payload, '*', [
         messageChannelRef.current.port2,
@@ -69,10 +83,11 @@ function CommandView() {
     return () => {
       messageChannelRef.current?.port1.close();
       messageChannelRef.current?.port2.close();
+      updateCommandState('useCommandViewNavigation', false);
 
       commandCtx.setCommandViewMessagePort(null);
     };
-  }, [commandCtx]);
+  }, [commandCtx, updateCommandState]);
   useEffect(() => {
     const data = activeRoute?.data as ExtensionCommandExecutePayloadWithData;
 

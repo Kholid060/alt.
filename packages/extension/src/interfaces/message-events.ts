@@ -18,8 +18,10 @@ export interface ExtensionMessagePortEvent {
     toastId: string,
     options: Required<ExtensionAPI.UI.ToastOptions>,
   ];
+  'extension:navigation-pop': [];
   'extension:query-clear-value': [];
   'extension:hide-toast': [toastId: string];
+  'extension:navigation-toggle-root-lock': [lock: boolean];
   'extension:query-update-placeholder': [placeholder: string];
   'extension:finish-execute': [ExtensionExecutionFinishReason, string?];
 }

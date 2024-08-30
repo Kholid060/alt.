@@ -1,37 +1,22 @@
-import { BetterMessagePortSync } from '@altdot/shared';
-import { createContext, useEffect, useState } from 'react';
-import { useUiListStore } from '@altdot/ui/dist/context/list.context';
 import {
-  ExtensionMessagePortCallback,
   ExtensionMessagePortEvent,
+  ExtensionMessagePortCallback,
 } from '@altdot/extension';
+import { BetterMessagePortSync } from '@altdot/shared';
+import { useUiListStore } from '@altdot/ui';
+import { useEffect } from 'react';
 
-interface ExtensionContextState {
-  query: string;
-}
-
-export const ExtensionContext = createContext<ExtensionContextState>({
-  query: '',
-});
-
-export function ExtensionProvider({
-  children,
+function ExtensionEventListener({
   messagePort,
-  value,
 }: {
-  children: React.ReactNode;
-  value?: string;
   messagePort: BetterMessagePortSync<ExtensionMessagePortEvent>;
 }) {
   const listStore = useUiListStore();
-
-  const [query, setQuery] = useState(() => value ?? '');
 
   useEffect(() => {
     const onQueryChange: ExtensionMessagePortCallback<
       'extension:query-change'
     > = (newQuery) => {
-      setQuery(newQuery);
       listStore.setState('search', newQuery);
     };
     const onParentKeydown: ExtensionMessagePortCallback<
@@ -51,9 +36,7 @@ export function ExtensionProvider({
     };
   }, [messagePort, listStore]);
 
-  return (
-    <ExtensionContext.Provider value={{ query }}>
-      {children}
-    </ExtensionContext.Provider>
-  );
+  return null;
 }
+
+export default ExtensionEventListener;

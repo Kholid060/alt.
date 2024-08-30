@@ -22,6 +22,7 @@ export declare namespace UI {
     closeWindow(): Promise<void>;
 
     alert: Alert.Static;
+    navigation: Navigation.Static;
     searchPanel: SearchPanel.Static;
   }
 }
@@ -61,5 +62,17 @@ export declare namespace UI.Alert {
   interface Static {
     // @ext-api-value
     confirm(options: ConfirmOptions): Promise<boolean>;
+  }
+}
+
+export declare namespace UI.Navigation {
+  interface PopOptions {
+    root?: boolean;
+  }
+  interface Static {
+    // @ext-api-value
+    pop(options?: PopOptions): void;
+    // @ext-api-value
+    push(page: React.ReactNode): void;
   }
 }

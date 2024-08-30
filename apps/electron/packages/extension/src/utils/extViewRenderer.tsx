@@ -10,7 +10,8 @@ import {
 } from '../components/extension-errors';
 import { UiListProvider } from '@altdot/ui/dist/context/list.context';
 import { UiTooltipProvider } from '@altdot/ui/dist/components/ui/tooltip';
-import { ExtensionProvider } from '../context/extension.context';
+import ExtensionHistory from '../components/ExtensionHistory';
+import ExtensionEventListener from '../components/ExtensionEventListener';
 
 async function loadStyle(themeStyle: string) {
   const themeStyleEl = document.createElement('style');
@@ -68,13 +69,15 @@ const extViewRenderer: ExtensionRenderer<[string]> = async (
       >
         <UiListProvider>
           <UiTooltipProvider>
-            <ExtensionProvider messagePort={messagePort}>
-              {CommandView ? (
-                <CommandView {...launchContext} />
-              ) : (
-                <ExtensionErrorNotFound />
-              )}
-            </ExtensionProvider>
+            <ExtensionEventListener messagePort={messagePort} />
+            {CommandView ? (
+              <ExtensionHistory
+                messagePort={messagePort}
+                rootView={<CommandView {...launchContext} />}
+              />
+            ) : (
+              <ExtensionErrorNotFound />
+            )}
           </UiTooltipProvider>
         </UiListProvider>
       </ReactErrorBoundary>

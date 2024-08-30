@@ -3,6 +3,17 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { UiList, UiImage, UiInput, UiListItem, UiIcons, _extension } from '@altdot/extension';
 import ItemList from './components/ItemList';
 
+function InifinitePage({ depth }: { depth: number }) {
+  return (
+    <div>
+      <button onClick={() => _extension.ui.navigation.push(<InifinitePage depth={depth + 1} />)}>Go depth</button>
+      <button onClick={() => _extension.ui.navigation.pop()}>Pop stack</button>
+      <button onClick={() => _extension.ui.navigation.pop({ root: true })}>Pop to root</button>
+      Page depth: {depth}
+    </div>
+  )
+}
+
 function CommandMain() {
   const [apps, setApps] = useState<_extension.Shell.InstalledApps.AppDetail[]>([]);
 
@@ -85,7 +96,7 @@ function CommandMain() {
 
   return (
     <div className="p-2">
-      <ItemList />
+      <InifinitePage depth={0} />
       <UiList items={[...customItem,...items]} />
     </div>
   );

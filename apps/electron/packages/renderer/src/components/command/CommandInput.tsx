@@ -305,6 +305,15 @@ function CommandInput() {
     argumentContainerRef.current.style.translate = `${translateX}px 0px`;
   }
   function navigateBack() {
+    const isCommandViewNavigation =
+      useCommandStore.getState().useCommandViewNavigation;
+    if (isCommandViewNavigation && commandCtx.runnerMessagePort.current) {
+      commandCtx.runnerMessagePort.current.eventSync.sendMessage(
+        'extension:navigation-pop',
+      );
+      return;
+    }
+
     if (commandRouteCtx) {
       const currentRoute = commandRouteCtx.getState().currentRoute;
       if (!currentRoute?.path) {

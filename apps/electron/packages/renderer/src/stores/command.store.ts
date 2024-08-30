@@ -19,6 +19,7 @@ interface CommandStoreState {
   query: string;
   isWindowHidden: boolean;
   commandAliases: Set<string>;
+  useCommandViewNavigation: boolean;
   commandArgs: ExtensionCommandArgs;
   errorOverlay: CommandErrorOverlay | null;
   activeBrowserTab: ExtensionBrowserTabContext | null;
@@ -44,6 +45,7 @@ const initialState: CommandStoreState = {
   isWindowHidden: true,
   activeBrowserTab: null,
   commandAliases: new Set(),
+  useCommandViewNavigation: false,
   commandArgs: {
     args: {},
     commandId: '',
