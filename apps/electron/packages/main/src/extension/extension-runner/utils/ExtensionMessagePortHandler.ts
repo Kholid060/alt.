@@ -2,8 +2,8 @@
 import { isObject } from '@altdot/shared';
 import { debugLog } from '#common/utils/helper';
 import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.interface';
-import type { ExtensionMessagePortMessageHandler } from '../extension-execution-event.service';
 import type { ExtensionAPIMessagePayload } from '#packages/common/interface/extension.interface';
+import { ExtensionMessagePortMessageHandler } from '../extension-runner.interface';
 
 class ExtensionMessagePortHandler {
   private ports: Map<string, Electron.MessagePortMain> = new Map();

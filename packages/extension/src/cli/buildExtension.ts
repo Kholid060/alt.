@@ -1,4 +1,5 @@
 import type { InlineConfig, Rollup } from 'vite';
+import { builtinModules } from 'module';
 import { BuildError, logger } from './utils/logger';
 import ManifestUtils, { EXT_API_PKG_NAME } from './utils/ManifestUtils';
 import path from 'path';
@@ -68,7 +69,10 @@ async function buildCommands(watch = false) {
       },
       rollupOptions: {
         treeshake: watch ? undefined : 'smallest',
-        external: [...Object.keys(DEPS_MAP)],
+        external: [
+          ...Object.keys(DEPS_MAP),
+          ...builtinModules.flatMap((item) => [item, `node:${item}`]),
+        ],
         output: {
           paths: (id) => {
             return DEPS_MAP[id] || id;

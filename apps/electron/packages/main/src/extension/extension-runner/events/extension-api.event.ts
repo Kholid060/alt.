@@ -1,5 +1,5 @@
 import { IPCUserExtensionEventsMap } from '#packages/common/interface/ipc-events.interface';
-import { ExtensionExecutionEventContext } from '../extension-execution-event.interface';
+import { ExtensionExecutionEventContext } from '../extension-runner.interface';
 
 export class ExtensionApiEvent<T extends keyof IPCUserExtensionEventsMap> {
   constructor(

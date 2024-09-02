@@ -1,7 +1,7 @@
 import { IPCUserExtensionEventsMap } from '#packages/common/interface/ipc-events.interface';
 import { applyDecorators } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { ExtensionApiEvent } from '/@/extension/extension-execution-event/events/extension-api.event';
+import { ExtensionApiEvent } from '/@/extension/extension-runner/events/extension-api.event';
 
 type TypeMethodDecorator<
   T extends keyof IPCUserExtensionEventsMap,

@@ -1,4 +1,5 @@
 import { _extension, CommandLaunchContext, OAuthRedirect } from '@altdot/extension';
+import fs from 'fs';
 
 const filePath = 'D:\\test.txt';
 
@@ -136,16 +137,18 @@ export default async function CommandMain(context: CommandLaunchContext) {
   // console.log(element);
   // await _extension.browser.activeTab.type('textarea[aria-label="Search"]', 'hello!');
 
+  // console.log(await alertConfirm());
+
   // await authorizeCredential();
 
   // await getTabs();
   // await selectElement();
   // await selectFile();
 
-  console.log('__', JSON.stringify(_extension.runtime.platform, null, 2));
+  // console.log('__', JSON.stringify(_extension.runtime.platform, null, 2));
 
-  const result = await _extension.childProcess.exec(`node -e "console.log(process.env)"`, [])
-  console.log(result.stdout);
+  // const result = await _extension.childProcess.exec(`node -e "console.log(process.env)"`, [])
+  // console.log(result.stdout);
 
   // await storage();
 
@@ -154,13 +157,16 @@ export default async function CommandMain(context: CommandLaunchContext) {
 
   // await _extension.storage.set('test', 'hello world');
   // await _extension.shell.showItemInFolder(filePath);
-  // console.log(await _extension.browser.activeTab.get());
-  // await _extension.browser.activeTab.type(`textarea[name="q"],[contenteditable="true"],input`, 'Hello world\ntestst', { delay: 10, clearValue: true });
-  // console.log(await _extension.browser.activeTab.getText())
-  // console.log(await _extension.browser.activeTab.select('select', 'css', 'html'))
-  // console.log(await _extension.browser.activeTab.getAttributes('input'));
-  // console.log(await _extension.browser.activeTab.getAttributes('input', 'type'));
-  // console.log(await _extension.browser.activeTab.getAttributes('input', ['type', 'id']));
+
+  console.log(process.env);
+  // const [googleTab] = await _extension.browser.tabs.query({ url: '*://*.google.com/' });
+  // if (!googleTab) throw new Error('missing google tab');
+  // await googleTab.type(`textarea[name="q"]`, 'Hello world\ntestst', { delay: 10, clearValue: true });
+  // console.log(await googleTab.getText())
+  // console.log(await googleTab.select('select', 'css', 'html'))
+  // console.log(await googleTab.getAttributes('input'));
+  // console.log(await googleTab.getAttributes('input', 'type'));
+  // console.log(await googleTab.getAttributes('input', ['type', 'id']));
 
   // const inputEl = await _extension.browser.activeTab.findAllElements('input[type="text"]');
   // await inputEl[0].type('hello world')

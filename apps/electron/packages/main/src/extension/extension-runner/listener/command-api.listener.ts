@@ -2,15 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { ExtensionApiEvent } from '../events/extension-api.event';
 import { OnExtensionAPI } from '/@/common/decorators/extension.decorator';
 import { CommandLaunchBy, ExtensionAPI } from '@altdot/extension';
-import { ExtensionCommandService } from '../../extension-command/extension-command.service';
 import { isObject } from '@altdot/shared';
 import { ExtensionRunnerService } from '../../extension-runner/extension-runner.service';
+import { DBService } from '/@/db/db.service';
+import { extensionCommands } from '/@/db/schema/extension.schema';
+import { and, eq } from 'drizzle-orm';
 
 @Injectable()
 export class ExtensionCommandApiListener {
   constructor(
+    private dbService: DBService,
     private extensionRunner: ExtensionRunnerService,
-    private extensionCommand: ExtensionCommandService,
   ) {}
 
   @OnExtensionAPI('command.updateDetail')
@@ -20,10 +22,17 @@ export class ExtensionCommandApiListener {
   }: ExtensionApiEvent<'command.updateDetail'>) {
     if (typeof subtitle === 'undefined') return;
 
-    await this.extensionCommand.updateCommand(
-      { commandId, extensionId },
-      { subtitle },
-    );
+    await this.dbService.db
+      .update(extensionCommands)
+      .set({
+        subtitle,
+      })
+      .where(
+        and(
+          eq(extensionCommands.id, commandId),
+          eq(extensionCommands.extensionId, extensionId),
+        ),
+      );
   }
 
   @OnExtensionAPI('command.launch')

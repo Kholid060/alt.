@@ -282,7 +282,6 @@ export type IPCEvents = IPCShellEvents &
   IPCUserExtensionEvents;
 
 export interface IPCSendEventMainToRenderer {
-  'extension:running-commands-change': [items: ExtensionCommandProcess[]];
   'shared-window:stop-execute-command': [runnerId: string];
   'shared-window:stop-execute-workflow': [runnerId: string];
   'window:visibility-change': [isHidden: boolean];
@@ -291,6 +290,7 @@ export interface IPCSendEventMainToRenderer {
   'command-window:open-json-view': [
     executeCommandPayload: ExtensionCommandJSONViewData,
   ];
+  'command-window:close-message-port': [id: string];
   'command-window:open-view': [executeCommandPayload: ExtensionCommandViewData];
   'command-window:show-oauth-overlay': [
     {
@@ -346,6 +346,7 @@ export interface IPCPostEventRendererToMain {
 }
 
 export interface IPCPostMessageEventMainToRenderer {
+  'command-window:extension-port': [runnerId: string];
   'message-port:created': [{ channelId: MessagePortChannelIds }];
 }
 

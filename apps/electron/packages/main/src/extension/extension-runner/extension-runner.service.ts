@@ -3,11 +3,10 @@ import {
   ExtensionCommandExecutePayload,
   ExtensionCommandExecutePayloadWithData,
   ExtensionCommandJSONViewData,
-  ExtensionCommandProcess,
 } from '#packages/common/interface/extension.interface';
 import { CommandLaunchBy, ExtensionAPI } from '@altdot/extension';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ExtensionConfigService } from '../extension-config/extension-config.service';
 import { BrowserExtensionService } from '/@/browser-extension/browser-extension.service';
 import { ExtensionLoaderService } from '/@/extension-loader/extension-loader.service';
@@ -18,17 +17,20 @@ import {
 import type { Cache } from 'cache-manager';
 import { DBService } from '/@/db/db.service';
 import { BrowserWindowService } from '/@/browser-window/browser-window.service';
-import { IPCSendPayload } from '#packages/common/interface/ipc-events.interface';
 import { extensionErrors } from '/@/db/schema/extension.schema';
 import { ClipboardService } from '/@/clipboard/clipboard.service';
-import { shell } from 'electron';
+import { MessageChannelMain, shell } from 'electron';
 import { parseJSON } from '@altdot/shared';
 import { debugLog } from '#packages/common/utils/helper';
 import { getExtensionPlatform } from '/@/common/utils/helper';
+import ExtensionRunnerCommandAction from './runner/ExtensionRunnerCommandAction';
+import ExtensionRunnerBase from './runner/ExtensionRunnerBase';
+import { ExtensionRunnerExecutionService } from './extension-runner-execution.service';
+import ExtensionRunnerCommandScript from './runner/ExtensionRunnerCommandScript';
 
 @Injectable()
-export class ExtensionRunnerService {
-  private runningCommands: Map<string, ExtensionCommandProcess> = new Map();
+export class ExtensionRunnerService implements OnModuleInit {
+  private runningCommands: Map<string, ExtensionRunnerBase> = new Map();
   private executionResolvers = new Map<
     string,
     PromiseWithResolvers<ExtensionAPI.Command.LaunchResult>
@@ -42,7 +44,70 @@ export class ExtensionRunnerService {
     private extensionConfig: ExtensionConfigService,
     private browserExtension: BrowserExtensionService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private executionService: ExtensionRunnerExecutionService,
   ) {}
+
+  onModuleInit() {
+    this.executionService.runnerEventEmitter.on(
+      'finish',
+      async ({ payload, data, runnerId }) => {
+        // eslint-disable-next-line drizzle/enforce-delete-with-where
+        this.runningCommands.delete(runnerId);
+
+        if (payload.command.type === 'action') {
+          const commandWindow = await this.browserWindow.get('command', {
+            noThrow: true,
+            autoCreate: false,
+          });
+          if (commandWindow) {
+            commandWindow.sendMessage(
+              'command-window:close-message-port',
+              runnerId,
+            );
+          }
+        } else if (
+          payload.command.type === 'script' &&
+          payload.launchContext.launchBy !== CommandLaunchBy.WORKFLOW
+        ) {
+          const commandJSON = CommandJSONValidation.safeParse(
+            parseJSON(data as string, null),
+          );
+          if (commandJSON.success) {
+            this.handleCommandJSON(commandJSON.data, {
+              title: payload.command.title,
+              commandId: payload.commandId,
+              extensionId: payload.extensionId,
+              subtitle: payload.command.extension.title,
+              icon: payload.command.icon || payload.command.extension.icon,
+            });
+          } else {
+            debugLog(JSON.stringify(commandJSON.error, null, 2));
+          }
+        }
+      },
+    );
+    this.executionService.runnerEventEmitter.on(
+      'error',
+      async ({ errorMessage, payload, runnerId }) => {
+        this.dbService.db.insert(extensionErrors).values({
+          message: errorMessage,
+          title: payload.command.title,
+          extensionId: payload.extensionId,
+        });
+
+        const commandWindow = await this.browserWindow.get('command', {
+          noThrow: true,
+          autoCreate: false,
+        });
+        if (commandWindow) {
+          commandWindow.sendMessage(
+            'command-window:close-message-port',
+            runnerId,
+          );
+        }
+      },
+    );
+  }
 
   private async getBrowserCtx(): Promise<
     ExtensionBrowserTabContext | undefined
@@ -97,56 +162,6 @@ export class ExtensionRunnerService {
     }
   }
 
-  handleExecutionChange(
-    type: IPCSendPayload<'extension:command-exec-change'>[0],
-    detail: IPCSendPayload<'extension:command-exec-change'>[1],
-    result: IPCSendPayload<'extension:command-exec-change'>[2],
-  ) {
-    const { extensionId, runnerId, title } = detail;
-    if (type === 'start') {
-      this.runningCommands.set(runnerId, detail);
-    } else {
-      const resolver = this.executionResolvers.get(runnerId);
-      if (resolver) resolver.resolve(result);
-
-      if (!result.success) {
-        this.dbService.db.insert(extensionErrors).values({
-          title,
-          extensionId,
-          message: result.errorMessage,
-        });
-      } else if (
-        detail.type === 'script' &&
-        detail.launchBy !== CommandLaunchBy.WORKFLOW
-      ) {
-        const commandJSON = CommandJSONValidation.safeParse(
-          parseJSON(result.result as string, null),
-        );
-        if (commandJSON.success) {
-          this.handleCommandJSON(commandJSON.data, {
-            icon: detail.icon,
-            title: detail.title,
-            commandId: detail.commandId,
-            extensionId: detail.extensionId,
-            subtitle: detail.extensionTitle,
-          });
-        } else {
-          debugLog(JSON.stringify(commandJSON.error, null, 2));
-        }
-      }
-
-      // eslint-disable-next-line drizzle/enforce-delete-with-where
-      this.runningCommands.delete(runnerId);
-    }
-
-    if (detail.noEmit) return;
-
-    this.browserWindow.sendMessageToAllWindows({
-      name: 'extension:running-commands-change',
-      args: [this.getRunningCommands()],
-    });
-  }
-
   getRunningCommands() {
     return [...this.runningCommands.values()];
   }
@@ -189,12 +204,7 @@ export class ExtensionRunnerService {
     }
     if (command.isDisabled) throw new Error('This command is disabled');
 
-    if (
-      !payload.browserCtx &&
-      command.extension.permissions?.some((permission) =>
-        permission.startsWith('browser'),
-      )
-    ) {
+    if (!payload.browserCtx) {
       payload.browserCtx = await this.getBrowserCtx();
     }
 
@@ -226,19 +236,43 @@ export class ExtensionRunnerService {
       platform: getExtensionPlatform(),
     };
 
-    let runnerId: string | null = null;
+    const runnerId: string | null = null;
 
     switch (command.type) {
-      case 'script':
-      case 'action': {
-        const windowSharedProcess =
-          await this.browserWindow.get('shared-process');
-        runnerId = await windowSharedProcess.invoke(
-          'shared-window:execute-command',
+      case 'script': {
+        const runner = new ExtensionRunnerCommandScript(
           executeCommandPayload,
+          this.executionService.runnerEventEmitter,
         );
 
-        break;
+        return runner.run({ waitUntilFinished: options?.waitUntilFinished });
+      }
+      case 'action': {
+        const mainChannel = new MessageChannelMain();
+        const rendererChannel = new MessageChannelMain();
+
+        const runner = new ExtensionRunnerCommandAction(
+          executeCommandPayload,
+          this.executionService.runnerEventEmitter,
+          {
+            main: mainChannel.port1,
+            renderer: rendererChannel.port1,
+          },
+        );
+        this.executionService.addMessagePort(mainChannel.port2, runner.id);
+        const commandWindow = await this.browserWindow.get('command', {
+          noThrow: true,
+          autoCreate: false,
+        });
+        if (commandWindow) {
+          commandWindow.postMessage(
+            'command-window:extension-port',
+            runner.id,
+            [rendererChannel.port2],
+          );
+        }
+
+        return runner.run({ waitUntilFinished: options?.waitUntilFinished });
       }
       case 'view': {
         const windowCommand = await this.browserWindow.get('command');
@@ -271,11 +305,8 @@ export class ExtensionRunnerService {
     return runnerId;
   }
 
-  async stopCommandExecution(runnerId: string) {
-    const windowSharedProcess = await this.browserWindow.get('shared-process');
-    windowSharedProcess.sendMessage(
-      'shared-window:stop-execute-command',
-      runnerId,
-    );
+  stopCommandExecution(runnerId: string) {
+    const runningCommand = this.runningCommands.get(runnerId);
+    if (runningCommand) runningCommand.stop();
   }
 }

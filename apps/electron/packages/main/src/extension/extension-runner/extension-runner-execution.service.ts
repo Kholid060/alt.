@@ -1,33 +1,27 @@
+import { CustomError } from '#packages/common/errors/custom-errors';
 import { ExtensionAPIMessagePayload } from '#packages/common/interface/extension.interface';
 import {
   IPCUserExtensionEventsMap,
   IPCEventError,
 } from '#packages/common/interface/ipc-events.interface';
-import { Inject, Injectable } from '@nestjs/common';
-import ExtensionMessagePortHandler from './utils/ExtensionMessagePortHandler';
-import { isExtHasApiPermission } from '#packages/common/utils/check-ext-permission';
-import { CustomError } from '#packages/common/errors/custom-errors';
-import { LoggerService } from '/@/logger/logger.service';
-import type { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Injectable, OnModuleInit, Inject } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MessagePortMain } from 'electron';
-import { ExtensionApiEvent } from './events/extension-api.event';
+import EventEmitter from 'eventemitter3';
 import { ExtensionQueryService } from '../extension-query.service';
-
-export type ExtensionMessagePortMessageHandler = <
-  T extends keyof IPCUserExtensionEventsMap,
->(
-  detail: ExtensionAPIMessagePayload & {
-    name: T;
-    args: Parameters<IPCUserExtensionEventsMap[T]>;
-  },
-) => Promise<Awaited<ReturnType<IPCUserExtensionEventsMap[T]>> | IPCEventError>;
+import { ExtensionApiEvent } from './events/extension-api.event';
+import { ExtensionRunnerEvents } from './runner/ExtensionRunnerBase';
+import ExtensionMessagePortHandler from './utils/ExtensionMessagePortHandler';
+import { LoggerService } from '/@/logger/logger.service';
+import type { Cache } from 'cache-manager';
 
 const CACHE_MAX_AGE_MS = 120_000; // 2 minutes
 
 @Injectable()
-export class ExtensionExecutionEventService {
+export class ExtensionRunnerExecutionService implements OnModuleInit {
+  readonly runnerEventEmitter = new EventEmitter<ExtensionRunnerEvents>();
+
   private messagePortHandler: ExtensionMessagePortHandler;
 
   constructor(
@@ -39,6 +33,10 @@ export class ExtensionExecutionEventService {
     this.messagePortHandler = new ExtensionMessagePortHandler(
       this.handleExecutionMessage.bind(this),
     );
+  }
+
+  onModuleInit() {
+    this.runnerEventEmitter.on('finish', () => {});
   }
 
   async handleExecutionMessage<T extends keyof IPCUserExtensionEventsMap>({
@@ -56,10 +54,7 @@ export class ExtensionExecutionEventService {
   > {
     try {
       const extensionManifest = await this.getExtensionManifest(key);
-      if (
-        !extensionManifest ||
-        !isExtHasApiPermission(name, extensionManifest.permissions || [])
-      ) {
+      if (!extensionManifest) {
         throw new CustomError(
           `Doesn't have permission to access the "${name}" API`,
         );

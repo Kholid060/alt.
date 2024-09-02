@@ -2,27 +2,25 @@ import { Controller } from '@nestjs/common';
 import { ExtensionRunnerService } from './extension-runner.service';
 import type {
   IPCInvokePayload,
+  IPCInvokeReturn,
   IPCSendPayload,
 } from '#packages/common/interface/ipc-events.interface';
-import { Payload } from '@nestjs/microservices';
+import { Ctx, Payload } from '@nestjs/microservices';
 import { IPCInvoke, IPCSend } from '/@/common/decorators/ipc.decorator';
+import { ExtensionRunnerExecutionService } from './extension-runner-execution.service';
 
 @Controller()
 export class ExtensionRunnerController {
-  constructor(private extensionRunner: ExtensionRunnerService) {}
+  constructor(
+    private extensionRunner: ExtensionRunnerService,
+    private extensionExecution: ExtensionRunnerExecutionService,
+  ) {}
 
   @IPCInvoke('extension:execute-command')
   executeCommand(
     @Payload() [payload]: IPCInvokePayload<'extension:execute-command'>,
   ) {
     return this.extensionRunner.executeCommand(payload);
-  }
-
-  @IPCSend('extension:command-exec-change')
-  onExecutionChange(
-    @Payload() payload: IPCSendPayload<'extension:command-exec-change'>,
-  ) {
-    return this.extensionRunner.handleExecutionChange(...payload);
   }
 
   @IPCInvoke('extension:stop-running-command')
@@ -42,5 +40,33 @@ export class ExtensionRunnerController {
     @Payload() [runnerId]: IPCSendPayload<'extension:stop-execute-command'>,
   ) {
     this.extensionRunner.stopCommandExecution(runnerId);
+  }
+
+  @IPCSend('extension:execution-message-port')
+  addExecutionMessagePort(
+    @Ctx() event: Electron.IpcMainEvent,
+    @Payload()
+    [{ extPortId }]: IPCSendPayload<'extension:execution-message-port'>,
+  ) {
+    this.extensionExecution.addMessagePort(event.ports[0], extPortId);
+  }
+
+  @IPCSend('extension:delete-execution-message-port')
+  deleteExecutionMessagePort(
+    @Payload()
+    [{ extPortId }]: IPCSendPayload<'extension:delete-execution-message-port'>,
+  ) {
+    this.extensionExecution.deleteMessagePort(extPortId);
+  }
+
+  @IPCInvoke('user-extension')
+  handleExecutionMessage(
+    @Ctx() event: Electron.IpcMainInvokeEvent,
+    @Payload() [payload]: IPCInvokePayload<'user-extension'>,
+  ): IPCInvokeReturn<'user-extension'> {
+    return this.extensionExecution.handleExecutionMessage({
+      ...payload,
+      sender: event,
+    });
   }
 }

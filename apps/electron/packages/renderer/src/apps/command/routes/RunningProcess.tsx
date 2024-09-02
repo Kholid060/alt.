@@ -116,17 +116,6 @@ function RunningProcess() {
         if (isIPCEventError(result)) return;
         setCommands(result);
       });
-
-    const offRunningExtChanges = preloadAPI.main.ipc.on(
-      'extension:running-commands-change',
-      (_, items) => {
-        setCommands(items);
-      },
-    );
-
-    return () => {
-      offRunningExtChanges();
-    };
   }, [uiListStore]);
 
   return (

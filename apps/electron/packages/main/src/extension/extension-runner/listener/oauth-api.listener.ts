@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { OnExtensionAPI } from '/@/common/decorators/extension.decorator';
 import { ExtensionApiEvent } from '../events/extension-api.event';
 import { OAuthService } from '/@/oauth/oauth.service';
-import type { ExtensionExecutionEventReturn } from '../extension-execution-event.interface';
 import { ExtensionOAuthTokensService } from '../../extension-oauth-tokens/extension-oauth-tokens.service';
+import type { ExtensionExecutionEventReturn } from '../extension-runner.interface';
 
 @Injectable()
 export class ExtensionOAuthApiListener {

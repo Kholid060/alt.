@@ -2,17 +2,16 @@ import { createContext, useEffect, useRef } from 'react';
 import { useCommandPanelStore } from '../stores/command-panel.store';
 import preloadAPI from '../utils/preloadAPI';
 import { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
-import { MESSAGE_PORT_CHANNEL_IDS } from '#packages/common/utils/constant/constant';
-import {
-  MessagePortListener,
-  MessagePortRenderer,
-} from '#common/utils/message-port-renderer';
 import { MessagePortSharedCommandWindowEvents } from '#packages/common/interface/message-port-events.interface';
 import { debugLog } from '#packages/common/utils/helper';
 import { ExtensionMessagePortEventAsync } from '@altdot/extension';
 import { useDialog } from '@altdot/ui';
+import {
+  ExtensionRendererMessagePort,
+  MessagePortListener,
+} from '../utils/ExtensionRendererMessagePort';
 
-type RunnerMessagePort = MessagePortRenderer<
+type RunnerMessagePort = ExtensionRendererMessagePort<
   ExtensionMessagePortEventAsync,
   MessagePortSharedCommandWindowEvents
 >;
@@ -33,7 +32,7 @@ export function CommandCtxProvider({
   children: React.ReactNode;
 }) {
   const runnerMessagePort = useRef<RunnerMessagePort>(
-    new MessagePortRenderer(),
+    new ExtensionRendererMessagePort(),
   );
   const commandViewMessagePort = useRef<MessagePort | null>(null);
 
@@ -50,7 +49,7 @@ export function CommandCtxProvider({
       return;
     }
 
-    runnerMessagePort.current.changePort('view', port);
+    runnerMessagePort.current.addPort('view', port);
     commandViewMessagePort.current = port;
   }
 
@@ -85,12 +84,20 @@ export function CommandCtxProvider({
     );
 
     const offSharedMessagePortListener = MessagePortListener.on(
-      MESSAGE_PORT_CHANNEL_IDS.sharedWithCommand,
-      ({ ports: [port] }) => {
-        if (!port) return;
+      'command-window:extension-port',
+      ({ ports: [port], data }) => {
+        if (!port || !data) return;
 
-        debugLog('Receive MessagePort from shared process', port);
-        runnerMessagePort.current.changePort('action', port);
+        debugLog('Receive extension MessagePort', port);
+        runnerMessagePort.current.addPort(data[0], port);
+      },
+    );
+
+    const offCloseMessagePort = preloadAPI.main.ipc.on(
+      'command-window:close-message-port',
+      (_, id) => {
+        console.log('destroy', id);
+        runnerMessagePort.current.destroyPort(id);
       },
     );
 
@@ -98,6 +105,7 @@ export function CommandCtxProvider({
       offHideToast();
       offShowToast();
       offConfirmAlert();
+      offCloseMessagePort();
       offSharedMessagePortListener();
     };
   }, [dialog]);

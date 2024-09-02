@@ -53,6 +53,8 @@ const config = defineConfig({
     lib: {
       entry: {
         index: 'src/index.ts',
+        'extension-command-action.worker':
+          'src/extension/extension-runner/worker/extension-command-action.worker.ts',
       },
       formats: ['es'],
     },

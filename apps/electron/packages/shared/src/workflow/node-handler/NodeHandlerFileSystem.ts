@@ -58,9 +58,7 @@ export class NodeHandlerFileSystem extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
     }
   }
 
-  private async stat({
-    node,
-  }: Pick<ExecuteParams, 'node'>): Promise<ExtensionAPI.Fs.Stats[]> {
+  private async stat({ node }: Pick<ExecuteParams, 'node'>) {
     const files = await globby(node.data.readFilePath, { gitignore: false });
     if (files.length === 0 && node.data.throwIfEmpty) {
       throw new Error("Couldn't find files with inputted patterns");
