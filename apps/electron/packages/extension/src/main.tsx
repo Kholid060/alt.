@@ -16,6 +16,8 @@ import { PRELOAD_API_KEY } from '#common/utils/constant/constant';
 import { ExtensionErrorUnhandledVanilla } from './components/extension-errors';
 import { applyTheme } from '#common/utils/helper';
 import injectComponents from './utils/injectComponents';
+import '@altdot/ui/dist/theme.css';
+import { MODULE_MAP } from './utils/constant';
 
 declare global {
   interface Window {
@@ -28,10 +30,15 @@ type ExtensionMessagePort = BetterMessagePort<
   ExtensionMessagePortEvent
 >;
 
-async function injectExtensionAPI(
-  messagePort: ExtensionMessagePort,
-  { browserCtx, platform }: ExtensionCommandExecutePayloadWithData,
-) {
+async function injectExtensionAPI({
+  messagePort,
+  viewActionPort,
+  payload: { browserCtx, platform },
+}: {
+  viewActionPort?: MessagePort;
+  messagePort: ExtensionMessagePort;
+  payload: ExtensionCommandExecutePayloadWithData;
+}) {
   await new Promise<void>((resolve) => {
     function isLoaded() {
       if ('$$extIPC' in window) return resolve();
@@ -44,6 +51,7 @@ async function injectExtensionAPI(
   const extensionAPI = createExtensionAPI({
     platform,
     messagePort,
+    viewActionPort,
     sendMessage: window.$$extIPC,
     browserCtx: browserCtx ?? null,
   });
@@ -53,13 +61,32 @@ async function injectExtensionAPI(
     value: extensionAPI,
   });
 }
+async function loadStyle() {
+  if (import.meta.env.DEV) {
+    const cssPath = `.${MODULE_MAP.css}`;
+    const { default: styleStr } = (await import(cssPath)) as {
+      default: string;
+    };
+    const styleEl = document.createElement('style');
+    styleEl.textContent = styleStr;
+
+    document.head.appendChild(styleEl);
+    return;
+  }
+
+  const linkEl = document.createElement('link');
+  linkEl.rel = 'stylesheet';
+  linkEl.href = MODULE_MAP.css;
+
+  document.head.appendChild(linkEl);
+}
 
 async function onMessage({
-  ports,
   data,
+  ports,
 }: MessageEvent<ExtensionCommandViewInitMessage>) {
   try {
-    const [port] = ports;
+    const [port, viewActionPort] = ports;
     if (!port) throw new Error('Message port empty');
     if (typeof data !== 'object' || data.type !== 'init')
       throw new Error('Invalid payload');
@@ -67,15 +94,18 @@ async function onMessage({
     applyTheme(data.theme);
 
     const messagePort: ExtensionMessagePort = new BetterMessagePort(port);
-    await injectExtensionAPI(messagePort, data.payload);
+    await injectExtensionAPI({
+      messagePort,
+      viewActionPort,
+      payload: data.payload,
+    });
     injectComponents();
-    await extViewRenderer(
-      {
-        messagePort: messagePort.sync,
-        launchContext: data.payload.launchContext,
-      },
-      data.themeStyle,
-    );
+
+    await loadStyle();
+    await extViewRenderer({
+      messagePort: messagePort.sync,
+      launchContext: data.payload.launchContext,
+    });
 
     messagePort.sync.on('app:theme-changed', applyTheme);
   } catch (error) {

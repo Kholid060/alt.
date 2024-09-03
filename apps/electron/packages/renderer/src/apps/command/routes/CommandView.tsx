@@ -1,21 +1,18 @@
+/* eslint-disable react/no-unknown-property */
 import { memo, useEffect, useRef, useState } from 'react';
-import { EXTENSION_VIEW } from '#common/utils/constant/constant';
 import { useCommandCtx } from '/@/hooks/useCommandCtx';
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
 import {
   ExtensionCommandViewInitMessage,
-  ExtensionCommandExecutePayloadWithData,
+  ExtensionCommandViewExecutePayload,
 } from '#common/interface/extension.interface';
 import { sleep } from '@altdot/shared';
-import preloadAPI from '/@/utils/preloadAPI';
-import { isIPCEventError } from '#packages/common/utils/helper';
-import { useCommandPanelStore } from '/@/stores/command-panel.store';
 import { getExtIconURL } from '/@/utils/helper';
 import { useTheme } from '/@/hooks/useTheme';
 import { useCommandStore } from '/@/stores/command.store';
+import { useCommandPanelHeader } from '/@/hooks/useCommandPanelHeader';
 
 function CommandView() {
-  const setHeader = useCommandPanelStore.use.setHeader();
   const updateCommandState = useCommandStore.use.setState();
 
   const theme = useTheme();
@@ -27,8 +24,21 @@ function CommandView() {
 
   const commandCtx = useCommandCtx();
 
-  const [show, setShow] = useState(false);
   const [iframeKey, setIframeKey] = useState(0);
+
+  const { payload, port } = activeRoute?.data as {
+    port: MessagePort;
+    payload: ExtensionCommandViewExecutePayload;
+  };
+
+  useCommandPanelHeader({
+    icon: getExtIconURL(
+      payload.command.icon || payload.command.extension.icon,
+      payload.extensionId,
+    ),
+    title: payload.command.title,
+    subtitle: payload.command.extension.title,
+  });
 
   async function onIframeLoad() {
     if (!activeRoute?.data || !iframeRef.current) return;
@@ -37,16 +47,12 @@ function CommandView() {
       const iframe = iframeRef.current;
       messageChannelRef.current = new MessageChannel();
 
-      const payload: ExtensionCommandViewInitMessage = {
+      const iframePayload: ExtensionCommandViewInitMessage = {
+        payload,
         type: 'init',
         themeStyle: '',
         theme: theme.theme,
-        payload: activeRoute.data as ExtensionCommandExecutePayloadWithData,
       };
-
-      payload.themeStyle = (
-        await import('@altdot/ui/dist/theme.css?inline')
-      ).default;
 
       commandCtx.setCommandViewMessagePort(messageChannelRef.current.port1);
       commandCtx.runnerMessagePort.current.eventSync.on(
@@ -68,11 +74,12 @@ function CommandView() {
         },
       );
 
-      iframe.contentWindow?.postMessage(payload, '*', [
-        messageChannelRef.current.port2,
-      ]);
+      const portsPayload: MessagePort[] = [messageChannelRef.current.port2];
+      if (port) portsPayload.push(port);
 
-      await sleep(100);
+      iframe.contentWindow?.postMessage(iframePayload, '*', portsPayload);
+
+      await sleep(200);
       iframe.style.visibility = 'visible';
     } catch (error) {
       console.error(error);
@@ -83,41 +90,11 @@ function CommandView() {
     return () => {
       messageChannelRef.current?.port1.close();
       messageChannelRef.current?.port2.close();
-      updateCommandState('useCommandViewNavigation', false);
 
       commandCtx.setCommandViewMessagePort(null);
+      updateCommandState('useCommandViewNavigation', false);
     };
   }, [commandCtx, updateCommandState]);
-  useEffect(() => {
-    const data = activeRoute?.data as ExtensionCommandExecutePayloadWithData;
-
-    if (!data) {
-      navigate('');
-    } else {
-      setShow(true);
-      preloadAPI.main.ipc
-        .invoke('database:get-command', {
-          commandId: data.commandId,
-          extensionId: data.extensionId,
-        })
-        .then((data) => {
-          if (isIPCEventError(data) || !data) return;
-
-          setHeader({
-            icon: getExtIconURL(
-              data.icon || data.extension.icon,
-              data.extensionId,
-            ),
-            title: data.title,
-            subtitle: data.extension.title,
-          });
-        });
-    }
-
-    return () => {
-      setHeader(null);
-    };
-  }, [activeRoute, navigate, setHeader]);
   useEffect(() => {
     commandCtx.runnerMessagePort.current.eventSync.sendMessage(
       'app:theme-changed',
@@ -125,18 +102,19 @@ function CommandView() {
     );
   }, [commandCtx.runnerMessagePort, theme.theme]);
 
-  if (!show) return null;
+  if (!payload) {
+    navigate('');
+    return null;
+  }
 
   return (
     <iframe
+      name="extension-page"
       key={iframeKey}
       title="sandbox"
       ref={iframeRef}
-      name={EXTENSION_VIEW.frameName}
       src={`extension://${activeRoute?.params.extensionId}/command/${activeRoute?.params.commandId}/`}
-      sandbox="allow-scripts"
-      className="block h-80 w-full"
-      style={{ visibility: 'hidden' }}
+      className="invisible block h-80 w-full"
       onLoad={onIframeLoad}
     />
   );

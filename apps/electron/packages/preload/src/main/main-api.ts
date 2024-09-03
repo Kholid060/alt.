@@ -9,11 +9,17 @@ export const ipc = {
   handle: IPCRenderer.instance.handle.bind(IPCRenderer.instance),
 };
 
-IPCRenderer.on('command-window:extension-port', ({ ports }, runnerId) => {
-  window.dispatchEvent(
-    new MessageEvent('command-window:extension-port', {
-      ports,
-      data: runnerId,
-    }),
-  );
+const events = [
+  'command-window:open-view',
+  'command-window:extension-port',
+] as const;
+events.forEach((name) => {
+  IPCRenderer.on(name, ({ ports }, runnerId) => {
+    window.dispatchEvent(
+      new MessageEvent(name, {
+        ports,
+        data: runnerId,
+      }),
+    );
+  });
 });

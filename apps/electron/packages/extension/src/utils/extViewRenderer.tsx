@@ -13,31 +13,6 @@ import { UiTooltipProvider } from '@altdot/ui/dist/components/ui/tooltip';
 import ExtensionHistory from '../components/ExtensionHistory';
 import ExtensionEventListener from '../components/ExtensionEventListener';
 
-async function loadStyle(themeStyle: string) {
-  const themeStyleEl = document.createElement('style');
-  themeStyleEl.id = 'theme-style';
-  themeStyleEl.textContent = themeStyle;
-  document.head.appendChild(themeStyleEl);
-
-  if (import.meta.env.DEV) {
-    const cssPath = `.${MODULE_MAP.css}`;
-    const { default: styleStr } = (await import(cssPath)) as {
-      default: string;
-    };
-    const styleEl = document.createElement('style');
-    styleEl.textContent = styleStr;
-
-    document.head.appendChild(styleEl);
-    return;
-  }
-
-  const linkEl = document.createElement('link');
-  linkEl.rel = 'stylesheet';
-  linkEl.href = MODULE_MAP.css;
-
-  document.head.appendChild(linkEl);
-}
-
 async function getView() {
   try {
     const { default: renderer } = (await import(MODULE_MAP.renderer)) as {
@@ -51,14 +26,14 @@ async function getView() {
   }
 }
 
-const extViewRenderer: ExtensionRenderer<[string]> = async (
-  { messagePort, launchContext },
-  theme,
-) => {
-  await loadStyle(theme);
-
-  const CommandView = await getView();
-  const reactDOM = (await import(MODULE_MAP.reactDOM)) as typeof ReactDOM;
+const extViewRenderer: ExtensionRenderer = async ({
+  messagePort,
+  launchContext,
+}) => {
+  const [CommandView, reactDOM] = await Promise.all([
+    getView(),
+    (await import(MODULE_MAP.reactDOM)) as typeof ReactDOM,
+  ]);
 
   reactDOM.createRoot(document.querySelector('#app')!).render(
     <React.StrictMode>

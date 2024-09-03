@@ -4,7 +4,11 @@ import type {
   ExtensionMessagePortEventAsync,
 } from '@altdot/extension';
 import { ExtensionAPI } from '@altdot/extension';
-import type { BetterMessagePort } from '@altdot/shared';
+import {
+  BetterMessagePort,
+  BetterMessagePortAsync,
+  BetterMessagePortSync,
+} from '@altdot/shared';
 import { nanoid } from 'nanoid/non-secure';
 import { CUSTOM_SCHEME } from '../constant/constant';
 import type { ExtensionAPIValues } from '@altdot/extension/dist/extensionApiBuilder';
@@ -28,6 +32,7 @@ export interface CreateExtensionAPI {
     ExtensionMessagePortEventAsync,
     ExtensionMessagePortEvent
   >;
+  viewActionPort?: MessagePort;
 }
 
 const sendTabActionMessage: (
@@ -217,12 +222,36 @@ function extensionSqlite({
   };
 }
 
+function extensionViewAction(
+  port?: MessagePort,
+): Pick<ExtensionAPIValues, 'viewAction.async' | 'viewAction.sync'> {
+  const messagePort = port ? new BetterMessagePort(port) : null;
+
+  return {
+    'viewAction.sync':
+      messagePort?.sync ||
+      ({
+        off() {},
+        on() {},
+        sendMessage() {},
+      } as unknown as BetterMessagePortSync<ExtensionViewActionSyncEvent>),
+    'viewAction.async':
+      messagePort?.async ||
+      ({
+        off() {},
+        on() {},
+        sendMessage() {},
+      } as unknown as BetterMessagePortAsync<ExtensionViewActionAsyncEvent>),
+  };
+}
+
 export function createExtensionAPI({
   platform,
   browserCtx,
   messagePort,
   sendMessage,
   context = null,
+  viewActionPort,
 }: CreateExtensionAPI) {
   return Object.freeze(
     extensionApiBuilder({
@@ -231,6 +260,7 @@ export function createExtensionAPI({
         ...extensionAPIGetIconURL(),
         ...extensionAPIUi(messagePort),
         ...extensionOAuth({ sendMessage }),
+        ...extensionViewAction(viewActionPort),
         ...extensionAPISearchPanel(messagePort),
         ...extensionBrowserTabs({
           browserCtx,

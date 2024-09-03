@@ -9,6 +9,7 @@ import { Shell as ImportedShell } from './namespaces/shell';
 import { Sqlite as ImportedSqlite } from './namespaces/sqlite';
 import { Storage as ImportedStorage } from './namespaces/storage';
 import { UI as ImportedUI } from './namespaces/ui';
+import { ViewAction as ImportedViewAction } from './namespaces/view-action';
 
 declare namespace ExtensionAPI {
   const browser: Browser.Static;
@@ -21,6 +22,7 @@ declare namespace ExtensionAPI {
   const sqlite: Sqlite.Static;
   const storage: Storage.Static;
   const ui: UI.Static;
+  const viewAction: ViewAction.Static;
 
   export import Browser = ImportedBrowser;
   export import Clipboard = ImportedClipboard;
@@ -32,6 +34,7 @@ declare namespace ExtensionAPI {
   export import Sqlite = ImportedSqlite;
   export import Storage = ImportedStorage;
   export import UI = ImportedUI;
+  export import ViewAction = ImportedViewAction;
 }
 
 export { ExtensionAPI, ExtensionAPI as _extension };

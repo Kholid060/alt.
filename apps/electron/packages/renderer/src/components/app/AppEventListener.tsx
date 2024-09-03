@@ -4,6 +4,7 @@ import {
   CommandNavigateOptions,
   useCommandNavigate,
 } from '/@/hooks/useCommandRoute';
+import { MessagePortListener } from '/@/utils/ExtensionRendererMessagePort';
 
 function AppEventListener() {
   const navigate = useCommandNavigate();
@@ -32,15 +33,30 @@ function AppEventListener() {
         });
       },
     );
-    const offOpenCommandViewPage = preloadAPI.main.ipc.on(
+    const offOpenCommandViewPage = MessagePortListener.on(
       'command-window:open-view',
-      (_, payload) => {
-        const { extensionId, commandId } = payload;
-        navigate(`/extensions/${extensionId}/${commandId}/view`, {
-          data: payload,
-        });
+      (event) => {
+        const payload = event.data;
+        navigate(
+          `/extensions/${payload.extensionId}/${payload.commandId}/view`,
+          {
+            data: {
+              payload,
+              port: event.ports[0],
+            },
+          },
+        );
       },
     );
+    // const offOpenCommandViewPage = preloadAPI.main.ipc.on(
+    //   'command-window:open-view',
+    //   (_, payload) => {
+    //     const { extensionId, commandId } = payload;
+    //     navigate(`/extensions/${extensionId}/${commandId}/view`, {
+    //       data: payload,
+    //     });
+    //   },
+    // );
 
     return () => {
       offInputConfig();

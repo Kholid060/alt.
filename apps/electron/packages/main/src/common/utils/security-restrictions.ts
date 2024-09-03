@@ -1,3 +1,4 @@
+import { CUSTOM_SCHEME } from '#packages/common/utils/constant/constant';
 import type { Session } from 'electron';
 import { app, shell } from 'electron';
 import { URL } from 'node:url';
@@ -113,7 +114,10 @@ export function applySecurity() {
      * @see https://www.electronjs.org/docs/latest/tutorial/security#12-verify-webview-options-before-creation
      */
     contents.on('will-attach-webview', (event, webPreferences, params) => {
+      if (params.src.startsWith(CUSTOM_SCHEME.extension)) return;
+
       const { origin } = new URL(params.src);
+
       if (!ALLOWED_ORIGINS_AND_PERMISSIONS.has(origin)) {
         if (import.meta.env.DEV) {
           console.warn(

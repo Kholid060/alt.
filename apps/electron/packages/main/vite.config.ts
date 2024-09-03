@@ -51,11 +51,11 @@ const config = defineConfig({
     assetsDir: '.',
     minify: !IS_DEV,
     lib: {
-      entry: {
-        index: 'src/index.ts',
-        'extension-command-action.worker':
-          'src/extension/extension-runner/worker/extension-command-action.worker.ts',
-      },
+      entry: [
+        'src/index.ts',
+        'src/extension/extension-runner/worker/extension-command-action.worker.ts',
+        'src/extension/extension-runner/worker/extension-command-view-action.worker.ts',
+      ],
       formats: ['es'],
     },
     rollupOptions: {

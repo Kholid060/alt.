@@ -7,7 +7,7 @@ import type {
   ExtensionCommandExecutePayloadWithData,
   ExtensionCommandJSONViewData,
   ExtensionCommandProcess,
-  ExtensionCommandViewData,
+  ExtensionCommandViewExecutePayload,
 } from './extension.interface';
 import type {
   AllButLast,
@@ -291,7 +291,6 @@ export interface IPCSendEventMainToRenderer {
     executeCommandPayload: ExtensionCommandJSONViewData,
   ];
   'command-window:close-message-port': [id: string];
-  'command-window:open-view': [executeCommandPayload: ExtensionCommandViewData];
   'command-window:show-oauth-overlay': [
     {
       authUrl: string;
@@ -346,6 +345,9 @@ export interface IPCPostEventRendererToMain {
 }
 
 export interface IPCPostMessageEventMainToRenderer {
+  'command-window:open-view': [
+    executeCommandPayload: ExtensionCommandViewExecutePayload,
+  ];
   'command-window:extension-port': [runnerId: string];
   'message-port:created': [{ channelId: MessagePortChannelIds }];
 }

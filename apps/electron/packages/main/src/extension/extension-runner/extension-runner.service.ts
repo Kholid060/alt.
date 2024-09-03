@@ -27,6 +27,7 @@ import ExtensionRunnerCommandAction from './runner/ExtensionRunnerCommandAction'
 import ExtensionRunnerBase from './runner/ExtensionRunnerBase';
 import { ExtensionRunnerExecutionService } from './extension-runner-execution.service';
 import ExtensionRunnerCommandScript from './runner/ExtensionRunnerCommandScript';
+import ExtensionRunnerCommandView from './runner/ExtensionRunnerCommandViewAction';
 
 @Injectable()
 export class ExtensionRunnerService implements OnModuleInit {
@@ -89,7 +90,10 @@ export class ExtensionRunnerService implements OnModuleInit {
     this.executionService.runnerEventEmitter.on(
       'error',
       async ({ errorMessage, payload, runnerId }) => {
-        this.dbService.db.insert(extensionErrors).values({
+        // eslint-disable-next-line drizzle/enforce-delete-with-where
+        this.runningCommands.delete(runnerId);
+
+        await this.dbService.db.insert(extensionErrors).values({
           message: errorMessage,
           title: payload.command.title,
           extensionId: payload.extensionId,
@@ -193,7 +197,17 @@ export class ExtensionRunnerService implements OnModuleInit {
         );
       },
       with: {
-        extension: {},
+        extension: {
+          columns: {
+            id: true,
+            icon: true,
+            title: true,
+            isLocal: true,
+            isError: true,
+            isDisabled: true,
+            errorMessage: true,
+          },
+        },
       },
     });
     if (!command) throw new Error("Coudln't find command");
@@ -236,14 +250,13 @@ export class ExtensionRunnerService implements OnModuleInit {
       platform: getExtensionPlatform(),
     };
 
-    const runnerId: string | null = null;
-
     switch (command.type) {
       case 'script': {
         const runner = new ExtensionRunnerCommandScript(
           executeCommandPayload,
           this.executionService.runnerEventEmitter,
         );
+        this.runningCommands.set(runner.id, runner);
 
         return runner.run({ waitUntilFinished: options?.waitUntilFinished });
       }
@@ -260,6 +273,8 @@ export class ExtensionRunnerService implements OnModuleInit {
           },
         );
         this.executionService.addMessagePort(mainChannel.port2, runner.id);
+        this.runningCommands.set(runner.id, runner);
+
         const commandWindow = await this.browserWindow.get('command', {
           noThrow: true,
           autoCreate: false,
@@ -276,37 +291,27 @@ export class ExtensionRunnerService implements OnModuleInit {
       }
       case 'view': {
         const windowCommand = await this.browserWindow.get('command');
-        windowCommand.toggleWindow(true);
-        windowCommand.sendMessage('command-window:open-view', {
-          ...payload,
-          command,
-          commandFilePath: '',
-          title: command.title,
-          platform: getExtensionPlatform(),
-          subtitle: command.extension.title,
-          icon: command.icon || command.extension.icon,
-        });
-        break;
+        const runner = new ExtensionRunnerCommandView(
+          windowCommand,
+          executeCommandPayload,
+          this.executionService.runnerEventEmitter,
+        );
+        this.runningCommands.set(runner.id, runner);
+
+        return runner.run();
       }
       default:
         throw new Error(
           `Command with "${command.type}" type doesn't have handler`,
         );
     }
-
-    if (options?.waitUntilFinished && runnerId) {
-      const resolver =
-        Promise.withResolvers<ExtensionAPI.Command.LaunchResult>();
-      this.executionResolvers.set(runnerId, resolver);
-
-      return resolver.promise;
-    }
-
-    return runnerId;
   }
 
   stopCommandExecution(runnerId: string) {
     const runningCommand = this.runningCommands.get(runnerId);
     if (runningCommand) runningCommand.stop();
+
+    // eslint-disable-next-line drizzle/enforce-delete-with-where
+    this.runningCommands.delete(runnerId);
   }
 }

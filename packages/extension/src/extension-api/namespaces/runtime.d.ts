@@ -34,6 +34,7 @@ export declare namespace Runtime {
 
   interface Static {
     config: Config.Static;
+    viewAction: ViewAction.Static;
 
     readonly platform: PlatformInfo;
 

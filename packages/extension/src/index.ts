@@ -14,3 +14,8 @@ export * from './const/extension.const';
 export { CommandLaunchBy } from './interfaces/command.interface';
 
 export type ExtensionManifest = Omit<ExtensionManifestType, '$apiVersion'>;
+
+declare global {
+  interface ExtensionViewActionSyncEvent {}
+  interface ExtensionViewActionAsyncEvent {}
+}

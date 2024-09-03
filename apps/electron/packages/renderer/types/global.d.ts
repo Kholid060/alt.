@@ -53,3 +53,11 @@ interface URLPatternComponentResult {
 declare interface Element {
   scrollIntoViewIfNeeded(centerIfNeeded?: boolean): void;
 }
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      webview: React.DetailedHTMLProps<Electron.WebviewTag>;
+    }
+  }
+}

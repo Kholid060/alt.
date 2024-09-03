@@ -31,6 +31,10 @@ function CommandMain() {
     _extension.runtime.config.getValues('command').then(console.log)
   }, []);
 
+  const anu: Test = {
+
+  }
+
   const customItem: UiListItem[] = [
     {
       title: 'Hello world',
@@ -96,6 +100,7 @@ function CommandMain() {
 
   return (
     <div className="p-2">
+      <button onClick={() => _extension.viewAction.async.sendMessage('test').then(console.log)}>Test</button>
       <InifinitePage depth={0} />
       <UiList items={[...customItem,...items]} />
     </div>

@@ -89,14 +89,13 @@ export function CommandCtxProvider({
         if (!port || !data) return;
 
         debugLog('Receive extension MessagePort', port);
-        runnerMessagePort.current.addPort(data[0], port);
+        runnerMessagePort.current.addPort(data, port);
       },
     );
 
     const offCloseMessagePort = preloadAPI.main.ipc.on(
       'command-window:close-message-port',
       (_, id) => {
-        console.log('destroy', id);
         runnerMessagePort.current.destroyPort(id);
       },
     );

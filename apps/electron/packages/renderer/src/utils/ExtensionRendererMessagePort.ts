@@ -6,7 +6,7 @@ export class MessagePortListener {
   static on<T extends keyof IPCPostMessageEventMainToRenderer>(
     name: T,
     callback: (
-      event: MessageEvent<IPCPostMessageEventMainToRenderer[T]>,
+      event: MessageEvent<IPCPostMessageEventMainToRenderer[T][0]>,
     ) => void,
   ) {
     //@ts-expect-error The event is MessageEvent dispatched by preload
@@ -18,7 +18,7 @@ export class MessagePortListener {
   static off<T extends keyof IPCPostMessageEventMainToRenderer>(
     name: T,
     callback: (
-      event: MessageEvent<IPCPostMessageEventMainToRenderer[T]>,
+      event: MessageEvent<IPCPostMessageEventMainToRenderer[T][0]>,
     ) => void,
   ) {
     //@ts-expect-error CUSTOM EVENT!!!
@@ -51,7 +51,6 @@ export class ExtensionRendererMessagePort<AsyncT, SyncT> {
   }
 
   private onMessage({ data }: MessageEvent) {
-    console.log(data);
     if (data?.type === 'send' && data.isSync) {
       this.eventSync.messageHandler(data);
     } else {

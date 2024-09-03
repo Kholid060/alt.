@@ -15,11 +15,15 @@ import { AppTheme } from './app.interface';
 export type ExtensionConfigType = (typeof EXTENSION_CONFIG_TYPE)[number];
 export type ExtensionPermissions = (typeof EXTENSION_PERMISSIONS)[number];
 
+export interface ExtensionCommandViewActionPayload {
+  filePath: string;
+}
+
 export interface ExtensionCommandViewInitMessage {
   type: 'init';
   theme: AppTheme;
   themeStyle: string;
-  payload: ExtensionCommandExecutePayloadWithData;
+  payload: ExtensionCommandViewExecutePayload;
 }
 
 export interface ExtensionConfigData {
@@ -39,13 +43,6 @@ export interface ExtensionCommandExecutePayload {
   launchContext: CommandLaunchContext;
   browserCtx?: ExtensionBrowserTabContext;
   scriptOptions?: ExtensionCommandExecuteScriptOptions;
-}
-
-export interface ExtensionCommandViewData
-  extends ExtensionCommandExecutePayloadWithData {
-  title: string;
-  icon: string;
-  subtitle: string;
 }
 
 export interface ExtensionCommandJSONViewData {
@@ -93,4 +90,9 @@ export interface ExtensionCommandProcess {
   extensionTitle: string;
   launchBy: CommandLaunchBy;
   type: ExtensionCommandType;
+}
+
+export interface ExtensionCommandViewExecutePayload
+  extends ExtensionCommandExecutePayloadWithData {
+  runnerId: string;
 }

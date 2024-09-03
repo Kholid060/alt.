@@ -7,8 +7,8 @@ import type { IPCUserExtensionEventsMap } from '#common/interface/ipc-events.int
 import { contextBridge } from 'electron';
 import IPCRenderer from '#common/utils/IPCRenderer';
 import type {
-  ExtensionCommandExecutePayload,
   ExtensionCommandViewInitMessage,
+  ExtensionCommandViewExecutePayload,
 } from '#common/interface/extension.interface';
 import { isIPCEventError } from '#common/utils/helper';
 
@@ -20,8 +20,6 @@ function setExtView(type: 'empty' | 'error' = 'empty') {
 
 class ExtensionAPI {
   static init() {
-    let payload: ExtensionCommandExecutePayload | null = null;
-
     window.addEventListener(
       'message',
       ({ ports, data }: MessageEvent<ExtensionCommandViewInitMessage>) => {
@@ -29,35 +27,24 @@ class ExtensionAPI {
         if (!messagePort) throw new Error('PORT IS EMPTY');
 
         new ExtensionAPI(data.payload).loadAPI();
-        payload = data.payload;
-      },
-      { once: true },
-    );
-    window.addEventListener('unload', () => {
-      if (!payload) return;
 
-      IPCRenderer.send(
-        'extension:command-exec-change',
-        'finish',
-        {
-          icon: '',
-          title: '',
-          noEmit: true,
-          type: 'view',
-          runnerId: '',
-          extensionTitle: '',
-          commandId: payload.commandId,
-          extensionId: payload.extensionId,
-          launchBy: payload.launchContext.launchBy,
-        },
-        { success: true, result: '' },
-      );
-    });
+        window.addEventListener(
+          'unload',
+          () => {
+            IPCRenderer.send(
+              'extension:stop-execute-command',
+              data.payload.runnerId,
+            );
+          },
+          { once: true },
+        );
+      },
+    );
   }
 
   private key: string = '';
 
-  constructor(readonly payload: ExtensionCommandExecutePayload) {
+  constructor(readonly payload: ExtensionCommandViewExecutePayload) {
     this.payload = payload;
   }
 

@@ -25,6 +25,7 @@ export const EXT_API_PKG_NAME = '@altdot/extension';
 const SUPPORTED_ICON_SIZE = 256;
 const SUPPORTED_ICON_TYPE = ['.png'];
 const EXT_COMMAND_FILE_EXTENSION = '.{js,jsx,ts,tsx}';
+const EXT_COMMAND_ACTION_FILE_EXTENSION = '.{js,ts}';
 
 z.setErrorMap(errorMap);
 class ManifestUtils {
@@ -184,6 +185,34 @@ class ManifestUtils {
           scripts[command.name] = commandFilePath;
         } else {
           commands[command.name] = commandFilePath;
+
+          if (command.type === 'view') {
+            const commandFileName = path.basename(
+              commandFilePath,
+              path.extname(commandFilePath),
+            );
+            const commandDirName = path.dirname(commandFilePath);
+
+            let viewActionPath: string | null = null;
+
+            if (commandFileName === 'index') {
+              const lastDirName = commandDirName.split('/').pop();
+              viewActionPath = path.join(
+                commandDirName,
+                `${lastDirName}.action${EXT_COMMAND_ACTION_FILE_EXTENSION}`,
+              );
+            } else {
+              viewActionPath = path.join(
+                commandDirName,
+                `${commandFileName}.action${EXT_COMMAND_ACTION_FILE_EXTENSION}`,
+              );
+            }
+
+            const [commandViewAction] = await globby(viewActionPath);
+            if (commandViewAction) {
+              commands[`${command.name}.action`] = commandViewAction;
+            }
+          }
         }
       }),
     );

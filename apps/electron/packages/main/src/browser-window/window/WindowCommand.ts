@@ -42,7 +42,7 @@ class WindowCommand extends WindowBase {
         contextIsolation: true,
         nodeIntegrationInSubFrames: true,
         sandbox: true,
-        webviewTag: false, // The webview tag is not recommended. Consider alternatives like an iframe or Electron's BrowserView. @see https://www.electronjs.org/docs/latest/api/webview-tag#warning
+        webviewTag: false,
         preload: join(app.getAppPath(), 'packages/preload/dist/index.mjs'),
       },
     });

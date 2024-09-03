@@ -2,6 +2,7 @@
 
 import { chrome } from '../../.electron-vendors.cache.json';
 import react from '@vitejs/plugin-react';
+import { builtinModules } from 'node:module';
 import { join } from 'node:path';
 
 const PACKAGE_ROOT = __dirname;
@@ -37,7 +38,12 @@ const config = {
     assetsDir: '.',
     minify: process.env.MODE !== 'development',
     rollupOptions: {
-      external: ['react', 'react/jsx-runtime', 'react-dom'],
+      external: [
+        'react',
+        'react/jsx-runtime',
+        'react-dom',
+        ...builtinModules.flatMap((item) => [item, `node:${item}`]),
+      ],
       output: {
         entryFileNames: '[name].js',
         paths: {
