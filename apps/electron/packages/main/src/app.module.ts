@@ -30,6 +30,7 @@ import { app } from 'electron';
 import { WebAppModule } from './web-app/web-app.module';
 import { envConfig } from './common/config/env.config';
 import { ClipboardModule } from './clipboard/clipboard.module';
+import { WorkflowRunnerModule } from './workflow-runner/workflow-runner.module';
 
 const envVarsSchema = z.object({
   API_KEY: z.string().min(1),
@@ -86,6 +87,7 @@ const envVarsSchema = z.object({
     InstalledAppsModule,
     CustomProtocolModule,
     GlobalShortcutModule,
+    WorkflowRunnerModule,
     ExtensionLoaderModule,
     WorkflowHistoryModule,
     ExtensionConfigModule,

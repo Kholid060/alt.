@@ -19,6 +19,14 @@ import { ElectronApiService } from './electron-api.service';
 export class ElectronApiController {
   constructor(private electronApi: ElectronApiService) {}
 
+  @IPCInvoke('shell:open-path')
+  shellOpenPath(
+    @Payload() [path]: IPCInvokePayload<'shell:open-path'>,
+  ): IPCInvokeReturn<'shell:open-path'> {
+    shell.openPath(path);
+    return Promise.resolve();
+  }
+
   @IPCInvoke('shell:open-url')
   shellOpenUrl(
     @Payload() [url]: IPCInvokePayload<'shell:open-url'>,

@@ -8,12 +8,14 @@ import type {
 } from '#packages/common/interface/ipc-events.interface';
 import { WorkflowService } from './workflow.service';
 import { BrowserWindow } from 'electron';
+import { WorkflowRunnerService } from '../workflow-runner/workflow-runner.service';
 
 @Controller()
 export class WorkflowController {
   constructor(
     private workflow: WorkflowService,
     private workflowQuery: WorkflowQueryService,
+    private workflowRunner: WorkflowRunnerService,
   ) {}
 
   @IPCInvoke('database:delete-workflow')
@@ -58,9 +60,9 @@ export class WorkflowController {
   @IPCInvoke('workflow:stop-running')
   async stopRunningWorkflow(
     @Payload()
-    [filter]: IPCInvokePayload<'workflow:stop-running'>,
+    [runnerId]: IPCInvokePayload<'workflow:stop-running'>,
   ): IPCInvokeReturn<'workflow:stop-running'> {
-    await this.workflow.stopRunningWorkflow(filter);
+    await this.workflowRunner.stopExecution(runnerId);
   }
 
   @IPCInvoke('workflow:execute')
@@ -68,7 +70,7 @@ export class WorkflowController {
     @Payload()
     [payload]: IPCInvokePayload<'workflow:execute'>,
   ): IPCInvokeReturn<'workflow:execute'> {
-    return this.workflow.execute(payload);
+    return this.workflowRunner.execute(payload);
   }
 
   @IPCInvoke('workflow:export')

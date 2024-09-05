@@ -160,7 +160,7 @@ export function generateRandomString(length = 12) {
 export function promiseWithResolver<T = void>(): PromiseWithResolver<T> {
   let reject: (reason?: any) => void = () => {};
   let resolve: (value: T | PromiseLike<T>) => void = () => {};
-  const promise = new self.Promise<T>((res, rej) => {
+  const promise = new Promise<T>((res, rej) => {
     reject = rej;
     resolve = res;
   });

@@ -53,6 +53,7 @@ const config = defineConfig({
     lib: {
       entry: [
         'src/index.ts',
+        'src/workflow-runner/worker/workflow-runner.worker.ts',
         'src/extension/extension-runner/worker/extension-command-action.worker.ts',
         'src/extension/extension-runner/worker/extension-command-view-action.worker.ts',
       ],

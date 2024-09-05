@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { WindowBaseState, WindowMessageName } from './window/WindowBase';
 import { IPCRendererSendEvent } from '#packages/common/interface/ipc-events.interface';
 import WindowDashboard from './window/WindowDashboard';
-import WindowSharedProcess from './window/WindowSharedProcess';
 import WindowCommand from './window/WindowCommand';
 import { OnAppReady } from '../common/hooks/on-app-ready.hook';
 import { GlobalShortcutService } from '../global-shortcut/global-shortcut.service';
@@ -14,13 +13,11 @@ import { sleep } from '@altdot/shared';
 interface BrowserWindowMap {
   command: WindowCommand;
   dashboard: WindowDashboard;
-  'shared-process': WindowSharedProcess;
 }
 
 const browserWindowMap = {
   command: WindowCommand,
   dashboard: WindowDashboard,
-  'shared-process': WindowSharedProcess,
 };
 
 type WindowNames = keyof BrowserWindowMap;

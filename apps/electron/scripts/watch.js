@@ -109,23 +109,6 @@ function setupExtensionPackageWatcher({ resolvedUrls }) {
   });
 }
 
-function setupSharedPackageWatcher({ resolvedUrls }) {
-  process.env.VITE_DEV_SERVER_URL = resolvedUrls.local[0];
-
-  return build({
-    mode,
-    logLevel,
-    configFile: 'packages/shared/vite.config.ts',
-    build: {
-      /**
-       * Set to {} to enable rollup watcher
-       * @see https://vitejs.dev/config/build-options.html#build-watch
-       */
-      watch: {},
-    },
-  });
-}
-
 /**
  * Dev server for Renderer package
  * This must be the first,
@@ -138,7 +121,6 @@ const rendererWatchServer = await createServer({
   configFile: 'packages/renderer/vite.config.js',
 }).then((s) => s.listen());
 
-await setupSharedPackageWatcher(rendererWatchServer);
 await setupExtensionPackageWatcher(rendererWatchServer);
 await setupPreloadPackageWatcher(rendererWatchServer);
 await setupMainPackageWatcher(rendererWatchServer);

@@ -4,4 +4,4 @@ export type WindowDashboardPages =
   | 'settings'
   | 'extensions';
 
-export type WindowNames = 'shared-process' | 'command' | 'dashboard';
+export type WindowNames = 'command' | 'dashboard';

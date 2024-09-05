@@ -18,9 +18,10 @@ export class ExtensionRunnerController {
 
   @IPCInvoke('extension:execute-command')
   executeCommand(
-    @Payload() [payload]: IPCInvokePayload<'extension:execute-command'>,
+    @Payload()
+    [payload, options]: IPCInvokePayload<'extension:execute-command'>,
   ) {
-    return this.extensionRunner.executeCommand(payload);
+    return this.extensionRunner.executeCommand(payload, options);
   }
 
   @IPCInvoke('extension:stop-running-command')

@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { BrowserWindowService } from '../browser-window/browser-window.service';
 import { WorkflowQueryService } from './workflow-query.service';
-import { WorkflowRunPayload } from '#packages/common/interface/workflow.interface';
 import { GlobalShortcutService } from '../global-shortcut/global-shortcut.service';
 import { KeyboardShortcutUtils } from '#packages/common/utils/KeyboardShortcutUtils';
 import { OnAppReady } from '../common/hooks/on-app-ready.hook';
@@ -25,20 +23,17 @@ import { APIService } from '../api/api.service';
 import { ApiExtensionHighlightItem } from '@altdot/shared';
 import { ExtensionQueryService } from '../extension/extension-query.service';
 import { WORKFLOW_LOGS_FOLDER } from '../common/utils/constant';
-import { WorkflowHistoryService } from './workflow-history/workflow-history.service';
-import { WORKFLOW_HISTORY_STATUS } from '#packages/common/utils/constant/workflow.const';
-import { WindowBaseState } from '../browser-window/window/WindowBase';
+import { WorkflowRunnerService } from '../workflow-runner/workflow-runner.service';
 
 @Injectable()
 export class WorkflowService implements OnAppReady {
   constructor(
     private logger: LoggerService,
     private apiService: APIService,
-    private browserWindow: BrowserWindowService,
     private workflowQuery: WorkflowQueryService,
+    private workflowRunner: WorkflowRunnerService,
     private extensionQuery: ExtensionQueryService,
     private globalShortcut: GlobalShortcutService,
-    private workflowHistory: WorkflowHistoryService,
   ) {}
 
   async onAppReady() {
@@ -73,7 +68,7 @@ export class WorkflowService implements OnAppReady {
                 node.data.shortcut,
               ),
               callback: () => {
-                this.execute({
+                this.workflowRunner.execute({
                   id: workflowId,
                   startNodeId: node.id,
                 });
@@ -119,29 +114,6 @@ export class WorkflowService implements OnAppReady {
     await fs.writeFile(filePath, JSON.stringify(workflowData));
   }
 
-  async execute(payload: WorkflowRunPayload) {
-    const workflow = await this.workflowQuery.get(payload.id);
-    if (!workflow) throw new Error("Couldn't find workflow");
-    if (workflow.isDisabled) return null;
-
-    await this.workflowQuery.incrementExecuteCount(payload.id);
-
-    if (payload.customElement) {
-      workflow.nodes = payload.customElement.nodes;
-      workflow.edges = payload.customElement.edges;
-    }
-
-    const windowSharedProcess = await this.browserWindow.get('shared-process');
-    return windowSharedProcess.invoke(
-      { name: 'shared-window:execute-workflow', ensureWindow: true },
-      {
-        ...payload,
-        workflow,
-        logDir: WORKFLOW_LOGS_FOLDER,
-      },
-    );
-  }
-
   async importFromFile(filePath?: string[]) {
     try {
       let workflowsFilePath = filePath;
@@ -184,42 +156,6 @@ export class WorkflowService implements OnAppReady {
       this.logger.error(['WorkflowService', 'import'], error);
       throw error;
     }
-  }
-
-  async stopRunningWorkflow(runnerId: string) {
-    const windowSharedProcess = await this.browserWindow.get('shared-process', {
-      noThrow: true,
-      autoCreate: false,
-    });
-    if (
-      !windowSharedProcess ||
-      windowSharedProcess.state === WindowBaseState.Closed
-    ) {
-      const history = await this.workflowHistory.get({ runnerId });
-      if (!history) return;
-
-      const endedAt = new Date();
-      await this.workflowHistory.updateHistory(
-        {
-          runnerId,
-        },
-        {
-          endedAt: endedAt.toISOString(),
-          status: WORKFLOW_HISTORY_STATUS.Finish,
-          duration: endedAt.getTime() - new Date(history.startedAt).getTime(),
-        },
-      );
-      return;
-    }
-
-    await windowSharedProcess.sendMessage(
-      {
-        noThrow: true,
-        ensureWindow: false,
-        name: 'shared-window:stop-execute-workflow',
-      },
-      runnerId,
-    );
   }
 
   async updateWorkflow(workflowId: string, payload: WorkflowUpdatePayload) {

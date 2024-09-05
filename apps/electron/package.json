@@ -11,8 +11,7 @@
     "email": "kholid060@gmail.com"
   },
   "scripts": {
-    "build": "pnpm run build:main && pnpm build:shared && pnpm run build:preload && pnpm build:extension && pnpm run build:renderer",
-    "build:shared": "cd ./packages/shared && vite build",
+    "build": "pnpm run build:main && pnpm run build:preload && pnpm build:extension && pnpm run build:renderer",
     "build:extension": "cd ./packages/extension && vite build",
     "build:main": "cd ./packages/main && vite build",
     "build:preload": "cd ./packages/preload && vite build",
@@ -20,12 +19,11 @@
     "compile": "cross-env MODE=production pnpm run build && electron-builder build --config electron-builder.json",
     "dev": "node scripts/watch.js",
     "lint": "eslint . --ext js,mjs,cjs,ts,mts,cts,tsx",
-    "typecheck:shared": "tsc --noEmit -p packages/shared/tsconfig.json",
     "typecheck:main": "tsc --noEmit -p packages/main/tsconfig.json",
     "rebuild": "electron-rebuild -f -w better-sqlite3",
     "typecheck:preload": "tsc --noEmit -p packages/preload/tsconfig.json",
     "typecheck:renderer": "tsc --noEmit -p packages/renderer/tsconfig.json",
-    "typecheck": "pnpm run typecheck:main && pnpm run typecheck:shared && pnpm run typecheck:preload && pnpm run typecheck:renderer",
+    "typecheck": "pnpm run typecheck:main && pnpm run typecheck:preload && pnpm run typecheck:renderer",
     "electron-postinstall": "cross-env ELECTRON_RUN_AS_NODE=1 electron scripts/update-electron-vendors.js && electron-builder install-app-deps",
     "format": "npx prettier --write \"**/*.{js,mjs,cjs,ts,mts,cts,tsx,json}\"",
     "db:generate": "drizzle-kit generate --config \"./drizzle.config.ts\""

@@ -12,7 +12,6 @@ import {
 } from '@altdot/shared';
 import { CommandLaunchBy } from '@altdot/extension/dist/interfaces/command.interface';
 import { workflows } from '../db/schema/workflow.schema';
-import { WorkflowService } from '../workflow/workflow.service';
 import { WORKFLOW_MANUAL_TRIGGER_ID } from '#packages/common/utils/constant/workflow.const';
 import { BrowserWindowService } from '../browser-window/browser-window.service';
 import { LoggerService } from '../logger/logger.service';
@@ -20,6 +19,7 @@ import path from 'path';
 import { OAuthService } from '../oauth/oauth.service';
 import { APP_DEEP_LINK_HOST } from '#packages/common/utils/constant/app.const';
 import { ExtensionRunnerService } from '../extension/extension-runner/extension-runner.service';
+import { WorkflowRunnerService } from '../workflow-runner/workflow-runner.service';
 
 function convertArgValue(argument: ExtensionCommandArgument, value: string) {
   let convertedValue: unknown = value;
@@ -42,7 +42,7 @@ export class DeepLinkService implements OnModuleInit {
     private dbService: DBService,
     private oauthService: OAuthService,
     private loggerService: LoggerService,
-    private workflowService: WorkflowService,
+    private workflowRunner: WorkflowRunnerService,
     private extensionRunner: ExtensionRunnerService,
     private browserWindowService: BrowserWindowService,
   ) {}
@@ -201,7 +201,7 @@ export class DeepLinkService implements OnModuleInit {
       }
     }
 
-    await this.workflowService.execute({
+    await this.workflowRunner.execute({
       id: workflow.id,
       startNodeId: WORKFLOW_MANUAL_TRIGGER_ID,
     });

@@ -3,6 +3,7 @@ import type { WorkflowRunPayload } from './workflow.interface';
 
 export type WorkflowRunnerRunPayload = Omit<WorkflowRunPayload, 'id'> & {
   logDir: string;
+  runnerId?: string;
   workflow: WorkflowDetailModel;
 };
 

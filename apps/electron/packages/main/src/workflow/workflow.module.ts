@@ -5,11 +5,12 @@ import { WorkflowService } from './workflow.service';
 import { ExtensionQueryService } from '../extension/extension-query.service';
 import { APIModule } from '../api/api.module';
 import { WorkflowHistoryModule } from './workflow-history/workflow-history.module';
+import { WorkflowRunnerModule } from '../workflow-runner/workflow-runner.module';
 
 @Module({
   controllers: [WorkflowController],
-  imports: [APIModule, WorkflowHistoryModule],
   exports: [WorkflowService, WorkflowQueryService],
+  imports: [APIModule, WorkflowHistoryModule, WorkflowRunnerModule],
   providers: [WorkflowService, WorkflowQueryService, ExtensionQueryService],
 })
 export class WorkflowModule {}

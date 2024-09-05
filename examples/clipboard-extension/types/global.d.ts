@@ -1,8 +1,7 @@
-declare namespace ExtensionAPI {
-  namespace ViewAction {
-    interface SyncEvent {}
-    interface AsyncEvent {
-      'test': () => void;
-    }
-  }
+interface ExtensionViewActionSyncEvent {
+  hola: [test: number]
+}
+
+interface ExtensionViewActionAsyncEvent {
+  'test': () => boolean;
 }

@@ -29,7 +29,6 @@ import type {
 } from './workflow.interface';
 import type Electron from 'electron';
 import type { MessagePortChannelIds } from './message-port-events.interface';
-import type { WorkflowRunnerRunPayload } from './workflow-runner.interace';
 import type { WindowNames } from './window.interface';
 import type {
   AppMessagePortBridgeOptions,
@@ -140,6 +139,7 @@ export interface IPCWindowEvents {
 
 export interface IPCShellEvents {
   'shell:open-url': (url: string) => void;
+  'shell:open-path': (path: string) => void;
   'shell:open-in-folder': (path: string) => void;
   'shell:move-to-trash': (path: string) => void;
 }
@@ -156,11 +156,17 @@ export interface IPCAppsEvents {
 
 export interface IPCClipboardEvents {
   'clipboard:copy': (content: string) => void;
-  'clipboard:write': (content: string) => void;
+  'clipboard:write': (
+    format: ExtensionAPI.Clipboard.ClipboardContentType,
+    content: string,
+  ) => void;
   'clipboard:paste': (content?: string) => void;
   'clipboard:has-buffer': (contentType: string) => boolean;
   'clipboard:read-buffer': (contentType: string) => string;
   'clipboard:copy-buffer': (contentType: string, content: string) => void;
+  'clipboard:read': (
+    type: ExtensionAPI.Clipboard.ClipboardContentType,
+  ) => string;
 }
 
 export interface IPCBrowserEvents {
@@ -216,6 +222,7 @@ export interface IPCExtensionEvents {
   ) => string | null;
   'extension:execute-command': (
     payload: ExtensionCommandExecutePayload,
+    options?: { waitUntilFinished?: boolean },
   ) => string | null;
   'extension:stop-running-command': (runnerId: string) => void;
   'extension:list-running-commands': () => ExtensionCommandProcess[];
@@ -355,9 +362,6 @@ export interface IPCPostMessageEventMainToRenderer {
 interface IPCInvokeEventMainToRenderer {
   'shared-window:execute-command': (
     payload: ExtensionCommandExecutePayloadWithData,
-  ) => Promise<string>;
-  'shared-window:execute-workflow': (
-    payload: WorkflowRunnerRunPayload,
   ) => Promise<string>;
 }
 
