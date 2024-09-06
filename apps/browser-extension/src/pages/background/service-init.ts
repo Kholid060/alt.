@@ -18,7 +18,7 @@ function initWebsocketService() {
   WebsocketService.instance.init();
 }
 
-export function initBackgroundService() {
-  initWebsocketService();
+export async function initBackgroundService() {
   BackgroundBrowserEventListener.instance.startListeners();
+  initWebsocketService();
 }

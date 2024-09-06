@@ -7,11 +7,16 @@ class BackgroundBrowserEventListener {
   constructor() {}
 
   startListeners() {
+    Browser.runtime.onStartup.addListener(this.onStartup);
     Browser.action.onClicked.addListener(this.onActionClicked);
   }
 
   stopListeners() {
     Browser.action.onClicked.removeListener(this.onActionClicked);
+  }
+
+  onStartup() {
+    WebsocketService.instance.tryConnect();
   }
 
   private onActionClicked() {

@@ -7,3 +7,7 @@ export function getShadowRoot(element: Element) {
 
   return chrome.dom?.openOrClosedShadowRoot(element as HTMLElement);
 }
+
+export function debugLog(...args: unknown[]) {
+  if (import.meta.env.DEV) console.log(...args);
+}

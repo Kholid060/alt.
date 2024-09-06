@@ -1,12 +1,14 @@
 import { Socket, io } from 'socket.io-client';
 import {
   APP_WEBSOCKET_PORT,
+  sleep,
   type ExtensionWSClientToServerEvents,
   type ExtensionWSServerToClientEvents,
 } from '@altdot/shared';
 import getBrowserInfo from '../utils/getBrowserInfo';
 import { websocketEventsListener } from './websocket.service-events';
 import EventEmitter from 'eventemitter3';
+import Browser from 'webextension-polyfill';
 
 interface WSEvent {
   connect: [];
@@ -22,13 +24,21 @@ class WebsocketService extends EventEmitter<WSEvent> {
     return this._instance;
   }
 
-  socket: Socket<
+  private socket: Socket<
     ExtensionWSServerToClientEvents,
     ExtensionWSClientToServerEvents
   > | null = null;
 
   constructor() {
     super();
+  }
+
+  private async startConnectInterval() {
+    if (this.socket?.connected) return;
+
+    await sleep(10_000);
+    if (!__IS_FIREFOX__) await Browser.runtime.getPlatformInfo();
+    await this.startConnectInterval();
   }
 
   async init() {
@@ -45,8 +55,11 @@ class WebsocketService extends EventEmitter<WSEvent> {
       console.log('WEBSOCKET CONNECTED');
     });
     this.socket.on('disconnect', (reason) => {
+      this.startConnectInterval();
       this.emit('disconnect', reason);
     });
+
+    this.startConnectInterval();
     websocketEventsListener(this.socket!);
   }
 
