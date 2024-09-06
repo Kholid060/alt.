@@ -2,6 +2,7 @@ import { ExtensionCommandExecutePayloadWithData } from '#packages/common/interfa
 import { BetterMessagePort, isObject } from '@altdot/shared';
 import { createExtensionAPI } from '#common/utils/extension/extension-api-factory';
 import ExtensionWorkerMessagePort from '../utils/ExtensionWorkerMessagePort';
+import forwardConsole from '/@/common/utils/forward-console';
 
 process.parentPort.once('message', async ({ data, ports }) => {
   try {
@@ -26,6 +27,12 @@ process.parentPort.once('message', async ({ data, ports }) => {
       messagePort: ports[0],
     });
 
+    Error.prepareStackTrace = (err) => {
+      if (!err.stack) return err.stack;
+
+      return err.stack.split('\n').slice(0, -1).join('\n');
+    };
+
     Object.defineProperties(global, {
       self: {
         value: global,
@@ -43,6 +50,15 @@ process.parentPort.once('message', async ({ data, ports }) => {
           messagePort: new BetterMessagePort(ports[1]),
           sendMessage: messagePort.sendMessage.bind(messagePort),
         }),
+      },
+      console: {
+        value: forwardConsole(
+          {
+            commandTitle: payload.command.title,
+            extensionTitle: payload.command.extension.title,
+          },
+          (consolePayload) => ports[1].postMessage(consolePayload),
+        ),
       },
     });
 

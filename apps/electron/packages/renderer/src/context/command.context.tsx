@@ -6,10 +6,12 @@ import { MessagePortSharedCommandWindowEvents } from '#packages/common/interface
 import { debugLog } from '#packages/common/utils/helper';
 import { ExtensionMessagePortEventAsync } from '@altdot/extension';
 import { useDialog } from '@altdot/ui';
+import { FORWARD_CONSOLE_TYPE } from '#packages/main/src/common/utils/forward-console';
 import {
   ExtensionRendererMessagePort,
   MessagePortListener,
 } from '../utils/ExtensionRendererMessagePort';
+import { forwardConsoleHandler } from '#packages/common/utils/forwardConsoleHandler';
 
 type RunnerMessagePort = ExtensionRendererMessagePort<
   ExtensionMessagePortEventAsync,
@@ -89,6 +91,11 @@ export function CommandCtxProvider({
         if (!port || !data) return;
 
         debugLog('Receive extension MessagePort', port);
+
+        port.addEventListener('message', ({ data }) => {
+          if (data.type !== FORWARD_CONSOLE_TYPE) return;
+          forwardConsoleHandler(data);
+        });
         runnerMessagePort.current.addPort(data, port);
       },
     );

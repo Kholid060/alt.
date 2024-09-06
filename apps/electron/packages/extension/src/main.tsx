@@ -18,6 +18,8 @@ import { applyTheme } from '#common/utils/helper';
 import injectComponents from './utils/injectComponents';
 import '@altdot/ui/dist/theme.css';
 import { MODULE_MAP } from './utils/constant';
+import { forwardConsoleHandler } from '#common/utils/forwardConsoleHandler';
+import { FORWARD_CONSOLE_TYPE } from '../../main/src/common/utils/forward-console';
 
 declare global {
   interface Window {
@@ -33,7 +35,7 @@ type ExtensionMessagePort = BetterMessagePort<
 async function injectExtensionAPI({
   messagePort,
   viewActionPort,
-  payload: { browserCtx, platform },
+  payload: { browserCtx, platform, command },
 }: {
   viewActionPort?: MessagePort;
   messagePort: ExtensionMessagePort;
@@ -47,6 +49,17 @@ async function injectExtensionAPI({
     }
     isLoaded();
   });
+
+  if (viewActionPort) {
+    viewActionPort.addEventListener('message', ({ data }) => {
+      if (data.type !== FORWARD_CONSOLE_TYPE) return;
+      forwardConsoleHandler({
+        ...data,
+        commandTitle: command.title,
+        extensionTitle: command.extension.title,
+      });
+    });
+  }
 
   const extensionAPI = createExtensionAPI({
     platform,

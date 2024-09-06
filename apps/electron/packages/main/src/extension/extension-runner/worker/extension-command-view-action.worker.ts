@@ -1,5 +1,6 @@
 import { ExtensionCommandViewActionPayload } from '#packages/common/interface/extension.interface';
 import { BetterMessagePort, isObject } from '@altdot/shared';
+import forwardConsole from '/@/common/utils/forward-console';
 
 process.parentPort.once('message', async ({ data, ports }) => {
   let port: Electron.MessagePortMain | null = null;
@@ -21,6 +22,13 @@ process.parentPort.once('message', async ({ data, ports }) => {
     const payload = data.payload as ExtensionCommandViewActionPayload;
     port = ports[0];
 
+    Error.prepareStackTrace = (err) => {
+      if (!err.stack) return err.stack;
+      console.log(err.stack);
+
+      return err.stack.split('\n').slice(0, -3).join('\n');
+    };
+
     Object.defineProperties(global, {
       self: {
         value: global,
@@ -35,6 +43,15 @@ process.parentPort.once('message', async ({ data, ports }) => {
         writable: false,
         enumerable: false,
         configurable: false,
+      },
+      console: {
+        value: forwardConsole(
+          {
+            commandTitle: '',
+            extensionTitle: '',
+          },
+          (consolePayload) => port?.postMessage(consolePayload),
+        ),
       },
     });
 
