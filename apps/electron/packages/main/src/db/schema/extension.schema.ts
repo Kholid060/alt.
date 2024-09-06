@@ -1,4 +1,5 @@
 import type { CredentialType } from '#common/interface/credential.interface';
+import { ExtensionCommandMetadata } from '#packages/common/interface/extension.interface';
 import type {
   ExtensionCommand,
   ExtensionCommandArgument,
@@ -63,7 +64,7 @@ export const extensionsRelations = relations(extensions, ({ many }) => ({
 }));
 
 export const extensionCommands = sqliteTable('extension_commands', {
-  // extensionId:commandName
+  // id => extensionId:commandName
   id: text('id').primaryKey(),
   shortcut: text('shortcut').unique(),
   icon: text('icon'),
@@ -90,6 +91,9 @@ export const extensionCommands = sqliteTable('extension_commands', {
     .notNull()
     .references(() => extensions.id, { onDelete: 'cascade' }),
   dismissAlert: integer('dismiss_alert', { mode: 'boolean' }),
+  metadata: text('metadata', {
+    mode: 'json',
+  }).$type<ExtensionCommandMetadata>(),
 });
 export type NewExtensionCommand = typeof extensionCommands.$inferInsert;
 export type SelectExtensionCommand = typeof extensionCommands.$inferSelect;

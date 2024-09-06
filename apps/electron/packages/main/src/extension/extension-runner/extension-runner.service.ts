@@ -68,6 +68,7 @@ export class ExtensionRunnerService implements OnModuleInit {
           }
         } else if (
           payload.command.type === 'script' &&
+          payload.command.metadata?.scriptHasView &&
           payload.launchContext.launchBy !== CommandLaunchBy.WORKFLOW
         ) {
           const commandJSON = CommandJSONValidation.safeParse(

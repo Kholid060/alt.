@@ -9,6 +9,7 @@ import {
 import WorkflowRunner from './runner/WorkflowRunner';
 import * as nodeHandlersClasses from './node-handler';
 import { WorkflowRunnerMessagePort } from '../interfaces/workflow-runner.interface';
+import { debugLog } from '#packages/common/utils/helper';
 
 export interface WorkflowRunnerExecuteOptions extends WorkflowRunnerRunPayload {
   onFinish?(
@@ -53,6 +54,8 @@ class WorkflowRunnerManager {
       return acc;
     }, {}) as NodeHandlersObj;
 
+    debugLog('Executing workflow:', workflow.name, runnerId);
+
     const runner = new WorkflowRunner({
       ...rest,
       logDir,
@@ -86,6 +89,8 @@ class WorkflowRunnerManager {
         reason,
         startedAt: runner.startedAt,
       });
+
+      debugLog('Finish workflow execution:', workflow.name, runnerId);
 
       if (onFinish) await onFinish(runner, reason);
     });

@@ -55,10 +55,14 @@ export const mapManifestToDB = {
     icon,
     title,
     config,
+    hasView,
     subtitle,
     description,
     arguments: commandArguments,
-  }: ExtensionCommand): Omit<NewExtensionCommand, 'extensionId' | 'id'> {
+  }: ExtensionCommand & { hasView?: boolean }): Omit<
+    NewExtensionCommand,
+    'extensionId' | 'id'
+  > {
     return {
       name,
       icon,
@@ -68,6 +72,7 @@ export const mapManifestToDB = {
       subtitle,
       description,
       arguments: commandArguments,
+      metadata: { scriptHasView: hasView },
     };
   },
 };

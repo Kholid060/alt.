@@ -152,7 +152,7 @@ export class WorkflowRunnerService {
 
     await this.ensureWorker();
 
-    const runnerId = nanoid();
+    const runnerId = nanoid(5);
     const [history] = await this.workflowHistory.insertHistory({
       runnerId,
       workflowId: workflow.id,

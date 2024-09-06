@@ -1,0 +1,1 @@
+ALTER TABLE `extension_commands` ADD `metadata` text;

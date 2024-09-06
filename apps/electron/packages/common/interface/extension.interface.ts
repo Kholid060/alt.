@@ -96,3 +96,7 @@ export interface ExtensionCommandViewExecutePayload
   extends ExtensionCommandExecutePayloadWithData {
   runnerId: string;
 }
+
+export interface ExtensionCommandMetadata {
+  scriptHasView?: boolean;
+}
