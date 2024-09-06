@@ -65,7 +65,7 @@ You can write the script command in any supported language, unlike the View and 
 
 And because the script command is just a script that runs on the user's computer, whether the script can be run depends on whether the language is installed. For example, when the extension has a [Python](https://www.python.org/) script, but the user doesn't have Python installed, the app will throw an error when the user tries to run the script command.
 
-The script command can show the user interface to the Command Bar by outputting [JSON view](/reference/command-json-output/). For example,
+The script command can show the user interface to the Command Bar by outputting [JSON view](/reference/command-json-output/) and `hasView` is `true` in [the manifest](/extensions/manifest/#command-script-type-additional-properties). For example,
 
 ```js
 // script.js

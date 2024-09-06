@@ -278,6 +278,39 @@ export const commandProps = [
   </tbody>
 </table>
 
+### Command `script` type Additional Properties
+
+export const scriptCommandProps = [
+  {
+    name: 'hasScript',
+    type: <code>?boolean</code>,
+    description: <p>Whether the script return <a href="/reference/command-json-output/">Command JSON output</a></p>,
+  },
+];
+
+<table style="display: table; width: 100%">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th style="min-width: 100px">Type</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {scriptCommandProps.map((prop) => (
+      <tr key={prop.name}>
+        <td>{prop.name}</td>
+        <td>
+          {prop.type}
+        </td>
+        <td>
+          {prop.description}
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
 ## Config Properties
 
 export const configProps = [

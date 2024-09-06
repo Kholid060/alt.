@@ -117,6 +117,7 @@ export default {
       name: 'javascript.js',
       title: 'JavaScript',
       type: 'script',
+      hasView: true,
       arguments: [
         {
           name: 'test',
