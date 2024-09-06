@@ -11,10 +11,22 @@ export declare namespace Sqlite {
   }
 
   abstract class Database {
+    abstract close(): Promise<void>;
+    abstract execute(sql: string): void;
     abstract sql<T = unknown>(sql: string): Statement<T>;
   }
 
+  interface OpenOptions {
+    path: string;
+  }
+
   interface Static {
+    // @ext-api-value
+    exec(sql: string): Promise<void>;
+
+    // @ext-api-value
+    open(options: OpenOptions): Database;
+
     // @ext-api-value
     sql<T = unknown>(sql: string): Statement<T>;
   }

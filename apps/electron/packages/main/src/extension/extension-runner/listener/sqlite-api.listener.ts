@@ -21,4 +21,34 @@ export class ExtensionSqliteApiListener {
 
     return Promise.resolve(result);
   }
+
+  @OnExtensionAPI('sqlite.execute')
+  execute({
+    context: { extensionId },
+    args: [{ sql, dbPath }],
+  }: ExtensionApiEvent<'sqlite.execute'>) {
+    this.extensionSqlite.execute(extensionId, sql, dbPath);
+    return Promise.resolve();
+  }
+
+  @OnExtensionAPI('sqlite.openDb')
+  openDB({
+    context: { extensionId },
+    args: [dbPath],
+  }: ExtensionApiEvent<'sqlite.openDb'>) {
+    if (!dbPath) return Promise.reject('Missing DB Path');
+
+    this.extensionSqlite.openDatabase(extensionId, dbPath);
+
+    return Promise.resolve();
+  }
+
+  @OnExtensionAPI('sqlite.closeDb')
+  closeDB({
+    context: { extensionId },
+    args: [dbPath],
+  }: ExtensionApiEvent<'sqlite.closeDb'>) {
+    this.extensionSqlite.closeDB(extensionId, dbPath);
+    return Promise.resolve();
+  }
 }

@@ -18,7 +18,10 @@ import type { ExtensionBrowserTabContext } from '../../interface/extension.inter
 import { APP_ICON_DIR_PREFIX } from '../../utils/constant/app.const';
 import { OAuthPKCEClient } from './extension-oauth-client';
 import { ExtensionBrowserTab } from './extension-browser-api';
-import { createSqliteStatement } from './extension-sqlite-utils';
+import {
+  createExtensionSqliteDB,
+  createSqliteStatement,
+} from './extension-sqlite-utils';
 
 export interface CreateExtensionAPI {
   context?: unknown;
@@ -215,10 +218,12 @@ function extensionSqlite({
   sendMessage,
 }: Pick<CreateExtensionAPI, 'sendMessage'>): Pick<
   ExtensionAPIValues,
-  'sqlite.sql'
+  'sqlite.sql' | 'sqlite.exec' | 'sqlite.open'
 > {
   return {
+    'sqlite.exec': (sql) => sendMessage('sqlite.execute', { sql }),
     'sqlite.sql': (sql) => createSqliteStatement(sql, { sendMessage }),
+    'sqlite.open': (options) => createExtensionSqliteDB(options, sendMessage),
   };
 }
 

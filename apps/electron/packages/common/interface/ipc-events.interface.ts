@@ -111,6 +111,12 @@ export interface IPCUserExtensionCustomEventsMap {
     params: unknown[];
     method: 'get' | 'all' | 'run';
   }) => Promise<unknown>;
+  'sqlite.execute': (options: {
+    sql: string;
+    dbPath?: string;
+  }) => Promise<void>;
+  'sqlite.openDb': (dbPath: string) => Promise<void>;
+  'sqlite.closeDb': (dbPath: string) => Promise<void>;
 }
 
 export type IPCUserExtensionEventsMap = FlatActionExtensionAPI &

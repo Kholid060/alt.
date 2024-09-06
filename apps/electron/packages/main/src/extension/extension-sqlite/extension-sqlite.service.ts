@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import Database from 'better-sqlite3';
+import Database, { type Database as DatabaseType } from 'better-sqlite3';
 import path from 'path';
 import fs from 'fs-extra';
 import { ExtensionError } from '#packages/common/errors/custom-errors';
@@ -9,8 +9,11 @@ type SqliteDatabase = ReturnType<typeof Database>;
 
 const BASE_EXT_DB_PATH = path.join(DATABASE_FOLDER, 'extensions');
 
-const MAX_DB_IDLE_MS = 60_000; // 60 seconds
+const MAX_DB_IDLE_MS = 5 * 60 * 1000; // 5 minutes
 const CHECK_CONNECTION_INTERVAL_MS = 60_000; // 60 seconds
+
+const getDBKey = (extensionId: string, dbPath?: string) =>
+  dbPath ? `${extensionId}:${dbPath}` : extensionId;
 
 @Injectable()
 export class ExtensionSqliteService implements OnModuleInit {
@@ -46,6 +49,22 @@ export class ExtensionSqliteService implements OnModuleInit {
     fs.ensureDirSync(BASE_EXT_DB_PATH);
   }
 
+  openDatabase(extensionId: string, dbPath?: string): DatabaseType {
+    const dbKey = getDBKey(extensionId, dbPath);
+    let database = this.DBs[dbKey]?.database;
+    if (!database) {
+      database = dbPath
+        ? new Database(dbPath, { fileMustExist: true })
+        : new Database(path.join(BASE_EXT_DB_PATH, extensionId));
+      this.DBs[dbKey] = {
+        database,
+        lastQueryTime: Date.now(),
+      };
+    }
+
+    return database;
+  }
+
   query(
     extensionId: string,
     {
@@ -60,20 +79,11 @@ export class ExtensionSqliteService implements OnModuleInit {
       method: 'get' | 'all' | 'run';
     },
   ) {
-    let database =
-      this.DBs[dbPath ? `${extensionId}:${dbPath}` : extensionId]?.database;
-    if (!database) {
-      database = dbPath
-        ? new Database(dbPath, { fileMustExist: true })
-        : new Database(path.join(BASE_EXT_DB_PATH, extensionId));
-      this.DBs[extensionId] = {
-        database,
-        lastQueryTime: Date.now(),
-      };
-    }
+    const database = this.openDatabase(extensionId, dbPath);
+    const dbKey = getDBKey(extensionId, dbPath);
 
     this.checkConnections();
-    this.DBs[extensionId].lastQueryTime = Date.now();
+    this.DBs[dbKey].lastQueryTime = Date.now();
 
     try {
       const dbQuery = database.prepare(query);
@@ -83,15 +93,21 @@ export class ExtensionSqliteService implements OnModuleInit {
     }
   }
 
-  closeDB(extensionId: string) {
-    if (!this.DBs[extensionId]) return;
+  closeDB(extensionId: string, dbPath?: string) {
+    const dbKey = getDBKey(extensionId, dbPath);
+    if (!this.DBs[dbKey]) return;
 
-    this.DBs[extensionId].database.close();
-    delete this.DBs[extensionId];
+    this.DBs[dbKey].database.close();
+    delete this.DBs[dbKey];
 
     if (Object.keys(this.DBs).length === 0 && this.checkConnectionInterval) {
       clearInterval(this.checkConnectionInterval);
     }
+  }
+
+  execute(extensionId: string, sql: string, dbPath?: string) {
+    const database = this.openDatabase(extensionId, dbPath);
+    database.exec(sql);
   }
 
   async deleteDB(extensionId: string) {
