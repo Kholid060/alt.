@@ -108,6 +108,7 @@ export const ExtensionCommandSchema = z.discriminatedUnion('type', [
   ExtensionCommandBase.merge(
     z.object({
       type: z.literal('script'),
+      hasView: z.boolean().optional(),
     }),
   ),
 ]);
