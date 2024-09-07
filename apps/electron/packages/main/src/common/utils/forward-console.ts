@@ -30,13 +30,13 @@ function forwardConsole(
       consoleKeys.map((key) => [
         key,
         (...args: unknown[]) => {
+          if (import.meta.env.DEV) originalConsole[key](...args);
           sendMessage({
             args,
             level: key,
             type: FORWARD_CONSOLE_TYPE,
             ...additionalProps,
           });
-          originalConsole[key](...args);
         },
       ]),
     ),

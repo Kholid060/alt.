@@ -1,5 +1,5 @@
 import Store from 'electron-store';
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { AppSettings } from '#packages/common/interface/app.interface';
 import { app, nativeTheme } from 'electron';
 import { APP_DEFAULT_SETTINGS } from '/@/common/config/app.config';
@@ -11,7 +11,10 @@ export interface AppStoreData {
 }
 
 @Injectable()
-export class AppStoreService extends Store<AppStoreData> {
+export class AppStoreService
+  extends Store<AppStoreData>
+  implements OnModuleInit
+{
   constructor(private browserWindow: BrowserWindowService) {
     super({
       defaults: {
@@ -41,6 +44,10 @@ export class AppStoreService extends Store<AppStoreData> {
     });
   }
 
+  onModuleInit() {
+    nativeTheme.themeSource = this.get('settings.theme') ?? 'system';
+  }
+
   getSettings<T extends keyof AppSettings>(key?: T): AppSettings;
   getSettings<T extends keyof AppSettings>(key: T): AppSettings[T];
   getSettings<T extends keyof AppSettings>(key?: T) {
@@ -65,6 +72,9 @@ export class AppStoreService extends Store<AppStoreData> {
       app.setLoginItemSettings({
         openAtLogin: settings.startup,
       });
+    }
+    if (Object.hasOwn(settings, 'theme')) {
+      nativeTheme.themeSource = settings.theme!;
     }
 
     const updatedSettings: AppSettings = {

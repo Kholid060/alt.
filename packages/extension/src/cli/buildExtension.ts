@@ -47,13 +47,18 @@ async function buildCommands(watch = false) {
       'process.env.NODE_ENV': `'${process.env.NODE_ENV}'`,
     },
     publicDir: './public',
-    esbuild: watch
-      ? {
-          keepNames: true,
-          minifyWhitespace: true,
-          minifyIdentifiers: true,
-        }
-      : undefined,
+    esbuild: {
+      supported: {
+        'top-level-await': true,
+      },
+      ...(watch
+        ? {
+            keepNames: true,
+            minifyWhitespace: true,
+            minifyIdentifiers: true,
+          }
+        : {}),
+    },
     build: {
       minify: watch ? false : 'esbuild',
       outDir: OUT_DIR,

@@ -1,8 +1,7 @@
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
-import { UiIcons, UiImage } from '@altdot/ui';
+import { UiIcons } from '@altdot/ui';
 import { LucideIcon, TriangleAlertIcon } from 'lucide-react';
-import { useRef, useState } from 'react';
-import { useIsDarkTheme } from '/@/hooks/useTheme';
+import { useState } from 'react';
 
 const iconPrefix = 'icon:';
 
@@ -19,10 +18,6 @@ function UiExtensionIcon({
   extensionIcon?: boolean;
   iconWrapper?: (icon: LucideIcon) => React.ReactNode;
 }) {
-  const isDarkTheme = useIsDarkTheme();
-
-  const hasTriedDarkIcon = useRef(false);
-
   const [imageError, setImageError] = useState(false);
 
   if (icon.startsWith(iconPrefix)) {
@@ -41,33 +36,28 @@ function UiExtensionIcon({
     return iconWrapper ? iconWrapper(TriangleAlertIcon) : <TriangleAlertIcon />;
   }
 
+  const imgSrc = extensionIcon
+    ? `${CUSTOM_SCHEME.extension}://${id}/icon/${icon}`
+    : icon;
+
   return (
-    <UiImage
-      src={
-        extensionIcon
-          ? `${CUSTOM_SCHEME.extension}://${id}/icon/${isDarkTheme && !hasTriedDarkIcon.current ? `${icon}@dark` : icon}`
-          : icon
-      }
-      onError={(event) => {
-        const target = event.target as HTMLImageElement;
-        if (isDarkTheme) {
-          if (target.src.includes('@dark')) {
-            target.src = target.src.replaceAll('@dark', '');
-            hasTriedDarkIcon.current = true;
-          } else if (!hasTriedDarkIcon.current) {
-            target.src = target.src + '@dark';
-            hasTriedDarkIcon.current = true;
+    <picture>
+      <source media="(prefers-color-scheme: dark)" srcSet={imgSrc + '@dark'} />
+      <img
+        src={imgSrc}
+        alt={alt}
+        onError={(event) => {
+          const img = event.target as HTMLImageElement;
+          if (img.currentSrc.includes('@dark')) {
+            if (img.previousElementSibling?.tagName === 'SOURCE') {
+              img.previousElementSibling.remove();
+            }
           } else {
             setImageError(true);
           }
-        } else if (target.src.includes('@dark')) {
-          target.src = target.src.replaceAll('@dark', '');
-        } else {
-          setImageError(true);
-        }
-      }}
-      alt={alt}
-    />
+        }}
+      />
+    </picture>
   );
 }
 
