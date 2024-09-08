@@ -1,6 +1,5 @@
 import { ExtensionCommandViewActionPayload } from '#packages/common/interface/extension.interface';
 import { BetterMessagePort, isObject } from '@altdot/shared';
-import forwardConsole from '/@/common/utils/forward-console';
 
 process.parentPort.once('message', async ({ data, ports }) => {
   let port: Electron.MessagePortMain | null = null;
@@ -43,15 +42,6 @@ process.parentPort.once('message', async ({ data, ports }) => {
         writable: false,
         enumerable: false,
         configurable: false,
-      },
-      console: {
-        value: forwardConsole(
-          {
-            commandTitle: '',
-            extensionTitle: '',
-          },
-          (consolePayload) => port?.postMessage(consolePayload),
-        ),
       },
     });
 

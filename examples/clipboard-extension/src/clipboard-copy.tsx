@@ -158,7 +158,7 @@ export default async function CommandMain(context: CommandLaunchContext) {
   // await _extension.storage.set('test', 'hello world');
   // await _extension.shell.showItemInFolder(filePath);
 
-  console.log(process.env);
+  console.log('Hello world');
   // const [googleTab] = await _extension.browser.tabs.query({ url: '*://*.google.com/' });
   // if (!googleTab) throw new Error('missing google tab');
   // await googleTab.type(`textarea[name="q"]`, 'Hello world\ntestst', { delay: 10, clearValue: true });

@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
-import buildExtension from './buildExtension';
+import ExtensionBuilder from './extension-builder/ExtensionBuilder';
 
 const program = new Command();
 
 program
   .command('build')
   .option('-w, --watch', '[boolean] rebuilds when modules have changed on disk')
-  .action((name) => {
-    buildExtension(Boolean(name.watch));
+  .action(async (name) => {
+    const builder = new ExtensionBuilder(Boolean(name.watch));
+    await builder.init();
   });
 
 program.parse();

@@ -1,5 +1,5 @@
 import type { CredentialType } from '#common/interface/credential.interface';
-import { ExtensionCommandMetadata } from '#packages/common/interface/extension.interface';
+import { ExtensionCommandMetadata } from '#common/interface/extension.interface';
 import type {
   ExtensionCommand,
   ExtensionCommandArgument,

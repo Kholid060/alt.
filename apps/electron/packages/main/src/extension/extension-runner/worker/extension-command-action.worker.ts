@@ -1,8 +1,7 @@
 import { ExtensionCommandExecutePayloadWithData } from '#packages/common/interface/extension.interface';
-import { BetterMessagePort, isObject } from '@altdot/shared';
+import { BetterMessagePort, isObject, sleep } from '@altdot/shared';
 import { createExtensionAPI } from '#common/utils/extension/extension-api-factory';
 import ExtensionWorkerMessagePort from '../utils/ExtensionWorkerMessagePort';
-import forwardConsole from '/@/common/utils/forward-console';
 
 process.parentPort.once('message', async ({ data, ports }) => {
   try {
@@ -51,15 +50,6 @@ process.parentPort.once('message', async ({ data, ports }) => {
           sendMessage: messagePort.sendMessage.bind(messagePort),
         }),
       },
-      console: {
-        value: forwardConsole(
-          {
-            commandTitle: payload.command.title,
-            extensionTitle: payload.command.extension.title,
-          },
-          (consolePayload) => ports[1].postMessage(consolePayload),
-        ),
-      },
     });
 
     const { default: commandFunction } = await import(
@@ -70,6 +60,10 @@ process.parentPort.once('message', async ({ data, ports }) => {
     }
 
     const value = await commandFunction(payload.launchContext);
+
+    // flush console fetch
+    if (payload.command.extension.isLocal) await sleep(100);
+
     process.parentPort.postMessage({ type: 'finish', value });
   } catch (error) {
     console.error(error);

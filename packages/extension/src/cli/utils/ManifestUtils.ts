@@ -94,16 +94,19 @@ class ManifestUtils {
       manifestObject = script.mod.default ?? null;
     }
 
-    return manifestObject;
+    return { path: manifestFilePath, data: manifestObject };
   }
 
-  async getExtensionManifest(): Promise<ExtensionManifest> {
+  async getExtensionManifest(): Promise<{
+    path: string;
+    data: ExtensionManifest;
+  }> {
     const manifestFile = await this.resolveExtensionManifest();
     const manifest = await ExtensionManifestSchema.merge(
       z.object({
         $apiVersion: z.string().optional(),
       }),
-    ).safeParseAsync(manifestFile);
+    ).safeParseAsync(manifestFile.data);
     if (!manifest.success) {
       throw logger.error(
         fromZodError(manifest.error, {
@@ -131,7 +134,10 @@ class ManifestUtils {
       }),
     );
 
-    return manifest.data as ExtensionManifest;
+    return {
+      path: manifestFile.path,
+      data: manifest.data as ExtensionManifest,
+    };
   }
 
   writeManifestFile(manifest: ExtensionManifest) {

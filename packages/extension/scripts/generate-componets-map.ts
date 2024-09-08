@@ -64,7 +64,6 @@ async function main() {
 
   const template = `/* eslint-disable */\n// GENERATED FILE\n\n${componentTemplate.import.join('\n')}\n\n${componentTemplate.export.join('\n')}\n\n${componentTemplate.exportType.join('\n')}\n`;
   const componentMapPath = path.join(SRC_PATH, 'components/components-map.ts');
-  console.log(path.resolve(componentMapPath));
 
   await fs.writeFile(componentMapPath, template);
 }
