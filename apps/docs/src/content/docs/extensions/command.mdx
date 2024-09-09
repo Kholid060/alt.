@@ -4,7 +4,7 @@ sidebar:
   order: 3
 ---
 
-import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Tabs, TabItem, FileTree } from '@astrojs/starlight/components';
 
 ## Command Type
 
@@ -39,12 +39,30 @@ function Component() {
   );
 }
 
+
 export default Component;
 ```
 
+#### View Command Action
+
+Because the command view doesn't have access to Node.JS API, you need to add an action for the command view. To add an action file, you only need to create a new file where the file name is the same as the view command but you must add the `.action` suffix for the action file. For example, `search-files.tsx` and the action file would be `search-files.action.ts`.
+
+<FileTree>
+
+- src
+  - search-files.tsx
+  - search-files.action.ts
+- manifest.ts
+- package.JSON
+- README.md
+
+</FileTree>
+
+Inside the action file, you can only access the [`viewAction`](/reference/extension-api/viewaction) API.
+
 ### Action Command
 
-Opposite of the view command, the action type command doesn't return view whatsoever. This command type runs in the background, and because it runs as a [Web Worker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers), you can only use [Extension APIs](/reference/extension-api/) and [APIs](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Functions_and_classes_available_to_workers) that the Web Worker supports.
+Opposite of the view command, the action type command doesn't return view whatsoever. This command type runs in the background, and run in [Node.js](https://nodejs.org) environment meaning that you access [Node.js API](https://nodejs.org/docs/latest/api/). 
 
 ```ts
 // action-command.ts

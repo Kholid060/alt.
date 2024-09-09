@@ -2,7 +2,7 @@
 title: storage
 ---
 
-Enables extensions to store and retrieve data. The extension must have the `storage` permission to use this API.
+Enables extensions to store and retrieve data.
 
 The storage API has two storage areas you can use: `local` and `secure`, where the value on the `secure` area will be encrypted using the electron [`safeStorage`](https://www.electronjs.org/docs/latest/api/safe-storage) API before it gets stored.
 

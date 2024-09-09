@@ -5,7 +5,7 @@ sidebar:
 ---
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
-import { EXTENSION_CATEGORIES, EXTENSION_COMMAND_TYPE, EXTENSION_PERMISSIONS, EXTENSION_CONFIG_TYPE, EXTENSION_COMMAND_ARGUMENT_TYPE } from '@altdot/shared';
+import { EXTENSION_CATEGORIES, EXTENSION_COMMAND_TYPE, EXTENSION_CONFIG_TYPE, EXTENSION_COMMAND_ARGUMENT_TYPE } from '@altdot/shared';
 
 export const iconDescription = <>
   Name of the image file in the <code>public/icon</code> folder. The image must be PNG and have 512x512 dimensions.
@@ -180,11 +180,6 @@ export const manifestProps = [
     name: 'config',
     type: <code><a href="#config-properties">?Config</a>[]</code>,
     description: <>List of the extension configuration</>,
-  },
-  {
-    name: 'permissions',
-    type: <code><a href="#permissions">?Permissions</a>[]</code>,
-    description: 'List of Extension API permissions that the extension wants to have access to',
   },
 ]
 
@@ -541,15 +536,5 @@ Here are some categories that you can put in the extension manifest:
 <ul>
   {EXTENSION_CATEGORIES.map((category) => (
     <li key={category}>{category}</li>
-  ))}
-</ul>
-
-## Permissions
-
-Available permissions:
-
-<ul>
-  {EXTENSION_PERMISSIONS.map((permission) => (
-    <li key={permission}><code>{permission}</code></li>
   ))}
 </ul>

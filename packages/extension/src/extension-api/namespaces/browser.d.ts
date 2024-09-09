@@ -80,7 +80,10 @@ export declare namespace Browser.Tabs {
 
     selectElement(
       options?: SelectElementOptions,
-    ): Promise<{ selector: string; canceled: boolean }>;
+    ): Promise<
+      | { selector: string; el: null; canceled: true }
+      | { selector: string; el: ElementHandle; canceled: false }
+    >;
 
     reload(): Promise<void>;
 

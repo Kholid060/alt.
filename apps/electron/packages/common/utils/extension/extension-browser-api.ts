@@ -51,15 +51,23 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
     });
   }
 
-  selectElement(
+  async selectElement(
     options?: ExtensionAPI.Browser.Tabs.SelectElementOptions,
-  ): Promise<{ selector: string; canceled: boolean }> {
-    return this.#sendAction({
+  ): ReturnType<ExtensionAPI.Browser.Tabs.Tab['selectElement']> {
+    const result = await this.#sendAction({
       name: 'tabs:select-element',
       browserId: this.#tabDetail.browserId,
       timeout: 10 * 60 * 1000, // 10 minutes
       args: [{ tabId: this.id }, options ?? {}],
     });
+
+    return result.canceled
+      ? { canceled: true, el: null, selector: '' }
+      : {
+          canceled: false,
+          el: this.#createElementHandle({ selector: result.selector }),
+          selector: result.selector,
+        };
   }
 
   reload(): Promise<void> {

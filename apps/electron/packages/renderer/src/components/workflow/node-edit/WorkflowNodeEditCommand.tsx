@@ -96,7 +96,7 @@ function CommandArgs({ data }: { data: WorkflowNodeCommand['data'] }) {
         return (
           <li key={data.extension.id + arg.name + index}>
             <WorkflowUiFormExpression
-              label={arg.title}
+              label={arg.title + (arg.required ? '' : ' (optional)')}
               labelId={arg.name}
               data={data.$expData ?? {}}
               path={`argsValue.${arg.name}`}

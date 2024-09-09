@@ -2,7 +2,7 @@
 title: command
 ---
 
-Launch or update the extension command. The extension must have the `command` permission to use this API.
+Launch or update the extension command.
 
 ## Functions
 

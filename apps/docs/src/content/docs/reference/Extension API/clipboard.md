@@ -2,7 +2,7 @@
 title: clipboard
 ---
 
-Interact with the system clipboard. To use this API, the extension must have the `clipboard` permission.
+Interact with the system clipboard.
 
 ## Functions
 

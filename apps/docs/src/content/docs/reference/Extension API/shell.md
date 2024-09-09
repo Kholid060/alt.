@@ -2,7 +2,7 @@
 title: shell
 ---
 
-Provides functions related to desktop integration. The extension must have the `shell` permission to use this API.
+Provides functions related to desktop integration.
 
 ## Functions
 

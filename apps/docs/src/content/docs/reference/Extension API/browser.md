@@ -2,7 +2,7 @@
 title: browser
 ---
 
-Interact with the browser. The extension must have the `browser` permission to use this API.
+Interact with the browser.
 
 ## Functions
 
