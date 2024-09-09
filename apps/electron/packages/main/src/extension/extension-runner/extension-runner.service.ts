@@ -27,7 +27,7 @@ import ExtensionRunnerCommandAction from './runner/ExtensionRunnerCommandAction'
 import ExtensionRunnerBase from './runner/ExtensionRunnerBase';
 import { ExtensionRunnerExecutionService } from './extension-runner-execution.service';
 import ExtensionRunnerCommandScript from './runner/ExtensionRunnerCommandScript';
-import ExtensionRunnerCommandView from './runner/ExtensionRunnerCommandViewAction';
+import ExtensionRunnerCommandView from './runner/ExtensionRunnerCommandView';
 
 @Injectable()
 export class ExtensionRunnerService implements OnModuleInit {

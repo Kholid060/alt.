@@ -17,4 +17,9 @@ export class CustomProtocolController {
   handleExtensionProtocol(@Payload() [req]: [GlobalRequest]) {
     return this.customProtocolService.handleExtensionProtocol(req);
   }
+
+  @CustomProtocol(CUSTOM_SCHEME.imagePreview, { privilege: { standard: true } })
+  handleImagePreview(@Payload() [req]: [GlobalRequest]) {
+    return this.customProtocolService.handleImagePreview(req);
+  }
 }

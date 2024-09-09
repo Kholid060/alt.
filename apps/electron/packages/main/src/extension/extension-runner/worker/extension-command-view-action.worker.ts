@@ -23,8 +23,6 @@ process.parentPort.once('message', async ({ data, ports }) => {
 
     Error.prepareStackTrace = (err) => {
       if (!err.stack) return err.stack;
-      console.log(err.stack);
-
       return err.stack.split('\n').slice(0, -3).join('\n');
     };
 

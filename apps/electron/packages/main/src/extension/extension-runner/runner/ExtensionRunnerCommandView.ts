@@ -32,6 +32,7 @@ class ExtensionRunnerCommandView implements ExtensionRunnerBase {
     if (fs.existsSync(viewActionFilePath)) {
       const messageChannel = new MessageChannelMain();
       actionMessagePort = messageChannel.port1;
+
       this.process = utilityProcess.fork(
         path.join(__DIRNAME, './extension-command-view-action.worker.js'),
         [],

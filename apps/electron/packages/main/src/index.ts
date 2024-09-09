@@ -1,11 +1,12 @@
 import { AppModule } from './app.module';
 import ElectronLogger from './common/utils/ElectronLogger';
 import ElectronNest from './ElectronNest';
-import { Menu, app } from 'electron';
+import { Menu, app, protocol } from 'electron';
 import updater from 'electron-updater';
 import { APP_USER_MODEL_ID } from '@altdot/shared';
 import { devtoolsExtInstaller } from './common/utils/devtools-ext-installer';
 import { applySecurity } from './common/utils/security-restrictions';
+import { CUSTOM_SCHEME } from '#packages/common/utils/constant/constant';
 
 ElectronLogger._instance.log('Starting app');
 

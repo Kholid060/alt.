@@ -1,4 +1,5 @@
 import fs from 'fs-extra';
+import path from 'path';
 import { APP_ICON_DIR_PREFIX } from '#packages/common/utils/constant/app.const';
 import { CUSTOM_SCHEME } from '#packages/common/utils/constant/constant';
 import { Injectable } from '@nestjs/common';
@@ -32,7 +33,7 @@ export class CustomProtocolService {
       const appId = filePath.slice(APP_ICON_DIR_PREFIX.length + 1);
       const appIcon = await this.installedApps.getAppIcon(appId);
       if (appIcon) return new Response(appIcon.toPNG());
-    } else if (!fs.existsSync(filePath)) {
+    } else if (fs.existsSync(filePath)) {
       const fileIcon = await app.getFileIcon(decodeURIComponent(filePath), {
         size: 'normal',
       });
@@ -79,6 +80,25 @@ export class CustomProtocolService {
       code: 'not-found',
       message: 'Not found',
     });
+  }
+
+  async handleImagePreview(req: GlobalRequest) {
+    const filePath = decodeURIComponent(
+      req.url.slice(`${CUSTOM_SCHEME.imagePreview}://`.length),
+    );
+    const extName = path.extname(filePath);
+    if (
+      !fs.existsSync(filePath) ||
+      (extName !== '.png' && extName !== '.jpg')
+    ) {
+      return createErrorResponse({
+        status: 404,
+        code: 'not-found',
+        message: 'Not found',
+      });
+    }
+
+    return net.fetch(filePath);
   }
 
   private async handleCommandPath(extId: string, ...paths: string[]) {

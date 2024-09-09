@@ -2,6 +2,7 @@ export const CUSTOM_SCHEME = {
   sandbox: 'sandbox',
   fileIcon: 'file-icon',
   extension: 'extension',
+  imagePreview: 'image-preview',
 } as const;
 
 export const EXTENSION_VIEW = {
