@@ -537,6 +537,13 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
 );
 UiListRoot.displayName = 'UiListRoot';
 
+function scrollIntoView(el: Element, options: boolean | ScrollIntoViewOptions) {
+  'scrollIntoViewIfNeeded' in el
+    ? // @ts-expect-error chrome only method
+      el.scrollIntoViewIfNeeded(false)
+    : el.scrollIntoView(options);
+}
+
 function UiListItemRenderer({
   item,
   value,
@@ -567,14 +574,15 @@ function UiListItemRenderer({
     const parentEl = elRef.current.parentElement;
     if (
       parentEl?.classList.contains('group-list') &&
-      parentEl.firstElementChild === elRef.current
+      parentEl.firstElementChild === elRef.current &&
+      parentEl.previousElementSibling
     ) {
-      parentEl.previousElementSibling?.scrollIntoView({
+      scrollIntoView(parentEl.previousElementSibling, {
         block: 'nearest',
       });
     }
 
-    elRef.current.scrollIntoView({
+    scrollIntoView(elRef.current, {
       block: 'nearest',
     });
   }, [isSelected]);
