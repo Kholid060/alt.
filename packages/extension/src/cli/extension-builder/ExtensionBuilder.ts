@@ -48,8 +48,6 @@ class ExtensionBuilder {
       this.extensionManifest.data,
     );
     await this.build(this.getViteConfig(port), port);
-
-    console.log(port);
   }
 
   private getViteConfig(serverPort?: number): InlineConfig {
@@ -166,6 +164,11 @@ class ExtensionBuilder {
   private async build(config: InlineConfig, serverPort?: number) {
     const { build } = await import('vite');
     const watcher = await build(config);
+
+    if (!this.watchMode) {
+      await this.copyScriptEntries();
+      await this.manifestUtils.writeManifestFile(this.extensionManifest!.data);
+    }
 
     if (!('close' in watcher) || !this.extensionManifest || !this.entries)
       return;
