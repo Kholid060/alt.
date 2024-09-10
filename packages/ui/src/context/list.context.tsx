@@ -35,8 +35,11 @@ interface UiListStore {
   emit(): void;
   snapshot(): UiListState;
   subscribe(callback: () => void): () => void;
-  listControllerKeyBind(event: KeyboardEvent): void;
   setSelectedItem(detail: UiListSelectedItem, replace?: true): void;
+  listControllerKeyBind(
+    event: KeyboardEvent,
+    isRemoteController?: boolean,
+  ): boolean;
   setSelectedItem(detail: Partial<UiListSelectedItem>, replace?: false): void;
   setSelectedItem(detail: Partial<UiListSelectedItem>, replace: false): void;
   setState<T extends keyof UiListState>(
@@ -124,35 +127,35 @@ export function UiListProvider({ children }: { children: React.ReactNode }) {
       setController(controller) {
         listController.current = controller;
       },
-      listControllerKeyBind(event) {
+      listControllerKeyBind(event, isRemoteController = false) {
         const controller = listController.current;
-        if (!controller) return;
+        if (!controller && !isRemoteController) return false;
 
         const isRunningAction =
           listController.current?.runActionByShortcut(event) ?? false;
-        if (isRunningAction) return;
+        if (isRunningAction) return false;
 
         switch (event.key) {
           case 'Home':
             event.preventDefault();
-            controller.firstItem();
-            break;
+            controller?.firstItem();
+            return true;
           case 'End':
             event.preventDefault();
-            controller.lastItem();
-            break;
+            controller?.lastItem();
+            return true;
           case 'Enter':
             event.preventDefault();
-            controller.selectItem();
-            break;
+            controller?.selectItem();
+            return true;
           case 'ArrowUp':
             event.preventDefault();
-            event.altKey ? controller.prevGroup() : controller.prevItem();
-            break;
+            event.altKey ? controller?.prevGroup() : controller?.prevItem();
+            return true;
           case 'ArrowDown':
             event.preventDefault();
-            event.altKey ? controller.nextGroup() : controller.nextItem();
-            break;
+            event.altKey ? controller?.nextGroup() : controller?.nextItem();
+            return true;
           case 'ArrowLeft':
           case 'ArrowRight': {
             const target = event.target as HTMLInputElement;
@@ -171,15 +174,17 @@ export function UiListProvider({ children }: { children: React.ReactNode }) {
               (toLeft && actionIndex <= -1) ||
               (!toLeft && actionIndex >= actions.length - 1)
             )
-              return;
+              return false;
 
             event.preventDefault();
 
             state.current.selectedItem.actionIndex += toLeft ? -1 : 1;
             store.emit();
-            break;
+            return true;
           }
         }
+
+        return false;
       },
     }),
     [listeners, state],

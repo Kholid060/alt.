@@ -35,7 +35,8 @@ const extViewRenderer: ExtensionRenderer = async ({
     (await import(MODULE_MAP.reactDOM)) as typeof ReactDOM,
   ]);
 
-  reactDOM.createRoot(document.querySelector('#app')!).render(
+  const root = reactDOM.createRoot(document.querySelector('#app')!);
+  root.render(
     <React.StrictMode>
       <ReactErrorBoundary
         FallbackComponent={(props) => (
@@ -58,6 +59,10 @@ const extViewRenderer: ExtensionRenderer = async ({
       </ReactErrorBoundary>
     </React.StrictMode>,
   );
+
+  window.addEventListener('unload', () => {
+    root.unmount();
+  });
 };
 
 export default extViewRenderer;

@@ -255,6 +255,7 @@ function CommandInput() {
   const argumentContainerRef = useRef<HTMLDivElement>(null);
 
   const commandTitleRef = useRef('');
+  const extViewListConnected = useRef(false);
   const fallbackFocusToInput = useRef(false);
 
   useHotkeys(
@@ -324,6 +325,7 @@ function CommandInput() {
 
     clearPanel();
     navigate('');
+    extViewListConnected.current = false;
   }
   function onKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     const target = event.target as HTMLInputElement;
@@ -371,8 +373,15 @@ function CommandInput() {
         }
         break;
       }
-      default:
-        uiListStore.listControllerKeyBind(event.nativeEvent);
+      default: {
+        const preventEvent = uiListStore.listControllerKeyBind(
+          event.nativeEvent,
+          extViewListConnected.current,
+        );
+        if (preventEvent && extViewListConnected.current) {
+          event.preventDefault();
+        }
+      }
     }
   }
   const onInputValueChange = useCallback(
@@ -404,9 +413,16 @@ function CommandInput() {
         inputRef.current.placeholder = placeholder;
       },
     );
+    const offToggleConnectedList = messagePort.eventSync.on(
+      'extension:toggle-connected-list',
+      (connected) => {
+        extViewListConnected.current = connected;
+      },
+    );
 
     return () => {
       offListener();
+      offToggleConnectedList();
       offUpdatePlaceholderListener();
     };
   }, [uiListStore, commandCtx.runnerMessagePort]);

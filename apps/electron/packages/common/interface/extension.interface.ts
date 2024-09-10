@@ -2,6 +2,7 @@ import {
   CommandLaunchBy,
   CommandLaunchContext,
   ExtensionAPI,
+  ExtensionMessagePortEvent,
 } from '@altdot/extension';
 import { CommandJSONView } from '@altdot/extension/dist/validation/command-json.validation';
 import { ExtensionCommandModel } from '../../main/src/extension/extension-command/extension-command.interface';
@@ -99,4 +100,8 @@ export interface ExtensionCommandViewExecutePayload
 
 export interface ExtensionCommandMetadata {
   scriptHasView?: boolean;
+}
+
+export interface ExtensionMessagePortEvents extends ExtensionMessagePortEvent {
+  'extension:toggle-connected-list': [connected: boolean];
 }

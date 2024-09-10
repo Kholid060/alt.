@@ -1,8 +1,10 @@
 import { createContext, useEffect, useRef } from 'react';
 import { useCommandPanelStore } from '../stores/command-panel.store';
 import preloadAPI from '../utils/preloadAPI';
-import { ExtensionCommandExecutePayload } from '#packages/common/interface/extension.interface';
-import { MessagePortSharedCommandWindowEvents } from '#packages/common/interface/message-port-events.interface';
+import {
+  ExtensionCommandExecutePayload,
+  ExtensionMessagePortEvents,
+} from '#packages/common/interface/extension.interface';
 import { debugLog } from '#packages/common/utils/helper';
 import { ExtensionMessagePortEventAsync } from '@altdot/extension';
 import { useDialog } from '@altdot/ui';
@@ -13,7 +15,7 @@ import {
 
 type RunnerMessagePort = ExtensionRendererMessagePort<
   ExtensionMessagePortEventAsync,
-  MessagePortSharedCommandWindowEvents
+  ExtensionMessagePortEvents
 >;
 
 export interface CommandContextState {
