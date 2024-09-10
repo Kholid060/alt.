@@ -172,7 +172,7 @@ function NodeExecution({ node }: { node: WorkflowNodes }) {
   }, [node]);
   useEffect(() => {
     const offWorkflowEvents = preloadAPI.main.ipc.on(
-      'shared-process:workflow-events',
+      'workflow:execution-events',
       (_, events) => {
         const [execNode, data] =
           (events['node:execute-finish'] || events['node:execute-error']) ?? [];

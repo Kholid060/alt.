@@ -23,6 +23,8 @@ function CommandArgs({ data }: { data: WorkflowNodeCommand['data'] }) {
     return <p className="text-center text-muted-foreground">No parameters</p>;
   }
 
+  console.log(data.argsValue);
+
   return (
     <ul className="space-y-3">
       {data.args.map((arg, index) => {
@@ -36,7 +38,7 @@ function CommandArgs({ data }: { data: WorkflowNodeCommand['data'] }) {
                   inputSize="sm"
                   id={arg.name}
                   required={arg.required}
-                  value={data.argsValue[arg.name] as string}
+                  value={(data.argsValue[arg.name] as string) ?? ''}
                   onChange={(event) => {
                     updateArgValue(arg.name, event.target.value);
                   }}

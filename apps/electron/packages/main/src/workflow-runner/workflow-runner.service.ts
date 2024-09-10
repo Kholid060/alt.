@@ -1,5 +1,8 @@
 /* eslint-disable drizzle/enforce-delete-with-where */
-import { WorkflowRunPayload } from '#packages/common/interface/workflow.interface';
+import {
+  WorkflowEmitEvents,
+  WorkflowRunPayload,
+} from '#packages/common/interface/workflow.interface';
 import { Injectable } from '@nestjs/common';
 import { __DIRNAME, WORKFLOW_LOGS_FOLDER } from '../common/utils/constant';
 import { WorkflowQueryService } from '../workflow/workflow-query.service';
@@ -14,6 +17,7 @@ import { WorkflowHistoryService } from '../workflow/workflow-history/workflow-hi
 import path from 'path';
 import { nanoid } from 'nanoid';
 import { WORKFLOW_HISTORY_STATUS } from '#packages/common/utils/constant/workflow.const';
+import { BrowserWindowService } from '../browser-window/browser-window.service';
 
 const WORKER_TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
 
@@ -30,6 +34,7 @@ export class WorkflowRunnerService {
   > = new Map();
 
   constructor(
+    private readonly browserWindow: BrowserWindowService,
     private readonly workflowQuery: WorkflowQueryService,
     private readonly workflowHistory: WorkflowHistoryService,
   ) {
@@ -75,6 +80,13 @@ export class WorkflowRunnerService {
       const messagePort: WorkflowRunnerMessagePort = new BetterMessagePort(
         workerPort,
       );
+
+      messagePort.sync.on('workflow-event:node-execute-error', (...args) =>
+        this.emitEventToDashboard({ 'node:execute-error': args }),
+      );
+      messagePort.sync.on('workflow-event:node-execute-finish', (...args) =>
+        this.emitEventToDashboard({ 'node:execute-finish': args }),
+      );
       messagePort.sync.on('workflow-event:error', this.onWorkflowError);
       messagePort.sync.on('workflow-event:finish', this.onWorkflowFinish);
       messagePort.async.on('ipc:invoke', (name, args) => {
@@ -94,6 +106,19 @@ export class WorkflowRunnerService {
         timeout: null,
       };
     });
+  }
+
+  private async emitEventToDashboard(events: Partial<WorkflowEmitEvents>) {
+    const dashboardWindow = await this.browserWindow.get('dashboard', {
+      autoCreate: false,
+      noThrow: true,
+    });
+    if (!dashboardWindow) return;
+
+    dashboardWindow.sendMessage(
+      { name: 'workflow:execution-events', ensureWindow: false, noThrow: true },
+      events,
+    );
   }
 
   private startWorkerTimer() {

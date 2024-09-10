@@ -21,7 +21,7 @@ function WorkflowCombobox({
 
   useEffect(() => {
     listStore.setState('search', data.workflowId);
-  }, [data.workflowId]);
+  }, [data.workflowId, listStore]);
 
   return (
     <div className="group/combobox relative">

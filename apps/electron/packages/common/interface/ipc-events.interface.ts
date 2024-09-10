@@ -4,7 +4,6 @@ import type {
   ExtensionBrowserTabContext,
   ExtensionNeedConfigInput,
   ExtensionCommandExecutePayload,
-  ExtensionCommandExecutePayloadWithData,
   ExtensionCommandJSONViewData,
   ExtensionCommandProcess,
   ExtensionCommandViewExecutePayload,
@@ -295,8 +294,7 @@ export type IPCEvents = IPCShellEvents &
   IPCUserExtensionEvents;
 
 export interface IPCSendEventMainToRenderer {
-  'shared-window:stop-execute-command': [runnerId: string];
-  'shared-window:stop-execute-workflow': [runnerId: string];
+  'workflow:execution-events': [events: Partial<WorkflowEmitEvents>];
   'window:visibility-change': [isHidden: boolean];
   'app:update-route': [path: string, routeData?: unknown];
   'app:settings-changed': [settings: AppSettings];
@@ -344,7 +342,6 @@ export interface IPCSendEventRendererToRenderer {
       executeCommandPayload?: ExtensionCommandExecutePayload;
     },
   ];
-  'shared-process:workflow-events': [events: Partial<WorkflowEmitEvents>];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   'database:changes': [Record<any, any[]>];
 }
@@ -365,11 +362,7 @@ export interface IPCPostMessageEventMainToRenderer {
   'message-port:created': [{ channelId: MessagePortChannelIds }];
 }
 
-interface IPCInvokeEventMainToRenderer {
-  'shared-window:execute-command': (
-    payload: ExtensionCommandExecutePayloadWithData,
-  ) => Promise<string>;
-}
+interface IPCInvokeEventMainToRenderer {}
 
 export type IPCMainSendEvent = IPCSendEventRendererToRenderer &
   IPCSendEventRendererToMain &

@@ -61,21 +61,4 @@ export class BrowserWindowController {
       excludeWindow: [sender.id],
     });
   }
-
-  @IPCSend('shared-process:workflow-events')
-  async sharedProcessWorkflowEvents(
-    @Payload() [events]: IPCSendPayload<'shared-process:workflow-events'>,
-  ) {
-    const dashboardWindow = await this.browserWindow.get('dashboard', {
-      autoCreate: false,
-    });
-    await dashboardWindow.sendMessage(
-      {
-        noThrow: true,
-        ensureWindow: false,
-        name: 'shared-process:workflow-events',
-      },
-      events,
-    );
-  }
 }
