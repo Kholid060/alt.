@@ -257,6 +257,7 @@ function CommandInput() {
   const commandTitleRef = useRef('');
   const extViewListConnected = useRef(false);
   const fallbackFocusToInput = useRef(false);
+  const argumentParentRect = useRef<DOMRect | null>(null);
 
   useHotkeys(
     'mod+f',
@@ -295,11 +296,11 @@ function CommandInput() {
 
     spanRef.current.textContent = value;
 
-    if (!argumentContainerRef.current) return;
+    if (!argumentContainerRef.current || !argumentParentRect.current) return;
 
     const { width } = argumentContainerRef.current.getBoundingClientRect();
     const translateX = Math.min(
-      window.innerWidth - width - 24, // 24 => left value with padding,
+      argumentParentRect.current.width - width,
       spanRef.current.offsetWidth,
     );
 
@@ -435,7 +436,14 @@ function CommandInput() {
       onKeyDown={onKeyDown}
     >
       <CommandInputIcon onNavigateBack={navigateBack} />
-      <div className="relative h-full flex-grow">
+      <div
+        className="relative h-full flex-grow"
+        ref={(ref) => {
+          if (ref) {
+            argumentParentRect.current = ref.getBoundingClientRect();
+          }
+        }}
+      >
         <CommandInputTextField
           ref={inputRef}
           onValueChange={onInputValueChange}
