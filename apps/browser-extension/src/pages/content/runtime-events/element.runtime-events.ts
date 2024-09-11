@@ -13,24 +13,40 @@ const CUSTOM_ERRORS = {
     new Error(`Couldn't find element with "${selector}" selector`),
   InvalidElement: (elName: string) =>
     new Error(`Element is not a "${elName}" element`),
+  MissingCtxElement: () =>
+    new Error(
+      'Missing context element. The current element might be removed from the DOM tree',
+    ),
 };
 
-let elementCache: { el: Element | Element[] | null; selector: string } | null =
-  null;
+const elementCaches = new Map<
+  string,
+  { el: Element | Element[] | null; selector: string; createdAt: number }
+>();
 
 function queryElement(
-  { selector, elementIndex }: ExtensionBrowserElementSelector,
+  selector: ExtensionBrowserElementSelector,
   options: { throwError: false },
 ): Promise<Element | null>;
 function queryElement(
-  { selector, elementIndex }: ExtensionBrowserElementSelector,
+  selector: ExtensionBrowserElementSelector,
   options?: { throwError: true },
 ): Promise<Element>;
 async function queryElement(
-  { selector, elementIndex }: ExtensionBrowserElementSelector,
+  {
+    selector,
+    elementIndex,
+    parentSelectorIndex,
+    parentSelector = '',
+  }: ExtensionBrowserElementSelector,
   { throwError = true }: { throwError?: boolean } = {},
 ): Promise<Element | null> {
-  if (elementCache?.selector === selector) {
+  const elementKey = elementIndex
+    ? `${parentSelector + parentSelectorIndex}${selector}#${elementIndex}`
+    : `${parentSelector + parentSelectorIndex}${selector}`;
+  const elementCache = elementCaches.get(elementKey);
+  console.log('CACHE', elementKey, elementCache);
+  if (elementCache) {
     if (typeof elementIndex === 'number') {
       const element = Array.isArray(elementCache.el)
         ? elementCache.el[elementIndex ?? 0]
@@ -38,11 +54,22 @@ async function queryElement(
       if (element) return element;
     } else if (!Array.isArray(elementCache.el) && elementCache.el) {
       if (!elementCache.el.parentNode) {
-        elementCache = null;
+        elementCaches.delete(selector);
       } else {
         return elementCache.el;
       }
     }
+  }
+
+  const elementCtx = parentSelector
+    ? await queryElement(
+        { selector: parentSelector, elementIndex: parentSelectorIndex },
+        { throwError: false },
+      )
+    : document;
+  console.log(elementCtx, { selector, parentSelector, elementIndex });
+  if (!elementCtx) {
+    throw CUSTOM_ERRORS.MissingCtxElement();
   }
 
   if (typeof elementIndex === 'number') {
@@ -53,10 +80,11 @@ async function queryElement(
       return null;
     }
 
-    elementCache = {
+    elementCaches.set(elementKey, {
       selector,
       el: elements,
-    };
+      createdAt: new Date().getTime(),
+    });
 
     return elements[elementIndex];
   }
@@ -68,10 +96,11 @@ async function queryElement(
     return null;
   }
 
-  elementCache = {
+  elementCaches.set(elementKey, {
     selector,
     el: element,
-  };
+    createdAt: new Date().getTime(),
+  });
 
   return element;
 }

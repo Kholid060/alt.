@@ -53,6 +53,8 @@ export interface ExtensionBrowserTab {
 export interface ExtensionBrowserElementSelector {
   selector: string;
   elementIndex?: number;
+  parentSelector?: string;
+  parentSelectorIndex?: number;
 }
 
 type ExtensionWSAckHandler<T extends unknown[] = [], R = void> = (

@@ -4,7 +4,9 @@ import { CreateExtensionAPI } from './extension-api-factory';
 import { ExtensionBrowserElementSelector } from '@altdot/shared';
 
 const getElementSelector = (
-  selector: ExtensionAPI.Browser.Tabs.ElementSelector,
+  selector:
+    | ExtensionAPI.Browser.Tabs.ElementSelector
+    | ExtensionBrowserElementSelector,
 ): ExtensionBrowserElementSelector =>
   typeof selector === 'string' ? { selector } : selector;
 
@@ -241,10 +243,9 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
     });
   }
 
-  #createElementHandle(selector: {
-    selector: string;
-    elementIndex?: number;
-  }): ExtensionAPI.Browser.Tabs.ElementHandle {
+  #createElementHandle(
+    selector: ExtensionBrowserElementSelector,
+  ): ExtensionAPI.Browser.Tabs.ElementHandle {
     return {
       type: this.type.bind(this, selector),
       click: this.click.bind(this, selector),
@@ -259,24 +260,36 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
       selectFile: this.selectFile.bind(this, selector),
       getAttributes: this.getAttributes.bind(this, selector),
       setAttributes: this.setAttributes.bind(this, selector),
+      findAllElements: (childSelector) =>
+        this.#_findAllElements({
+          selector: childSelector,
+          parentSelector: selector.selector,
+          parentSelectorIndex: selector.elementIndex,
+        }),
+      findElement: (childSelector) =>
+        this.#_findElement({
+          selector: childSelector,
+          parentSelector: selector.selector,
+          parentSelectorIndex: selector.elementIndex,
+        }),
     };
   }
 
-  async findElement(
-    selector: string,
+  async #_findElement(
+    selector: ExtensionBrowserElementSelector,
   ): Promise<ExtensionAPI.Browser.Tabs.ElementHandle | null> {
     const elementExists = await this.#sendAction({
       browserId: this.#tabDetail.browserId,
       name: 'tabs:element-exists',
-      args: [{ tabId: this.id }, getElementSelector(selector), false],
+      args: [{ tabId: this.id }, selector, false],
     });
     if (!elementExists) return null;
 
-    return this.#createElementHandle({ selector });
+    return this.#createElementHandle(selector);
   }
 
-  async findAllElements(
-    selector: string,
+  async #_findAllElements(
+    selector: ExtensionBrowserElementSelector,
   ): Promise<ExtensionAPI.Browser.Tabs.ElementHandle[]> {
     const elementExists = await this.#sendAction({
       browserId: this.#tabDetail.browserId,
@@ -285,8 +298,20 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
     });
 
     return (elementExists as number[]).map((index) =>
-      this.#createElementHandle({ selector, elementIndex: index }),
+      this.#createElementHandle({ ...selector, elementIndex: index }),
     );
+  }
+
+  async findElement(
+    selector: string,
+  ): Promise<ExtensionAPI.Browser.Tabs.ElementHandle | null> {
+    return this.#_findElement(getElementSelector(selector));
+  }
+
+  async findAllElements(
+    selector: string,
+  ): Promise<ExtensionAPI.Browser.Tabs.ElementHandle[]> {
+    return this.#_findAllElements(getElementSelector(selector));
   }
 
   async waitForSelector(
