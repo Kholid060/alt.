@@ -245,6 +245,7 @@ class ElementSelector {
 
   private _mouseMoveHandler({ clientX, clientY }: MouseEvent) {
     let { 1: target } = document.elementsFromPoint(clientX, clientY);
+    if (!target) return;
 
     if (target.shadowRoot) {
       target = target.shadowRoot.elementsFromPoint(clientX, clientY)[1];
@@ -258,6 +259,7 @@ class ElementSelector {
   private _visibilityChangeHandler() {
     if (document.visibilityState === 'hidden' && this.resolverFunc) {
       this.resolverFunc({ canceled: true, selector: '' });
+      this.destroy();
     }
   }
 
@@ -276,15 +278,26 @@ class ElementSelector {
     this.prevSelectedEl = element;
   }
 
+  private isElMatchFilter(element: Element): Element | null {
+    if (this.filter?.selector) {
+      if (!this.filter.closestSelector) {
+        return element.matches(this.filter.selector) ? element : null;
+      }
+    }
+    if (this.filter?.closestSelector) {
+      return element.closest(this.filter.closestSelector);
+    }
+
+    return element;
+  }
+
   private _mouseDownHandler() {
     if (!this.prevSelectedEl || !this.resolverFunc) return;
 
-    if (this.filter?.selector) {
-      const isMatchFilter = this.prevSelectedEl.matches(this.filter.selector);
-      if (!isMatchFilter) {
-        alert('This element does not match the filter');
-        return;
-      }
+    this.prevSelectedEl = this.isElMatchFilter(this.prevSelectedEl);
+    if (!this.prevSelectedEl) {
+      alert('This element does not match the filter');
+      return;
     }
 
     let selector = finder(this.prevSelectedEl);

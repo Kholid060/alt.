@@ -36,6 +36,7 @@ export declare namespace Browser.Tabs {
 
   interface ElementHandle {
     type: OmitFirstArg<Tabs.Tab['type']>;
+    findElement: Tabs.Tab['findElement'];
     click: OmitFirstArg<Tabs.Tab['click']>;
     press: OmitFirstArg<Tabs.Tab['press']>;
     keyUp: OmitFirstArg<Tabs.Tab['keyUp']>;
@@ -44,6 +45,7 @@ export declare namespace Browser.Tabs {
     getText: OmitFirstArg<Tabs.Tab['getText']>;
     getHTML: OmitFirstArg<Tabs.Tab['getHTML']>;
     mouseUp: OmitFirstArg<Tabs.Tab['mouseUp']>;
+    findAllElements: Tabs.Tab['findAllElements'];
     mouseDown: OmitFirstArg<Tabs.Tab['mouseDown']>;
     selectFile: OmitFirstArg<Tabs.Tab['selectFile']>;
     getAttributes: OmitFirstArg<Tabs.Tab['getAttributes']>;
@@ -61,6 +63,7 @@ export declare namespace Browser.Tabs {
 
   interface SelectElementFilter {
     selector?: string;
+    closestSelector?: string;
   }
   interface SelectElementOptions {
     title?: string;
