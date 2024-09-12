@@ -130,7 +130,7 @@ export class ExtensionRunnerService implements OnModuleInit {
           title: browser.tab.title,
         };
       },
-      2500,
+      1000,
     );
   }
 

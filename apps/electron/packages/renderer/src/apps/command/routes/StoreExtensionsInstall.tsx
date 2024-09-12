@@ -189,7 +189,7 @@ function StoreExtensionsInstall() {
             </span>
             <a
               className="ml-6 inline-flex items-center underline"
-              href={query.data.sourceUrl}
+              href={`${query.data.sourceUrl}/tree/${query.data.relativePath}`}
               target="_blank"
               rel="noreferer noreferrer"
             >

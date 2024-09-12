@@ -76,6 +76,7 @@ export class BrowserExtensionService {
           active: true,
           lastFocusedBrowser: true,
         });
+
         if (!tab || isWSAckError(tab)) return null;
         if (!tab[0]) return null;
 
