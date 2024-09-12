@@ -1,11 +1,19 @@
-import { ExtensionNewPayload } from '@/routes/devconsole/extensions/new';
 import APIService from '@/services/api.service';
 import { useUserStore } from '@/stores/user.store';
 import GithubAPI from '@/utils/GithubAPI';
+import { mergePath } from '@/utils/helper';
 import { ExtensionManifestSchema } from '@altdot/extension/dist/extension-manifest';
 import { parseJSON } from '@altdot/shared';
-import { useToast, UiDialog, UiLabel, UiInput, UiButton } from '@altdot/ui';
+import {
+  useToast,
+  UiDialog,
+  UiLabel,
+  UiInput,
+  UiButton,
+  UiTooltip,
+} from '@altdot/ui';
 import { useNavigate } from '@tanstack/react-router';
+import { InfoIcon } from 'lucide-react';
 import { useState } from 'react';
 
 function DevConsoleNewExtension({ onClose }: { onClose?: () => void }) {
@@ -15,6 +23,7 @@ function DevConsoleNewExtension({ onClose }: { onClose?: () => void }) {
 
   const [repoUrl, setRepoUrl] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [extRelativePath, setExtRelativePath] = useState('/');
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     if (!profile) return;
@@ -29,11 +38,11 @@ function DevConsoleNewExtension({ onClose }: { onClose?: () => void }) {
         return;
       }
 
-      const manifestFile = await GithubAPI.instance.getRepoContents(
-        owner,
+      const manifestFile = await GithubAPI.instance.getRepoContents({
         repo,
-        'dist/manifest.json',
-      );
+        owner,
+        relativePath: mergePath(extRelativePath, '/dist/manifest.json'),
+      });
       const manifestContent = parseJSON(
         Array.isArray(manifestFile)
           ? 'null'
@@ -83,16 +92,18 @@ function DevConsoleNewExtension({ onClose }: { onClose?: () => void }) {
 
       navigate({
         to: '/devconsole/extensions/new',
-        // @ts-expect-error push extension data
         state: {
-          repo: {
-            owner,
-            name: repo,
-            url: `https://github.com/${owner}/${repo}`,
-            branch: new URL(manifestFile.url).searchParams.get('ref'),
+          newExtension: {
+            repo: {
+              owner,
+              name: repo,
+              relativePath: extRelativePath,
+              url: `https://github.com/${owner}/${repo}`,
+              branch: new URL(manifestFile.url).searchParams.get('ref') ?? '',
+            },
+            manifest: manifest.data,
           },
-          manifest: manifest.data,
-        } as ExtensionNewPayload,
+        },
       });
     } catch (error) {
       toast({
@@ -131,6 +142,24 @@ function DevConsoleNewExtension({ onClose }: { onClose?: () => void }) {
           {errorMessage && (
             <p className="ml-1 text-sm text-destructive-text">{errorMessage}</p>
           )}
+          <UiLabel
+            htmlFor="extension-repo-dir"
+            className="mb-1 ml-1 mt-3 block"
+          >
+            Root directory (optional){' '}
+            <UiTooltip
+              className="max-w-xs"
+              label="The directory where the extension source code is located"
+            >
+              <InfoIcon className="inline size-4" />
+            </UiTooltip>
+          </UiLabel>
+          <UiInput
+            id="extension-repo-dir"
+            value={extRelativePath}
+            placeholder="/extension-folder"
+            onValueChange={setExtRelativePath}
+          />
           <UiDialog.Footer className="mt-6">
             <UiButton disabled={!repoUrl} className="min-w-24" type="submit">
               Continue

@@ -1,3 +1,4 @@
+import { mergePath } from '@/utils/helper';
 import { ExtensionManifest } from '@altdot/extension/dist/extension-manifest';
 import { StoreApi, createStore } from 'zustand';
 
@@ -6,6 +7,7 @@ export interface ExtensionNewRepo {
   name: string;
   owner: string;
   branch: string;
+  relativePath: string;
 }
 
 export interface ExtensionNewStoreState {
@@ -39,7 +41,7 @@ export const createExtensionNewStore = (props: ExtensionNewStoreProps) => {
     ...props,
     banners: [],
     getAssetURL(path) {
-      return `${get().baseAssetURL}${path}`;
+      return mergePath(get().baseAssetURL, path);
     },
     $reset() {
       // @ts-expect-error clear value

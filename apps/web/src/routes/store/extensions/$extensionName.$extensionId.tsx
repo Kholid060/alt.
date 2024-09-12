@@ -30,6 +30,7 @@ import { UserRoundIcon, ShareIcon, CpuIcon } from 'lucide-react';
 import dayjs from '@/lib/dayjs';
 import { useNativeApp } from '@/hooks/useNativeApp';
 import { Helmet } from 'react-helmet-async';
+import { mergePath } from '@/utils/helper';
 
 function queryData(extensionId: string) {
   return {
@@ -69,7 +70,10 @@ export const Route = createFileRoute(
       .ensureQueryData(queryData(extensionId))
       .then((data) => ({
         ...data,
-        baseAssetURL: new URL(data.sourceUrl).pathname + data.relativePath,
+        baseAssetURL: mergePath(
+          new URL(data.sourceUrl).pathname,
+          data.relativePath,
+        ),
       }));
     if (result.name !== extensionName) {
       throw redirect({
@@ -306,7 +310,7 @@ function StoreExtensionsDetailPage() {
               <ExtensionDetailMarkdownAsset
                 filename="README"
                 assetUrl={GithubAPI.getRawURL(
-                  extension.baseAssetURL + '/README.md',
+                  mergePath(extension.baseAssetURL, '/README.md'),
                 )}
               />
             </UiTabsContent>
@@ -363,7 +367,11 @@ function StoreExtensionsDetailPage() {
               <p className="text-muted-foreground">Source code</p>
               <p className="text-right">
                 <a
-                  href={extension.sourceUrl}
+                  href={mergePath(
+                    extension.sourceUrl,
+                    'tree',
+                    extension.relativePath,
+                  )}
                   target="_blank"
                   rel="noreferrer"
                   className="hover:underline"
@@ -395,7 +403,7 @@ function StoreExtensionsDetailPage() {
                 </div>
               </div>
             )}
-            {permissions.length > 0 && (
+            {/* {permissions.length > 0 && (
               <div className="mt-4">
                 <p className="font-semibold text-muted-foreground">
                   Permissions
@@ -408,7 +416,7 @@ function StoreExtensionsDetailPage() {
                   ))}
                 </ul>
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </UiTabs>

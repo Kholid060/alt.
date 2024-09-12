@@ -7,6 +7,7 @@ import { AdminExtensionListItem } from '@/interface/admin.interface';
 import APIService from '@/services/api.service';
 import GithubAPI from '@/utils/GithubAPI';
 import { EXT_BANNER_NAME_REGEX, UserRole } from '@/utils/constant';
+import { mergePath } from '@/utils/helper';
 import { routeBeforeLoadPipe } from '@/utils/route-utils';
 import { ExtensionManifestSchema } from '@altdot/extension/dist/extension-manifest';
 import {
@@ -86,8 +87,13 @@ function ExtensionApproveRequest({
   async function fetchExtDetail() {
     try {
       const [_, owner, repo] = new URL(extension.sourceUrl).pathname.split('/');
+      const [__, ...relativePath] = extension.relativePath.split('/');
       const distFiles = await GithubAPI.instance
-        .getRepoContents(owner, repo, 'dist')
+        .getRepoContents({
+          repo,
+          owner,
+          relativePath: mergePath(relativePath.join('/'), 'dist'),
+        })
         .then((result) => (Array.isArray(result) ? result : [result]));
 
       let manifestRawUrl = '';
@@ -148,7 +154,7 @@ function ExtensionApproveRequest({
             iconUrl: manifest.data.icon.startsWith('icon:')
               ? manifest.data.icon
               : GithubAPI.getRawURL(
-                  `/${owner}/${repo}/${extension.relativePath}/dist/${manifest.data.icon}`,
+                  `/${owner}/${repo}/${extension.relativePath}/public/icon/${manifest.data.icon}.png`,
                 ),
           },
           null,
@@ -349,13 +355,18 @@ function ExtensionListItem({
       <tr className="border-b border-border/50 last:border-b-0 hover:bg-card">
         <td className="p-3">
           <a
-            href={`/store/extensions/${item.id}/${item.name}`}
-            target="_blank"
+            href={
+              item.isPublished
+                ? `/store/extensions/${item.id}/${item.name}`
+                : '#'
+            }
+            target={item.isPublished ? '_blank' : '_self'}
             className="flex items-center"
             rel="noreferrer"
           >
             <ExtensionDetailIcon
-              className="size-5"
+              svgClass="size-5"
+              imageClass="size-8"
               title={item.title}
               icon={item.iconUrl}
               iconUrl={item.iconUrl}
@@ -413,7 +424,11 @@ function ExtensionListItem({
               </UiDropdownMenuTrigger>
               <UiDropdownMenuContent align="end">
                 <UiDropdownMenuItem asChild>
-                  <a href={item.sourceUrl} target="_blank" rel="noreferrer">
+                  <a
+                    href={mergePath(item.sourceUrl, 'tree', item.relativePath)}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     <ExternalLinkIcon className="mr-2 size-4" />
                     Open extension source
                   </a>

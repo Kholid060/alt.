@@ -1,5 +1,6 @@
 import { ARequestInit, afetch } from '@altdot/shared';
 import { EXT_BANNER_NAME_REGEX } from './constant';
+import { mergePath } from './helper';
 
 const GITHUB_API_BASE_URL = 'https://api.github.com';
 const GITHUB_RAW_BASE_URL = 'https://raw.githubusercontent.com/';
@@ -15,6 +16,12 @@ export interface GithubRepoContent {
   content?: string;
   html_url: string;
   download_url: string;
+}
+
+export interface GithubRepoPath {
+  repo: string;
+  owner: string;
+  relativePath?: string;
 }
 
 class GithubAPI {
@@ -37,16 +44,18 @@ class GithubAPI {
     return afetch<T>(`${GITHUB_API_BASE_URL}${path}`, init);
   }
 
-  getRepoContents(owner: string, repo: string, path = '') {
+  getRepoContents({ repo, owner, relativePath = '' }: GithubRepoPath) {
     return this.fetch<GithubRepoContent | GithubRepoContent[]>(
-      `/repos/${owner}/${repo}/contents/${path}`,
+      `/repos/${owner}/${repo}/contents/${relativePath}`,
     );
   }
 
-  async getExtBanners(owner: string, repo: string) {
-    const files = await this.getRepoContents(owner, repo, 'asset').then(
-      (result) => (Array.isArray(result) ? result : [result]),
-    );
+  async getExtBanners({ owner, repo, relativePath }: GithubRepoPath) {
+    const files = await this.getRepoContents({
+      repo,
+      owner,
+      relativePath: mergePath(relativePath ?? '', 'asset'),
+    }).then((result) => (Array.isArray(result) ? result : [result]));
     const banners: string[] = [];
     for (const file of files) {
       if (file.type === 'file' && EXT_BANNER_NAME_REGEX.test(file.name)) {

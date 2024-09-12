@@ -11,6 +11,7 @@ import {
 } from '@/hooks/useExtensionNewStore';
 import APIService from '@/services/api.service';
 import GithubAPI from '@/utils/GithubAPI';
+import { mergePath } from '@/utils/helper';
 import { ExtensionManifest } from '@altdot/extension/dist/extension-manifest';
 import { isObject } from '@altdot/shared';
 import {
@@ -28,20 +29,23 @@ import {
   UiTabsTrigger,
   UiTabsContent,
 } from '@altdot/ui';
+import { useQuery } from '@tanstack/react-query';
 import {
   Link,
   createFileRoute,
   redirect,
   useNavigate,
 } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { z } from 'zod';
 import { useShallow } from 'zustand/react/shallow';
 
 export const Route = createFileRoute('/devconsole/extensions/new')({
   component: DevConsoleExtensionsNewPage,
   async loader({ location }) {
-    const payload = await extensionNewPayload.safeParseAsync(location.state);
+    const payload = await extensionNewPayload.safeParseAsync(
+      location.state.newExtension,
+    );
     if (!payload.success) {
       throw redirect({
         replace: true,
@@ -54,29 +58,34 @@ export const Route = createFileRoute('/devconsole/extensions/new')({
 });
 
 function ExtensionDetailTab() {
-  const [repo, banners, manifest, updateState] = useExtensionNewStore(
-    useShallow((state) => [
-      state.repo,
-      state.banners,
-      state.manifest,
-      state.updateState,
-    ]),
+  const [repo, manifest, updateState] = useExtensionNewStore(
+    useShallow((state) => [state.repo, state.manifest, state.updateState]),
   );
 
-  useEffect(() => {
-    if (!repo.name || !repo.owner) return;
-
-    GithubAPI.instance
-      .getExtBanners(repo.owner, repo.name)
-      .then((result) => updateState('banners', result));
-  }, [repo.name, repo.owner, updateState]);
+  const bannersQuery = useQuery({
+    retry: 1,
+    refetchInterval: false,
+    refetchOnReconnect: false,
+    refetchOnWindowFocus: false,
+    refetchIntervalInBackground: false,
+    queryKey: [repo, 'assets'],
+    queryFn: () =>
+      GithubAPI.instance.getExtBanners({
+        repo: repo.name,
+        owner: repo.owner,
+        relativePath: repo.relativePath,
+      }),
+  });
+  if (bannersQuery.data) {
+    updateState('banners', bannersQuery.data);
+  }
 
   return (
     <ExtensionDetail
-      banners={banners}
       sourceUrl={repo.url}
       commands={manifest.commands}
       categories={manifest.categories}
+      banners={bannersQuery.data ?? []}
     />
   );
 }
@@ -109,12 +118,12 @@ function ExtensionsNewHeader() {
         name: manifest.name,
         sourceUrl: repo.url,
         title: manifest.title,
-        relativePath: `/${repo.branch}`,
         categories: manifest.categories,
         permissions: manifest.permissions,
+        relativePath: mergePath(repo.branch, repo.relativePath),
         iconUrl: manifest.icon.startsWith('icon:')
           ? manifest.icon
-          : getAssetURL(`/dist/icon/${manifest.icon}.png`),
+          : getAssetURL(`/public/icon/${manifest.icon}.png`),
         version: manifest.version,
         description: manifest.description,
         apiVersion: manifest.$apiVersion ?? '*',
@@ -159,7 +168,7 @@ function ExtensionsNewHeader() {
       title={manifest.title}
       version={manifest.version}
       description={manifest.description}
-      iconUrl={getAssetURL(`/dist/icon/${manifest.icon}.png`)}
+      iconUrl={getAssetURL(mergePath('/public/icon/', `${manifest.icon}.png`))}
       suffixSlot={
         <UiButtonLoader
           className="ml-4"
@@ -180,20 +189,21 @@ const extensionNewPayload = z.object({
     name: z.string(),
     owner: z.string(),
     branch: z.string(),
+    relativePath: z.string(),
   }),
 });
 export type ExtensionNewPayload = z.infer<typeof extensionNewPayload>;
 
 function DevConsoleExtensionsNewPage() {
-  const payload = Route.useLoaderData();
+  const { repo, manifest } = Route.useLoaderData();
 
   const baseAssetUrl = GithubAPI.getRawURL(
-    `${payload.repo.owner}/${payload.repo.name}/${payload.repo.branch}`,
+    mergePath(`${repo.owner}/${repo.name}/${repo.branch}`, repo.relativePath),
   );
 
   return (
     <div className="container pt-28">
-      <ExtensionNewProvider {...{ ...payload, baseAssetURL: baseAssetUrl }}>
+      <ExtensionNewProvider {...{ repo, manifest, baseAssetURL: baseAssetUrl }}>
         <UiBreadcrumb>
           <UiBreadcrumbList>
             <UiBreadcrumbItem>
@@ -225,7 +235,7 @@ function DevConsoleExtensionsNewPage() {
           </UiTabsContent>
           <UiTabsContent value="manifest" className="pt-4">
             <div className="whitespace-pre-wrap rounded-lg border bg-card p-4 text-sm">
-              <UiHighlight code={JSON.stringify(payload.manifest, null, 4)} />
+              <UiHighlight code={JSON.stringify(manifest, null, 4)} />
             </div>
           </UiTabsContent>
           <UiTabsContent value="readme" className="pt-4">
