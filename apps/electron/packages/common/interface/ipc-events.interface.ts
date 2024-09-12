@@ -12,6 +12,7 @@ import type {
   AllButLast,
   BrowserConnected,
   BrowserInfo,
+  BrowserSelectFileData,
   BrowserSelectFileOptions,
   BrowserType,
   ExtensionActiveTabActionWSEvents,
@@ -70,7 +71,7 @@ export interface IPCUserExtensionBrowserAPI
   'tabs:select-file': (
     tab: ExtensionBrowserTabDetail,
     selector: ExtensionBrowserElementSelector,
-    files: (string | BrowserSelectFileOptions)[],
+    files: (string | BrowserSelectFileData)[],
     cb: WSAckCallback<void>,
   ) => void;
 }
@@ -89,7 +90,8 @@ export interface IPCUserExtensionCustomEventsMap {
     browserId: string;
     tab: ExtensionBrowserTabDetail;
     selector: ExtensionBrowserElementSelector;
-    files: (string | BrowserSelectFileOptions)[];
+    files: (string | BrowserSelectFileData)[];
+    options: ExtensionAPI.Browser.Tabs.SelectFileOptions;
   }) => ReturnType<ExtensionAPI.Browser.Tabs.Tab['selectFile']>;
   'oAuth.startAuth': (
     provider: ExtensionAPI.OAuth.OAuthProvider,
@@ -182,12 +184,15 @@ export interface IPCBrowserEvents {
     browserId: string,
     url: string,
   ) => ExtensionBrowserTabContext;
-  'browser:select-files': (detail: {
-    tabId: number;
-    paths: string[];
-    selector: string;
-    browserId: string;
-  }) => void;
+  'browser:select-files': (
+    detail: {
+      tabId: number;
+      paths: string[];
+      selector: string;
+      browserId: string;
+    },
+    options?: BrowserSelectFileOptions,
+  ) => void;
   'browser:actions': <
     T extends keyof ExtensionActiveTabActionWSEvents,
     P extends Parameters<ExtensionActiveTabActionWSEvents[T]>,

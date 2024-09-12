@@ -120,6 +120,15 @@ async function storage() {
   console.log(JSON.stringify({ test }));
 }
 
+async function dragDropFile() {
+  const activeTab = await _extension.browser.tabs.getActive();
+  if (!activeTab) throw new Error('Missing active tab');
+
+  await activeTab.selectFile('[data-test-id="panel-content"]', ['D:\\mailist.xlsx'], {
+    action: 'drag-drop',
+  });
+}
+
 export default async function CommandMain(context: CommandLaunchContext) {
   console.log(JSON.stringify(context));
   // await new Promise((r) => setTimeout(r, 4000));
@@ -159,6 +168,7 @@ export default async function CommandMain(context: CommandLaunchContext) {
   // await _extension.shell.showItemInFolder(filePath);
 
   console.log('Hello world');
+  await dragDropFile();
   // const [googleTab] = await _extension.browser.tabs.query({ url: '*://*.google.com/' });
   // if (!googleTab) throw new Error('missing google tab');
   // await googleTab.type(`textarea[name="q"]`, 'Hello world\ntestst', { delay: 10, clearValue: true });

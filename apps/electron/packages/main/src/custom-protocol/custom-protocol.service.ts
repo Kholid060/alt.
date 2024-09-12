@@ -33,13 +33,12 @@ export class CustomProtocolService {
       const appId = filePath.slice(APP_ICON_DIR_PREFIX.length + 1);
       const appIcon = await this.installedApps.getAppIcon(appId);
       if (appIcon) return new Response(appIcon.toPNG());
-    } else if (fs.existsSync(filePath)) {
-      const fileIcon = await app.getFileIcon(decodeURIComponent(filePath), {
-        size: 'normal',
-      });
-      return new Response(fileIcon.toPNG());
     }
 
+    const fileIcon = await app.getFileIcon(decodeURIComponent(filePath), {
+      size: 'normal',
+    });
+    return new Response(fileIcon.toPNG());
     return createErrorResponse({
       status: 404,
       code: 'NOT_FOUND',

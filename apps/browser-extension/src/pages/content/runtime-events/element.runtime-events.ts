@@ -404,15 +404,9 @@ RuntimeMessage.instance.onMessage(
 
 RuntimeMessage.instance.onMessage(
   'element:select-file',
-  async (_, selector, fileId) => {
+  async (_, selector, fileId, options) => {
     const element = await queryElement(selector);
-    if (!(element instanceof HTMLInputElement) || element.type !== 'file') {
-      throw new Error(
-        'Invalid element. The element must  be "<input type="file">"',
-      );
-    }
-
     const files = await ContentFileHandle.instance.requestFile(fileId);
-    selectFile(element, files);
+    await selectFile(element, files, options);
   },
 );

@@ -5,6 +5,7 @@ import { IPCInvokePayload } from '#packages/common/interface/ipc-events.interfac
 import { CustomError } from '#packages/common/errors/custom-errors';
 import { getFileDetail } from '../common/utils/getFileDetail';
 import { isWSAckError } from '../common/utils/helper';
+import { BrowserSelectFileOptions } from '@altdot/shared';
 
 @Injectable()
 export class BrowserExtensionActionService {
@@ -29,17 +30,20 @@ export class BrowserExtensionActionService {
     };
   }
 
-  async selectFile({
-    paths,
-    tabId,
-    selector,
-    browserId,
-  }: IPCInvokePayload<'browser:select-files'>[0]) {
+  async selectFile(
+    {
+      paths,
+      tabId,
+      selector,
+      browserId,
+    }: IPCInvokePayload<'browser:select-files'>[0],
+    options: BrowserSelectFileOptions = {},
+  ) {
     const files = await Promise.all(paths.map(getFileDetail));
     const result = await this.browserExtension.emitToBrowserWithAck({
       browserId,
       name: 'tabs:select-file',
-      args: [{ tabId }, { selector }, files],
+      args: [{ tabId }, { selector }, files, options],
     });
     if (isWSAckError(result)) {
       throw new CustomError(result.errorMessage);

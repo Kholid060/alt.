@@ -1,6 +1,10 @@
 import type { ExtensionAPI } from '@altdot/extension';
 import type { WORKFLOW_NODE_TYPE } from '../const/workflow-nodes-type.const';
-import type { KeyboardShortcut, BrowserType } from '@altdot/shared';
+import type {
+  KeyboardShortcut,
+  BrowserType,
+  BrowserSelectFileOptions,
+} from '@altdot/shared';
 import type { Edge, Node } from '@xyflow/react';
 import { ExtensionCommandArgument } from '@altdot/extension/dist/extension-manifest';
 
@@ -297,6 +301,7 @@ export type WorkflowNodeSelectFile = WorkflowNodeBase<
     selector: string;
     jsonInput: string;
     mode: 'list' | 'json';
+    action: BrowserSelectFileOptions['action'];
   },
   WORKFLOW_NODE_TYPE.SELECT_FILE
 >;

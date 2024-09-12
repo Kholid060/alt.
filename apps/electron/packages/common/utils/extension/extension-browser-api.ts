@@ -233,10 +233,12 @@ export class ExtensionBrowserTab implements ExtensionAPI.Browser.Tabs.Tab {
 
   selectFile(
     selector: ExtensionAPI.Browser.Tabs.ElementSelector,
-    files: (string | ExtensionAPI.Browser.Tabs.SelectFileOptions)[],
+    files: (string | ExtensionAPI.Browser.Tabs.SelectFileData)[],
+    options: ExtensionAPI.Browser.Tabs.SelectFileOptions = {},
   ): Promise<void> {
     return this.#sendMessage('browser.tabs.selectFiles', {
       files,
+      options,
       tab: { tabId: this.id },
       browserId: this.#tabDetail.browserId,
       selector: getElementSelector(selector),

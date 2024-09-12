@@ -1,11 +1,23 @@
 import { WorkflowNodeSelectFile } from '@altdot/workflow';
-import { UiButton, UiInput, UiLabel, UiSwitch } from '@altdot/ui';
+import { UiButton, UiInput, UiLabel, UiSelect, UiSwitch } from '@altdot/ui';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import WorkflowUiFormExpression from '../ui/WorkflowUiFormExpression';
 import WorkflowNodeLayoutEdit from './WorkflowNodeLayoutEdit';
 import { WORKFLOW_NODE_TYPE } from '@altdot/workflow/dist/const/workflow-nodes-type.const';
 import { TrashIcon } from 'lucide-react';
 import WorkflowUiCodeEditor from '../ui/WorkflowUiCodeEditor';
+import { ExtensionAPI } from '@altdot/extension';
+
+type SelectFileAction =
+  Required<ExtensionAPI.Browser.Tabs.SelectFileOptions>['action'];
+
+const selectFileActions: {
+  label: string;
+  value: SelectFileAction;
+}[] = [
+  { label: 'Select', value: 'select' },
+  { label: 'Drag & Drop', value: 'drag-drop' },
+];
 
 function WorkflowNodeEditSelectFile() {
   const node = useWorkflowEditorStore.use.editNode() as WorkflowNodeSelectFile;
@@ -43,6 +55,33 @@ function WorkflowNodeEditSelectFile() {
             updateEditNode<WorkflowNodeSelectFile>({ selector: value })
           }
         />
+      </WorkflowUiFormExpression>
+      <WorkflowUiFormExpression
+        data={node.data.$expData}
+        path="action"
+        label="Action"
+        className="mt-2"
+        labelId="browser-select-file--action"
+        onDataChange={($expData) =>
+          updateEditNode<WorkflowNodeSelectFile>({ $expData })
+        }
+      >
+        <UiSelect
+          inputSize="sm"
+          id="browser-select-file--action"
+          value={node.data.action ?? 'select'}
+          onValueChange={(value) =>
+            updateEditNode<WorkflowNodeSelectFile>({
+              action: value as SelectFileAction,
+            })
+          }
+        >
+          {selectFileActions.map((option) => (
+            <UiSelect.Option key={option.value} value={option.value}>
+              {option.label}
+            </UiSelect.Option>
+          ))}
+        </UiSelect>
       </WorkflowUiFormExpression>
       <hr className="my-4" />
       <div className="flex items-center">

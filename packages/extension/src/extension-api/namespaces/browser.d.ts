@@ -1,6 +1,7 @@
 import type {
   USKeyboardKeys,
   BrowserGetHTMLOptions,
+  BrowserSelectFileData,
   BrowserSelectFileOptions,
   KeyboardBrowserTypeOptions,
   BrowserWaitForSelectorOptions,
@@ -71,6 +72,7 @@ export declare namespace Browser.Tabs {
     filter?: SelectElementFilter;
   }
 
+  type SelectFileData = BrowserSelectFileData;
   type SelectFileOptions = BrowserSelectFileOptions;
 
   interface Tab {
@@ -152,7 +154,8 @@ export declare namespace Browser.Tabs {
 
     selectFile(
       selector: ElementSelector,
-      files: (string | SelectFileOptions)[],
+      files: (string | SelectFileData)[],
+      options?: SelectFileOptions,
     ): Promise<void>;
 
     findElement(selector: string): Promise<ElementHandle | null>;

@@ -49,7 +49,7 @@ export class ExtensionBrowserApiListener {
 
   @OnExtensionAPI('browser.tabs.selectFiles')
   async selectFileActiveTab({
-    args: [{ browserId, timeout, files, selector, tab }],
+    args: [{ browserId, timeout, files, selector, tab, options }],
   }: ExtensionApiEvent<'browser.tabs.selectFiles'>) {
     const resolvedFiles = await Promise.all(
       files.map(async (file) => {
@@ -63,7 +63,7 @@ export class ExtensionBrowserApiListener {
       name: 'tabs:select-file',
       timeout,
       browserId,
-      args: [tab, selector, resolvedFiles],
+      args: [tab, selector, resolvedFiles, options],
     });
     if (isWSAckError(result)) {
       throw new CustomError(result.errorMessage);

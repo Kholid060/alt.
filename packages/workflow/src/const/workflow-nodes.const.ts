@@ -434,6 +434,7 @@ export const WORKFLOW_NODES: {
       selector: '',
       mode: 'list',
       jsonInput: '',
+      action: 'select',
       isDisabled: false,
       $nodeType: WORKFLOW_NODE_TYPE.SELECT_FILE,
     },

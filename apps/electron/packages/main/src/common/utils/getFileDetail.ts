@@ -1,4 +1,4 @@
-import type { BrowserSelectFileOptions } from '@altdot/shared';
+import type { BrowserSelectFileData } from '@altdot/shared';
 import fs from 'fs-extra';
 import path from 'path';
 import mime from 'mime-types';
@@ -22,5 +22,5 @@ export async function getFileDetail(filePath: string) {
     contents: buffer,
     lastModified: stat.mtime.getTime(),
     mimeType: <string>mime.lookup(filePath),
-  } as BrowserSelectFileOptions;
+  } as BrowserSelectFileData;
 }

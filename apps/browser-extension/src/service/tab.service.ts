@@ -4,6 +4,7 @@ import RuntimeMessage from '../utils/RuntimeMessage';
 import {
   BrowserGetHTMLOptions,
   BrowserGetTextOptions,
+  BrowserSelectFileOptions,
   ExtensionBrowserElementSelector,
   KeyboardBrowserTypeOptions,
 } from '@altdot/shared';
@@ -15,6 +16,13 @@ interface TabTarget {
 }
 
 class TabService {
+  static async focusCurrentTabWindow(tabId: number) {
+    const tab = await Browser.tabs.get(tabId);
+    if (!tab || !tab.windowId) return;
+
+    await Browser.windows.update(tab.windowId, { focused: true });
+  }
+
   static reload(tabId: number) {
     return Browser.tabs.reload(tabId);
   }
@@ -31,6 +39,7 @@ class TabService {
     } as const;
 
     await injectContentHandlerScript(tabId);
+    await this.focusCurrentTabWindow(tabId);
     await RuntimeMessage.instance.sendMessageToTab({
       tabId,
       frameId,
@@ -52,6 +61,7 @@ class TabService {
     },
   ) {
     await injectContentHandlerScript(tabId);
+    await this.focusCurrentTabWindow(tabId);
     await RuntimeMessage.instance.sendMessageToTab({
       tabId,
       frameId,
@@ -104,6 +114,7 @@ class TabService {
     ...values: string[]
   ) {
     await injectContentHandlerScript(tabId);
+    await this.focusCurrentTabWindow(tabId);
     return await RuntimeMessage.instance.sendMessageToTab({
       tabId,
       frameId,
@@ -119,6 +130,7 @@ class TabService {
     options?: ExtensionAPI.Browser.Tabs.KeyDownOptions,
   ) {
     await injectContentHandlerScript(tabId);
+    await this.focusCurrentTabWindow(tabId);
     return await RuntimeMessage.instance.sendMessageToTab({
       tabId,
       frameId,
@@ -134,6 +146,7 @@ class TabService {
     options?: ExtensionAPI.Browser.Tabs.KeyUpOptions,
   ) {
     await injectContentHandlerScript(tabId);
+    await this.focusCurrentTabWindow(tabId);
     return await RuntimeMessage.instance.sendMessageToTab({
       tabId,
       frameId,
@@ -150,6 +163,7 @@ class TabService {
       ExtensionAPI.Browser.Tabs.KeyDownOptions,
   ) {
     await injectContentHandlerScript(tabId);
+    await this.focusCurrentTabWindow(tabId);
     return await RuntimeMessage.instance.sendMessageToTab({
       tabId,
       frameId,
@@ -237,12 +251,14 @@ class TabService {
     { tabId, frameId = 0 }: TabTarget,
     selector: ExtensionBrowserElementSelector,
     fileId: string,
+    options: BrowserSelectFileOptions,
   ) {
     await injectContentHandlerScript(tabId);
+    await this.focusCurrentTabWindow(tabId);
     return await RuntimeMessage.instance.sendMessageToTab({
       tabId,
       frameId,
-      args: [selector, fileId],
+      args: [selector, fileId, options],
       name: 'element:select-file',
     });
   }

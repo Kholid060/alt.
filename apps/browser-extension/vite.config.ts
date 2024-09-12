@@ -11,6 +11,15 @@ const pagesDir = resolve(srcDir, 'pages');
 const isDev = process.env.__DEV__ === 'true';
 const isProduction = !isDev;
 
+const input: Record<string, string> = {
+  'content-iframe': resolve(pagesDir, 'content', 'iframe', 'index.ts'),
+  background: resolve(pagesDir, 'background', 'index.ts'),
+  'content-script': resolve(pagesDir, 'content', 'index.ts'),
+};
+if (isDev) {
+  input.experiment = resolve(pagesDir, 'content', 'experiment/index.ts');
+}
+
 export default defineConfig({
   resolve: {
     alias: {
@@ -34,11 +43,7 @@ export default defineConfig({
     reportCompressedSize: isProduction,
     emptyOutDir: !isDev,
     rollupOptions: {
-      input: {
-        'content-iframe': resolve(pagesDir, 'content', 'iframe', 'index.ts'),
-        background: resolve(pagesDir, 'background', 'index.ts'),
-        'content-script': resolve(pagesDir, 'content', 'index.ts'),
-      },
+      input,
       output: {
         entryFileNames: 'src/pages/[name]/index.js',
         chunkFileNames: isDev

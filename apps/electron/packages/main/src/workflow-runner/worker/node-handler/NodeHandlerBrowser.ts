@@ -523,12 +523,18 @@ export class NodeHandlerSelectFile extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
       return path.path;
     });
 
-    await runner.ipc.invoke('browser:select-files', {
-      paths,
-      tabId,
-      selector,
-      browserId,
-    });
+    await runner.ipc.invoke(
+      'browser:select-files',
+      {
+        paths,
+        tabId,
+        selector,
+        browserId,
+      },
+      {
+        action: node.data.action,
+      },
+    );
 
     return {
       value: null,

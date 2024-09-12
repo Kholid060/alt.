@@ -66,6 +66,7 @@ export interface RuntimeEvent {
   'element:select-file': (
     selector: ExtensionBrowserElementSelector,
     fileId: string,
+    options?: ExtensionAPI.Browser.Tabs.SelectFileOptions,
   ) => void;
 }
 

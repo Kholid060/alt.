@@ -138,7 +138,7 @@ interface Tab {
 
   selectFile(
     selector: ElementSelector,
-    files: (string | SelectFileOptions)[],
+    files: (string | SelectFileData)[],
   ): Promise<void>;
 
   findElement(selector: string): Promise<ElementHandle | null>;
@@ -450,9 +450,9 @@ export default async function Command() {
 ```
 
 #### `browser.tabs.Tab.selectFile`
-> (selector?: <a href="#browsertabselementselector">ElementSelector</a>, files: (string | <a href="#browsertabsselectfileoptions">SelectFileOptions</a>)[]) =&gt; Promise&lt;string[]&gt;
+> (selector?: <a href="#browsertabselementselector">ElementSelector</a>, files: (string | <a href="#browsertabsselectfileData">SelectFileData</a>)[], options?: [SelectFileOptions](#browsertabsselectfileoptions)) =&gt; Promise&lt;string[]&gt;
 
-Set the files as the value of the <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file"> &lt;input type="file" /&gt;</a> file element. The string in the> files</code> parameter mfile path.
+Set the files in the <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file"> &lt;input type="file" /&gt;</a> element or simulate drag and drop files into the browser. The string in the <code>files</code> parameter is a file path.
 
 **Example**
 ```ts
@@ -561,7 +561,7 @@ interface ElementHandle {
   getHTML(options?: Partial<GetHTMLOptions>,): Promise<string>;
   mouseUp(): Promise<void>;
   mouseDown(): Promise<void>;
-  selectFile(files: (string | SelectFileOptions)[]): Promise<void>;
+  selectFile(files: (string | SelectFileData)[]): Promise<void>;
   getAttributes(attrNames?: string | string[]): Promise<string | null | Record<string, string>>;
   setAttributes(attrs: Record<string, string>): Promise<void>;
 }
@@ -728,12 +728,12 @@ The browser tab's loading status
 type TabStatus = 'loading' | 'complete';
 ```
 
-### `browser.tabs.SelectFileOptions`
+### `browser.tabs.SelectFileData`
 
-File to select in the HTML [`<input type="file" />`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file) element
+Data of the file to select.
 
 ```ts
-interface SelectFileOptions {
+interface SelectFileData {
   fileName: string;
   mimeType: string;
   lastModified: number;
@@ -746,6 +746,20 @@ interface SelectFileOptions {
 | `fileName` | `string` | Name of the file. It should include the file extension |
 | `mimeType` | `string` | [MIME type](https://en.wikipedia.org/wiki/Media_type) of the file |
 | `lastModified` | `number` | Last time the file is modified. The value must be in [unix time](https://en.wikipedia.org/wiki/Unix_time) |
+
+### `browser.tabs.SelectFileOptions`
+
+Options for the [`browser.selectFile`](#browsertabstabselectfile) method.
+
+```ts
+interface SelectFileOptions {
+  action?: 'select' | 'drag-drop';
+}
+```
+
+| Property | Type | Description |
+| ----------- | ----------- | ----------- |
+| `action` | `?('select' \| 'drag-drop')` | Which action to simulate when selecting a file. `select` to simulate the user selecting a file on the [`<input type="file" />`](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file) element. `drag-drop` simulates the user dragging and dropping the file into the element. |
 
 ### `browser.tabs.TabDetail`
 

@@ -37,8 +37,10 @@ export class BrowserExtensionController {
   }
 
   @IPCInvoke('browser:select-files')
-  selectFiles(@Payload() [detail]: IPCInvokePayload<'browser:select-files'>) {
-    return this.browserExtensionAction.selectFile(detail);
+  selectFiles(
+    @Payload() [detail, options]: IPCInvokePayload<'browser:select-files'>,
+  ) {
+    return this.browserExtensionAction.selectFile(detail, options);
   }
 
   @IPCInvoke('browser:actions')

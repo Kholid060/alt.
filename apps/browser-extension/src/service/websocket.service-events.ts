@@ -288,9 +288,14 @@ export function websocketEventsListener(
 
   io.on(
     'tabs:select-file',
-    wsAckHandler(async (tab, selector, files, callback) => {
+    wsAckHandler(async (tab, selector, files, options, callback) => {
       const fileId = BackgroundFileHandle.instance.addFiles(files);
-      await TabService.selectFile({ tabId: tab.tabId }, selector, fileId);
+      await TabService.selectFile(
+        { tabId: tab.tabId },
+        selector,
+        fileId,
+        options,
+      );
 
       callback();
     }),

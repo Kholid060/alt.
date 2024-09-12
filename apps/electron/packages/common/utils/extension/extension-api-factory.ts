@@ -275,6 +275,8 @@ export function createExtensionAPI({
         'runtime.platform': platform,
         'runtime.getFileIconURL': (filePath) =>
           `${CUSTOM_SCHEME.fileIcon}://${filePath}`,
+        'runtime.getImageFileURL': (filePath) =>
+          `${CUSTOM_SCHEME.imagePreview}://${filePath}`,
       },
       context,
       apiHandler: sendMessage,

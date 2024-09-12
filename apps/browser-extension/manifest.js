@@ -26,6 +26,16 @@ const manifest = {
   icons: {
     128: 'icon-128.png',
   },
+  content_scripts:
+    process.env.__DEV__ === 'true'
+      ? [
+          {
+            matches: ['*://*/*'],
+            run_at: 'document_idle',
+            js: ['./src/pages/experiment/index.js'],
+          },
+        ]
+      : undefined,
   web_accessible_resources: [
     {
       resources: [

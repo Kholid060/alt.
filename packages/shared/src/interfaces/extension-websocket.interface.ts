@@ -22,11 +22,14 @@ export interface BrowserWaitForSelectorOptions {
   state?: 'attached' | 'detached' | 'visible' | 'hidden';
 }
 
-export interface BrowserSelectFileOptions {
+export interface BrowserSelectFileData {
   fileName: string;
   mimeType: string;
   lastModified: number;
   contents: ArrayBuffer;
+}
+export interface BrowserSelectFileOptions {
+  action?: 'select' | 'drag-drop';
 }
 
 export interface WSAckErrorResult {
@@ -83,6 +86,7 @@ interface ExtensionTabsQueryOptions {
   status?: 'loading' | 'complete';
 }
 
+// DON'T USE UNDEFINED AS THE PARAMETER VALUE
 export interface ExtensionActiveTabActionWSEvents {
   'tabs:is-closed': ExtensionWSAckTabHandler<[], boolean>;
   'tabs:query': ExtensionWSAckHandler<
@@ -97,7 +101,7 @@ export interface ExtensionActiveTabActionWSEvents {
     [text: string, options: Partial<KeyboardBrowserTypeOptions>]
   >;
   'tabs:select-file': ExtensionWSAckElementHandler<
-    [files: BrowserSelectFileOptions[]]
+    [files: BrowserSelectFileData[], options: BrowserSelectFileOptions]
   >;
   'tabs:get-text': ExtensionWSAckElementHandler<
     [options: Partial<BrowserGetTextOptions>],

@@ -1,7 +1,7 @@
 import {
   BetterMessagePortResult,
   BetterMessagePortSend,
-  BrowserSelectFileOptions,
+  BrowserSelectFileData,
   isObject,
 } from '@altdot/shared';
 import { nanoid } from 'nanoid';
@@ -9,7 +9,7 @@ import { nanoid } from 'nanoid';
 class BackgroundFileHandle {
   static instance = new BackgroundFileHandle();
 
-  private files: Map<string, BrowserSelectFileOptions[]> = new Map();
+  private files: Map<string, BrowserSelectFileData[]> = new Map();
 
   constructor() {
     this.onMessage = this.onMessage.bind(this);
@@ -52,7 +52,7 @@ class BackgroundFileHandle {
     );
   }
 
-  addFiles(files: BrowserSelectFileOptions[]) {
+  addFiles(files: BrowserSelectFileData[]) {
     const fileId = nanoid(5);
     this.files.set(fileId, files);
 
