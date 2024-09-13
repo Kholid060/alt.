@@ -257,6 +257,16 @@ export class ExtensionLoaderService {
         });
       });
 
+      /**
+       * Create a dummy package.json file to set the type to module
+       * otherwise it will throw "Cannot use import statement outside a module" error
+       * when importing the extension command file in the extension worker
+       */
+      await fs.writeJSON(path.join(extDir, 'package.json'), {
+        type: 'module',
+        name: 'altdot-extension',
+      });
+
       return await this.importExtension(path.join(extDir, 'manifest.json'), {
         extensionId,
         isLocal: false,
