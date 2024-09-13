@@ -239,7 +239,8 @@ export type WorkflowNodeTriggerExecuteWorkflow = WorkflowNodeBase<
 export type WorkflowNodeBrowserTab = WorkflowNodeBase<
   {
     newTabURL: string;
-    action: 'open-tab' | 'use-active-tab';
+    findTabFiler: string;
+    action: 'open-tab' | 'find-tab' | 'use-active-tab';
   },
   WORKFLOW_NODE_TYPE.BROWSER_TAB
 >;

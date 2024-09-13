@@ -34,6 +34,7 @@ export function applySecurity() {
    */
   const ALLOWED_EXTERNAL_ORIGINS = new Set<string>([
     'https://github.com',
+    'https://developer.mozilla.org',
     import.meta.env.VITE_WEB_BASE_URL,
   ]);
 

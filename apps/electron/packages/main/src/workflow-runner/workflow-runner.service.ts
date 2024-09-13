@@ -97,7 +97,11 @@ export class WorkflowRunnerService {
         return handler({}, ...args);
       });
       messagePort.sync.on('ipc:send', (name, args) => {
-        ipcMain.emit(name, ...args);
+        // @ts-expect-error _events is private property
+        const handler = ipcMain._events[name];
+        if (!handler) throw new Error(`"${name}" doesn't have handler`);
+
+        return handler({}, ...args);
       });
 
       this.worker = {

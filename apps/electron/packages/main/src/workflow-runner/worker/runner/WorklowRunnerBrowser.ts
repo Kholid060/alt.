@@ -11,6 +11,7 @@ import type {
   WSAckErrorResult,
 } from '@altdot/shared';
 import WorkflowRunnerIPC from './WorkflowRunnerIPC';
+import { WORKFLOW_NODE_TYPE, WORKFLOW_NODES } from '@altdot/workflow';
 
 export type WorkflowRunnerBrowserContext = SetNullable<
   NonNullable<ExtensionBrowserTabContext>,
@@ -39,7 +40,7 @@ class WorkflowRunnerBrowser {
     const { browserId, tabId } = this.context;
     if (browserId === null || tabId === null) {
       throw new Error(
-        'Couldn\'t find an active tab. Use the "Browser Tab" node before using this node.',
+        `Couldn't find an active tab. Use the "${WORKFLOW_NODES[WORKFLOW_NODE_TYPE.BROWSER_TAB].title}" node before using this node.`,
       );
     }
 

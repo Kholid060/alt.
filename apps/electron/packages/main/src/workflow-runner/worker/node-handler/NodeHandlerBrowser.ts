@@ -1,4 +1,5 @@
 import {
+  ExtensionBrowserTab,
   isObject,
   isValidURL,
   parseJSON,
@@ -11,9 +12,14 @@ import type {
 } from './WorkflowNodeHandler';
 import WorkflowNodeHandler from './WorkflowNodeHandler';
 import WorkflowFileHandle from '../utils/WorkflowFileHandle';
-import { WorkflowNodeUseBrowser, WORKFLOW_NODE_TYPE } from '@altdot/workflow';
+import {
+  WorkflowNodeUseBrowser,
+  WORKFLOW_NODE_TYPE,
+  WorkflowNodeBrowserTab,
+} from '@altdot/workflow';
 import { getExactType } from '../utils/workflow-runner-utils';
 import WorkflowRunnerIPC from '../runner/WorkflowRunnerIPC';
+import WorkflowRunner from '../runner/WorkflowRunner';
 
 const browserName: Record<BrowserType, string> = {
   firefox: 'Firefox',
@@ -140,6 +146,76 @@ export class NodeHandlerBrowserTab extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
     super(WORKFLOW_NODE_TYPE.BROWSER_TAB);
   }
 
+  private async useActiveTab(runner: WorkflowRunner, browserId: string) {
+    const activeTab = await runner.ipc.invoke(
+      'browser:get-active-tab',
+      browserId,
+    );
+    if (!activeTab) throw new Error("Couldn't find active tab");
+
+    runner.browser.setContext(activeTab);
+
+    return {
+      url: activeTab.url,
+      title: activeTab.title,
+    };
+  }
+
+  private async createNewTab(
+    runner: WorkflowRunner,
+    node: WorkflowNodeBrowserTab,
+    browserId: string,
+  ) {
+    const url = node.data.newTabURL;
+    if (
+      typeof url !== 'string' ||
+      !url.startsWith('http') ||
+      !isValidURL(node.data.newTabURL)
+    ) {
+      throw new Error(`"${node.data.newTabURL}" is invalid URL`);
+    }
+
+    const activeTab = await runner.ipc.invoke(
+      'browser:new-tab',
+      browserId,
+      url,
+    );
+    if (!activeTab) throw new Error("Couldn't create a new tab");
+
+    runner.browser.setContext(activeTab);
+
+    return {
+      url: activeTab.url,
+      title: activeTab.title,
+    };
+  }
+
+  private async findTab(
+    runner: WorkflowRunner,
+    node: WorkflowNodeBrowserTab,
+    browserId: string,
+  ) {
+    const [tab] = (await runner.ipc.invoke('browser:actions', {
+      browserId,
+      name: 'tabs:query',
+      args: [{ url: node.data.findTabFiler }],
+    })) as ExtensionBrowserTab[];
+    if (!tab) {
+      throw new Error(
+        `Couldn't find a tab with "${node.data.findTabFiler}" match pattern`,
+      );
+    }
+
+    runner.browser.setContext({
+      tabId: tab.id,
+    });
+
+    return {
+      url: '',
+      title: '',
+    };
+  }
+
   async execute({
     node,
     runner,
@@ -159,42 +235,20 @@ export class NodeHandlerBrowserTab extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
     let value: {
       url: string;
       title: string;
-    };
+    } | null = null;
 
-    if (node.data.action === 'use-active-tab') {
-      const activeTab = await runner.ipc.invoke(
-        'browser:get-active-tab',
-        browserId,
-      );
-      if (!activeTab) throw new Error("Couldn't find active tab");
-
-      runner.browser.setContext(activeTab);
-      value = {
-        url: activeTab.url,
-        title: activeTab.title,
-      };
-    } else {
-      const url = node.data.newTabURL;
-      if (
-        typeof url !== 'string' ||
-        !url.startsWith('http') ||
-        !isValidURL(node.data.newTabURL)
-      ) {
-        throw new Error(`"${node.data.newTabURL}" is invalid URL`);
-      }
-
-      const activeTab = await runner.ipc.invoke(
-        'browser:new-tab',
-        browserId,
-        url,
-      );
-      if (!activeTab) throw new Error("Couldn't create a new tab");
-
-      runner.browser.setContext(activeTab);
-      value = {
-        url: activeTab.url,
-        title: activeTab.title,
-      };
+    switch (node.data.action) {
+      case 'use-active-tab':
+        value = await this.useActiveTab(runner, browserId);
+        break;
+      case 'open-tab':
+        value = await this.createNewTab(runner, node, browserId);
+        break;
+      case 'find-tab':
+        value = await this.findTab(runner, node, browserId);
+        break;
+      default:
+        throw new Error(`"${node.data.action}" is an invalid action`);
     }
 
     return { value };

@@ -325,9 +325,10 @@ export const WORKFLOW_NODES: {
     group: 'Browser',
     subtitle: 'Browser',
     icon: PanelTopIcon,
-    title: 'Browser Tab',
+    title: 'Active Tab',
     defaultData: {
       newTabURL: '',
+      findTabFiler: '',
       isDisabled: false,
       action: 'use-active-tab',
       $nodeType: WORKFLOW_NODE_TYPE.BROWSER_TAB,
