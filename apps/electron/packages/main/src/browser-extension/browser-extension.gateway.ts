@@ -1,8 +1,10 @@
 import { APP_WEBSOCKET_PORT } from '@altdot/shared';
 import {
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
+  SubscribeMessage,
   WebSocketGateway,
 } from '@nestjs/websockets';
 import { BrowserExtensionService } from './browser-extension.service';
@@ -52,10 +54,19 @@ export class BrowserExtensionGateway
     this.browserExtension.addConnectedBrowser({
       ...connectedBrowser.data,
       socketId: client.id,
+      lastAccessed: Date.now(),
     });
   }
 
   handleDisconnect(client: BrowserExtensionSocket) {
     this.browserExtension.removeConnectedBrowser(client.data.browserInfo.id);
+  }
+
+  @SubscribeMessage('browser:last-accessed')
+  browserLastAccessed(
+    @MessageBody()
+    { browserId, lastAccessed }: { browserId: string; lastAccessed: number },
+  ) {
+    this.browserExtension.updateConnectedBrowser(browserId, { lastAccessed });
   }
 }

@@ -1,7 +1,6 @@
 import {
   AllButLast,
   BrowserConnected,
-  BrowserInfo,
   ExtensionWSServerToClientEvents,
   Last,
 } from '@altdot/shared';
@@ -9,8 +8,11 @@ import { Injectable } from '@nestjs/common';
 import { CustomError } from '#packages/common/errors/custom-errors';
 import { isWSAckError } from '../common/utils/helper';
 import { BrowserExtensionNamespace } from './browser-extension.interface';
+import { BrowserExtensionConnectedBrowser } from '#packages/common/interface/browser-extension.interface';
 
-type ExtensionBrowserInfo = BrowserInfo & { socketId: string };
+type ExtensionBrowserInfo = BrowserExtensionConnectedBrowser & {
+  socketId: string;
+};
 
 const BROWSER_EMIT_TIMEOUT_MS = 60_000;
 
@@ -97,6 +99,16 @@ export class BrowserExtensionService {
 
   addConnectedBrowser(browser: ExtensionBrowserInfo) {
     this.connectedBrowsers.set(browser.id, browser);
+  }
+
+  updateConnectedBrowser(
+    browserId: string,
+    browser: Partial<BrowserExtensionConnectedBrowser>,
+  ) {
+    const data = this.connectedBrowsers.get(browserId);
+    if (!data) return;
+
+    this.connectedBrowsers.set(browserId, { ...data, ...browser });
   }
 
   removeConnectedBrowser(browserId: string) {

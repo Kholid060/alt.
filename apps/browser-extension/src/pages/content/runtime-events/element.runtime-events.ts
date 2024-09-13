@@ -45,7 +45,7 @@ async function queryElement(
     ? `${parentSelector + parentSelectorIndex}${selector}#${elementIndex}`
     : `${parentSelector + parentSelectorIndex}${selector}`;
   const elementCache = elementCaches.get(elementKey);
-  console.log('CACHE', elementKey, elementCache);
+
   if (elementCache) {
     if (typeof elementIndex === 'number') {
       const element = Array.isArray(elementCache.el)
@@ -67,7 +67,7 @@ async function queryElement(
         { throwError: false },
       )
     : document;
-  console.log(elementCtx, { selector, parentSelector, elementIndex });
+
   if (!elementCtx) {
     throw CUSTOM_ERRORS.MissingCtxElement();
   }

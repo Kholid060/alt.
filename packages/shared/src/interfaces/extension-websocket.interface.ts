@@ -39,7 +39,12 @@ export interface WSAckErrorResult {
 
 export type WSAckCallback<T> = (result: T | WSAckErrorResult) => void;
 
-export interface ExtensionWSClientToServerEvents {}
+export interface ExtensionWSClientToServerEvents {
+  'browser:last-accessed': (data: {
+    browserId: string;
+    lastAccessed: number;
+  }) => void;
+}
 
 export interface ExtensionBrowserTabDetail {
   tabId: number;

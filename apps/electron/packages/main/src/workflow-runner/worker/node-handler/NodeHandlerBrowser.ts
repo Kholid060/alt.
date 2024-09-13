@@ -35,7 +35,9 @@ async function getOpenedBrowser(
 
   let browserId: string | null = null;
   if (preferBrowser === 'any') {
-    browserId = connectedBrowsers[0]?.id ?? null;
+    browserId =
+      connectedBrowsers.sort((a, z) => z.lastAccessed - a.lastAccessed)[0]
+        ?.id ?? null;
   } else {
     browserId =
       connectedBrowsers.find((browser) => browser.type === preferBrowser)?.id ??

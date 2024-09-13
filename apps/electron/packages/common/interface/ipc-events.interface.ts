@@ -11,7 +11,6 @@ import type {
 import type {
   AllButLast,
   BrowserConnected,
-  BrowserInfo,
   BrowserSelectFileData,
   BrowserSelectFileOptions,
   BrowserType,
@@ -46,6 +45,7 @@ import {
 } from '../../main/src/workflow/workflow.interface';
 import { SelectExtension } from '../../main/src/db/schema/extension.schema';
 import { WorkflowHistoryLogItem } from '../../main/src/workflow/workflow-history/workflow-history.interface';
+import { BrowserExtensionConnectedBrowser } from './browser-extension.interface';
 
 export interface IPCRendererInvokeEventPayload {
   name: string;
@@ -178,7 +178,7 @@ export interface IPCClipboardEvents {
 
 export interface IPCBrowserEvents {
   'browser:get-focused': () => BrowserConnected[];
-  'browser:get-connected-browsers': () => BrowserInfo[];
+  'browser:get-connected-browsers': () => BrowserExtensionConnectedBrowser[];
   'browser:get-active-tab': (browserId?: string) => ExtensionBrowserTabContext;
   'browser:new-tab': (
     browserId: string,
