@@ -10,10 +10,7 @@ export class ExtensionUIApiListener {
 
   @OnExtensionAPI('ui.closeWindow')
   async close(_event: ExtensionApiEvent<'ui.closeWindow'>) {
-    const windowCommand = await this.browserWindow.get('command', {
-      noThrow: true,
-      autoCreate: false,
-    });
+    const windowCommand = this.browserWindow.get('command');
     if (!windowCommand) return;
 
     await windowCommand.toggleWindow(false);

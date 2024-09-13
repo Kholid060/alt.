@@ -23,10 +23,7 @@ export class ExtensionBrowserApiListener {
     args: [detail],
   }: ExtensionApiEvent<'browser.tabs.#actions'>) {
     if (detail.name === 'tabs:select-element') {
-      const commandWindow = await this.browserWindow.get('command', {
-        autoCreate: false,
-        noThrow: true,
-      });
+      const commandWindow = this.browserWindow.get('command');
       if (commandWindow) {
         const result = await commandWindow.tempHideWindow(() =>
           this.browserExtension.emitToBrowserWithAck(detail),

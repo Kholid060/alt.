@@ -72,6 +72,7 @@ export const workflowsHistory = sqliteTable(
     status: text('status').notNull().$type<WORKFLOW_HISTORY_STATUS>(),
   },
   (table) => ({
+    workflowIdIdx: index('workflow_id_idx').on(table.workflowId),
     workflowRunnerIdIdx: index('workflow_runner_id_idx').on(table.runnerId),
   }),
 );

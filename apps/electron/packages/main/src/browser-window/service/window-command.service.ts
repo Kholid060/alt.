@@ -9,7 +9,7 @@ export class WindowCommandService {
   async openInputConfig(
     payload: IPCSendPayload<'command-window:input-config'>[0],
   ) {
-    const commandWindow = await this.browserWindow.get('command');
+    const commandWindow = await this.browserWindow.getOrCreate('command');
     commandWindow.toggleWindow(true);
     commandWindow.sendMessage('command-window:input-config', payload);
   }

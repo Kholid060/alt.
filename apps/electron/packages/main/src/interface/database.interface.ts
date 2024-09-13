@@ -40,6 +40,7 @@ import type {
   WorkflowHistoryListPaginationModel,
   WorkflowHistoryModel,
   WorkflowHistoryRunningItemModel,
+  WorkflowHistoryRunningWorkflowFilter,
   WorkflowHistoryUpdatePayload,
 } from '../workflow/workflow-history/workflow-history.interface';
 import type { ExtensionManifest } from '@altdot/extension';
@@ -92,7 +93,9 @@ export interface DatabaseQueriesEvent {
   'database:get-workflow-history-list': (
     filter?: WorkflowHistoryListPaginationFilter,
   ) => WorkflowHistoryListPaginationModel;
-  'database:get-running-workflows': () => WorkflowHistoryRunningItemModel[];
+  'database:get-running-workflows': (
+    filter?: WorkflowHistoryRunningWorkflowFilter,
+  ) => WorkflowHistoryRunningItemModel[];
   'database:get-oauth-tokens-account-list': () => ExtensionOAuthTokensListItemModel[];
 }
 

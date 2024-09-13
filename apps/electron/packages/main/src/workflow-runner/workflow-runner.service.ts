@@ -112,17 +112,11 @@ export class WorkflowRunnerService {
     });
   }
 
-  private async emitEventToDashboard(events: Partial<WorkflowEmitEvents>) {
-    const dashboardWindow = await this.browserWindow.get('dashboard', {
-      autoCreate: false,
-      noThrow: true,
-    });
+  private emitEventToDashboard(events: Partial<WorkflowEmitEvents>) {
+    const dashboardWindow = this.browserWindow.get('dashboard');
     if (!dashboardWindow) return;
 
-    dashboardWindow.sendMessage(
-      { name: 'workflow:execution-events', ensureWindow: false, noThrow: true },
-      events,
-    );
+    dashboardWindow.sendMessage('workflow:execution-events', events);
   }
 
   private startWorkerTimer() {
@@ -139,6 +133,12 @@ export class WorkflowRunnerService {
   ) {
     const runner = this.runningWorkflows.get(runnerId);
     if (!runner) return;
+
+    this.emitEventToDashboard({
+      error: [
+        { errorMessage: message, runnerId, workflowId: runner.workflowId },
+      ],
+    });
 
     this.workflowHistory.updateHistory(runner.historyId, {
       startedAt,
@@ -157,6 +157,10 @@ export class WorkflowRunnerService {
   ) {
     const runner = this.runningWorkflows.get(runnerId);
     if (!runner) return;
+
+    this.emitEventToDashboard({
+      finish: [{ runnerId, workflowId: runner.workflowId }],
+    });
 
     this.workflowHistory.updateHistory(runner.historyId, {
       startedAt,
@@ -197,6 +201,9 @@ export class WorkflowRunnerService {
         logDir: WORKFLOW_LOGS_FOLDER,
       },
     );
+    this.emitEventToDashboard({
+      start: [{ runnerId: result.runnerId, workflowId: workflow.id }],
+    });
     this.runningWorkflows.set(result.runnerId, {
       runnerId,
       historyId: history.id,

@@ -21,6 +21,11 @@ export interface WorkflowClipboardData {
 }
 
 export interface WorkflowEmitEvents {
+  start: [detail: { workflowId: string; runnerId: string }];
+  finish: [detail: { workflowId: string; runnerId: string }];
+  error: [
+    detail: { workflowId: string; runnerId: string; errorMessage: string },
+  ];
   'node:execute-finish': [
     node: { id: string; type: WORKFLOW_NODE_TYPE },
     value: unknown,

@@ -25,30 +25,6 @@ export enum WindowBaseState {
   Closed = 'closed',
 }
 
-export interface WindowMessageName<T extends string> {
-  name: T;
-  noThrow?: boolean;
-  ensureWindow?: boolean;
-}
-
-function getMessagePayload<T extends string>(
-  eventName: T | WindowMessageName<T>,
-): Required<WindowMessageName<T>> {
-  if (typeof eventName === 'string') {
-    return {
-      noThrow: false,
-      name: eventName,
-      ensureWindow: true,
-    };
-  }
-
-  return {
-    noThrow: false,
-    ensureWindow: true,
-    ...eventName,
-  };
-}
-
 class WindowBaseInvokeMessage {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   messages = new Map<string, PromiseWithResolvers<any>>();
@@ -183,58 +159,28 @@ class WindowBase extends EventEmitter<WindowBaseEvents> {
   }
 
   async sendMessage<T extends keyof IPCRendererSendEvent>(
-    eventName: T | WindowMessageName<T>,
+    name: T,
     ...args: IPCRendererSendEvent[T]
   ) {
-    const { name, noThrow, ensureWindow } = getMessagePayload(eventName);
-    if (!this.window) {
-      if (ensureWindow) {
-        await this.createWindow();
-      } else if (!noThrow) {
-        throw new Error(`"${this.windowId}" hasn't been initialized`);
-      }
-    }
-
     this.window?.webContents.send(name, ...args);
   }
 
   async postMessage<T extends keyof IPCPostMessageEventMainToRenderer>(
-    eventName: T | WindowMessageName<T>,
+    name: T,
     data: IPCPostMessageEventMainToRenderer[T][0],
     ports?: Electron.MessagePortMain[],
   ) {
-    const { name, noThrow, ensureWindow } = getMessagePayload(eventName);
-    if (!this.window) {
-      if (ensureWindow) {
-        await this.createWindow();
-      } else if (!noThrow) {
-        throw new Error(`"${this.windowId}" hasn't been initialized`);
-      }
-    }
-
     this.window?.webContents.postMessage(name, data, ports);
   }
 
   async invoke<
     T extends keyof IPCRendererInvokeEvent,
     R extends ReturnType<IPCRendererInvokeEvent[T]>,
-  >(
-    eventName: T | WindowMessageName<T>,
-    ...args: Parameters<IPCRendererInvokeEvent[T]>
-  ): Promise<R> {
-    debugLog(`Invoke{${this.windowId}}`, eventName);
+  >(name: T, ...args: Parameters<IPCRendererInvokeEvent[T]>): Promise<R> {
+    debugLog(`Invoke{${this.windowId}}`, name);
     const messageId = nanoid(5);
 
     try {
-      const { name, noThrow, ensureWindow } = getMessagePayload(eventName);
-      if (!this.window) {
-        if (ensureWindow) {
-          await this.createWindow();
-        } else if (!noThrow) {
-          throw new Error(`"${this.windowId}" hasn't been initialized`);
-        }
-      }
-
       const resolver = Promise.withResolvers<R>();
       this.invokeMessages.messages.set(messageId, resolver);
 

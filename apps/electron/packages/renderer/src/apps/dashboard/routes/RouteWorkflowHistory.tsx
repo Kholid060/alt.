@@ -1,80 +1,29 @@
-import { forwardRef, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useDatabase } from '/@/hooks/useDatabase';
 import { useDebounceValue } from 'usehooks-ts';
-import {
-  UiBadge,
-  UiButton,
-  UiDialog,
-  UiInput,
-  UiSelect,
-  UiTooltip,
-  useToast,
-} from '@altdot/ui';
+import { UiButton, UiDialog, UiInput, UiSelect, useToast } from '@altdot/ui';
 import {
   ArrowDownAzIcon,
   ArrowUpAzIcon,
   ArrowUpRightIcon,
   CalendarIcon,
-  LoaderIcon,
   SearchIcon,
   TimerIcon,
-  TrashIcon,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { WORKFLOW_HISTORY_STATUS } from '#packages/common/utils/constant/workflow.const';
+import { Link, useNavigate } from 'react-router-dom';
 import dayjs from '/@/lib/dayjs';
 import preloadAPI from '/@/utils/preloadAPI';
 import { isIPCEventError } from '#packages/common/utils/helper';
 import UiItemsPagination from '/@/components/ui/UiItemsPagination';
 import {
   WorkflowHistoryListPaginationFilter,
-  WorkflowHistoryLogItem,
   WorkflowHistoryWithWorkflowModel,
 } from '#packages/main/src/workflow/workflow-history/workflow-history.interface';
-import { WORKFLOW_NODES } from '@altdot/workflow';
 import { useDocumentTitle } from '/@/hooks/useDocumentTitle';
+import WorkflowHistoryTable from '/@/components/workflow-history/WorkflowHistoryTable';
+import WorkflowHistoryStatusBadge from '/@/components/workflow-history/WorkflowHistoryStatusBadge';
+import WorkflowHistoryDetail from '/@/components/workflow-history/WorkflowHistoryDetail';
 
-/**
- * TO_DO: add { nodeLink: number } property to save some space?
- * The value of the "nodeLink" property is the "id" of the log
- * store the log id when the node is logged for the first time in WorkflowRunnerLogger
- */
-
-const WorkflowHistoryStatusBadge = forwardRef<
-  HTMLDivElement,
-  { status: WORKFLOW_HISTORY_STATUS }
->(({ status }, ref) => {
-  switch (status) {
-    case WORKFLOW_HISTORY_STATUS.Error:
-      return (
-        <UiBadge ref={ref} variant="destructive">
-          Error
-        </UiBadge>
-      );
-    case WORKFLOW_HISTORY_STATUS.Finish:
-      return <UiBadge ref={ref}>Finish</UiBadge>;
-    case WORKFLOW_HISTORY_STATUS.Running:
-      return (
-        <UiBadge ref={ref} variant="outline" className="text-yellow-400">
-          <LoaderIcon className="mr-1 h-4 w-4 animate-spin" />
-          Running
-        </UiBadge>
-      );
-    default:
-      return null;
-  }
-});
-WorkflowHistoryStatusBadge.displayName = 'WorkflowHistoryStatusBadge';
-
-const today = new Date();
-function formatDate(dateStr: string) {
-  const date = new Date(dateStr);
-  if (date.getDate() !== today.getDate()) {
-    return dayjs(date).format('DD MMM, HH:mm');
-  }
-
-  return dayjs(date).fromNow();
-}
 function formatDuration(duration: number) {
   if (duration < 5000) return 'Less than 5 seconds';
   if (duration < 60_000) return `${Math.round(duration / 1000)} seconds`;
@@ -84,86 +33,11 @@ function formatDuration(duration: number) {
 
 type HistorySort = Required<WorkflowHistoryListPaginationFilter>['sort'];
 
-const logLevelClass: Record<string, string> = {
-  default: 'hover:bg-card',
-  error: 'hover:bg-destructive/25 bg-destructive/20 text-destructive-text',
-};
-function WorkflowHistoryDetail({
-  history,
-}: {
-  history: WorkflowHistoryWithWorkflowModel;
-}) {
-  const [log, setlog] = useState<WorkflowHistoryLogItem[]>([]);
-
-  useEffect(() => {
-    preloadAPI.main.ipc
-      .invokeWithError('workflow-history:get-log', history.runnerId)
-      .then(setlog);
-  }, [history.runnerId]);
-
-  return (
-    <div
-      className="overflow-auto border-t py-6 font-mono text-sm text-muted-foreground"
-      style={{ maxHeight: 'calc(100vh - 15rem)' }}
-    >
-      <table className="h-full w-full align-top">
-        <thead>
-          <tr>
-            <th className="w-32"></th>
-            <th className="w-40"></th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {log.length === 0 && (
-            <tr>
-              <td colSpan={99} className="text-center">
-                No log data
-              </td>
-            </tr>
-          )}
-          {log.map((item) => (
-            <tr
-              key={item.id}
-              className={
-                'align-top ' +
-                (logLevelClass[item.level] ?? logLevelClass.default)
-              }
-            >
-              <td className="py-1.5 pl-6 pr-2">{item.time}</td>
-              <td className="line-clamp-1 px-2 py-1.5">
-                {item.node && (
-                  <Link
-                    title={
-                      (WORKFLOW_NODES[item.node.type]?.title ??
-                        item.node.type) + ' node'
-                    }
-                    className="hover:text-foreground"
-                    to={`/workflows/${history.workflowId}?toNode=${item.node.id}`}
-                  >
-                    <ArrowUpRightIcon className="mr-1 inline-block size-4 align-middle" />
-                    <span className="align-middle">
-                      {WORKFLOW_NODES[item.node.type]?.title ?? item.node.type}
-                    </span>
-                  </Link>
-                )}
-              </td>
-              <td className="py-1.5 pl-2 pr-6">
-                {item.msg}
-                {item.args ? ` ${item.args.join(' ')}` : ''}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
 function RouteWorkflowHistory() {
   useDocumentTitle('Workflow history');
 
   const { toast } = useToast();
+  const navigate = useNavigate();
   const { queryDatabase } = useDatabase();
 
   const [search, setSearch] = useDebounceValue('', 500);
@@ -274,88 +148,12 @@ function RouteWorkflowHistory() {
         </div>
       </div>
       <div className="mt-4 rounded-lg border text-sm">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b text-left">
-              <th className="h-12 min-w-48 px-3">Workflow</th>
-              <th className="h-12 px-3 text-center">Status</th>
-              <th className="h-12 px-3">Started at</th>
-              <th className="h-12 px-3">Duration</th>
-              <th className="h-12 w-36 px-3"></th>
-            </tr>
-          </thead>
-          <tbody className="divide-y">
-            {workflowHistory.items.length === 0 && (
-              <tr>
-                <td
-                  className="p-3 text-center text-muted-foreground"
-                  colSpan={9}
-                >
-                  No data
-                </td>
-              </tr>
-            )}
-            {workflowHistory.items.map((item) => (
-              <tr
-                key={item.id}
-                className="group cursor-default border-b border-border/50 hover:bg-card"
-              >
-                <td>
-                  <button
-                    className="block w-full p-3 text-left"
-                    onClick={() => setSelectedHistoryId(item.id)}
-                  >
-                    <p>{item.workflow.name}</p>
-                    <p className="leading-tight text-muted-foreground">
-                      {item.runnerId}
-                    </p>
-                  </button>
-                </td>
-                <td className="p-3 text-center">
-                  {item.status === WORKFLOW_HISTORY_STATUS.Error ? (
-                    <UiTooltip delayDuration={0} label={item.errorMessage}>
-                      <div>
-                        <WorkflowHistoryStatusBadge status={item.status} />
-                      </div>
-                    </UiTooltip>
-                  ) : (
-                    <WorkflowHistoryStatusBadge status={item.status} />
-                  )}
-                </td>
-                <td className="p-3">{formatDate(item.startedAt)}</td>
-                <td className="p-3">
-                  {item.duration ? formatDuration(item.duration) : '-'}
-                </td>
-                <td className="p-3">
-                  <div className="flex items-center justify-end gap-3">
-                    {item.status === WORKFLOW_HISTORY_STATUS.Running && (
-                      <UiButton
-                        size="sm"
-                        variant="secondary"
-                        onClick={() =>
-                          preloadAPI.main.ipc.invoke(
-                            'workflow:stop-running',
-                            item.runnerId,
-                          )
-                        }
-                      >
-                        Stop
-                      </UiButton>
-                    )}
-                    <UiButton
-                      size="icon-sm"
-                      variant="ghost"
-                      onClick={() => deleteHistory(item.id)}
-                      className="invisible group-hover:visible"
-                    >
-                      <TrashIcon className="h-5 w-5 text-destructive-text" />
-                    </UiButton>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <WorkflowHistoryTable
+          className="w-full"
+          items={workflowHistory.items}
+          onDeleteHistory={(item) => deleteHistory(item.id)}
+          onHistorySelected={(item) => setSelectedHistoryId(item.id)}
+        />
       </div>
       <UiItemsPagination
         autoHide
@@ -402,7 +200,20 @@ function RouteWorkflowHistory() {
                   </div>
                 </UiDialog.Header>
               </div>
-              <WorkflowHistoryDetail history={selectedHistory} />
+              <div
+                className="w-full overflow-auto border-t py-6 text-sm"
+                style={{ maxHeight: 'calc(100vh - 15rem)' }}
+              >
+                <WorkflowHistoryDetail
+                  history={selectedHistory}
+                  className="w-full"
+                  onNodeClicked={(nodeId) =>
+                    navigate(
+                      `/workflows/${selectedHistory.workflowId}?toNode=${nodeId}`,
+                    )
+                  }
+                />
+              </div>
             </>
           )}
         </UiDialog.Content>

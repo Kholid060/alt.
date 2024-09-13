@@ -50,8 +50,11 @@ export class WorkflowHistoryController {
   }
 
   @IPCInvoke('database:get-running-workflows')
-  listRunningWorkflows(): IPCInvokeReturn<'database:get-running-workflows'> {
-    return this.workflowHistory.listRunningWorkflows();
+  listRunningWorkflows(
+    @Payload()
+    [filter]: IPCInvokePayload<'database:get-running-workflows'>,
+  ): IPCInvokeReturn<'database:get-running-workflows'> {
+    return this.workflowHistory.listRunningWorkflows(filter);
   }
 
   @IPCInvoke('workflow-history:get-log')

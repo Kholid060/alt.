@@ -14,6 +14,7 @@ export type WorkflowHistoryWithWorkflowModel = SelectWorkflowHistory & {
 export interface WorkflowHistoryListPaginationFilter {
   filter?: {
     name?: string;
+    workflowId?: string;
   };
   sort?: {
     asc: boolean;
@@ -59,4 +60,8 @@ export interface WorkflowHistoryLogItem {
   level: number;
   args?: string[];
   node?: { id: string; type: WORKFLOW_NODE_TYPE };
+}
+
+export interface WorkflowHistoryRunningWorkflowFilter {
+  workflowId?: string;
 }

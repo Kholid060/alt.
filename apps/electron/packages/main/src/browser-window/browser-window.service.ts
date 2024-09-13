@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { WindowBaseState, WindowMessageName } from './window/WindowBase';
+import { WindowBaseState } from './window/WindowBase';
 import { IPCRendererSendEvent } from '#packages/common/interface/ipc-events.interface';
 import WindowDashboard from './window/WindowDashboard';
 import WindowCommand from './window/WindowCommand';
@@ -32,7 +32,7 @@ export class BrowserWindowService implements OnAppReady {
   ) {}
 
   async onAppReady() {
-    const windowCommand = await this.get('command');
+    const windowCommand = await this.getOrCreate('command');
     this.globalShortcut.register({
       keys: GLOBAL_SHORTCUTS.toggleCommandWindow,
       callback: () => windowCommand.toggleWindow(),
@@ -49,44 +49,32 @@ export class BrowserWindowService implements OnAppReady {
     return this.windows.has(name);
   }
 
-  async get<T extends WindowNames>(
+  async getOrCreate<T extends WindowNames>(
     name: T,
-    options?: { autoCreate: false; noThrow?: false },
-  ): Promise<BrowserWindowMap[T]>;
-  async get<T extends WindowNames>(
-    name: T,
-    options?: { autoCreate: true; noThrow?: true },
-  ): Promise<BrowserWindowMap[T]>;
-  async get<T extends WindowNames>(
-    name: T,
-    options?: { autoCreate: false; noThrow: true },
-  ): Promise<BrowserWindowMap[T] | null>;
-  async get<T extends WindowNames>(
-    name: T,
-    {
-      noThrow = false,
-      autoCreate = true,
-    }: { autoCreate?: boolean; noThrow?: boolean } = {},
   ): Promise<BrowserWindowMap[T]> {
-    if (!Object.hasOwn(browserWindowMap, name)) {
-      throw new Error('Invalid window name');
-    }
+    let browserWindow = this.get(name);
+    if (!browserWindow) {
+      browserWindow = new browserWindowMap[name](
+        this.loggerService,
+      ) as BrowserWindowMap[T];
+      if (!browserWindow) {
+        throw new Error('Invalid window name');
+      }
 
-    let browserWindow = (this.windows.get(name) as BrowserWindowMap[T]) ?? null;
-    if (browserWindow) return browserWindow;
-
-    browserWindow = new browserWindowMap[name](
-      this.loggerService,
-    ) as BrowserWindowMap[T];
-    this.windows.set(name, browserWindow);
-
-    if (autoCreate) {
       await browserWindow.createWindow();
-    } else if (!noThrow) {
-      throw new Error(`Can't access "${name}" window before created`);
+      browserWindow.window?.once('close', () => {
+        // eslint-disable-next-line drizzle/enforce-delete-with-where
+        this.windows.delete(name);
+      });
+
+      this.windows.set(name, browserWindow);
     }
 
     return browserWindow;
+  }
+
+  get<T extends WindowNames>(name: T): BrowserWindowMap[T] | null {
+    return (this.windows.get(name) as BrowserWindowMap[T]) ?? null;
   }
 
   async destroy(name: WindowNames) {
@@ -97,7 +85,7 @@ export class BrowserWindowService implements OnAppReady {
   }
 
   async open(name: WindowNames, routePath?: string) {
-    const browserWindow = await this.get(name);
+    const browserWindow = await this.getOrCreate(name);
     await browserWindow.restoreOrCreateWindow();
     await sleep(125);
     if (routePath) browserWindow.sendMessage('app:update-route', routePath);
@@ -121,7 +109,7 @@ export class BrowserWindowService implements OnAppReady {
     args,
     excludeWindow,
   }: {
-    name: T | WindowMessageName<T>;
+    name: T;
     args: IPCRendererSendEvent[T];
     excludeWindow?: (WindowNames | number)[];
   }) {

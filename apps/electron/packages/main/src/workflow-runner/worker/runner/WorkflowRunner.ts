@@ -75,7 +75,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   private nodeHandlers: NodeHandlersObj;
   private nodesIdxMap: Map<string, number>;
   private nodeExecutionQueue: string[] = [];
-  private emitEvents: Record<keyof WorkflowEmitEvents, boolean>;
+  private emitEvents: Partial<Record<keyof WorkflowEmitEvents, boolean>>;
 
   id: string;
   startedAt: string;

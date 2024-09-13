@@ -60,7 +60,7 @@ export class OAuthService {
     // eslint-disable-next-line drizzle/enforce-delete-with-where
     this.authSessions.delete(sessionId);
 
-    const windowCommand = await this.browserWindow.get('command');
+    const windowCommand = await this.browserWindow.getOrCreate('command');
     await windowCommand.toggleWindow(true);
     windowCommand.sendMessage('command-window:oauth-success', sessionId);
   }
@@ -117,7 +117,7 @@ export class OAuthService {
   ) {
     this.clearExpSession();
 
-    const windowCommand = await this.browserWindow.get('command');
+    const windowCommand = await this.browserWindow.getOrCreate('command');
     await windowCommand.toggleWindow(true);
 
     const sessionId = nanoid();

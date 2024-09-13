@@ -28,7 +28,8 @@ export class TrayMenuService implements OnAppReady {
         label: 'Command',
         click: () => {
           this.logger.wrap(['tray', 'command-menu'], async () => {
-            const windowCommand = await this.browserWindow.get('command');
+            const windowCommand =
+              await this.browserWindow.getOrCreate('command');
             await windowCommand.toggleWindow(true);
           });
         },
@@ -37,7 +38,8 @@ export class TrayMenuService implements OnAppReady {
         label: 'Dashboard',
         click: () => {
           this.logger.wrap(['tray', 'dashboard-menu'], async () => {
-            const windowDashboard = await this.browserWindow.get('dashboard');
+            const windowDashboard =
+              await this.browserWindow.getOrCreate('dashboard');
             await windowDashboard.restoreOrCreateWindow();
           });
         },
@@ -75,7 +77,8 @@ export class TrayMenuService implements OnAppReady {
 
     this.tray.addListener('double-click', () => {
       this.logger.wrap(['tray', 'double-click'], async () => {
-        const windowDashboard = await this.browserWindow.get('dashboard');
+        const windowDashboard =
+          await this.browserWindow.getOrCreate('dashboard');
         await windowDashboard.restoreOrCreateWindow();
       });
     });

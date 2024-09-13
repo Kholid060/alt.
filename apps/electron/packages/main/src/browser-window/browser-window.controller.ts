@@ -21,16 +21,14 @@ export class BrowserWindowController {
 
   @IPCInvoke('command-window:show')
   async openCommandWindow() {
-    const commandWindow = await this.browserWindow.get('command');
+    const commandWindow = await this.browserWindow.getOrCreate('command');
     await commandWindow.toggleWindow(true);
   }
 
   @IPCInvoke('command-window:close')
-  async closeCommandWindow() {
-    const commandWindow = await this.browserWindow.get('command', {
-      autoCreate: false,
-    });
-    await commandWindow.toggleWindow(false);
+  closeCommandWindow() {
+    const commandWindow = this.browserWindow.get('command');
+    commandWindow?.toggleWindow(false);
   }
 
   @IPCSend('command-window:input-config')

@@ -1,0 +1,1 @@
+CREATE INDEX `workflow_id_idx` ON `workflows_history` (`workflow_id`);

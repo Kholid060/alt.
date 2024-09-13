@@ -64,6 +64,7 @@ import UiExtensionIcon from '/@/components/ui/UiExtensionIcon';
 import { WorkflowEditorNodeListModal } from '/@/components/workflow/editor/WorkflowEditorNodeList';
 import { UiList, useToast } from '@altdot/ui';
 import { useDocumentTitle } from '/@/hooks/useDocumentTitle';
+import WorkflowEditorLogs from '/@/components/workflow/editor/WorkflowEditorLogs';
 
 const defaultNodeTypes = Object.values(WORKFLOW_NODE_TYPE).reduce<
   Partial<Record<WORKFLOW_NODE_TYPE, React.FC<NodeProps<WorkflowNodes>>>>
@@ -521,7 +522,8 @@ function RouteWorkflow() {
             <div className="relative flex flex-grow">
               <WorkflowEditorNodeListModal />
               <WorkflowEditor />
-              <Panel position="bottom-right">
+              <Panel position="bottom-right" className="inline-flex gap-2">
+                <WorkflowEditorLogs workflowId={workflowId!} />
                 <WorkflowUndoRedo />
               </Panel>
               <WorkflowEditorEditNode />

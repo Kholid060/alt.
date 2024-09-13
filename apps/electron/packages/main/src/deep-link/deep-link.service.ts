@@ -156,7 +156,8 @@ export class DeepLinkService implements OnModuleInit {
     }
 
     if (command.type === 'view') {
-      const windowCommand = await this.browserWindowService.get('command');
+      const windowCommand =
+        await this.browserWindowService.getOrCreate('command');
       windowCommand.toggleWindow(true);
     }
 
@@ -211,10 +212,11 @@ export class DeepLinkService implements OnModuleInit {
     const [_, type, itemId] = pathname.split('/');
     if (!itemId) return;
 
-    const windowcommand = await this.browserWindowService.get('command');
+    const windowcommand =
+      await this.browserWindowService.getOrCreate('command');
     await windowcommand.toggleWindow(true);
     await windowcommand.sendMessage(
-      { ensureWindow: true, name: 'app:update-route' },
+      'app:update-route',
       `/store/${type}/${itemId}/install`,
     );
   }

@@ -21,20 +21,14 @@ export class AppService {
   async messagePortBridge(
     ports: Electron.MessagePortMain[],
     channelId: MessagePortChannelIds,
-    options?: AppMessagePortBridgeOptions,
+    _options?: AppMessagePortBridgeOptions,
   ) {
     if (ports.length === 0) return;
 
     switch (channelId) {
       case MESSAGE_PORT_CHANNEL_IDS.sharedWithCommand: {
-        const windowCommand = await this.browserWindow.get('command');
-        windowCommand.postMessage(
-          options
-            ? { ...options, name: 'message-port:created' }
-            : 'message-port:created',
-          { channelId },
-          ports,
-        );
+        const windowCommand = await this.browserWindow.getOrCreate('command');
+        windowCommand.postMessage('message-port:created', { channelId }, ports);
         break;
       }
     }

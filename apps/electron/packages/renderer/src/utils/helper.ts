@@ -44,3 +44,10 @@ export function getExtIconURL(icon: string, extensionId: string) {
 export function isIPCEventError(result: unknown): result is IPCEventError {
   return Boolean(result) && isObject(result) && '$isError' in result;
 }
+
+export function formatDuration(duration: number) {
+  if (duration < 5000) return 'Less than 5 seconds';
+  if (duration < 60_000) return `${Math.round(duration / 1000)} seconds`;
+
+  return `${Math.round(duration / 1000 / 60)} minutes`;
+}

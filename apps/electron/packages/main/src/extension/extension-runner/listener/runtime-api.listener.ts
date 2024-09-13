@@ -38,7 +38,7 @@ export class ExtensionRuntimeApiListener {
       if (!command?.config?.length) return Promise.resolve();
     }
 
-    const windowCommand = await this.browserWindow.get('command');
+    const windowCommand = await this.browserWindow.getOrCreate('command');
     await windowCommand.toggleWindow(true);
     await windowCommand.sendMessage('command-window:input-config', {
       type,

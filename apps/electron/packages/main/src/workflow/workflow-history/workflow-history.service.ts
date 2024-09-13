@@ -10,6 +10,7 @@ import {
   WorkflowHistoryUpdatePayload,
   WorkflowHistoryModel,
   WorkflowHistoryLogItem,
+  WorkflowHistoryRunningWorkflowFilter,
 } from './workflow-history.interface';
 import fs from 'fs-extra';
 import { eq, like, asc, desc, count, getOperators } from 'drizzle-orm';
@@ -83,6 +84,9 @@ export class WorkflowHistoryService implements OnAppReady {
 
     if (filter?.name) {
       query = query.where(like(workflows.name, `%${filter.name}%`));
+    }
+    if (filter?.workflowId) {
+      query = query.where(eq(workflows.id, filter.workflowId));
     }
     if (sort) {
       let sortColumn: SQLiteColumn = workflowsHistory.id;
@@ -205,7 +209,9 @@ export class WorkflowHistoryService implements OnAppReady {
     return ids;
   }
 
-  listRunningWorkflows(): Promise<WorkflowHistoryRunningItemModel[]> {
+  listRunningWorkflows(
+    filter?: WorkflowHistoryRunningWorkflowFilter,
+  ): Promise<WorkflowHistoryRunningItemModel[]> {
     return this.dbService.db.query.workflowsHistory.findMany({
       columns: {
         runnerId: true,
@@ -220,7 +226,18 @@ export class WorkflowHistoryService implements OnAppReady {
         },
       },
       where(fields, operators) {
-        return operators.eq(fields.status, WORKFLOW_HISTORY_STATUS.Running);
+        const runningFilter = operators.eq(
+          fields.status,
+          WORKFLOW_HISTORY_STATUS.Running,
+        );
+        if (filter?.workflowId) {
+          return operators.and(
+            runningFilter,
+            operators.eq(fields.workflowId, filter.workflowId),
+          );
+        }
+
+        return runningFilter;
       },
     });
   }

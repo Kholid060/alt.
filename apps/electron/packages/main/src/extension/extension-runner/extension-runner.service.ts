@@ -51,15 +51,12 @@ export class ExtensionRunnerService implements OnModuleInit {
   onModuleInit() {
     this.executionService.runnerEventEmitter.on(
       'finish',
-      async ({ payload, data, runnerId }) => {
+      ({ payload, data, runnerId }) => {
         // eslint-disable-next-line drizzle/enforce-delete-with-where
         this.runningCommands.delete(runnerId);
 
         if (payload.command.type === 'action') {
-          const commandWindow = await this.browserWindow.get('command', {
-            noThrow: true,
-            autoCreate: false,
-          });
+          const commandWindow = this.browserWindow.get('command');
           if (commandWindow) {
             commandWindow.sendMessage(
               'command-window:close-message-port',
@@ -100,10 +97,7 @@ export class ExtensionRunnerService implements OnModuleInit {
           extensionId: payload.extensionId,
         });
 
-        const commandWindow = await this.browserWindow.get('command', {
-          noThrow: true,
-          autoCreate: false,
-        });
+        const commandWindow = this.browserWindow.get('command');
         if (commandWindow) {
           commandWindow.sendMessage(
             'command-window:close-message-port',
@@ -159,7 +153,7 @@ export class ExtensionRunnerService implements OnModuleInit {
           break;
       }
     } else if (data.view) {
-      const commandWindow = await this.browserWindow.get('command');
+      const commandWindow = await this.browserWindow.getOrCreate('command');
       commandWindow.sendMessage('command-window:open-json-view', {
         detail,
         view: data.view,
@@ -233,7 +227,7 @@ export class ExtensionRunnerService implements OnModuleInit {
       commandId,
     );
     if (typeof commandConfig === 'string') {
-      const windowCommand = await this.browserWindow.get('command');
+      const windowCommand = await this.browserWindow.getOrCreate('command');
       await windowCommand.sendMessage('command-window:input-config', {
         commandId,
         extensionId,
@@ -276,10 +270,7 @@ export class ExtensionRunnerService implements OnModuleInit {
         this.executionService.addMessagePort(mainChannel.port2, runner.id);
         this.runningCommands.set(runner.id, runner);
 
-        const commandWindow = await this.browserWindow.get('command', {
-          noThrow: true,
-          autoCreate: false,
-        });
+        const commandWindow = await this.browserWindow.get('command');
         if (commandWindow) {
           commandWindow.postMessage(
             'command-window:extension-port',
@@ -291,7 +282,7 @@ export class ExtensionRunnerService implements OnModuleInit {
         return runner.run({ waitUntilFinished: options?.waitUntilFinished });
       }
       case 'view': {
-        const windowCommand = await this.browserWindow.get('command');
+        const windowCommand = await this.browserWindow.getOrCreate('command');
         const runner = new ExtensionRunnerCommandView(
           windowCommand,
           executeCommandPayload,
