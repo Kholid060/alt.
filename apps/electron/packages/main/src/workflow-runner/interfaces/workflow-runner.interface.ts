@@ -9,11 +9,11 @@ import {
 
 interface WorkflowRunnerEvents {
   'workflow-event:node-execute-finish': [
-    node: { id: string; type: WORKFLOW_NODE_TYPE },
+    node: { id: string; type: WORKFLOW_NODE_TYPE; name: string },
     value: unknown,
   ];
   'workflow-event:node-execute-error': [
-    node: { id: string; type: WORKFLOW_NODE_TYPE },
+    node: { id: string; type: WORKFLOW_NODE_TYPE; name: string },
     message: string,
   ];
   'workflow-event:error': [runnerId: string, error: WorkflowStatusErrorEvent];

@@ -118,7 +118,11 @@ export function useWorkflowEditor() {
   }: Partial<
     Pick<
       WorkflowRunPayload,
-      'maxStep' | 'emitEvents' | 'startNodeId' | 'customElement'
+      | 'maxStep'
+      | 'emitEvents'
+      | 'startNodeId'
+      | 'finishNodeId'
+      | 'customElement'
     >
   > = {}) {
     const { workflow } = useWorkflowEditorStore.getState();

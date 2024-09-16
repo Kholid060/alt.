@@ -27,11 +27,11 @@ export interface WorkflowEmitEvents {
     detail: { workflowId: string; runnerId: string; errorMessage: string },
   ];
   'node:execute-finish': [
-    node: { id: string; type: WORKFLOW_NODE_TYPE },
+    node: { id: string; type: WORKFLOW_NODE_TYPE; name: string },
     value: unknown,
   ];
   'node:execute-error': [
-    node: { id: string; type: WORKFLOW_NODE_TYPE },
+    node: { id: string; type: WORKFLOW_NODE_TYPE; name: string },
     message: string,
   ];
 }
@@ -39,6 +39,7 @@ export interface WorkflowEmitEvents {
 export interface WorkflowRunPayload {
   id: string;
   maxStep?: number;
+  finishNodeId?: string;
   customElement?: WorkflowElement;
   startNodeId: typeof WORKFLOW_MANUAL_TRIGGER_ID | string;
   emitEvents?: Partial<Record<keyof WorkflowEmitEvents, boolean>>;

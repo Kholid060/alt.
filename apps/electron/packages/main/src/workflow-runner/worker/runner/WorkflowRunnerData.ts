@@ -116,7 +116,7 @@ class WorkflowRunnerData {
       vars: this.variables.getAll(),
       loopData: this.loopData.getAll(),
       parentWorkflow: this.runner.parentWorkflow,
-      prevNode: this.nodeData.get('prevNode')?.value ?? null,
+      prevNode: this.nodeData.get('prevNode') ?? null,
     };
   }
 

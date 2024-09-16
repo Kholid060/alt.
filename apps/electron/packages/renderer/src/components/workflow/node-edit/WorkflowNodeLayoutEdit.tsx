@@ -14,14 +14,14 @@ import {
 import WorkflowNodeSettings from './WorkflowNodeSettings';
 import { WorkflowNodes } from '@altdot/workflow';
 import { WORKFLOW_NODES } from '@altdot/workflow';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
 import WorkflowUiCodeEditor from '../ui/WorkflowUiCodeEditor';
 import { Edge, Node, getIncomers } from '@xyflow/react';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor/workflow-editor.store';
 import { WORKFLOW_NODE_TYPE } from '@altdot/workflow/dist/const/workflow-nodes-type.const';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
-import { Loader2Icon, TriangleAlertIcon } from 'lucide-react';
+import { Loader2Icon } from 'lucide-react';
 import { isIPCEventError } from '#packages/common/utils/helper';
 
 function NodeId({ nodeId }: { nodeId: string }) {
@@ -108,17 +108,34 @@ function NodeExecution({ node }: { node: WorkflowNodes }) {
   const { toast } = useToast();
   const { runCurrentWorkflow } = useWorkflowEditor();
 
-  const [nodeId, setNodeId] = useState(node.id);
-  const [prevNodes, setPrevNodes] = useState<PrevNode[]>([]);
-  const [outputs, setOutputs] = useState<
-    Record<
-      string,
-      { nodeId: string; isLoading: boolean; output: string; isError?: boolean }
-    >
-  >({});
+  const outputs = useRef<
+    {
+      name: string;
+      nodeId: string;
+      output: unknown;
+      status: 'error' | 'success';
+    }[]
+  >([]);
+
+  const [startNodeId, setStartNodeId] = useState(node.id);
+  const [isExecuting, setIsExecuting] = useState(false);
+
+  const prevNodes = useMemo(() => {
+    const { nodes, edges } = useWorkflowEditorStore.getState().workflow ?? {
+      nodes: [],
+      edges: [],
+    };
+
+    return findPrevNodes({
+      edges,
+      nodes,
+      currentNode: node,
+      baseNodeId: node.id,
+    });
+  }, [node]);
 
   async function executeNode() {
-    if (!nodeId) return;
+    if (!startNodeId) return;
 
     if (workflowDisabled) {
       toast({
@@ -133,12 +150,8 @@ function NodeExecution({ node }: { node: WorkflowNodes }) {
         'node:execute-error': true,
         'node:execute-finish': true,
       },
-      maxStep: 1,
-      customElement: {
-        edges: [],
-        nodes: [node],
-      },
-      startNodeId: nodeId,
+      startNodeId: startNodeId,
+      finishNodeId: node.id,
     });
     if (isIPCEventError(result)) {
       toast({
@@ -150,26 +163,10 @@ function NodeExecution({ node }: { node: WorkflowNodes }) {
     }
     if (!result) return;
 
-    setOutputs({
-      ...outputs,
-      [nodeId]: {
-        nodeId,
-        output: '',
-        isLoading: true,
-      },
-    });
+    outputs.current = [];
+    setIsExecuting(true);
   }
 
-  useEffect(() => {
-    const { nodes, edges } = useWorkflowEditorStore.getState().workflow ?? {
-      nodes: [],
-      edges: [],
-    };
-
-    setPrevNodes(
-      findPrevNodes({ currentNode: node, edges, nodes, baseNodeId: node.id }),
-    );
-  }, [node]);
   useEffect(() => {
     const offWorkflowEvents = preloadAPI.main.ipc.on(
       'workflow:execution-events',
@@ -178,39 +175,37 @@ function NodeExecution({ node }: { node: WorkflowNodes }) {
           (events['node:execute-finish'] || events['node:execute-error']) ?? [];
         if (!execNode) return;
 
-        setOutputs((prevData) => ({
-          ...prevData,
-          [execNode.id]: {
-            isLoading: false,
-            nodeId: execNode.id,
-            output: JSON.stringify(data, null, 2),
-            isError: Boolean(events['node:execute-error']),
-          },
-        }));
+        if (node.id === execNode.id) setIsExecuting(false);
+
+        outputs.current.unshift({
+          nodeId: execNode.id,
+          status: Object.hasOwn(events, 'node:execute-error')
+            ? 'error'
+            : 'success',
+          name: execNode.name,
+          output: data,
+        });
       },
     );
 
     return () => {
       offWorkflowEvents();
     };
-  }, []);
-
-  const editorValue =
-    outputs[nodeId] && !outputs[nodeId].isLoading ? outputs[nodeId].output : '';
+  }, [node.id]);
 
   return (
     <>
       <UiLabel className="ml-1" htmlFor="select-node">
-        Node
+        Execute from
       </UiLabel>
       <div className="flex items-end">
         <UiSelect
-          value={nodeId}
+          value={startNodeId}
           inputSize="sm"
           id="select-node"
           placeholder="Select node"
           className="overflow-hidden [&>span]:line-clamp-1"
-          onValueChange={setNodeId}
+          onValueChange={setStartNodeId}
         >
           <UiSelect.Option value={node.id}>Current node</UiSelect.Option>
           <UiSelect.Group>
@@ -233,10 +228,10 @@ function NodeExecution({ node }: { node: WorkflowNodes }) {
           variant="secondary"
           className="relative ml-2"
           onClick={executeNode}
-          disabled={outputs[nodeId]?.isLoading}
+          disabled={isExecuting}
         >
           Execute
-          {outputs[nodeId]?.isLoading && (
+          {isExecuting && (
             <div className="absolute flex h-full w-full cursor-default items-center justify-center rounded-md bg-inherit bg-secondary">
               <Loader2Icon className="animate-spin" />
             </div>
@@ -244,20 +239,16 @@ function NodeExecution({ node }: { node: WorkflowNodes }) {
         </UiButton>
       </div>
       <div className="mt-2">
-        <div className="flex items-center justify-between">
-          <p className="ml-1">Output</p>
-          {outputs[nodeId]?.isError && (
-            <p className="flex cursor-default items-center gap-1 text-destructive-text">
-              <TriangleAlertIcon className="size-4" />
-              error
-            </p>
-          )}
-        </div>
+        <p className="ml-1">Output</p>
         <WorkflowUiCodeEditor
           readOnly
           lang="js"
           hideHeader
-          value={editorValue}
+          value={
+            isExecuting
+              ? 'Executing...'
+              : JSON.stringify(outputs.current, null, 2)
+          }
           placeholder="Node output"
         />
       </div>

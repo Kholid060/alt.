@@ -23,6 +23,11 @@ export class ExtensionBrowserApiListener {
     args: [detail],
   }: ExtensionApiEvent<'browser.tabs.#actions'>) {
     if (detail.name === 'tabs:select-element') {
+      const dashboardWindow = this.browserWindow.get('dashboard');
+      if (dashboardWindow?.window?.isFocused()) {
+        dashboardWindow?.window?.minimize();
+      }
+
       const commandWindow = this.browserWindow.get('command');
       if (commandWindow) {
         const result = await commandWindow.tempHideWindow(() =>

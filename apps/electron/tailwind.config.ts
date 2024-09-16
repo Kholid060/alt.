@@ -45,10 +45,10 @@ const display = [
 export default {
   content: [
     './*.html',
-    './src/**/*.{js,ts,jsx,tsx}',
-    '../packages/extension/src/**/*.tsx',
-    '../../../../packages/ui/src/**/*.{js,ts,jsx,tsx}',
-    '../../../../packages/workflow/src/**/*.{js,ts,jsx,tsx}',
+    './packages/renderer/src/**/**.{js,ts,jsx,tsx}',
+    './packages/extension/src/**/**.{js,ts,jsx,tsx}',
+    '../../packages/ui/src/**/*.{js,ts,jsx,tsx}',
+    '../../packages/workflow/src/**/*.{js,ts,jsx,tsx}',
   ],
   safelist: [
     'grow',

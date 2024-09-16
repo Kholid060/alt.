@@ -70,27 +70,26 @@ export class BrowserExtensionService {
   }
 
   async getFocused(): Promise<BrowserConnected | null> {
-    const tabs = await Promise.allSettled(
-      this.getConnectedBrowsers().map(async (browser) => {
-        const { socketId, ...browserInfo } = browser;
-        const socket = this.server?.sockets.get(socketId);
-        const tab = await socket?.timeout(5000).emitWithAck('tabs:query', {
-          active: true,
-          lastFocusedBrowser: true,
-        });
+    const lastFocusedBrowser = this.getConnectedBrowsers()
+      .sort((a, z) => z.lastAccessed - a.lastAccessed)
+      .at(0);
+    if (!lastFocusedBrowser) return null;
 
-        if (!tab || isWSAckError(tab)) return null;
-        if (!tab[0]) return null;
+    const { socketId, ...browserInfo } = lastFocusedBrowser;
+    const socket = this.server?.sockets.get(socketId);
+    const tab = await socket?.timeout(5000).emitWithAck('tabs:query', {
+      active: true,
+      lastFocusedBrowser: true,
+    });
 
-        return {
-          ...browserInfo,
-          focused: true,
-          tab: tab[0],
-        };
-      }),
-    );
+    if (!tab || isWSAckError(tab)) return null;
+    if (!tab[0]) return null;
 
-    return tabs.find((item) => item.status === 'fulfilled')?.value ?? null;
+    return {
+      ...browserInfo,
+      focused: true,
+      tab: tab[0],
+    };
   }
 
   getConnectedBrowsers() {

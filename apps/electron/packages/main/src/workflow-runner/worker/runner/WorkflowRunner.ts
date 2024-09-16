@@ -73,6 +73,7 @@ export interface WorkflowRunnerPrevNodeExecution {
 class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
   private startNodeId: string;
   private nodeHandlers: NodeHandlersObj;
+  private readonly finishNodeId?: string;
   private nodesIdxMap: Map<string, number>;
   private nodeExecutionQueue: string[] = [];
   private emitEvents: Partial<Record<keyof WorkflowEmitEvents, boolean>>;
@@ -102,6 +103,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     messagePort,
     startNodeId,
     nodeHandlers,
+    finishNodeId,
     parentWorkflow,
     maxStep = Infinity,
   }: WorkflowRunnerOptions) {
@@ -113,6 +115,7 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
     this.workflow = workflow;
     this.startNodeId = startNodeId;
     this.nodeHandlers = nodeHandlers;
+    this.finishNodeId = finishNodeId;
     this.parentWorkflow = parentWorkflow ?? null;
 
     this.ipc = new WorkflowRunnerIPC(messagePort);
@@ -354,6 +357,12 @@ class WorkflowRunner extends EventEmitter<WorkflowRunnerEvents> {
           node,
           `Finish executing node in ${Date.now() - startExecTime}ms`,
         );
+      }
+
+      if (node.id === this.finishNodeId) {
+        this.state = WorkflowRunnerState.Finish;
+        this.emit('finish', WorkflowRunnerFinishReason.Done);
+        return;
       }
 
       this.dataStorage.nodeData.set('prevNode', {

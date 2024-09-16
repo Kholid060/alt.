@@ -10,6 +10,11 @@ import WorkflowRunner from './runner/WorkflowRunner';
 import * as nodeHandlersClasses from './node-handler';
 import { WorkflowRunnerMessagePort } from '../interfaces/workflow-runner.interface';
 import { debugLog } from '#packages/common/utils/helper';
+import {
+  WORKFLOW_NODE_TYPE,
+  WORKFLOW_NODES,
+  WorkflowNodes,
+} from '@altdot/workflow';
 
 export interface WorkflowRunnerExecuteOptions extends WorkflowRunnerRunPayload {
   onFinish?(
@@ -21,6 +26,14 @@ export interface WorkflowRunnerExecuteOptions extends WorkflowRunnerRunPayload {
     error: { message: string; location?: string },
   ): void | Promise<void>;
   parent?: WorkflowRunnerParent;
+}
+
+function getWorkflowName(node: WorkflowNodes) {
+  if (node.type === WORKFLOW_NODE_TYPE.COMMAND) {
+    return node.data.title;
+  }
+
+  return WORKFLOW_NODES[node.type].title;
 }
 
 class WorkflowRunnerManager {
@@ -94,20 +107,25 @@ class WorkflowRunnerManager {
 
       if (onFinish) await onFinish(runner, reason);
     });
-    runner.on('node:execute-finish', ({ id, type }, execResult) => {
+    runner.on('node:execute-finish', (node, execResult) => {
       this.messagePort!.sync.sendMessage(
         'workflow-event:node-execute-finish',
         {
-          id,
-          type,
+          id: node.id,
+          type: node.type,
+          name: getWorkflowName(node),
         },
         execResult,
       );
     });
-    runner.on('node:execute-error', ({ id, type }, message) => {
+    runner.on('node:execute-error', (node, message) => {
       this.messagePort!.sync.sendMessage(
         'workflow-event:node-execute-error',
-        { id, type },
+        {
+          id: node.id,
+          type: node.type,
+          name: getWorkflowName(node),
+        },
         message,
       );
     });

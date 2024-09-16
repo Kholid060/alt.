@@ -16,7 +16,6 @@ import { PRELOAD_API_KEY } from '#common/utils/constant/constant';
 import { ExtensionErrorUnhandledVanilla } from './components/extension-errors';
 import { applyTheme } from '#common/utils/helper';
 import injectComponents from './utils/injectComponents';
-import '@altdot/ui/dist/theme.css';
 import { MODULE_MAP } from './utils/constant';
 
 declare global {
