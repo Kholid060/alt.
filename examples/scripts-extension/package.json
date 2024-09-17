@@ -1,9 +1,0 @@
-{
-  "name": "scripts-extension",
-  "scripts": {
-    "build": "altdot build"
-  },
-  "dependencies": {
-    "@altdot/extension": "workspace:*"
-  }
-}
