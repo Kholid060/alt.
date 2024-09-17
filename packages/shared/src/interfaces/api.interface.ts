@@ -145,14 +145,6 @@ export type ApiExtensionUserListItem = Omit<ApiExtensionListItem, 'owner'> &
 export type ApiExtensionUserDetail = ApiExtensionDetail &
   Pick<ApiExtension, 'entry' | 'isPublished'>;
 
-export type ApiAdminExtensionListItem = ApiExtensionListItem &
-  Pick<ApiExtension, 'isPublished' | 'sourceUrl' | 'relativePath'> & {
-    entry:
-      | (ApiExtensionEntry & { id: number; updateReason: string | null })
-      | null;
-    owner: ApiExtensionOwner & Pick<ApiUserProfile, 'id'>;
-  };
-
 export type ApiExtensionHighlightItem = Pick<
   ApiExtension,
   'id' | 'name' | 'title' | 'iconUrl' | 'description' | 'owner'
@@ -164,13 +156,6 @@ export interface ApiStoreListExtensionsQuery {
   category?: ExtensionCategories;
   sortBy?: 'recently-added' | 'most-installed';
 }
-
-export type ApiAdminSetExtentionEntryPayload =
-  | { type: 'rejected'; reason: string }
-  | {
-      type: 'approved';
-      extension: Partial<ApiExtensionCreatePayload & { downloadUrl: string }>;
-    };
 
 export interface ApiWorkflowNode {
   id: string;

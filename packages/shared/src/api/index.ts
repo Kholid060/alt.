@@ -1,7 +1,6 @@
 import { ARequestInit, FetchError, afetch } from '../utils/afetch';
 import APIMeNamespace from './namespace/api-me.namespace';
 import APIStoreNamespace from './namespace/api-store.namespace';
-import APIAdminNamespace from './namespace/api-admin.namespace';
 import APIExtensionsNamespace from './namespace/api-extensions.namespace-';
 import APIWorkflowsNamespace from './namespace/api-workflows.namespace';
 import APIUserNamespace from './namespace/api-user.namespace';
@@ -37,12 +36,11 @@ class API {
   handleError: typeof API.handleError = API.handleError;
   getErrorMessage: typeof API.getErrorMessage = API.getErrorMessage;
 
-  me = new APIMeNamespace(this);
-  user = new APIUserNamespace(this);
-  store = new APIStoreNamespace(this);
-  admin = new APIAdminNamespace(this);
-  workflows = new APIWorkflowsNamespace(this);
-  extensions = new APIExtensionsNamespace(this);
+  readonly me = new APIMeNamespace(this);
+  readonly user = new APIUserNamespace(this);
+  readonly store = new APIStoreNamespace(this);
+  readonly workflows = new APIWorkflowsNamespace(this);
+  readonly extensions = new APIExtensionsNamespace(this);
 
   constructor(
     readonly apiBaseURL: string,
