@@ -33,7 +33,7 @@ class ContentFileHandle {
   constructor() {}
 
   private async getPort() {
-    if (!this.iframe || !this.iframe.parentNode) {
+    if (!this.iframe || !this.iframe.isConnected) {
       this.iframe = null;
       this.messagePort?.destroy();
       this.messagePort = null;

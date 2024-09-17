@@ -51,9 +51,9 @@ async function queryElement(
       const element = Array.isArray(elementCache.el)
         ? elementCache.el[elementIndex ?? 0]
         : null;
-      if (element) return element;
+      if (element && element.isConnected) return element;
     } else if (!Array.isArray(elementCache.el) && elementCache.el) {
-      if (!elementCache.el.parentNode) {
+      if (!elementCache.el.isConnected) {
         elementCaches.delete(selector);
       } else {
         return elementCache.el;
@@ -373,7 +373,7 @@ RuntimeMessage.instance.onMessage(
         });
         break;
       case 'detached':
-        checkState(() => (!element ? true : !element.parentNode));
+        checkState(() => (!element ? true : !element.isConnected));
         break;
       case 'visible':
         checkState(async () => {
