@@ -6,24 +6,28 @@ import {
 } from '../interface/workflow-editor.interface';
 import { createDebounce } from '@altdot/shared';
 import preloadAPI from '../utils/preloadAPI';
-import { isIPCEventError } from '#packages/common/utils/helper';
+import { WorkflowNodesContextState } from '@altdot/workflow';
+import { SelectExtension } from '#packages/main/src/db/schema/extension.schema';
 
 export interface WorkflowEditorContextState {
   event: EventEmitter<WorkflowEditorEvents>;
   lastMousePos: React.MutableRefObject<XYPosition>;
-  isExtCommandExists(commandId: string): {
-    cancel: () => void;
-    result: Promise<boolean>;
-  };
+  isExtCommandExists: WorkflowNodesContextState['extCommandChecker'];
 }
 
-export const WorkflowEditorContext = createContext<WorkflowEditorContextState>({
-  event: new EventEmitter(),
-  lastMousePos: { current: { x: 0, y: 0 } },
-  isExtCommandExists: () => ({ cancel() {}, result: Promise.resolve(false) }),
-});
+export const WorkflowEditorContext = createContext<WorkflowEditorContextState>(
+  {} as WorkflowEditorContextState,
+);
 
 const extCommandDebounce = createDebounce();
+
+type ExtCommandListenerFunc = (exists: boolean) => void;
+
+interface ExtensionCommandListener {
+  extension: Pick<SelectExtension, 'id' | 'isLocal' | 'title'>;
+  checkedCommands: Set<string>;
+  listeners: Record<string, Set<ExtCommandListenerFunc>>;
+}
 
 export function WorkflowEditorProvider({
   children,
@@ -33,62 +37,78 @@ export function WorkflowEditorProvider({
   const lastMousePos = useRef<XYPosition>({ x: 0, y: 0 });
   const eventEmitter = useRef(new EventEmitter<WorkflowEditorEvents>());
 
-  const extCommandQueue = useRef<
-    Record<string, PromiseWithResolvers<boolean>[]>
-  >({});
+  const extCommandListeners = useRef<Record<string, ExtensionCommandListener>>(
+    {},
+  );
 
   const isExtCommandExists: WorkflowEditorContextState['isExtCommandExists'] =
-    useCallback((commandId: string) => {
-      const resolver = Promise.withResolvers<boolean>();
+    useCallback(({ commandName, extension }, listener) => {
+      const commandId = `${extension.id}:${commandName}`;
+
+      if (!extCommandListeners.current[extension.id]) {
+        extCommandListeners.current[extension.id] = {
+          extension,
+          listeners: {},
+          checkedCommands: new Set(),
+        };
+      }
+
+      const extensionListener =
+        extCommandListeners.current[extension.id].listeners;
+      if (!extensionListener[commandId]) {
+        extensionListener[commandId] = new Set();
+      }
+
+      extensionListener[commandId].add(listener);
 
       extCommandDebounce(async () => {
         try {
-          const result = await preloadAPI.main.ipc.invoke(
-            'database:extension-command-exists',
-            Object.keys(extCommandQueue.current),
-          );
-          if (isIPCEventError(result)) {
-            Object.values(extCommandQueue.current)
-              .flat()
-              .forEach((promise) => {
-                promise.reject(new Error(result.message));
-              });
-            return;
-          }
+          const commandIds = Object.values(extCommandListeners.current).reduce<
+            string[]
+          >((acc, curr) => {
+            Object.keys(curr.listeners).forEach((key) => {
+              if (curr.checkedCommands.has(key)) return;
 
-          Object.keys(extCommandQueue.current).forEach((key) => {
-            const value = result[key] ?? false;
-            extCommandQueue.current[key].forEach((resolver) => {
-              resolver.resolve(value);
+              acc.push(key);
+            });
+
+            return acc;
+          }, []);
+          if (commandIds.length === 0) return;
+
+          const result = await preloadAPI.main.ipc.invokeWithError(
+            'database:extension-command-exists',
+            commandIds,
+          );
+          const missingExtensionIds = new Set<string>();
+
+          Object.values(extCommandListeners.current).forEach((extData) => {
+            Object.keys(extData.listeners).forEach((key) => {
+              if (extData.checkedCommands.has(key)) return;
+
+              const value = result[key];
+              extData.listeners[key].forEach((listener) => {
+                listener(value);
+              });
+
+              extData.checkedCommands.add(key);
+
+              if (!value && !extData.extension.isLocal) {
+                missingExtensionIds.add(extension.id);
+              }
             });
           });
+
+          eventEmitter.current.emit('node-command:missing-extension', [
+            ...missingExtensionIds,
+          ]);
         } catch (error) {
           console.error(error);
-          Object.values(extCommandQueue.current)
-            .flat()
-            .forEach((resolver) => {
-              resolver.reject(new Error('Something went wrong!'));
-            });
-        } finally {
-          extCommandQueue.current = {};
         }
       }, 1000);
 
-      if (!extCommandQueue.current[commandId]) {
-        extCommandQueue.current[commandId] = [];
-      }
-      extCommandQueue.current[commandId].push(resolver);
-
-      return {
-        cancel() {
-          const index =
-            extCommandQueue.current[commandId]?.indexOf(resolver) ?? -1;
-          if (index === -1) return;
-
-          resolver.reject(new Error('CANCELED'));
-          extCommandQueue.current[commandId].splice(index, 1);
-        },
-        result: resolver.promise,
+      return () => {
+        extensionListener[commandId]?.delete(listener);
       };
     }, []);
 
@@ -98,8 +118,49 @@ export function WorkflowEditorProvider({
     };
     window.addEventListener('mousemove', onMousemove);
 
+    const workflowEventEmitter = eventEmitter.current;
+    const onNodeCommandExistChange = (
+      {
+        commandId,
+        extensionId,
+      }: { extensionId?: string; commandId?: string[] },
+      exists: boolean,
+    ) => {
+      if (commandId) {
+        Object.values(extCommandListeners.current).forEach((extData) => {
+          commandId.forEach((id) => {
+            const listeners = extData.listeners[id];
+            if (!listeners) return;
+
+            listeners.forEach((listener) => listener(exists));
+          });
+        });
+        return;
+      }
+
+      if (!extensionId) return;
+
+      Object.values(extCommandListeners.current).forEach((extData) => {
+        if (extData.extension.id !== extensionId) return;
+
+        Object.values(extData.listeners).forEach((listeners) => {
+          listeners.forEach((listener) => {
+            listener(exists);
+          });
+        });
+      });
+    };
+    workflowEventEmitter.addListener(
+      'node-command:exists-changed',
+      onNodeCommandExistChange,
+    );
+
     return () => {
       window.removeEventListener('mousemove', onMousemove);
+      workflowEventEmitter.addListener(
+        'node-command:exists-changed',
+        onNodeCommandExistChange,
+      );
     };
   }, []);
 

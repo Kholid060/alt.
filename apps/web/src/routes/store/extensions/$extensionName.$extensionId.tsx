@@ -2,11 +2,7 @@ import {
   ExtensionDetailIcon,
   ExtensionDetailMarkdownAsset,
 } from '@/components/extension/ExtensionDetail';
-import {
-  ExtensionStoreDetail,
-  ExtensionPermissions,
-  ExtensionCommand,
-} from '@/interface/extension.interface';
+import { ExtensionStoreDetail } from '@/interface/extension.interface';
 import APIService from '@/services/api.service';
 import GithubAPI from '@/utils/GithubAPI';
 import { APP_TITLE, EXTENSION_COMMAND_TYPE_NAME } from '@/utils/constant';
@@ -173,111 +169,106 @@ function ExtensionPageBanner({
   );
 }
 
-function getPermissionsDescription(
-  permissions: ExtensionPermissions[],
-  commands: ExtensionCommand[],
-) {
-  const permissionDetail: Record<
-    string,
-    { description: string; permissions: string[] }
-  > = {};
-  const addPermission = ({
-    key,
-    permission,
-    description,
-    excludeIfHas,
-  }: {
-    key: string;
-    description: string;
-    permission: string;
-    excludeIfHas?: ExtensionPermissions;
-  }) => {
-    if (excludeIfHas && permissionDetail[excludeIfHas]) return;
+// function getPermissionsDescription(
+//   permissions: ExtensionPermissions[],
+//   commands: ExtensionCommand[],
+// ) {
+//   const permissionDetail: Record<
+//     string,
+//     { description: string; permissions: string[] }
+//   > = {};
+//   const addPermission = ({
+//     key,
+//     permission,
+//     description,
+//     excludeIfHas,
+//   }: {
+//     key: string;
+//     description: string;
+//     permission: string;
+//     excludeIfHas?: ExtensionPermissions;
+//   }) => {
+//     if (excludeIfHas && permissionDetail[excludeIfHas]) return;
 
-    if (!permissionDetail[key]) {
-      permissionDetail[key] = {
-        description,
-        permissions: [],
-      };
-    }
+//     if (!permissionDetail[key]) {
+//       permissionDetail[key] = {
+//         description,
+//         permissions: [],
+//       };
+//     }
 
-    permissionDetail[key].permissions.push(permission);
-  };
+//     permissionDetail[key].permissions.push(permission);
+//   };
 
-  commands.forEach((command) => {
-    if (command.type !== 'script') return;
+//   commands.forEach((command) => {
+//     if (command.type !== 'script') return;
 
-    addPermission({
-      key: 'script',
-      description: 'Execute script file',
-      permission: `${command.name} file`,
-    });
-  });
+//     addPermission({
+//       key: 'script',
+//       description: 'Execute script file',
+//       permission: `${command.name} file`,
+//     });
+//   });
 
-  const sortedPermissions = permissions.sort(
-    (a, z) => a.split('.').length - z.split('.').length,
-  );
-  sortedPermissions.forEach((permission) => {
-    switch (permission) {
-      case 'clipboard':
-        addPermission({
-          permission,
-          key: permission,
-          description: 'Read and write the clipboard data',
-        });
-        break;
-      case 'notifications':
-        addPermission({
-          permission,
-          key: permission,
-          description: 'Display notification',
-        });
-        break;
-      case 'fs.read':
-        addPermission({
-          permission,
-          key: permission,
-          excludeIfHas: 'fs',
-          description: 'Read your local file',
-        });
-        break;
+//   const sortedPermissions = permissions.sort(
+//     (a, z) => a.split('.').length - z.split('.').length,
+//   );
+//   sortedPermissions.forEach((permission) => {
+//     switch (permission) {
+//       case 'clipboard':
+//         addPermission({
+//           permission,
+//           key: permission,
+//           description: 'Read and write the clipboard data',
+//         });
+//         break;
+//       case 'notifications':
+//         addPermission({
+//           permission,
+//           key: permission,
+//           description: 'Display notification',
+//         });
+//         break;
+//       case 'fs.read':
+//         addPermission({
+//           permission,
+//           key: permission,
+//           excludeIfHas: 'fs',
+//           description: 'Read your local file',
+//         });
+//         break;
 
-      case 'fs.write': {
-        addPermission({
-          permission,
-          key: permission,
-          excludeIfHas: 'fs',
-          description: 'Write your local file',
-        });
-        break;
-      }
-      case 'fs':
-        addPermission({
-          permission,
-          key: permission,
-          description: 'Read and write your local file',
-        });
-        break;
-      case 'browser.tabs':
-        addPermission({
-          permission,
-          key: 'browser',
-          description: 'Access the the browser tabs',
-        });
-        break;
-    }
-  });
+//       case 'fs.write': {
+//         addPermission({
+//           permission,
+//           key: permission,
+//           excludeIfHas: 'fs',
+//           description: 'Write your local file',
+//         });
+//         break;
+//       }
+//       case 'fs':
+//         addPermission({
+//           permission,
+//           key: permission,
+//           description: 'Read and write your local file',
+//         });
+//         break;
+//       case 'browser.tabs':
+//         addPermission({
+//           permission,
+//           key: 'browser',
+//           description: 'Access the the browser tabs',
+//         });
+//         break;
+//     }
+//   });
 
-  return Object.values(permissionDetail);
-}
+//   return Object.values(permissionDetail);
+// }
 
 function StoreExtensionsDetailPage() {
   const extension = Route.useLoaderData();
-
-  const permissions = getPermissionsDescription(
-    extension.permissions ?? [],
-    extension.commands,
-  );
 
   return (
     <div className="container py-36">

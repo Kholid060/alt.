@@ -15,10 +15,13 @@ export interface WorkflowNodesContextState {
   onCopyNode?(nodeData: NodeData[]): void;
   onRunWorkflow?(nodeData: NodeData): void;
   resolveExtIcon(nodeData: NodeData<WorkflowNodeCommand>): React.ReactNode;
-  extCommandChecker(commandId: string): {
-    cancel: () => void;
-    result: Promise<boolean>;
-  };
+  extCommandChecker(
+    detail: {
+      commandName: string;
+      extension: WorkflowNodeCommand['data']['extension'];
+    },
+    onChanged: (exists: boolean) => void,
+  ): () => void;
   onToggleDisable?(nodeData: NodeData, isDisabled: boolean): void;
   onOpenContextMenu?(nodeData: NodeData, event: React.MouseEvent): void;
 }

@@ -10,6 +10,7 @@ import type {
 } from './extension.interface';
 import type {
   AllButLast,
+  ApiExtensionHighlightItem,
   BrowserConnected,
   BrowserSelectFileData,
   BrowserSelectFileOptions,
@@ -214,6 +215,9 @@ export interface IPCOAuthEvents {
 }
 
 export interface IPCExtensionEvents {
+  'extension:fetch-extension-highlight': (
+    ids: string[],
+  ) => ApiExtensionHighlightItem[];
   'extension:get-platform': () => ExtensionAPI.Runtime.PlatformInfo;
   'extension:is-config-inputted': (
     extensionId: string,

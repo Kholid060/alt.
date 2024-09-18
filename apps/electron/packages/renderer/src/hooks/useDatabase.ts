@@ -163,3 +163,7 @@ export function useDatabaseQuery<
 
   return { ...state, updateState, refresh: fetchQuery };
 }
+
+export function useDatabaseCtx() {
+  return useContext(DatabaseContext);
+}

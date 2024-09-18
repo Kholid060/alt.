@@ -266,15 +266,13 @@ export const WorkflowNodeCommandNode: React.FC<NodeProps<WorkflowNodeCommand>> =
     const extensionIcon = useMemo(() => resolveExtIcon({ id, data }), []);
 
     useEffect(() => {
-      const command = extCommandChecker(
-        `${data.extension.id}:${data.commandId}`,
+      const destroyListener = extCommandChecker(
+        { commandName: data.commandId, extension: data.extension },
+        setCommandExists,
       );
-      command.result.then(setCommandExists).catch(() => {
-        // do nothing
-      });
 
-      return () => command.cancel();
-    }, [data.commandId, data.extension.id, extCommandChecker]);
+      return () => destroyListener();
+    }, [data.commandId, data.extension, extCommandChecker]);
 
     return (
       <>

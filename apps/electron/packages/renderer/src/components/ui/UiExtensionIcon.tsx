@@ -42,13 +42,19 @@ function UiExtensionIcon({
 
   return (
     <picture>
-      <source media="(prefers-color-scheme: dark)" srcSet={imgSrc + '@dark'} />
+      {extensionIcon && (
+        <source
+          media="(prefers-color-scheme: dark)"
+          srcSet={imgSrc + '@dark'}
+        />
+      )}
       <img
         src={imgSrc}
         alt={alt}
+        loading="lazy"
         onError={(event) => {
           const img = event.target as HTMLImageElement;
-          if (img.currentSrc.includes('@dark')) {
+          if (img.currentSrc.includes('@dark') && extensionIcon) {
             if (img.previousElementSibling?.tagName === 'SOURCE') {
               img.previousElementSibling.remove();
             }

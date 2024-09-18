@@ -14,6 +14,7 @@ import WorkflowHistoryDetail from '../../workflow-history/WorkflowHistoryDetail'
 import WorkflowHistoryStatusBadge from '../../workflow-history/WorkflowHistoryStatusBadge';
 import { formatDuration } from '/@/utils/helper';
 import { useReactFlow, useStoreApi } from '@xyflow/react';
+import { useWorkflowEditorStore } from '/@/stores/workflow-editor/workflow-editor.store';
 
 function WorkflowHistoryContent({
   workflowId,
@@ -125,7 +126,8 @@ function WorkflowHistoryContent({
   );
 }
 
-function WorkflowEditorLogs({ workflowId }: { workflowId: string }) {
+function WorkflowEditorLogs() {
+  const workflowId = useWorkflowEditorStore((state) => state.workflow?.id);
   const runningWorkflows = useDatabaseQuery('database:get-running-workflows', [
     { workflowId },
   ]);
@@ -133,7 +135,7 @@ function WorkflowEditorLogs({ workflowId }: { workflowId: string }) {
   const [showDialog, setShowDialog] = useState(false);
 
   return (
-    <div className="rounded-md border border-border/60 bg-secondary">
+    <>
       <UiTooltip label="Workflow history">
         <UiButton
           variant="ghost"
@@ -146,18 +148,18 @@ function WorkflowEditorLogs({ workflowId }: { workflowId: string }) {
               {runningWorkflows.data.length}
             </span>
           )}
-          <HistoryIcon className="h-5 w-5" />
+          <HistoryIcon />
         </UiButton>
       </UiTooltip>
       <UiDialog modal open={showDialog} onOpenChange={setShowDialog}>
         <UiDialog.Content className="max-w-4xl p-0" blurBg={false}>
           <WorkflowHistoryContent
-            workflowId={workflowId}
+            workflowId={workflowId!}
             onCloseDialog={() => setShowDialog(false)}
           />
         </UiDialog.Content>
       </UiDialog>
-    </div>
+    </>
   );
 }
 

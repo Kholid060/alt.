@@ -11,11 +11,13 @@ import { ExtensionAuthTokenService } from './extension-auth-token/extension-auth
 import { ExtensionStorageService } from './extension-storage/extension-storage.service';
 import { ExtensionQueryService } from './extension-query.service';
 import { ExtensionOAuthTokensModule } from './extension-oauth-tokens/extension-oauth-tokens.module';
+import { APIService } from '../api/api.service';
 
 @Module({
   exports: [ExtensionService, ExtensionSqliteModule, ExtensionQueryService],
   controllers: [ExtensionController],
   providers: [
+    APIService,
     ExtensionService,
     ExtensionQueryService,
     ExtensionStorageService,

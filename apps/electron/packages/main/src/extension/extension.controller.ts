@@ -7,10 +7,14 @@ import type {
 } from '#packages/common/interface/ipc-events.interface';
 import { ExtensionQueryService } from './extension-query.service';
 import { getExtensionPlatform } from '../common/utils/helper';
+import { APIService } from '../api/api.service';
 
 @Controller()
 export class ExtensionController {
-  constructor(private extensionQuery: ExtensionQueryService) {}
+  constructor(
+    private apiService: APIService,
+    private extensionQuery: ExtensionQueryService,
+  ) {}
 
   @IPCInvoke('database:get-extension')
   getExtension(
@@ -65,5 +69,13 @@ export class ExtensionController {
   @IPCInvoke('extension:get-platform')
   async getExtensionPlatform(): IPCInvokeReturn<'extension:get-platform'> {
     return getExtensionPlatform();
+  }
+
+  @IPCInvoke('extension:fetch-extension-highlight')
+  async getExtensionHighlight(
+    @Payload()
+    [ids]: IPCInvokePayload<'extension:fetch-extension-highlight'>,
+  ): IPCInvokeReturn<'extension:fetch-extension-highlight'> {
+    return this.apiService.extensions.getHighlights(ids);
   }
 }

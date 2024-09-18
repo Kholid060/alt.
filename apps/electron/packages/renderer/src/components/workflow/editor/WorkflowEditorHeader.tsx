@@ -44,6 +44,7 @@ import DeepLinkURL from '#packages/common/utils/DeepLinkURL';
 import WorkflowDetailForm from '../WorkflowDetailForm';
 import { WorkflowUpdatePayload } from '#packages/main/src/workflow/workflow.interface';
 import { WORKFLOW_NODE_TRIGGERS } from '#packages/common/utils/constant/workflow.const';
+import WorkflowEditorLogs from './WorkflowEditorLogs';
 
 function WorkflowInformation() {
   const workflow = useWorkflowEditorStore.use.workflow();
@@ -109,7 +110,9 @@ function WorkflowInformation() {
   );
 }
 
-function WorkflowVariableModal() {
+function WorkflowVariableModal(
+  props: React.DetailsHTMLAttributes<HTMLButtonElement>,
+) {
   const variables = useWorkflowEditorStore(
     (state) => state.workflow?.variables ?? [],
   );
@@ -171,12 +174,12 @@ function WorkflowVariableModal() {
     <UiDialog modal>
       <UiTooltip label="Workflow variables">
         <UiDialog.Trigger asChild>
-          <UiButton size="icon" variant="ghost">
+          <UiButton size="icon" variant="ghost" {...props}>
             <VariableIcon />
           </UiButton>
         </UiDialog.Trigger>
       </UiTooltip>
-      <UiDialog.Content className="max-w-2xl p-0">
+      <UiDialog.Content blurBg={false} className="max-w-2xl p-0">
         <UiDialog.Header className="px-6 pt-6">
           <UiDialog.Title>Workflow variables</UiDialog.Title>
           <UiDialog.Description>
@@ -309,7 +312,7 @@ function WorkflowSaveButton() {
     params.set('preventCloseWindow', `${enableWorkflowSaveBtn}`);
 
     setSearchParams(params);
-  }, [enableWorkflowSaveBtn]);
+  }, [enableWorkflowSaveBtn, setSearchParams]);
 
   const saveWorkflow = useCallback(async () => {
     try {
@@ -572,7 +575,8 @@ function WorkflowEditorHeader() {
       </UiTooltip>
       <hr className="mx-4 h-2/6 w-px bg-border/50" />
       <WorkflowInformation />
-      <WorkflowVariableModal />
+      <WorkflowEditorLogs />
+      <WorkflowVariableModal className="ml-2" />
       <WorkflowMoreMenu />
       <hr className="mx-4 h-2/6 w-px bg-border/50" />
       <WorkflowToggles />

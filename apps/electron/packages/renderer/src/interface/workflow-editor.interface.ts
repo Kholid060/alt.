@@ -67,6 +67,11 @@ export interface WorkflowEditorOpenNodeListModalPayload {
 }
 
 export interface WorkflowEditorEvents {
+  'node-command:missing-extension': (ids: string[]) => void;
+  'node-command:exists-changed': (
+    detail: { extensionId?: string; commandId?: string[] },
+    exists: boolean,
+  ) => void;
   'context-menu:close': () => void;
   'context-menu:open': (payload: WorkflowEditorContextMenuEventPayload) => void;
   'node-list-modal:open': (

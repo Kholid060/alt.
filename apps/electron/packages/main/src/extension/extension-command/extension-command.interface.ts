@@ -35,3 +35,11 @@ export type ExtensionCommandUpdatePayload = Partial<
     | 'customSubtitle'
   >
 >;
+
+export type ExtensionCommandExistsItem =
+  | {
+      exists: true;
+      isLocal: boolean;
+      extensionId: string;
+    }
+  | { exists: false; isLocal: null; extensionId: null };

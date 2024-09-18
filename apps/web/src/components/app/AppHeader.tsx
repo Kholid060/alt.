@@ -1,6 +1,5 @@
 import SupabaseService from '@/services/supabase.service';
 import { useUserStore } from '@/stores/user.store';
-import { UserRole } from '@/utils/constant';
 import {
   UiAvatar,
   UiAvatarFallback,
@@ -22,7 +21,6 @@ import {
   LogOutIcon,
   MenuIcon,
   SettingsIcon,
-  UserRoundCogIcon,
   UserRoundIcon,
   XIcon,
 } from 'lucide-react';
@@ -75,14 +73,6 @@ function ProfileMenu() {
                   Developer dashboard
                 </Link>
               </UiDropdownMenuItem>
-              {profile.role === UserRole.Admin && (
-                <UiDropdownMenuItem asChild>
-                  <Link to="/admin/dashboard">
-                    <UserRoundCogIcon className="mr-2 size-4" />
-                    Admin dashboard
-                  </Link>
-                </UiDropdownMenuItem>
-              )}
             </UiDropdownMenuGroup>
             <UiDropdownMenuSeparator />
             <UiDropdownMenuGroup>
@@ -177,7 +167,7 @@ function HeaderLinkMobile() {
 
 function AppHeader() {
   return (
-    <header className="fixed left-0 top-0 z-[49] w-full">
+    <header className="fixed left-0 top-0 z-[57] w-full">
       <div className="container">
         <nav className="mx-auto mt-4 grid h-14 grid-cols-12 items-center rounded-md border bg-background/70 px-4 backdrop-blur-sm">
           <div className="col-span-6 md:col-span-2">

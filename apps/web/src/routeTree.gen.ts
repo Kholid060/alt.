@@ -20,7 +20,6 @@ import { Route as AuthIndexImport } from './routes/auth/index'
 import { Route as UUsernameImport } from './routes/u.$username_'
 import { Route as OauthRedirectImport } from './routes/oauth/redirect'
 import { Route as UUsernameIndexImport } from './routes/u.$username_/index'
-import { Route as AdminDashboardIndexImport } from './routes/admin/dashboard/index'
 import { Route as UUsernameWorkflowsImport } from './routes/u.$username_/workflows'
 import { Route as UUsernameExtensionsImport } from './routes/u.$username_/extensions'
 import { Route as StoreWorkflowsWorkflowIdImport } from './routes/store/workflows/$workflowId'
@@ -80,11 +79,6 @@ const OauthRedirectRoute = OauthRedirectImport.update({
 const UUsernameIndexRoute = UUsernameIndexImport.update({
   path: '/',
   getParentRoute: () => UUsernameRoute,
-} as any)
-
-const AdminDashboardIndexRoute = AdminDashboardIndexImport.update({
-  path: '/admin/dashboard/',
-  getParentRoute: () => rootRoute,
 } as any)
 
 const UUsernameWorkflowsRoute = UUsernameWorkflowsImport.update({
@@ -301,13 +295,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UUsernameWorkflowsImport
       parentRoute: typeof UUsernameImport
     }
-    '/admin/dashboard/': {
-      id: '/admin/dashboard/'
-      path: '/admin/dashboard'
-      fullPath: '/admin/dashboard'
-      preLoaderRoute: typeof AdminDashboardIndexImport
-      parentRoute: typeof rootRoute
-    }
     '/u/$username/': {
       id: '/u/$username/'
       path: '/'
@@ -351,7 +338,6 @@ export const routeTree = rootRoute.addChildren({
   DevconsoleWorkflowsWorkflowIdRoute,
   DevconsoleWorkflowsNewRoute,
   StoreWorkflowsWorkflowIdRoute,
-  AdminDashboardIndexRoute,
   StoreExtensionsExtensionNameExtensionIdRoute,
 })
 
@@ -376,7 +362,6 @@ export const routeTree = rootRoute.addChildren({
         "/devconsole/workflows/$workflowId",
         "/devconsole/workflows/new",
         "/store/workflows/$workflowId",
-        "/admin/dashboard/",
         "/store/extensions/$extensionName/$extensionId"
       ]
     },
@@ -462,9 +447,6 @@ export const routeTree = rootRoute.addChildren({
     "/u/$username/workflows": {
       "filePath": "u.$username_/workflows.tsx",
       "parent": "/u/$username"
-    },
-    "/admin/dashboard/": {
-      "filePath": "admin/dashboard/index.tsx"
     },
     "/u/$username/": {
       "filePath": "u.$username_/index.tsx",
