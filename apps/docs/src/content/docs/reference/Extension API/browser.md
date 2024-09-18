@@ -450,7 +450,7 @@ export default async function Command() {
 ```
 
 #### `browser.tabs.Tab.selectFile`
-> (selector?: <a href="#browsertabselementselector">ElementSelector</a>, files: (string | <a href="#browsertabsselectfileData">SelectFileData</a>)[], options?: [SelectFileOptions](#browsertabsselectfileoptions)) =&gt; Promise&lt;string[]&gt;
+> (selector?: <a href="#browsertabselementselector">ElementSelector</a>, files: (string | <a href="#browsertabsselectfiledata">SelectFileData</a>)[], options?: [SelectFileOptions](#browsertabsselectfileoptions)) =&gt; Promise&lt;string[]&gt;
 
 Set the files in the <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file"> &lt;input type="file" /&gt;</a> element or simulate drag and drop files into the browser. The string in the <code>files</code> parameter is a file path.
 
