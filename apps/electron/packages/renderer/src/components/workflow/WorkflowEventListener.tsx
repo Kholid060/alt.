@@ -12,7 +12,7 @@ export const isInsideWorkflowEditor = (event: Event) =>
     event.target.classList.toString().startsWith('react-flow'));
 
 function WorkflowShortcutListener() {
-  const { copyElements, selectAllNodes } = useWorkflowEditor();
+  const { copyElements, selectAllNodes, pasteElements } = useWorkflowEditor();
 
   useHotkeys(
     'mod+a',
@@ -27,12 +27,21 @@ function WorkflowShortcutListener() {
   useHotkeys(
     ['mod+c', 'mod+x'],
     (event) => {
+      console.log('hola', isInsideWorkflowEditor(event));
       if (!isInsideWorkflowEditor(event)) return;
 
       const { edges, nodes } = useWorkflowEditorStore.getState().selection;
       if (edges.length === 0 && nodes.length === 0) return;
 
       copyElements({ edges, nodes }, event.key === 'x');
+    },
+    [],
+  );
+  useHotkeys(
+    ['mod+v'],
+    (event) => {
+      if (!isInsideWorkflowEditor(event)) return;
+      pasteElements();
     },
     [],
   );

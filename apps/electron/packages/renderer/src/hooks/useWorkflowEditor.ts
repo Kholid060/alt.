@@ -77,7 +77,10 @@ export function useWorkflowEditor() {
       }),
     );
 
-    if (nodes.length > 0) addNodes(nodes);
+    if (nodes.length > 0) {
+      addNodes(nodes);
+      storeApi.getState().addSelectedNodes(nodes.map((node) => node.id!));
+    }
     if (edges.length > 0) addEdges(edges);
 
     return null;
