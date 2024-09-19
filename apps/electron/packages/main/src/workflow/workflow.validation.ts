@@ -17,8 +17,8 @@ export const workflowFileValidation = z.object({
       id: z.string(),
       source: z.string(),
       target: z.string(),
-      sourceHandle: z.string().nullable(),
-      targetHandle: z.string().nullable(),
+      sourceHandle: z.string().nullable().optional(),
+      targetHandle: z.string().nullable().optional(),
     })
     .array(),
   viewport: z

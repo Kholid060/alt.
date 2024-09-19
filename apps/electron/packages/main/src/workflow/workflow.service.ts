@@ -11,7 +11,6 @@ import {
   workflowFileValidation,
 } from './workflow.validation';
 import { LoggerService } from '../logger/logger.service';
-import { fromZodError } from 'zod-validation-error';
 import {
   WorkflowApiWithExtensions,
   WorkflowInsertPayload,
@@ -118,7 +117,7 @@ export class WorkflowService implements OnAppReady {
     try {
       let workflowsFilePath = filePath;
       if (!workflowsFilePath) {
-        ({ filePaths: workflowsFilePath } = await dialog.showOpenDialog({
+        const { filePaths, canceled } = await dialog.showOpenDialog({
           buttonLabel: 'Import',
           title: 'Import workflow',
           filters: [
@@ -128,8 +127,10 @@ export class WorkflowService implements OnAppReady {
             },
           ],
           defaultPath: app.getPath('documents'),
-        }));
-        if (!workflowsFilePath) return;
+        });
+        if (canceled || !filePaths) return;
+
+        workflowsFilePath = filePaths;
       }
 
       await Promise.all(
@@ -140,9 +141,8 @@ export class WorkflowService implements OnAppReady {
 
           if (!workflow.success) {
             this.logger.error(
-              ['WorkflowService', 'import'],
-              `(${path.basename(filePath)})`,
-              fromZodError(workflow.error),
+              ['WorkflowService', 'import', `(${path.basename(filePath)})`],
+              workflow.error,
             );
             return;
           }

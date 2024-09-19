@@ -17,19 +17,21 @@ function CommandWorkflowsList() {
     [{ limit: 10, sort: { by: 'isPinned', asc: false } }],
     {
       transform(data): CommandListItemWorkflow[] {
-        return data.map((workflow) => {
-          return {
-            group: workflow.isPinned ? 'Pinned' : 'All',
-            icon: workflow.icon,
-            title: workflow.name,
-            value: `workflow:${workflow.id}`,
-            metadata: {
-              type: 'workflow',
-              workflowId: workflow.id,
-              isPinned: workflow.isPinned ?? false,
-            },
-          };
-        });
+        return data
+          .sort((a, z) => (a.updatedAt > z.updatedAt ? -1 : 1))
+          .map((workflow) => {
+            return {
+              group: workflow.isPinned ? 'Pinned' : 'All',
+              icon: workflow.icon,
+              title: workflow.name,
+              value: `workflow:${workflow.id}`,
+              metadata: {
+                type: 'workflow',
+                workflowId: workflow.id,
+                isPinned: workflow.isPinned ?? false,
+              },
+            };
+          });
       },
     },
   );

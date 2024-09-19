@@ -128,7 +128,6 @@
     "@nestjs/microservices": "^10.3.10",
     "@nestjs/platform-socket.io": "^10.3.10",
     "@nestjs/websockets": "^10.3.10",
-    "@sentry/electron": "^5.4.0",
     "adm-zip": "^0.5.14",
     "better-sqlite3": "^11.2.1",
     "cache-manager": "^5.6.1",

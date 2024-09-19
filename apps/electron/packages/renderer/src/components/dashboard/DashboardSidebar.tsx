@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import UiLogo from '../ui/UiLogo';
 import preloadAPI from '/@/utils/preloadAPI';
 import { AppVersions } from '#packages/common/interface/app.interface';
+import WebURL from '#packages/common/utils/WebURL';
 
 const navigationItems: { title: string; path: string; icon: LucideIcon }[] = [
   {
@@ -70,7 +71,10 @@ function AboutApp() {
           variant="secondary"
           size="sm"
           onClick={() =>
-            preloadAPI.main.ipc.invoke('shell:open-url', 'https://example.com')
+            preloadAPI.main.ipc.invoke(
+              'shell:open-url',
+              'https://docs.altdot.app',
+            )
           }
         >
           <ExternalLinkIcon className="mr-2 size-4" />
@@ -80,7 +84,7 @@ function AboutApp() {
           variant="secondary"
           size="sm"
           onClick={() =>
-            preloadAPI.main.ipc.invoke('shell:open-url', 'https://example.com')
+            preloadAPI.main.ipc.invoke('shell:open-url', WebURL.baseURL)
           }
         >
           <ExternalLinkIcon className="mr-2 size-4" />
