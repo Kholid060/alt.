@@ -36,7 +36,7 @@ export class ExtensionUpdaterService implements OnAppReady {
   }
 
   private async checkUpdate() {
-    const lastCheckUpdate = this.appStore.get('lastCheckExtensionUpdate');
+    const lastCheckUpdate = await this.appStore.get('lastCheckExtensionUpdate');
     const checkUpdate =
       !lastCheckUpdate ||
       new Date(lastCheckUpdate).getDate() !== new Date().getDate();

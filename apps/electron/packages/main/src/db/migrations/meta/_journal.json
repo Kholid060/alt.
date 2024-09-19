@@ -43,6 +43,13 @@
       "when": 1726211511030,
       "tag": "0005_dear_calypso",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1726718367911,
+      "tag": "0006_bizarre_mandroid",
+      "breakpoints": true
     }
   ]
 }

@@ -311,7 +311,7 @@ export function WorkflowEditorNodeListModal() {
     {
       preventDefault: true,
     },
-    [],
+    [openModal],
   );
 
   function onSelectItem(node: WorkflowNewNode) {

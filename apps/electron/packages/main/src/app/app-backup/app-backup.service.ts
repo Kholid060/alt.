@@ -82,7 +82,7 @@ export class AppBackupService {
     return {
       workflows,
       extensions,
-      settings: this.appStore.getSettings(),
+      settings: this.appStore.get(),
     };
   }
 

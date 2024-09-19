@@ -39,11 +39,9 @@ export class AppController {
   getSettings(
     @Payload() [key]: IPCInvokePayload<'app:get-settings'>,
   ): IPCInvokeReturn<'app:get-settings'> {
-    return Promise.resolve(
-      this.appStore.getSettings(
-        key,
-      ) as unknown as IPCInvokeReturn<'app:get-settings'>,
-    );
+    return this.appStore.getSettings(
+      key,
+    ) as unknown as IPCInvokeReturn<'app:get-settings'>;
   }
 
   @IPCInvoke('app:set-settings')

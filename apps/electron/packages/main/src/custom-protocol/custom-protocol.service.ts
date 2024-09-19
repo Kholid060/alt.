@@ -38,12 +38,8 @@ export class CustomProtocolService {
     const fileIcon = await app.getFileIcon(decodeURIComponent(filePath), {
       size: 'normal',
     });
+
     return new Response(fileIcon.toPNG());
-    return createErrorResponse({
-      status: 404,
-      code: 'NOT_FOUND',
-      message: 'Icon not found',
-    });
   }
 
   async handleExtensionProtocol(req: GlobalRequest) {

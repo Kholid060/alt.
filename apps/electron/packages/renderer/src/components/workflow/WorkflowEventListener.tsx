@@ -27,7 +27,6 @@ function WorkflowShortcutListener() {
   useHotkeys(
     ['mod+c', 'mod+x'],
     (event) => {
-      console.log('hola', isInsideWorkflowEditor(event));
       if (!isInsideWorkflowEditor(event)) return;
 
       const { edges, nodes } = useWorkflowEditorStore.getState().selection;

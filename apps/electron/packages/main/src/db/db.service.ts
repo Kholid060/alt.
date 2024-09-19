@@ -11,6 +11,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import * as workflowsSchema from '/@/db/schema/workflow.schema';
 import * as extensionsSchema from '/@/db/schema/extension.schema';
+import * as storeSchema from '/@/db/schema/store.schema';
 import { debugLog } from '#packages/common/utils/helper';
 import { DatabaseQueriesEvent } from '../interface/database.interface';
 import { DATABASE_CHANGES_ALL_ARGS } from '#packages/common/utils/constant/constant';
@@ -20,7 +21,8 @@ import { DATABASE_FOLDER } from '../common/utils/constant';
 const DB_PATH = path.join(DATABASE_FOLDER, 'extensions.db');
 
 export type SQLiteDatabaseSchema = typeof extensionsSchema &
-  typeof workflowsSchema;
+  typeof workflowsSchema &
+  typeof storeSchema;
 export type SQLiteDatabase = BetterSQLite3Database<SQLiteDatabaseSchema>;
 export type SQLiteDatabaseTx = Parameters<
   Parameters<SQLiteDatabase['transaction']>[0]
@@ -42,8 +44,9 @@ export class DBService implements OnModuleInit, OnApplicationShutdown {
     this.connection = new Database(DB_PATH);
     this.db = drizzle(this.connection, {
       schema: {
-        ...extensionsSchema,
+        ...storeSchema,
         ...workflowsSchema,
+        ...extensionsSchema,
       },
     });
 
