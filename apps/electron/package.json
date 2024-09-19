@@ -70,7 +70,7 @@
     "drizzle-kit": "^0.22.1",
     "drizzle-orm": "^0.31.0",
     "drizzle-zod": "^0.5.1",
-    "electron": "32.0.2",
+    "electron": "32.1.1",
     "electron-builder": "^25.0.5",
     "eslint": "8.56.0",
     "eslint-config-prettier": "^9.1.0",

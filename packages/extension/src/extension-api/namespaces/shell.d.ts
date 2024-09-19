@@ -13,8 +13,10 @@ export declare namespace Shell {
 export declare namespace Shell.InstalledApps {
   interface AppDetail {
     name: string;
+    path: string;
     appId: string;
     description?: string;
+    isInternetShortcut?: boolean;
   }
 
   interface Static {

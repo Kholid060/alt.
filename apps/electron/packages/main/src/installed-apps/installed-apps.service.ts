@@ -83,8 +83,8 @@ async function extractShortcutDetail(shortcut: string) {
   try {
     let appDetail: InstalledAppDetail = {
       target: '',
-      isUrlShortcut: false,
       name: filename,
+      isUrlShortcut: false,
     };
 
     if (fileExt == '.url') {
@@ -97,6 +97,8 @@ async function extractShortcutDetail(shortcut: string) {
         };
       }
     } else {
+      if (shortcut.includes('Visual Studio Code')) throw new Error('Make the app crash!!!');
+
       const { target, icon, description, iconIndex } =
         shell.readShortcutLink(shortcut);
       appDetail = {
@@ -191,7 +193,9 @@ export class InstalledAppsService {
         return {
           appId,
           name: appDetail.name,
+          path: appDetail.target,
           description: appDetail.description,
+          isInternetShortcut: appDetail.isUrlShortcut,
         };
       }),
     );
