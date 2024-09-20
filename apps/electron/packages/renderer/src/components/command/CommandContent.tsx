@@ -31,20 +31,18 @@ const CommandContent = forwardRef<HTMLDivElement>((_, ref) => {
   const mergedRef = mergeRefs(containerRef, ref);
 
   return (
-    <>
-      <div
-        ref={mergedRef}
-        className="custom-scroller max-h-80 min-h-48 overflow-auto"
-        style={{
-          height: 'var(--ui-list-height)',
-          transition: 'height 250ms ease',
-        }}
-      >
-        <div ref={resizerContainerRef}>
-          <CommandRouteOutlet />
-        </div>
+    <div
+      ref={mergedRef}
+      className="custom-scroller max-h-80 min-h-48 overflow-auto"
+      style={{
+        height: 'var(--ui-list-height)',
+        transition: 'height 250ms ease',
+      }}
+    >
+      <div ref={resizerContainerRef}>
+        <CommandRouteOutlet />
       </div>
-    </>
+    </div>
   );
 });
 CommandContent.displayName = 'CommandContent';

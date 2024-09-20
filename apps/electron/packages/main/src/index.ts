@@ -7,6 +7,8 @@ import { APP_USER_MODEL_ID } from '@altdot/shared';
 import { devtoolsExtInstaller } from './common/utils/devtools-ext-installer';
 import { applySecurity } from './common/utils/security-restrictions';
 
+console.time('startup');
+
 ElectronLogger._instance.log('Starting app');
 
 applySecurity();
@@ -50,6 +52,8 @@ const electronNest = await ElectronNest.createApp(AppModule, {
   logger: console,
 });
 await electronNest.init();
+
+console.timeEnd('startup');
 
 /**
  * Check for app updates, install it in background and notify user that new version was installed.
