@@ -305,10 +305,13 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
             return;
           }
 
-          const itemEl = document.querySelector<HTMLElement>(
-            `[data-item-value="${id}"]`,
+          const itemEl =
+            listStore.containerRef.current?.querySelector<HTMLElement>(
+              `[data-item-value="${id}"]`,
+            );
+          itemEl?.dispatchEvent(
+            new CustomEvent(ITEM_SELECTED_EVENT, { detail: id, bubbles: true }),
           );
-          itemEl?.dispatchEvent(new Event(ITEM_SELECTED_EVENT));
         },
         runActionByShortcut(event) {
           const { actions } = listStore.snapshot().selectedItem;
@@ -486,7 +489,21 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
       };
     }, [disabledItemSelection, controller, listStore]);
     useEffect(() => {
+      const onItemSelectedEvent = (event: Event) => {
+        if (event instanceof CustomEvent) {
+          onItemSelected?.(event.detail);
+        }
+      };
+      listStore.containerRef.current?.addEventListener(
+        ITEM_SELECTED_EVENT,
+        onItemSelectedEvent,
+      );
+
       return () => {
+        listStore.containerRef.current?.removeEventListener(
+          ITEM_SELECTED_EVENT,
+          onItemSelectedEvent,
+        );
         listStore.setSelectedItem({
           id: '',
           index: -1,
@@ -495,7 +512,7 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
           actionIndex: -1,
         });
       };
-    }, [listStore]);
+    }, [listStore, onItemSelected]);
 
     return (
       <div ref={listStore.containerRef} {...props}>
@@ -594,12 +611,9 @@ function UiListItemRenderer({
         ref: elRef,
         selected: isSelected,
         props: {
-          onPointerMove,
           onClick,
-          onSelected() {
-            item.onSelected?.();
-            onSelected?.();
-          },
+          onSelected,
+          onPointerMove,
         },
       },
       index,
@@ -617,10 +631,7 @@ function UiListItemRenderer({
       actions={item.actions}
       selected={isSelected}
       subtitle={item.subtitle}
-      onSelected={() => {
-        item.onSelected?.();
-        onSelected?.();
-      }}
+      onSelected={item.onSelected}
       description={item.description}
       onClick={onClick}
       onPointerMove={onPointerMove}
@@ -819,13 +830,17 @@ const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
     useEffect(() => {
       const element = elementRef.current;
 
-      const onSelectedEvent = () => onSelected?.(value);
+      const onSelectedEvent = (event: Event) => {
+        if (event instanceof CustomEvent) {
+          onSelected?.(event.detail);
+        }
+      };
       element?.addEventListener(ITEM_SELECTED_EVENT, onSelectedEvent);
 
       return () => {
         element?.removeEventListener(ITEM_SELECTED_EVENT, onSelectedEvent);
       };
-    }, [onSelected, value]);
+    }, [onSelected]);
 
     return (
       <div
@@ -860,7 +875,7 @@ const UiListItem = forwardRef<HTMLDivElement, UiListItemProps>(
                   </span>
                 )}
               </p>
-              <span className="text-muted-foreground leading-tight">
+              <span className="text-muted-foreground leading-tight text-xs">
                 {description}
               </span>
             </div>
