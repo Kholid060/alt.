@@ -1,4 +1,4 @@
-import { CustomError } from '#packages/common/errors/custom-errors';
+import { CustomError, ExtensionError } from '#packages/common/errors/custom-errors';
 import { ExtensionAPIMessagePayload } from '#packages/common/interface/extension.interface';
 import {
   IPCUserExtensionEventsMap,
@@ -81,7 +81,7 @@ export class ExtensionRunnerExecutionService implements OnModuleInit {
         message: 'Something went wrong',
       };
 
-      if (error instanceof CustomError) {
+      if (error instanceof CustomError || error instanceof ExtensionError) {
         errorPayload.message = error.message;
       } else if (error instanceof Error) {
         this.loggerService.error(['execution-event-service'], error.message);

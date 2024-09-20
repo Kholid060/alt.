@@ -87,7 +87,7 @@ export class ExtensionSqliteService implements OnModuleInit {
 
     try {
       const dbQuery = database.prepare(query);
-      return dbQuery[method](params);
+      return dbQuery[method](...params);
     } catch (error) {
       throw new ExtensionError((error as Error).message);
     }
