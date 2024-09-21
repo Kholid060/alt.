@@ -3,7 +3,7 @@ import path from 'path';
 import { APP_ICON_DIR_PREFIX } from '#packages/common/utils/constant/app.const';
 import { CUSTOM_SCHEME } from '#packages/common/utils/constant/constant';
 import { Injectable } from '@nestjs/common';
-import { app, net } from 'electron';
+import { app, nativeImage, NativeImage, nativeTheme, net } from 'electron';
 import { ExtensionLoaderService } from '../extension-loader/extension-loader.service';
 import { fileURLToPath } from 'url';
 import { InstalledAppsService } from '../installed-apps/installed-apps.service';
@@ -15,6 +15,7 @@ const extensionFilePath = fileURLToPath(
 const rendererFilePath = fileURLToPath(
   new URL('./../../renderer/dist/', import.meta.url),
 );
+const assetsFilePath = fileURLToPath(new URL('./assets', import.meta.url));
 
 @Injectable()
 export class CustomProtocolService {
@@ -29,17 +30,34 @@ export class CustomProtocolService {
 
   async handleFileIconProtocol(req: GlobalRequest) {
     const filePath = req.url.slice(`${CUSTOM_SCHEME.fileIcon}://`.length);
+    let image: NativeImage | null = null;
+
     if (filePath.startsWith(APP_ICON_DIR_PREFIX)) {
       const appId = filePath.slice(APP_ICON_DIR_PREFIX.length + 1);
-      const appIcon = await this.installedApps.getAppIcon(appId);
-      if (appIcon) return new Response(appIcon.toPNG());
+      image = await this.installedApps.getAppIcon(appId);
+    } else {
+      image = await app.getFileIcon(decodeURIComponent(filePath), {
+        size: 'normal',
+      });
     }
 
-    const fileIcon = await app.getFileIcon(decodeURIComponent(filePath), {
-      size: 'normal',
-    });
+    if (!image) {
+      return createErrorResponse({
+        status: 404,
+        message: 'Not found',
+      });
+    }
 
-    return new Response(fileIcon.toPNG());
+    if (image.isEmpty()) {
+      image = nativeImage.createFromPath(
+        path.join(
+          assetsFilePath,
+          nativeTheme.shouldUseDarkColors ? 'window@dark.png' : 'window.png',
+        ),
+      );
+    }
+
+    return new Response(image.toPNG());
   }
 
   async handleExtensionProtocol(req: GlobalRequest) {
