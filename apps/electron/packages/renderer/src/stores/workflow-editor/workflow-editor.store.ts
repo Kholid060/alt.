@@ -174,15 +174,23 @@ const workflowEditorStore = create(
       }, 250);
     },
     applyElementChanges({ edges, nodes }) {
-      const { workflow, enableWorkflowSaveBtn: enableWorkflowSaveBtnState } =
-        get();
+      const {
+        workflow,
+        workflowChanges,
+        enableWorkflowSaveBtn: enableWorkflowSaveBtnState,
+      } = get();
       if (!workflow) return;
 
       let enableWorkflowSaveBtn = true;
       const updatedElement: Partial<WorkflowElement> = {};
+      const changes: (keyof WorkflowUpdatePayload)[] = [];
 
-      if (edges) updatedElement.edges = applyEdgeChanges(edges, workflow.edges);
+      if (edges) {
+        updatedElement.edges = applyEdgeChanges(edges, workflow.edges);
+        changes.push('edges');
+      }
       if (nodes) {
+        changes.push('nodes');
         enableWorkflowSaveBtn =
           enableWorkflowSaveBtnState || nodes[0].type !== 'select';
         updatedElement.nodes = applyNodeChanges(
@@ -194,6 +202,7 @@ const workflowEditorStore = create(
       set({
         enableWorkflowSaveBtn,
         workflow: { ...workflow, ...updatedElement },
+        workflowChanges: new Set([...workflowChanges, ...changes]),
       });
     },
     updateWorkflow(data, saveChanges = true) {

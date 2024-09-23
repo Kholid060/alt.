@@ -16,7 +16,6 @@ import { WorkflowNodes } from '@altdot/workflow';
 import { WORKFLOW_NODES } from '@altdot/workflow';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
-import WorkflowUiCodeEditor from '../ui/WorkflowUiCodeEditor';
 import { Edge, Node, getIncomers } from '@xyflow/react';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor/workflow-editor.store';
 import { WORKFLOW_NODE_TYPE } from '@altdot/workflow/dist/const/workflow-nodes-type.const';
