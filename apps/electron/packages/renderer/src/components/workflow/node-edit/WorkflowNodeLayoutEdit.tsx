@@ -240,17 +240,13 @@ function NodeExecution({ node }: { node: WorkflowNodes }) {
       </div>
       <div className="mt-2">
         <p className="ml-1">Output</p>
-        <WorkflowUiCodeEditor
-          readOnly
-          lang="js"
-          hideHeader
-          value={
-            isExecuting
-              ? 'Executing...'
-              : JSON.stringify(outputs.current, null, 2)
-          }
-          placeholder="Node output"
-        />
+        <pre className="max-h-96 overflow-auto rounded-md border bg-card p-2 text-sm text-muted-foreground">
+          {isExecuting
+            ? 'Executing...'
+            : outputs.current
+              ? JSON.stringify(outputs.current, null, 2)
+              : 'Node output'}
+        </pre>
       </div>
     </>
   );

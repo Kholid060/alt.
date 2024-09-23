@@ -33,7 +33,7 @@ class WindowDashboard extends WindowBase {
         browserWindow?.show();
 
         if (import.meta.env.DEV) {
-          browserWindow?.webContents.openDevTools({ mode: 'undocked' });
+          browserWindow?.webContents.openDevTools({ mode: 'right' });
         }
       });
       browserWindow.on('close', async (event) => {

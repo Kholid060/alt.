@@ -45,9 +45,20 @@ import WorkflowDetailForm from '../WorkflowDetailForm';
 import { WorkflowUpdatePayload } from '#packages/main/src/workflow/workflow.interface';
 import { WORKFLOW_NODE_TRIGGERS } from '#packages/common/utils/constant/workflow.const';
 import WorkflowEditorLogs from './WorkflowEditorLogs';
+import { useShallow } from 'zustand/react/shallow';
 
 function WorkflowInformation() {
-  const workflow = useWorkflowEditorStore.use.workflow();
+  const workflow = useWorkflowEditorStore(
+    useShallow((state) =>
+      state.workflow
+        ? {
+            name: state.workflow.name,
+            icon: state.workflow.icon,
+            description: state.workflow.description,
+          }
+        : null,
+    ),
+  );
   const updateWorkflow = useWorkflowEditorStore.use.updateWorkflow();
 
   const [open, setOpen] = useState(false);
@@ -385,7 +396,16 @@ function WorkflowSaveButton() {
   );
 }
 function WorkflowToggles() {
-  const workflow = useWorkflowEditorStore.use.workflow();
+  const workflow = useWorkflowEditorStore(
+    useShallow((state) =>
+      state.workflow
+        ? {
+            isPinned: state.workflow.isPinned,
+            isDisabled: state.workflow.isDisabled,
+          }
+        : null,
+    ),
+  );
   const updateWorkflow = useWorkflowEditorStore.use.updateWorkflow();
 
   if (!workflow) return;
