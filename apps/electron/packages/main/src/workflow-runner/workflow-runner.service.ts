@@ -216,7 +216,7 @@ export class WorkflowRunnerService {
   }
 
   async stopExecution(runnerId: string) {
-    if (!this.worker) {
+    if (!this.worker || !this.runningWorkflows.has(runnerId)) {
       const history = await this.workflowHistory.get({ runnerId });
       if (!history) return;
 
