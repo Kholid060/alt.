@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useCallback, useContext } from 'react';
 import { CommandRouteContext } from '../context/command-route.context';
 import {
   CommandRouteActions,
@@ -26,20 +26,19 @@ export function useCommandRoute<T>(
 
 export function useCommandNavigate() {
   const commandNavigate = useCommandRoute((state) => state.navigate);
-  const setCommandPanelHeader = useCommandPanelStore.use.setHeader();
 
-  function navigate(
-    path: CommandNavigateParams[0],
-    detail?: CommandNavigateOptions,
-  ) {
-    if (detail && Object.hasOwn(detail, 'panelHeader')) {
-      setCommandPanelHeader(detail.panelHeader!);
-    }
+  const navigate = useCallback(
+    (path: CommandNavigateParams[0], detail?: CommandNavigateOptions) => {
+      if (detail && Object.hasOwn(detail, 'panelHeader')) {
+        useCommandPanelStore.getState().setHeader(detail.panelHeader!);
+      }
 
-    commandNavigate(path, {
-      data: detail?.data,
-    });
-  }
+      commandNavigate(path, {
+        data: detail?.data,
+      });
+    },
+    [commandNavigate],
+  );
 
   return navigate;
 }

@@ -15,13 +15,27 @@ export class ExtensionRuntimeApiListener {
   @OnExtensionAPI('runtime.config.getValues')
   async getConfigValues({
     args: [type = 'command'],
-    context: { commandId, extensionId },
+    context: { commandId, extensionId, extension },
   }: ExtensionApiEvent<'runtime.config.getValues'>) {
     const configId =
       type === 'command' ? `${extensionId}:${commandId}` : extensionId;
     const configValues = await this.extensionConfig.getConfigs(configId);
+    if (!configValues || !configValues.value) {
+      const command = extension.commands.find(
+        (command) => command.name === commandId,
+      );
+      if (!command || !command.config) return {};
 
-    return (configValues?.value ?? {}) as object;
+      return command.config.reduce<Record<string, unknown>>((acc, curr) => {
+        if (Object.hasOwn(curr, 'defaultValue')) {
+          acc[curr.name] = curr.defaultValue;
+        }
+
+        return acc;
+      }, {}) as object;
+    }
+
+    return configValues.value;
   }
 
   @OnExtensionAPI('runtime.config.openConfigPage')

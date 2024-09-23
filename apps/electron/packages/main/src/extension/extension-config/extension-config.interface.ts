@@ -22,12 +22,13 @@ export type ExtensionConfigModel = Omit<
 >;
 
 export interface ExtensionConfigWithSchemaModel
-  extends Pick<SelectExtensionConfig, 'value' | 'configId' | 'extensionId'> {
+  extends Pick<SelectExtensionConfig, 'configId' | 'extensionId'> {
   commandIcon: string;
   commandTitle: string;
   extensionIcon: string;
   extensionTitle: string;
   config: ExtensionConfig[];
+  value: null | Record<string, unknown>;
 }
 
 export interface ExtensionConfigGetPayload {

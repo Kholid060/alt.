@@ -166,7 +166,7 @@ export class ExtensionConfigService {
       );
       if (!command || !command.config || !command.extension) return null;
 
-      const value = (await this.getConfigs(configId)) ?? {};
+      const value = (await this.getConfigs(configId))?.value ?? null;
       return {
         value,
         configId,
@@ -186,7 +186,7 @@ export class ExtensionConfigService {
     });
     if (!extension || !extension.config) return null;
 
-    const value = (await this.getConfigs(configId)) ?? {};
+    const value = (await this.getConfigs(configId))?.value ?? null;
     return {
       value,
       configId,

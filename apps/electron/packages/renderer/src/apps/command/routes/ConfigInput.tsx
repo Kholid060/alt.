@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { UseFormReturn, useForm } from 'react-hook-form';
 import { useCommandNavigate, useCommandRoute } from '/@/hooks/useCommandRoute';
 import {
@@ -308,18 +308,16 @@ function ConfigInput({
   const navigate = useCommandNavigate();
   const { executeCommand } = useCommandCtx();
 
-  const alreadyHasValue = useRef(false);
-
   const form = useForm<Record<string, unknown>>({
     async defaultValues() {
       if (!Array.isArray(data.config)) return {};
 
       const defaultValues: Record<string, unknown> = {};
       data.config.forEach((item) => {
-        if (Object.hasOwn(item, 'defaultValue')) {
-          defaultValues[item.name] = item.defaultValue ?? '';
-        } else if (Object.hasOwn(data.value, item.name)) {
+        if (data.value && Object.hasOwn(data.value, item.name)) {
           defaultValues[item.name] = data.value[item.name];
+        } else if (Object.hasOwn(item, 'defaultValue')) {
+          defaultValues[item.name] = item.defaultValue ?? '';
         }
       });
 
@@ -356,7 +354,7 @@ function ConfigInput({
         {},
       );
 
-      if (alreadyHasValue.current) {
+      if (data.value) {
         result = await preloadAPI.main.ipc.invoke(
           'database:update-extension-config',
           configId,
@@ -485,13 +483,15 @@ function ConfigInputRoute() {
           return;
         }
 
+        console.trace();
+
         setConfig({
           data,
           id: configId,
         });
       },
     });
-  }, [currentRoute.params, queryDatabase, navigate]);
+  }, [currentRoute.params, navigate, queryDatabase]);
 
   if (!config) return null;
 

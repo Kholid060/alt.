@@ -1,6 +1,6 @@
-# `Turborepo` Vite starter
+# Alt.
 
-This is an official starter Turborepo.
+An extensible launcher.
 
 ## Using this example
 
