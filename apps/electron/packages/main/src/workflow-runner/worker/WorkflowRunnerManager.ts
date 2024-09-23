@@ -110,6 +110,7 @@ class WorkflowRunnerManager {
     runner.on('node:execute-finish', (node, execResult) => {
       this.messagePort!.sync.sendMessage(
         'workflow-event:node-execute-finish',
+        runnerId,
         {
           id: node.id,
           type: node.type,
@@ -121,6 +122,7 @@ class WorkflowRunnerManager {
     runner.on('node:execute-error', (node, message) => {
       this.messagePort!.sync.sendMessage(
         'workflow-event:node-execute-error',
+        runnerId,
         {
           id: node.id,
           type: node.type,

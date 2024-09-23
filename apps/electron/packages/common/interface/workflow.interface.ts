@@ -27,10 +27,12 @@ export interface WorkflowEmitEvents {
     detail: { workflowId: string; runnerId: string; errorMessage: string },
   ];
   'node:execute-finish': [
+    runnerId: string,
     node: { id: string; type: WORKFLOW_NODE_TYPE; name: string },
     value: unknown,
   ];
   'node:execute-error': [
+    runnerId: string,
     node: { id: string; type: WORKFLOW_NODE_TYPE; name: string },
     message: string,
   ];

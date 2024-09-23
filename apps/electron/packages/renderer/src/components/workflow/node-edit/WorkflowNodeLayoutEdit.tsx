@@ -12,11 +12,11 @@ import {
   useToast,
 } from '@altdot/ui';
 import WorkflowNodeSettings from './WorkflowNodeSettings';
-import { WorkflowNodes } from '@altdot/workflow';
+import { WorkflowEdges, WorkflowNodes } from '@altdot/workflow';
 import { WORKFLOW_NODES } from '@altdot/workflow';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import preloadAPI from '/@/utils/preloadAPI';
-import { Edge, Node, getIncomers } from '@xyflow/react';
+import { Edge, Node, getConnectedEdges, getIncomers } from '@xyflow/react';
 import { useWorkflowEditorStore } from '/@/stores/workflow-editor/workflow-editor.store';
 import { WORKFLOW_NODE_TYPE } from '@altdot/workflow/dist/const/workflow-nodes-type.const';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
@@ -54,6 +54,7 @@ interface PrevNode {
   step: number;
   type: string;
   title: string;
+  node: WorkflowNodes;
 }
 
 const MAX_DEPTH = 5;
@@ -89,6 +90,7 @@ function findPrevNodes(
       step: depth,
       type: nodeData.type,
       title: nodeData.title,
+      node: node as WorkflowNodes,
     });
 
     findPrevNodes(
@@ -115,6 +117,7 @@ function NodeExecution({ node }: { node: WorkflowNodes }) {
       status: 'error' | 'success';
     }[]
   >([]);
+  const runnerId = useRef('');
 
   const [startNodeId, setStartNodeId] = useState(node.id);
   const [isExecuting, setIsExecuting] = useState(false);
@@ -136,6 +139,24 @@ function NodeExecution({ node }: { node: WorkflowNodes }) {
   async function executeNode() {
     if (!startNodeId) return;
 
+    let edges: WorkflowEdges[] = [];
+    const nodes: WorkflowNodes[] = [node];
+
+    if (startNodeId !== node.id) {
+      const startNodeIndex = prevNodes.findIndex(
+        (item) => item.id === startNodeId,
+      );
+      if (startNodeIndex === -1) return;
+
+      nodes.push(
+        ...prevNodes.slice(0, startNodeIndex + 1).map((item) => item.node),
+      );
+      edges = getConnectedEdges(
+        nodes,
+        useWorkflowEditorStore.getState().workflow?.edges || [],
+      );
+    }
+
     if (workflowDisabled) {
       toast({
         variant: 'destructive',
@@ -149,8 +170,9 @@ function NodeExecution({ node }: { node: WorkflowNodes }) {
         'node:execute-error': true,
         'node:execute-finish': true,
       },
-      startNodeId: startNodeId,
       finishNodeId: node.id,
+      startNodeId: startNodeId,
+      customElement: { nodes, edges },
     });
     if (isIPCEventError(result)) {
       toast({
@@ -163,6 +185,7 @@ function NodeExecution({ node }: { node: WorkflowNodes }) {
     if (!result) return;
 
     outputs.current = [];
+    runnerId.current = result;
     setIsExecuting(true);
   }
 
@@ -170,11 +193,17 @@ function NodeExecution({ node }: { node: WorkflowNodes }) {
     const offWorkflowEvents = preloadAPI.main.ipc.on(
       'workflow:execution-events',
       (_, events) => {
-        const [execNode, data] =
+        const [_runnerId, execNode, data] =
           (events['node:execute-finish'] || events['node:execute-error']) ?? [];
         if (!execNode) return;
 
-        if (node.id === execNode.id) setIsExecuting(false);
+        if (
+          node.id === execNode.id ||
+          (events.finish && events.finish[0]?.runnerId === runnerId.current)
+        ) {
+          runnerId.current = '';
+          setIsExecuting(false);
+        }
 
         outputs.current.unshift({
           nodeId: execNode.id,
