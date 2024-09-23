@@ -543,7 +543,6 @@ const UiListRoot = forwardRef<UiListRef, UiListProps>(
               value={item.value}
               renderItem={renderItem}
               onClick={() => onItemClick(item)}
-              onSelected={() => onItemSelected?.(item.value)}
               onPointerMove={() => onPointerMove(item, index)}
             />
           );
@@ -566,14 +565,12 @@ function UiListItemRenderer({
   value,
   index,
   onClick,
-  onSelected,
   renderItem,
   onPointerMove,
 }: {
   value: string;
   index: number;
   item: UiListItem;
-  onSelected?: () => void;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> &
   Pick<UiListProps, 'renderItem'>) {
   const itemId = useId();
@@ -612,8 +609,8 @@ function UiListItemRenderer({
         selected: isSelected,
         props: {
           onClick,
-          onSelected,
           onPointerMove,
+          onSelected: item.onSelected,
         },
       },
       index,
