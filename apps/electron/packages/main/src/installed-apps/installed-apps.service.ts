@@ -6,7 +6,13 @@ import { nanoid } from 'nanoid/non-secure';
 import type { ExtensionAPI } from '@altdot/extension';
 import type { BrowserApp } from '#packages/common/interface/ipc-events.interface';
 import { Injectable } from '@nestjs/common';
-import { browserDetail, browserRegex, extractShortcutDetail, programShortcutDirs, resolveEnvDir } from './utils/installed-apps-util';
+import {
+  browserDetail,
+  browserRegex,
+  extractShortcutDetail,
+  programShortcutDirs,
+  resolveEnvDir,
+} from './utils/installed-apps-util';
 
 @Injectable()
 export class InstalledAppsService {
@@ -37,61 +43,57 @@ export class InstalledAppsService {
     const seenApps = new Set<string>();
 
     const shortcuts = await globby(shortcutDirs);
-    const appPromise = await Promise.allSettled<
-      Promise<ExtensionAPI.Shell.InstalledApps.AppDetail | null>[]
-    >(
+    await Promise.all(
       shortcuts.map(async (shortcut) => {
-        const appDetail = await extractShortcutDetail(shortcut);
-        if (!appDetail?.target || seenApps.has(appDetail.target)) return null;
+        try {
+          const appDetail = await extractShortcutDetail(shortcut);
+          if (!appDetail?.target || seenApps.has(appDetail.target)) return;
 
-        const appId = nanoid(5);
-        seenApps.add(appDetail.target);
+          const appId = nanoid(5);
+          seenApps.add(appDetail.target);
 
-        let iconPath: string | undefined;
+          let iconPath: string | undefined;
 
-        if (appDetail.icon?.endsWith('.ico')) {
-          iconPath = appDetail.icon;
-        }
-
-        this.appPaths.set(appId, {
-          iconPath,
-          shortcutPath: shortcut,
-          target: appDetail.target,
-          isUrlShortcut: appDetail.isUrlShortcut,
-        });
-
-        if (browserRegex.test(appDetail.name)) {
-          const browser = browserDetail.find((browser) => {
-            return path.basename(appDetail.target) === browser.filename;
-          });
-          if (browser) {
-            this.browsers.push({
-              name: browser.name,
-              type: browser.type,
-              location: appDetail.target,
-            });
+          if (appDetail.icon?.endsWith('.ico')) {
+            iconPath = appDetail.icon;
           }
-        }
 
-        return {
-          appId,
-          name: appDetail.name,
-          path: appDetail.path,
-          description: appDetail.description,
-          isInternetShortcut: appDetail.isUrlShortcut,
-        };
+          this.appPaths.set(appId, {
+            iconPath,
+            shortcutPath: shortcut,
+            target: appDetail.target,
+            isUrlShortcut: appDetail.isUrlShortcut,
+          });
+
+          if (browserRegex.test(appDetail.name)) {
+            const browser = browserDetail.find((browser) => {
+              return path.basename(appDetail.target) === browser.filename;
+            });
+            if (browser) {
+              this.browsers.push({
+                name: browser.name,
+                type: browser.type,
+                location: appDetail.target,
+              });
+            }
+          }
+
+          this.apps.push({
+            appId,
+            name: appDetail.name,
+            path: appDetail.path,
+            description: appDetail.description,
+            isInternetShortcut: appDetail.isUrlShortcut,
+          });
+        } catch {
+          // do nothing
+        }
       }),
     );
 
-    this.apps = appPromise
-      .reduce<ExtensionAPI.Shell.InstalledApps.AppDetail[]>((acc, curr) => {
-        if (curr.status === 'fulfilled' && curr.value) {
-          acc.push(curr.value);
-        }
-
-        return acc;
-      }, [])
-      .sort((a, b) => (a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1));
+    this.apps = this.apps.sort((a, b) =>
+      a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1,
+    );
     this.isAppsFetched = true;
   }
 

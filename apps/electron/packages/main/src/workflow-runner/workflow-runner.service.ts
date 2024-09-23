@@ -192,6 +192,13 @@ export class WorkflowRunnerService {
       startedAt: new Date().toString(),
       status: WORKFLOW_HISTORY_STATUS.Running,
     });
+
+    this.runningWorkflows.set(runnerId, {
+      runnerId,
+      historyId: history.id,
+      workflowId: workflow.id,
+    });
+
     const result = await this.worker!.messagePort.async.sendMessage(
       'execute-workflow',
       {
@@ -203,11 +210,6 @@ export class WorkflowRunnerService {
     );
     this.emitEventToDashboard({
       start: [{ runnerId: result.runnerId, workflowId: workflow.id }],
-    });
-    this.runningWorkflows.set(result.runnerId, {
-      runnerId,
-      historyId: history.id,
-      workflowId: workflow.id,
     });
 
     return runnerId;
