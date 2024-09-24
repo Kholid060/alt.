@@ -1,8 +1,0 @@
-{
-  "compilerOptions": {
-    "jsx": "react-jsx",
-    "esModuleInterop": true,
-    "lib": ["ESNext", "DOM"],
-    "types": ["@altdot/extension/api"]
-  },
-}

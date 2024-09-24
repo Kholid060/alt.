@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "strict": true,
-    "jsx": "react-jsx",
-    "esModuleInterop": true,
-    "lib": ["ESNext", "DOM"]
-  },
-  "include": ["./types", "src"]
-}

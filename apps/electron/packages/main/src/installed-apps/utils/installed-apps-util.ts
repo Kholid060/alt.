@@ -8,7 +8,7 @@ export const programShortcutDirs = [
   '%APPDATA%/Microsoft/Windows/Start Menu/Programs',
   '%PROGRAMDATA%/Microsoft/Windows/Start Menu/Programs',
   app.getPath('desktop'),
-  path.join(app.getPath('desktop'), '../../Public/Desktop')
+  path.join(app.getPath('desktop'), '../../Public/Desktop'),
 ];
 
 export function resolveEnvDir(dir: string) {
@@ -107,7 +107,11 @@ export async function extractShortcutDetail(shortcut: string) {
   return null;
 }
 
-export const browserDetail: { name: string; filename: string; type: BrowserType }[] = [
+export const browserDetail: {
+  name: string;
+  filename: string;
+  type: BrowserType;
+}[] = [
   { name: 'Firefox', filename: 'firefox.exe', type: 'firefox' },
   { name: 'Microsoft Edge', filename: 'msedge.exe', type: 'edge' },
   { name: 'Google Chrome', filename: 'chrome.exe', type: 'chrome' },

@@ -1,6 +1,7 @@
-import CodeMirror from '@uiw/react-codemirror';
+import CodeMirror, { ReactCodeMirrorRef } from '@uiw/react-codemirror';
 import { tokyoNightInit } from '@uiw/codemirror-theme-tokyo-night';
-import { forwardRef } from 'react';
+import { forwardRef, useEffect, useRef } from 'react';
+import { mergeRefs } from '/@/utils/helper';
 
 const editorTheme = tokyoNightInit({
   theme: 'dark',
@@ -17,11 +18,21 @@ const UiCodeEditor = forwardRef<
   React.ComponentRef<typeof CodeMirror>,
   React.ComponentPropsWithoutRef<typeof CodeMirror>
 >(({ extensions, ...props }, ref) => {
+  const editorRef = useRef<ReactCodeMirrorRef>(null);
+
+  useEffect(() => {
+    const editor = editorRef.current?.view;
+
+    return () => {
+      editor?.destroy();
+    };
+  }, []);
+
   return (
     <CodeMirror
-      ref={ref}
       theme="dark"
       placeholder="Your code here..."
+      ref={mergeRefs(editorRef, ref)}
       extensions={[editorTheme, ...(extensions ?? [])]}
       {...props}
     />
