@@ -17,7 +17,7 @@ const UiDialogOverlay = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay> & {
     blurBg?: boolean;
   }
->(({ className, blurBg = true, ...props }, ref) => (
+>(({ className, blurBg = false, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
