@@ -189,7 +189,7 @@ function StoreFilter() {
           navigate({
             to: value,
             replace: true,
-            search: location.search,
+            search: location.search as StoreQueryValidation,
           });
         }}
         className="w-full md:w-auto"
