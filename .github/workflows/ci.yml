@@ -8,31 +8,9 @@ on:
       - 'renovate/**'
     paths:
       - 'apps/electron/**'
-    paths-ignore:
-      - '.github/**'
-      - '!.github/workflows/ci.yml'
-      - '!.github/workflows/typechecking.yml'
-      - '!.github/workflows/tests.yml'
-      - '!.github/workflows/release.yml'
-      - '**.md'
-      - .editorconfig
-      - .gitignore
-      - '.idea/**'
-      - '.vscode/**'
   pull_request:
     paths:
       - 'apps/electron/**'
-    paths-ignore:
-      - '.github/**'
-      - '!.github/workflows/ci.yml'
-      - '!.github/workflows/typechecking.yml'
-      - '!.github/workflows/tests.yml'
-      - '!.github/workflows/release.yml'
-      - '**.md'
-      - .editorconfig
-      - .gitignore
-      - '.idea/**'
-      - '.vscode/**'
 
 concurrency:
   group: ci-${{ github.ref }}
