@@ -314,32 +314,240 @@ declare module '@tanstack/react-router' {
 
 // Create and export the route tree
 
-export const routeTree = rootRoute.addChildren({
-  IndexRoute,
-  DevconsoleRoute: DevconsoleRoute.addChildren({
-    DevconsoleDevconsoleExtensionsRoute,
-    DevconsoleDevconsoleWorkflowsRoute,
-  }),
-  SettingsRoute: SettingsRoute.addChildren({ SettingsSettingsProfileRoute }),
-  StoreRoute: StoreRoute.addChildren({
-    StoreStoreExtensionsRoute,
-    StoreStoreWorkflowsRoute,
-  }),
-  OauthRedirectRoute,
-  UUsernameRoute: UUsernameRoute.addChildren({
-    UUsernameExtensionsRoute,
-    UUsernameWorkflowsRoute,
-    UUsernameIndexRoute,
-  }),
-  AuthIndexRoute,
-  StoreIndexRoute,
-  DevconsoleExtensionsExtensionIdRoute,
-  DevconsoleExtensionsNewRoute,
-  DevconsoleWorkflowsWorkflowIdRoute,
-  DevconsoleWorkflowsNewRoute,
-  StoreWorkflowsWorkflowIdRoute,
-  StoreExtensionsExtensionNameExtensionIdRoute,
-})
+interface DevconsoleRouteChildren {
+  DevconsoleDevconsoleExtensionsRoute: typeof DevconsoleDevconsoleExtensionsRoute
+  DevconsoleDevconsoleWorkflowsRoute: typeof DevconsoleDevconsoleWorkflowsRoute
+}
+
+const DevconsoleRouteChildren: DevconsoleRouteChildren = {
+  DevconsoleDevconsoleExtensionsRoute: DevconsoleDevconsoleExtensionsRoute,
+  DevconsoleDevconsoleWorkflowsRoute: DevconsoleDevconsoleWorkflowsRoute,
+}
+
+const DevconsoleRouteWithChildren = DevconsoleRoute._addFileChildren(
+  DevconsoleRouteChildren,
+)
+
+interface SettingsRouteChildren {
+  SettingsSettingsProfileRoute: typeof SettingsSettingsProfileRoute
+}
+
+const SettingsRouteChildren: SettingsRouteChildren = {
+  SettingsSettingsProfileRoute: SettingsSettingsProfileRoute,
+}
+
+const SettingsRouteWithChildren = SettingsRoute._addFileChildren(
+  SettingsRouteChildren,
+)
+
+interface StoreRouteChildren {
+  StoreStoreExtensionsRoute: typeof StoreStoreExtensionsRoute
+  StoreStoreWorkflowsRoute: typeof StoreStoreWorkflowsRoute
+}
+
+const StoreRouteChildren: StoreRouteChildren = {
+  StoreStoreExtensionsRoute: StoreStoreExtensionsRoute,
+  StoreStoreWorkflowsRoute: StoreStoreWorkflowsRoute,
+}
+
+const StoreRouteWithChildren = StoreRoute._addFileChildren(StoreRouteChildren)
+
+interface UUsernameRouteChildren {
+  UUsernameExtensionsRoute: typeof UUsernameExtensionsRoute
+  UUsernameWorkflowsRoute: typeof UUsernameWorkflowsRoute
+  UUsernameIndexRoute: typeof UUsernameIndexRoute
+}
+
+const UUsernameRouteChildren: UUsernameRouteChildren = {
+  UUsernameExtensionsRoute: UUsernameExtensionsRoute,
+  UUsernameWorkflowsRoute: UUsernameWorkflowsRoute,
+  UUsernameIndexRoute: UUsernameIndexRoute,
+}
+
+const UUsernameRouteWithChildren = UUsernameRoute._addFileChildren(
+  UUsernameRouteChildren,
+)
+
+export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
+  '': typeof StoreRouteWithChildren
+  '/oauth/redirect': typeof OauthRedirectRoute
+  '/u/$username': typeof UUsernameRouteWithChildren
+  '/auth': typeof AuthIndexRoute
+  '/store': typeof StoreIndexRoute
+  '/devconsole/extensions': typeof DevconsoleDevconsoleExtensionsRoute
+  '/devconsole/workflows': typeof DevconsoleDevconsoleWorkflowsRoute
+  '/settings/profile': typeof SettingsSettingsProfileRoute
+  '/store/extensions': typeof StoreStoreExtensionsRoute
+  '/store/workflows': typeof StoreStoreWorkflowsRoute
+  '/devconsole/extensions/$extensionId': typeof DevconsoleExtensionsExtensionIdRoute
+  '/devconsole/extensions/new': typeof DevconsoleExtensionsNewRoute
+  '/devconsole/workflows/$workflowId': typeof DevconsoleWorkflowsWorkflowIdRoute
+  '/devconsole/workflows/new': typeof DevconsoleWorkflowsNewRoute
+  '/store/workflows/$workflowId': typeof StoreWorkflowsWorkflowIdRoute
+  '/u/$username/extensions': typeof UUsernameExtensionsRoute
+  '/u/$username/workflows': typeof UUsernameWorkflowsRoute
+  '/u/$username/': typeof UUsernameIndexRoute
+  '/store/extensions/$extensionName/$extensionId': typeof StoreExtensionsExtensionNameExtensionIdRoute
+}
+
+export interface FileRoutesByTo {
+  '/': typeof IndexRoute
+  '': typeof StoreRouteWithChildren
+  '/oauth/redirect': typeof OauthRedirectRoute
+  '/auth': typeof AuthIndexRoute
+  '/store': typeof StoreIndexRoute
+  '/devconsole/extensions': typeof DevconsoleDevconsoleExtensionsRoute
+  '/devconsole/workflows': typeof DevconsoleDevconsoleWorkflowsRoute
+  '/settings/profile': typeof SettingsSettingsProfileRoute
+  '/store/extensions': typeof StoreStoreExtensionsRoute
+  '/store/workflows': typeof StoreStoreWorkflowsRoute
+  '/devconsole/extensions/$extensionId': typeof DevconsoleExtensionsExtensionIdRoute
+  '/devconsole/extensions/new': typeof DevconsoleExtensionsNewRoute
+  '/devconsole/workflows/$workflowId': typeof DevconsoleWorkflowsWorkflowIdRoute
+  '/devconsole/workflows/new': typeof DevconsoleWorkflowsNewRoute
+  '/store/workflows/$workflowId': typeof StoreWorkflowsWorkflowIdRoute
+  '/u/$username/extensions': typeof UUsernameExtensionsRoute
+  '/u/$username/workflows': typeof UUsernameWorkflowsRoute
+  '/u/$username': typeof UUsernameIndexRoute
+  '/store/extensions/$extensionName/$extensionId': typeof StoreExtensionsExtensionNameExtensionIdRoute
+}
+
+export interface FileRoutesById {
+  __root__: typeof rootRoute
+  '/': typeof IndexRoute
+  '/_devconsole': typeof DevconsoleRouteWithChildren
+  '/_settings': typeof SettingsRouteWithChildren
+  '/_store': typeof StoreRouteWithChildren
+  '/oauth/redirect': typeof OauthRedirectRoute
+  '/u/$username': typeof UUsernameRouteWithChildren
+  '/auth/': typeof AuthIndexRoute
+  '/store/': typeof StoreIndexRoute
+  '/_devconsole/devconsole/extensions': typeof DevconsoleDevconsoleExtensionsRoute
+  '/_devconsole/devconsole/workflows': typeof DevconsoleDevconsoleWorkflowsRoute
+  '/_settings/settings/profile': typeof SettingsSettingsProfileRoute
+  '/_store/store/extensions': typeof StoreStoreExtensionsRoute
+  '/_store/store/workflows': typeof StoreStoreWorkflowsRoute
+  '/devconsole/extensions/$extensionId': typeof DevconsoleExtensionsExtensionIdRoute
+  '/devconsole/extensions/new': typeof DevconsoleExtensionsNewRoute
+  '/devconsole/workflows/$workflowId': typeof DevconsoleWorkflowsWorkflowIdRoute
+  '/devconsole/workflows/new': typeof DevconsoleWorkflowsNewRoute
+  '/store/workflows/$workflowId': typeof StoreWorkflowsWorkflowIdRoute
+  '/u/$username/extensions': typeof UUsernameExtensionsRoute
+  '/u/$username/workflows': typeof UUsernameWorkflowsRoute
+  '/u/$username/': typeof UUsernameIndexRoute
+  '/store/extensions/$extensionName/$extensionId': typeof StoreExtensionsExtensionNameExtensionIdRoute
+}
+
+export interface FileRouteTypes {
+  fileRoutesByFullPath: FileRoutesByFullPath
+  fullPaths:
+    | '/'
+    | ''
+    | '/oauth/redirect'
+    | '/u/$username'
+    | '/auth'
+    | '/store'
+    | '/devconsole/extensions'
+    | '/devconsole/workflows'
+    | '/settings/profile'
+    | '/store/extensions'
+    | '/store/workflows'
+    | '/devconsole/extensions/$extensionId'
+    | '/devconsole/extensions/new'
+    | '/devconsole/workflows/$workflowId'
+    | '/devconsole/workflows/new'
+    | '/store/workflows/$workflowId'
+    | '/u/$username/extensions'
+    | '/u/$username/workflows'
+    | '/u/$username/'
+    | '/store/extensions/$extensionName/$extensionId'
+  fileRoutesByTo: FileRoutesByTo
+  to:
+    | '/'
+    | ''
+    | '/oauth/redirect'
+    | '/auth'
+    | '/store'
+    | '/devconsole/extensions'
+    | '/devconsole/workflows'
+    | '/settings/profile'
+    | '/store/extensions'
+    | '/store/workflows'
+    | '/devconsole/extensions/$extensionId'
+    | '/devconsole/extensions/new'
+    | '/devconsole/workflows/$workflowId'
+    | '/devconsole/workflows/new'
+    | '/store/workflows/$workflowId'
+    | '/u/$username/extensions'
+    | '/u/$username/workflows'
+    | '/u/$username'
+    | '/store/extensions/$extensionName/$extensionId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_devconsole'
+    | '/_settings'
+    | '/_store'
+    | '/oauth/redirect'
+    | '/u/$username'
+    | '/auth/'
+    | '/store/'
+    | '/_devconsole/devconsole/extensions'
+    | '/_devconsole/devconsole/workflows'
+    | '/_settings/settings/profile'
+    | '/_store/store/extensions'
+    | '/_store/store/workflows'
+    | '/devconsole/extensions/$extensionId'
+    | '/devconsole/extensions/new'
+    | '/devconsole/workflows/$workflowId'
+    | '/devconsole/workflows/new'
+    | '/store/workflows/$workflowId'
+    | '/u/$username/extensions'
+    | '/u/$username/workflows'
+    | '/u/$username/'
+    | '/store/extensions/$extensionName/$extensionId'
+  fileRoutesById: FileRoutesById
+}
+
+export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
+  DevconsoleRoute: typeof DevconsoleRouteWithChildren
+  SettingsRoute: typeof SettingsRouteWithChildren
+  StoreRoute: typeof StoreRouteWithChildren
+  OauthRedirectRoute: typeof OauthRedirectRoute
+  UUsernameRoute: typeof UUsernameRouteWithChildren
+  AuthIndexRoute: typeof AuthIndexRoute
+  StoreIndexRoute: typeof StoreIndexRoute
+  DevconsoleExtensionsExtensionIdRoute: typeof DevconsoleExtensionsExtensionIdRoute
+  DevconsoleExtensionsNewRoute: typeof DevconsoleExtensionsNewRoute
+  DevconsoleWorkflowsWorkflowIdRoute: typeof DevconsoleWorkflowsWorkflowIdRoute
+  DevconsoleWorkflowsNewRoute: typeof DevconsoleWorkflowsNewRoute
+  StoreWorkflowsWorkflowIdRoute: typeof StoreWorkflowsWorkflowIdRoute
+  StoreExtensionsExtensionNameExtensionIdRoute: typeof StoreExtensionsExtensionNameExtensionIdRoute
+}
+
+const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
+  DevconsoleRoute: DevconsoleRouteWithChildren,
+  SettingsRoute: SettingsRouteWithChildren,
+  StoreRoute: StoreRouteWithChildren,
+  OauthRedirectRoute: OauthRedirectRoute,
+  UUsernameRoute: UUsernameRouteWithChildren,
+  AuthIndexRoute: AuthIndexRoute,
+  StoreIndexRoute: StoreIndexRoute,
+  DevconsoleExtensionsExtensionIdRoute: DevconsoleExtensionsExtensionIdRoute,
+  DevconsoleExtensionsNewRoute: DevconsoleExtensionsNewRoute,
+  DevconsoleWorkflowsWorkflowIdRoute: DevconsoleWorkflowsWorkflowIdRoute,
+  DevconsoleWorkflowsNewRoute: DevconsoleWorkflowsNewRoute,
+  StoreWorkflowsWorkflowIdRoute: StoreWorkflowsWorkflowIdRoute,
+  StoreExtensionsExtensionNameExtensionIdRoute:
+    StoreExtensionsExtensionNameExtensionIdRoute,
+}
+
+export const routeTree = rootRoute
+  ._addFileChildren(rootRouteChildren)
+  ._addFileTypes<FileRouteTypes>()
 
 /* prettier-ignore-end */
 

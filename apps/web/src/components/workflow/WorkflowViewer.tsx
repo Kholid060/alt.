@@ -94,10 +94,7 @@ const WorkflowViewer = memo(
     ({ edges, nodes, className, ...props }, ref) => {
       return (
         <WorkflowNodesProvider
-          extCommandChecker={() => ({
-            cancel: () => {},
-            result: Promise.resolve(true),
-          })}
+          extCommandChecker={() => () => ({})}
           hideToolbar
           resolveExtIcon={(node) => (
             <IconResolver
