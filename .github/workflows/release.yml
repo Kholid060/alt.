@@ -16,6 +16,7 @@ concurrency:
 defaults:
   run:
     shell: 'bash'
+    working-directory: ./apps/electron
 
 
 jobs:
