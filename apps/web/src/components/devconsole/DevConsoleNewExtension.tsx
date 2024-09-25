@@ -9,8 +9,8 @@ import {
   UiDialog,
   UiLabel,
   UiInput,
-  UiButton,
   UiTooltip,
+  UiButtonLoader,
 } from '@altdot/ui';
 import { useNavigate } from '@tanstack/react-router';
 import { InfoIcon } from 'lucide-react';
@@ -25,10 +25,13 @@ function DevConsoleNewExtension({ onClose }: { onClose?: () => void }) {
   const [errorMessage, setErrorMessage] = useState('');
   const [extRelativePath, setExtRelativePath] = useState('/');
 
+  const [isLoading, setIsLoading] = useState(false);
+
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    if (!profile) return;
+    if (!profile || isLoading) return;
 
     event.preventDefault();
+    setIsLoading(true);
 
     try {
       const url = new URL(repoUrl);
@@ -115,6 +118,7 @@ function DevConsoleNewExtension({ onClose }: { onClose?: () => void }) {
 
       console.error(error);
     } finally {
+      setIsLoading(false);
       setErrorMessage('');
     }
   }
@@ -161,9 +165,14 @@ function DevConsoleNewExtension({ onClose }: { onClose?: () => void }) {
             onValueChange={setExtRelativePath}
           />
           <UiDialog.Footer className="mt-6">
-            <UiButton disabled={!repoUrl} className="min-w-24" type="submit">
+            <UiButtonLoader
+              disabled={!repoUrl}
+              isLoading={isLoading}
+              className="min-w-24"
+              type="submit"
+            >
               Continue
-            </UiButton>
+            </UiButtonLoader>
           </UiDialog.Footer>
         </form>
       </UiDialog.Content>
