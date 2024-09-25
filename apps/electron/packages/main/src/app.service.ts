@@ -1,14 +1,35 @@
 import os from 'os';
 import { app } from 'electron';
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { MessagePortChannelIds } from '#packages/common/interface/message-port-events.interface';
 import { MESSAGE_PORT_CHANNEL_IDS } from '#packages/common/utils/constant/constant';
 import { BrowserWindowService } from './browser-window/browser-window.service';
 import { AppMessagePortBridgeOptions } from '#packages/common/interface/app.interface';
+import { AppStoreService } from './app/app-store/app-store.service';
+import { ExtensionLoaderService } from './extension-loader/extension-loader.service';
+import { ConfigService } from '@nestjs/config';
+import { AppEnv } from './common/validation/app-env.validation';
 
 @Injectable()
-export class AppService {
-  constructor(private browserWindow: BrowserWindowService) {}
+export class AppService implements OnModuleInit {
+  constructor(
+    private appStore: AppStoreService,
+    private config: ConfigService<AppEnv, true>,
+    private browserWindow: BrowserWindowService,
+    private extensionLoader: ExtensionLoaderService,
+  ) {}
+
+  async onModuleInit() {
+    const isFirstTime = await this.appStore.get('isFirstTime', true);
+    if (!isFirstTime) return;
+
+    Promise.allSettled(
+      this.config
+        .get('INITIAL_EXT_IDS')
+        .map((id: string) => this.extensionLoader.installExtension(id)),
+    );
+    await this.appStore.set('isFirstTime', false);
+  }
 
   getVersion() {
     return {

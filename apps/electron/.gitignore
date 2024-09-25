@@ -60,3 +60,5 @@ thumbs.db
 vite.config.*.timestamp-*
 
 releases
+
+.env.production

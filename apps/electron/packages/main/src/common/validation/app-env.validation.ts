@@ -7,6 +7,10 @@ export const appEnvSchema = z.object({
   VITE_DEV_SERVER_URL: z.string().optional(),
   VITE_WEB_BASE_URL: z.string().url().min(1),
   VITE_API_BASE_URL: z.string().url().min(1),
+  INITIAL_EXT_IDS: z
+    .string()
+    .min(1)
+    .transform((value) => value.split(',').map((str) => str.trim())),
   WS_ALLOWED_ORIGIN: z
     .string()
     .min(1)

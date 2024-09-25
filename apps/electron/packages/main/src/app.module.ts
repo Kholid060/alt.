@@ -20,7 +20,6 @@ import { OAuthModule } from './oauth/oauth.module';
 import { WorkflowModule } from './workflow/workflow.module';
 import { WorkflowHistoryModule } from './workflow/workflow-history/workflow-history.module';
 import { ConfigModule } from '@nestjs/config';
-import { z } from 'zod';
 import { AppBackupModule } from './app/app-backup/app-backup.module';
 import { AppStoreModule } from './app/app-store/app-store.module';
 import { AppCryptoModule } from './app/app-crypto/app-crypto.module';
@@ -31,18 +30,7 @@ import { WebAppModule } from './web-app/web-app.module';
 import { envConfig } from './common/config/env.config';
 import { ClipboardModule } from './clipboard/clipboard.module';
 import { WorkflowRunnerModule } from './workflow-runner/workflow-runner.module';
-
-const envVarsSchema = z.object({
-  API_KEY: z.string().min(1),
-  SECRET_DATA_KEY: z.string().min(32),
-  VITE_DEV_SERVER_URL: z.string().optional(),
-  VITE_WEB_BASE_URL: z.string().url().min(1),
-  VITE_API_BASE_URL: z.string().url().min(1),
-  WS_ALLOWED_ORIGIN: z
-    .string()
-    .min(1)
-    .transform((value) => value.split(',').map((str) => str.trim())),
-});
+import { appEnvSchema } from './common/validation/app-env.validation';
 
 @Module({
   providers: [AppService],
@@ -64,7 +52,7 @@ const envVarsSchema = z.object({
         const isSingleInstance = app.requestSingleInstanceLock();
         if (!isSingleInstance) return {};
 
-        return envVarsSchema.parse(
+        return appEnvSchema.parse(
           import.meta.env.DEV ? { ...process.env, ...config } : envConfig(),
         );
       },
