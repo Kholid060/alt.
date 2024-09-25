@@ -32,6 +32,7 @@
     "react-dom": "^18.2.0",
     "react-helmet-async": "^2.0.5",
     "react-hook-form": "^7.52.1",
+    "react-medium-image-zoom": "^5.2.10",
     "socket.io-client": "^4.7.5",
     "usehooks-ts": "^3.1.0",
     "wretch": "^2.9.0",
