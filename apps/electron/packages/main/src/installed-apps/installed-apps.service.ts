@@ -134,8 +134,6 @@ export class InstalledAppsService {
     const appPath = this.appPaths.get(appId);
     if (!appPath) throw new Error("Can't find app");
 
-    return shell.openExternal(appPath.target, {
-      workingDirectory: app.getPath('desktop'),
-    });
+    return shell.openPath(appPath.target);
   }
 }

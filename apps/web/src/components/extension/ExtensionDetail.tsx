@@ -128,7 +128,7 @@ export function ExtensionDetailMarkdownAsset({
   if (query.isError) {
     const isNotFound = 'status' in query.error && query.error.status === 404;
 
-    return (
+    return isNotFound ? null : (
       <div className="mx-auto mt-12 flex max-w-md flex-col place-items-center text-center">
         <div className="inline-block rounded-full bg-card/60 p-6 text-muted-foreground">
           <FileIcon className="size-10" />

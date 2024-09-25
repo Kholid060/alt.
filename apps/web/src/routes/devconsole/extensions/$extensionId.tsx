@@ -12,6 +12,7 @@ import APIService from '@/services/api.service';
 import GithubAPI from '@/utils/GithubAPI';
 import { APP_TITLE } from '@/utils/constant';
 import { PageError } from '@/utils/custom-error';
+import { mergePath } from '@/utils/helper';
 import {
   useDialog,
   useToast,
@@ -51,7 +52,10 @@ const queryData = (extensionId: string) =>
     select(data) {
       return {
         ...data,
-        baseAssetURL: new URL(data.sourceUrl).pathname + data.relativePath,
+        baseAssetURL: mergePath(
+          new URL(data.sourceUrl).pathname,
+          data.relativePath,
+        ),
       };
     },
     queryFn: () => APIService.instance.me.getExtension(extensionId),
@@ -203,16 +207,20 @@ function ExtensionHeader({
                 </UiButton>
               </UiDropdownMenuTrigger>
               <UiDropdownMenuContent align="end">
-                <UiDropdownMenuItem asChild>
-                  <a
-                    href={`/store/extensions/${extension.id}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Open store page
-                  </a>
-                </UiDropdownMenuItem>
-                <UiDropdownMenuSeparator />
+                {extension.isPublished && (
+                  <>
+                    <UiDropdownMenuItem asChild>
+                      <a
+                        href={`/store/extensions/${extension.name}/${extension.id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Open store page
+                      </a>
+                    </UiDropdownMenuItem>
+                    <UiDropdownMenuSeparator />
+                  </>
+                )}
                 {status === 'in-review' && (
                   <UiDropdownMenuItem
                     variant="destructive"

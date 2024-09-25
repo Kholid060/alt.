@@ -4,7 +4,11 @@ import { fileURLToPath } from 'url';
 
 const userDataPath = app.getPath('userData');
 
-export const EXTENSION_FOLDER = path.join(userDataPath, 'extensions');
+export const EXTENSION_FOLDER = path.join(
+  app.getPath('home'),
+  '.altdot',
+  'extensions',
+);
 
 export const APP_LOGS_DIR = path.join(userDataPath, 'logs');
 
