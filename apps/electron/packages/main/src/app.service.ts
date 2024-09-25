@@ -23,11 +23,10 @@ export class AppService implements OnModuleInit {
     const isFirstTime = await this.appStore.get('isFirstTime', true);
     if (!isFirstTime) return;
 
-    Promise.allSettled(
-      this.config
-        .get('INITIAL_EXT_IDS')
-        .map((id: string) => this.extensionLoader.installExtension(id)),
+    this.extensionLoader.installDefaultExtensions(
+      this.config.get('INITIAL_EXT_IDS'),
     );
+
     await this.appStore.set('isFirstTime', false);
   }
 

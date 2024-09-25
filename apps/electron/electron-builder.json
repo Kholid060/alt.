@@ -12,6 +12,7 @@
     "!**/node_modules/better-sqlite3/deps/**",
     "!**/node_modules/@jitl/quickjs-wasmfile-debug-*/**",
     "!**/node_modules/@altdot/native/target",
+    "buildResources/extensions/**",
     "buildResources/icon.*"
   ],
   "publish": [
