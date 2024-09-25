@@ -99,19 +99,16 @@ export class CustomProtocolService {
     const filePath = decodeURIComponent(
       req.url.slice(`${CUSTOM_SCHEME.imagePreview}://`.length),
     );
-    const extName = path.extname(filePath);
-    if (
-      !fs.existsSync(filePath) ||
-      (extName !== '.png' && extName !== '.jpg')
-    ) {
-      return createErrorResponse({
-        status: 404,
-        code: 'not-found',
-        message: 'Not found',
-      });
-    }
+    const img = await nativeImage
+      .createThumbnailFromPath(filePath, {
+        height: 256,
+        width: 256,
+      })
+      .catch(() => null);
 
-    return net.fetch(filePath);
+    return img
+      ? new Response(img.toPNG())
+      : createErrorResponse({ message: 'Not found', status: 404 });
   }
 
   private async handleCommandPath(extId: string, ...paths: string[]) {

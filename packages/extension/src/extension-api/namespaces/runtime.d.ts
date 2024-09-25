@@ -39,7 +39,7 @@ export declare namespace Runtime {
     readonly platform: PlatformInfo;
 
     // @ext-api-value
-    getImageFileURL(filePath: string): string;
+    getFileThumbnailURL(filePath: string): string;
 
     // @ext-api-value
     getFileIconURL(filePath: string): string;
