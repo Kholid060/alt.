@@ -23,6 +23,5 @@ jobs:
       contents: write # Allows this job to create releases
     with:
       dry-run: ${{ github.event_name != 'push' || github.ref_name != 'main' }}
-    needs: [ typechecking, tests ]
     uses: ./.github/workflows/release.yml
 
