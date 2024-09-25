@@ -169,7 +169,7 @@ export class ExtensionCommandService implements OnAppReady {
       'database:get-extension-list': [DATABASE_CHANGES_ALL_ARGS],
     });
 
-    if (shortcut) {
+    if (typeof shortcut !== 'undefined') {
       this.toggleShortcut(extensionId, commandId, shortcut);
     }
 

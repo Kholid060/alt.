@@ -1,4 +1,3 @@
-import fs from 'fs-extra';
 import path from 'path';
 import { APP_ICON_DIR_PREFIX } from '#packages/common/utils/constant/app.const';
 import { CUSTOM_SCHEME } from '#packages/common/utils/constant/constant';
