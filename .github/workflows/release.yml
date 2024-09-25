@@ -16,11 +16,14 @@ concurrency:
 defaults:
   run:
     shell: 'bash'
-    working-directory: ./apps/electron
 
 
 jobs:
   draft_release:
+
+    defaults:
+      run:
+        working-directory: ./apps/electron
 
     permissions:
       contents: write # Allows this job to create releases
@@ -45,7 +48,7 @@ jobs:
 
       - run: npm run build
 
-      - name: Compile artifacts ${{ inputs.dry-run && '' || 'and upload them to github release' }}
+      - name: Compile artifacts
         # I use this action because it is capable of retrying multiple times if there are any issues with the distribution server
         uses: nick-fields/retry@v3
         with:
