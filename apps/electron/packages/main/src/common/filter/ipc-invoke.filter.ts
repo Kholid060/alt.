@@ -22,10 +22,13 @@ export class IpcInvokeFilter {
       };
     }
 
-    ElectronLogger._instance.error({
-      location: ['IPCMainHandle', this.channel],
-      error,
-    });
+    ElectronLogger._instance.error(
+      {
+        error,
+        location: ['IPCMainHandle', this.channel],
+      },
+      error instanceof Error ? error.message : error,
+    );
 
     throw error;
   }

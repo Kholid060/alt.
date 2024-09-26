@@ -17,8 +17,8 @@ const IS_DEV = process.env.MODE === 'development';
 if (!IS_DEV) {
   dotenv.config({
     path: [
-      resolve(PROJECT_ROOT, '.env'),
       resolve(PROJECT_ROOT, '.env.production'),
+      resolve(PROJECT_ROOT, '.env'),
     ],
   });
 }
