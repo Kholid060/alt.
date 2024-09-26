@@ -12,6 +12,7 @@ import { AppBackupService } from './app/app-backup/app-backup.service';
 import { BrowserWindow } from 'electron';
 import { AppStoreService } from './app/app-store/app-store.service';
 import { AppCryptoService } from './app/app-crypto/app-crypto.service';
+import updater from 'electron-updater';
 
 @Controller()
 export class AppController {
@@ -87,5 +88,10 @@ export class AppController {
       payload.channelId,
       payload.options,
     );
+  }
+
+  @IPCSend('app:check-update')
+  checkAppUpdate() {
+    updater.autoUpdater.checkForUpdatesAndNotify();
   }
 }

@@ -10,6 +10,7 @@ import { applySecurity } from './common/utils/security-restrictions';
 console.time('startup');
 
 ElectronLogger._instance.log('Starting app');
+updater.autoUpdater.logger = ElectronLogger._instance;
 
 applySecurity();
 app.setAppUserModelId(APP_USER_MODEL_ID);
