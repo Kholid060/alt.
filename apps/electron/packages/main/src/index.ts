@@ -50,7 +50,7 @@ app.on('window-all-closed', () => {
  * Start app
  */
 const electronNest = await ElectronNest.createApp(AppModule, {
-  logger: console,
+  logger: import.meta.env.DEV ? console : ElectronLogger._instance,
 });
 await electronNest.init();
 
