@@ -9,7 +9,7 @@ import ExtensionRunnerBase, {
 import WindowCommand from '/@/browser-window/window/WindowCommand';
 import EventEmitter from 'eventemitter3';
 import fs from 'fs-extra';
-import { MessageChannelMain, utilityProcess } from 'electron';
+import { MessageChannelMain, MessagePortMain, utilityProcess } from 'electron';
 import path from 'path';
 import { filterAppEnv } from '../utils/filter-app-env';
 import { __DIRNAME } from '/@/common/utils/constant';
@@ -25,22 +25,24 @@ class ExtensionRunnerCommandView implements ExtensionRunnerBase {
     readonly eventEmitter: EventEmitter<ExtensionRunnerEvents>,
   ) {}
 
-  async run() {
-    let actionMessagePort: Electron.MessagePortMain | null = null;
-
+  private initViewAction(): Promise<null | MessagePortMain> {
     const viewActionFilePath = this.payload.commandFilePath + '.action.js';
-    if (fs.existsSync(viewActionFilePath)) {
-      const messageChannel = new MessageChannelMain();
-      actionMessagePort = messageChannel.port1;
+    if (!fs.existsSync(viewActionFilePath)) return Promise.resolve(null);
 
-      this.process = utilityProcess.fork(
-        path.join(__DIRNAME, './extension-command-view-action.worker.js'),
-        [],
-        { env: filterAppEnv() },
-      );
-      this.process.once('exit', () => {
-        this.process = null;
-      });
+    const resolver = Promise.withResolvers<MessagePortMain>();
+    const messageChannel = new MessageChannelMain();
+
+    this.process = utilityProcess.fork(
+      path.join(__DIRNAME, './extension-command-view-action.worker.js'),
+      [],
+      { env: filterAppEnv() },
+    );
+    this.process.once('exit', () => {
+      this.process = null;
+    });
+    this.process.once('spawn', () => {
+      if (!this.process) return;
+
       this.process.postMessage(
         {
           type: 'start',
@@ -50,7 +52,14 @@ class ExtensionRunnerCommandView implements ExtensionRunnerBase {
         },
         [messageChannel.port2],
       );
-    }
+      resolver.resolve(messageChannel.port1);
+    });
+
+    return resolver.promise;
+  }
+
+  async run() {
+    const actionMessagePort = await this.initViewAction();
 
     this.windowCommand.toggleWindow(true);
     this.windowCommand.postMessage(
