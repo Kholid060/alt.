@@ -150,7 +150,10 @@ const workflowEditorStore = create(
       });
 
       updateWorkflowNodeDebounce(() => {
-        get().updateWorkflow(({ nodes }) => {
+        const latestState = get();
+        if (!latestState.editNode) return;
+
+        latestState.updateWorkflow(({ nodes }) => {
           let nodeUpdated = false;
 
           const newNodes = nodes.map((item) => {
@@ -162,7 +165,7 @@ const workflowEditorStore = create(
               ...item,
               data: {
                 ...item.data,
-                ...node.data,
+                ...latestState.editNode!.data,
               },
             };
           }) as WorkflowNodes[];
