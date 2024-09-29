@@ -1,7 +1,6 @@
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
 import { app, screen } from 'electron';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import WindowBase, { WindowBaseState } from './WindowBase';
 import { sleep } from '@altdot/shared';
 import { centerWindow } from '/@/common/utils/helper';
@@ -9,8 +8,9 @@ import { LoggerService } from '/@/logger/logger.service';
 
 export const COMMNAND_WINDOW_BOUND = {
   width: 650,
+  height: 500,
   maxWidth: 650,
-  minHeight: 400,
+  minHeight: 300,
   maxHeight: 600,
 } as const;
 
@@ -169,7 +169,7 @@ class WindowCommand extends WindowBase {
     if (browserWindow && display.id !== this.lastDisplayId) {
       centerWindow(browserWindow, display, {
         width: COMMNAND_WINDOW_BOUND.width,
-        height: COMMNAND_WINDOW_BOUND.maxHeight,
+        height: COMMNAND_WINDOW_BOUND.height,
       });
       this.lastDisplayId = display.id;
     }
