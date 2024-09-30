@@ -216,7 +216,7 @@ function StoreFilter() {
 }
 function StoreLayout() {
   return (
-    <main className="container pb-28 pt-36">
+    <main className="container pt-36">
       <Helmet>
         <title>Store ー {APP_TITLE}</title>
         <meta

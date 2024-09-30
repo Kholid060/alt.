@@ -28,7 +28,7 @@ function ExtensionStoreCard({
     <UiCard className="flex flex-col">
       <UiCardHeader className="flex-1 flex-row items-center justify-between space-y-0 p-4">
         <ExtensionDetailIcon
-          imageClass="size-10 aspect-square rounded-md object-cover object-center"
+          imageClass="size-10 aspect-square rounded-sm object-cover object-center"
           icon={extension.iconUrl}
           iconUrl={extension.iconUrl}
           title={`${extension.title} icon`}
