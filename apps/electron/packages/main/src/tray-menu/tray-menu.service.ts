@@ -63,7 +63,7 @@ export class TrayMenuService implements OnAppReady {
         label: 'Report bug',
         click() {
           shell.openExternal(
-            'https://github.com/Kholid060/altdot/issues/new/choose',
+            'https://github.com/Kholid060/alt./issues/new/choose',
           );
         },
       },

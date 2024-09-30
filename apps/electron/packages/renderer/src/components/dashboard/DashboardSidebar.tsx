@@ -65,6 +65,14 @@ function AboutApp() {
       <div>
         <p>version {versions.app}</p>
         <p className="text-sm text-muted-foreground">{versions.os}</p>
+        <UiButton
+          variant="secondary"
+          size="sm"
+          onClick={() => preloadAPI.main.ipc.send('app:check-update')}
+          className="mt-4"
+        >
+          Check for update
+        </UiButton>
       </div>
       <UiDialog.Footer className="justify-start pt-6">
         <UiButton
@@ -95,7 +103,10 @@ function AboutApp() {
           variant="secondary"
           size="sm"
           onClick={() =>
-            preloadAPI.main.ipc.invoke('shell:open-url', 'https://example.com')
+            preloadAPI.main.ipc.invoke(
+              'shell:open-url',
+              'https://github.com/Kholid060/alt./issues/new/choose',
+            )
           }
         >
           <ExternalLinkIcon className="mr-2 size-4" />

@@ -64,6 +64,15 @@ class WorkflowRunnerBrowser {
   setContext(ctxData: Partial<WorkflowRunnerBrowserContext>) {
     this.context = { ...this.context, ...ctxData };
   }
+
+  checkIfHasBrowser() {
+    const { browserId, tabId } = this.context;
+    if (browserId === null || tabId === null) {
+      throw new Error(
+        'Couldn\'t find an active tab. Use the "Browser Tab" node before using this node.',
+      );
+    }
+  }
 }
 
 export default WorkflowRunnerBrowser;

@@ -1,11 +1,10 @@
 {
   "name": "electron-app",
-  "description": "Alt.",
-  "version": "0.0.0",
-  "private": true,
+  "description": "alt.",
+  "version": "0.1.0",
   "type": "module",
   "main": "packages/main/dist/index.js",
-  "repository": "github:kholid060/altdot",
+  "repository": "github:kholid060/alt.",
   "author": {
     "name": "Ahmad Kholid",
     "email": "kholid060@gmail.com"

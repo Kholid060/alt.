@@ -1,18 +1,24 @@
 import { UiSkeleton, UiButton, UiButtonLoader } from '@altdot/ui';
 import { InfiniteData, UseInfiniteQueryResult } from '@tanstack/react-query';
+import clsx from 'clsx';
 import { StoreIcon } from 'lucide-react';
 
 function StoreListItems<
   T extends UseInfiniteQueryResult<InfiniteData<unknown>>,
 >({
   query,
+  className,
   renderList,
+  ...props
 }: {
   query: T;
   renderList: (items: NonNullable<T['data']>) => React.ReactNode;
-}) {
+} & React.DetailsHTMLAttributes<HTMLDivElement>) {
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div
+      className={clsx('grid grid-cols-1 gap-4 md:grid-cols-2', className)}
+      {...props}
+    >
       {query.isPending ? (
         <>
           <UiSkeleton className="h-36" />

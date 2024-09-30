@@ -1,6 +1,6 @@
 # Alt.
 
-An extensible launcher.
+An extendable launcher.
 
 
 https://github.com/user-attachments/assets/7d1d1e6f-77d4-4fd5-8e19-60475c4ef207

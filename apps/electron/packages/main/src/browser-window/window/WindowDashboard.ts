@@ -7,6 +7,8 @@ class WindowDashboard extends WindowBase {
   constructor() {
     super('dashboard', {
       show: false, // Use the 'ready-to-show' event to show the instantiated BrowserWindow.
+      minWidth: 1000,
+      minHeight: 650,
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,

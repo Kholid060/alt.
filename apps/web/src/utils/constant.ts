@@ -14,4 +14,4 @@ export const EXTENSION_COMMAND_TYPE_NAME: Record<ExtensionCommandType, string> =
 
 export const EXT_BANNER_NAME_REGEX = /banner-[0-9]*.png/;
 
-export const APP_TITLE = 'Alt.';
+export const APP_TITLE = 'alt.';

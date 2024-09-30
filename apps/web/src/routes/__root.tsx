@@ -1,3 +1,4 @@
+import AppFooter from '@/components/app/AppFooter';
 import AppHeader from '@/components/app/AppHeader';
 import AppLoadingIndicator, {
   AppLoadingPlaceholder,
@@ -46,6 +47,7 @@ function AppRoot() {
       <Outlet />
       <AppLoadingIndicator />
       <TanStackRouterDevtools />
+      <AppFooter className="mt-72" />
     </DialogProvider>
   );
 }

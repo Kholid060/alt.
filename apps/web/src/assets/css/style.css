@@ -73,3 +73,10 @@
     right: -8%;
   }
 }
+
+[data-rmiz-modal-overlay="visible"] {
+  @apply bg-black/80 !important;
+}
+[data-rmiz-modal-img] {
+  @apply rounded-lg;
+}

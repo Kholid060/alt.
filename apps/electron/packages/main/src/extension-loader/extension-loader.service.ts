@@ -20,14 +20,16 @@ import { eq } from 'drizzle-orm';
 import { APIService } from '../api/api.service';
 import { afetch } from '@altdot/shared';
 import fs from 'fs-extra';
-import AdmZip from 'adm-zip';
-import originalFs from 'original-fs';
-import { EXTENSION_FOLDER } from '/@/common/utils/constant';
+import {
+  DEFAULT_EXTENSION_DIR,
+  EXTENSION_FOLDER,
+} from '/@/common/utils/constant';
 import { LoggerService } from '../logger/logger.service';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
 import { ExtensionSqliteService } from '../extension/extension-sqlite/extension-sqlite.service';
 import { ExtensionWithCommandsModel } from '../extension/extension.interface';
+import { extractExtensionZIP } from './extension-loader-util';
 
 @Injectable()
 export class ExtensionLoaderService {
@@ -238,34 +240,7 @@ export class ExtensionLoaderService {
         responseType: 'arrayBuffer',
       });
 
-      const admZip = new AdmZip(Buffer.from(data), { fs: originalFs });
-
-      const manifestFile = admZip.getEntry('manifest.json');
-      if (!manifestFile || manifestFile.isDirectory) {
-        throw new Error('Manifest file not found');
-      }
-
-      const extDir = path.join(EXTENSION_FOLDER, extensionId);
-      await fs.emptyDir(extDir);
-      await fs.ensureDir(extDir);
-
-      await new Promise<void>((resolve, reject) => {
-        admZip.extractAllToAsync(extDir, true, true, (error) => {
-          if (error) return reject(error);
-
-          resolve();
-        });
-      });
-
-      /**
-       * Create a dummy package.json file to set the type to module
-       * otherwise it will throw "Cannot use import statement outside a module" error
-       * when importing the extension command file in the extension worker
-       */
-      await fs.writeJSON(path.join(extDir, 'package.json'), {
-        type: 'module',
-        name: 'altdot-extension',
-      });
+      const extDir = await extractExtensionZIP(Buffer.from(data), extensionId);
 
       return await this.importExtension(path.join(extDir, 'manifest.json'), {
         extensionId,
@@ -281,5 +256,28 @@ export class ExtensionLoaderService {
       // eslint-disable-next-line drizzle/enforce-delete-with-where
       this.installingIds.delete(extensionId);
     }
+  }
+
+  async installDefaultExtensions(extensionIds: string[]) {
+    await Promise.allSettled(
+      extensionIds.map(async (extensionId) => {
+        const extensionPath = path.join(
+          DEFAULT_EXTENSION_DIR,
+          `${extensionId}.zip`,
+        );
+        if (!fs.existsSync(extensionPath)) return;
+
+        const extDir = await extractExtensionZIP(
+          await fs.readFile(extensionPath),
+          extensionId,
+        );
+        await this.importExtension(path.join(extDir, 'manifest.json'), {
+          extensionId,
+          isLocal: false,
+        });
+
+        if (import.meta.env.PROD) await fs.remove(extensionPath);
+      }),
+    );
   }
 }

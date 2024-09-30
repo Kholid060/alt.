@@ -7,6 +7,7 @@ import googleLogoSvg from '@/assets/logo/google.svg';
 import githubLogoWhiteSvg from '@/assets/logo/github-white.svg';
 import { routeBeforeLoadPipe } from '@/utils/route-utils';
 import { noAuthGuard } from '@/guards/auth.guard';
+import { useHideFooter } from '@/hooks/useHideFooter';
 
 export const Route = createFileRoute('/auth/')({
   component: AuthPage,
@@ -14,6 +15,8 @@ export const Route = createFileRoute('/auth/')({
 });
 
 function AuthPage() {
+  useHideFooter();
+
   function signInWithOAuth(provider: SupabaseOAuthProvider) {
     const redirectTo = new URLSearchParams(window.location.search).get(
       'redirectTo',

@@ -25,3 +25,7 @@ export const GLOBAL_SHORTCUTS = {
 export const __FILENAME = fileURLToPath(import.meta.url);
 
 export const __DIRNAME = path.dirname(__FILENAME);
+
+export const DEFAULT_EXTENSION_DIR = fileURLToPath(
+  new URL('../../../buildResources/extensions', import.meta.url),
+);

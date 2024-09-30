@@ -1,7 +1,6 @@
 import { CUSTOM_SCHEME } from '#common/utils/constant/constant';
 import { app, screen } from 'electron';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import WindowBase, { WindowBaseState } from './WindowBase';
 import { sleep } from '@altdot/shared';
 import { centerWindow } from '/@/common/utils/helper';
@@ -9,8 +8,9 @@ import { LoggerService } from '/@/logger/logger.service';
 
 export const COMMNAND_WINDOW_BOUND = {
   width: 650,
+  height: 500,
   maxWidth: 650,
-  minHeight: 400,
+  minHeight: 300,
   maxHeight: 600,
 } as const;
 
@@ -26,11 +26,12 @@ function windowInitialPos() {
   };
 }
 class WindowCommand extends WindowBase {
+  private lastDisplayId: number | null = null;
+
   constructor(private logger: LoggerService) {
     super('command', {
       show: false, // Use the 'ready-to-show' event to show the instantiated BrowserWindow.
       frame: false,
-      type: 'toolbar',
       resizable: false,
       skipTaskbar: true,
       transparent: true,
@@ -140,11 +141,7 @@ class WindowCommand extends WindowBase {
            * @see https://github.com/nodejs/node/issues/12682
            * @see https://github.com/electron/electron/issues/6869
            */
-          await browserWindow.loadFile(
-            fileURLToPath(
-              new URL('./../../renderer/dist/index.html', import.meta.url),
-            ),
-          );
+          await browserWindow.loadFile('packages/renderer/dist/index.html');
         }
       } catch (error) {
         this.logger.error(['WindowCommand', 'create hook'], error);
@@ -169,11 +166,12 @@ class WindowCommand extends WindowBase {
     const cursorPosition = screen.getCursorScreenPoint();
     const display = screen.getDisplayNearestPoint(cursorPosition);
 
-    if (browserWindow) {
+    if (browserWindow && display.id !== this.lastDisplayId) {
       centerWindow(browserWindow, display, {
         width: COMMNAND_WINDOW_BOUND.width,
-        height: COMMNAND_WINDOW_BOUND.maxHeight,
+        height: COMMNAND_WINDOW_BOUND.height,
       });
+      this.lastDisplayId = display.id;
     }
 
     if (browserWindow && (showWindow || isHidden)) {

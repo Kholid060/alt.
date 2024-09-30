@@ -9,7 +9,7 @@ import ExtensionRunnerBase, {
 import WindowCommand from '/@/browser-window/window/WindowCommand';
 import EventEmitter from 'eventemitter3';
 import fs from 'fs-extra';
-import { MessageChannelMain, utilityProcess } from 'electron';
+import { MessageChannelMain, MessagePortMain, utilityProcess } from 'electron';
 import path from 'path';
 import { filterAppEnv } from '../utils/filter-app-env';
 import { __DIRNAME } from '/@/common/utils/constant';
@@ -25,22 +25,23 @@ class ExtensionRunnerCommandView implements ExtensionRunnerBase {
     readonly eventEmitter: EventEmitter<ExtensionRunnerEvents>,
   ) {}
 
-  async run() {
-    let actionMessagePort: Electron.MessagePortMain | null = null;
-
+  private initViewAction(): null | MessagePortMain {
     const viewActionFilePath = this.payload.commandFilePath + '.action.js';
-    if (fs.existsSync(viewActionFilePath)) {
-      const messageChannel = new MessageChannelMain();
-      actionMessagePort = messageChannel.port1;
+    if (!fs.existsSync(viewActionFilePath)) return null;
 
-      this.process = utilityProcess.fork(
-        path.join(__DIRNAME, './extension-command-view-action.worker.js'),
-        [],
-        { env: filterAppEnv() },
-      );
-      this.process.once('exit', () => {
-        this.process = null;
-      });
+    const messageChannel = new MessageChannelMain();
+
+    this.process = utilityProcess.fork(
+      path.join(__DIRNAME, './extension-command-view-action.worker.js'),
+      [],
+      { env: filterAppEnv() },
+    );
+    this.process.once('exit', () => {
+      this.process = null;
+    });
+    this.process.once('spawn', () => {
+      if (!this.process) return;
+
       this.process.postMessage(
         {
           type: 'start',
@@ -50,9 +51,14 @@ class ExtensionRunnerCommandView implements ExtensionRunnerBase {
         },
         [messageChannel.port2],
       );
-    }
+    });
 
-    this.windowCommand.toggleWindow(true);
+    return messageChannel.port1;
+  }
+
+  async run() {
+    const actionMessagePort = this.initViewAction();
+
     this.windowCommand.postMessage(
       'command-window:open-view',
       {
@@ -61,6 +67,7 @@ class ExtensionRunnerCommandView implements ExtensionRunnerBase {
       },
       actionMessagePort ? [actionMessagePort] : [],
     );
+    this.windowCommand.toggleWindow(true);
   }
 
   stop() {

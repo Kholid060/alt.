@@ -25,12 +25,7 @@ import {
   TrashIcon,
   VariableIcon,
 } from 'lucide-react';
-import {
-  Link,
-  useBlocker,
-  useNavigate,
-  useSearchParams,
-} from 'react-router-dom';
+import { Link, useBlocker, useNavigate } from 'react-router-dom';
 import { useWorkflowEditorStore } from '../../../stores/workflow-editor/workflow-editor.store';
 import { useWorkflowEditor } from '/@/hooks/useWorkflowEditor';
 import { isIPCEventError } from '#packages/common/utils/helper';
@@ -290,8 +285,6 @@ function WorkflowSaveButton() {
   const enableWorkflowSaveBtn =
     useWorkflowEditorStore.use.enableWorkflowSaveBtn();
 
-  const [_searchParams, setSearchParams] = useSearchParams();
-
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -319,11 +312,10 @@ function WorkflowSaveButton() {
   }, [blocker, navigate]);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    params.set('preventCloseWindow', `${enableWorkflowSaveBtn}`);
-
-    setSearchParams(params);
-  }, [enableWorkflowSaveBtn, setSearchParams]);
+    const url = new URL(window.location.href);
+    url.searchParams.set('preventCloseWindow', `${enableWorkflowSaveBtn}`);
+    window.history.replaceState(null, '', url);
+  }, [enableWorkflowSaveBtn]);
 
   const saveWorkflow = useCallback(async () => {
     try {

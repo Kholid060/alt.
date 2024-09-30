@@ -27,6 +27,8 @@ import dayjs from '@/lib/dayjs';
 import { useNativeApp } from '@/hooks/useNativeApp';
 import { Helmet } from 'react-helmet-async';
 import { mergePath } from '@/utils/helper';
+import Zoom from 'react-medium-image-zoom';
+import 'react-medium-image-zoom/dist/styles.css';
 
 function queryData(extensionId: string) {
   return {
@@ -156,12 +158,14 @@ function ExtensionPageBanner({
             key={banner}
             className="relative aspect-video h-64 flex-shrink-0 snap-start overflow-hidden rounded-lg"
           >
-            <img
-              src={banner}
-              loading="lazy"
-              alt={`${extension.title} banner ${index + 1}`}
-              className="h-full w-full object-cover object-center"
-            />
+            <Zoom>
+              <img
+                src={banner}
+                loading="lazy"
+                alt={`${extension.title} banner ${index + 1}`}
+                className="h-full w-full object-cover object-center"
+              />
+            </Zoom>
           </div>
         ))}
       </div>

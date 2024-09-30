@@ -323,6 +323,7 @@ export interface IPCSendEventMainToRenderer {
 }
 
 export interface IPCSendEventRendererToMain {
+  'app:check-update': [];
   'window:toggle-lock': [];
   'extension:stop-execute-command': [runnerId: string];
   'extension:command-exec-change': [

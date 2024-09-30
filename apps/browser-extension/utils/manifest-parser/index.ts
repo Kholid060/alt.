@@ -14,6 +14,11 @@ class ManifestParser {
   static convertToFirefoxCompatibleManifest(manifest: Manifest) {
     const manifestCopy = {
       ...manifest,
+      browser_specific_settings: {
+        gecko: {
+          id: 'kholid060@gmail.com',
+        },
+      },
     } as { [key: string]: unknown };
 
     manifestCopy.background = {

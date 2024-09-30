@@ -32,10 +32,7 @@ import ExtensionRunnerCommandView from './runner/ExtensionRunnerCommandView';
 @Injectable()
 export class ExtensionRunnerService implements OnModuleInit {
   private runningCommands: Map<string, ExtensionRunnerBase> = new Map();
-  private executionResolvers = new Map<
-    string,
-    PromiseWithResolvers<ExtensionAPI.Command.LaunchResult>
-  >();
+  private viewRunnerId: string | null = null;
 
   constructor(
     private dbService: DBService,
@@ -282,6 +279,8 @@ export class ExtensionRunnerService implements OnModuleInit {
         return runner.run({ waitUntilFinished: options?.waitUntilFinished });
       }
       case 'view': {
+        if (this.viewRunnerId) this.stopCommandExecution(this.viewRunnerId);
+
         const windowCommand = await this.browserWindow.getOrCreate('command');
         const runner = new ExtensionRunnerCommandView(
           windowCommand,
@@ -289,6 +288,7 @@ export class ExtensionRunnerService implements OnModuleInit {
           this.executionService.runnerEventEmitter,
         );
         this.runningCommands.set(runner.id, runner);
+        this.viewRunnerId = runner.id;
 
         return runner.run();
       }
@@ -302,6 +302,8 @@ export class ExtensionRunnerService implements OnModuleInit {
   stopCommandExecution(runnerId: string) {
     const runningCommand = this.runningCommands.get(runnerId);
     if (runningCommand) runningCommand.stop();
+
+    if (runnerId === this.viewRunnerId) this.viewRunnerId = null;
 
     // eslint-disable-next-line drizzle/enforce-delete-with-where
     this.runningCommands.delete(runnerId);
