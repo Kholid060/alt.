@@ -25,11 +25,10 @@ class ExtensionRunnerCommandView implements ExtensionRunnerBase {
     readonly eventEmitter: EventEmitter<ExtensionRunnerEvents>,
   ) {}
 
-  private initViewAction(): Promise<null | MessagePortMain> {
+  private initViewAction(): null | MessagePortMain {
     const viewActionFilePath = this.payload.commandFilePath + '.action.js';
-    if (!fs.existsSync(viewActionFilePath)) return Promise.resolve(null);
+    if (!fs.existsSync(viewActionFilePath)) return null;
 
-    const resolver = Promise.withResolvers<MessagePortMain>();
     const messageChannel = new MessageChannelMain();
 
     this.process = utilityProcess.fork(
@@ -52,16 +51,14 @@ class ExtensionRunnerCommandView implements ExtensionRunnerBase {
         },
         [messageChannel.port2],
       );
-      resolver.resolve(messageChannel.port1);
     });
 
-    return resolver.promise;
+    return messageChannel.port1;
   }
 
   async run() {
-    const actionMessagePort = await this.initViewAction();
+    const actionMessagePort = this.initViewAction();
 
-    this.windowCommand.toggleWindow(true);
     this.windowCommand.postMessage(
       'command-window:open-view',
       {
@@ -70,6 +67,7 @@ class ExtensionRunnerCommandView implements ExtensionRunnerBase {
       },
       actionMessagePort ? [actionMessagePort] : [],
     );
+    this.windowCommand.toggleWindow(true);
   }
 
   stop() {
