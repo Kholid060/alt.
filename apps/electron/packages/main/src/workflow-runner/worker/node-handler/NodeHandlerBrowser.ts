@@ -599,3 +599,45 @@ export class NodeHandlerSelectFile extends WorkflowNodeHandler<WORKFLOW_NODE_TYP
 
   destroy() {}
 }
+
+export class NodeHandlerBrowserSelect extends WorkflowNodeHandler<WORKFLOW_NODE_TYPE.BROWSER_SELECT> {
+  constructor() {
+    super(WORKFLOW_NODE_TYPE.BROWSER_SELECT, {
+      dataValidation: [{ key: 'values', name: 'Options', types: ['Array'] }],
+    });
+  }
+
+  async execute({
+    node,
+    runner,
+  }: WorkflowNodeHandlerExecute<WORKFLOW_NODE_TYPE.BROWSER_SELECT>): Promise<WorkflowNodeHandlerExecuteReturn> {
+    runner.browser.checkIfHasBrowser();
+
+    const selector = node.data.selector.trim();
+    if (!selector) throw new Error('Element selector is empty');
+
+    let values: string[] = [];
+    if (node.data.mode === 'json') {
+      const currentVals = Array.isArray(node.data.jsonInput)
+        ? node.data.jsonInput
+        : parseJSON(node.data.jsonInput, node.data.jsonInput);
+      if (!Array.isArray(currentVals)) {
+        throw new Error(
+          `Invalid JSON options. Expected array of strings but got ${getExactType(currentVals)}`,
+        );
+      }
+
+      values = currentVals;
+    } else if (node.data.mode === 'list') {
+      values = node.data.values;
+    }
+
+    await runner.browser.sendMessage('tabs:select', { selector }, values);
+
+    return {
+      value: null,
+    };
+  }
+
+  destroy() {}
+}

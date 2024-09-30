@@ -29,6 +29,7 @@ import {
   BracketsIcon,
   FileUpIcon,
   StickyNoteIcon,
+  ListIcon,
 } from 'lucide-react';
 import { WORKFLOW_NODE_TYPE } from './workflow-nodes-type.const';
 
@@ -457,5 +458,22 @@ export const WORKFLOW_NODES: {
     handleTarget: ['default'],
     handleSource: ['default'],
     type: WORKFLOW_NODE_TYPE.NOTE,
+  },
+  [WORKFLOW_NODE_TYPE.BROWSER_SELECT]: {
+    title: 'Element Select',
+    group: 'Browser',
+    icon: ListIcon,
+    subtitle: 'Browser',
+    defaultData: {
+      values: [],
+      mode: 'list',
+      selector: '',
+      jsonInput: '',
+      isDisabled: false,
+      $nodeType: WORKFLOW_NODE_TYPE.BROWSER_SELECT,
+    },
+    handleTarget: ['default'],
+    handleSource: ['default'],
+    type: WORKFLOW_NODE_TYPE.BROWSER_SELECT,
   },
 } as const;

@@ -296,6 +296,16 @@ export type WorkflowNodeWaitSelector = WorkflowNodeBase<
   WORKFLOW_NODE_TYPE.WAIT_SELECTOR
 >;
 
+export type WorkflowNodeBrowserSelect = WorkflowNodeBase<
+  {
+    selector: string;
+    values: string[];
+    jsonInput: string;
+    mode: 'list' | 'json';
+  },
+  WORKFLOW_NODE_TYPE.BROWSER_SELECT
+>;
+
 export type WorkflowNodeSelectFile = WorkflowNodeBase<
   {
     files: string[];
@@ -335,6 +345,7 @@ export interface WorkflowNodesMap {
   [WORKFLOW_NODE_TYPE.NOTIFICATION]: WorkflowNodeNotification;
   [WORKFLOW_NODE_TYPE.BROWSER_MOUSE]: WorkflowNodeBrowserMouse;
   [WORKFLOW_NODE_TYPE.WAIT_SELECTOR]: WorkflowNodeWaitSelector;
+  [WORKFLOW_NODE_TYPE.BROWSER_SELECT]: WorkflowNodeBrowserSelect;
   [WORKFLOW_NODE_TYPE.GET_ELEMENT_TEXT]: WorkflowNodeGetElementText;
   [WORKFLOW_NODE_TYPE.BROWSER_KEYBOARD]: WorkflowNodeBrowserKeyboard;
   [WORKFLOW_NODE_TYPE.EXECUTE_WORKFLOW]: WorkflowNodeExecuteWorkflow;
@@ -363,6 +374,7 @@ export type WorkflowNodes =
   | WorkflowNodeNotification
   | WorkflowNodeBrowserMouse
   | WorkflowNodeWaitSelector
+  | WorkflowNodeBrowserSelect
   | WorkflowNodeGetElementText
   | WorkflowNodeBrowserKeyboard
   | WorkflowNodeExecuteWorkflow
