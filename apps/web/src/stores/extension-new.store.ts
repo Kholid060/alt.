@@ -45,7 +45,7 @@ export const createExtensionNewStore = (props: ExtensionNewStoreProps) => {
     },
     $reset() {
       // @ts-expect-error clear value
-      set({ banners: [], manifest: {}, categories: [], repo: {} });
+      set({ banners: null, manifest: null, categories: null, repo: null });
     },
     updateState(key, value) {
       set({ [key]: value });

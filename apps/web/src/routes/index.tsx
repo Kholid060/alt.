@@ -249,7 +249,7 @@ function FeatureSection() {
 
 function LandingPage() {
   return (
-    <main className="mt-24">
+    <main className="mt-24 pb-48">
       <Helmet>
         <title>{APP_TITLE}</title>
       </Helmet>
