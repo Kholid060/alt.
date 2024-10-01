@@ -63,7 +63,7 @@ function AboutApp() {
         <UiLogo className="text-4xl" />
       </UiDialog.Header>
       <div>
-        <p>version {versions.app}</p>
+        <p>v{versions.app}</p>
         <p className="text-sm text-muted-foreground">{versions.os}</p>
         <UiButton
           variant="secondary"
@@ -74,7 +74,7 @@ function AboutApp() {
           Check for update
         </UiButton>
       </div>
-      <UiDialog.Footer className="justify-start pt-6">
+      <UiDialog.Footer className="justify-start gap-2 pt-6 md:gap-0">
         <UiButton
           variant="secondary"
           size="sm"
@@ -98,7 +98,7 @@ function AboutApp() {
           <ExternalLinkIcon className="mr-2 size-4" />
           Website
         </UiButton>
-        <div className="flex-grow"></div>
+        <div className="hidden flex-grow md:block"></div>
         <UiButton
           variant="secondary"
           size="sm"
