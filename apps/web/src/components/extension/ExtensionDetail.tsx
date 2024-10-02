@@ -230,21 +230,33 @@ export function ExtensionDetail({
       <div className="col-span-5 mt-4 leading-none md:mt-0">
         <UiLabel>Commands</UiLabel>
       </div>
-      <ul className="col-span-7 space-y-3">
-        {commands.map((command) => (
-          <li key={command.name}>
-            <span className="rounded-full border px-2 py-0.5 text-xs">
-              {EXTENSION_COMMAND_TYPE_NAME[command.type]}
-            </span>
-            <div className="ml-2 mt-px inline-block align-top">
-              <p>{command.title}</p>
-              <p className="leading-tight text-muted-foreground">
-                {command.description}
-              </p>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <table className="col-span-7">
+        <thead>
+          <tr>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {commands.map((command) => (
+            <tr key={command.name}>
+              <td className="pb-3 align-top">
+                <span className="rounded-full border px-2 py-0.5 text-xs">
+                  {EXTENSION_COMMAND_TYPE_NAME[command.type]}
+                </span>
+              </td>
+              <td className="pb-3 align-top">
+                <div className="ml-2 mt-px inline-block align-top">
+                  <p>{command.title}</p>
+                  <p className="text-sm leading-tight text-muted-foreground">
+                    {command.description}
+                  </p>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }

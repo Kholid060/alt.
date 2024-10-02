@@ -1,5 +1,5 @@
 import os from 'os';
-import { app } from 'electron';
+import { app, dialog } from 'electron';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { MessagePortChannelIds } from '#packages/common/interface/message-port-events.interface';
 import { MESSAGE_PORT_CHANNEL_IDS } from '#packages/common/utils/constant/constant';
@@ -9,15 +9,29 @@ import { AppStoreService } from './app/app-store/app-store.service';
 import { ExtensionLoaderService } from './extension-loader/extension-loader.service';
 import { ConfigService } from '@nestjs/config';
 import { AppEnv } from './common/validation/app-env.validation';
+import updater from 'electron-updater';
+import { OnAppReady } from './common/hooks/on-app-ready.hook';
+import { LoggerService } from './logger/logger.service';
 
 @Injectable()
-export class AppService implements OnModuleInit {
+export class AppService implements OnModuleInit, OnAppReady {
   constructor(
+    private logger: LoggerService,
     private appStore: AppStoreService,
     private config: ConfigService<AppEnv, true>,
     private browserWindow: BrowserWindowService,
     private extensionLoader: ExtensionLoaderService,
   ) {}
+
+  onAppReady() {
+    updater.autoUpdater.addListener('update-not-available', () => {
+      dialog.showMessageBox({ message: 'No update available' });
+    });
+    updater.autoUpdater.addListener('error', (error) => {
+      dialog.showMessageBox({ message: 'Error when checking update' });
+      this.logger.error(['app', 'check-update'], error.message);
+    });
+  }
 
   async onModuleInit() {
     const isFirstTime = await this.appStore.get('isFirstTime', true);
@@ -36,6 +50,10 @@ export class AppService implements OnModuleInit {
       app: app.getVersion(),
       os: `${process.platform}@${os.release()}`,
     };
+  }
+
+  checkUpdate() {
+    updater.autoUpdater.checkForUpdatesAndNotify();
   }
 
   async messagePortBridge(

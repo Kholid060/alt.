@@ -3,7 +3,7 @@ import {
   ExtensionNewStoreProps,
   createExtensionNewStore,
 } from '@/stores/extension-new.store';
-import { createContext, useRef } from 'react';
+import { createContext, useEffect, useRef } from 'react';
 
 export const ExtensionNewContext = createContext<ExtensionNewStore | null>(
   null,
@@ -17,6 +17,14 @@ export function ExtensionNewProvider({
   if (!storeRef.current) {
     storeRef.current = createExtensionNewStore(props);
   }
+
+  useEffect(() => {
+    return () => {
+      storeRef.current = undefined;
+    };
+  }, [storeRef]);
+
+  if (!storeRef.current) return null;
 
   return (
     <ExtensionNewContext.Provider value={storeRef.current}>
