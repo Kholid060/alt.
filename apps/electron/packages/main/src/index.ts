@@ -57,24 +57,6 @@ await electronNest.init();
 console.timeEnd('startup');
 
 /**
- * Check for app updates, install it in background and notify user that new version was installed.
- * No reason run this in non-production build.
- * @see https://www.electron.build/auto-update.html#quick-setup-guide
- *
- * Note: It may throw "ENOENT: no such file app-update.yml"
- * if you compile production app without publishing it to distribution server.
- * Like `npm run compile` does. It's ok 😅
- */
-if (import.meta.env.PROD) {
-  app
-    .whenReady()
-    .then(() => updater.autoUpdater.checkForUpdatesAndNotify())
-    .catch((e) =>
-      ElectronLogger._instance.error('Failed check and install updates:', e),
-    );
-}
-
-/**
  * Install React or any other extension in development mode only.
  * Note: You must install the extension in Google Chrome first
  */

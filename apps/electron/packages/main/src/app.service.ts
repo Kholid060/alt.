@@ -15,6 +15,8 @@ import { LoggerService } from './logger/logger.service';
 
 @Injectable()
 export class AppService implements OnModuleInit, OnAppReady {
+  private checkUpdateForFirstTime = true;
+
   constructor(
     private logger: LoggerService,
     private appStore: AppStoreService,
@@ -24,12 +26,24 @@ export class AppService implements OnModuleInit, OnAppReady {
   ) {}
 
   onAppReady() {
+    if (import.meta.env.PROD) {
+      updater.autoUpdater.checkForUpdatesAndNotify().finally(() => {
+        this.checkUpdateForFirstTime = false;
+      });
+    } else {
+      this.checkUpdateForFirstTime = false;
+    }
+
     updater.autoUpdater.addListener('update-not-available', () => {
+      if (this.checkUpdateForFirstTime) return;
+
       dialog.showMessageBox({ message: 'No update available' });
     });
     updater.autoUpdater.addListener('error', (error) => {
-      dialog.showMessageBox({ message: 'Error when checking update' });
       this.logger.error(['app', 'check-update'], error.message);
+
+      if (this.checkUpdateForFirstTime) return;
+      dialog.showMessageBox({ message: 'Error when checking update' });
     });
   }
 

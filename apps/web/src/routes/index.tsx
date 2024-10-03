@@ -48,14 +48,27 @@ function HeadingSection() {
         From launcher to automation. Search apps, access productivity tools, and
         workflow automation within one app
       </p>
-      <div className="mt-20">
+      <div className="mt-20 text-center">
         <UiButton size="lg" onClick={downloadWindows}>
           Download for Windows
         </UiButton>
         <p className="mt-1 text-sm text-muted-foreground">Windows 11</p>
+        <a
+          href="https://www.producthunt.com/posts/alt-4?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-alt&#0045;4"
+          target="_blank"
+          rel="noreferrer"
+          className="mt-12 inline-block"
+        >
+          <img
+            src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=493808&theme=neutral"
+            alt="alt&#0046; - An&#0032;extendable&#0032;launcher | Product Hunt"
+            width="220"
+            height="36"
+          />
+        </a>
       </div>
       <div
-        className="group relative mt-28 aspect-video cursor-pointer overflow-hidden rounded-md ring-8 ring-muted md:mt-64"
+        className="group relative mt-28 aspect-video cursor-pointer overflow-hidden rounded-md ring-8 ring-muted md:mt-56"
         onClick={() => setShowIframe(true)}
       >
         {showIframe ? (

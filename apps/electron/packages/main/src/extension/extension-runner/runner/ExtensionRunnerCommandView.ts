@@ -36,21 +36,18 @@ class ExtensionRunnerCommandView implements ExtensionRunnerBase {
       [],
       { env: filterAppEnv() },
     );
+    this.process.postMessage(
+      {
+        type: 'start',
+        payload: {
+          filePath: viewActionFilePath,
+        } as ExtensionCommandViewActionPayload,
+      },
+      [messageChannel.port2],
+    );
+
     this.process.once('exit', () => {
       this.process = null;
-    });
-    this.process.once('spawn', () => {
-      if (!this.process) return;
-
-      this.process.postMessage(
-        {
-          type: 'start',
-          payload: {
-            filePath: viewActionFilePath,
-          } as ExtensionCommandViewActionPayload,
-        },
-        [messageChannel.port2],
-      );
     });
 
     return messageChannel.port1;
